@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
  */
 public class FSConfigurationService implements ConfigurationService {
     /**
-     * The supported extention for configuration files
+     * The supported extension for configuration files
      */
     private static final String CONFIG_EXT = ".ini";
 
@@ -62,6 +62,17 @@ public class FSConfigurationService implements ConfigurationService {
     @Override
     public String getName() {
         return "Configuration Service - File System";
+    }
+
+    @Override
+    public String getProperty(String name) {
+        if (name == null)
+            return null;
+        if ("identifier".equals(name))
+            return getIdentifier();
+        if ("name".equals(name))
+            return getName();
+        return null;
     }
 
     @Override

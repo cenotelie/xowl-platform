@@ -20,14 +20,14 @@
 
 package org.xowl.platform.services.workflow;
 
-import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.Service;
 
 /**
  * Represents a service that drives a workflow on the platform
  *
  * @author Laurent Wouters
  */
-public interface WorkflowService extends Identifiable {
+public interface WorkflowService extends Service {
     /**
      * Gets the current workflow
      *

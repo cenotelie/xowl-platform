@@ -23,6 +23,7 @@ package org.xowl.platform.services.lts.impl;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.BaseArtifact;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.store.IOUtils;
@@ -31,6 +32,7 @@ import org.xowl.store.rdf.LiteralNode;
 import org.xowl.store.rdf.Node;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
+import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
@@ -52,16 +54,24 @@ public class RemoteLTSService implements TripleStoreService {
     /**
      * The connection to the remote host
      */
-    private final HTTPConnection connection;
+    private HTTPConnection connection;
 
     /**
-     * Initializes this service
+     * Gets the HTTP connection
      *
-     * @param configurationService The configuration service
+     * @return The HTTP connection
      */
-    public RemoteLTSService(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(this);
-        this.connection = new HTTPConnection(configuration.get("endpoint"), configuration.get("login"), configuration.get("password"));
+    private HTTPConnection getConnection() {
+        if (connection == null) {
+            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            if (configurationService == null)
+                return null;
+            Configuration configuration = configurationService.getConfigFor(this);
+            if (configuration == null)
+                return null;
+            connection = new HTTPConnection(configuration.get("endpoint"), configuration.get("login"), configuration.get("password"));
+        }
+        return connection;
     }
 
     @Override
@@ -75,7 +85,21 @@ public class RemoteLTSService implements TripleStoreService {
     }
 
     @Override
+    public String getProperty(String name) {
+        if (name == null)
+            return null;
+        if ("identifier".equals(name))
+            return getIdentifier();
+        if ("name".equals(name))
+            return getName();
+        return null;
+    }
+
+    @Override
     public Result sparql(String query) {
+        HTTPConnection connection = getConnection();
+        if (connection == null)
+            return new ResultFailure("The connection to the remote host is not configured");
         return connection.sparql(query);
     }
 

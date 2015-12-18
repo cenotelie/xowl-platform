@@ -22,6 +22,7 @@ package org.xowl.platform.services.lts;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.Service;
 import org.xowl.store.sparql.Result;
 
 import java.util.Collection;
@@ -31,7 +32,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface TripleStoreService extends Identifiable {
+public interface TripleStoreService extends Service {
     /**
      * Executes a SPARQL command on the triple store
      *

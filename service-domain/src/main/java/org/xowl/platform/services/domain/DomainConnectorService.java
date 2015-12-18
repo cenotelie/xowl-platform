@@ -22,6 +22,7 @@ package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.Service;
 import org.xowl.store.Serializable;
 
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorService extends Identifiable, Serializable {
+public interface DomainConnectorService extends Service, Serializable {
     /**
      * Gets the version number of this connector
      *

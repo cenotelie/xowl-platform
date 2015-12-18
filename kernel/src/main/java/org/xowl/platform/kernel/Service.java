@@ -18,33 +18,19 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.config;
-
-import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.Service;
-import org.xowl.utils.config.Configuration;
-
-import java.io.File;
+package org.xowl.platform.kernel;
 
 /**
- * The configuration service that provides configuration elements to other entities
+ * Represents a service on the platform
  *
  * @author Laurent Wouters
  */
-public interface ConfigurationService extends Service {
+public interface Service extends Identifiable {
     /**
-     * Gets the configuration for the specified entity
+     * Gets the property of this service for the specified name
      *
-     * @param entity An entity
-     * @return The corresponding configuration element
+     * @param name The name of a property
+     * @return The property's value
      */
-    Configuration getConfigFor(Identifiable entity);
-
-    /**
-     * Resolves the specified file name against the configuration repository represented by this service
-     *
-     * @param file The file to resolve
-     * @return The resolved file
-     */
-    File resolve(String file);
+    String getProperty(String name);
 }

@@ -20,6 +20,7 @@
 
 package org.xowl.platform.services.workflow.impl;
 
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.workflow.*;
 import org.xowl.platform.utils.Utils;
@@ -58,7 +59,7 @@ public class XOWLWorkflowService implements WorkflowService {
     private void retrieveWorkflow() {
         if (workflow != null)
             return;
-        ConfigurationService service = Utils.getService(ConfigurationService.class);
+        ConfigurationService service = ServiceUtils.getService(ConfigurationService.class);
         if (service == null)
             return;
         Configuration configuration = service.getConfigFor(this);
@@ -84,6 +85,17 @@ public class XOWLWorkflowService implements WorkflowService {
     @Override
     public String getName() {
         return "xOWL Workflow Service";
+    }
+
+    @Override
+    public String getProperty(String name) {
+        if (name == null)
+            return null;
+        if ("identifier".equals(name))
+            return getIdentifier();
+        if ("name".equals(name))
+            return getName();
+        return null;
     }
 
     @Override

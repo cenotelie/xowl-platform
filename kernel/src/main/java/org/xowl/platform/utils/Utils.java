@@ -38,29 +38,6 @@ import java.nio.charset.Charset;
  */
 public class Utils {
     /**
-     * Gets the first service for the specified service type
-     *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
-     */
-    public static <S> S getService(Class<S> serviceType) {
-        return null;
-    }
-
-    /**
-     * Gets the service for the specified service type with a specific identifier
-     *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param id          The identifier of the service to retrieve
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
-     */
-    public static <S> S getService(Class<S> serviceType, String id) {
-        return null;
-    }
-
-    /**
      * Parses the JSON content
      *
      * @param logger  The logger to use

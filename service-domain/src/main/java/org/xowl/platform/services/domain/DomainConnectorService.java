@@ -21,7 +21,6 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
 import org.xowl.store.Serializable;
 

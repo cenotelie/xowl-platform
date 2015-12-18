@@ -20,18 +20,37 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.Serializable;
+import org.xowl.store.AbstractRepository;
+import org.xowl.store.rdf.Quad;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * An artifact represents the basic unit of information exchanged in the platform
+ * Represents an artifact that is a set of quads
  *
  * @author Laurent Wouters
  */
-public interface Artifact extends Identifiable, Serializable {
+public class ArtifactQuads extends BaseArtifact {
     /**
-     * Gets the content MIME type
-     *
-     * @return The content type
+     * The contained quads
      */
-    String getMIMEType();
+    protected final Collection<Quad> content;
+
+    /**
+     * Initializes this artifact
+     *
+     * @param identifier The identifier for this artifact
+     * @param name       The name for this artifact
+     * @param quads      The quads contained in this artifact
+     */
+    public ArtifactQuads(String identifier, String name, Collection<Quad> quads) {
+        super(identifier, name);
+        this.content = Collections.unmodifiableCollection(quads);
+    }
+
+    @Override
+    public String getMIMEType() {
+        return AbstractRepository.SYNTAX_NQUADS;
+    }
 }

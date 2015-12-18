@@ -21,18 +21,13 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.Quad;
-
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * The base implementation of an artifact
  *
  * @author Laurent Wouters
  */
-public class BaseArtifact implements Artifact {
+public abstract class BaseArtifact implements Artifact {
     /**
      * The identifier for this baseline
      */
@@ -41,21 +36,16 @@ public class BaseArtifact implements Artifact {
      * The name of this baseline
      */
     protected final String name;
-    /**
-     * The quads containing the serialized requirements
-     */
-    protected final Collection<Quad> quads;
 
     /**
      * Initializes this data package
      *
-     * @param identifier The identifier for the
-     * @param quads      The serialized requirements
+     * @param identifier The identifier for this artifact
+     * @param name       The name for this artifact
      */
-    public BaseArtifact(String identifier, String name, Collection<Quad> quads) {
+    public BaseArtifact(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
-        this.quads = Collections.unmodifiableCollection(quads);
     }
 
     @Override
@@ -66,21 +56,6 @@ public class BaseArtifact implements Artifact {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public Collection<Quad> getMetadata() {
-        return quads;
-    }
-
-    @Override
-    public String getMIMEType() {
-        return null;
-    }
-
-    @Override
-    public InputStream getStream() {
-        return null;
     }
 
     @Override

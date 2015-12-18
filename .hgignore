@@ -1,0 +1,7 @@
+syntax: glob
+*/out/*
+*/target/*
+*/.idea/*
+*.iml
+.idea/*
+target/*

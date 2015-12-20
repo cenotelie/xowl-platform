@@ -22,7 +22,7 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.services.lts.impl.RemoteLTSService;
+import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
 
 import java.util.Hashtable;
 
@@ -34,7 +34,7 @@ import java.util.Hashtable;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(TripleStoreService.class, new RemoteLTSService(), new Hashtable<String, Object>());
+        bundleContext.registerService(TripleStoreService.class, new RemoteXOWLStoreService(), new Hashtable<String, Object>());
     }
 
     @Override

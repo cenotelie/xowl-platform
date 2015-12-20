@@ -20,12 +20,7 @@
 
 package org.xowl.platform.services.lts;
 
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
-import org.xowl.store.sparql.Result;
-
-import java.util.Collection;
 
 /**
  * Represents a triple-store service for the platform
@@ -34,49 +29,20 @@ import java.util.Collection;
  */
 public interface TripleStoreService extends Service {
     /**
-     * Executes a SPARQL command on the triple store
+     * Gets the live store that contains the currently active artifacts
+     * Reasoning is expected to be activated on this store.
+     * This store cannot be expected to be persistent.
      *
-     * @param query The SPARQL command
-     * @return The result
+     * @return The live store
      */
-    Result sparql(String query);
+    TripleStore getLiveStore();
 
     /**
-     * Sends the metadata of an artifact to the triple store
+     * Gets the long-term store that contains a copy of all the artifacts managed by the platform
+     * Reasoning is not expected to be activated on this store.
+     * This store is expected to be persistent.
      *
-     * @param artifact The artifact
-     * @return Whether the operation succeeded
+     * @return The long-term store
      */
-    boolean store(Artifact artifact);
-
-    /**
-     * Deletes an artifact from the triple store
-     *
-     * @param artifact The artifact
-     * @return Whether the operation succeeded
-     */
-    boolean delete(Artifact artifact);
-
-    /**
-     * Deletes an artifact from the triple store
-     *
-     * @param identifier The identifier of the artifact to delete
-     * @return Whether the operation succeeded
-     */
-    boolean delete(String identifier);
-
-    /**
-     * Retrieves the artifact from the triple store
-     *
-     * @param identifier The identifier of a artifact
-     * @return The artifact, or null it is unknown or cannot be retrieved
-     */
-    Artifact retrieve(String identifier);
-
-    /**
-     * Lists the artifacts in the triple store
-     *
-     * @return The list of the stored artifacts
-     */
-    Collection<Artifact> listArtifacts();
+    TripleStore getLongTermStore();
 }

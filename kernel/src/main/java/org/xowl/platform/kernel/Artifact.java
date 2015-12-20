@@ -21,17 +21,33 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.store.Serializable;
+import org.xowl.store.rdf.Quad;
+
+import java.util.Collection;
 
 /**
- * An artifact represents the basic unit of information exchanged in the platform
+ * An artifact represents a package of data in the form of quads that can be managed by the federation platform
+ * An artifact contains two sets of quads:
+ * - Metadata quads that express knowledge about the artifact itself.
+ *   Metadata quads must be contained in the platform artifact graph.
+ *   Metadata quads must have the artifact's identifier as subject.
+ * - Content quads, i.e. the payload.
+ *   Content quads must be contained in the graph that is represented by the artifact's identifier.
  *
  * @author Laurent Wouters
  */
 public interface Artifact extends Identifiable, Serializable {
     /**
-     * Gets the content MIME type
+     * Gets the metadata quads
      *
-     * @return The content type
+     * @return The metadata quads
      */
-    String getMIMEType();
+    Collection<Quad> getMetadata();
+
+    /**
+     * Gets the payload content quads
+     *
+     * @return The payload content quads
+     */
+    Collection<Quad> getContent();
 }

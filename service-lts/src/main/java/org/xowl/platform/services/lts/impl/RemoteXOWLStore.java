@@ -4,38 +4,39 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Laurent Wouters - lwouters@xowl.org
+ * Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
 package org.xowl.platform.services.lts.impl;
 
 import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.kernel.ArtifactDeferred;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
-import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.LiteralNode;
-import org.xowl.store.rdf.Node;
-import org.xowl.store.rdf.Quad;
+import org.xowl.store.rdf.*;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
+import org.xowl.store.sparql.ResultSolutions;
+import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
 import org.xowl.utils.config.Configuration;
+import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -44,15 +45,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implements a triple store service that is backed by a remote store connected to via HTTP
+ * Represents a remote xOWL store for this platform
  *
  * @author Laurent Wouters
  */
-public class RemoteLTSService implements TripleStoreService {
+public class RemoteXOWLStore implements TripleStore {
+    /**
+     * The parent service
+     */
+    private final RemoteXOWLStoreService service;
+    /**
+     * The name of this store
+     */
+    private final String name;
     /**
      * The connection to the remote host
      */
     private HTTPConnection connection;
+
+    /**
+     * Initializes this store
+     *
+     * @param service The parent service
+     * @param name    The name of this store
+     */
+    public RemoteXOWLStore(RemoteXOWLStoreService service, String name) {
+        this.service = service;
+        this.name = name;
+    }
 
     /**
      * Gets the HTTP connection
@@ -64,33 +84,12 @@ public class RemoteLTSService implements TripleStoreService {
             ConfigurationService configurationService = ServiceUtils.getOSGIService(ConfigurationService.class);
             if (configurationService == null)
                 return null;
-            Configuration configuration = configurationService.getConfigFor(this);
+            Configuration configuration = configurationService.getConfigFor(service);
             if (configuration == null)
                 return null;
-            connection = new HTTPConnection(configuration.get("endpoint"), configuration.get("login"), configuration.get("password"));
+            connection = new HTTPConnection(configuration.get(name, "endpoint"), configuration.get(name, "login"), configuration.get(name, "password"));
         }
         return connection;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return RemoteLTSService.class.getCanonicalName();
-    }
-
-    @Override
-    public String getName() {
-        return "Remote Triple Store Service";
-    }
-
-    @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
     }
 
     @Override
@@ -103,14 +102,23 @@ public class RemoteLTSService implements TripleStoreService {
 
     @Override
     public boolean store(Artifact artifact) {
+        HTTPConnection connection = getConnection();
+        if (connection == null)
+            return false;
+
         StringWriter writer = new StringWriter();
         writer.write("INSERT DATA { GRAPH <");
         writer.write(IOUtils.escapeStringW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ");
         NTripleSerializer serializer = new NTripleSerializer(writer);
-        //serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
+        serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
+        writer.write(" } }; INSERT DATA { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
+        writer.write("> {");
+        serializer.serialize(Logger.DEFAULT, artifact.getContent().iterator());
         writer.write(" } }");
-        Result result = sparql(writer.toString());
+
+        Result result = connection.sparql(writer.toString());
         return result.isSuccess();
     }
 
@@ -121,17 +129,36 @@ public class RemoteLTSService implements TripleStoreService {
 
     @Override
     public boolean delete(String identifier) {
-        Result result = sparql("DELETE WHERE { GRAPH <" + KernelSchema.GRAPH_ARTIFACTS + "> { <" + IOUtils.escapeStringW3C(identifier) + "> ?p ?o } }");
+        HTTPConnection connection = getConnection();
+        if (connection == null)
+            return false;
+
+        StringWriter writer = new StringWriter();
+        writer.write("DELETE WHERE { GRAPH <");
+        writer.write(IOUtils.escapeStringW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { <");
+        writer.write(IOUtils.escapeStringW3C(identifier));
+        writer.write("> ?p ?o } }; DROP SILENT GRAPH <");
+        writer.write(IOUtils.escapeStringW3C(identifier));
+        writer.write(">");
+
+        Result result = connection.sparql(writer.toString());
         return result.isSuccess();
     }
 
     @Override
     public Artifact retrieve(String identifier) {
+        HTTPConnection connection = getConnection();
+        if (connection == null)
+            return null;
+
         Result result = sparql("DESCRIBE <" + IOUtils.escapeStringW3C(identifier) + ">");
         if (result.isFailure())
             return null;
-        Collection<Quad> quads = ((ResultQuads) result).getQuads();
-        return buildArtifact(identifier, quads);
+        Collection<Quad> metadata = ((ResultQuads) result).getQuads();
+        if (metadata.isEmpty())
+            return null;
+        return buildArtifact(metadata);
     }
 
     @Override
@@ -154,7 +181,7 @@ public class RemoteLTSService implements TripleStoreService {
             }
         }
         for (Map.Entry<IRINode, Collection<Quad>> entry : data.entrySet()) {
-            result.add(buildArtifact(entry.getKey().getIRIValue(), entry.getValue()));
+            result.add(buildArtifact(entry.getValue()));
         }
         return result;
     }
@@ -162,22 +189,28 @@ public class RemoteLTSService implements TripleStoreService {
     /**
      * Builds the default artifact from the specified identifier and set of metadata
      *
-     * @param identifier The identifier
-     * @param metadata   The metadata
+     * @param metadata The metadata
      * @return The artifact
      */
-    private Artifact buildArtifact(String identifier, Collection<Quad> metadata) {
-        String name = "";
-        for (Quad quad : metadata) {
-            if (quad.getProperty().getNodeType() == Node.TYPE_IRI
-                    && KernelSchema.HAS_NAME.equals(((IRINode) quad.getProperty()).getIRIValue())
-                    && quad.getSubject().getNodeType() == Node.TYPE_IRI
-                    && identifier.equals(((IRINode) quad.getSubject()).getIRIValue())
-                    && quad.getObject().getNodeType() == Node.TYPE_LITERAL) {
-                name = ((LiteralNode) quad.getObject()).getLexicalValue();
+    private Artifact buildArtifact(Collection<Quad> metadata) {
+        return new ArtifactDeferred(metadata) {
+            @Override
+            protected Collection<Quad> load() {
+                Result result = sparql("SELECT ?s ?p ?o WHERE  { GRAPH <" + IOUtils.escapeStringW3C(identifier) + "> { ?s ?p ?o } }");
+                if (result.isFailure())
+                    return null;
+                ResultSolutions solutions = ((ResultSolutions) result);
+                Collection<Quad> quads = new ArrayList<>(solutions.getSolutions().size());
+                CachedNodes nodes = new CachedNodes();
+                IRINode graph = nodes.getIRINode(identifier);
+                for (QuerySolution solution : solutions.getSolutions()) {
+                    quads.add(new Quad(graph,
+                            (SubjectNode) solution.get("s"),
+                            (Property) solution.get("p"),
+                            solution.get("o")));
+                }
+                return quads;
             }
-        }
-        //return new BaseArtifact(identifier, name, metadata);
-        return null;
+        };
     }
 }

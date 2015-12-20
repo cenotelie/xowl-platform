@@ -61,7 +61,7 @@ public class FSConfigurationService implements ConfigurationService {
 
     @Override
     public String getName() {
-        return "Configuration Service - File System";
+        return "xOWL Federation Platform - Configuration Service";
     }
 
     @Override

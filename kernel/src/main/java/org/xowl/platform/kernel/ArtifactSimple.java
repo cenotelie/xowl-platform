@@ -21,13 +21,21 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.store.IOUtils;
+import org.xowl.store.rdf.IRINode;
+import org.xowl.store.rdf.LiteralNode;
+import org.xowl.store.rdf.Node;
+import org.xowl.store.rdf.Quad;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * The base implementation of an artifact
+ * Implements a simple artifacts that contains all its data
  *
  * @author Laurent Wouters
  */
-public abstract class BaseArtifact implements Artifact {
+public class ArtifactSimple implements Artifact {
     /**
      * The identifier for this baseline
      */
@@ -36,16 +44,39 @@ public abstract class BaseArtifact implements Artifact {
      * The name of this baseline
      */
     protected final String name;
+    /**
+     * The metadata quads
+     */
+    protected final Collection<Quad> metadata;
+    /**
+     * The payload quads
+     */
+    protected final Collection<Quad> content;
 
     /**
      * Initializes this data package
      *
-     * @param identifier The identifier for this artifact
-     * @param name       The name for this artifact
+     * @param metadata The metadata quads
+     * @param content  The payload quads
      */
-    public BaseArtifact(String identifier, String name) {
+    public ArtifactSimple(Collection<Quad> metadata, Collection<Quad> content) {
+        String identifier = "";
+        String name = "";
+        for (Quad quad : metadata) {
+            if (quad.getProperty().getNodeType() == Node.TYPE_IRI
+                    && KernelSchema.HAS_NAME.equals(((IRINode) quad.getProperty()).getIRIValue())
+                    && quad.getSubject().getNodeType() == Node.TYPE_IRI
+                    && identifier.equals(((IRINode) quad.getSubject()).getIRIValue())
+                    && quad.getObject().getNodeType() == Node.TYPE_LITERAL) {
+                name = ((LiteralNode) quad.getObject()).getLexicalValue();
+            }
+            if (identifier.isEmpty())
+                identifier = ((IRINode) quad.getSubject()).getIRIValue();
+        }
         this.identifier = identifier;
         this.name = name;
+        this.metadata = Collections.unmodifiableCollection(new ArrayList<>(metadata));
+        this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
     }
 
     @Override
@@ -70,7 +101,17 @@ public abstract class BaseArtifact implements Artifact {
                 + "\", \"name\":"
                 + IOUtils.escapeStringJSON(name)
                 + "\", \"type\": \""
-                + IOUtils.escapeStringJSON(getMIMEType())
+                + IOUtils.escapeStringJSON(Artifact.class.getCanonicalName())
                 + "\"}";
+    }
+
+    @Override
+    public Collection<Quad> getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public Collection<Quad> getContent() {
+        return content;
     }
 }

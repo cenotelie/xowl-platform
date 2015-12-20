@@ -6,34 +6,22 @@
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
-	<artifactId>xowl-service-server</artifactId>
+	<artifactId>xowl-dependencies</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.1.0-SNAPSHOT</version>
-	<name>xOWL Federation - Service Server</name>
-	<description>The server service</description>
+	<name>xOWL Federation - Dependencies</name>
+	<description>The embedded dependencies for the platform</description>
 	<dependencies>
 		<dependency>
-			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-kernel</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<groupId>xml-resolver</groupId>
+			<artifactId>xml-resolver</artifactId>
+			<version>1.2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.util.tracker</artifactId>
-			<version>1.5.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.service.http</artifactId>
-			<version>1.2.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<groupId>org.xowl.infra</groupId>
+			<artifactId>xowl-store</artifactId>
+			<version>1.0-beta2</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -47,7 +35,10 @@
 				<configuration>
 					<excludeDependencies>*;scope=provided|runtime</excludeDependencies>
 					<instructions>
-						<Bundle-Activator>org.xowl.platform.services.server.Activator</Bundle-Activator>
+						<Import-Package>!sun.io,javax.net.ssl</Import-Package>
+						<Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Export-Package>*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -59,7 +59,7 @@ public class XOWLWorkflowService implements WorkflowService {
     private void retrieveWorkflow() {
         if (workflow != null)
             return;
-        ConfigurationService service = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService service = ServiceUtils.getOSGIService(ConfigurationService.class);
         if (service == null)
             return;
         Configuration configuration = service.getConfigFor(this);

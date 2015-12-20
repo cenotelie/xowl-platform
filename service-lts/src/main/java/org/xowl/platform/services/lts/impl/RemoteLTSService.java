@@ -21,7 +21,6 @@
 package org.xowl.platform.services.lts.impl;
 
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.BaseArtifact;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
@@ -37,7 +36,6 @@ import org.xowl.store.sparql.ResultQuads;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
 import org.xowl.utils.config.Configuration;
-import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -63,7 +61,7 @@ public class RemoteLTSService implements TripleStoreService {
      */
     private HTTPConnection getConnection() {
         if (connection == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            ConfigurationService configurationService = ServiceUtils.getOSGIService(ConfigurationService.class);
             if (configurationService == null)
                 return null;
             Configuration configuration = configurationService.getConfigFor(this);
@@ -110,7 +108,7 @@ public class RemoteLTSService implements TripleStoreService {
         writer.write(IOUtils.escapeStringW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ");
         NTripleSerializer serializer = new NTripleSerializer(writer);
-        serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
+        //serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
         writer.write(" } }");
         Result result = sparql(writer.toString());
         return result.isSuccess();
@@ -179,6 +177,7 @@ public class RemoteLTSService implements TripleStoreService {
                 name = ((LiteralNode) quad.getObject()).getLexicalValue();
             }
         }
-        return new BaseArtifact(identifier, name, metadata);
+        //return new BaseArtifact(identifier, name, metadata);
+        return null;
     }
 }

@@ -1,6 +1,6 @@
 FROM java:8
 MAINTAINER Laurent Wouters <lwouters@xowl.org>
-LABEL description="Docker image for the xOWL federation platform"
+LABEL description "Docker image for the xOWL federation platform"
 EXPOSE 8080
 EXPOSE 8443
 ENTRYPOINT ["java", "-Dxowl.conf.dir=/config", "-jar", "felix-framework-5.4.0/bin/felix.jar", "-b", "felix-framework-5.4.0/bundle"]

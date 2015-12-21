@@ -29,7 +29,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Base implemented of a domain connector
+ * Base implementation of a domain connector
  *
  * @author Laurent Wouters
  */
@@ -111,7 +111,9 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{\"type\": \"connector\", \"identifier\": \"");
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(DomainConnectorService.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));

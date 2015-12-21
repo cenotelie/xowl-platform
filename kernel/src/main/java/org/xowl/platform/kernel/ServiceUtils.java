@@ -27,8 +27,6 @@ import org.osgi.framework.ServiceReference;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 /**
  * Utility APIs for services
@@ -36,50 +34,6 @@ import java.util.ServiceLoader;
  * @author Laurent Wouters
  */
 public class ServiceUtils {
-    /**
-     * Gets the first service for the specified service type (using Java service loader)
-     *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
-     */
-    public static <S extends Service> S getJavaService(Class<S> serviceType) {
-        Iterator<S> iterator = ServiceLoader.load(serviceType).iterator();
-        return iterator.hasNext() ? iterator.next() : null;
-    }
-
-    /**
-     * Gets all the services for the specified service type (using Java service loader)
-     *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param <S>         The type of service
-     * @return The services
-     */
-    public static <S extends Service> Collection<S> getJavaServices(Class<S> serviceType) {
-        Collection<S> result = new ArrayList<>();
-        for (S service : ServiceLoader.load(serviceType))
-            result.add(service);
-        return result;
-    }
-
-    /**
-     * Gets the service for the specified service type with a specific identifier (using Java service loader)
-     *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param id          The identifier of the service to retrieve
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
-     */
-    public static <S extends Service> S getJavaService(Class<S> serviceType, String id) {
-        if (id == null)
-            return getJavaService(serviceType);
-        for (S service : ServiceLoader.load(serviceType)) {
-            if (id.equals(service.getIdentifier()))
-                return service;
-        }
-        return null;
-    }
-
     /**
      * Gets the first service for the specified service type (using OSGI framework)
      *

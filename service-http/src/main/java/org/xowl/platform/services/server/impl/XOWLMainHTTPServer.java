@@ -20,18 +20,13 @@
 
 package org.xowl.platform.services.server.impl;
 
-import org.xowl.platform.services.server.ServerService;
-import org.xowl.store.sparql.Result;
-import org.xowl.utils.Files;
-import org.xowl.utils.logging.Logger;
+import org.xowl.platform.services.server.HTTPServerService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 
 /**
@@ -46,7 +41,7 @@ import java.net.HttpURLConnection;
  *
  * @author Laurent Wouters
  */
-public class XOWLMainServer extends HttpServlet implements ServerService {
+public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService {
     /**
      * The JSON MIME type
      */
@@ -54,7 +49,7 @@ public class XOWLMainServer extends HttpServlet implements ServerService {
 
     @Override
     public String getIdentifier() {
-        return XOWLMainServer.class.getCanonicalName();
+        return XOWLMainHTTPServer.class.getCanonicalName();
     }
 
     @Override

@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.xowl.platform.services.server.impl.XOWLMainServer;
+import org.xowl.platform.services.server.impl.XOWLMainHTTPServer;
 import org.xowl.utils.logging.Logger;
 
 import java.util.Hashtable;
@@ -43,7 +43,7 @@ public class Activator implements BundleActivator {
     /**
      * The server
      */
-    private XOWLMainServer server;
+    private XOWLMainHTTPServer server;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
@@ -66,9 +66,9 @@ public class Activator implements BundleActivator {
                 return httpService;
             }
         };
-        server = new XOWLMainServer();
+        server = new XOWLMainHTTPServer();
         httpTracker.open();
-        bundleContext.registerService(ServerService.class, server, new Hashtable<String, Object>());
+        bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
     }
 
     @Override

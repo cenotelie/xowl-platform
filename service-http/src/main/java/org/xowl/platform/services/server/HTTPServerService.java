@@ -27,5 +27,5 @@ import org.xowl.platform.kernel.Service;
  *
  * @author Laurent Wouters
  */
-public interface ServerService extends Service {
+public interface HTTPServerService extends Service {
 }

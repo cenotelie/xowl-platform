@@ -24,5 +24,5 @@ package org.xowl.platform.services.server;
  * Interface for services that offer an HTTP interface
  * @author Laurent Wouters
  */
-public interface ServedService {
+public interface HTTPServedService {
 }

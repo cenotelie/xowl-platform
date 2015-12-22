@@ -22,6 +22,7 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
 
 import java.util.Hashtable;
@@ -34,7 +35,12 @@ import java.util.Hashtable;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(TripleStoreService.class, new RemoteXOWLStoreService(), new Hashtable<String, Object>());
+        RemoteXOWLStoreService service = new RemoteXOWLStoreService();
+        Hashtable<String, Object> properties = new Hashtable<>();
+        properties.put("id", service.getIdentifier());
+        properties.put("uri", "sparql");
+        bundleContext.registerService(TripleStoreService.class, service, properties);
+        bundleContext.registerService(ServiceHttpServed.class, service, properties);
     }
 
     @Override

@@ -18,11 +18,27 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.server;
+package org.xowl.platform.kernel;
+
+import org.xowl.platform.utils.HttpResponse;
+
+import java.util.Map;
 
 /**
  * Interface for services that offer an HTTP interface
+ *
  * @author Laurent Wouters
  */
-public interface HTTPServedService {
+public interface ServiceHttpServed extends Service {
+    /**
+     * Responds to a message
+     *
+     * @param method      The HTTP method
+     * @param parameters  The request parameters
+     * @param contentType The content type, if any
+     * @param content     The content, if any
+     * @param accept      The Accept header, if any
+     * @return The response
+     */
+    HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
 }

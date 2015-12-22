@@ -59,7 +59,7 @@ public class XOWLWorkflowService implements WorkflowService {
     private void retrieveWorkflow() {
         if (workflow != null)
             return;
-        ConfigurationService service = ServiceUtils.getOSGIService(ConfigurationService.class);
+        ConfigurationService service = ServiceUtils.getService(ConfigurationService.class);
         if (service == null)
             return;
         Configuration configuration = service.getConfigFor(this);
@@ -84,7 +84,7 @@ public class XOWLWorkflowService implements WorkflowService {
 
     @Override
     public String getName() {
-        return "xOWL Workflow Service";
+        return "xOWL Federation Platform - Workflow Service";
     }
 
     @Override

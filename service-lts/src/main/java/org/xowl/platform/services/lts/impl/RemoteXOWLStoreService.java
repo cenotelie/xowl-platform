@@ -22,6 +22,14 @@ package org.xowl.platform.services.lts.impl;
 
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.utils.HttpResponse;
+import org.xowl.store.sparql.Result;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * Implements a triple store service that is backed by a remote store connected to via HTTP
@@ -70,6 +78,30 @@ public class RemoteXOWLStoreService implements TripleStoreService {
         if ("name".equals(name))
             return getName();
         return null;
+    }
+
+    @Override
+    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        if (content == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        String request = new String(content, Charset.forName("UTF-8"));
+        Result result = storeLive.sparql(request);
+        String responseType = Result.SYNTAX_JSON;
+        switch (accept) {
+            case Result.SYNTAX_CSV:
+            case Result.SYNTAX_TSV:
+            case Result.SYNTAX_XML:
+            case Result.SYNTAX_JSON:
+                responseType = accept;
+                break;
+        }
+        StringWriter writer = new StringWriter();
+        try {
+            result.print(writer, responseType);
+        } catch (IOException exception) {
+            // cannot happen
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString().getBytes(Charset.forName("UTF-8")));
     }
 
     @Override

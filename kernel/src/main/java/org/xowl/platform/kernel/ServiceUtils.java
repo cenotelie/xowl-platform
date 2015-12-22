@@ -24,6 +24,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.xowl.utils.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,13 +36,13 @@ import java.util.Collection;
  */
 public class ServiceUtils {
     /**
-     * Gets the first service for the specified service type (using OSGI framework)
+     * Gets the first service for the specified service type
      *
      * @param serviceType A type of service as the Java class that must be implemented
      * @param <S>         The type of service
      * @return The service, or null if there is none
      */
-    public static <S extends Service> S getOSGIService(Class<S> serviceType) {
+    public static <S extends Service> S getService(Class<S> serviceType) {
         BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
         ServiceReference reference = context.getServiceReference(serviceType);
         if (reference == null)
@@ -52,13 +53,13 @@ public class ServiceUtils {
     }
 
     /**
-     * Gets the first service for the specified service type (using OSGI framework)
+     * Gets the first service for the specified service type
      *
      * @param serviceType A type of service as the Java class that must be implemented
      * @param <S>         The type of service
      * @return The service, or null if there is none
      */
-    public static <S extends Service> Collection<S> getOSGIServices(Class<S> serviceType) {
+    public static <S extends Service> Collection<S> getServices(Class<S> serviceType) {
         Collection<S> result = new ArrayList<>();
         BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
         try {
@@ -78,29 +79,30 @@ public class ServiceUtils {
     }
 
     /**
-     * Gets the service for the specified service type with a specific identifier (using OSGI framework)
+     * Gets the service for the specified service type with a a specific parameter
      *
      * @param serviceType A type of service as the Java class that must be implemented
-     * @param id          The identifier of the service to retrieve
+     * @param paramName   The name of the parameter to match
+     * @param paramValue  The value of the parameter to match
      * @param <S>         The type of service
      * @return The service, or null if there is none
      */
-    public static <S extends Service> S getOSGIService(Class<S> serviceType, String id) {
+    public static <S extends Service> S getService(Class<S> serviceType, String paramName, String paramValue) {
+        S result = null;
         BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
         try {
-            Collection references = context.getServiceReferences(serviceType, null);
+            Collection references = context.getServiceReferences(serviceType, "(" + paramName + "=" + paramValue + ")");
             for (Object obj : references) {
                 ServiceReference reference = (ServiceReference) obj;
                 if (reference == null)
                     continue;
-                S service = (S) context.getService(reference);
-                if (id.equals(service.getIdentifier()))
-                    return service;
+                if (result == null)
+                    result = (S) context.getService(reference);
+                context.ungetService(reference);
             }
-            return null;
         } catch (InvalidSyntaxException exception) {
-            // cannot happen
-            return null;
+            Logger.DEFAULT.error(exception);
         }
+        return result;
     }
 }

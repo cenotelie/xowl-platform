@@ -20,33 +20,28 @@
 
 package org.xowl.platform.services.server.impl;
 
+import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.server.HTTPServerService;
+import org.xowl.platform.utils.HttpResponse;
+import org.xowl.utils.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
 /**
  * The main server for the platform
- * HTTP API outline:
- * GET:  /connectors            Get the list of the connectors
- * GET:  /artifacts             Get the list of the maintained artifacts
- * GET:  /workflow              Get the definition of the workflow
- * POST: /workflow?action=xx    Triggers the specified workflow activity
- * POST: /sparql                Executes a SPARQL command
- * POST: /connector?id=xx       Posts a message to a connector identified by the provided ID
  *
  * @author Laurent Wouters
  */
 public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService {
-    /**
-     * The JSON MIME type
-     */
-    private static final String MIME_TYPE_JSON = "application/json";
-
     @Override
     public String getIdentifier() {
         return XOWLMainHTTPServer.class.getCanonicalName();
@@ -54,7 +49,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
     @Override
     public String getName() {
-        return "xOWL Main Server";
+        return "xOWL Federation Platform - HTTP Server Service";
     }
 
     @Override
@@ -73,14 +68,98 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         doCORSPreflight(response);
     }
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handleRequest("GET", request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handleRequest("POST", request, response);
+    }
+
+    /**
+     * Handles a request
+     *
+     * @param method   The HTTP method
+     * @param request  The request
+     * @param response The response
+     */
+    private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
+        String uri = request.getRequestURI();
+        if (uri.startsWith("/service/")) {
+            ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring("/service/".length()));
+            if (service == null) {
+                addCORSHeader(response);
+                response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+            } else {
+                doServedService(service, method, request, response);
+            }
+        } else {
+            uri = uri.substring(1);
+            ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "uri", uri);
+            if (service == null) {
+                addCORSHeader(response);
+                response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+            } else {
+                doServedService(service, method, request, response);
+            }
+        }
+    }
+
     /**
      * Responds to a CORS pre-flight request
      *
      * @param response The HTTP response
      */
-    protected void doCORSPreflight(HttpServletResponse response) {
+    private void doCORSPreflight(HttpServletResponse response) {
         addCORSHeader(response);
         response.setStatus(HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * Responds on a request for a served service
+     *
+     * @param service  The served service
+     * @param method   The HTTP method
+     * @param request  The request
+     * @param response The response
+     */
+    private void doServedService(ServiceHttpServed service, String method, HttpServletRequest request, HttpServletResponse response) {
+        byte[] content = null;
+        if (request.getContentLength() > 0) {
+            try (InputStream is = request.getInputStream()) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int read = is.read(buffer);
+                while (read > 0) {
+                    output.write(buffer, 0, read);
+                    read = is.read(buffer);
+                }
+                content = output.toByteArray();
+            } catch (IOException exception) {
+                Logger.DEFAULT.error(exception);
+            }
+        }
+        HttpResponse serviceResponse = service.onMessage(method,
+                request.getParameterMap(),
+                request.getContentType(),
+                content,
+                request.getHeader("Accept"));
+        if (serviceResponse == null) {
+            response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            return;
+        }
+        response.setStatus(serviceResponse.code);
+        if (serviceResponse.contentType != null)
+            response.setContentType(serviceResponse.contentType);
+        if (serviceResponse.content != null) {
+            try (OutputStream os = response.getOutputStream()) {
+                os.write(serviceResponse.content);
+            } catch (IOException exception) {
+                Logger.DEFAULT.error(exception);
+            }
+        }
     }
 
     /**
@@ -88,7 +167,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      *
      * @param response The response to add headers to
      */
-    protected void addCORSHeader(HttpServletResponse response) {
+    private void addCORSHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Cache-Control");
         response.setHeader("Access-Control-Allow-Origin", "*");

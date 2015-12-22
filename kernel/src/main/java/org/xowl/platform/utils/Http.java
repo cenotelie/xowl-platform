@@ -23,7 +23,10 @@ package org.xowl.platform.utils;
 import org.xowl.utils.logging.Logger;
 
 import javax.net.ssl.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -146,20 +149,18 @@ public class Http {
             return null;
         }
 
-        String result;
         String resultType = connection.getContentType();
+        byte[] result;
         //Get Response
         try (InputStream is = connection.getInputStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-            StringBuilder response = new StringBuilder();
-            char[] buffer = new char[1024];
-            int read = rd.read(buffer);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int read = is.read(buffer);
             while (read > 0) {
-                response.append(buffer, 0, read);
-                read = rd.read(buffer);
+                output.write(buffer, 0, read);
+                read = is.read(buffer);
             }
-            rd.close();
-            result = response.toString();
+            result = output.toByteArray();
         } catch (IOException exception) {
             logger.error(exception);
             return null;

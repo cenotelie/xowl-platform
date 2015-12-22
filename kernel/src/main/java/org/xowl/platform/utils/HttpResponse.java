@@ -37,7 +37,7 @@ public class HttpResponse {
     /**
      * The response content, if any
      */
-    public final String content;
+    public final byte[] content;
 
     /**
      * Initializes this response
@@ -57,7 +57,7 @@ public class HttpResponse {
      * @param contentType The response content type, if any
      * @param content     The response content, if any
      */
-    public HttpResponse(int code, String contentType, String content) {
+    public HttpResponse(int code, String contentType, byte[] content) {
         this.code = code;
         this.contentType = contentType;
         this.content = content;

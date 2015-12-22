@@ -62,7 +62,7 @@ public class BasicRemoteXOWLStore extends RemoteXOWLStore {
     @Override
     protected HTTPConnection getConnection() {
         if (connection == null) {
-            ConfigurationService configurationService = ServiceUtils.getOSGIService(ConfigurationService.class);
+            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
             if (configurationService == null)
                 return null;
             Configuration configuration = configurationService.getConfigFor(service);

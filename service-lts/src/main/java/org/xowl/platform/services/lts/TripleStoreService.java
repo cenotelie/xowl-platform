@@ -45,4 +45,11 @@ public interface TripleStoreService extends Service {
      * @return The long-term store
      */
     TripleStore getLongTermStore();
+
+    /**
+     * Gets the store that can be used to persist data for the services on the platform
+     *
+     * @return The service store
+     */
+    TripleStore getServiceStore();
 }

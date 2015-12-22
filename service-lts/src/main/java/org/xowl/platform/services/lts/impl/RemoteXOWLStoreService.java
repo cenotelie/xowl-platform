@@ -37,13 +37,18 @@ public class RemoteXOWLStoreService implements TripleStoreService {
      * The long term store
      */
     private final RemoteXOWLStore storeLongTerm;
+    /**
+     * The service store
+     */
+    private final RemoteXOWLStore storeService;
 
     /**
      * Initializes this service
      */
     public RemoteXOWLStoreService() {
-        this.storeLive = new RemoteXOWLStore(this, "live");
-        this.storeLongTerm = new RemoteXOWLStore(this, "longTerm");
+        this.storeLive = new BasicRemoteXOWLStore(this, "live");
+        this.storeLongTerm = new BasicRemoteXOWLStore(this, "longTerm");
+        this.storeService = new BasicRemoteXOWLStore(this, "service");
     }
 
     @Override
@@ -75,5 +80,10 @@ public class RemoteXOWLStoreService implements TripleStoreService {
     @Override
     public TripleStore getLongTermStore() {
         return storeLongTerm;
+    }
+
+    @Override
+    public TripleStore getServiceStore() {
+        return storeService;
     }
 }

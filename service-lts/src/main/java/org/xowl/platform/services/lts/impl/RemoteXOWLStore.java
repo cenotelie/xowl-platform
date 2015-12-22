@@ -4,18 +4,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- * <p>
+ *
  * Contributors:
- * Laurent Wouters - lwouters@xowl.org
+ *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
 package org.xowl.platform.services.lts.impl;
@@ -23,8 +23,6 @@ package org.xowl.platform.services.lts.impl;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactDeferred;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.store.IOUtils;
 import org.xowl.store.rdf.*;
@@ -35,7 +33,6 @@ import org.xowl.store.sparql.ResultSolutions;
 import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
-import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
@@ -49,48 +46,13 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class RemoteXOWLStore implements TripleStore {
+abstract class RemoteXOWLStore implements TripleStore {
     /**
-     * The parent service
-     */
-    private final RemoteXOWLStoreService service;
-    /**
-     * The name of this store
-     */
-    private final String name;
-    /**
-     * The connection to the remote host
-     */
-    private HTTPConnection connection;
-
-    /**
-     * Initializes this store
+     * Gets the connection for this store
      *
-     * @param service The parent service
-     * @param name    The name of this store
+     * @return The connection for this store
      */
-    public RemoteXOWLStore(RemoteXOWLStoreService service, String name) {
-        this.service = service;
-        this.name = name;
-    }
-
-    /**
-     * Gets the HTTP connection
-     *
-     * @return The HTTP connection
-     */
-    private HTTPConnection getConnection() {
-        if (connection == null) {
-            ConfigurationService configurationService = ServiceUtils.getOSGIService(ConfigurationService.class);
-            if (configurationService == null)
-                return null;
-            Configuration configuration = configurationService.getConfigFor(service);
-            if (configuration == null)
-                return null;
-            connection = new HTTPConnection(configuration.get(name, "endpoint"), configuration.get(name, "login"), configuration.get(name, "password"));
-        }
-        return connection;
-    }
+    protected abstract HTTPConnection getConnection();
 
     @Override
     public Result sparql(String query) {

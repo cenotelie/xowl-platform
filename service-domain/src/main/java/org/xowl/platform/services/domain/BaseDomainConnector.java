@@ -21,10 +21,15 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.utils.HttpResponse;
+import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 
+import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -104,6 +109,11 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
+    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        return new HttpResponse(HttpURLConnection.HTTP_OK, Utils.MIME_JSON, serializedJSON().getBytes(Charset.forName("UTF-8")));
+    }
+
+    @Override
     public String serializedString() {
         return getIdentifier();
     }
@@ -117,8 +127,6 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
-        builder.append("\", \"version\": \"");
-        builder.append(IOUtils.escapeStringJSON(getVersion()));
         builder.append("\", \"canPullInput\": ");
         builder.append(canPullInput());
         builder.append(", \"queue\": [");

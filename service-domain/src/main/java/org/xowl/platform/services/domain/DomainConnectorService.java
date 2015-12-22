@@ -21,7 +21,7 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.store.Serializable;
 
 import java.util.List;
@@ -36,14 +36,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorService extends Service, Serializable {
-    /**
-     * Gets the version number of this connector
-     *
-     * @return The version number of this connector
-     */
-    String getVersion();
-
+public interface DomainConnectorService extends ServiceHttpServed, Serializable {
     /**
      * Pushes an artifact to the associated client
      *
@@ -89,13 +82,4 @@ public interface DomainConnectorService extends Service, Serializable {
      * @return The next queued artifact or null if there is none
      */
     Artifact getNextInput(boolean block);
-
-    /**
-     * Handles the reception of a message from a client
-     *
-     * @param content     The message's content
-     * @param contentType The message's content type
-     * @return Whether the operation was successful
-     */
-    boolean onMessage(String content, String contentType);
 }

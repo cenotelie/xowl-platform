@@ -38,6 +38,11 @@ import java.nio.charset.Charset;
  */
 public class Utils {
     /**
+     * The MIME type for JSON
+     */
+    public static final String MIME_JSON = "application/json";
+
+    /**
      * Parses the JSON content
      *
      * @param logger  The logger to use

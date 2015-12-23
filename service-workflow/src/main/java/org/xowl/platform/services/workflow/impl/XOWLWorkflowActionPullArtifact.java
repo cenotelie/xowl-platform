@@ -23,6 +23,7 @@ package org.xowl.platform.services.workflow.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.workflow.WorkflowActionReply;
 import org.xowl.platform.services.workflow.WorkflowActionReplySuccess;
+import org.xowl.platform.services.workflow.WorkflowUtils;
 import org.xowl.store.IOUtils;
 
 /**
@@ -57,8 +58,7 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
 
     @Override
     public WorkflowActionReply execute(Object parameter) {
-        // TODO: implements this
-        return WorkflowActionReplySuccess.INSTANCE;
+        return WorkflowUtils.pullArtifact(connectorId);
     }
 
     @Override

@@ -77,19 +77,24 @@ public class XOWLWorkflowActivity implements WorkflowActivity {
                 description = description.substring(1, description.length() - 1);
             } else if ("actions".equals(head)) {
                 for (ASTNode actionNode : member.getChildren().get(1).getChildren()) {
-                    boolean isPullAction = false;
+                    String type = "";
                     for (ASTNode actionMember : actionNode.getChildren()) {
                         head = IOUtils.unescape(actionMember.getChildren().get(0).getValue());
                         head = head.substring(1, head.length() - 1);
-                        if ("connectorId".equals(head)) {
-                            isPullAction = true;
+                        if ("type".equals(head)) {
+                            type = IOUtils.unescape(actionMember.getChildren().get(1).getValue());
+                            type = type.substring(1, head.length() - 1);
                             break;
                         }
                     }
-                    if (isPullAction)
-                        actions.add(new XOWLWorkflowActionPullArtifact(actionNode));
-                    else
-                        actions.add(new XOWLWorkflowAction(actionNode));
+                    switch (type) {
+                        case "org.xowl.platform.services.workflow.impl.XOWLWorkflowActionPullArtifact":
+                            actions.add(new XOWLWorkflowActionPullArtifact(actionNode));
+                            break;
+                        default:
+                            actions.add(new XOWLWorkflowAction(actionNode));
+                            break;
+                    }
                 }
             }
         }

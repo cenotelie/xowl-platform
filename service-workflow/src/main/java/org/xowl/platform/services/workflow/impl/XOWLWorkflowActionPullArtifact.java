@@ -63,6 +63,10 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", \"name\": \"" + IOUtils.escapeStringJSON(name) + "\", \"finishOnSuccess\": " + finishOnSuccess + ", \"connectorId\": \"" + IOUtils.escapeStringJSON(connectorId) + "\"}";
+        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
+                "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
+                "\"finishOnSuccess\": " + finishOnSuccess + ", " +
+                "\"type\": \""+IOUtils.escapeStringJSON(XOWLWorkflowActionPullArtifact.class.getCanonicalName())+"\", " +
+                "\"connectorId\": \"" + IOUtils.escapeStringJSON(connectorId) + "\"}";
     }
 }

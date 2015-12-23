@@ -20,6 +20,7 @@
 
 package org.xowl.platform.services.lts.impl;
 
+import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.HttpResponse;
@@ -36,7 +37,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class RemoteXOWLStoreService implements TripleStoreService {
+public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpServed {
     /**
      * The live store
      */

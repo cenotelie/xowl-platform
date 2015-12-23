@@ -22,6 +22,7 @@ package org.xowl.platform.services.lts;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.store.sparql.Result;
+import org.xowl.store.xsp.XSPReply;
 
 import java.util.Collection;
 
@@ -38,6 +39,14 @@ public interface TripleStore {
      * @return The result
      */
     Result sparql(String query);
+
+    /**
+     * Executes an XSP command on the store
+     *
+     * @param command The command
+     * @return The reply
+     */
+    XSPReply execute(String command);
 
     /**
      * Sends the metadata of an artifact to the triple store

@@ -33,6 +33,8 @@ import org.xowl.store.sparql.ResultSolutions;
 import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyNetworkError;
 import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
@@ -60,6 +62,14 @@ abstract class RemoteXOWLStore implements TripleStore {
         if (connection == null)
             return new ResultFailure("The connection to the remote host is not configured");
         return connection.sparql(query);
+    }
+
+    @Override
+    public XSPReply execute(String command) {
+        HTTPConnection connection = getConnection();
+        if (connection == null)
+            return new XSPReplyNetworkError("The connection to the remote host is not configured");
+        return connection.xsp(command);
     }
 
     @Override

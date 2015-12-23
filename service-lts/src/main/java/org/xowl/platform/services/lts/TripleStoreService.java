@@ -20,14 +20,14 @@
 
 package org.xowl.platform.services.lts;
 
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.Service;
 
 /**
  * Represents a triple-store service for the platform
  *
  * @author Laurent Wouters
  */
-public interface TripleStoreService extends ServiceHttpServed {
+public interface TripleStoreService extends Service {
     /**
      * Gets the live store that contains the currently active artifacts
      * Reasoning is expected to be activated on this store.

@@ -56,5 +56,5 @@ public interface WorkflowService extends Service {
      * @param parameter A parameter for the action, if any
      * @return The action's result
      */
-    WorkflowActionReply execute(String action, Object parameter);
+    WorkflowActionReply execute(WorkflowAction action, Object parameter);
 }

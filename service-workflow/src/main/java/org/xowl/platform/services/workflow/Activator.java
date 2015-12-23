@@ -22,6 +22,7 @@ package org.xowl.platform.services.workflow;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.workflow.impl.XOWLWorkflowService;
 
 import java.util.Hashtable;
@@ -34,7 +35,12 @@ import java.util.Hashtable;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(WorkflowService.class, new XOWLWorkflowService(), new Hashtable<String, Object>());
+        XOWLWorkflowService service = new XOWLWorkflowService();
+        Hashtable<String, Object> properties = new Hashtable<>();
+        properties.put("id", service.getIdentifier());
+        properties.put("uri", "workflow");
+        bundleContext.registerService(WorkflowService.class, service, properties);
+        bundleContext.registerService(ServiceHttpServed.class, service, properties);
     }
 
     @Override

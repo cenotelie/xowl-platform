@@ -20,10 +20,10 @@
 
 package org.xowl.platform.services.workflow.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.workflow.WorkflowAction;
 import org.xowl.platform.services.workflow.WorkflowActionReply;
 import org.xowl.platform.services.workflow.WorkflowActionReplySuccess;
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.store.IOUtils;
 
 /**
@@ -44,6 +44,15 @@ public class XOWLWorkflowAction implements WorkflowAction {
      * Whether the current activity is finished by this successful action
      */
     protected final boolean finishOnSuccess;
+
+    /**
+     * Gets whether the current activity is finished by this successful action
+     *
+     * @return Whether the current activity is finished by this successful action
+     */
+    public boolean isFinishOnSuccess() {
+        return finishOnSuccess;
+    }
 
     /**
      * Initializes this action

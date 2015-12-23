@@ -20,11 +20,22 @@
 
 package org.xowl.platform.services.workflow.impl;
 
-import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.services.config.ConfigurationService;
-import org.xowl.platform.services.workflow.*;
-import org.xowl.platform.utils.Utils;
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.*;
+import org.xowl.platform.services.config.ConfigurationService;
+import org.xowl.platform.services.lts.TripleStore;
+import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.workflow.*;
+import org.xowl.platform.utils.HttpResponse;
+import org.xowl.platform.utils.Utils;
+import org.xowl.store.IOUtils;
+import org.xowl.store.Vocabulary;
+import org.xowl.store.rdf.IRINode;
+import org.xowl.store.rdf.LiteralNode;
+import org.xowl.store.rdf.Node;
+import org.xowl.store.rdf.Quad;
+import org.xowl.store.storage.NodeManager;
+import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
@@ -32,14 +43,35 @@ import org.xowl.utils.logging.Logger;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the default workflow service for the platform
  *
  * @author Laurent Wouters
  */
-public class XOWLWorkflowService implements WorkflowService {
+public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
+    /**
+     * The identifier of the artifact that contains the data for this service
+     */
+    private static final String ARTIFACT_CONFIG = "http://xowl.org/platform/services/workflow/" + XOWLWorkflowService.class.getCanonicalName();
+    /**
+     * The property for the current phase
+     */
+    private static final String PROPERTY_CURRENT_PHASE = "http://xowl.org/platform/services/workflow#currentPhase";
+    /**
+     * The property for the current activity
+     */
+    private static final String PROPERTY_CURRENT_ACTIVITY = "http://xowl.org/platform/services/workflow#currentActivity";
+
+    /**
+     * Node manager for creating new artifacts
+     */
+    private final NodeManager nodeManager;
     /**
      * The workflow
      */
@@ -52,6 +84,13 @@ public class XOWLWorkflowService implements WorkflowService {
      * The current activity
      */
     private WorkflowActivity currentActivity;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLWorkflowService() {
+        nodeManager = new CachedNodes();
+    }
 
     /**
      * Retrieve the workflow from the configuration
@@ -71,10 +110,78 @@ public class XOWLWorkflowService implements WorkflowService {
                 workflow = new XOWLWorkflow(root);
                 currentPhase = workflow.getPhases().get(0);
                 currentActivity = currentPhase.getActivities().get(0);
+                retrieveState();
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
             }
         }
+    }
+
+    /**
+     * Retrieves the current phase and activity
+     */
+    private void retrieveState() {
+        TripleStoreService tripleStoreService = ServiceUtils.getService(TripleStoreService.class);
+        if (tripleStoreService == null)
+            return;
+        TripleStore store = tripleStoreService.getServiceStore();
+        if (store == null)
+            return;
+        Artifact artifact = store.retrieve(ARTIFACT_CONFIG);
+        if (artifact == null)
+            return;
+        String phaseID = null;
+        String activityID = null;
+        for (Quad quad : artifact.getMetadata()) {
+            if (quad.getProperty().getNodeType() == Node.TYPE_IRI) {
+                if (PROPERTY_CURRENT_PHASE.equals(((IRINode) quad.getProperty()).getIRIValue())) {
+                    phaseID = ((LiteralNode) quad.getObject()).getLexicalValue();
+                } else if (PROPERTY_CURRENT_ACTIVITY.equals(((IRINode) quad.getProperty()).getIRIValue())) {
+                    activityID = ((LiteralNode) quad.getObject()).getLexicalValue();
+                }
+            }
+        }
+        if (phaseID != null) {
+            for (WorkflowPhase phase : workflow.getPhases()) {
+                if (phaseID.equals(phase.getIdentifier())) {
+                    currentPhase = phase;
+                    currentActivity = phase.getActivities().get(0);
+                    if (activityID != null) {
+                        for (WorkflowActivity activity : phase.getActivities()) {
+                            if (activityID.equals(activity.getIdentifier())) {
+                                currentActivity = activity;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Pushes the current state
+     */
+    private void pushNewState() {
+        TripleStoreService tripleStoreService = ServiceUtils.getService(TripleStoreService.class);
+        if (tripleStoreService == null)
+            return;
+        TripleStore store = tripleStoreService.getServiceStore();
+        if (store == null)
+            return;
+        IRINode graph = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
+        IRINode subject = nodeManager.getIRINode(ARTIFACT_CONFIG);
+        IRINode propName = nodeManager.getIRINode(KernelSchema.HAS_NAME);
+        IRINode propCurrentPhase = nodeManager.getIRINode(PROPERTY_CURRENT_PHASE);
+        IRINode propCurrentActivity = nodeManager.getIRINode(PROPERTY_CURRENT_ACTIVITY);
+        List<Quad> metadata = new ArrayList<>();
+        metadata.add(new Quad(graph, subject, propName, nodeManager.getLiteralNode("State of XOWLWorkflowService", Vocabulary.xsdString, null)));
+        metadata.add(new Quad(graph, subject, propCurrentPhase, nodeManager.getLiteralNode(currentPhase.getIdentifier(), Vocabulary.xsdString, null)));
+        metadata.add(new Quad(graph, subject, propCurrentActivity, nodeManager.getLiteralNode(currentActivity.getIdentifier(), Vocabulary.xsdString, null)));
+        Artifact artifact = new ArtifactSimple(metadata, new ArrayList<Quad>());
+        store.delete(ARTIFACT_CONFIG);
+        store.store(artifact);
     }
 
     @Override
@@ -117,15 +224,57 @@ public class XOWLWorkflowService implements WorkflowService {
     }
 
     @Override
-    public WorkflowActionReply execute(String action, Object parameter) {
+    public WorkflowActionReply execute(WorkflowAction action, Object parameter) {
         WorkflowActivity activity = getActiveActivity();
         if (activity == null)
             return new WorkflowActionReplyFailure("The workflow is not configured");
-        for (WorkflowAction workflowAction : activity.getActions()) {
-            if (workflowAction.getIdentifier().equals(action)) {
-                return workflowAction.execute(parameter);
+        if (!activity.getActions().contains(action))
+            return new WorkflowActionReplyFailure("This action is not available");
+        WorkflowActionReply reply = action.execute(parameter);
+        if (reply.isSuccess()) {
+            int indexPhase = workflow.getPhases().indexOf(currentPhase);
+            int indexActivity = currentPhase.getActivities().indexOf(currentActivity);
+            indexActivity++;
+            if (indexActivity >= currentPhase.getActivities().size()) {
+                indexPhase++;
+                if (indexPhase < workflow.getPhases().size()) {
+                    currentPhase = workflow.getPhases().get(indexPhase);
+                    currentActivity = currentPhase.getActivities().get(0);
+                    pushNewState();
+                }
+            } else {
+                currentActivity = currentPhase.getActivities().get(indexActivity);
+                pushNewState();
             }
         }
-        return new WorkflowActionReplyFailure("Cannot find action " + action + " on activity " + activity.getIdentifier());
+        return reply;
+    }
+
+    @Override
+    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        if (parameters == null || parameters.isEmpty()) {
+            retrieveWorkflow();
+            if (workflow == null)
+                return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured".getBytes(Charset.forName("UTF-8")));
+            return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, workflow.serializedJSON().getBytes(Charset.forName("UTF-8")));
+        }
+
+        String[] values = parameters.get("action");
+        if (values == null || values.length < 1)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected action parameter".getBytes(Charset.forName("UTF-8")));
+        String actionID = values[0];
+        retrieveWorkflow();
+        if (workflow == null)
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured".getBytes(Charset.forName("UTF-8")));
+        for (WorkflowAction action : currentActivity.getActions()) {
+            if (action.getIdentifier().equals(actionID)) {
+                WorkflowActionReply reply = execute(action, null);
+                if (reply.isSuccess())
+                    return new HttpResponse(HttpURLConnection.HTTP_OK);
+                else
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, reply.serializedString().getBytes(Charset.forName("UTF-8")));
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Action is unavailable".getBytes(Charset.forName("UTF-8")));
     }
 }

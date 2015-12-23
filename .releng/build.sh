@@ -19,7 +19,7 @@ cp "$ROOT/service-server/target/xowl-service-http-$VERSION.jar" "$RELENG/docker/
 cp "$ROOT/service-workflow/target/xowl-service-workflow-$VERSION.jar" "$RELENG/docker/"
 
 # Build the docker image
-docker build -t xowl/xowl-platform:$VERSION "$RELENG/docker"
+docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
 rm "$RELENG/docker/xowl-dependencies-$VERSION.jar"

@@ -86,24 +86,28 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @param response The response
      */
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
-        String uri = request.getRequestURI();
-        if (uri.startsWith("/service/")) {
-            ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring("/service/".length()));
-            if (service == null) {
-                addCORSHeader(response);
-                response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+        try {
+            String uri = request.getRequestURI();
+            if (uri.startsWith("/service/")) {
+                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring("/service/".length()));
+                if (service == null) {
+                    addCORSHeader(response);
+                    response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+                } else {
+                    doServedService(service, method, request, response);
+                }
             } else {
-                doServedService(service, method, request, response);
+                uri = uri.substring(1);
+                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "uri", uri);
+                if (service == null) {
+                    addCORSHeader(response);
+                    response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+                } else {
+                    doServedService(service, method, request, response);
+                }
             }
-        } else {
-            uri = uri.substring(1);
-            ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "uri", uri);
-            if (service == null) {
-                addCORSHeader(response);
-                response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
-            } else {
-                doServedService(service, method, request, response);
-            }
+        } catch (Exception | Error exception) {
+            Logger.DEFAULT.error(exception);
         }
     }
 

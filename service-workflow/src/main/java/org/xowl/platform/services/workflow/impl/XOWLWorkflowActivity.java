@@ -83,7 +83,7 @@ public class XOWLWorkflowActivity implements WorkflowActivity {
                         head = head.substring(1, head.length() - 1);
                         if ("type".equals(head)) {
                             type = IOUtils.unescape(actionMember.getChildren().get(1).getValue());
-                            type = type.substring(1, head.length() - 1);
+                            type = type.substring(1, type.length() - 1);
                             break;
                         }
                     }

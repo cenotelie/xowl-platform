@@ -34,11 +34,12 @@ public interface ServiceHttpServed extends Service {
      * Responds to a message
      *
      * @param method      The HTTP method
+     * @param uri         The requested URI
      * @param parameters  The request parameters
      * @param contentType The content type, if any
      * @param content     The content, if any
      * @param accept      The Accept header, if any
      * @return The response
      */
-    HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
+    HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
 }

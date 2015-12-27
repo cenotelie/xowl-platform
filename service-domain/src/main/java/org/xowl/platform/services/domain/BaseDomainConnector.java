@@ -109,7 +109,7 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
-    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         return new HttpResponse(HttpURLConnection.HTTP_OK, Utils.MIME_JSON, serializedJSON().getBytes(Charset.forName("UTF-8")));
     }
 

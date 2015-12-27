@@ -59,7 +59,7 @@ public class DomainDirectoryService implements ServiceHttpServed {
     }
 
     @Override
-    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         Collection<DomainConnectorService> connectors = ServiceUtils.getServices(DomainConnectorService.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;

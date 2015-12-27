@@ -146,6 +146,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             }
         }
         HttpResponse serviceResponse = service.onMessage(method,
+                request.getRequestURI(),
                 request.getParameterMap(),
                 request.getContentType(),
                 content,

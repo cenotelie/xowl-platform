@@ -38,7 +38,7 @@ public class Activator implements BundleActivator {
         RemoteXOWLStoreService service = new RemoteXOWLStoreService();
         Hashtable<String, Object> properties = new Hashtable<>();
         properties.put("id", service.getIdentifier());
-        properties.put("uri", "sparql");
+        properties.put("uri", new String[] {"sparql", "artifacts"});
         bundleContext.registerService(TripleStoreService.class, service, properties);
         bundleContext.registerService(ServiceHttpServed.class, service, properties);
     }

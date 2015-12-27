@@ -20,16 +20,19 @@
 
 package org.xowl.platform.services.lts.impl;
 
+import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.HttpResponse;
+import org.xowl.store.IOUtils;
 import org.xowl.store.sparql.Result;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -82,7 +85,22 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
     }
 
     @Override
-    public HttpResponse onMessage(String method, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        if ("/sparql".equals(uri))
+            return onMessageSPARQL(content, accept);
+        if ("/artifacts".equals(uri))
+            return onMessageGetArtifacts();
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Responds to a SPARQL command
+     *
+     * @param content The SPARQL content
+     * @param accept  The accept HTTP header
+     * @return The response
+     */
+    private HttpResponse onMessageSPARQL(byte[] content, String accept) {
         if (content == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         String request = new String(content, Charset.forName("UTF-8"));
@@ -103,6 +121,25 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
             // cannot happen
         }
         return new HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString().getBytes(Charset.forName("UTF-8")));
+    }
+
+    /**
+     * Responds to a request to list the artifacts
+     *
+     * @return The response
+     */
+    private HttpResponse onMessageGetArtifacts() {
+        Collection<Artifact> artifacts = getLongTermStore().listArtifacts();
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Artifact artifact : artifacts) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(artifact.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString().getBytes(Charset.forName("UTF-8")));
     }
 
     @Override

@@ -62,4 +62,17 @@ public class HttpResponse {
         this.contentType = contentType;
         this.content = content;
     }
+
+    /**
+     * Initializes this response
+     *
+     * @param code        The response code
+     * @param contentType The response content type, if any
+     * @param content     The response content, if any
+     */
+    public HttpResponse(int code, String contentType, String content) {
+        this.code = code;
+        this.contentType = contentType;
+        this.content = content == null ? null : content.getBytes(Utils.DEFAULT_CHARSET);
+    }
 }

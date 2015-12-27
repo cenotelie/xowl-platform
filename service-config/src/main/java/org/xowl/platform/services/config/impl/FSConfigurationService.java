@@ -23,13 +23,13 @@ package org.xowl.platform.services.config.impl;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.services.config.ConfigurationService;
+import org.xowl.platform.utils.Utils;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * An implementation of the configuration service that relies on the file system
@@ -81,7 +81,7 @@ public class FSConfigurationService implements ConfigurationService {
         File file = new File(root, entity.getIdentifier() + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
             try (FileInputStream stream = new FileInputStream(file)) {
-                configuration.load(stream, Charset.forName("UTF-8"));
+                configuration.load(stream, Utils.DEFAULT_CHARSET);
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
             }

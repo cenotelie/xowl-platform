@@ -78,6 +78,16 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         handleRequest("POST", request, response);
     }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handleRequest("PUT", request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handleRequest("DELETE", request, response);
+    }
+
     /**
      * Handles a request
      *

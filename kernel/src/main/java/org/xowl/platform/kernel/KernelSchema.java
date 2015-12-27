@@ -58,13 +58,13 @@ public interface KernelSchema {
     String USER = URI_KERNEL + "#User";
 
     /**
-     * The hasId property
+     * The hasName property
      */
     String HAS_NAME = URI_KERNEL + "#hasName";
     /**
-     * The creationTime property
+     * The from property
      */
-    String CREATION_TIME = URI_KERNEL + "#creationTime";
+    String FROM = URI_KERNEL + "#from";
     /**
      * The creator property
      */

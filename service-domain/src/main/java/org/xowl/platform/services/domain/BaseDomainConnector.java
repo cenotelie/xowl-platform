@@ -22,11 +22,9 @@ package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.utils.HttpResponse;
-import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +70,17 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
+    public String getProperty(String name) {
+        if (name == null)
+            return null;
+        if ("identifier".equals(name))
+            return getIdentifier();
+        if ("name".equals(name))
+            return getName();
+        return null;
+    }
+
+    @Override
     public boolean canPullInput() {
         return false;
     }
@@ -110,7 +119,7 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return new HttpResponse(HttpURLConnection.HTTP_OK, Utils.MIME_JSON, serializedJSON().getBytes(Charset.forName("UTF-8")));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
     }
 
     @Override

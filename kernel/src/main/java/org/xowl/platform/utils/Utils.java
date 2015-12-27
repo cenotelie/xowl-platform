@@ -38,9 +38,9 @@ import java.nio.charset.Charset;
  */
 public class Utils {
     /**
-     * The MIME type for JSON
+     * The default charset
      */
-    public static final String MIME_JSON = "application/json";
+    public static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     /**
      * Parses the JSON content

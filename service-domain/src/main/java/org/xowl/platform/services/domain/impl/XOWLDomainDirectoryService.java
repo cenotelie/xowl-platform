@@ -25,6 +25,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.domain.DomainConnectorService;
+import org.xowl.platform.services.domain.DomainDirectoryService;
 import org.xowl.platform.utils.HttpResponse;
 import org.xowl.store.IOUtils;
 
@@ -39,7 +40,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class DomainDirectoryService implements ServiceHttpServed {
+public class XOWLDomainDirectoryService implements DomainDirectoryService {
     /**
      * The spawned connectors
      */
@@ -47,7 +48,7 @@ public class DomainDirectoryService implements ServiceHttpServed {
 
     @Override
     public String getIdentifier() {
-        return DomainDirectoryService.class.getCanonicalName();
+        return XOWLDomainDirectoryService.class.getCanonicalName();
     }
 
     @Override
@@ -77,6 +78,52 @@ public class DomainDirectoryService implements ServiceHttpServed {
         if (action != null && action.equals("delete") && (method.equals("POST") || method.equals("GET")))
             return onMessageDeleteConnector(parameters);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Override
+    public Collection<DomainConnectorService> getConnectors() {
+        return ServiceUtils.getServices(DomainConnectorService.class);
+    }
+
+    @Override
+    public DomainConnectorService get(String identifier) {
+        DomainConnectorService service = parametricConnectors.get(identifier);
+        if (service != null)
+            return service;
+        return ServiceUtils.getService(DomainConnectorService.class, "id", identifier);
+    }
+
+    @Override
+    public DomainConnectorService spawn(String identifier, String name, String[] uris) {
+        synchronized (parametricConnectors) {
+            DomainConnectorService service = get(identifier);
+            if (service != null)
+                // already exists
+                return null;
+            BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
+            ParametricDomainConnector connector = new ParametricDomainConnector(identifier, name);
+            parametricConnectors.put(identifier, connector);
+            Hashtable<String, Object> properties = new Hashtable<>();
+            properties.put("id", identifier);
+            if (uris != null)
+                properties.put("uri", uris);
+            connector.refAsDomainConnector = context.registerService(DomainConnectorService.class, connector, properties);
+            connector.refAsServedService = context.registerService(ServiceHttpServed.class, connector, properties);
+            return connector;
+        }
+    }
+
+    @Override
+    public boolean delete(String identifier) {
+        synchronized (parametricConnectors) {
+            ParametricDomainConnector connector = parametricConnectors.get(identifier);
+            if (connector == null)
+                return false;
+            connector.refAsDomainConnector.unregister();
+            connector.refAsServedService.unregister();
+            parametricConnectors.remove(identifier);
+            return true;
+        }
     }
 
     /**
@@ -109,19 +156,10 @@ public class DomainDirectoryService implements ServiceHttpServed {
         String[] names = parameters.get("name");
         String[] uris = parameters.get("uris");
         if (ids == null || ids.length == 0 || names == null || names.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        ParametricDomainConnector connector = parametricConnectors.get(ids[0]);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected at least one id and one name parameter");
+        DomainConnectorService connector = spawn(ids[0], names[0], uris);
         if (connector != null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
-        connector = new ParametricDomainConnector(ids[0], names[0]);
-        parametricConnectors.put(ids[0], connector);
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", ids[0]);
-        if (uris != null)
-            properties.put("uri", uris);
-        connector.refAsDomainConnector = context.registerService(DomainConnectorService.class, connector, properties);
-        connector.refAsServedService = context.registerService(ServiceHttpServed.class, connector, properties);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "The connector already exist");
         return new HttpResponse(HttpURLConnection.HTTP_OK);
     }
 
@@ -134,13 +172,10 @@ public class DomainDirectoryService implements ServiceHttpServed {
     private HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        ParametricDomainConnector connector = parametricConnectors.get(ids[0]);
-        if (connector == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        connector.refAsDomainConnector.unregister();
-        connector.refAsServedService.unregister();
-        parametricConnectors.remove(ids[0]);
-        return new HttpResponse(HttpURLConnection.HTTP_OK);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        boolean success = delete(ids[0]);
+        if (success)
+            return new HttpResponse(HttpURLConnection.HTTP_OK);
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to delete connector with id " + ids[0]);
     }
 }

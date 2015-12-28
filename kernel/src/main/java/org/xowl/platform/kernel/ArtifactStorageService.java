@@ -73,12 +73,11 @@ public interface ArtifactStorageService extends Service {
     Collection<Artifact> list(String base);
 
     /**
-     * Gets whether an artifact is currently published in a live reasoning store
+     * Lists all the live artifacts
      *
-     * @param artifact An artifact
-     * @return Whether the artifact is currently published in a live reasoning store
+     * @return The list of the live artifacts
      */
-    boolean isLive(Artifact artifact);
+    Collection<Artifact> getAllLive();
 
     /**
      * Pushes an artifact to a live reasoning store

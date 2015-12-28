@@ -182,9 +182,18 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public boolean isLive(Artifact artifact) {
-        // TODO: implement this
-        return false;
+    public Collection<Artifact> getAllLive() {
+        StringWriter writer = new StringWriter();
+        writer.write("DESCRIBE ?a WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write("> } }");
+
+        Result sparqlResult = storeLive.sparql(writer.toString());
+        if (sparqlResult.isFailure())
+            return new ArrayList<>();
+        return buildArtifacts(((ResultQuads) sparqlResult).getQuads());
     }
 
     @Override
@@ -334,7 +343,6 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         return new ArtifactDeferred(metadata) {
             @Override
             protected Collection<Quad> load() {
-                // TODO: change for a CONSTRUCT query
                 Result result = storeLongTerm.sparql("SELECT ?s ?p ?o WHERE  { GRAPH <" + IOUtils.escapeAbsoluteURIW3C(identifier) + "> { ?s ?p ?o } }");
                 if (result.isFailure())
                     return null;

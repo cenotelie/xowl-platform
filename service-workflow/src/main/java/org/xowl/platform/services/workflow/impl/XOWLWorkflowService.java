@@ -175,7 +175,7 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
             return;
         IRINode graph = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
         IRINode subject = nodeManager.getIRINode(ARTIFACT_CONFIG);
-        IRINode propName = nodeManager.getIRINode(KernelSchema.HAS_NAME);
+        IRINode propName = nodeManager.getIRINode(KernelSchema.NAME);
         IRINode propCurrentPhase = nodeManager.getIRINode(PROPERTY_CURRENT_PHASE);
         IRINode propCurrentActivity = nodeManager.getIRINode(PROPERTY_CURRENT_ACTIVITY);
         List<Quad> metadata = new ArrayList<>();

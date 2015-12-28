@@ -22,6 +22,7 @@ package org.xowl.platform.services.lts.impl;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactDeferred;
+import org.xowl.platform.kernel.ArtifactUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.store.IOUtils;
@@ -85,7 +86,7 @@ abstract class RemoteXOWLStore implements TripleStore {
         NTripleSerializer serializer = new NTripleSerializer(writer);
         serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
         writer.write(" } }; INSERT DATA { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
+        writer.write(IOUtils.escapeAbsoluteURIW3C(ArtifactUtils.getContentGraph(artifact)));
         writer.write("> {");
         serializer.serialize(Logger.DEFAULT, artifact.getContent().iterator());
         writer.write(" } }");

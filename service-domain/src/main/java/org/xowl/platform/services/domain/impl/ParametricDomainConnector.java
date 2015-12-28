@@ -160,7 +160,7 @@ class ParametricDomainConnector extends BaseDomainConnector {
         List<Quad> metadata = new ArrayList<>();
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(Vocabulary.rdfType), nodeManager.getIRINode(KernelSchema.ARTIFACT)));
         if (names != null && names.length >= 1)
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.HAS_NAME), nodeManager.getLiteralNode(names[0], Vocabulary.xsdString, null)));
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(names[0], Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(identifier, Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());

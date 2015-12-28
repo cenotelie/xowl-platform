@@ -20,10 +20,6 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.LiteralNode;
-import org.xowl.store.rdf.Node;
 import org.xowl.store.rdf.Quad;
 
 import java.util.ArrayList;
@@ -35,19 +31,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class ArtifactSimple implements Artifact {
-    /**
-     * The identifier for this baseline
-     */
-    protected final String identifier;
-    /**
-     * The name of this baseline
-     */
-    protected final String name;
-    /**
-     * The metadata quads
-     */
-    protected final Collection<Quad> metadata;
+public class ArtifactSimple extends ArtifactBase {
     /**
      * The payload quads
      */
@@ -60,54 +44,8 @@ public class ArtifactSimple implements Artifact {
      * @param content  The payload quads
      */
     public ArtifactSimple(Collection<Quad> metadata, Collection<Quad> content) {
-        String identifier = "";
-        String name = "";
-        for (Quad quad : metadata) {
-            if (quad.getProperty().getNodeType() == Node.TYPE_IRI
-                    && KernelSchema.HAS_NAME.equals(((IRINode) quad.getProperty()).getIRIValue())
-                    && quad.getSubject().getNodeType() == Node.TYPE_IRI
-                    && identifier.equals(((IRINode) quad.getSubject()).getIRIValue())
-                    && quad.getObject().getNodeType() == Node.TYPE_LITERAL) {
-                name = ((LiteralNode) quad.getObject()).getLexicalValue();
-            }
-            if (identifier.isEmpty())
-                identifier = ((IRINode) quad.getSubject()).getIRIValue();
-        }
-        this.identifier = identifier;
-        this.name = name;
-        this.metadata = Collections.unmodifiableCollection(new ArrayList<>(metadata));
+        super(metadata);
         this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String serializedString() {
-        return identifier;
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
-                + "\", \"name\":"
-                + IOUtils.escapeStringJSON(name)
-                + "\", \"type\": \""
-                + IOUtils.escapeStringJSON(Artifact.class.getCanonicalName())
-                + "\"}";
-    }
-
-    @Override
-    public Collection<Quad> getMetadata() {
-        return metadata;
     }
 
     @Override

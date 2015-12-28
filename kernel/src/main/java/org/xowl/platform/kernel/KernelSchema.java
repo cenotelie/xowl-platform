@@ -58,9 +58,17 @@ public interface KernelSchema {
     String USER = URI_KERNEL + "#User";
 
     /**
-     * The hasName property
+     * The base property
      */
-    String HAS_NAME = URI_KERNEL + "#hasName";
+    String BASE = URI_KERNEL + "#base";
+    /**
+     * The version property
+     */
+    String VERSION = URI_KERNEL + "#version";
+    /**
+     * The name property
+     */
+    String NAME = URI_KERNEL + "#name";
     /**
      * The from property
      */

@@ -25,6 +25,9 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.domain.DomainConnectorService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyFailure;
+import org.xowl.store.xsp.XSPReplyResult;
 
 /**
  * Utility APIs for the workflows
@@ -38,21 +41,21 @@ public class WorkflowUtils {
      * @param connector The identifier of a connector
      * @return The result of the operation
      */
-    public static WorkflowActionReply pullArtifact(String connector) {
+    public static XSPReply pullArtifact(String connector) {
         DomainConnectorService connectorService = ServiceUtils.getService(DomainConnectorService.class, "id", connector);
         if (connectorService == null)
-            return new WorkflowActionReplyFailure("Failed to resolve connector " + connector);
+            return new XSPReplyFailure("Failed to resolve connector " + connector);
         Artifact artifact = connectorService.getNextInput(false);
         if (artifact == null)
-            return new WorkflowActionReplyFailure("No queued artifact in connector " + connector);
+            return new XSPReplyFailure("No queued artifact in connector " + connector);
         TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
         if (ltsService == null)
-            return new WorkflowActionReplyFailure("Failed to resolve a LTS service");
+            return new XSPReplyFailure("Failed to resolve a LTS service");
         TripleStore longTermStore = ltsService.getLongTermStore();
         if (longTermStore == null)
-            return new WorkflowActionReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
+            return new XSPReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
         boolean success = longTermStore.store(artifact);
-        return success ? WorkflowActionReplySuccess.INSTANCE : new WorkflowActionReplyFailure("Failed to push the artifact to the long term store");
+        return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the long term store");
     }
 
     /**
@@ -61,20 +64,20 @@ public class WorkflowUtils {
      * @param artifactID The identifier of the artifact to push
      * @return The result of the operation
      */
-    public static WorkflowActionReply pushToLive(String artifactID) {
+    public static XSPReply pushToLive(String artifactID) {
         TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
         if (ltsService == null)
-            return new WorkflowActionReplyFailure("Failed to resolve a LTS service");
+            return new XSPReplyFailure("Failed to resolve a LTS service");
         TripleStore longTermStore = ltsService.getLongTermStore();
         if (longTermStore == null)
-            return new WorkflowActionReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
+            return new XSPReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
         TripleStore liveStore = ltsService.getLiveStore();
         if (liveStore == null)
-            return new WorkflowActionReplyFailure("Failed to retrieve the live store on LTS service " + ltsService.getIdentifier());
+            return new XSPReplyFailure("Failed to retrieve the live store on LTS service " + ltsService.getIdentifier());
         Artifact artifact = longTermStore.retrieve(artifactID);
         if (artifact == null)
-            return new WorkflowActionReplyFailure("Artifact " + artifactID + " does not exist in the long term store");
+            return new XSPReplyFailure("Artifact " + artifactID + " does not exist in the long term store");
         boolean success = liveStore.store(artifact);
-        return success ? WorkflowActionReplySuccess.INSTANCE : new WorkflowActionReplyFailure("Failed to push the artifact to the live store");
+        return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the live store");
     }
 }

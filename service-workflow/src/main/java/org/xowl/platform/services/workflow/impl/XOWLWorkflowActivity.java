@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.workflow.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.workflow.WorkflowAction;
 import org.xowl.platform.services.workflow.WorkflowActivity;
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.store.IOUtils;
 
 import java.util.ArrayList;
@@ -87,14 +87,7 @@ public class XOWLWorkflowActivity implements WorkflowActivity {
                             break;
                         }
                     }
-                    switch (type) {
-                        case "org.xowl.platform.services.workflow.impl.XOWLWorkflowActionPullArtifact":
-                            actions.add(new XOWLWorkflowActionPullArtifact(actionNode));
-                            break;
-                        default:
-                            actions.add(new XOWLWorkflowAction(actionNode));
-                            break;
-                    }
+                    actions.add(XOWLWorkflowService.newAction(type, actionNode));
                 }
             }
         }

@@ -22,6 +22,7 @@ package org.xowl.platform.services.workflow;
 
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.store.Serializable;
+import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents an action that can be triggered in a workflow within the platform
@@ -35,5 +36,5 @@ public interface WorkflowAction extends Identifiable, Serializable {
      * @param parameter The parameter, if any
      * @return The result
      */
-    WorkflowActionReply execute(Object parameter);
+    XSPReply execute(Object parameter);
 }

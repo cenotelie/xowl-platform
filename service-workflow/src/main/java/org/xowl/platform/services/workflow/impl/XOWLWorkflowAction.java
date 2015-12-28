@@ -22,9 +22,9 @@ package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.workflow.WorkflowAction;
-import org.xowl.platform.services.workflow.WorkflowActionReply;
-import org.xowl.platform.services.workflow.WorkflowActionReplySuccess;
 import org.xowl.store.IOUtils;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplySuccess;
 
 /**
  * Base class for workflow actions
@@ -81,8 +81,8 @@ public class XOWLWorkflowAction implements WorkflowAction {
     }
 
     @Override
-    public WorkflowActionReply execute(Object parameter) {
-        return WorkflowActionReplySuccess.INSTANCE;
+    public XSPReply execute(Object parameter) {
+        return XSPReplySuccess.instance();
     }
 
     @Override
@@ -102,6 +102,9 @@ public class XOWLWorkflowAction implements WorkflowAction {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", \"name\": \"" + IOUtils.escapeStringJSON(name) + "\", \"finishOnSuccess\": " + finishOnSuccess + "}";
+        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
+                "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
+                "\"finishOnSuccess\": " + finishOnSuccess + ", " +
+                "\"type\": \"XOWLWorkflowAction\"}";
     }
 }

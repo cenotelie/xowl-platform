@@ -18,31 +18,38 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.services.workflow.impl;
+
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.services.workflow.WorkflowUtils;
+import org.xowl.store.IOUtils;
+import org.xowl.store.xsp.XSPReply;
 
 /**
- * Implements a reply to a successful workflow action
+ * Represents an action in a workflow that consists in pushing an artifact from the long term store to the live store
  *
  * @author Laurent Wouters
  */
-public class WorkflowActionReplySuccess implements WorkflowActionReply {
+public class XOWLWorkflowActionPushLive extends XOWLWorkflowAction {
     /**
-     * The default instance
+     * Initializes this action
+     *
+     * @param node The specification
      */
-    public static final WorkflowActionReplySuccess INSTANCE = new WorkflowActionReplySuccess();
-
-    @Override
-    public boolean isSuccess() {
-        return true;
+    public XOWLWorkflowActionPushLive(ASTNode node) {
+        super(node);
     }
 
     @Override
-    public String serializedString() {
-        return "OK";
+    public XSPReply execute(Object parameter) {
+        return WorkflowUtils.pullArtifact(parameter.toString());
     }
 
     @Override
     public String serializedJSON() {
-        return "{\"isSuccess\":\"true\"}";
+        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
+                "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
+                "\"finishOnSuccess\": " + finishOnSuccess + ", " +
+                "\"type\": \"XOWLWorkflowActionPushLive\"}";
     }
 }

@@ -20,43 +20,30 @@
 
 package org.xowl.platform.services.workflow;
 
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.Service;
+
+import java.util.Collection;
+
 /**
- * Implements a reply to a failed workflow action
+ * Represents a service that can create workflow elements
  *
  * @author Laurent Wouters
  */
-public class WorkflowActionReplyFailure implements WorkflowActionReply {
+public interface WorkflowFactoryService extends Service {
     /**
-     * The default instance
-     */
-    public static final WorkflowActionReplyFailure INSTANCE = new WorkflowActionReplyFailure(null);
-
-    /**
-     * The message, if any
-     */
-    private final String message;
-
-    /**
-     * Initializes this failure
+     * Gets the types of workflow actions supported by this service
      *
-     * @param message The message
+     * @return The types of workflow actions
      */
-    public WorkflowActionReplyFailure(String message) {
-        this.message = message;
-    }
+    Collection<String> getActionTypes();
 
-    @Override
-    public boolean isSuccess() {
-        return false;
-    }
-
-    @Override
-    public String serializedString() {
-        return message != null ? "ERROR: " + message : "ERROR";
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"isSuccess\":\"false\", \"message\": \"" + (message != null ? message : "") + "\"}";
-    }
+    /**
+     * Creates a new action object
+     *
+     * @param type           The action type
+     * @param jsonDefinition The definition of the action
+     * @return The new action
+     */
+    WorkflowAction create(String type, ASTNode jsonDefinition);
 }

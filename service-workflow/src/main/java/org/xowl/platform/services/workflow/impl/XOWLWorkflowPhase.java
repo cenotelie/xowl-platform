@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.workflow.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.workflow.WorkflowActivity;
 import org.xowl.platform.services.workflow.WorkflowPhase;
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.store.IOUtils;
 
 import java.util.ArrayList;

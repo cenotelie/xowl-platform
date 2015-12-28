@@ -21,10 +21,9 @@
 package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.services.workflow.WorkflowActionReply;
-import org.xowl.platform.services.workflow.WorkflowActionReplySuccess;
 import org.xowl.platform.services.workflow.WorkflowUtils;
 import org.xowl.store.IOUtils;
+import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents an action in a workflow that consists in pulling an artifact from a connector to the platform
@@ -57,7 +56,7 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
     }
 
     @Override
-    public WorkflowActionReply execute(Object parameter) {
+    public XSPReply execute(Object parameter) {
         return WorkflowUtils.pullArtifact(connectorId);
     }
 
@@ -66,7 +65,7 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
         return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
                 "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
                 "\"finishOnSuccess\": " + finishOnSuccess + ", " +
-                "\"type\": \""+IOUtils.escapeStringJSON(XOWLWorkflowActionPullArtifact.class.getCanonicalName())+"\", " +
+                "\"type\": \"XOWLWorkflowActionPullArtifact\", " +
                 "\"connectorId\": \"" + IOUtils.escapeStringJSON(connectorId) + "\"}";
     }
 }

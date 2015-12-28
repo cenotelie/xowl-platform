@@ -21,6 +21,7 @@
 package org.xowl.platform.services.workflow;
 
 import org.xowl.platform.kernel.Service;
+import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents a service that drives a workflow on the platform
@@ -56,5 +57,5 @@ public interface WorkflowService extends Service {
      * @param parameter A parameter for the action, if any
      * @return The action's result
      */
-    WorkflowActionReply execute(WorkflowAction action, Object parameter);
+    XSPReply execute(WorkflowAction action, Object parameter);
 }

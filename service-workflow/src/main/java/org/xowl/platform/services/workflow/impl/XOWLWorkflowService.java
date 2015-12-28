@@ -36,6 +36,8 @@ import org.xowl.store.rdf.Node;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.storage.NodeManager;
 import org.xowl.store.storage.cache.CachedNodes;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
@@ -45,11 +47,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Implements the default workflow service for the platform
+ * This service uses a configuration element that must define a workflow through a JSON notation
  *
  * @author Laurent Wouters
  */
@@ -223,13 +227,13 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
     }
 
     @Override
-    public WorkflowActionReply execute(WorkflowAction action, Object parameter) {
+    public XSPReply execute(WorkflowAction action, Object parameter) {
         WorkflowActivity activity = getActiveActivity();
         if (activity == null)
-            return new WorkflowActionReplyFailure("The workflow is not configured");
+            return new XSPReplyFailure("The workflow is not configured");
         if (!activity.getActions().contains(action))
-            return new WorkflowActionReplyFailure("This action is not available");
-        WorkflowActionReply reply = action.execute(parameter);
+            return new XSPReplyFailure("This action is not available");
+        XSPReply reply = action.execute(parameter);
         if (reply.isSuccess()) {
             int indexPhase = workflow.getPhases().indexOf(currentPhase);
             int indexActivity = currentPhase.getActivities().indexOf(currentActivity);
@@ -267,13 +271,29 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
         for (WorkflowAction action : currentActivity.getActions()) {
             if (action.getIdentifier().equals(actionID)) {
-                WorkflowActionReply reply = execute(action, null);
+                XSPReply reply = execute(action, null);
                 if (reply.isSuccess())
-                    return new HttpResponse(HttpURLConnection.HTTP_OK);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, reply.serializedJSON());
                 else
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, reply.serializedString());
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Action is unavailable");
+    }
+
+    /**
+     * Creates a new action
+     *
+     * @param type           The type of action
+     * @param jsonDefinition The definition of the action
+     * @return The new action
+     */
+    public static WorkflowAction newAction(String type, ASTNode jsonDefinition) {
+        Collection<WorkflowFactoryService> factories = ServiceUtils.getServices(WorkflowFactoryService.class);
+        for (WorkflowFactoryService factory : factories) {
+            if (factory.getActionTypes().contains(type))
+                return factory.create(type, jsonDefinition);
+        }
+        return new XOWLWorkflowAction(jsonDefinition);
     }
 }

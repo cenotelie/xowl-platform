@@ -22,6 +22,7 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
 
@@ -38,8 +39,9 @@ public class Activator implements BundleActivator {
         RemoteXOWLStoreService service = new RemoteXOWLStoreService();
         Hashtable<String, Object> properties = new Hashtable<>();
         properties.put("id", service.getIdentifier());
-        properties.put("uri", new String[] {"sparql", "artifacts"});
+        properties.put("uri", new String[]{"sparql", "artifacts"});
         bundleContext.registerService(TripleStoreService.class, service, properties);
+        bundleContext.registerService(ArtifactStorageService.class, service, properties);
         bundleContext.registerService(ServiceHttpServed.class, service, properties);
     }
 

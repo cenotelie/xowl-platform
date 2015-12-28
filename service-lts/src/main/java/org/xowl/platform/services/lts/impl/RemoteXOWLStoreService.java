@@ -20,19 +20,26 @@
 
 package org.xowl.platform.services.lts.impl;
 
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
+import org.xowl.store.rdf.*;
 import org.xowl.store.sparql.Result;
+import org.xowl.store.sparql.ResultQuads;
+import org.xowl.store.sparql.ResultSolutions;
+import org.xowl.store.storage.cache.CachedNodes;
+import org.xowl.store.writers.NTripleSerializer;
+import org.xowl.utils.logging.Logger;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,7 +47,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpServed {
+public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStorageService, ServiceHttpServed {
     /**
      * The live store
      */
@@ -82,6 +89,112 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
         if ("name".equals(name))
             return getName();
         return null;
+    }
+
+    @Override
+    public TripleStore getLiveStore() {
+        return storeLive;
+    }
+
+    @Override
+    public TripleStore getLongTermStore() {
+        return storeLongTerm;
+    }
+
+    @Override
+    public TripleStore getServiceStore() {
+        return storeService;
+    }
+
+    @Override
+    public boolean store(Artifact artifact) {
+        return store(artifact, storeLongTerm);
+    }
+
+    @Override
+    public Artifact retrieve(String identifier) {
+        Result result = storeLongTerm.sparql("DESCRIBE <" + IOUtils.escapeAbsoluteURIW3C(identifier) + ">");
+        if (result.isFailure())
+            return null;
+        Collection<Quad> metadata = ((ResultQuads) result).getQuads();
+        if (metadata.isEmpty())
+            return null;
+        return buildArtifact(metadata);
+    }
+
+    @Override
+    public Artifact retrieve(String base, String version) {
+        StringWriter writer = new StringWriter();
+        writer.write("DESCRIBE ?a WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(">. ?a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
+        writer.write("> <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(base));
+        writer.write(">. ?a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.VERSION));
+        writer.write("> \"");
+        writer.write(IOUtils.escapeStringW3C(version));
+        writer.write("\" } }");
+        Result result = storeLongTerm.sparql(writer.toString());
+        if (result.isFailure())
+            return null;
+        Collection<Quad> metadata = ((ResultQuads) result).getQuads();
+        if (metadata.isEmpty())
+            return null;
+        return buildArtifact(metadata);
+    }
+
+    @Override
+    public Collection<Artifact> list() {
+        StringWriter writer = new StringWriter();
+        writer.write("DESCRIBE ?a WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write("> } }");
+
+        Result sparqlResult = storeLongTerm.sparql(writer.toString());
+        if (sparqlResult.isFailure())
+            return new ArrayList<>();
+        return buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+    }
+
+    @Override
+    public Collection<Artifact> list(String base) {
+        StringWriter writer = new StringWriter();
+        writer.write("DESCRIBE ?a WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(">. ?a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
+        writer.write("> <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(base));
+        writer.write("> } }");
+
+        Result sparqlResult = storeLongTerm.sparql(writer.toString());
+        if (sparqlResult.isFailure())
+            return new ArrayList<>();
+        return buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+    }
+
+    @Override
+    public boolean isLive(Artifact artifact) {
+        // TODO: implement this
+        return false;
+    }
+
+    @Override
+    public boolean pushToLive(Artifact artifact) {
+        return store(artifact, storeLive);
+    }
+
+    @Override
+    public boolean pullFromLive(Artifact artifact) {
+        return delete(artifact, storeLive);
     }
 
     @Override
@@ -129,7 +242,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
      * @return The response
      */
     private HttpResponse onMessageGetArtifacts() {
-        Collection<Artifact> artifacts = getLongTermStore().listArtifacts();
+        Collection<Artifact> artifacts = list();
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
         for (Artifact artifact : artifacts) {
@@ -142,18 +255,101 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
         return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
-    @Override
-    public TripleStore getLiveStore() {
-        return storeLive;
+    /**
+     * Stores the specified artifact
+     *
+     * @param artifact The artifact to store
+     * @param store    The target store
+     * @return Whether the operation succeeded
+     */
+    private boolean store(Artifact artifact, TripleStore store) {
+        StringWriter writer = new StringWriter();
+        writer.write("INSERT DATA { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ");
+        NTripleSerializer serializer = new NTripleSerializer(writer);
+        serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
+        writer.write(" } }; INSERT DATA { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
+        writer.write("> {");
+        serializer.serialize(Logger.DEFAULT, artifact.getContent().iterator());
+        writer.write(" } }");
+        Result result = store.sparql(writer.toString());
+        return result.isSuccess();
     }
 
-    @Override
-    public TripleStore getLongTermStore() {
-        return storeLongTerm;
+    /**
+     * Deletes the specified artifact
+     *
+     * @param artifact The artifact to delete
+     * @param store    The target store
+     * @return Whether the operation succeeded
+     */
+    private boolean delete(Artifact artifact, TripleStore store) {
+        StringWriter writer = new StringWriter();
+        writer.write("DELETE WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
+        writer.write("> ?p ?o } }; DROP SILENT GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
+        writer.write(">");
+        Result result = store.sparql(writer.toString());
+        return result.isSuccess();
     }
 
-    @Override
-    public TripleStore getServiceStore() {
-        return storeService;
+    /**
+     * Builds the default artifacts from the specified metadata
+     *
+     * @param quads The metadata of multiple artifacts
+     * @return The artifacts
+     */
+    private Collection<Artifact> buildArtifacts(Collection<Quad> quads) {
+        Collection<Artifact> result = new ArrayList<>();
+        Map<IRINode, Collection<Quad>> data = new HashMap<>();
+        for (Quad quad : quads) {
+            if (quad.getSubject().getNodeType() == Node.TYPE_IRI) {
+                IRINode subject = (IRINode) quad.getSubject();
+                Collection<Quad> metadata = data.get(subject);
+                if (metadata == null) {
+                    metadata = new ArrayList<>();
+                    data.put(subject, metadata);
+                }
+                metadata.add(quad);
+            }
+        }
+        for (Map.Entry<IRINode, Collection<Quad>> entry : data.entrySet()) {
+            result.add(buildArtifact(entry.getValue()));
+        }
+        return result;
+    }
+
+    /**
+     * Builds the default artifact from the specified metadata
+     *
+     * @param metadata The metadata
+     * @return The artifact
+     */
+    private Artifact buildArtifact(Collection<Quad> metadata) {
+        return new ArtifactDeferred(metadata) {
+            @Override
+            protected Collection<Quad> load() {
+                // TODO: change for a CONSTRUCT query
+                Result result = storeLongTerm.sparql("SELECT ?s ?p ?o WHERE  { GRAPH <" + IOUtils.escapeAbsoluteURIW3C(identifier) + "> { ?s ?p ?o } }");
+                if (result.isFailure())
+                    return null;
+                ResultSolutions solutions = ((ResultSolutions) result);
+                Collection<Quad> quads = new ArrayList<>(solutions.getSolutions().size());
+                CachedNodes nodes = new CachedNodes();
+                IRINode graph = nodes.getIRINode(identifier);
+                for (QuerySolution solution : solutions.getSolutions()) {
+                    quads.add(new Quad(graph,
+                            (SubjectNode) solution.get("s"),
+                            (Property) solution.get("p"),
+                            solution.get("o")));
+                }
+                return quads;
+            }
+        };
     }
 }

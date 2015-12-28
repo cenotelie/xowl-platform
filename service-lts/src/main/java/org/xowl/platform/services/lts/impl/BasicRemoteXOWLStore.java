@@ -34,7 +34,7 @@ import org.xowl.utils.config.Configuration;
  *
  * @author Laurent Wouters
  */
-public class BasicRemoteXOWLStore extends RemoteXOWLStore {
+class BasicRemoteXOWLStore extends RemoteXOWLStore {
     /**
      * The parent service
      */

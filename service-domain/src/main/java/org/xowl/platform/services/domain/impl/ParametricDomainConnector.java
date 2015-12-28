@@ -22,6 +22,7 @@ package org.xowl.platform.services.domain.impl;
 
 import org.osgi.framework.ServiceRegistration;
 import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.domain.BaseDomainConnector;
@@ -148,7 +149,7 @@ class ParametricDomainConnector extends BaseDomainConnector {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
         BufferedLogger logger = new BufferedLogger();
         String contentString = new String(content, Utils.DEFAULT_CHARSET);
-        String resource = KernelSchema.GRAPH_ARTIFACTS + "#" + UUID.randomUUID().toString();
+        String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, null);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");

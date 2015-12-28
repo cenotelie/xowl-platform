@@ -20,8 +20,11 @@
 
 package org.xowl.platform.services.lts;
 
+import org.xowl.platform.kernel.Artifact;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.xsp.XSPReply;
+
+import java.util.Collection;
 
 /**
  * Represents a triple store for the platform
@@ -44,4 +47,35 @@ public interface TripleStore {
      * @return The reply
      */
     XSPReply execute(String command);
+
+    /**
+     * Gets the artifacts in this store
+     *
+     * @return The artifacts in this store
+     */
+    Collection<Artifact> getArtifacts();
+
+    /**
+     * Stores an artifact in this store
+     *
+     * @param artifact The artifact to store
+     * @return Whether the operation succeeded
+     */
+    boolean store(Artifact artifact);
+
+    /**
+     * Retrieves the artifact identified by the specified identifier
+     *
+     * @param identifier The identifier of a artifact
+     * @return The artifact, or null it is unknown or cannot be retrieved
+     */
+    Artifact retrieve(String identifier);
+
+    /**
+     * Deletes the artifact identified by the specified identifier
+     *
+     * @param identifier The identifier of a artifact
+     * @return Whether the operation succeeded
+     */
+    boolean delete(String identifier);
 }

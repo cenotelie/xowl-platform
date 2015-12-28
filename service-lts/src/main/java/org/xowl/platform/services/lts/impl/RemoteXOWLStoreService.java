@@ -25,13 +25,13 @@ import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.HttpResponse;
+import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.sparql.Result;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
 
@@ -103,7 +103,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
     private HttpResponse onMessageSPARQL(byte[] content, String accept) {
         if (content == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        String request = new String(content, Charset.forName("UTF-8"));
+        String request = new String(content, Utils.DEFAULT_CHARSET);
         Result result = storeLive.sparql(request);
         String responseType = Result.SYNTAX_JSON;
         switch (accept) {
@@ -120,7 +120,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
         } catch (IOException exception) {
             // cannot happen
         }
-        return new HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString().getBytes(Charset.forName("UTF-8")));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString());
     }
 
     /**
@@ -139,7 +139,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ServiceHttpSe
             builder.append(artifact.serializedJSON());
         }
         builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString().getBytes(Charset.forName("UTF-8")));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
     @Override

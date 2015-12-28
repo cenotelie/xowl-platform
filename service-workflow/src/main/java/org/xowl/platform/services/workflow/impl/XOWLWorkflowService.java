@@ -44,7 +44,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
         String file = configuration.get("processFile");
         if (file != null) {
             try (InputStream stream = new FileInputStream(service.resolve(file))) {
-                String content = Files.read(stream, Charset.forName("UTF-8"));
+                String content = Files.read(stream, Utils.DEFAULT_CHARSET);
                 ASTNode root = Utils.parseJSON(Logger.DEFAULT, content);
                 workflow = new XOWLWorkflow(root);
                 currentPhase = workflow.getPhases().get(0);
@@ -255,26 +254,26 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
         if (parameters == null || parameters.isEmpty()) {
             retrieveWorkflow();
             if (workflow == null)
-                return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured".getBytes(Charset.forName("UTF-8")));
-            return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, workflow.serializedJSON().getBytes(Charset.forName("UTF-8")));
+                return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, workflow.serializedJSON());
         }
 
         String[] values = parameters.get("action");
         if (values == null || values.length < 1)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected action parameter".getBytes(Charset.forName("UTF-8")));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected action parameter");
         String actionID = values[0];
         retrieveWorkflow();
         if (workflow == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured".getBytes(Charset.forName("UTF-8")));
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
         for (WorkflowAction action : currentActivity.getActions()) {
             if (action.getIdentifier().equals(actionID)) {
                 WorkflowActionReply reply = execute(action, null);
                 if (reply.isSuccess())
                     return new HttpResponse(HttpURLConnection.HTTP_OK);
                 else
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, reply.serializedString().getBytes(Charset.forName("UTF-8")));
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, reply.serializedString());
             }
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Action is unavailable".getBytes(Charset.forName("UTF-8")));
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Action is unavailable");
     }
 }

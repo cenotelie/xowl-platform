@@ -20,26 +20,24 @@
 
 package org.xowl.platform.services.lts.impl;
 
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.kernel.ArtifactStorageService;
+import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.ServiceHttpServed;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.*;
+import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultQuads;
-import org.xowl.store.sparql.ResultSolutions;
-import org.xowl.store.storage.cache.CachedNodes;
-import org.xowl.store.writers.NTripleSerializer;
-import org.xowl.utils.logging.Logger;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

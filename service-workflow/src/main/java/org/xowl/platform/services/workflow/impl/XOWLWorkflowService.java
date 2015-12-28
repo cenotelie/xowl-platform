@@ -269,9 +269,11 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
         retrieveWorkflow();
         if (workflow == null)
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
+
+        String message = content == null ? null : new String(content, Utils.DEFAULT_CHARSET);
         for (WorkflowAction action : currentActivity.getActions()) {
             if (action.getIdentifier().equals(actionID)) {
-                XSPReply reply = execute(action, null);
+                XSPReply reply = execute(action, message);
                 if (reply.isSuccess())
                     return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, reply.serializedJSON());
                 else

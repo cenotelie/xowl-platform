@@ -42,7 +42,7 @@ public class XOWLWorkflowActionPushLive extends XOWLWorkflowAction {
 
     @Override
     public XSPReply execute(Object parameter) {
-        return WorkflowUtils.pullArtifact(parameter.toString());
+        return WorkflowUtils.pushToLive(parameter.toString());
     }
 
     @Override

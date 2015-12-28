@@ -21,10 +21,9 @@
 package org.xowl.platform.services.workflow;
 
 import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.domain.DomainConnectorService;
-import org.xowl.platform.services.lts.TripleStore;
-import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
@@ -45,16 +44,13 @@ public class WorkflowUtils {
         DomainConnectorService connectorService = ServiceUtils.getService(DomainConnectorService.class, "id", connector);
         if (connectorService == null)
             return new XSPReplyFailure("Failed to resolve connector " + connector);
+        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
+        if (storageService == null)
+            return new XSPReplyFailure("Failed to resolve an artifact storage service");
         Artifact artifact = connectorService.getNextInput(false);
         if (artifact == null)
             return new XSPReplyFailure("No queued artifact in connector " + connector);
-        TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
-        if (ltsService == null)
-            return new XSPReplyFailure("Failed to resolve a LTS service");
-        TripleStore longTermStore = ltsService.getLongTermStore();
-        if (longTermStore == null)
-            return new XSPReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
-        boolean success = longTermStore.store(artifact);
+        boolean success = storageService.store(artifact);
         return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the long term store");
     }
 
@@ -65,19 +61,13 @@ public class WorkflowUtils {
      * @return The result of the operation
      */
     public static XSPReply pushToLive(String artifactID) {
-        TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
-        if (ltsService == null)
-            return new XSPReplyFailure("Failed to resolve a LTS service");
-        TripleStore longTermStore = ltsService.getLongTermStore();
-        if (longTermStore == null)
-            return new XSPReplyFailure("Failed to retrieve the long term store on LTS service " + ltsService.getIdentifier());
-        TripleStore liveStore = ltsService.getLiveStore();
-        if (liveStore == null)
-            return new XSPReplyFailure("Failed to retrieve the live store on LTS service " + ltsService.getIdentifier());
-        Artifact artifact = longTermStore.retrieve(artifactID);
+        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
+        if (storageService == null)
+            return new XSPReplyFailure("Failed to resolve an artifact storage service");
+        Artifact artifact = storageService.retrieve(artifactID);
         if (artifact == null)
             return new XSPReplyFailure("Artifact " + artifactID + " does not exist in the long term store");
-        boolean success = liveStore.store(artifact);
+        boolean success = storageService.pushToLive(artifact);
         return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the live store");
     }
 }

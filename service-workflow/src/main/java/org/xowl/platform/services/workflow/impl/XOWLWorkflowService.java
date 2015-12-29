@@ -38,6 +38,7 @@ import org.xowl.store.storage.NodeManager;
 import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
+import org.xowl.store.xsp.XSPReplyResult;
 import org.xowl.store.xsp.XSPReplySuccess;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
@@ -259,7 +260,7 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
             return new XSPReplyFailure("Could not find the job execution service");
         WorkflowJob job = newJob(action.getName(), action);
         executor.schedule(job);
-        return XSPReplySuccess.instance();
+        return new XSPReplyResult<>(job);
     }
 
     @Override

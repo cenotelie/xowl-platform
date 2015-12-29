@@ -23,19 +23,19 @@ package org.xowl.platform.services.executor.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.config.ConfigurationService;
+import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, Service {
+public class XOWLJobExecutor implements JobExecutionService, ServiceHttpServed {
     /**
      * The bound of the executor queue
      */
@@ -239,6 +239,26 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
         for (Runnable runnable : getExecutorPool().getQueue())
             result.add((Job) runnable);
         return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        List<Job> queue = getQueue();
+        StringWriter builder = new StringWriter();
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(JobExecutionService.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
+        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
+        builder.append("\", \"name\": \"");
+        builder.append(IOUtils.escapeStringJSON(getName()));
+        builder.append("\", \"queue\": [");
+        for (int i = 0; i != queue.size(); i++) {
+            if (i == 0)
+                builder.append(", ");
+            builder.append(queue.get(i).serializedJSON());
+        }
+        builder.append("]}");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
     /**

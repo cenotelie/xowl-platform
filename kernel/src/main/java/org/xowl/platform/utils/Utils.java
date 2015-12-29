@@ -24,12 +24,18 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
 import org.xowl.store.loaders.JSONLDLoader;
+import org.xowl.store.rdf.Quad;
+import org.xowl.store.rdf.SubjectNode;
 import org.xowl.utils.logging.BufferedLogger;
 import org.xowl.utils.logging.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility APIs for the server
@@ -102,5 +108,24 @@ public class Utils {
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    /**
+     * Maps a collection of quads by their subject
+     *
+     * @param quads A collection of quads
+     * @return The mapped quads
+     */
+    public static Map<SubjectNode, Collection<Quad>> mapBySubject(Collection<Quad> quads) {
+        Map<SubjectNode, Collection<Quad>> result = new HashMap<>();
+        for (Quad quad : quads) {
+            Collection<Quad> target = result.get(quad.getSubject());
+            if (target == null) {
+                target = new ArrayList<>();
+                result.put(quad.getSubject(), target);
+            }
+            target.add(quad);
+        }
+        return result;
     }
 }

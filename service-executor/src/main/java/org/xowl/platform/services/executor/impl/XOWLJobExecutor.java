@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.executor;
+package org.xowl.platform.services.executor.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.*;

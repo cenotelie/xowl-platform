@@ -23,6 +23,7 @@ package org.xowl.platform.services.executor;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.JobExecutionService;
+import org.xowl.platform.services.executor.impl.XOWLJobExecutor;
 
 /**
  * The activator for this bundle

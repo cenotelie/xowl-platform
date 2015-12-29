@@ -1,1 +1,1 @@
-org.xowl.platform.services.executor.XOWLJobExecutor
+org.xowl.platform.services.executor.impl.XOWLJobExecutor

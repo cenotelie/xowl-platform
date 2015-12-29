@@ -89,7 +89,7 @@ public abstract class ArtifactBase implements Artifact {
                 if (KernelSchema.NAME.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     name = ((LiteralNode) quad.getObject()).getLexicalValue();
                 else if (KernelSchema.BASE.equals(((IRINode) quad.getProperty()).getIRIValue()))
-                    baseID = ((LiteralNode) quad.getObject()).getLexicalValue();
+                    baseID = ((IRINode) quad.getObject()).getIRIValue();
                 else if (KernelSchema.VERSION.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     version = ((LiteralNode) quad.getObject()).getLexicalValue();
             }

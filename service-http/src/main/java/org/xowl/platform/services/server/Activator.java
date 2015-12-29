@@ -50,7 +50,7 @@ public class Activator implements BundleActivator {
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
-                    service.unregister("/");
+                    service.unregister(HTTPServerService.URI_API);
                 } catch (IllegalArgumentException exception) {
                     // ignore this
                 }
@@ -59,7 +59,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerServlet("/", server, null, null);
+                    httpService.registerServlet(HTTPServerService.URI_API, server, null, null);
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

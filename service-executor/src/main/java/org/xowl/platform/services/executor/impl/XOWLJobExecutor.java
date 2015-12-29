@@ -83,7 +83,7 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
             if (configuration != null) {
                 String value = configuration.get("storage");
                 if (value != null)
-                    storage = configurationService.resolve(value);
+                    storage = new File(value);
                 else
                     storage = new File(System.getProperty("user.dir"));
                 try {

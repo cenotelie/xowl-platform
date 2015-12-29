@@ -118,7 +118,7 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
      * @param job the finished job
      */
     private void onJobFinished(Job job) {
-        File file = new File(storage, Utils.encode(job.getIdentifier()));
+        File file = new File(storage, getFileName(job));
         if (file.exists()) {
             if (!file.delete()) {
                 Logger.DEFAULT.error("Failed to delete " + file.getAbsolutePath());
@@ -136,7 +136,7 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
         File[] files = storage.listFiles();
         if (files != null) {
             for (int i = 0; i != files.length; i++) {
-                if (files[i].getName().startsWith("job-")) {
+                if (isJobFile(files[i].getName())) {
                     try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
                         String content = Files.read(reader);
                         reloadJob(files[i].getAbsolutePath(), content);
@@ -212,7 +212,7 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
             exists = storage.mkdirs();
         }
         if (exists) {
-            try (Writer write = Files.getWriter(new File(storage, "job-" + Utils.encode(job.getIdentifier())).getAbsolutePath())) {
+            try (Writer write = Files.getWriter(new File(storage, getFileName(job)).getAbsolutePath())) {
                 write.write(job.serializedJSON());
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
@@ -239,5 +239,25 @@ public class XOWLJobExecutor implements JobExecutionService, Service {
         for (Runnable runnable : getExecutorPool().getQueue())
             result.add((Job) runnable);
         return Collections.unmodifiableList(result);
+    }
+
+    /**
+     * Gets the file name for a job
+     *
+     * @param job The job
+     * @return The file name
+     */
+    private static String getFileName(Job job) {
+        return "job-" + Utils.encode(job.getIdentifier()) + ".json";
+    }
+
+    /**
+     * Gets whether a file name is a serialized job
+     *
+     * @param name The name of a file
+     * @return Whether this is a serialized job
+     */
+    private static boolean isJobFile(String name) {
+        return name.startsWith("job-") && name.endsWith(".json");
     }
 }

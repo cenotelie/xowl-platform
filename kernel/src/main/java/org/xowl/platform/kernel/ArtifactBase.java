@@ -130,7 +130,7 @@ public abstract class ArtifactBase implements Artifact {
     public String serializedJSON() {
         return "{\"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
-                + "\", \"name\":"
+                + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)
                 + "\", \"type\": \""
                 + IOUtils.escapeStringJSON(Artifact.class.getCanonicalName())

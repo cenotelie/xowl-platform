@@ -31,5 +31,5 @@ public interface HTTPServerService extends Service {
     /**
      * The URI prefix for API connections
      */
-    String URI_API = "/api/";
+    String URI_API = "/api";
 }

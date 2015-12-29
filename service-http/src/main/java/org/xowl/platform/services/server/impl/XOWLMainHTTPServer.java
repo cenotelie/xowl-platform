@@ -98,8 +98,8 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
         try {
             String uri = request.getRequestURI();
-            if (uri.startsWith(URI_API + "service/")) {
-                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring((URI_API + "service/").length()));
+            if (uri.startsWith(URI_API + "/service/")) {
+                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring((URI_API + "/service/").length()));
                 if (service == null) {
                     addCORSHeader(response);
                     response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
@@ -107,7 +107,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                     doServedService(service, method, request, response);
                 }
             } else {
-                uri = uri.substring(URI_API.length());
+                uri = uri.substring(URI_API.length() + 1);
                 ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "uri", uri);
                 if (service == null) {
                     addCORSHeader(response);

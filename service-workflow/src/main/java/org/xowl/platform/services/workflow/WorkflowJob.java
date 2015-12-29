@@ -18,43 +18,61 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow.impl;
+package org.xowl.platform.services.workflow;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.services.workflow.WorkflowUtils;
-import org.xowl.store.IOUtils;
+import org.xowl.platform.kernel.JobBase;
 import org.xowl.store.xsp.XSPReply;
 
 /**
- * Represents an action in a workflow that consists in pushing an artifact from the long term store to the live store
+ * Implements a job for the workflow that encapsulate a workflow action
  *
  * @author Laurent Wouters
  */
-public class XOWLWorkflowActionPushLive extends XOWLWorkflowAction {
+public class WorkflowJob extends JobBase {
     /**
-     * Initializes this action
-     *
-     * @param node The specification
+     * The underlying action
      */
-    public XOWLWorkflowActionPushLive(ASTNode node) {
-        super(node);
+    protected final WorkflowAction action;
+    /**
+     * The action's result
+     */
+    protected XSPReply result;
+
+    /**
+     * Initializes this job
+     *
+     * @param name   The action's name
+     * @param action The workflow action
+     */
+    public WorkflowJob(String name, WorkflowAction action) {
+        super(name, action.getType());
+        this.action = action;
+    }
+
+    /**
+     * Initializes this job
+     *
+     * @param definition The actions's definition
+     * @param action     The workflow action
+     */
+    public WorkflowJob(ASTNode definition, WorkflowAction action) {
+        super(definition);
+        this.action = action;
     }
 
     @Override
-    public String getType() {
-        return "XOWLWorkflowActionPushLive";
+    protected String getJSONSerializedPayload() {
+        return action.serializedJSON();
     }
 
     @Override
-    public XSPReply execute(Object parameter) {
-        return WorkflowUtils.pushToLive(parameter.toString());
+    public void onComplete() {
+        // do nothing
     }
 
     @Override
-    public String serializedJSON() {
-        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
-                "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
-                "\"finishOnSuccess\": " + finishOnSuccess + ", " +
-                "\"type\": \"XOWLWorkflowActionPushLive\"}";
+    public void doRun() {
+        result = action.execute(null);
     }
 }

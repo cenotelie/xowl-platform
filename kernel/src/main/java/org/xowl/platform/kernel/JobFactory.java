@@ -18,32 +18,22 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.kernel.Service;
-
-import java.util.Collection;
 
 /**
- * Represents a service that can create workflow elements
+ * A factory of jobs that is used to produce jobs from their serialized representation
  *
  * @author Laurent Wouters
  */
-public interface WorkflowFactoryService extends Service {
+public interface JobFactory extends Service {
     /**
-     * Gets the types of workflow actions supported by this service
+     * Creates a job from the specified definition
      *
-     * @return The types of workflow actions
+     * @param type       The job type
+     * @param definition The definition of a job
+     * @return The created job
      */
-    Collection<String> getActionTypes();
-
-    /**
-     * Creates a new action object
-     *
-     * @param type           The action type
-     * @param jsonDefinition The definition of the action
-     * @return The new action
-     */
-    WorkflowAction newAction(String type, ASTNode jsonDefinition);
+    Job newJob(String type, ASTNode definition);
 }

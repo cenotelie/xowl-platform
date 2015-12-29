@@ -31,6 +31,13 @@ import org.xowl.store.xsp.XSPReply;
  */
 public interface WorkflowAction extends Identifiable, Serializable {
     /**
+     * Gets the action's type
+     *
+     * @return The action's type
+     */
+    String getType();
+
+    /**
      * Executes/triggers this action
      *
      * @param parameter The parameter, if any

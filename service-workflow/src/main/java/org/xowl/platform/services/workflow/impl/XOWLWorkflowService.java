@@ -38,6 +38,7 @@ import org.xowl.store.storage.NodeManager;
 import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
+import org.xowl.store.xsp.XSPReplySuccess;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
@@ -187,6 +188,26 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
         store.store(artifact);
     }
 
+    /**
+     * Advances in the workflow
+     */
+    private void workflowAdvance() {
+        int indexPhase = workflow.getPhases().indexOf(currentPhase);
+        int indexActivity = currentPhase.getActivities().indexOf(currentActivity);
+        indexActivity++;
+        if (indexActivity >= currentPhase.getActivities().size()) {
+            indexPhase++;
+            if (indexPhase < workflow.getPhases().size()) {
+                currentPhase = workflow.getPhases().get(indexPhase);
+                currentActivity = currentPhase.getActivities().get(0);
+                pushNewState();
+            }
+        } else {
+            currentActivity = currentPhase.getActivities().get(indexActivity);
+            pushNewState();
+        }
+    }
+
     @Override
     public String getIdentifier() {
         return XOWLWorkflowService.class.getCanonicalName();
@@ -233,24 +254,12 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
             return new XSPReplyFailure("The workflow is not configured");
         if (!activity.getActions().contains(action))
             return new XSPReplyFailure("This action is not available");
-        XSPReply reply = action.execute(parameter);
-        if (reply.isSuccess()) {
-            int indexPhase = workflow.getPhases().indexOf(currentPhase);
-            int indexActivity = currentPhase.getActivities().indexOf(currentActivity);
-            indexActivity++;
-            if (indexActivity >= currentPhase.getActivities().size()) {
-                indexPhase++;
-                if (indexPhase < workflow.getPhases().size()) {
-                    currentPhase = workflow.getPhases().get(indexPhase);
-                    currentActivity = currentPhase.getActivities().get(0);
-                    pushNewState();
-                }
-            } else {
-                currentActivity = currentPhase.getActivities().get(indexActivity);
-                pushNewState();
-            }
-        }
-        return reply;
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return new XSPReplyFailure("Could not find the job execution service");
+        WorkflowJob job = newJob(action.getName(), action);
+        executor.schedule(job);
+        return XSPReplySuccess.instance();
     }
 
     @Override
@@ -294,8 +303,44 @@ public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
         Collection<WorkflowFactoryService> factories = ServiceUtils.getServices(WorkflowFactoryService.class);
         for (WorkflowFactoryService factory : factories) {
             if (factory.getActionTypes().contains(type))
-                return factory.create(type, jsonDefinition);
+                return factory.newAction(type, jsonDefinition);
         }
         return new XOWLWorkflowAction(jsonDefinition);
+    }
+
+    /**
+     * Creates a new workflow job
+     *
+     * @param name   The job's name
+     * @param action The associated action
+     * @return The job
+     */
+    public WorkflowJob newJob(String name, WorkflowAction action) {
+        return new WorkflowJob(name, action) {
+            @Override
+            public void onComplete() {
+                if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
+                    workflowAdvance();
+                }
+            }
+        };
+    }
+
+    /**
+     * Creates a new workflow job
+     *
+     * @param definition The job's definition
+     * @param action     The associated action
+     * @return The job
+     */
+    public WorkflowJob newJob(ASTNode definition, WorkflowAction action) {
+        return new WorkflowJob(definition, action) {
+            @Override
+            public void onComplete() {
+                if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
+                    workflowAdvance();
+                }
+            }
+        };
     }
 }

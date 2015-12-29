@@ -18,52 +18,58 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow.impl;
+package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.services.workflow.WorkflowAction;
 import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplySuccess;
+import org.xowl.utils.concurrent.SafeRunnable;
+import org.xowl.utils.logging.Logger;
+
+import java.util.UUID;
 
 /**
- * Base class for workflow actions
+ * Base implementation of a job on the platform
  *
  * @author Laurent Wouters
  */
-public class XOWLWorkflowAction implements WorkflowAction {
+public abstract class JobBase extends SafeRunnable implements Job {
     /**
-     * The unique identifier of this action
+     * The job's identifier
      */
     protected final String identifier;
     /**
-     * The name of this action
+     * The job's name
      */
     protected final String name;
     /**
-     * Whether the current activity is finished by this successful action
+     * The job's type
      */
-    protected final boolean finishOnSuccess;
+    protected final String type;
 
     /**
-     * Gets whether the current activity is finished by this successful action
+     * Initializes this job
      *
-     * @return Whether the current activity is finished by this successful action
+     * @param name The job's name
+     * @param type The job's type
      */
-    public boolean isFinishOnSuccess() {
-        return finishOnSuccess;
+    public JobBase(String name, String type) {
+        super(Logger.DEFAULT);
+        this.identifier = UUID.randomUUID().toString();
+        this.name = name;
+        this.type = type;
     }
 
     /**
-     * Initializes this action
+     * Initializes this job
      *
-     * @param node The specification
+     * @param definition The JSON definition
      */
-    public XOWLWorkflowAction(ASTNode node) {
+    public JobBase(ASTNode definition) {
+        super(Logger.DEFAULT);
         String id = null;
         String name = null;
-        String finish = null;
-        for (ASTNode member : node.getChildren()) {
+        String type = null;
+        for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
             String value = IOUtils.unescape(member.getChildren().get(1).getValue());
             head = head.substring(1, head.length() - 1);
@@ -71,23 +77,13 @@ public class XOWLWorkflowAction implements WorkflowAction {
                 id = value.substring(1, value.length() - 1);
             } else if ("name".equals(head)) {
                 name = value.substring(1, value.length() - 1);
-            } else if ("finishOnSuccess".equals(head)) {
-                finish = value;
+            } else if ("type".equals(head)) {
+                type = value;
             }
         }
         this.identifier = id;
         this.name = name;
-        this.finishOnSuccess = "true".equalsIgnoreCase(finish);
-    }
-
-    @Override
-    public String getType() {
-        return "XOWLWorkflowAction";
-    }
-
-    @Override
-    public XSPReply execute(Object parameter) {
-        return XSPReplySuccess.instance();
+        this.type = type;
     }
 
     @Override
@@ -102,14 +98,26 @@ public class XOWLWorkflowAction implements WorkflowAction {
 
     @Override
     public String serializedString() {
-        return serializedJSON();
+        return identifier;
     }
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) + "\", " +
-                "\"name\": \"" + IOUtils.escapeStringJSON(name) + "\", " +
-                "\"finishOnSuccess\": " + finishOnSuccess + ", " +
-                "\"type\": \"XOWLWorkflowAction\"}";
+        return "{\"identifier\": \""
+                + IOUtils.escapeStringJSON(identifier)
+                + "\", \"name\":\""
+                + IOUtils.escapeStringJSON(name)
+                + "\", \"type\": \""
+                + IOUtils.escapeStringJSON(type)
+                + "\", \"payload\": "
+                + getJSONSerializedPayload()
+                + "}";
     }
+
+    /**
+     * Gets the JSON serialization of the job's payload
+     *
+     * @return The serialization
+     */
+    protected abstract String getJSONSerializedPayload();
 }

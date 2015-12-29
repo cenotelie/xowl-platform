@@ -18,38 +18,22 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.services.executor;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.kernel.ServiceHttpServed;
-import org.xowl.platform.services.workflow.impl.XOWLWorkflowFactoryService;
-import org.xowl.platform.services.workflow.impl.XOWLWorkflowService;
-
-import java.util.Hashtable;
+import org.xowl.platform.kernel.JobExecutionService;
 
 /**
- * Activator for the workflow service bundle
+ * The activator for this bundle
  *
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        XOWLWorkflowService service = new XOWLWorkflowService();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", service.getIdentifier());
-        properties.put("uri", "workflow");
-        bundleContext.registerService(WorkflowService.class, service, properties);
-        bundleContext.registerService(ServiceHttpServed.class, service, properties);
-
-        XOWLWorkflowFactoryService factory = new XOWLWorkflowFactoryService(service);
-        properties = new Hashtable<>();
-        properties.put("id", factory.getIdentifier());
-        properties.put("type", XOWLWorkflowFactoryService.ACTIONS);
-        bundleContext.registerService(WorkflowFactoryService.class, factory, properties);
-        bundleContext.registerService(JobFactory.class, factory, properties);
+        XOWLJobExecutor service = new XOWLJobExecutor();
+        bundleContext.registerService(JobExecutionService.class, service, null);
     }
 
     @Override

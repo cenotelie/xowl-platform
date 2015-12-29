@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.xowl.platform</groupId>
+		<artifactId>top</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.xowl.platform</groupId>
+	<artifactId>xowl-service-executor</artifactId>
+	<packaging>bundle</packaging>
+	<version>0.1.0-SNAPSHOT</version>
+	<name>xOWL Federation - Service Job Executor</name>
+	<description>The job executor service</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.xowl.platform</groupId>
+			<artifactId>xowl-kernel</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xowl.platform</groupId>
+			<artifactId>xowl-service-config</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>3.0.1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<excludeDependencies>*;scope=provided|runtime</excludeDependencies>
+					<instructions>
+						<Bundle-Activator>org.xowl.platform.services.executor.Activator</Bundle-Activator>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

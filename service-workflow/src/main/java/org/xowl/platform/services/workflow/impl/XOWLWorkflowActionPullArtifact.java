@@ -56,6 +56,11 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
     }
 
     @Override
+    public String getType() {
+        return "XOWLWorkflowActionPullArtifact";
+    }
+
+    @Override
     public XSPReply execute(Object parameter) {
         return WorkflowUtils.pullArtifact(connectorId);
     }

@@ -18,32 +18,43 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.kernel;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.kernel.Service;
-
-import java.util.Collection;
+import java.util.List;
 
 /**
- * Represents a service that can create workflow elements
+ * A service for the execution of background jobs
  *
  * @author Laurent Wouters
  */
-public interface WorkflowFactoryService extends Service {
+public interface JobExecutionService extends Service {
     /**
-     * Gets the types of workflow actions supported by this service
+     * Schedules a job for execution
      *
-     * @return The types of workflow actions
+     * @param job The job to execute
      */
-    Collection<String> getActionTypes();
+    void schedule(Job job);
 
     /**
-     * Creates a new action object
+     * Cancels a job
      *
-     * @param type           The action type
-     * @param jsonDefinition The definition of the action
-     * @return The new action
+     * @param job The job to cancel
      */
-    WorkflowAction newAction(String type, ASTNode jsonDefinition);
+    void cancel(Job job);
+
+    /**
+     * Gets whether a job is scheduled
+     * When a job is not scheduled it can mean that is has already been executed
+     *
+     * @param job A job
+     * @return Whether the job is scheduled
+     */
+    boolean isScheduled(Job job);
+
+    /**
+     * Gets the current queue
+     *
+     * @return The current queue
+     */
+    List<Job> getQueue();
 }

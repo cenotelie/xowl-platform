@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, ServiceHttpServed {
+public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     /**
      * The bound of the executor queue
      */

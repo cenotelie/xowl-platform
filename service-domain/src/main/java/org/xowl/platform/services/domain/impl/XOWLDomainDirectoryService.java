@@ -22,7 +22,7 @@ package org.xowl.platform.services.domain.impl;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.domain.DomainConnectorService;
 import org.xowl.platform.services.domain.DomainDirectoryService;
@@ -108,7 +108,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             if (uris != null)
                 properties.put("uri", uris);
             connector.refAsDomainConnector = context.registerService(DomainConnectorService.class, connector, properties);
-            connector.refAsServedService = context.registerService(ServiceHttpServed.class, connector, properties);
+            connector.refAsServedService = context.registerService(HttpAPIService.class, connector, properties);
             return connector;
         }
     }

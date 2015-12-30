@@ -23,7 +23,7 @@ package org.xowl.platform.services.workflow;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.workflow.impl.XOWLWorkflowFactoryService;
 import org.xowl.platform.services.workflow.impl.XOWLWorkflowService;
 
@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
         properties.put("id", service.getIdentifier());
         properties.put("uri", "workflow");
         bundleContext.registerService(WorkflowService.class, service, properties);
-        bundleContext.registerService(ServiceHttpServed.class, service, properties);
+        bundleContext.registerService(HttpAPIService.class, service, properties);
 
         XOWLWorkflowFactoryService factory = new XOWLWorkflowFactoryService(service);
         properties = new Hashtable<>();

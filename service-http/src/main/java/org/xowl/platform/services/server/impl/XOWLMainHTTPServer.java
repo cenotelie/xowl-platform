@@ -20,7 +20,7 @@
 
 package org.xowl.platform.services.server.impl;
 
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.server.HTTPServerService;
 import org.xowl.platform.utils.HttpResponse;
@@ -99,7 +99,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         try {
             String uri = request.getRequestURI();
             if (uri.startsWith(URI_API + "/service/")) {
-                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "id", uri.substring((URI_API + "/service/").length()));
+                HttpAPIService service = ServiceUtils.getService(HttpAPIService.class, "id", uri.substring((URI_API + "/service/").length()));
                 if (service == null) {
                     addCORSHeader(response);
                     response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
@@ -108,7 +108,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 }
             } else {
                 uri = uri.substring(URI_API.length() + 1);
-                ServiceHttpServed service = ServiceUtils.getService(ServiceHttpServed.class, "uri", uri);
+                HttpAPIService service = ServiceUtils.getService(HttpAPIService.class, "uri", uri);
                 if (service == null) {
                     addCORSHeader(response);
                     response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
@@ -139,7 +139,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @param request  The request
      * @param response The response
      */
-    private void doServedService(ServiceHttpServed service, String method, HttpServletRequest request, HttpServletResponse response) {
+    private void doServedService(HttpAPIService service, String method, HttpServletRequest request, HttpServletResponse response) {
         byte[] content = null;
         if (request.getContentLength() > 0) {
             try (InputStream is = request.getInputStream()) {

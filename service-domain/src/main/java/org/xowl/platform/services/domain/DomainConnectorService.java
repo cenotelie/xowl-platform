@@ -21,7 +21,7 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.store.Serializable;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorService extends ServiceHttpServed, Serializable {
+public interface DomainConnectorService extends HttpAPIService, Serializable {
     /**
      * Pushes an artifact to the associated client
      *

@@ -23,7 +23,7 @@ package org.xowl.platform.services.executor;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.JobExecutionService;
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.executor.impl.XOWLJobExecutor;
 
 import java.util.Hashtable;
@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
         properties.put("id", service.getIdentifier());
         properties.put("uri", "jobs");
         bundleContext.registerService(JobExecutionService.class, service, properties);
-        bundleContext.registerService(ServiceHttpServed.class, service, properties);
+        bundleContext.registerService(HttpAPIService.class, service, properties);
     }
 
     @Override

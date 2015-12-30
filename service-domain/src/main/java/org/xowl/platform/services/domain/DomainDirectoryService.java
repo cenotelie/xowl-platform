@@ -20,7 +20,7 @@
 
 package org.xowl.platform.services.domain;
 
-import org.xowl.platform.kernel.ServiceHttpServed;
+import org.xowl.platform.kernel.HttpAPIService;
 
 import java.util.Collection;
 
@@ -29,7 +29,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface DomainDirectoryService extends ServiceHttpServed {
+public interface DomainDirectoryService extends HttpAPIService {
     /**
      * Gets the available connectors
      *

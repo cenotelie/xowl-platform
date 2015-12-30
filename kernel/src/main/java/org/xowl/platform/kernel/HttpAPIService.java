@@ -25,11 +25,11 @@ import org.xowl.platform.utils.HttpResponse;
 import java.util.Map;
 
 /**
- * Interface for services that offer an HTTP interface
+ * Interface for services that offer an HTTP API interface
  *
  * @author Laurent Wouters
  */
-public interface ServiceHttpServed extends Service {
+public interface HttpAPIService extends Service {
     /**
      * Responds to a message
      *

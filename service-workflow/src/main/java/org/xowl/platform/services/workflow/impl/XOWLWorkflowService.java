@@ -39,7 +39,6 @@ import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
-import org.xowl.store.xsp.XSPReplySuccess;
 import org.xowl.utils.Files;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.logging.Logger;
@@ -59,7 +58,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLWorkflowService implements WorkflowService, ServiceHttpServed {
+public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
     /**
      * The identifier of the artifact that contains the data for this service
      */

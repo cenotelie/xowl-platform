@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="256" height="287" viewBox="0 0 256 287" id="db" version="1.1">
+    <defs id="definitions">
+      <linearGradient id="baseGradient">
+        <stop offset="0" style="stop-color:#4682b4;stop-opacity:1;" />
+        <stop offset="1" style="stop-color:#ffffff;stop-opacity:1" />
+      </linearGradient>
+      <linearGradient id="linearGradient4202" xlink:href="#baseGradient" x1="174.76653" y1="1004.8653" x2="-21.297026" y2="1004.8653" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.98069499,0,0,0.98069499,1.9806949,-747.03322)" />
+      <linearGradient id="linearGradient4210" xlink:href="#baseGradient" x1="237.30467" y1="1026.1957" x2="-45.551449" y2="862.88861" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.98069499,0,0,0.98069499,1.9806949,-747.03322)" />
+      <linearGradient id="linearGradient4202-3" gradientTransform="matrix(0.98069499,0,0,0.98069499,2.9613899,-810.78459)" xlink:href="#baseGradient" x1="174.76653" y1="1004.8653" x2="-21.297026" y2="1004.8653" gradientUnits="userSpaceOnUse" />
+      <linearGradient id="linearGradient4210-3" gradientTransform="matrix(0.98069499,0,0,0.98069499,2.9613899,-810.78459)" xlink:href="#baseGradient" x1="237.30467" y1="1026.1957" x2="-45.551449" y2="862.88861" gradientUnits="userSpaceOnUse" />
+      <linearGradient id="linearGradient4202-2" gradientTransform="matrix(0.98069499,0,0,0.98069499,2.9613899,-873.54905)" xlink:href="#baseGradient" x1="174.76653" y1="1004.8653" x2="-21.297026" y2="1004.8653" gradientUnits="userSpaceOnUse" />
+      <linearGradient id="linearGradient4210-31" gradientTransform="matrix(0.98069499,0,0,0.98069499,2.9613899,-873.54905)" xlink:href="#baseGradient" x1="237.30467" y1="1026.1957" x2="-45.551449" y2="862.88861" gradientUnits="userSpaceOnUse" />
+    </defs>
+    <g>
+      <ellipse cx="127.50965" cy="190.86635" rx="125.52895" ry="62.764477" style="fill:url(#linearGradient4210);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path d="m 253.03862,222.24862 c 0,22.42352 -23.9257,43.14382 -62.76449,54.35562 -38.8388,11.2118 -86.69016,11.2118 -125.528959,0 -38.83879,-11.2118 -62.7644726,-31.9321 -62.7644761,-54.35562 l 0,-31.38226 c -3.5e-6,22.42359 23.9256801,43.14423 62.7644761,54.35598 38.838799,11.2118 86.690159,11.2118 125.528959,0 38.8388,-11.21175 62.76449,-31.93239 62.76449,-54.35598 z"
+      style="fill:url(#linearGradient4202);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <ellipse cx="128.49034" cy="127.11495" rx="125.52895" ry="62.764477" style="fill:url(#linearGradient4210-3);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path d="m 254.0193,158.49729 c 0,22.42358 -23.92569,43.1438 -62.76447,54.3556 -38.8388,11.2118 -86.69016,11.2118 -125.528971,0 C 26.887072,201.64109 2.9613899,180.92087 2.9613899,158.49729 l 0,-31.3823 c -9.8e-6,22.4236 23.9256821,43.14426 62.7644691,54.35605 38.838811,11.2118 86.690171,11.2118 125.528971,0 38.83879,-11.21179 62.76447,-31.93245 62.76447,-54.35605 z"
+      style="fill:url(#linearGradient4202-3);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <ellipse cx="128.49034" cy="64.350548" rx="125.52895" ry="62.764477" style="fill:url(#linearGradient4210-31);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path d="m 254.0193,95.73279 c 0,22.4236 -23.92569,43.14383 -62.76447,54.35562 -38.8388,11.2118 -86.69016,11.2118 -125.528961,0 C 26.887082,138.87662 2.9613997,118.15639 2.9613899,95.73279 l 0,-31.38226 c 0,22.42359 23.9256821,43.14424 62.7644791,54.35604 38.838801,11.21179 86.690161,11.21179 125.528961,0 38.83879,-11.2118 62.76447,-31.93245 62.76447,-54.35604 z"
+      style="fill:url(#linearGradient4202-2);fill-opacity:1;stroke:#000000;stroke-width:1.9613899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </svg>

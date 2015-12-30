@@ -158,9 +158,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         if (ids == null || ids.length == 0 || names == null || names.length == 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected at least one id and one name parameter");
         DomainConnectorService connector = spawn(ids[0], names[0], uris);
-        if (connector != null)
+        if (connector == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "The connector already exist");
-        return new HttpResponse(HttpURLConnection.HTTP_OK);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, connector.serializedJSON());
     }
 
     /**

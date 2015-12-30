@@ -1,0 +1,35 @@
+.body {
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+.hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.header {
+  margin-top: 5px;
+}
+
+.async-marker {
+  position: fixed;
+  top: 100px;
+  left: 15px;
+  padding: 5px 5px 5px 5px;
+  box-shadow: 0px 0px 5px 5px #ef7c00;
+  -webkit-animation: async-marker-animate 1s infinite;
+  animation: async-marker-animate 1s infinite;
+}
+
+@-webkit-keyframes async-marker-animate {
+  50% {
+    box-shadow: 0px 0px 5px 5px #ffffff;
+  }
+}
+
+@keyframes async-marker-animate {
+  50% {
+    box-shadow: 0px 0px 5px 5px #ffffff;
+  }
+}

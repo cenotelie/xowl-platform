@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>xOWL Platform</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/web/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="/web/app.css">
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+</head>
+
+<body>
+  <object data="/web/assets/db.svg" type="image/svg+xml" id="dbsvg" style="display: none"></object>
+  <object data="/web/assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
+  <div class="header">
+    <span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="/web/assets/xowl.png" width="25px" style="display: inline-block;"/>
+      xOWL Platform
+    </span>
+    <hr style="margin-top: 5px; margin-bottom: 5px;" />
+  </div>
+  <div id="body"></div>
+  <script src="connectors.js"></script>
+  <script>
+    init();
+  </script>
+</body>
+
+</html>

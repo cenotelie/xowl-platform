@@ -2,6 +2,10 @@
 // Provided under LGPLv3
 
 function init() {
+	var url = document.URL;
+	var index = url.indexOf("/web/");
+	if (index > 0)
+		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
 	request("connectors", function (status, ct, content) {
 		if (status == 200) {
 			setup(JSON.parse(content));
@@ -31,6 +35,10 @@ function onClickConnector(connector) {
 	alert("This is the connector " + connector.name);
 }
 
+function onClickLink(connector) {
+
+}
+
 var GRAPH_WIDTH = 1024;
 var GRAPH_HEIGHT = 512;
 var SVG_DEFINITIONS = null;
@@ -49,14 +57,16 @@ function setupLoadSVG() {
 	SVG_CONNECTOR = doc.children[0];
 }
 
-function createCanvas() {
+function createCanvas(nb) {
+	var height = 256 * SVG_CONNECTOR_SCALE * 2 * nb;
+	GRAPH_HEIGHT = (height < 300 ? 300 : height);
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	var canvas = document.createElementNS("http://www.w3.org/2000/svg", "g");
 	svg.setAttribute("height", GRAPH_HEIGHT);
 	svg.setAttribute("width", GRAPH_WIDTH);
 	svg.appendChild(SVG_DEFINITIONS);
 	svg.appendChild(canvas);
-	document.getElementById("body").appendChild(svg);
+	document.getElementById("display").appendChild(svg);
 	return canvas;
 }
 
@@ -96,6 +106,7 @@ function newLink(def, x1, y1, x2, y2) {
 	var c1 = x1 + 100;
 	var c2 = x2 - 100;
 	var link = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	link.onclick = function () { onClickLink(def); };
 	var classes = "link";
 	if (def.queue.length > 0)
 		classes += " linkWaiting";
@@ -122,7 +133,7 @@ function newDBLink(x1, y1, x2, y2) {
 
 function setup(connectors) {
 	setupLoadSVG();
-	var svg = createCanvas();
+	var svg = createCanvas(connectors.length);
 	svg.appendChild(newDBLink(20 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 300 - 5, GRAPH_HEIGHT / 2));
 	svg.appendChild(newDB("Live Store", 20, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));
 	svg.appendChild(newDB("Long Term", 300, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));

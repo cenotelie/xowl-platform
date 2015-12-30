@@ -21,9 +21,50 @@
       <img class="img-responsive" src="/web/assets/xowl.png" width="25px" style="display: inline-block;"/>
       xOWL Platform
     </span>
+    <div style="display: inline-block; margin-left: 50px;">
+      <span style="display: inline-block;">
+        <strong>Domain Connectors Management</strong>
+      </span>
+    </div>
     <hr style="margin-top: 5px; margin-bottom: 5px;" />
   </div>
-  <div id="body" class="body"></div>
+  <div class="body">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="panel panel-default">
+            <div id="display" class="panel-body">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              New Generic Connector
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label for="input-id">Unique identifier</label>
+                <input type="text" class="form-control" id="input-id" placeholder="org.xowl.platform.services.domain.MyDomain">
+              </div>
+              <div class="form-group">
+                <label for="input-name">Name</label>
+                <input type="text" class="form-control" id="input-name" placeholder="Connector for MyDomain">
+              </div>
+              <div class="form-group">
+                <label for="input-uri">Access URI</label>
+                <div class="input-group">
+                  <span id="input-uri-addon" class="input-group-addon"></span>
+                  <input type="text" class="form-control" id="input-uri" placeholder="mydomain">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="connectors.js"></script>
   <script>
     init();

@@ -23,6 +23,14 @@ function request(uri, callback) {
 	xmlHttp.send();
 }
 
+function onClickDB(db) {
+	alert("This is a triple store");
+}
+
+function onClickConnector(connector) {
+	alert("This is the connector " + connector.name);
+}
+
 var GRAPH_WIDTH = 1024;
 var GRAPH_HEIGHT = 512;
 var SVG_DEFINITIONS = null;
@@ -55,6 +63,8 @@ function createCanvas() {
 function newDB(name, x, y) {
 	var node = SVG_DB.cloneNode(true);
 	node.setAttribute("transform", "translate(" + x + "," + y + ")scale(" + SVG_DB_SCALE + ")");
+	node.setAttribute("class", "db");
+	node.onclick = function () { onClickDB(name); };
 	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 	text.setAttribute("x", 128);
 	text.setAttribute("y", 287 + 40);
@@ -66,24 +76,32 @@ function newDB(name, x, y) {
 	return node;
 }
 
-function newConnector(name, x, y) {
+function newConnector(def, x, y) {
 	var node = SVG_CONNECTOR.cloneNode(true);
 	node.setAttribute("transform", "translate(" + x + "," + y + ")scale(" + SVG_CONNECTOR_SCALE + ")");
+	node.setAttribute("class", "connector");
+	node.onclick = function () { onClickConnector(def); };
 	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 	text.setAttribute("x", 256 + 10);
 	text.setAttribute("y", 256 / 2);
 	text.setAttribute("text-anchor", "start");
 	text.setAttribute("font-family", "sans-serif");
 	text.setAttribute("font-size", "60");
-	text.appendChild(document.createTextNode(name));
+	text.appendChild(document.createTextNode(def.name));
 	node.appendChild(text);
 	return node;
 }
 
-function newLink(x1, y1, x2, y2) {
+function newLink(def, x1, y1, x2, y2) {
 	var c1 = x1 + 100;
 	var c2 = x2 - 100;
 	var link = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	var classes = "link";
+	if (def.queue.length > 0)
+		classes += " linkWaiting";
+	if (def.canPullInput)
+		classes += " linkCanPull";
+	link.setAttribute("class", classes);
 	link.setAttribute("fill", "none");
 	link.setAttribute("stroke", "black");
 	link.setAttribute("stroke-width", "3");
@@ -92,17 +110,27 @@ function newLink(x1, y1, x2, y2) {
 	return link;
 }
 
+function newDBLink(x1, y1, x2, y2) {
+	var link = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	link.setAttribute("class", "dblink");
+	link.setAttribute("fill", "none");
+	link.setAttribute("stroke-width", "3");
+	link.setAttribute("stroke-linecap", "round");
+	link.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
+	return link;
+}
+
 function setup(connectors) {
 	setupLoadSVG();
 	var svg = createCanvas();
-	svg.appendChild(newLink(20 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 300 - 5, GRAPH_HEIGHT / 2));
+	svg.appendChild(newDBLink(20 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 300 - 5, GRAPH_HEIGHT / 2));
 	svg.appendChild(newDB("Live Store", 20, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));
 	svg.appendChild(newDB("Long Term", 300, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));
 	var pad = (GRAPH_HEIGHT - connectors.length * 256 * SVG_CONNECTOR_SCALE) / (connectors.length + 1);
 	var y = pad;
 	for (var i = 0; i != connectors.length; i++) {
-		svg.appendChild(newLink(300 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 600 - 5, y + 256 * SVG_CONNECTOR_SCALE / 2));
-		svg.appendChild(newConnector(connectors[i].name, 600, y));
+		svg.appendChild(newLink(connectors[i], 300 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 600 - 5, y + 256 * SVG_CONNECTOR_SCALE / 2));
+		svg.appendChild(newConnector(connectors[i], 600, y));
 		y += 256 * SVG_CONNECTOR_SCALE + pad;
 	}
 }

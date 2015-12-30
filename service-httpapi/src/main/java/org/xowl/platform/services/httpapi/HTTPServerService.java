@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.server;
+package org.xowl.platform.services.httpapi;
 
 import org.xowl.platform.kernel.Service;
 
@@ -32,8 +32,4 @@ public interface HTTPServerService extends Service {
      * The URI prefix for API connections
      */
     String URI_API = "/api";
-    /**
-     * The URI prefix for web application data
-     */
-    String URI_WEB = "/web";
 }

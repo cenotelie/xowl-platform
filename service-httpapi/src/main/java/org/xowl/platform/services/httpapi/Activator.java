@@ -18,14 +18,14 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.server;
+package org.xowl.platform.services.httpapi;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.xowl.platform.services.server.impl.XOWLMainHTTPServer;
+import org.xowl.platform.services.httpapi.impl.XOWLMainHTTPServer;
 import org.xowl.utils.logging.Logger;
 
 import java.util.Hashtable;

@@ -39,8 +39,8 @@
 		<module>service-executor</module>
 		<module>service-lts</module>
 		<module>service-domain</module>
-		<module>service-http</module>
 		<module>service-workflow</module>
+		<module>service-httpapi</module>
 	</modules>
 	<build>
 		<plugins>

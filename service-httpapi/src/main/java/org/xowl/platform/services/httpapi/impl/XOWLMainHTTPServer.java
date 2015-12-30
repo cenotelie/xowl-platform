@@ -18,11 +18,11 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.server.impl;
+package org.xowl.platform.services.httpapi.impl;
 
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.services.server.HTTPServerService;
+import org.xowl.platform.services.httpapi.HTTPServerService;
 import org.xowl.platform.utils.HttpResponse;
 import org.xowl.utils.logging.Logger;
 

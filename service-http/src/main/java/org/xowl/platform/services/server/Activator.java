@@ -51,7 +51,6 @@ public class Activator implements BundleActivator {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
                     service.unregister(HTTPServerService.URI_API);
-                    service.unregister(HTTPServerService.URI_WEB);
                 } catch (IllegalArgumentException exception) {
                     // ignore this
                 }
@@ -61,7 +60,6 @@ public class Activator implements BundleActivator {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
                     httpService.registerServlet(HTTPServerService.URI_API, server, null, null);
-                    httpService.registerResources(HTTPServerService.URI_WEB, "/org/xowl/platform/web", null);
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

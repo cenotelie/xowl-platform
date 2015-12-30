@@ -41,6 +41,7 @@
 		<module>service-domain</module>
 		<module>service-workflow</module>
 		<module>service-httpapi</module>
+		<module>service-webapp</module>
 	</modules>
 	<build>
 		<plugins>

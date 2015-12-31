@@ -43,7 +43,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of a domain connector that can be configured and deployed at runtime
@@ -59,6 +62,10 @@ class ParametricDomainConnector extends BaseDomainConnector {
      * The name of this connector
      */
     private final String name;
+    /**
+     * The URI to access this connector
+     */
+    private final String[] uris;
     /**
      * The node manager when loading quads
      */
@@ -77,10 +84,12 @@ class ParametricDomainConnector extends BaseDomainConnector {
      *
      * @param identifier The identifier for this connector
      * @param name       The name of this connector
+     * @param uris       The URIs to access this connector
      */
-    public ParametricDomainConnector(String identifier, String name) {
+    public ParametricDomainConnector(String identifier, String name, String[] uris) {
         this.identifier = identifier;
         this.name = name;
+        this.uris = uris;
         this.nodeManager = new CachedNodes();
     }
 
@@ -107,6 +116,11 @@ class ParametricDomainConnector extends BaseDomainConnector {
         if (method.equals("POST"))
             return onMessagePostQuads(parameters, contentType, content);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected GET or POST request");
+    }
+
+    @Override
+    public String[] getURIs() {
+        return uris;
     }
 
     /**

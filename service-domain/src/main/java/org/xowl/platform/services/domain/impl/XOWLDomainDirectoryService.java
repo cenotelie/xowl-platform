@@ -101,7 +101,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                 // already exists
                 return null;
             BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
-            ParametricDomainConnector connector = new ParametricDomainConnector(identifier, name);
+            ParametricDomainConnector connector = new ParametricDomainConnector(identifier, name, uris);
             parametricConnectors.put(identifier, connector);
             Hashtable<String, Object> properties = new Hashtable<>();
             properties.put("id", identifier);

@@ -69,6 +69,15 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         }
     }
 
+    /**
+     * Gets the URIs that can be used to access this HTTP API of this connector
+     *
+     * @return The URIs for this connector
+     */
+    public String[] getURIs() {
+        return null;
+    }
+
     @Override
     public String getProperty(String name) {
         if (name == null)
@@ -136,7 +145,18 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
-        builder.append("\", \"canPullInput\": ");
+        builder.append(", \"uris\": [");
+        String[] uris = getURIs();
+        if (uris != null && uris.length > 0) {
+            for (int i = 0; i != uris.length; i++) {
+                if (i == 0)
+                    builder.append(", ");
+                builder.append("\"");
+                builder.append(IOUtils.escapeStringJSON(uris[i]));
+                builder.append("\"");
+            }
+        }
+        builder.append("], \"canPullInput\": ");
         builder.append(canPullInput());
         builder.append(", \"queue\": [");
         boolean first = true;

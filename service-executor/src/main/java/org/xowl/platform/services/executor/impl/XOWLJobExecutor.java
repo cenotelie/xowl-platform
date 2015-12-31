@@ -251,7 +251,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
-        builder.append("\", \"queue\": [");
+        builder.append("\", \"executed\": ");
+        builder.append(Long.toString(getExecutorPool().getCompletedTaskCount()));
+        builder.append(", \"queue\": [");
         for (int i = 0; i != queue.size(); i++) {
             if (i == 0)
                 builder.append(", ");

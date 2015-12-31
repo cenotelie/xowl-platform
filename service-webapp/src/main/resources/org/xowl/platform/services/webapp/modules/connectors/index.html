@@ -36,6 +36,45 @@
             <div id="display" class="panel-body">
             </div>
           </div>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              Connector Properties
+            </div>
+            <div id="connector-properties" class="panel-body" style="display: none;">
+              <div class="form-group">
+                <label for="connector-id">Unique identifier</label>
+                <input type="text" class="form-control" id="connector-id" readonly>
+              </div>
+              <div class="form-group">
+                <label for="connector-name">Name</label>
+                <input type="text" class="form-control" id="connector-name" readonly>
+              </div>
+              <div class="form-group">
+                <label for="connector-uri">Access URI</label>
+                <input type="text" class="form-control" id="connector-uri" readonly>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="connector-can-pull" readonly> Can pull from clients?
+                </label>
+              </div>
+              <div class="form-group">
+                <label for="connector-queue">Queued artifacts</label>
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Version</th>
+                    </tr>
+                  </thead>
+                  <tbody id="connector-queue">
+                  </tbody>
+                </table>
+              </div>
+              <button type="submit" class="btn btn-danger" onclick="onClickDeleteConnector()">Delete this connector</button>
+            </div>
+          </div>
         </div>
         <div class="col-md-4">
           <div class="panel panel-default">
@@ -61,54 +100,6 @@
                 </div>
               </div>
               <button type="submit" class="btn btn-primary" onclick="onClickNewConnector()">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8">
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              Connector Properties
-            </div>
-            <div class="panel-body">
-              <div class="form-group">
-                <label for="connector-id">Unique identifier</label>
-                <input type="text" class="form-control" id="connector-id">
-              </div>
-              <div class="form-group">
-                <label for="connector-name">Name</label>
-                <input type="text" class="form-control" id="connector-name">
-              </div>
-              <div class="form-group">
-                <label for="connector-uri">Access URI</label>
-                <div class="input-group">
-                  <span id="connector-uri-addon" class="input-group-addon"></span>
-                  <input type="text" class="form-control" id="connector-uri" placeholder="mydomain">
-                </div>
-              </div>
-              <div class="form-group">
-                <label>
-                  <input type="checkbox" class="form-control" id="connector-can-pull">
-                  Can pull from clients?
-                </label>
-              </div>
-              <div class="form-group">
-                <label for="connector-queue">Queued artifacts</label>
-                <table id="connector-queue" class="form-control table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Version</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
-              <button type="submit" class="btn btn-primary">Pull Artifact</button>
-              <button type="submit" class="btn btn-danger">Delete</button>
             </div>
           </div>
         </div>

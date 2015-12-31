@@ -36,11 +36,33 @@ function request(uri, callback) {
 }
 
 function onClickConnector(connector) {
-	alert("This is the connector " + connector.name);
+	SELECTED_CONNECTOR = connector;
+	var url = null;
+	if (connector.uris.length === 0) {
+		url = "not accessible";
+	} else {
+		url = document.URL;
+		var index = url.indexOf("/web/");
+		if (index > 0)
+			url = url.substring(0, index) + "/api/" + connector.uris[0];
+		else
+			url = "failed to retrieved"
+	}
+	document.getElementById("connector-properties").style.display = "";
+	document.getElementById("connector-id").value = connector.identifier;
+	document.getElementById("connector-name").value = connector.name;
+	document.getElementById("connector-uri").value = url;
+	document.getElementById("connector-can-pull").checked = connector.canPullInput;
+	var rows = document.getElementById("connector-queue");
+	var data = "";
+	for (var i = 0; i != connector.queue.length; i++) {
+		data += "<tr><td>" + i.toString() + "</td><td>" + connector.queue[i].name + "</td><td>" + connector.queue[i].version + "</td></tr>";
+	}
+	rows.innerHTML = data;
 }
 
 function onClickLink(connector) {
-
+	onClickConnector(connector);
 }
 
 function onClickNewConnector() {
@@ -85,6 +107,23 @@ function onClickNewConnector() {
 	});
 }
 
+function onClickDeleteConnector() {
+	if (SELECTED_CONNECTOR === null)
+		return;
+	var data = "connectors?action=delete&id=" + encodeURIComponent(SELECTED_CONNECTOR.identifier);
+	request(data, function (status, ct, content) {
+		if (status === 200) {
+			document.getElementById("connector-properties").style.display = "none";
+			CONNECTORS.splice(CONNECTORS.indexOf(SELECTED_CONNECTOR), 1);
+			render();
+		} else {
+			if (content !== null && content.length > 0)
+				alert(content);
+		}
+	});
+}
+
+var SELECTED_CONNECTOR = null;
 var CONNECTORS = null;
 var GRAPH_WIDTH = 700;
 var GRAPH_MIN_HEIGHT = 300;
@@ -113,7 +152,7 @@ function loadSVG() {
 }
 
 function createCanvas(nb) {
-	var height = SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE * 2 * nb;
+	var height = SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE * nb * 1.5;
 	GRAPH_HEIGHT = (height < GRAPH_MIN_HEIGHT ? GRAPH_MIN_HEIGHT : height);
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	var canvas = document.createElementNS("http://www.w3.org/2000/svg", "g");

@@ -161,6 +161,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 request.getContentType(),
                 content,
                 request.getHeader("Accept"));
+        addCORSHeader(response);
         if (serviceResponse == null) {
             response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
             return;

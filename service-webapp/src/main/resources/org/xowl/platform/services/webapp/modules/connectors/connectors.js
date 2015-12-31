@@ -32,7 +32,6 @@ function request(uri, callback) {
 	}
 	xmlHttp.open("GET", "/api/" + uri, true);
 	xmlHttp.setRequestHeader("Accept", "application/json");
-	xmlHttp.setRequestHeader("Content-Type", "application/sparql-query");
 	xmlHttp.send();
 }
 
@@ -42,6 +41,48 @@ function onClickConnector(connector) {
 
 function onClickLink(connector) {
 
+}
+
+function onClickNewConnector() {
+	var onerror = false;
+	var id = document.getElementById("input-id").value;
+	var name = document.getElementById("input-name").value;
+	var uri = document.getElementById("input-uri").value;
+	if (typeof id == "undefined" || id == null || id == "") {
+		document.getElementById("input-id").parentElement.className = "form-group has-error"
+		document.getElementById("input-id-help").innerHTML = "The identifier must not be empty.";
+		onerror = true;
+	}
+	if (typeof name == "undefined" || name == null || name == "") {
+		document.getElementById("input-name").parentElement.className = "form-group has-error"
+		document.getElementById("input-name-help").innerHTML = "The name must not be empty.";
+		onerror = true;
+	}
+	if (onerror)
+		return;
+	document.getElementById("input-id").parentElement.className = "form-group"
+	document.getElementById("input-id-help").innerHTML = "";
+	document.getElementById("input-name").parentElement.className = "form-group"
+	document.getElementById("input-name-help").innerHTML = "";
+	var data = "connectors?action=spawn&id=" + encodeURIComponent(id) + "&name=" + encodeURIComponent(name);
+	if (typeof id == 'string' && id.length > 0)
+		data += "&uri=" + encodeURIComponent(uri);
+	request(data, function (status, ct, content) {
+		if (status === 200) {
+			var connector = JSON.parse(content);
+			document.getElementById("input-id").value = "";
+			document.getElementById("input-name").value = "";
+			document.getElementById("input-uri").value = "";
+			if (CONNECTORS == null)
+				CONNECTORS = [connector];
+			else
+				CONNECTORS.push(connector);
+			render();
+		} else {
+			document.getElementById("input-id").parentElement.className = "form-group has-error"
+			document.getElementById("input-id-help").innerHTML = content;
+		}
+	});
 }
 
 var CONNECTORS = null;
@@ -79,6 +120,9 @@ function createCanvas(nb) {
 	svg.setAttribute("height", GRAPH_HEIGHT.toString());
 	svg.setAttribute("width", GRAPH_WIDTH.toString());
 	svg.appendChild(canvas);
+	var display = document.getElementById("display");
+	while (display.hasChildNodes())
+		display.removeChild(display.lastChild);
 	document.getElementById("display").appendChild(svg);
 	return canvas;
 }

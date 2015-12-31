@@ -154,7 +154,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         String[] names = parameters.get("name");
-        String[] uris = parameters.get("uris");
+        String[] uris = parameters.get("uri");
         if (ids == null || ids.length == 0 || names == null || names.length == 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected at least one id and one name parameter");
         DomainConnectorService connector = spawn(ids[0], names[0], uris);

@@ -145,11 +145,11 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
-        builder.append(", \"uris\": [");
+        builder.append("\", \"uris\": [");
         String[] uris = getURIs();
         if (uris != null && uris.length > 0) {
             for (int i = 0; i != uris.length; i++) {
-                if (i == 0)
+                if (i != 0)
                     builder.append(", ");
                 builder.append("\"");
                 builder.append(IOUtils.escapeStringJSON(uris[i]));

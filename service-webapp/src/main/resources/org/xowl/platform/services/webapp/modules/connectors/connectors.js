@@ -6,9 +6,18 @@ function init() {
 	var index = url.indexOf("/web/");
 	if (index > 0)
 		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
+	document.getElementById("xowlsvg").addEventListener('load', function () {
+		SVG_DB_LOADED = true;
+		render();
+	});
+	document.getElementById("connectorsvg").addEventListener('load', function () {
+		SVG_CONNECTOR_LOADED = true;
+		render();
+	});
 	request("connectors", function (status, ct, content) {
 		if (status == 200) {
-			setup(JSON.parse(content));
+			CONNECTORS = JSON.parse(content);
+			render();
 		}
 	});
 }
@@ -27,10 +36,6 @@ function request(uri, callback) {
 	xmlHttp.send();
 }
 
-function onClickDB(db) {
-	alert("This is a triple store");
-}
-
 function onClickConnector(connector) {
 	alert("This is the connector " + connector.name);
 }
@@ -39,49 +44,56 @@ function onClickLink(connector) {
 
 }
 
-var GRAPH_WIDTH = 1024;
-var GRAPH_HEIGHT = 512;
-var SVG_DEFINITIONS = null;
+var CONNECTORS = null;
+var GRAPH_WIDTH = 700;
+var GRAPH_MIN_HEIGHT = 300;
+var GRAPH_HEIGHT = GRAPH_MIN_HEIGHT;
 var SVG_DB = null;
 var SVG_CONNECTOR = null;
-var SVG_DB_SCALE = 0.5;
+var SVG_DB_LOADED = false;
+var SVG_DB_SIZE = 1000;
+var SVG_DB_SCALE = 0.15;
+var SVG_CONNECTOR_LOADED = false;
+var SVG_CONNECTOR_SIZE = 256;
 var SVG_CONNECTOR_SCALE = 0.25;
+var GRAPH_DB_X = 20;
+var GRAPH_CONNECTOR_X = 400;
 
-function setupLoadSVG() {
-	SVG_DEFINITIONS = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-	var doc = document.getElementById("dbsvg").contentDocument.documentElement;
-	for (var i = 0; i != doc.children[0].children.length; i++)
-		SVG_DEFINITIONS.appendChild(doc.children[0].children[i].cloneNode(true));
-	SVG_DB = doc.children[1];
+function render() {
+	if (CONNECTORS != null && SVG_DB_LOADED && SVG_CONNECTOR_LOADED)
+		doRender(CONNECTORS);
+}
+
+function loadSVG() {
+	var doc = document.getElementById("xowlsvg").contentDocument.documentElement;
+	SVG_DB = doc.children[0];
 	doc = document.getElementById("connectorsvg").contentDocument.documentElement;
 	SVG_CONNECTOR = doc.children[0];
 }
 
 function createCanvas(nb) {
-	var height = 256 * SVG_CONNECTOR_SCALE * 2 * nb;
-	GRAPH_HEIGHT = (height < 300 ? 300 : height);
+	var height = SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE * 2 * nb;
+	GRAPH_HEIGHT = (height < GRAPH_MIN_HEIGHT ? GRAPH_MIN_HEIGHT : height);
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	var canvas = document.createElementNS("http://www.w3.org/2000/svg", "g");
-	svg.setAttribute("height", GRAPH_HEIGHT);
-	svg.setAttribute("width", GRAPH_WIDTH);
-	svg.appendChild(SVG_DEFINITIONS);
+	svg.setAttribute("height", GRAPH_HEIGHT.toString());
+	svg.setAttribute("width", GRAPH_WIDTH.toString());
 	svg.appendChild(canvas);
 	document.getElementById("display").appendChild(svg);
 	return canvas;
 }
 
-function newDB(name, x, y) {
+function newDB(x, y) {
 	var node = SVG_DB.cloneNode(true);
 	node.setAttribute("transform", "translate(" + x + "," + y + ")scale(" + SVG_DB_SCALE + ")");
 	node.setAttribute("class", "db");
-	node.onclick = function () { onClickDB(name); };
 	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute("x", 128);
-	text.setAttribute("y", 287 + 40);
+	text.setAttribute("x", (SVG_DB_SIZE / 2).toString());
+	text.setAttribute("y", (SVG_DB_SIZE + SVG_DB_SIZE / 10).toString());
 	text.setAttribute("text-anchor", "middle");
 	text.setAttribute("font-family", "sans-serif");
-	text.setAttribute("font-size", "40");
-	text.appendChild(document.createTextNode(name));
+	text.setAttribute("font-size", "70");
+	text.appendChild(document.createTextNode("Federation Platform"));
 	node.appendChild(text);
 	return node;
 }
@@ -92,8 +104,8 @@ function newConnector(def, x, y) {
 	node.setAttribute("class", "connector");
 	node.onclick = function () { onClickConnector(def); };
 	var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	text.setAttribute("x", 256 + 10);
-	text.setAttribute("y", 256 / 2);
+	text.setAttribute("x", (SVG_CONNECTOR_SIZE + SVG_CONNECTOR_SIZE / 10).toString());
+	text.setAttribute("y", (SVG_CONNECTOR_SIZE / 2).toString());
 	text.setAttribute("text-anchor", "start");
 	text.setAttribute("font-family", "sans-serif");
 	text.setAttribute("font-size", "60");
@@ -121,27 +133,15 @@ function newLink(def, x1, y1, x2, y2) {
 	return link;
 }
 
-function newDBLink(x1, y1, x2, y2) {
-	var link = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	link.setAttribute("class", "dblink");
-	link.setAttribute("fill", "none");
-	link.setAttribute("stroke-width", "3");
-	link.setAttribute("stroke-linecap", "round");
-	link.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
-	return link;
-}
-
-function setup(connectors) {
-	setupLoadSVG();
+function doRender(connectors) {
+	loadSVG();
 	var svg = createCanvas(connectors.length);
-	svg.appendChild(newDBLink(20 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 300 - 5, GRAPH_HEIGHT / 2));
-	svg.appendChild(newDB("Live Store", 20, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));
-	svg.appendChild(newDB("Long Term", 300, (GRAPH_HEIGHT - 286 * SVG_DB_SCALE) / 2));
-	var pad = (GRAPH_HEIGHT - connectors.length * 256 * SVG_CONNECTOR_SCALE) / (connectors.length + 1);
+	svg.appendChild(newDB(GRAPH_DB_X, (GRAPH_HEIGHT - SVG_DB_SIZE * SVG_DB_SCALE) / 2));
+	var pad = (GRAPH_HEIGHT - connectors.length * SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE) / (connectors.length + 1);
 	var y = pad;
 	for (var i = 0; i != connectors.length; i++) {
-		svg.appendChild(newLink(connectors[i], 300 + 256 * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, 600 - 5, y + 256 * SVG_CONNECTOR_SCALE / 2));
-		svg.appendChild(newConnector(connectors[i], 600, y));
-		y += 256 * SVG_CONNECTOR_SCALE + pad;
+		svg.appendChild(newLink(connectors[i], GRAPH_DB_X + SVG_DB_SIZE * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, GRAPH_CONNECTOR_X - 5, y + SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE / 2));
+		svg.appendChild(newConnector(connectors[i], GRAPH_CONNECTOR_X, y));
+		y += SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE + pad;
 	}
 }

@@ -125,7 +125,7 @@ function onClickDeleteConnector() {
 
 var SELECTED_CONNECTOR = null;
 var CONNECTORS = null;
-var GRAPH_WIDTH = 700;
+var GRAPH_WIDTH = 1024;
 var GRAPH_MIN_HEIGHT = 300;
 var GRAPH_HEIGHT = GRAPH_MIN_HEIGHT;
 var SVG_DB = null;

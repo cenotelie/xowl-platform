@@ -26,10 +26,13 @@ import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.domain.*;
 import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
+import org.xowl.utils.config.Configuration;
+import org.xowl.utils.config.Section;
 import org.xowl.utils.logging.BufferedLogger;
 
 import java.net.HttpURLConnection;
@@ -67,6 +70,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * The registered factories
      */
     private final Collection<DomainConnectorFactory> factories = new ArrayList<>(8);
+    /**
+     * The map of statically configured connectors to resolve
+     */
+    private Map<String, Section> toResolve;
 
     @Override
     public String getIdentifier() {
@@ -112,11 +119,13 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
     @Override
     public Collection<DomainConnectorService> getConnectors() {
+        resolveConfigConnectors(null);
         return ServiceUtils.getServices(DomainConnectorService.class);
     }
 
     @Override
     public DomainConnectorService get(String identifier) {
+        resolveConfigConnectors(null);
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
             return registration.service;
@@ -140,7 +149,6 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                 // already exists
                 return null;
 
-            Collection<DomainConnectorFactory> factories = ServiceUtils.getServices(DomainConnectorFactory.class);
             for (DomainConnectorFactory factory : factories) {
                 if (factory.getDomains().contains(description)) {
                     // this is the factory
@@ -184,7 +192,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param factory The new factory
      */
     public void onFactoryOnline(DomainConnectorFactory factory) {
-        factories.add(factory);
+        synchronized (factories) {
+            factories.add(factory);
+        }
+        resolveConfigConnectors(factory);
     }
 
     /**
@@ -193,7 +204,95 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param factory The factory
      */
     public void onFactoryOffline(DomainConnectorFactory factory) {
-        factories.remove(factory);
+        synchronized (factories) {
+            factories.remove(factory);
+        }
+    }
+
+    /**
+     * Resolve statically configured connectors
+     *
+     * @param factory The new factory, if any
+     */
+    private void resolveConfigConnectors(DomainConnectorFactory factory) {
+        if (toResolve == null) {
+            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            if (configurationService == null)
+                return;
+            Configuration configuration = configurationService.getConfigFor(this);
+            if (configuration == null)
+                return;
+            toResolve = new HashMap<>();
+            for (Section section : configuration.getSections()) {
+                String domain = section.get("domain");
+                if (domain == null)
+                    continue;
+                toResolve.put(domain, section);
+            }
+        }
+        for (Map.Entry<String, Section> entry : toResolve.entrySet()) {
+            if (factory != null) {
+                // this is a new factory
+                for (DomainDescription domain : factory.getDomains()) {
+                    if (domain.getIdentifier().equals(entry.getKey())) {
+                        resolveConfigConnector(domain, entry.getValue());
+                        break;
+                    }
+                }
+            } else {
+                synchronized (factories) {
+                    for (DomainConnectorFactory existingFactory : factories) {
+                        boolean found = false;
+                        for (DomainDescription domain : existingFactory.getDomains()) {
+                            if (domain.getIdentifier().equals(entry.getKey())) {
+                                resolveConfigConnector(domain, entry.getValue());
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Resolves a statically configured connector
+     *
+     * @param domain  The domain
+     * @param section The configuration
+     */
+    private void resolveConfigConnector(DomainDescription domain, Section section) {
+        String id = section.getName();
+        String name = section.get("name");
+        if (id == null || name == null)
+            return;
+        List<String> uris = section.getAll("uris");
+        Map<DomainDescriptionParam, Object> customParams = new HashMap<>();
+        for (String property : section.getProperties()) {
+            if (property.equals("name") || property.equals("uris"))
+                continue;
+            DomainDescriptionParam parameter = null;
+            for (DomainDescriptionParam p : domain.getParameters()) {
+                if (p.getIdentifier().equals(property)) {
+                    parameter = p;
+                    break;
+                }
+            }
+            if (parameter == null)
+                continue;
+            List<String> values = section.getAll(property);
+            if (values.size() == 1)
+                customParams.put(parameter, values.get(0));
+            else if (values.size() > 1)
+                customParams.put(parameter, values.toArray());
+        }
+        DomainConnectorService service = spawn(domain, id, name, (String[]) uris.toArray(), customParams);
+        if (service != null) {
+            toResolve.remove(domain.getIdentifier());
+        }
     }
 
     /**

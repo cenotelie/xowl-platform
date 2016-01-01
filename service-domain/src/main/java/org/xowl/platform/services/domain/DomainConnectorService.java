@@ -23,6 +23,7 @@ package org.xowl.platform.services.domain;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.store.Serializable;
+import org.xowl.store.xsp.XSPReply;
 
 import java.util.List;
 
@@ -41,9 +42,9 @@ public interface DomainConnectorService extends HttpAPIService, Serializable {
      * Pushes an artifact to the associated client
      *
      * @param data The artifact to push
-     * @return Whether the operation succeeded
+     * @return The operation's result
      */
-    boolean pushToClient(Artifact data);
+    XSPReply pushToClient(Artifact data);
 
     /**
      * Gets whether this connector supports pulling artifacts from the client
@@ -79,7 +80,7 @@ public interface DomainConnectorService extends HttpAPIService, Serializable {
      * Gets the next queued artifact
      *
      * @param block Whether to wait until the artifact is available
-     * @return The next queued artifact or null if there is none
+     * @return The operation's result which can be casted to XSPReplyResult in case of success
      */
-    Artifact getNextInput(boolean block);
+    XSPReply getNextInput(boolean block);
 }

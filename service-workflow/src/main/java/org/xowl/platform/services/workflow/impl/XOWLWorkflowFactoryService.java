@@ -74,17 +74,6 @@ public class XOWLWorkflowFactoryService implements WorkflowFactoryService, JobFa
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public Collection<String> getActionTypes() {
         return ACTIONS_COLLECTION;
     }

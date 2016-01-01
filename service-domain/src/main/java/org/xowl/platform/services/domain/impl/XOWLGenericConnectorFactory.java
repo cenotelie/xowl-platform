@@ -20,7 +20,12 @@
 
 package org.xowl.platform.services.domain.impl;
 
-import org.xowl.platform.services.domain.*;
+import org.xowl.platform.services.domain.DomainConnectorFactory;
+import org.xowl.platform.services.domain.DomainDescription;
+import org.xowl.platform.services.domain.DomainDescriptionBase;
+import org.xowl.platform.services.domain.DomainDescriptionParam;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyResult;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,23 +63,12 @@ public class XOWLGenericConnectorFactory implements DomainConnectorFactory {
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public Collection<DomainDescription> getDomains() {
         return DESCRIPTIONS;
     }
 
     @Override
-    public DomainConnectorService newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
-        return new ParametricDomainConnector(identifier, name, uris);
+    public XSPReply newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
+        return new XSPReplyResult<>(new ParametricDomainConnector(identifier, name, uris));
     }
 }

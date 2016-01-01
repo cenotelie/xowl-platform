@@ -22,16 +22,19 @@ package org.xowl.platform.services.lts.impl;
 
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactStorageService;
-import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
-import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
+import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyFailure;
+import org.xowl.store.xsp.XSPReplyResult;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -89,17 +92,6 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public TripleStore getLiveStore() {
         return storeLive;
     }
@@ -115,17 +107,17 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public boolean store(Artifact artifact) {
+    public XSPReply store(Artifact artifact) {
         return storeLongTerm.store(artifact);
     }
 
     @Override
-    public Artifact retrieve(String identifier) {
+    public XSPReply retrieve(String identifier) {
         return storeLongTerm.retrieve(identifier);
     }
 
     @Override
-    public Artifact retrieve(String base, String version) {
+    public XSPReply retrieve(String base, String version) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -142,11 +134,11 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         writer.write("\" } }");
         Result result = storeLongTerm.sparql(writer.toString());
         if (result.isFailure())
-            return null;
+            return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
-            return null;
-        return storeLongTerm.buildArtifact(metadata);
+            return new XSPReplyFailure("No matching artifact");
+        return new XSPReplyResult<>(storeLongTerm.buildArtifact(metadata));
     }
 
     @Override
@@ -189,12 +181,12 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public boolean pushToLive(Artifact artifact) {
+    public XSPReply pushToLive(Artifact artifact) {
         return storeLive.store(artifact);
     }
 
     @Override
-    public boolean pullFromLive(Artifact artifact) {
+    public XSPReply pullFromLive(Artifact artifact) {
         return storeLive.delete(artifact.getIdentifier());
     }
 
@@ -204,12 +196,12 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (uri.equals(URI_API + "/sparql"))
             return onMessageSPARQL(content, accept);
         if (uri.equals(URI_API + "/artifacts"))
             return onMessageGetArtifacts();
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**
@@ -219,9 +211,9 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param accept  The accept HTTP header
      * @return The response
      */
-    private HttpResponse onMessageSPARQL(byte[] content, String accept) {
+    private IOUtils.HttpResponse onMessageSPARQL(byte[] content, String accept) {
         if (content == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         String request = new String(content, Utils.DEFAULT_CHARSET);
         Result result = storeLive.sparql(request);
         String responseType = Result.SYNTAX_JSON;
@@ -239,7 +231,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         } catch (IOException exception) {
             // cannot happen
         }
-        return new HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString());
     }
 
     /**
@@ -247,7 +239,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      *
      * @return The response
      */
-    private HttpResponse onMessageGetArtifacts() {
+    private IOUtils.HttpResponse onMessageGetArtifacts() {
         Collection<Artifact> artifacts = list();
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -258,6 +250,6 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             builder.append(artifact.serializedJSON());
         }
         builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 }

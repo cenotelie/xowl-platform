@@ -47,11 +47,10 @@ public class WorkflowUtils {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return new XSPReplyFailure("Failed to resolve an artifact storage service");
-        Artifact artifact = connectorService.getNextInput(false);
-        if (artifact == null)
-            return new XSPReplyFailure("No queued artifact in connector " + connector);
-        boolean success = storageService.store(artifact);
-        return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the long term store");
+        XSPReply reply = connectorService.getNextInput(false);
+        if (!reply.isSuccess())
+            return reply;
+        return storageService.store(((XSPReplyResult<Artifact>) reply).getData());
     }
 
     /**
@@ -64,10 +63,9 @@ public class WorkflowUtils {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return new XSPReplyFailure("Failed to resolve an artifact storage service");
-        Artifact artifact = storageService.retrieve(artifactID);
-        if (artifact == null)
-            return new XSPReplyFailure("Artifact " + artifactID + " does not exist in the long term store");
-        boolean success = storageService.pushToLive(artifact);
-        return success ? new XSPReplyResult<>(artifact) : new XSPReplyFailure("Failed to push the artifact to the live store");
+        XSPReply reply = storageService.retrieve(artifactID);
+        if (!reply.isSuccess())
+            return reply;
+        return storageService.pushToLive(((XSPReplyResult<Artifact>) reply).getData());
     }
 }

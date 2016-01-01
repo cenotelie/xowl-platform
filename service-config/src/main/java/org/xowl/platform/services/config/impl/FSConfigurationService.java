@@ -65,17 +65,6 @@ public class FSConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public Configuration getConfigFor(Identifiable entity) {
         Configuration configuration = new Configuration();
         File file = new File(root, entity.getIdentifier() + CONFIG_EXT);

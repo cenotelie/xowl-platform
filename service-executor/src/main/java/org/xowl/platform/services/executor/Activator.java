@@ -26,8 +26,6 @@ import org.xowl.platform.kernel.JobExecutionService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.executor.impl.XOWLJobExecutor;
 
-import java.util.Hashtable;
-
 /**
  * The activator for this bundle
  *

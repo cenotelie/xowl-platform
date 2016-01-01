@@ -28,8 +28,6 @@ import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.domain.impl.XOWLDomainDirectoryService;
 import org.xowl.platform.services.domain.impl.XOWLGenericConnectorFactory;
 
-import java.util.Hashtable;
-
 /**
  * Activator for the domain bundle
  *

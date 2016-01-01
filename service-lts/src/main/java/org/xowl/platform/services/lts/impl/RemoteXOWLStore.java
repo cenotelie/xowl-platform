@@ -33,8 +33,7 @@ import org.xowl.store.sparql.ResultSolutions;
 import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyNetworkError;
+import org.xowl.store.xsp.*;
 import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
@@ -88,7 +87,7 @@ abstract class RemoteXOWLStore implements TripleStore {
     }
 
     @Override
-    public boolean store(Artifact artifact) {
+    public XSPReply store(Artifact artifact) {
         StringWriter writer = new StringWriter();
         writer.write("INSERT DATA { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -101,22 +100,24 @@ abstract class RemoteXOWLStore implements TripleStore {
         serializer.serialize(Logger.DEFAULT, artifact.getContent().iterator());
         writer.write(" } }");
         Result result = sparql(writer.toString());
-        return result.isSuccess();
+        if (result.isSuccess())
+            return XSPReplySuccess.instance();
+        return new XSPReplyFailure(((ResultFailure) result).getMessage());
     }
 
     @Override
-    public Artifact retrieve(String identifier) {
+    public XSPReply retrieve(String identifier) {
         Result result = sparql("DESCRIBE <" + IOUtils.escapeAbsoluteURIW3C(identifier) + ">");
         if (result.isFailure())
-            return null;
+            return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
-            return null;
-        return buildArtifact(metadata);
+            return new XSPReplyFailure("Unknown artifact");
+        return new XSPReplyResult<>(buildArtifact(metadata));
     }
 
     @Override
-    public boolean delete(String identifier) {
+    public XSPReply delete(String identifier) {
         StringWriter writer = new StringWriter();
         writer.write("DELETE WHERE { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -126,7 +127,9 @@ abstract class RemoteXOWLStore implements TripleStore {
         writer.write(IOUtils.escapeAbsoluteURIW3C(identifier));
         writer.write(">");
         Result result = sparql(writer.toString());
-        return result.isSuccess();
+        if (result.isSuccess())
+            return XSPReplySuccess.instance();
+        return new XSPReplyFailure(((ResultFailure) result).getMessage());
     }
 
     /**

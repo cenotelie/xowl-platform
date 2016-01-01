@@ -20,6 +20,7 @@
 
 package org.xowl.platform.utils;
 
+import org.xowl.store.IOUtils;
 import org.xowl.utils.logging.Logger;
 
 import javax.net.ssl.*;
@@ -96,7 +97,7 @@ public class Http {
      * @param accept      The requested content type for the response, if any
      * @return The response, or null if an error occured
      */
-    public static HttpResponse request(Logger logger, String method, String uri, String contentType, String content, String authToken, String accept) {
+    public static IOUtils.HttpResponse request(Logger logger, String method, String uri, String contentType, String content, String authToken, String accept) {
         URL url;
         try {
             url = new URL(uri);
@@ -166,6 +167,6 @@ public class Http {
             return null;
         }
         connection.disconnect();
-        return new HttpResponse(responseCode, resultType, result);
+        return new IOUtils.HttpResponse(responseCode, resultType, result);
     }
 }

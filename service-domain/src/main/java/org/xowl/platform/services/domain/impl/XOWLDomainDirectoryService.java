@@ -28,9 +28,9 @@ import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.domain.*;
-import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
+import org.xowl.store.xsp.*;
 import org.xowl.utils.config.Configuration;
 import org.xowl.utils.config.Section;
 import org.xowl.utils.logging.BufferedLogger;
@@ -94,40 +94,29 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public Collection<String> getURIs() {
         return Arrays.asList(URIs);
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET") && parameters.isEmpty()) {
             if (uri.equals(URI_API + "/domains"))
                 return onMessageListDomains();
             if (uri.equals(URI_API + "/connectors"))
                 return onMessageListConnectors();
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }
         if (!method.equals("POST"))
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
 
         String[] actions = parameters.get("action");
         String action = actions != null && actions.length >= 1 ? actions[0] : null;
         if (action != null && action.equals("spawn"))
-            return onMessageCreateConnector(parameters, content, contentType);
+            return onMessageCreateConnector(parameters, content);
         if (action != null && action.equals("delete"))
             return onMessageDeleteConnector(parameters);
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override
@@ -155,23 +144,26 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     @Override
-    public DomainConnectorService spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
+    public XSPReply spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
         synchronized (connectorsById) {
             DomainConnectorService service = get(identifier);
             if (service != null)
                 // already exists
-                return null;
+                return new XSPReplyFailure("A connector with this identifier already exists");
 
             for (DomainConnectorFactory factory : factories) {
                 if (factory.getDomains().contains(description)) {
                     // this is the factory
-                    service = factory.newConnector(description, identifier, name, uris, parameters);
+                    XSPReply reply = factory.newConnector(description, identifier, name, uris, parameters);
+                    if (!reply.isSuccess())
+                        return reply;
+                    service = ((XSPReplyResult<DomainConnectorService>) reply).getData();
                     break;
                 }
             }
             if (service == null)
                 // failed to create the service (factory not fond?)
-                return null;
+                return new XSPReplyFailure("Could not find the factory to create this service");
 
             Registration registration = new Registration();
             registration.service = service;
@@ -181,19 +173,19 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             registration.refAsDomainConnector = context.registerService(DomainConnectorService.class, service, properties);
             registration.refAsServedService = context.registerService(HttpAPIService.class, service, null);
             connectorsById.put(identifier, registration);
-            return service;
+            return new XSPReplyResult<>(registration.service);
         }
     }
 
     @Override
-    public boolean delete(String identifier) {
+    public XSPReply delete(String identifier) {
         synchronized (connectorsById) {
             Registration registration = connectorsById.remove(identifier);
             if (registration == null)
-                return false;
+                return new XSPReplyFailure("No connector for the specified identifier");
             registration.refAsDomainConnector.unregister();
             registration.refAsServedService.unregister();
-            return true;
+            return XSPReplySuccess.instance();
         }
     }
 
@@ -300,8 +292,8 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             else if (values.size() > 1)
                 customParams.put(parameter, values.toArray());
         }
-        DomainConnectorService service = spawn(domain, id, name, (String[]) uris.toArray(), customParams);
-        if (service != null) {
+        XSPReply reply = spawn(domain, id, name, uris.toArray(new String[uris.size()]), customParams);
+        if (reply.isSuccess()) {
             toResolve.remove(domain.getIdentifier());
         }
     }
@@ -311,7 +303,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @return The response
      */
-    private HttpResponse onMessageListConnectors() {
+    private IOUtils.HttpResponse onMessageListConnectors() {
         Collection<DomainConnectorService> connectors = ServiceUtils.getServices(DomainConnectorService.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
@@ -322,7 +314,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             builder.append(connector.serializedJSON());
         }
         builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
     /**
@@ -330,7 +322,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @return The response
      */
-    private HttpResponse onMessageListDomains() {
+    private IOUtils.HttpResponse onMessageListDomains() {
         Collection<DomainDescription> domains = getDomains();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
@@ -341,26 +333,27 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             builder.append(domain.serializedJSON());
         }
         builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
     /**
      * Responds to the request to spawn a new parametric connector
      *
      * @param parameters The request parameters
+     * @param content    The content
      * @return The response
      */
-    private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content, String contentType) {
+    private IOUtils.HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content) {
         String[] domainIds = parameters.get("domain");
         if (domainIds == null || domainIds.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected domain parameter");
-        if (content == null || content.length == 0 || !IOUtils.MIME_JSON.equals(contentType))
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected JSON content");
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected domain parameter");
+        if (content == null || content.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = Utils.parseJSON(logger, new String(content, Utils.DEFAULT_CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
 
         DomainDescription domain = null;
         for (DomainDescription description : getDomains()) {
@@ -370,7 +363,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             }
         }
         if (domain == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
 
         String id = null;
         String name = null;
@@ -434,12 +427,12 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         }
 
         if (id == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Identifier for connector not specified");
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Identifier for connector not specified");
         if (name == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Name for connector not specified");
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Name for connector not specified");
 
-        DomainConnectorService connector = spawn(domain, id, name, (String[]) uris.toArray(), customParams);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, connector.serializedJSON());
+        XSPReply reply = spawn(domain, id, name, uris.toArray(new String[uris.size()]), customParams);
+        return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
     /**
@@ -448,13 +441,11 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param parameters The request parameters
      * @return The response
      */
-    private HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
+    private IOUtils.HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
-        boolean success = delete(ids[0]);
-        if (success)
-            return new HttpResponse(HttpURLConnection.HTTP_OK);
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to delete connector with id " + ids[0]);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        XSPReply reply = delete(ids[0]);
+        return XSPReplyUtils.toHttpResponse(reply, null);
     }
 }

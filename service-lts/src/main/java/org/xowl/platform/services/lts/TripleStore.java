@@ -59,23 +59,23 @@ public interface TripleStore {
      * Stores an artifact in this store
      *
      * @param artifact The artifact to store
-     * @return Whether the operation succeeded
+     * @return The operation's result
      */
-    boolean store(Artifact artifact);
+    XSPReply store(Artifact artifact);
 
     /**
      * Retrieves the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return The artifact, or null it is unknown or cannot be retrieved
+     * @return The operation's result
      */
-    Artifact retrieve(String identifier);
+    XSPReply retrieve(String identifier);
 
     /**
      * Deletes the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return Whether the operation succeeded
+     * @return The operation's result
      */
-    boolean delete(String identifier);
+    XSPReply delete(String identifier);
 }

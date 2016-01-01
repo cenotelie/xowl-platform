@@ -21,6 +21,7 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Service;
+import org.xowl.store.xsp.XSPReply;
 
 import java.util.Collection;
 import java.util.Map;
@@ -48,5 +49,5 @@ public interface DomainConnectorFactory extends Service {
      * @param parameters  The parameters for the new connector, if any
      * @return The new connector
      */
-    DomainConnectorService newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
+    XSPReply newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
 }

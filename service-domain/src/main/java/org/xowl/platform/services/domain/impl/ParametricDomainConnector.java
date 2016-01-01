@@ -25,7 +25,6 @@ import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.domain.BaseDomainConnector;
-import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.AbstractRepository;
 import org.xowl.store.IOUtils;
@@ -35,6 +34,8 @@ import org.xowl.store.rdf.IRINode;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.storage.NodeManager;
 import org.xowl.store.storage.cache.CachedNodes;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.utils.logging.BufferedLogger;
 import org.xowl.utils.logging.Logger;
 
@@ -92,9 +93,9 @@ class ParametricDomainConnector extends BaseDomainConnector {
     }
 
     @Override
-    public boolean pushToClient(Artifact data) {
+    public XSPReply pushToClient(Artifact data) {
         // cannot push to clients
-        return false;
+        return XSPReplyFailure.instance();
     }
 
     @Override
@@ -103,12 +104,12 @@ class ParametricDomainConnector extends BaseDomainConnector {
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET"))
-            return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
         if (method.equals("POST"))
             return onMessagePostQuads(parameters, contentType, content);
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected GET or POST request");
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected GET or POST request");
     }
 
     /**
@@ -119,7 +120,7 @@ class ParametricDomainConnector extends BaseDomainConnector {
      * @param content     The content
      * @return The response
      */
-    private HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
+    private IOUtils.HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
         String[] names = parameters.get("name");
         Loader loader = null;
         switch (contentType) {
@@ -148,14 +149,14 @@ class ParametricDomainConnector extends BaseDomainConnector {
                 break;
         }
         if (loader == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
         BufferedLogger logger = new BufferedLogger();
         String contentString = new String(content, Utils.DEFAULT_CHARSET);
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, null);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
         }
         Date artifactCreation = new Date();
         IRINode artifactNode = nodeManager.getIRINode(resource);
@@ -169,6 +170,6 @@ class ParametricDomainConnector extends BaseDomainConnector {
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
 
         queueInput(artifact);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, artifact.serializedJSON());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, artifact.serializedJSON());
     }
 }

@@ -20,6 +20,8 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.store.xsp.XSPReply;
+
 import java.util.Collection;
 
 /**
@@ -36,26 +38,26 @@ public interface ArtifactStorageService extends Service {
      * Stores an artifact in a long-term storage facility
      *
      * @param artifact The artifact to store
-     * @return Whether the operation succeeded
+     * @return The operation's result
      */
-    boolean store(Artifact artifact);
+    XSPReply store(Artifact artifact);
 
     /**
      * Retrieves the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return The artifact, or null it is unknown or cannot be retrieved
+     * @return The operation's result which can be casted to XSPReplyResult in case of success
      */
-    Artifact retrieve(String identifier);
+    XSPReply retrieve(String identifier);
 
     /**
      * Retrieves the specific version of an artifact
      *
      * @param base    The identifier of the base artifact
      * @param version The version to retrieve
-     * @return The artifact, or null it is unknown or cannot be retrieved
+     * @return The operation's result which can be casted to XSPReplyResult in case of success
      */
-    Artifact retrieve(String base, String version);
+    XSPReply retrieve(String base, String version);
 
     /**
      * Lists all the stored artifacts
@@ -85,14 +87,14 @@ public interface ArtifactStorageService extends Service {
      * @param artifact The artifact to push
      * @return Whether the operation succeeded
      */
-    boolean pushToLive(Artifact artifact);
+    XSPReply pushToLive(Artifact artifact);
 
     /**
      * Pulls an artifact from a live reasoning store
      * This effectively removes the artifact from the live reasoning store.
      *
      * @param artifact The artifact to pull
-     * @return Whether the operation succeeded
+     * @return The operation's result
      */
-    boolean pullFromLive(Artifact artifact);
+    XSPReply pullFromLive(Artifact artifact);
 }

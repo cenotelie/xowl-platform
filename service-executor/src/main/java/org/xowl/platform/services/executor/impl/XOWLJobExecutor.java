@@ -23,7 +23,6 @@ package org.xowl.platform.services.executor.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.config.ConfigurationService;
-import org.xowl.platform.utils.HttpResponse;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.utils.Files;
@@ -199,17 +198,6 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public void schedule(Job job) {
         ThreadPoolExecutor pool = getExecutorPool();
         boolean exists = storage.exists();
@@ -252,7 +240,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         List<Job> queue = getQueue();
         StringWriter builder = new StringWriter();
         builder.append("{\"type\": \"");
@@ -270,7 +258,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             builder.append(queue.get(i).serializedJSON());
         }
         builder.append("]}");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 
     /**

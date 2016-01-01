@@ -23,7 +23,7 @@ package org.xowl.platform.services.httpapi.impl;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.httpapi.HTTPServerService;
-import org.xowl.platform.utils.HttpResponse;
+import org.xowl.store.IOUtils;
 import org.xowl.utils.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -51,17 +51,6 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     @Override
     public String getName() {
         return "xOWL Federation Platform - HTTP Server Service";
-    }
-
-    @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
     }
 
     @Override
@@ -97,6 +86,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @param response The response
      */
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
+        addCORSHeader(response);
         try {
             String uri = request.getRequestURI();
             uri = uri.substring(HttpAPIService.URI_API.length() + 1);
@@ -107,11 +97,9 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                     return;
                 }
             }
-            addCORSHeader(response);
             response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
         } catch (Throwable exception) {
             Logger.DEFAULT.error(exception);
-            addCORSHeader(response);
             response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
         }
     }
@@ -150,23 +138,22 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 Logger.DEFAULT.error(exception);
             }
         }
-        HttpResponse serviceResponse = service.onMessage(method,
+        IOUtils.HttpResponse serviceResponse = service.onMessage(method,
                 request.getRequestURI(),
                 request.getParameterMap(),
                 request.getContentType(),
                 content,
                 request.getHeader("Accept"));
-        addCORSHeader(response);
         if (serviceResponse == null) {
             response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
             return;
         }
-        response.setStatus(serviceResponse.code);
-        if (serviceResponse.contentType != null)
-            response.setContentType(serviceResponse.contentType);
-        if (serviceResponse.content != null) {
+        response.setStatus(serviceResponse.getCode());
+        if (serviceResponse.getContentType() != null)
+            response.setContentType(serviceResponse.getContentType());
+        if (serviceResponse.getBodyAsBytes() != null) {
             try (OutputStream os = response.getOutputStream()) {
-                os.write(serviceResponse.content);
+                os.write(serviceResponse.getBodyAsBytes());
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
             }

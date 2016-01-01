@@ -26,8 +26,6 @@ import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
 
-import java.util.Hashtable;
-
 /**
  * Activator for the triple store service
  *

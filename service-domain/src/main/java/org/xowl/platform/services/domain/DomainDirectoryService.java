@@ -21,6 +21,7 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.store.xsp.XSPReply;
 
 import java.util.Collection;
 import java.util.Map;
@@ -61,16 +62,16 @@ public interface DomainDirectoryService extends HttpAPIService {
      * @param name        The new connector's name
      * @param uris        The new connector's API uris, if any
      * @param parameters  The parameters for the new connector, if any
-     * @return The new connector
+     * @return The operation's result
      */
-    DomainConnectorService spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
+    XSPReply spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
 
     /**
      * Deletes a spawned connector
      * Only previously spawned parametric connectors can be deleted
      *
      * @param identifier The identifier of a connector
-     * @return Whether the operation succeed
+     * @return The operation's result
      */
-    boolean delete(String identifier);
+    XSPReply delete(String identifier);
 }

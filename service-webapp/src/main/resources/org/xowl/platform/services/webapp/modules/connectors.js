@@ -1,6 +1,25 @@
 // Copyright (c) 2015 Laurent Wouters
 // Provided under LGPLv3
 
+var xowl = new XOWL();
+var SELECTED_DOMAIN = null;
+var DOMAINS = null;
+var SELECTED_CONNECTOR = null;
+var CONNECTORS = null;
+var GRAPH_WIDTH = 1024;
+var GRAPH_MIN_HEIGHT = 300;
+var GRAPH_HEIGHT = GRAPH_MIN_HEIGHT;
+var SVG_DB = null;
+var SVG_CONNECTOR = null;
+var SVG_DB_LOADED = false;
+var SVG_DB_SIZE = 1000;
+var SVG_DB_SCALE = 0.15;
+var SVG_CONNECTOR_LOADED = false;
+var SVG_CONNECTOR_SIZE = 256;
+var SVG_CONNECTOR_SCALE = 0.25;
+var GRAPH_DB_X = 20;
+var GRAPH_CONNECTOR_X = 400;
+
 function init() {
 	var url = document.URL;
 	var index = url.indexOf("/web/");
@@ -14,25 +33,55 @@ function init() {
 		SVG_CONNECTOR_LOADED = true;
 		render();
 	});
-	request("connectors", function (status, ct, content) {
+	xowl.getConnectors(function (status, ct, content) {
 		if (status == 200) {
-			CONNECTORS = JSON.parse(content);
+			CONNECTORS = content;
 			render();
+		}
+	});
+	xowl.getDomains(function (status, ct, content) {
+		if (status == 200) {
+			DOMAINS = content;
+			var select = document.getElementById("input-domain");
+			while (select.length > 0)
+				select.remove(select.length - 1);
+			for (var i = 0; i != DOMAINS.length; i++) {
+				var option = document.createElement("option");
+				option.text = DOMAINS[i].name;
+				select.add(option);
+			}
+			select.selectedIndex = -1;
 		}
 	});
 }
 
-function request(uri, callback) {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState == 4) {
-			var ct = xmlHttp.getResponseHeader("Content-Type");
-			callback(xmlHttp.status, ct, xmlHttp.responseText)
-		}
+function onDomainSelect() {
+	document.getElementById("input-domain-description").value = "";
+	var params = document.getElementById("input-params");
+	while (params.hasChildNodes()) {
+		params.removeChild(params.lastChild);
 	}
-	xmlHttp.open("GET", "/api/" + uri, true);
-	xmlHttp.setRequestHeader("Accept", "application/json");
-	xmlHttp.send();
+
+	var select = document.getElementById("input-domain");
+	if (select.selectedIndex == -1)
+		return;
+	SELECTED_DOMAIN = DOMAINS[select.selectedIndex];
+	document.getElementById("input-domain-description").value = SELECTED_DOMAIN.description;
+	for (var i = 0; i != SELECTED_DOMAIN.parameters.length; i++) {
+		var parameter = SELECTED_DOMAIN.parameters[i];
+		var data = "<div class='form-group'>";
+		if (parameter.isRequired)
+			data += "<span class='col-sm-1 glyphicon glyphicon-star text-danger' aria-hidden='true' title='required'></span>";
+		else
+			data += "<span class='col-sm-1' aria-hidden='true'></span>";
+		data += "<label class='col-sm-2 control-label'>";
+		data += parameter.name;
+		data += "</label>";
+		data += "<div class='col-sm-9'>";
+		data += "<input type='" + (parameter.typeHint === "password" ? "password" : "text") + "' class='form-control' id='input-param-" + i + "'>";
+		data += "</div></div>";
+		params.innerHTML += data;
+	}
 }
 
 function onClickConnector(connector) {
@@ -70,6 +119,11 @@ function onClickNewConnector() {
 	var id = document.getElementById("input-id").value;
 	var name = document.getElementById("input-name").value;
 	var uri = document.getElementById("input-uri").value;
+	if (SELECTED_DOMAIN == null) {
+		document.getElementById("input-domain").parentElement.className = "form-group has-error"
+		document.getElementById("input-domain-help").innerHTML = "A domain must be selected.";
+		onerror = true;
+	}
 	if (typeof id == "undefined" || id == null || id == "") {
 		document.getElementById("input-id").parentElement.className = "form-group has-error"
 		document.getElementById("input-id-help").innerHTML = "The identifier must not be empty.";
@@ -82,16 +136,32 @@ function onClickNewConnector() {
 	}
 	if (onerror)
 		return;
+	document.getElementById("input-domain").parentElement.className = "form-group"
+	document.getElementById("input-domain-help").innerHTML = "";
 	document.getElementById("input-id").parentElement.className = "form-group"
 	document.getElementById("input-id-help").innerHTML = "";
 	document.getElementById("input-name").parentElement.className = "form-group"
 	document.getElementById("input-name-help").innerHTML = "";
-	var data = "connectors?action=spawn&id=" + encodeURIComponent(id) + "&name=" + encodeURIComponent(name);
-	if (typeof id == 'string' && id.length > 0)
-		data += "&uri=" + encodeURIComponent(uri);
-	request(data, function (status, ct, content) {
+
+	var data = {
+		"identifier": id,
+		"name": name,
+		"uris": (typeof uri == "undefined" || uri == null || uri == "" ? [] : [uri])
+	};
+	for (var i = 0; i != SELECTED_DOMAIN.parameters.length; i++) {
+		var value = document.getElementById("input-param-" + i).value;
+		if (typeof value == "undefined" || value == null || value == "") {
+			if (SELECTED_DOMAIN.parameters[i].isRequired) {
+				document.getElementById("input-id").parentElement.className = "form-group has-error"
+				document.getElementById("input-id-help").innerHTML = "Parameter " + SELECTED_DOMAIN.parameters[i].name + " is required.";
+			}
+		} else {
+			data[SELECTED_DOMAIN.parameters[i]] = value;
+		}
+	}
+	xowl.createConnector(function (status, ct, content) {
 		if (status === 200) {
-			var connector = JSON.parse(content);
+			var connector = content;
 			document.getElementById("input-id").value = "";
 			document.getElementById("input-name").value = "";
 			document.getElementById("input-uri").value = "";
@@ -99,45 +169,28 @@ function onClickNewConnector() {
 				CONNECTORS = [connector];
 			else
 				CONNECTORS.push(connector);
+			for (var i = 0; i != SELECTED_DOMAIN.parameters.length; i++) {
+				document.getElementById("input-param-" + i).value = "";
+			}
 			render();
 		} else {
 			document.getElementById("input-id").parentElement.className = "form-group has-error"
 			document.getElementById("input-id-help").innerHTML = content;
 		}
-	});
+	}, SELECTED_DOMAIN, data);
 }
 
 function onClickDeleteConnector() {
 	if (SELECTED_CONNECTOR === null)
 		return;
-	var data = "connectors?action=delete&id=" + encodeURIComponent(SELECTED_CONNECTOR.identifier);
-	request(data, function (status, ct, content) {
+	xowl.deleteConnector(function (status, ct, content) {
 		if (status === 200) {
 			document.getElementById("connector-properties").style.display = "none";
 			CONNECTORS.splice(CONNECTORS.indexOf(SELECTED_CONNECTOR), 1);
 			render();
-		} else {
-			if (content !== null && content.length > 0)
-				alert(content);
 		}
-	});
+	}, SELECTED_CONNECTOR.identifier);
 }
-
-var SELECTED_CONNECTOR = null;
-var CONNECTORS = null;
-var GRAPH_WIDTH = 1024;
-var GRAPH_MIN_HEIGHT = 300;
-var GRAPH_HEIGHT = GRAPH_MIN_HEIGHT;
-var SVG_DB = null;
-var SVG_CONNECTOR = null;
-var SVG_DB_LOADED = false;
-var SVG_DB_SIZE = 1000;
-var SVG_DB_SCALE = 0.15;
-var SVG_CONNECTOR_LOADED = false;
-var SVG_CONNECTOR_SIZE = 256;
-var SVG_CONNECTOR_SCALE = 0.25;
-var GRAPH_DB_X = 20;
-var GRAPH_CONNECTOR_X = 400;
 
 function render() {
 	if (CONNECTORS != null && SVG_DB_LOADED && SVG_CONNECTOR_LOADED)

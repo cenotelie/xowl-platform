@@ -21,8 +21,9 @@
 package org.xowl.platform.services.domain;
 
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.utils.HttpResponse;
 import org.xowl.store.IOUtils;
+import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyResult;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -71,17 +72,6 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
-    public String getProperty(String name) {
-        if (name == null)
-            return null;
-        if ("identifier".equals(name))
-            return getIdentifier();
-        if ("name".equals(name))
-            return getName();
-        return null;
-    }
-
-    @Override
     public boolean canPullInput() {
         return false;
     }
@@ -106,21 +96,21 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
-    public Artifact getNextInput(boolean block) {
+    public XSPReply getNextInput(boolean block) {
         if (block) {
             try {
-                return input.take();
+                return new XSPReplyResult<>(input.take());
             } catch (InterruptedException exception) {
                 return null;
             }
         } else {
-            return input.poll();
+            return new XSPReplyResult<>(input.poll());
         }
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
+    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
     }
 
     @Override
@@ -141,7 +131,7 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         Collection<String> uris = getURIs();
         boolean first = true;
         for (String uri : uris) {
-            if (first)
+            if (!first)
                 builder.append(", ");
             first = false;
             builder.append("\"");

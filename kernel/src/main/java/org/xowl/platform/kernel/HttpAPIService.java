@@ -20,7 +20,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.platform.utils.HttpResponse;
+import org.xowl.store.IOUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -54,5 +54,5 @@ public interface HttpAPIService extends Service {
      * @param accept      The Accept header, if any
      * @return The response
      */
-    HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
+    IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
 }

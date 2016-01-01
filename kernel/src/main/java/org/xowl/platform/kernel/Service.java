@@ -26,11 +26,5 @@ package org.xowl.platform.kernel;
  * @author Laurent Wouters
  */
 public interface Service extends Identifiable {
-    /**
-     * Gets the property of this service for the specified name
-     *
-     * @param name The name of a property
-     * @return The property's value
-     */
-    String getProperty(String name);
+
 }

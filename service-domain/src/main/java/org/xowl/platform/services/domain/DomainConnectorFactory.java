@@ -20,41 +20,26 @@
 
 package org.xowl.platform.services.domain;
 
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;
 import java.util.Map;
 
 /**
- * Implements a directory service for the domain connectors
+ * A factory that can create new connectors for the platform
  *
  * @author Laurent Wouters
  */
-public interface DomainDirectoryService extends HttpAPIService {
+public interface DomainConnectorFactory extends Service {
     /**
-     * Gets the available connectors
-     *
-     * @return The available connectors
-     */
-    Collection<DomainConnectorService> getConnectors();
-
-    /**
-     * Gets the connector for the specified identifier
-     *
-     * @param identifier The identifier of a connector
-     * @return The connector, or null if it does not exist
-     */
-    DomainConnectorService get(String identifier);
-
-    /**
-     * Gets all the supported domains
+     * Gets the domains supported by this factory
      *
      * @return The supported domains
      */
     Collection<DomainDescription> getDomains();
 
     /**
-     * Spawns a new connector for a domain
+     * Instantiates a new connector for a domain
      *
      * @param description The domain's description
      * @param identifier  The new connector's unique identifier
@@ -63,14 +48,5 @@ public interface DomainDirectoryService extends HttpAPIService {
      * @param parameters  The parameters for the new connector, if any
      * @return The new connector
      */
-    DomainConnectorService spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
-
-    /**
-     * Deletes a spawned connector
-     * Only previously spawned parametric connectors can be deleted
-     *
-     * @param identifier The identifier of a connector
-     * @return Whether the operation succeed
-     */
-    boolean delete(String identifier);
+    DomainConnectorService newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
 }

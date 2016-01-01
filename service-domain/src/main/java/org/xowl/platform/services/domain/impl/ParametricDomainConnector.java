@@ -20,7 +20,6 @@
 
 package org.xowl.platform.services.domain.impl;
 
-import org.osgi.framework.ServiceRegistration;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
@@ -70,14 +69,6 @@ class ParametricDomainConnector extends BaseDomainConnector {
      * The node manager when loading quads
      */
     private final NodeManager nodeManager;
-    /**
-     * The reference to this service as a domain connector
-     */
-    ServiceRegistration refAsDomainConnector;
-    /**
-     * The reference to this service as a served service
-     */
-    ServiceRegistration refAsServedService;
 
     /**
      * Initializes this connector

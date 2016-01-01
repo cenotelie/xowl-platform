@@ -24,6 +24,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.domain.impl.XOWLDomainDirectoryService;
+import org.xowl.platform.services.domain.impl.XOWLGenericConnectorFactory;
 
 import java.util.Hashtable;
 
@@ -35,10 +36,13 @@ import java.util.Hashtable;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
+        XOWLGenericConnectorFactory factory = new XOWLGenericConnectorFactory();
+        bundleContext.registerService(DomainConnectorFactory.class, factory, null);
+
         XOWLDomainDirectoryService service = new XOWLDomainDirectoryService();
         Hashtable<String, Object> properties = new Hashtable<>();
         properties.put("id", service.getIdentifier());
-        properties.put("uri", "connectors");
+        properties.put("uri", new String[]{"connectors", "domains"});
         bundleContext.registerService(HttpAPIService.class, service, properties);
         bundleContext.registerService(DomainDirectoryService.class, service, properties);
     }

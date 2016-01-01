@@ -22,18 +22,18 @@ package org.xowl.platform.services.domain.impl;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.services.domain.DomainConnectorService;
-import org.xowl.platform.services.domain.DomainDirectoryService;
+import org.xowl.platform.services.domain.*;
 import org.xowl.platform.utils.HttpResponse;
+import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
+import org.xowl.utils.logging.BufferedLogger;
 
 import java.net.HttpURLConnection;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements a directory service for the domain connectors
@@ -42,9 +42,27 @@ import java.util.Map;
  */
 public class XOWLDomainDirectoryService implements DomainDirectoryService {
     /**
-     * The spawned connectors
+     * The data about a spawned connector
      */
-    private final Map<String, ParametricDomainConnector> parametricConnectors = new HashMap<>();
+    private static class Registration {
+        /**
+         * The service
+         */
+        public DomainConnectorService service;
+        /**
+         * The reference to this service as a domain connector
+         */
+        ServiceRegistration refAsDomainConnector;
+        /**
+         * The reference to this service as a served service
+         */
+        ServiceRegistration refAsServedService;
+    }
+
+    /**
+     * The spawned connectors by identifier
+     */
+    private final Map<String, Registration> connectorsById = new HashMap<>();
 
     @Override
     public String getIdentifier() {
@@ -69,13 +87,21 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (method.equals("GET") && parameters.isEmpty())
-            return onMessageListConnectors();
+        if (method.equals("GET") && parameters.isEmpty()) {
+            if ("domains".equals(uri))
+                return onMessageListDomains();
+            if ("connectors".equals(uri))
+                return onMessageListConnectors();
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        }
+        if (!method.equals("POST"))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+
         String[] actions = parameters.get("action");
         String action = actions != null && actions.length >= 1 ? actions[0] : null;
-        if (action != null && action.equals("spawn") && (method.equals("POST") || method.equals("GET")))
-            return onMessageCreateConnector(parameters);
-        if (action != null && action.equals("delete") && (method.equals("POST") || method.equals("GET")))
+        if (action != null && action.equals("spawn"))
+            return onMessageCreateConnector(parameters, content, contentType);
+        if (action != null && action.equals("delete"))
             return onMessageDeleteConnector(parameters);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
@@ -87,41 +113,64 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
     @Override
     public DomainConnectorService get(String identifier) {
-        DomainConnectorService service = parametricConnectors.get(identifier);
-        if (service != null)
-            return service;
+        Registration registration = connectorsById.get(identifier);
+        if (registration != null)
+            return registration.service;
         return ServiceUtils.getService(DomainConnectorService.class, "id", identifier);
     }
 
     @Override
-    public DomainConnectorService spawn(String identifier, String name, String[] uris) {
-        synchronized (parametricConnectors) {
+    public Collection<DomainDescription> getDomains() {
+        Collection<DomainDescription> result = new ArrayList<>(16);
+        Collection<DomainConnectorFactory> factories = ServiceUtils.getServices(DomainConnectorFactory.class);
+        for (DomainConnectorFactory factory : factories) {
+            result.addAll(factory.getDomains());
+        }
+        return result;
+    }
+
+    @Override
+    public DomainConnectorService spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
+        synchronized (connectorsById) {
             DomainConnectorService service = get(identifier);
             if (service != null)
                 // already exists
                 return null;
-            BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
-            ParametricDomainConnector connector = new ParametricDomainConnector(identifier, name, uris);
-            parametricConnectors.put(identifier, connector);
+
+            Collection<DomainConnectorFactory> factories = ServiceUtils.getServices(DomainConnectorFactory.class);
+            for (DomainConnectorFactory factory : factories) {
+                if (factory.getDomains().contains(description)) {
+                    // this is the factory
+                    service = factory.newConnector(description, identifier, name, uris, parameters);
+                    break;
+                }
+            }
+            if (service == null)
+                // failed to create the service (factory not fond?)
+                return null;
+
+            Registration registration = new Registration();
+            registration.service = service;
             Hashtable<String, Object> properties = new Hashtable<>();
             properties.put("id", identifier);
             if (uris != null)
                 properties.put("uri", uris);
-            connector.refAsDomainConnector = context.registerService(DomainConnectorService.class, connector, properties);
-            connector.refAsServedService = context.registerService(HttpAPIService.class, connector, properties);
-            return connector;
+            BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
+            registration.refAsDomainConnector = context.registerService(DomainConnectorService.class, service, properties);
+            registration.refAsServedService = context.registerService(HttpAPIService.class, service, properties);
+            connectorsById.put(identifier, registration);
+            return service;
         }
     }
 
     @Override
     public boolean delete(String identifier) {
-        synchronized (parametricConnectors) {
-            ParametricDomainConnector connector = parametricConnectors.get(identifier);
-            if (connector == null)
+        synchronized (connectorsById) {
+            Registration registration = connectorsById.remove(identifier);
+            if (registration == null)
                 return false;
-            connector.refAsDomainConnector.unregister();
-            connector.refAsServedService.unregister();
-            parametricConnectors.remove(identifier);
+            registration.refAsDomainConnector.unregister();
+            registration.refAsServedService.unregister();
             return true;
         }
     }
@@ -146,20 +195,119 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     /**
+     * Responds to a request for the list of the domains
+     *
+     * @return The response
+     */
+    private HttpResponse onMessageListDomains() {
+        Collection<DomainDescription> domains = getDomains();
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (DomainDescription domain : domains) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(domain.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
      * Responds to the request to spawn a new parametric connector
      *
      * @param parameters The request parameters
      * @return The response
      */
-    private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        String[] names = parameters.get("name");
-        String[] uris = parameters.get("uri");
-        if (ids == null || ids.length == 0 || names == null || names.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected at least one id and one name parameter");
-        DomainConnectorService connector = spawn(ids[0], names[0], uris);
-        if (connector == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "The connector already exist");
+    private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content, String contentType) {
+        String[] domainIds = parameters.get("domain");
+        if (domainIds == null || domainIds.length == 0)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected domain parameter");
+        if (content == null || content.length == 0 || !IOUtils.MIME_JSON.equals(contentType))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected JSON content");
+
+        BufferedLogger logger = new BufferedLogger();
+        ASTNode root = Utils.parseJSON(logger, new String(content, Utils.DEFAULT_CHARSET));
+        if (root == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+
+        DomainDescription domain = null;
+        for (DomainDescription description : getDomains()) {
+            if (description.getIdentifier().equals(domainIds[0])) {
+                domain = description;
+                break;
+            }
+        }
+        if (domain == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
+
+        String id = null;
+        String name = null;
+        List<String> uris = new ArrayList<>(2);
+        Map<DomainDescriptionParam, Object> customParams = new HashMap<>();
+        for (ASTNode member : root.getChildren()) {
+            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            switch (head) {
+                case "identifier":
+                    id = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    id = id.substring(1, id.length() - 1);
+                    break;
+                case "name":
+                    name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    name = name.substring(1, name.length() - 1);
+                    break;
+                case "uris": {
+                    ASTNode valueNode = member.getChildren().get(1);
+                    if (valueNode.getValue() != null) {
+                        String value = IOUtils.unescape(valueNode.getValue());
+                        value = value.substring(1, value.length() - 1);
+                        uris.add(value);
+                    } else if (valueNode.getChildren().size() > 0) {
+                        for (ASTNode childNode : valueNode.getChildren()) {
+                            String value = IOUtils.unescape(childNode.getValue());
+                            value = value.substring(1, value.length() - 1);
+                            uris.add(value);
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    DomainDescriptionParam parameter = null;
+                    for (DomainDescriptionParam p : domain.getParameters()) {
+                        if (p.getIdentifier().equals(head)) {
+                            parameter = p;
+                            break;
+                        }
+                    }
+                    if (parameter != null) {
+                        ASTNode valueNode = member.getChildren().get(1);
+                        if (valueNode.getValue() != null) {
+                            String value = IOUtils.unescape(valueNode.getValue());
+                            if (value.startsWith("\"") && value.endsWith("\""))
+                                value = value.substring(1, value.length() - 1);
+                            customParams.put(parameter, value);
+                        } else if (valueNode.getChildren().size() > 0) {
+                            String[] values = new String[valueNode.getChildren().size()];
+                            for (int i = 0; i != valueNode.getChildren().size(); i++) {
+                                String value = IOUtils.unescape(valueNode.getChildren().get(i).getValue());
+                                if (value.startsWith("\"") && value.endsWith("\""))
+                                    value = value.substring(1, value.length() - 1);
+                                values[i] = value;
+                            }
+                            customParams.put(parameter, values);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (id == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Identifier for connector not specified");
+        if (name == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Name for connector not specified");
+
+        DomainConnectorService connector = spawn(domain, id, name, (String[]) uris.toArray(), customParams);
         return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, connector.serializedJSON());
     }
 

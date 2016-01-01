@@ -30,6 +30,19 @@ import org.xowl.store.Serializable;
  */
 public interface DomainDescriptionParam extends Identifiable, Serializable {
     /**
+     * Type hint for a string parameter
+     */
+    String TYPE_HINT_STRING = "string";
+    /**
+     * Type hint for a number parameter
+     */
+    String TYPE_HINT_NUMBER = "number";
+    /**
+     * Type hint for an uri parameter
+     */
+    String TYPE_HINT_URI = "uri";
+
+    /**
      * Gets whether the parameter is required
      *
      * @return Whether the parameter is required

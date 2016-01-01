@@ -31,6 +31,11 @@ import java.util.Map;
  */
 public interface HttpAPIService extends Service {
     /**
+     * The URI prefix for API connections
+     */
+    String URI_API = "/api";
+
+    /**
      * Responds to a message
      *
      * @param method      The HTTP method

@@ -25,6 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.httpapi.impl.XOWLMainHTTPServer;
 import org.xowl.utils.logging.Logger;
 
@@ -50,7 +51,7 @@ public class Activator implements BundleActivator {
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
-                    service.unregister(HTTPServerService.URI_API);
+                    service.unregister(HttpAPIService.URI_API);
                 } catch (IllegalArgumentException exception) {
                     // ignore this
                 }
@@ -59,7 +60,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerServlet(HTTPServerService.URI_API, server, null, null);
+                    httpService.registerServlet(HttpAPIService.URI_API, server, null, null);
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

@@ -99,9 +99,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET") && parameters.isEmpty()) {
-            if ("domains".equals(uri))
+            if (uri.equals(URI_API + "/domain"))
                 return onMessageListDomains();
-            if ("connectors".equals(uri))
+            if (uri.equals(URI_API + "/connectors"))
                 return onMessageListConnectors();
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }

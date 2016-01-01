@@ -22,6 +22,8 @@ package org.xowl.platform.services.domain;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.domain.impl.XOWLDomainDirectoryService;
 import org.xowl.platform.services.domain.impl.XOWLGenericConnectorFactory;
@@ -34,21 +36,45 @@ import java.util.Hashtable;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The directory service
+     */
+    private XOWLDomainDirectoryService directory;
+    /**
+     * The tracker of the connector factories
+     */
+    private ServiceTracker factoryTracker;
+
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
+    public void start(final BundleContext bundleContext) throws Exception {
+        directory = new XOWLDomainDirectoryService();
+        Hashtable<String, Object> properties = new Hashtable<>();
+        properties.put("id", directory.getIdentifier());
+        properties.put("uri", new String[]{"connectors", "domains"});
+        bundleContext.registerService(HttpAPIService.class, directory, properties);
+        bundleContext.registerService(DomainDirectoryService.class, directory, properties);
+
+        factoryTracker = new ServiceTracker<DomainConnectorFactory, DomainConnectorFactory>(bundleContext, DomainConnectorFactory.class, null) {
+            @Override
+            public void removedService(ServiceReference reference, DomainConnectorFactory service) {
+                directory.onFactoryOffline(service);
+            }
+
+            @Override
+            public DomainConnectorFactory addingService(ServiceReference reference) {
+                DomainConnectorFactory factory = (DomainConnectorFactory) bundleContext.getService(reference);
+                directory.onFactoryOnline(factory);
+                return factory;
+            }
+        };
+        factoryTracker.open();
+
         XOWLGenericConnectorFactory factory = new XOWLGenericConnectorFactory();
         bundleContext.registerService(DomainConnectorFactory.class, factory, null);
-
-        XOWLDomainDirectoryService service = new XOWLDomainDirectoryService();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", service.getIdentifier());
-        properties.put("uri", new String[]{"connectors", "domains"});
-        bundleContext.registerService(HttpAPIService.class, service, properties);
-        bundleContext.registerService(DomainDirectoryService.class, service, properties);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        factoryTracker.close();
     }
 }

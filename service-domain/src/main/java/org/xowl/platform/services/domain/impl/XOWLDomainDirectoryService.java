@@ -63,6 +63,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * The spawned connectors by identifier
      */
     private final Map<String, Registration> connectorsById = new HashMap<>();
+    /**
+     * The registered factories
+     */
+    private final Collection<DomainConnectorFactory> factories = new ArrayList<>(8);
 
     @Override
     public String getIdentifier() {
@@ -122,7 +126,6 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     @Override
     public Collection<DomainDescription> getDomains() {
         Collection<DomainDescription> result = new ArrayList<>(16);
-        Collection<DomainConnectorFactory> factories = ServiceUtils.getServices(DomainConnectorFactory.class);
         for (DomainConnectorFactory factory : factories) {
             result.addAll(factory.getDomains());
         }
@@ -173,6 +176,24 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             registration.refAsServedService.unregister();
             return true;
         }
+    }
+
+    /**
+     * When a new connector factory service comes online
+     *
+     * @param factory The new factory
+     */
+    public void onFactoryOnline(DomainConnectorFactory factory) {
+        factories.add(factory);
+    }
+
+    /**
+     * When a connector factory service comes offline
+     *
+     * @param factory The factory
+     */
+    public void onFactoryOffline(DomainConnectorFactory factory) {
+        factories.remove(factory);
     }
 
     /**

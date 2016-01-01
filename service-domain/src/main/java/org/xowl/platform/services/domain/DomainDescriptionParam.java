@@ -34,6 +34,10 @@ public interface DomainDescriptionParam extends Identifiable, Serializable {
      */
     String TYPE_HINT_STRING = "string";
     /**
+     * Type hint for a password parameter
+     */
+    String TYPE_HINT_PASSWORD = "password";
+    /**
      * Type hint for a number parameter
      */
     String TYPE_HINT_NUMBER = "number";

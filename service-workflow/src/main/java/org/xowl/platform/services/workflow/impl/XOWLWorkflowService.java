@@ -47,10 +47,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements the default workflow service for the platform
@@ -71,6 +68,13 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
      * The property for the current activity
      */
     private static final String PROPERTY_CURRENT_ACTIVITY = "http://xowl.org/platform/services/workflow#currentActivity";
+    /**
+     * The URIs for this service
+     */
+    private static final String[] URIs = new String[]{
+            "workflow"
+    };
+
 
     /**
      * Node manager for creating new artifacts
@@ -260,6 +264,11 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
         WorkflowJob job = newJob(action.getName(), action);
         executor.schedule(job);
         return new XSPReplyResult<>(job);
+    }
+
+    @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(URIs);
     }
 
     @Override

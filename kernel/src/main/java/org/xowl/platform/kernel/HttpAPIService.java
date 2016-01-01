@@ -22,6 +22,7 @@ package org.xowl.platform.kernel;
 
 import org.xowl.platform.utils.HttpResponse;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -34,6 +35,13 @@ public interface HttpAPIService extends Service {
      * The URI prefix for API connections
      */
     String URI_API = "/api";
+
+    /**
+     * Gets the URIs for accessing the service
+     *
+     * @return The URIs for accessing the service
+     */
+    Collection<String> getURIs();
 
     /**
      * Responds to a message

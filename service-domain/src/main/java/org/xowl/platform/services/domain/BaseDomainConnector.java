@@ -26,6 +26,7 @@ import org.xowl.store.IOUtils;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -67,15 +68,6 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         } catch (InterruptedException exception) {
             return false;
         }
-    }
-
-    /**
-     * Gets the URIs that can be used to access this HTTP API of this connector
-     *
-     * @return The URIs for this connector
-     */
-    public String[] getURIs() {
-        return null;
     }
 
     @Override
@@ -146,20 +138,20 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
         builder.append("\", \"uris\": [");
-        String[] uris = getURIs();
-        if (uris != null && uris.length > 0) {
-            for (int i = 0; i != uris.length; i++) {
-                if (i != 0)
-                    builder.append(", ");
-                builder.append("\"");
-                builder.append(IOUtils.escapeStringJSON(uris[i]));
-                builder.append("\"");
-            }
+        Collection<String> uris = getURIs();
+        boolean first = true;
+        for (String uri : uris) {
+            if (first)
+                builder.append(", ");
+            first = false;
+            builder.append("\"");
+            builder.append(IOUtils.escapeStringJSON(uri));
+            builder.append("\"");
         }
         builder.append("], \"canPullInput\": ");
         builder.append(canPullInput());
         builder.append(", \"queue\": [");
-        boolean first = true;
+        first = true;
         for (Artifact artifact : getQueuedInputs()) {
             if (!first)
                 builder.append(", ");

@@ -37,11 +37,8 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         XOWLJobExecutor service = new XOWLJobExecutor();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", service.getIdentifier());
-        properties.put("uri", "jobs");
-        bundleContext.registerService(JobExecutionService.class, service, properties);
-        bundleContext.registerService(HttpAPIService.class, service, properties);
+        bundleContext.registerService(JobExecutionService.class, service, null);
+        bundleContext.registerService(HttpAPIService.class, service, null);
     }
 
     @Override

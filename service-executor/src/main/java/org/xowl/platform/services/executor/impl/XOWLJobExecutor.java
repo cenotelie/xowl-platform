@@ -32,10 +32,7 @@ import org.xowl.utils.logging.Logger;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +55,15 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * The executor max pool size
      */
     private static final int EXECUTOR_POOL_MAX = 16;
+
+    /**
+     * The URIs for this service
+     */
+    private static final String[] URIs = new String[]{
+            "connectors",
+            "domains"
+    };
+
 
     /**
      * The pool of executor threads
@@ -239,6 +245,11 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
         for (Runnable runnable : getExecutorPool().getQueue())
             result.add((Job) runnable);
         return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(URIs);
     }
 
     @Override

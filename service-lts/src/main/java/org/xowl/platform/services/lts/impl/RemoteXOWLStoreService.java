@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -46,6 +47,15 @@ import java.util.Map;
  * @author Laurent Wouters
  */
 public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService {
+    /**
+     * The URIs for this service
+     */
+    private static final String[] URIs = new String[]{
+            "sparql",
+            "artifacts"
+    };
+
+
     /**
      * The live store
      */
@@ -186,6 +196,11 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     @Override
     public boolean pullFromLive(Artifact artifact) {
         return storeLive.delete(artifact.getIdentifier());
+    }
+
+    @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(URIs);
     }
 
     @Override

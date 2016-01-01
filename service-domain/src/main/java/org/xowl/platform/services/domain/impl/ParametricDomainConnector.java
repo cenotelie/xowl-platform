@@ -42,10 +42,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of a domain connector that can be configured and deployed at runtime
@@ -101,17 +98,17 @@ class ParametricDomainConnector extends BaseDomainConnector {
     }
 
     @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(uris);
+    }
+
+    @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET"))
             return new HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
         if (method.equals("POST"))
             return onMessagePostQuads(parameters, contentType, content);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected GET or POST request");
-    }
-
-    @Override
-    public String[] getURIs() {
-        return uris;
     }
 
     /**

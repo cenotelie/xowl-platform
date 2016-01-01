@@ -38,14 +38,11 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         XOWLWorkflowService service = new XOWLWorkflowService();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", service.getIdentifier());
-        properties.put("uri", "workflow");
-        bundleContext.registerService(WorkflowService.class, service, properties);
-        bundleContext.registerService(HttpAPIService.class, service, properties);
+        bundleContext.registerService(WorkflowService.class, service, null);
+        bundleContext.registerService(HttpAPIService.class, service, null);
 
         XOWLWorkflowFactoryService factory = new XOWLWorkflowFactoryService(service);
-        properties = new Hashtable<>();
+        Hashtable<String, Object> properties = new Hashtable<>();
         properties.put("id", factory.getIdentifier());
         properties.put("type", XOWLWorkflowFactoryService.ACTIONS);
         bundleContext.registerService(WorkflowFactoryService.class, factory, properties);

@@ -37,12 +37,9 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         RemoteXOWLStoreService service = new RemoteXOWLStoreService();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", service.getIdentifier());
-        properties.put("uri", new String[]{"sparql", "artifacts"});
-        bundleContext.registerService(TripleStoreService.class, service, properties);
-        bundleContext.registerService(ArtifactStorageService.class, service, properties);
-        bundleContext.registerService(HttpAPIService.class, service, properties);
+        bundleContext.registerService(TripleStoreService.class, service, null);
+        bundleContext.registerService(ArtifactStorageService.class, service, null);
+        bundleContext.registerService(HttpAPIService.class, service, null);
     }
 
     @Override

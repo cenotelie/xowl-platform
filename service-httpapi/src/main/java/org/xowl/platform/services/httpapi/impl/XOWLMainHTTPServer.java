@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.Collection;
 
 /**
  * The main server for the platform
@@ -98,26 +99,20 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
         try {
             String uri = request.getRequestURI();
-            if (uri.startsWith(HttpAPIService.URI_API + "/service/")) {
-                HttpAPIService service = ServiceUtils.getService(HttpAPIService.class, "id", uri.substring((HttpAPIService.URI_API + "/service/").length()));
-                if (service == null) {
-                    addCORSHeader(response);
-                    response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
-                } else {
+            uri = uri.substring(HttpAPIService.URI_API.length() + 1);
+            Collection<HttpAPIService> services = ServiceUtils.getServices(HttpAPIService.class);
+            for (HttpAPIService service : services) {
+                if (service.getURIs().contains(uri)) {
                     doServedService(service, method, request, response);
-                }
-            } else {
-                uri = uri.substring(HttpAPIService.URI_API.length() + 1);
-                HttpAPIService service = ServiceUtils.getService(HttpAPIService.class, "uri", uri);
-                if (service == null) {
-                    addCORSHeader(response);
-                    response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
-                } else {
-                    doServedService(service, method, request, response);
+                    return;
                 }
             }
-        } catch (Exception | Error exception) {
+            addCORSHeader(response);
+            response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+        } catch (Throwable exception) {
             Logger.DEFAULT.error(exception);
+            addCORSHeader(response);
+            response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
         }
     }
 

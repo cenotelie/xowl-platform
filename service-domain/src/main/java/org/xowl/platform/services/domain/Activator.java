@@ -48,11 +48,8 @@ public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         directory = new XOWLDomainDirectoryService();
-        Hashtable<String, Object> properties = new Hashtable<>();
-        properties.put("id", directory.getIdentifier());
-        properties.put("uri", new String[]{"connectors", "domains"});
-        bundleContext.registerService(HttpAPIService.class, directory, properties);
-        bundleContext.registerService(DomainDirectoryService.class, directory, properties);
+        bundleContext.registerService(HttpAPIService.class, directory, null);
+        bundleContext.registerService(DomainDirectoryService.class, directory, null);
 
         factoryTracker = new ServiceTracker<DomainConnectorFactory, DomainConnectorFactory>(bundleContext, DomainConnectorFactory.class, null) {
             @Override

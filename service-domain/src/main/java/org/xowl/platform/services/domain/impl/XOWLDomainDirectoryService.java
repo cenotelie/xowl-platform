@@ -63,6 +63,14 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     /**
+     * The URIs for this service
+     */
+    private static final String[] URIs = new String[]{
+            "connectors",
+            "domains"
+    };
+
+    /**
      * The spawned connectors by identifier
      */
     private final Map<String, Registration> connectorsById = new HashMap<>();
@@ -97,9 +105,14 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(URIs);
+    }
+
+    @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET") && parameters.isEmpty()) {
-            if (uri.equals(URI_API + "/domain"))
+            if (uri.equals(URI_API + "/domains"))
                 return onMessageListDomains();
             if (uri.equals(URI_API + "/connectors"))
                 return onMessageListConnectors();
@@ -162,13 +175,11 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
             Registration registration = new Registration();
             registration.service = service;
-            Hashtable<String, Object> properties = new Hashtable<>();
-            properties.put("id", identifier);
-            if (uris != null)
-                properties.put("uri", uris);
+            Dictionary<String, Object> properties = new Hashtable<>();
+            properties.put("id", service.getIdentifier());
             BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
             registration.refAsDomainConnector = context.registerService(DomainConnectorService.class, service, properties);
-            registration.refAsServedService = context.registerService(HttpAPIService.class, service, properties);
+            registration.refAsServedService = context.registerService(HttpAPIService.class, service, null);
             connectorsById.put(identifier, registration);
             return service;
         }

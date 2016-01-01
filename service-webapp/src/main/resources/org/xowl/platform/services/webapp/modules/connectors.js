@@ -156,7 +156,7 @@ function onClickNewConnector() {
 				document.getElementById("input-id-help").innerHTML = "Parameter " + SELECTED_DOMAIN.parameters[i].name + " is required.";
 			}
 		} else {
-			data[SELECTED_DOMAIN.parameters[i]] = value;
+			data[SELECTED_DOMAIN.parameters[i].identifier] = value;
 		}
 	}
 	xowl.createConnector(function (status, ct, content) {

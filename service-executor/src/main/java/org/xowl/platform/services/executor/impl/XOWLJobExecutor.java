@@ -54,6 +54,10 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * The executor max pool size
      */
     private static final int EXECUTOR_POOL_MAX = 16;
+    /**
+     * The bound of the buffer of completed jobs
+     */
+    private static final int COMPLETED_QUEUED_BOUND = EXECUTOR_QUEUE_BOUND;
 
     /**
      * The URIs for this service
@@ -71,6 +75,22 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * The directory for the persistent storage of queued job
      */
     private File storage;
+    /**
+     * The buffer of completed jobs
+     */
+    private Job[] completed;
+    /**
+     * The index of the first completed job in the buffer
+     */
+    private int completedStart;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLJobExecutor() {
+        this.completed = new Job[COMPLETED_QUEUED_BOUND];
+        this.completedStart = -1;
+    }
 
     /**
      * Gets the executor pool
@@ -117,11 +137,24 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     /**
+     * Pushes a new completed job
+     *
+     * @param job The newly completed job
+     */
+    private void pushCompleted(Job job) {
+        completedStart++;
+        if (completedStart == COMPLETED_QUEUED_BOUND)
+            completedStart = 0;
+        completed[completedStart] = job;
+    }
+
+    /**
      * Action when a job is finished
      *
      * @param job the finished job
      */
     private void onJobFinished(Job job) {
+        pushCompleted(job);
         File file = new File(storage, getFileName(job));
         if (file.exists()) {
             if (!file.delete()) {
@@ -222,16 +255,34 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
-    public boolean isScheduled(Job job) {
-        return getExecutorPool().getQueue().contains(job);
-    }
-
-    @Override
     public List<Job> getQueue() {
         List<Job> result = new ArrayList<>();
         for (Runnable runnable : getExecutorPool().getQueue())
             result.add((Job) runnable);
         return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public Job getScheduledJob(String identifier) {
+        for (Runnable runnable : getExecutorPool().getQueue()) {
+            Job job = (Job) runnable;
+            if (job.getIdentifier().equals(identifier))
+                return job;
+        }
+        return null;
+    }
+
+    @Override
+    public Job getCompletedJob(String identifier) {
+        if (completedStart < 0)
+            return null;
+        for (int i = 0; i != completed.length; i++) {
+            if (completed[i] == null)
+                return null;
+            if (completed[i].getIdentifier().equals(identifier))
+                return completed[i];
+        }
+        return null;
     }
 
     @Override
@@ -241,23 +292,59 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
 
     @Override
     public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        String[] types = parameters.get("type");
+        String[] ids = parameters.get("id");
+        boolean isCompleted = (types != null && types.length > 0 && types[0].equals("completed"));
+        if (ids != null && ids.length > 0) {
+            Job job = isCompleted ? getCompletedJob(ids[0]) : getScheduledJob(ids[0]);
+            if (job == null)
+                return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, "");
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+        }
+        return isCompleted ? onRequestCompleted() : onRequestQueue();
+    }
+
+    /**
+     * Responds to a request for the queue
+     *
+     * @return The response
+     */
+    private IOUtils.HttpResponse onRequestQueue() {
         List<Job> queue = getQueue();
         StringWriter builder = new StringWriter();
-        builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(JobExecutionService.class.getCanonicalName()));
-        builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
-        builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(getName()));
-        builder.append("\", \"executed\": ");
-        builder.append(Long.toString(getExecutorPool().getCompletedTaskCount()));
-        builder.append(", \"queue\": [");
+        builder.append("[");
         for (int i = 0; i != queue.size(); i++) {
-            if (i == 0)
+            if (i != 0)
                 builder.append(", ");
             builder.append(queue.get(i).serializedJSON());
         }
-        builder.append("]}");
+        builder.append("]");
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request for the completed jobs
+     *
+     * @return The response
+     */
+    private IOUtils.HttpResponse onRequestCompleted() {
+        int start = completedStart;
+        if (start == -1)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, "[]");
+        StringWriter builder = new StringWriter();
+        builder.append("[");
+        for (int i = start; i != -1; i--) {
+            if (i != start)
+                builder.append(", ");
+            builder.append(completed[i].serializedJSON());
+        }
+        for (int i = COMPLETED_QUEUED_BOUND - 1; i != start; i--) {
+            if (completed[i] == null)
+                break;
+            builder.append(", ");
+            builder.append(completed[i].serializedJSON());
+        }
+        builder.append("]");
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
     }
 

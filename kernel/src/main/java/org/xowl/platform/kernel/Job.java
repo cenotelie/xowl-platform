@@ -21,6 +21,7 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.store.Serializable;
+import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents a job to be executed on the platform
@@ -32,4 +33,11 @@ public interface Job extends Identifiable, Serializable, Runnable {
      * Callback when the job has been completed
      */
     void onComplete();
+
+    /**
+     * Gets the result for this job, or null if it not yet complete
+     *
+     * @return The result for this job
+     */
+    XSPReply getResult();
 }

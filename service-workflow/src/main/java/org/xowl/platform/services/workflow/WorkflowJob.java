@@ -72,6 +72,11 @@ public class WorkflowJob extends JobBase {
     }
 
     @Override
+    public XSPReply getResult() {
+        return result;
+    }
+
+    @Override
     public void doRun() {
         result = action.execute(null);
     }

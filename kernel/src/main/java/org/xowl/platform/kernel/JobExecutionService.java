@@ -43,18 +43,25 @@ public interface JobExecutionService extends Service {
     void cancel(Job job);
 
     /**
-     * Gets whether a job is scheduled
-     * When a job is not scheduled it can mean that is has already been executed
-     *
-     * @param job A job
-     * @return Whether the job is scheduled
-     */
-    boolean isScheduled(Job job);
-
-    /**
      * Gets the current queue
      *
      * @return The current queue
      */
     List<Job> getQueue();
+
+    /**
+     * Retrieves a scheduled (or running) job from an identifier
+     *
+     * @param identifier The identifier of a job
+     * @return The corresponding job
+     */
+    Job getScheduledJob(String identifier);
+
+    /**
+     * Retrieves a completed job from an identifier
+     *
+     * @param identifier The identifier of a job
+     * @return The corresponding job
+     */
+    Job getCompletedJob(String identifier);
 }

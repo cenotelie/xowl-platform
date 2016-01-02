@@ -120,4 +120,21 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @return The serialization
      */
     protected abstract String getJSONSerializedPayload();
+
+    /**
+     * Gets the AST node for the payload in the specified definition
+     *
+     * @param definition The definition of a job
+     * @return The AST node for the payload
+     */
+    protected static ASTNode getPayloadNode(ASTNode definition) {
+        for (ASTNode member : definition.getChildren()) {
+            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("payload".equals(head)) {
+                return member.getChildren().get(1);
+            }
+        }
+        return null;
+    }
 }

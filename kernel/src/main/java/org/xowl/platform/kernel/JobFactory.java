@@ -29,6 +29,14 @@ import org.xowl.hime.redist.ASTNode;
  */
 public interface JobFactory extends Service {
     /**
+     * Gets whether this factory can de-serialize a job of the given type
+     *
+     * @param type The job type
+     * @return Whether the factory can handle it
+     */
+    boolean canDeserialize(String type);
+
+    /**
      * Creates a job from the specified definition
      *
      * @param type       The job type

@@ -210,14 +210,16 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             Logger.DEFAULT.error("Unknown job type " + file);
             return;
         }
-        JobFactory factory = ServiceUtils.getService(JobFactory.class, "type", type);
-        if (factory == null) {
-            Logger.DEFAULT.error("Could not find a factory for job " + file);
-            return;
+        Collection<JobFactory> factories = ServiceUtils.getServices(JobFactory.class);
+        for (JobFactory factory : factories) {
+            if (factory.canDeserialize(type)) {
+                Job job = factory.newJob(type, definition);
+                if (job != null)
+                    executorPool.execute(job);
+                return;
+            }
         }
-        Job job = factory.newJob(type, definition);
-        if (job != null)
-            executorPool.execute(job);
+        Logger.DEFAULT.error("Could not find a factory for job " + file);
     }
 
     @Override

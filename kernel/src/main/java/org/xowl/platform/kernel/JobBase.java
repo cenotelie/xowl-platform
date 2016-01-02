@@ -111,6 +111,8 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"payload\": "
                 + getJSONSerializedPayload()
+                + ", \"result\": "
+                + (getResult() == null ? "{}" : getResult().serializedJSON())
                 + "}";
     }
 

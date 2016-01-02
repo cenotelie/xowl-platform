@@ -25,8 +25,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.JobFactory;
 import org.xowl.platform.services.domain.impl.XOWLDomainDirectoryService;
 import org.xowl.platform.services.domain.impl.XOWLGenericConnectorFactory;
+import org.xowl.platform.services.domain.jobs.DomainJobFactory;
 
 /**
  * Activator for the domain bundle
@@ -64,8 +66,8 @@ public class Activator implements BundleActivator {
         };
         factoryTracker.open();
 
-        XOWLGenericConnectorFactory factory = new XOWLGenericConnectorFactory();
-        bundleContext.registerService(DomainConnectorFactory.class, factory, null);
+        bundleContext.registerService(DomainConnectorFactory.class, new XOWLGenericConnectorFactory(), null);
+        bundleContext.registerService(JobFactory.class, new DomainJobFactory(), null);
     }
 
     @Override

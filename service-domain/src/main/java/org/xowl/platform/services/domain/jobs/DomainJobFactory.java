@@ -18,34 +18,40 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.services.domain.jobs;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.services.workflow.impl.XOWLWorkflowFactoryService;
-import org.xowl.platform.services.workflow.impl.XOWLWorkflowService;
 
 /**
- * Activator for the workflow service bundle
+ * The factory for domain jobs
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public class DomainJobFactory implements JobFactory {
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        XOWLWorkflowService service = new XOWLWorkflowService();
-        bundleContext.registerService(WorkflowService.class, service, null);
-        bundleContext.registerService(HttpAPIService.class, service, null);
-
-        XOWLWorkflowFactoryService factory = new XOWLWorkflowFactoryService(service);
-        bundleContext.registerService(WorkflowFactoryService.class, factory, null);
-        bundleContext.registerService(JobFactory.class, factory, null);
+    public String getIdentifier() {
+        return DomainJobFactory.class.getCanonicalName();
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {
+    public String getName() {
+        return "xOWL Federation Platform - Domain Job Factory";
+    }
 
+    @Override
+    public boolean canDeserialize(String type) {
+        return (type.equals(PullArtifactJob.class.getCanonicalName())
+                || type.equals(PushArtifactToLiveJob.class.getCanonicalName()));
+    }
+
+    @Override
+    public Job newJob(String type, ASTNode definition) {
+        if (type.equals(PullArtifactJob.class.getCanonicalName()))
+            return new PullArtifactJob(definition);
+        if (type.equals(PushArtifactToLiveJob.class.getCanonicalName()))
+            return new PushArtifactToLiveJob(definition);
+        return null;
     }
 }

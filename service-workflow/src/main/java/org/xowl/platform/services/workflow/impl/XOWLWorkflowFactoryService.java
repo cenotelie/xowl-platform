@@ -90,6 +90,16 @@ public class XOWLWorkflowFactoryService implements WorkflowFactoryService, JobFa
     }
 
     @Override
+    public boolean canDeserialize(String type) {
+        switch (type) {
+            case "XOWLWorkflowActionPullArtifact":
+            case "XOWLWorkflowActionPushLive":
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public Job newJob(String type, ASTNode definition) {
         ASTNode nodePayload = null;
         for (ASTNode member : definition.getChildren()) {

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>xOWL: Jobs</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="stylesheet" type="text/css" href="../app.css">
+  <link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+</head>
+
+<body>
+  <div class="header">
+    <span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+    <div style="display: inline-block; margin-left: 50px;">
+      <span style="display: inline-block;">
+        <strong>Jobs</strong>
+      </span>
+    </div>
+    <hr style="margin-top: 5px; margin-bottom: 5px;" />
+  </div>
+  <div class="body">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Job Queue
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Scheduled on</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-scheduled">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Running Jobs
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Running since</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-running">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Completed Jobs
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Completed on</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-completed">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="../xowl-platform-api.js"></script>
+  <script src="../xowl-platform-ui.js"></script>
+  <script src="jobs.js"></script>
+  <script>
+    init();
+  </script>
+</body>
+
+</html>

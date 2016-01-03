@@ -317,7 +317,7 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
         return new WorkflowJob(name, action) {
             @Override
             public void onCompleted() {
-                status = JobStatus.Completed;
+                super.onCompleted();
                 if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
                     workflowAdvance();
                 }
@@ -336,7 +336,7 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
         return new WorkflowJob(definition, action) {
             @Override
             public void onCompleted() {
-                status = JobStatus.Completed;
+                super.onCompleted();
                 if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
                     workflowAdvance();
                 }

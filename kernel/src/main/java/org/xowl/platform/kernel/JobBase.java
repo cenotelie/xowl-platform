@@ -25,6 +25,8 @@ import org.xowl.store.IOUtils;
 import org.xowl.utils.concurrent.SafeRunnable;
 import org.xowl.utils.logging.Logger;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -46,6 +48,18 @@ public abstract class JobBase extends SafeRunnable implements Job {
      */
     protected final String type;
     /**
+     * The time this job has been scheduled
+     */
+    protected String timeScheduled;
+    /**
+     * The time this job has started running
+     */
+    protected String timeRun;
+    /**
+     * The time this job has been completed
+     */
+    protected String timeCompleted;
+    /**
      * The job's status
      */
     protected JobStatus status;
@@ -62,6 +76,9 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.name = name;
         this.type = type;
         this.status = JobStatus.Unscheduled;
+        this.timeScheduled = "";
+        this.timeRun = "";
+        this.timeCompleted = "";
     }
 
     /**
@@ -74,7 +91,10 @@ public abstract class JobBase extends SafeRunnable implements Job {
         String id = null;
         String name = null;
         String type = null;
-        String status = null;
+        this.status = JobStatus.Scheduled;
+        this.timeScheduled = "";
+        this.timeRun = "";
+        this.timeCompleted = "";
         for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
             String value = IOUtils.unescape(member.getChildren().get(1).getValue());
@@ -86,15 +106,19 @@ public abstract class JobBase extends SafeRunnable implements Job {
             } else if ("type".equals(head)) {
                 type = value;
             } else if ("status".equals(head)) {
-                status = value;
+                this.status = JobStatus.valueOf(value);
+            } else if ("timeScheduled".equals(head)) {
+                this.timeScheduled = value;
+            } else if ("timeRun".equals(head)) {
+                this.timeRun = value;
+            } else if ("timeCompleted".equals(head)) {
+                this.timeCompleted = value;
             }
         }
         this.identifier = id;
         this.name = name;
         this.type = type;
-        this.status = JobStatus.Scheduled;
-        if (status != null)
-            this.status = JobStatus.valueOf(status);
+
     }
 
     @Override
@@ -122,6 +146,12 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"status\": \""
                 + IOUtils.escapeStringJSON(status.toString())
+                + "\", \"timeScheduled\": \""
+                + IOUtils.escapeStringJSON(timeScheduled)
+                + "\", \"timeRun\": \""
+                + IOUtils.escapeStringJSON(timeRun)
+                + "\", \"timeCompleted\": \""
+                + IOUtils.escapeStringJSON(timeCompleted)
                 + "\", \"payload\": "
                 + getJSONSerializedPayload()
                 + ", \"result\": "
@@ -137,16 +167,19 @@ public abstract class JobBase extends SafeRunnable implements Job {
     @Override
     public void onScheduled() {
         status = JobStatus.Scheduled;
+        timeScheduled = DateFormat.getDateTimeInstance().format(new Date());
     }
 
     @Override
     public void onRun() {
         status = JobStatus.Running;
+        timeRun = DateFormat.getDateTimeInstance().format(new Date());
     }
 
     @Override
     public void onCompleted() {
         status = JobStatus.Completed;
+        timeCompleted = DateFormat.getDateTimeInstance().format(new Date());
     }
 
     /**

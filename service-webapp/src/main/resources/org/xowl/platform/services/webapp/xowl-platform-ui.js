@@ -9,7 +9,7 @@ function renderJobPayload(payload) {
 
 function renderXSPReply(xsp) {
 	if (!xsp.hasOwnProperty("isSuccess"))
-		return "";
+		return "Not completed yet";
 	if (!xsp.isSuccess) {
 		return "FAILURE: " + xsp.message;
 	} else if (xsp.hasOwnProperty("payload")) {

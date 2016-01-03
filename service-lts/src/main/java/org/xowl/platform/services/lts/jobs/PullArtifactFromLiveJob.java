@@ -31,11 +31,11 @@ import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
 
 /**
- * A job for pushing an artifact from the long-term store to the live store
+ * A job for pulling an artifact from the live store
  *
  * @author Laurent Wouters
  */
-public class PushArtifactToLiveJob extends JobBase {
+public class PullArtifactFromLiveJob extends JobBase {
     /**
      * The identifier of the target artifact
      */
@@ -50,8 +50,8 @@ public class PushArtifactToLiveJob extends JobBase {
      *
      * @param artifactId The target connector
      */
-    public PushArtifactToLiveJob(String artifactId) {
-        this(PushArtifactToLiveJob.class.getCanonicalName(), artifactId);
+    public PullArtifactFromLiveJob(String artifactId) {
+        this(PullArtifactFromLiveJob.class.getCanonicalName(), artifactId);
     }
 
     /**
@@ -60,8 +60,8 @@ public class PushArtifactToLiveJob extends JobBase {
      * @param type       The custom type of this job
      * @param artifactId The target connector
      */
-    public PushArtifactToLiveJob(String type, String artifactId) {
-        super("Push live artifact " + artifactId, type);
+    public PullArtifactFromLiveJob(String type, String artifactId) {
+        super("Pull live artifact " + artifactId, type);
         this.artifactId = artifactId;
     }
 
@@ -70,7 +70,7 @@ public class PushArtifactToLiveJob extends JobBase {
      *
      * @param definition The job's definition
      */
-    public PushArtifactToLiveJob(ASTNode definition) {
+    public PullArtifactFromLiveJob(ASTNode definition) {
         super(definition);
         String connector = IOUtils.unescape(getPayloadNode(definition).getValue());
         this.artifactId = connector.substring(1, connector.length() - 1);
@@ -101,6 +101,6 @@ public class PushArtifactToLiveJob extends JobBase {
         result = storage.retrieve(artifactId);
         if (!result.isSuccess())
             return;
-        result = storage.pushToLive(((XSPReplyResult<Artifact>) result).getData());
+        result = storage.pullFromLive(((XSPReplyResult<Artifact>) result).getData());
     }
 }

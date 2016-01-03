@@ -20,12 +20,11 @@
 
 package org.xowl.platform.services.lts.impl;
 
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ArtifactStorageService;
-import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
+import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.rdf.Quad;
@@ -199,8 +198,15 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (uri.equals(URI_API + "/sparql"))
             return onMessageSPARQL(content, accept);
-        if (uri.equals(URI_API + "/artifacts"))
+        if (uri.equals(URI_API + "/artifacts")) {
+            String[] actions = parameters.get("action");
+            String action = actions != null && actions.length >= 1 ? actions[0] : null;
+            if (action != null && action.equals("pull"))
+                return onMessagePullFromLive(parameters);
+            if (action != null && action.equals("push"))
+                return onMessagePushToLive(parameters);
             return onMessageGetArtifacts();
+        }
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -251,5 +257,43 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         }
         builder.append("]");
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to the request to pull an artifact from the live store
+     * When successful, this action creates the appropriate job and returns it.
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessagePullFromLive(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+        Job job = new PullArtifactFromLiveJob(ids[0]);
+        executor.schedule(job);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+    }
+
+    /**
+     * Responds to the request to push an artifact to the live store
+     * When successful, this action creates the appropriate job and returns it.
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessagePushToLive(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+        Job job = new PushArtifactToLiveJob(ids[0]);
+        executor.schedule(job);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
     }
 }

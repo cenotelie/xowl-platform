@@ -18,34 +18,40 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.lts;
+package org.xowl.platform.services.lts.jobs;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.ArtifactStorageService;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
-import org.xowl.platform.services.lts.jobs.StorageJobFactory;
 
 /**
- * Activator for the triple store service
+ * The factory for storage jobs
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public class StorageJobFactory implements JobFactory {
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        RemoteXOWLStoreService service = new RemoteXOWLStoreService();
-        bundleContext.registerService(TripleStoreService.class, service, null);
-        bundleContext.registerService(ArtifactStorageService.class, service, null);
-        bundleContext.registerService(HttpAPIService.class, service, null);
-
-        bundleContext.registerService(JobFactory.class, new StorageJobFactory(), null);
+    public String getIdentifier() {
+        return StorageJobFactory.class.getCanonicalName();
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {
+    public String getName() {
+        return "xOWL Federation Platform - Storage Job Factory";
+    }
 
+    @Override
+    public boolean canDeserialize(String type) {
+        return (type.equals(PullArtifactFromLiveJob.class.getCanonicalName()) ||
+                type.equals(PushArtifactToLiveJob.class.getCanonicalName()));
+    }
+
+    @Override
+    public Job newJob(String type, ASTNode definition) {
+        if (type.equals(PullArtifactFromLiveJob.class.getCanonicalName()))
+            return new PullArtifactFromLiveJob(definition);
+        if (type.equals(PushArtifactToLiveJob.class.getCanonicalName()))
+            return new PushArtifactToLiveJob(definition);
+        return null;
     }
 }

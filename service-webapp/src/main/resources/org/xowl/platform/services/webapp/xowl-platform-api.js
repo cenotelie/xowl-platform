@@ -115,6 +115,16 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 	}, "artifacts?live=true");
 }
 
+XOWL.prototype.getArtifactVersions = function (callback, base) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "artifacts?base=" + encodeURIComponent(base));
+}
+
 XOWL.prototype.pullFromLive = function (callback, artifactId) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {

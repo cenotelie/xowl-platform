@@ -206,7 +206,11 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             if (action != null && action.equals("push"))
                 return onMessagePushToLive(parameters);
             String[] lives = parameters.get("live");
+            String[] bases = parameters.get("base");
             boolean live = (lives != null && lives.length > 0 && lives[0].equalsIgnoreCase("true"));
+            String base = (bases != null && bases.length > 0) ? bases[0] : null;
+            if (base != null)
+                return onMessageGetArtifacts(base);
             return live ? onMessageGetLiveArtifacts() : onMessageGetArtifacts();
         }
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -249,6 +253,26 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      */
     private IOUtils.HttpResponse onMessageGetArtifacts() {
         Collection<Artifact> artifacts = list();
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Artifact artifact : artifacts) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(artifact.serializedJSON());
+        }
+        builder.append("]");
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request to list the artifacts for a specified base
+     *
+     * @param base The base to look for
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessageGetArtifacts(String base) {
+        Collection<Artifact> artifacts = list(base);
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
         for (Artifact artifact : artifacts) {

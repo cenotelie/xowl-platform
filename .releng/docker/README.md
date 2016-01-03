@@ -5,5 +5,6 @@ This is a Docker image for the xOWL platform.
 ## Use ##
 
 ```
-$ docker run -d -P --name my-xowl-platform xowl-platform:1.0.0-SNAPSHOT
+$ docker pull xowl/xowl-platform:latest
+$ docker run -d -p 8080:8080/tcp -p 8443:8443/tcp --name my-xowl-platform -v /path/to/host/config:/config xowl-platform:latest
 ```

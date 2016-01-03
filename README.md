@@ -1,12 +1,24 @@
 # xOWL Platform #
 
-This repository contains the components for the the xOWL federation platform.
+This is the xOWL platform, a set of components for the construction of federation platform based on a semantic principles.
+The xOWL platform enables the federation of heterogeneous datasets into a semantically coherent common representation so that business analyses can be performed.
+Typical applications to system engineering include the federation of Requirements, Functional Architectures, System Architectures, Safety Analyses and more.
 
 ## How to use ##
 
-TODO: add documentation about how to pull and use the docker image
+### Downloadable distribution ###
 
-TODO: add documentation about how to extend the platform with domain-specific bundles
+TODO: fill this
+
+### Docker image ###
+
+```
+$ docker pull xowl/xowl-platform:latest
+$ docker run -d -p 8080:8080/tcp -p 8443:8443/tcp --name my-xowl-platform -v /path/to/host/config:/config xowl-platform:latest
+```
+
+Replace the `/path/to/host/config` to a path where to store the configuration for the platform.
+With a web-browser, go to [https://localhost:8080/web/](https://localhost:8080/web/).
 
 ## License ##
 

@@ -155,7 +155,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
         // register as running
         synchronized (running) {
             for (int i = 0; i != running.length; i++) {
-                if (running[i] != null) {
+                if (running[i] == null) {
                     running[i] = job;
                     break;
                 }

@@ -7,6 +7,9 @@ function init() {
 	xowl.getJob(function (status, ct, content) {
 		if (status == 200) {
 			render(content);
+			if (content.status !== "Completed") {
+				window.setTimeout(init, 2000);
+			}
 		}
 	}, getParameterByName("id"));
 }

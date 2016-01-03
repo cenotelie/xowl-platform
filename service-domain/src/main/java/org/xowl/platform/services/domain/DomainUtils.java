@@ -56,10 +56,15 @@ public class DomainUtils {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return new XSPReplyFailure("Failed to resolve an artifact storage service");
-        XSPReply reply = connector.getNextInput(false);
+        XSPReply replyArtifact = connector.getNextInput(false);
+        if (!replyArtifact.isSuccess())
+            return replyArtifact;
+        Artifact artifact = ((XSPReplyResult<Artifact>) replyArtifact).getData();
+        XSPReply reply = storageService.store(artifact);
         if (!reply.isSuccess())
             return reply;
-        return storageService.store(((XSPReplyResult<Artifact>) reply).getData());
+        // reply with the artifact
+        return replyArtifact;
     }
 
     /**

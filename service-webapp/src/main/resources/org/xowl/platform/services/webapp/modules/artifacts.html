@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>xOWL: Artifacts</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="../favicon.png" />
+	<link rel="stylesheet" type="text/css" href="../app.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+</head>
+
+<body>
+	<object data="/web/assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
+	<object data="/web/assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
+	<div class="header">
+		<span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+		<div style="display: inline-block; margin-left: 50px;">
+			<span style="display: inline-block;">
+        <strong>Artifacts Management</strong>
+      </span>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom: 5px;" />
+	</div>
+	<div class="body">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-8">
+					<div class="panel panel-default" id="loader">
+						<div class="panel-body">
+							<img src="../assets/xowl.gif" width="32" height="32"/>
+							Loading ...
+						</div>
+					</div>
+					<div>
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Name</th>
+									<th>Latest version</th>
+									<th>Live</th>
+								</tr>
+							</thead>
+							<tbody id="artifacts">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Incoming artifacts
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered table-hover">
+								<thead>
+									<tr>
+										<th>Connector</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody id="connectors">
+								</tbody>
+							</table>
+							<a href="connectors.html">See all connectors</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../xowl-platform-api.js"></script>
+	<script src="artifacts.js"></script>
+	<script>
+		init();
+	</script>
+</body>
+
+</html>

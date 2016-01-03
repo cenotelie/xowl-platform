@@ -2,13 +2,14 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
+var connectorId = getParameterByName("id");
 
 function init() {
 	xowl.getConnector(function (status, ct, content) {
 		if (status == 200) {
 			render(content);
 		}
-	}, getParameterByName("id"));
+	}, connectorId);
 }
 
 function render(connector) {
@@ -34,4 +35,14 @@ function render(connector) {
 		data += "<tr><td>" + i.toString() + "</td><td> <img src=\"../assets/artifact.svg\" width=\"40\" height=\"40\" />" + connector.queue[i].name + "</td><td>" + connector.queue[i].version + "</td></tr>";
 	}
 	rows.innerHTML = data;
+}
+
+function onClickPull() {
+	xowl.pullFromConnector(function (status, ct, content) {
+		if (status == 200) {
+			window.open("job.html?id=" + encodeURIComponent(content.identifier));
+		} else {
+			alert(content);
+		}
+	}, connectorId);
 }

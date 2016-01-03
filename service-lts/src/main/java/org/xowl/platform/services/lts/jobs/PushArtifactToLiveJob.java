@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain.jobs;
+package org.xowl.platform.services.lts.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.JobBase;

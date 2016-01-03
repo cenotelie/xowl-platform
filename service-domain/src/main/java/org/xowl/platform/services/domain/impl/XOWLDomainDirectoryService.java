@@ -25,9 +25,13 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.Job;
+import org.xowl.platform.kernel.JobExecutionService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.domain.*;
+import org.xowl.platform.services.domain.jobs.PullArtifactJob;
+import org.xowl.platform.services.domain.jobs.PushArtifactJob;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.xsp.*;
@@ -116,6 +120,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             return onMessageCreateConnector(parameters, content);
         if (action != null && action.equals("delete"))
             return onMessageDeleteConnector(parameters);
+        if (action != null && action.equals("pull"))
+            return onMessagePullFromConnector(parameters);
+        if (action != null && action.equals("push"))
+            return onMessagePushToConnector(parameters);
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -447,5 +455,47 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
         XSPReply reply = delete(ids[0]);
         return XSPReplyUtils.toHttpResponse(reply, null);
+    }
+
+    /**
+     * Responds to the request to pull an artifact from a connector
+     * When successful, this action creates the appropriate job and returns it.
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessagePullFromConnector(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+        Job job = new PullArtifactJob(ids[0]);
+        executor.schedule(job);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+    }
+
+    /**
+     * Responds to the request to push an artifact to a connector
+     * When successful, this action creates the appropriate job and returns it.
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessagePushToConnector(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+        String[] artifacts = parameters.get("artifact");
+        if (artifacts == null || artifacts.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an artifact parameter");
+
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+        Job job = new PushArtifactJob(ids[0], artifacts[0]);
+        executor.schedule(job);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
     }
 }

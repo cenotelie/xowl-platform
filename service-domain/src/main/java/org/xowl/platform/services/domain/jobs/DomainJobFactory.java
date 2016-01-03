@@ -42,16 +42,16 @@ public class DomainJobFactory implements JobFactory {
 
     @Override
     public boolean canDeserialize(String type) {
-        return (type.equals(PullArtifactJob.class.getCanonicalName())
-                || type.equals(PushArtifactToLiveJob.class.getCanonicalName()));
+        return (type.equals(PullArtifactJob.class.getCanonicalName()) ||
+                type.equals(PushArtifactJob.class.getCanonicalName()));
     }
 
     @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(PullArtifactJob.class.getCanonicalName()))
             return new PullArtifactJob(definition);
-        if (type.equals(PushArtifactToLiveJob.class.getCanonicalName()))
-            return new PushArtifactToLiveJob(definition);
+        if (type.equals(PushArtifactJob.class.getCanonicalName()))
+            return new PushArtifactJob(definition);
         return null;
     }
 }

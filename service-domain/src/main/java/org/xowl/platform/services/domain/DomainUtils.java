@@ -36,14 +36,14 @@ public class DomainUtils {
     /**
      * Pulls an artifact from a connector into the long-term store
      *
-     * @param connector The identifier of a connector
+     * @param connectorId The identifier of a connector
      * @return The result of the operation
      */
-    public static XSPReply pullArtifactFrom(String connector) {
-        DomainConnectorService connectorService = ServiceUtils.getService(DomainConnectorService.class, "id", connector);
-        if (connectorService == null)
-            return new XSPReplyFailure("Failed to resolve connector " + connector);
-        return pullArtifactFrom(connectorService);
+    public static XSPReply pullArtifactFrom(String connectorId) {
+        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        if (connector == null)
+            return new XSPReplyFailure("Failed to resolve connector " + connectorId);
+        return pullArtifactFrom(connector);
     }
 
     /**
@@ -63,18 +63,22 @@ public class DomainUtils {
     }
 
     /**
-     * Pushes an artifact from the long-term store to the live store
+     * Pushes an artifact to a connector's client
      *
-     * @param artifactID The identifier of the artifact to push
+     * @param connectorId The identifier of the connector to push to
+     * @param artifactId  The identifier of the artifact to push
      * @return The result of the operation
      */
-    public static XSPReply pushToLive(String artifactID) {
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
-        if (storageService == null)
-            return new XSPReplyFailure("Failed to resolve an artifact storage service");
-        XSPReply reply = storageService.retrieve(artifactID);
+    public static XSPReply pushArtifactTo(String connectorId, String artifactId) {
+        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        if (connector == null)
+            return new XSPReplyFailure("Failed to resolve connector " + connectorId);
+        ArtifactStorageService storage = ServiceUtils.getService(ArtifactStorageService.class);
+        if (storage == null)
+            return new XSPReplyFailure("Failed to resolve the artifact storage service");
+        XSPReply reply = storage.retrieve(artifactId);
         if (!reply.isSuccess())
             return reply;
-        return storageService.pushToLive(((XSPReplyResult<Artifact>) reply).getData());
+        return connector.pushToClient(((XSPReplyResult<Artifact>) reply).getData());
     }
 }

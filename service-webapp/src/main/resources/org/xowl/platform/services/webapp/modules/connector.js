@@ -40,7 +40,7 @@ function render(connector) {
 function onClickPull() {
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (status == 200) {
-			window.open("job.html?id=" + encodeURIComponent(content.identifier));
+			document.location.href = "job.html?id=" + encodeURIComponent(content.identifier);
 		} else {
 			alert(content);
 		}

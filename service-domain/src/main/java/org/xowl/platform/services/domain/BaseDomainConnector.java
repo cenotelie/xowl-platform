@@ -23,6 +23,7 @@ package org.xowl.platform.services.domain;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.store.IOUtils;
 import org.xowl.store.xsp.XSPReply;
+import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
 
 import java.net.HttpURLConnection;
@@ -97,15 +98,19 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
 
     @Override
     public XSPReply getNextInput(boolean block) {
+        Artifact artifact = null;
         if (block) {
             try {
-                return new XSPReplyResult<>(input.take());
+                artifact = input.take();
             } catch (InterruptedException exception) {
-                return null;
+                // do nothing
             }
         } else {
-            return new XSPReplyResult<>(input.poll());
+            artifact = input.poll();
         }
+        if (artifact == null)
+            return new XSPReplyFailure("No queued artifact");
+        return new XSPReplyResult<>(artifact);
     }
 
     @Override

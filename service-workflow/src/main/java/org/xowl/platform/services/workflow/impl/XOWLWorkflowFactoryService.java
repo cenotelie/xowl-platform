@@ -22,10 +22,10 @@ package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.Job;
+import org.xowl.platform.kernel.JobBase;
 import org.xowl.platform.kernel.JobFactory;
 import org.xowl.platform.services.workflow.WorkflowAction;
 import org.xowl.platform.services.workflow.WorkflowFactoryService;
-import org.xowl.store.IOUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,8 +41,7 @@ public class XOWLWorkflowFactoryService implements WorkflowFactoryService, JobFa
      * The supported action types
      */
     public static final String[] ACTIONS = new String[]{
-            "XOWLWorkflowActionPullArtifact",
-            "XOWLWorkflowActionPushLive"
+            "XOWLWorkflowActionPullArtifact"
     };
     /**
      * The supported action types
@@ -80,44 +79,21 @@ public class XOWLWorkflowFactoryService implements WorkflowFactoryService, JobFa
 
     @Override
     public WorkflowAction newAction(String type, ASTNode jsonDefinition) {
-        switch (type) {
-            case "XOWLWorkflowActionPullArtifact":
-                return new XOWLWorkflowActionPullArtifact(jsonDefinition);
-            case "XOWLWorkflowActionPushLive":
-                return new XOWLWorkflowActionPushLive(jsonDefinition);
-        }
+        if (type.equals("XOWLWorkflowActionPullArtifact"))
+            return new XOWLWorkflowActionPullArtifact(jsonDefinition);
         return null;
     }
 
     @Override
     public boolean canDeserialize(String type) {
-        switch (type) {
-            case "XOWLWorkflowActionPullArtifact":
-            case "XOWLWorkflowActionPushLive":
-                return true;
-        }
-        return false;
+        return ACTIONS_COLLECTION.contains(type);
     }
 
     @Override
     public Job newJob(String type, ASTNode definition) {
-        ASTNode nodePayload = null;
-        for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("payload".equals(head)) {
-                nodePayload = member.getChildren().get(1);
-                break;
-            }
-        }
+        ASTNode nodePayload = JobBase.getPayloadNode(definition);
         if (nodePayload == null)
             return null;
-        switch (type) {
-            case "XOWLWorkflowActionPullArtifact":
-                return workflowService.newJob(definition, new XOWLWorkflowActionPullArtifact(nodePayload));
-            case "XOWLWorkflowActionPushLive":
-                return workflowService.newJob(definition, new XOWLWorkflowActionPushLive(nodePayload));
-        }
-        return null;
+        return workflowService.newJob(definition, newAction(type, nodePayload));
     }
 }

@@ -54,7 +54,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      */
     public JobBase(String name, String type) {
         super(Logger.DEFAULT);
-        this.identifier = UUID.randomUUID().toString();
+        this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
     }
@@ -129,7 +129,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param definition The definition of a job
      * @return The AST node for the payload
      */
-    protected static ASTNode getPayloadNode(ASTNode definition) {
+    public static ASTNode getPayloadNode(ASTNode definition) {
         for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);

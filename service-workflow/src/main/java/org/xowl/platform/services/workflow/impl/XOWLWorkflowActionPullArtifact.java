@@ -21,7 +21,7 @@
 package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.services.workflow.WorkflowUtils;
+import org.xowl.platform.services.domain.DomainUtils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.xsp.XSPReply;
 
@@ -62,7 +62,7 @@ public class XOWLWorkflowActionPullArtifact extends XOWLWorkflowAction {
 
     @Override
     public XSPReply execute(Object parameter) {
-        return WorkflowUtils.pullArtifact(connectorId);
+        return DomainUtils.pullArtifactFrom(connectorId);
     }
 
     @Override

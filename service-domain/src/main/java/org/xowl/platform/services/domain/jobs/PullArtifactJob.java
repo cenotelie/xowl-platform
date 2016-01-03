@@ -47,7 +47,17 @@ public class PullArtifactJob extends JobBase {
      * @param connectorId The target connector
      */
     public PullArtifactJob(String connectorId) {
-        super("Pull artifact from " + connectorId, PullArtifactJob.class.getCanonicalName());
+        this(PullArtifactJob.class.getCanonicalName(), "Pull artifact from " + connectorId);
+    }
+
+    /**
+     * Initializes this job
+     *
+     * @param type        The custom type of this job
+     * @param connectorId The target connector
+     */
+    public PullArtifactJob(String type, String connectorId) {
+        super("Pull artifact from " + connectorId, type);
         this.connectorId = connectorId;
     }
 

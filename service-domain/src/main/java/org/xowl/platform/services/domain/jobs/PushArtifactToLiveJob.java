@@ -47,7 +47,17 @@ public class PushArtifactToLiveJob extends JobBase {
      * @param artifactId The target connector
      */
     public PushArtifactToLiveJob(String artifactId) {
-        super("Push live artifact " + artifactId, PushArtifactToLiveJob.class.getCanonicalName());
+        this(PushArtifactToLiveJob.class.getCanonicalName(), "Push live artifact " + artifactId);
+    }
+
+    /**
+     * Initializes this job
+     *
+     * @param type       The custom type of this job
+     * @param artifactId The target connector
+     */
+    public PushArtifactToLiveJob(String type, String artifactId) {
+        super("Push live artifact " + artifactId, type);
         this.artifactId = artifactId;
     }
 

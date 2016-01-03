@@ -98,16 +98,12 @@ function onClickConnector(connector) {
 			url = "failed to retrieved"
 	}
 	document.getElementById("connector-properties").style.display = "";
-	document.getElementById("connector-id").value = connector.identifier;
+	document.getElementById("connector-identifier").value = connector.identifier;
 	document.getElementById("connector-name").value = connector.name;
 	document.getElementById("connector-uri").value = url;
-	document.getElementById("connector-can-pull").checked = connector.canPullInput;
-	var rows = document.getElementById("connector-queue");
-	var data = "";
-	for (var i = 0; i != connector.queue.length; i++) {
-		data += "<tr><td>" + i.toString() + "</td><td>" + connector.queue[i].name + "</td><td>" + connector.queue[i].version + "</td></tr>";
-	}
-	rows.innerHTML = data;
+	document.getElementById("connector-can-pull").value = (connector.canPullInput ? "YES" : "NO");
+	document.getElementById("connector-queue").value = connector.queue.length.toString();
+	document.getElementById("connector-link").href = "connector.html?id=" + encodeURIComponent(connector.identifier);
 }
 
 function onClickLink(connector) {

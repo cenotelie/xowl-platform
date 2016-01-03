@@ -104,11 +104,15 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
     @Override
     public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (method.equals("GET") && parameters.isEmpty()) {
+        if (method.equals("GET")) {
             if (uri.equals(URI_API + "/domains"))
                 return onMessageListDomains();
-            if (uri.equals(URI_API + "/connectors"))
+            if (uri.equals(URI_API + "/connectors")) {
+                String[] ids = parameters.get("id");
+                if (ids != null && ids.length > 0)
+                    return onMessageGetConnector(ids[0]);
                 return onMessageListConnectors();
+            }
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }
         if (!method.equals("POST"))
@@ -323,6 +327,19 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         }
         builder.append("]");
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request for a single connector
+     *
+     * @param connectorId The identifier of a connector
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessageGetConnector(String connectorId) {
+        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        if (connector == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, connector.serializedJSON());
     }
 
     /**

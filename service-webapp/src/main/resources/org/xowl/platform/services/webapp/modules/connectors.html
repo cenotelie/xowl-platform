@@ -40,38 +40,40 @@
             <div class="panel-heading">
               Connector Properties
             </div>
-            <div id="connector-properties" class="panel-body" style="display: none;">
-              <div class="form-group">
-                <label for="connector-id">Unique identifier</label>
-                <input type="text" class="form-control" id="connector-id" readonly>
-              </div>
-              <div class="form-group">
-                <label for="connector-name">Name</label>
-                <input type="text" class="form-control" id="connector-name" readonly>
-              </div>
-              <div class="form-group">
-                <label for="connector-uri">Access URI</label>
-                <input type="text" class="form-control" id="connector-uri" readonly>
-              </div>
-              <div class="form-group">
-                <label>
-                  <input type="checkbox" id="connector-can-pull" readonly> Can pull from clients?
-                </label>
-              </div>
-              <div class="form-group">
-                <label for="connector-queue">Queued artifacts</label>
-                <table class="table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Version</th>
-                    </tr>
-                  </thead>
-                  <tbody id="connector-queue">
-                  </tbody>
-                </table>
-              </div>
+            <div class="panel-body" id="connector-properties" style="display: none;">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="connector-identifier" class="col-sm-2 control-label">Identifier</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="connector-identifier" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="connector-name" class="col-sm-2 control-label">Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="connector-name" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="connector-uri" class="col-sm-2 control-label">Access URI</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="connector-uri" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="connector-can-pull" class="col-sm-2 control-label">Pull from client?</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="connector-can-pull" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="connector-queue" class="col-sm-2 control-label">Queued artifacts</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="connector-queue" readonly>
+                  </div>
+                </div>
+              </form>
+              <a id="connector-link" type="button" href="connector.html" class="btn btn-primary">Explore</a>
               <button type="submit" class="btn btn-danger" onclick="onClickDeleteConnector()">Delete this connector</button>
             </div>
           </div>

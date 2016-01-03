@@ -25,6 +25,16 @@ XOWL.prototype.getConnectors = function (callback) {
 	}, "connectors");
 }
 
+XOWL.prototype.getConnector = function (callback, connectorId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "connectors?id=" + encodeURIComponent(connectorId));
+}
+
 XOWL.prototype.createConnector = function (callback, domain, definition) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {

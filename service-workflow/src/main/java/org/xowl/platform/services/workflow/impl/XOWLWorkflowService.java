@@ -316,7 +316,8 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
     public WorkflowJob newJob(String name, WorkflowAction action) {
         return new WorkflowJob(name, action) {
             @Override
-            public void onComplete() {
+            public void onCompleted() {
+                status = JobStatus.Completed;
                 if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
                     workflowAdvance();
                 }
@@ -334,7 +335,8 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
     public WorkflowJob newJob(ASTNode definition, WorkflowAction action) {
         return new WorkflowJob(definition, action) {
             @Override
-            public void onComplete() {
+            public void onCompleted() {
+                status = JobStatus.Completed;
                 if (action instanceof XOWLWorkflowAction && ((XOWLWorkflowAction) action).isFinishOnSuccess()) {
                     workflowAdvance();
                 }

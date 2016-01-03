@@ -45,6 +45,10 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * The job's type
      */
     protected final String type;
+    /**
+     * The job's status
+     */
+    protected JobStatus status;
 
     /**
      * Initializes this job
@@ -57,6 +61,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
+        this.status = JobStatus.Unscheduled;
     }
 
     /**
@@ -69,6 +74,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         String id = null;
         String name = null;
         String type = null;
+        String status = null;
         for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
             String value = IOUtils.unescape(member.getChildren().get(1).getValue());
@@ -79,11 +85,16 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 name = value.substring(1, value.length() - 1);
             } else if ("type".equals(head)) {
                 type = value;
+            } else if ("status".equals(head)) {
+                status = value;
             }
         }
         this.identifier = id;
         this.name = name;
         this.type = type;
+        this.status = JobStatus.Scheduled;
+        if (status != null)
+            this.status = JobStatus.valueOf(status);
     }
 
     @Override
@@ -109,11 +120,33 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + IOUtils.escapeStringJSON(name)
                 + "\", \"type\": \""
                 + IOUtils.escapeStringJSON(type)
+                + "\", \"status\": \""
+                + IOUtils.escapeStringJSON(status.toString())
                 + "\", \"payload\": "
                 + getJSONSerializedPayload()
                 + ", \"result\": "
                 + (getResult() == null ? "{}" : getResult().serializedJSON())
                 + "}";
+    }
+
+    @Override
+    public JobStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public void onScheduled() {
+        status = JobStatus.Scheduled;
+    }
+
+    @Override
+    public void onRun() {
+        status = JobStatus.Running;
+    }
+
+    @Override
+    public void onCompleted() {
+        status = JobStatus.Completed;
     }
 
     /**

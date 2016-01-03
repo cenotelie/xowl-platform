@@ -67,11 +67,6 @@ public class WorkflowJob extends JobBase {
     }
 
     @Override
-    public void onComplete() {
-        // do nothing
-    }
-
-    @Override
     public XSPReply getResult() {
         return result;
     }

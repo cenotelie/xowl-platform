@@ -20,41 +20,26 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.Serializable;
-import org.xowl.store.xsp.XSPReply;
-
 /**
- * Represents a job to be executed on the platform
+ * The status of a job
  *
  * @author Laurent Wouters
  */
-public interface Job extends Identifiable, Serializable, Runnable {
+public enum JobStatus {
     /**
-     * Gets the job's current status
-     *
-     * @return The job's current status
+     * This job is not yet scheduled
      */
-    JobStatus getStatus();
-
+    Unscheduled,
     /**
-     * Gets the result for this job, or null if it not yet complete
-     *
-     * @return The result for this job
+     * The job is scheduled (in the queue of an executor)
      */
-    XSPReply getResult();
-
+    Scheduled,
     /**
-     * Event when the job is being scheduled
+     * The job is running
      */
-    void onScheduled();
-
+    Running,
     /**
-     * Event when the job is going to be run
+     * The job is completed
      */
-    void onRun();
-
-    /**
-     * Callback when the job has been completed
-     */
-    void onCompleted();
+    Completed
 }

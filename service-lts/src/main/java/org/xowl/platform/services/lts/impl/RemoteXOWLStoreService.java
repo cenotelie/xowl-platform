@@ -205,7 +205,9 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
                 return onMessagePullFromLive(parameters);
             if (action != null && action.equals("push"))
                 return onMessagePushToLive(parameters);
-            return onMessageGetArtifacts();
+            String[] lives = parameters.get("live");
+            boolean live = (lives != null && lives.length > 0 && lives[0].equalsIgnoreCase("true"));
+            return live ? onMessageGetLiveArtifacts() : onMessageGetArtifacts();
         }
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -247,6 +249,25 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      */
     private IOUtils.HttpResponse onMessageGetArtifacts() {
         Collection<Artifact> artifacts = list();
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Artifact artifact : artifacts) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(artifact.serializedJSON());
+        }
+        builder.append("]");
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request to list the live artifacts
+     *
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessageGetLiveArtifacts() {
+        Collection<Artifact> artifacts = getAllLive();
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
         for (Artifact artifact : artifacts) {

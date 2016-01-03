@@ -36,7 +36,7 @@ public interface JobExecutionService extends Service {
     void schedule(Job job);
 
     /**
-     * Cancels a job
+     * Cancels a job that is scheduled, but not running yet
      *
      * @param job The job to cancel
      */
@@ -50,18 +50,25 @@ public interface JobExecutionService extends Service {
     List<Job> getQueue();
 
     /**
-     * Retrieves a scheduled (or running) job from an identifier
+     * Gets the running jobs
      *
-     * @param identifier The identifier of a job
-     * @return The corresponding job
+     * @return The running jobs
      */
-    Job getScheduledJob(String identifier);
+    List<Job> getRunning();
 
     /**
-     * Retrieves a completed job from an identifier
+     * Gets the completed jobs
      *
-     * @param identifier The identifier of a job
-     * @return The corresponding job
+     * @return The completed jobs
      */
-    Job getCompletedJob(String identifier);
+    List<Job> getCompleted();
+
+    /**
+     * Gets the job from a job's identifier
+     *
+     * @param identifier     The identifier of the job to retrieve
+     * @param expectedStatus The expected status of the job
+     * @return The job, or null if it cannot be found
+     */
+    Job getJob(String identifier, JobStatus expectedStatus);
 }

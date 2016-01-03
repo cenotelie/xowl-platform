@@ -82,11 +82,6 @@ public class PushArtifactToLiveJob extends JobBase {
     }
 
     @Override
-    public void onComplete() {
-        // do nothing by default
-    }
-
-    @Override
     public XSPReply getResult() {
         return result;
     }

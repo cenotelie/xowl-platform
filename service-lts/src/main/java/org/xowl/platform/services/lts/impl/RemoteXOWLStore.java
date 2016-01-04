@@ -88,16 +88,22 @@ abstract class RemoteXOWLStore implements TripleStore {
 
     @Override
     public XSPReply store(Artifact artifact) {
+        Collection<Quad> metadata = artifact.getMetadata();
+        if (metadata == null || metadata.isEmpty())
+            return new XSPReplyFailure("Invalid artifact (empty metadata)");
+        Collection<Quad> content = artifact.getContent();
+        if (content == null)
+            return new XSPReplyFailure("Failed to fetch the artifact's content");
         StringWriter writer = new StringWriter();
         writer.write("INSERT DATA { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ");
         NTripleSerializer serializer = new NTripleSerializer(writer);
-        serializer.serialize(Logger.DEFAULT, artifact.getMetadata().iterator());
+        serializer.serialize(Logger.DEFAULT, metadata.iterator());
         writer.write(" } }; INSERT DATA { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
         writer.write("> {");
-        serializer.serialize(Logger.DEFAULT, artifact.getContent().iterator());
+        serializer.serialize(Logger.DEFAULT, content.iterator());
         writer.write(" } }");
         Result result = sparql(writer.toString());
         if (result.isSuccess())

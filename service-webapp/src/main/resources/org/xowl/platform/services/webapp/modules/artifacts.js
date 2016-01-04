@@ -95,7 +95,7 @@ function renderConnectors() {
 			var cell1 = document.createElement("td");
 			var cell2 = document.createElement("td");
 			var img = document.createElement("img");
-			img.src = "../assets/db.svg";
+			img.src = "../assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
 			var link = document.createElement("a");
@@ -117,7 +117,7 @@ function renderConnectors() {
 			var cell1 = document.createElement("td");
 			var cell2 = document.createElement("td");
 			var img = document.createElement("img");
-			img.src = "../assets/db.svg";
+			img.src = "../assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
 			var badge = document.createElement("span");

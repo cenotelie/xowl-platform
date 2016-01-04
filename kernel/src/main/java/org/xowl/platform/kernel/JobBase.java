@@ -97,22 +97,28 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.timeCompleted = "";
         for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
-            String value = IOUtils.unescape(member.getChildren().get(1).getValue());
             head = head.substring(1, head.length() - 1);
             if ("identifier".equals(head)) {
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 id = value.substring(1, value.length() - 1);
             } else if ("name".equals(head)) {
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
             } else if ("type".equals(head)) {
-                type = value;
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                type = value.substring(1, value.length() - 1);
             } else if ("status".equals(head)) {
-                this.status = JobStatus.valueOf(value);
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                this.status = JobStatus.valueOf(value.substring(1, value.length() - 1));
             } else if ("timeScheduled".equals(head)) {
-                this.timeScheduled = value;
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                this.timeScheduled = value.substring(1, value.length() - 1);
             } else if ("timeRun".equals(head)) {
-                this.timeRun = value;
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                this.timeRun = value.substring(1, value.length() - 1);
             } else if ("timeCompleted".equals(head)) {
-                this.timeCompleted = value;
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                this.timeCompleted = value.substring(1, value.length() - 1);
             }
         }
         this.identifier = id;

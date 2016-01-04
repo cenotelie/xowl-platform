@@ -25,12 +25,12 @@ import org.xowl.platform.kernel.ArtifactDeferred;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.*;
+import org.xowl.store.rdf.IRINode;
+import org.xowl.store.rdf.Node;
+import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
-import org.xowl.store.sparql.ResultSolutions;
-import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.storage.remote.HTTPConnection;
 import org.xowl.store.writers.NTripleSerializer;
 import org.xowl.store.xsp.*;
@@ -174,20 +174,10 @@ abstract class RemoteXOWLStore implements TripleStore {
         return new ArtifactDeferred(metadata) {
             @Override
             protected Collection<Quad> load() {
-                Result result = sparql("SELECT ?s ?p ?o WHERE  { GRAPH <" + IOUtils.escapeAbsoluteURIW3C(identifier) + "> { ?s ?p ?o } }");
+                Result result = sparql("CONSTRUCT FROM NAMED <" + IOUtils.escapeAbsoluteURIW3C(identifier) + "> WHERE { ?s ?p ?o }");
                 if (result.isFailure())
                     return null;
-                ResultSolutions solutions = ((ResultSolutions) result);
-                Collection<Quad> quads = new ArrayList<>(solutions.getSolutions().size());
-                CachedNodes nodes = new CachedNodes();
-                IRINode graph = nodes.getIRINode(identifier);
-                for (QuerySolution solution : solutions.getSolutions()) {
-                    quads.add(new Quad(graph,
-                            (SubjectNode) solution.get("s"),
-                            (Property) solution.get("p"),
-                            solution.get("o")));
-                }
-                return quads;
+                return ((ResultQuads) result).getQuads();
             }
         };
     }

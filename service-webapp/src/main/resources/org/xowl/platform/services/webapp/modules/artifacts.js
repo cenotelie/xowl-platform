@@ -6,6 +6,7 @@ var ARTIFACTS_ALL = null;
 var ARTIFACTS_LIVE = null;
 var ARTIFACTS = null;
 var CONNECTORS = null;
+var JOB = null;
 
 function init() {
 	xowl.getConnectors(function (status, ct, content) {
@@ -199,8 +200,13 @@ function onClickShowMore(group, button, rows, parentRow, childRows) {
 				];
 				cells[1].appendChild(document.createTextNode(group.artifacts[i].name));
 				cells[2].appendChild(document.createTextNode(group.artifacts[i].version));
-				if (group.artifacts[i].isLive)
-					cells[3].appendChild(document.createTextNode("yes"));
+				var toggle = document.createElement("div");
+				toggle.className = "toggle-button" + (group.artifacts[i].isLive ? " toggle-button-selected" : "");
+				toggle.appendChild(document.createElement("button"));
+				(function (artifact) {
+					toggle.onclick = function () { onClickToggleLive(artifact); }
+				})(group.artifacts[i]);
+				cells[3].appendChild(toggle);
 				for (var j = 0; j != cells.length; j++)
 					row.appendChild(cells[j]);
 				childRows.push(row);
@@ -228,11 +234,82 @@ function onClickShowMore(group, button, rows, parentRow, childRows) {
 }
 
 function onClickPull(connector) {
+	if (JOB !== null) {
+		alert("Please wait for the previous action to terminate.");
+		return;
+	}
+	JOB = "reserved";
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (status == 200) {
-			document.location.href = "job.html?id=" + encodeURIComponent(content.identifier);
+			trackJob(content.identifier, "Working ...", function(isSuccess) {
+				if (isSuccess)
+					window.location.reload(true);
+			});
 		} else {
-			alert(content);
+			displayError(content);
+			JOB = null;
 		}
 	}, connector.identifier);
+}
+
+function onClickToggleLive(artifact) {
+	if (JOB !== null) {
+		alert("Please wait for the previous action to terminate.");
+		return;
+	}
+	JOB = "reserved";
+	var callback = function (status, ct, content) {
+		if (status == 200) {
+			trackJob(content.identifier, "Working ...", function(isSuccess) {
+				if (isSuccess)
+					window.location.reload(true);
+			});
+		} else {
+			displayError(content);
+			JOB = null;
+		}
+	};
+	if (artifact.isLive)
+		xowl.pullFromLive(callback, artifact.identifier);
+	else
+		xowl.pushToLive(callback, artifact.identifier);
+}
+
+function trackJob(jobId, text, callback) {
+	var link = document.createElement("a");
+	link.href = "job.html?" + jobId;
+	link.appendChild(document.createTextNode(text));
+	var span = document.getElementById("loader-text");
+	while (span.hasChildNodes())
+		span.removeChild(span.lastChild);
+	span.appendChild(link);
+	document.getElementById("loader").style.display = "";
+	var doTrack = function () {
+		xowl.getJob(function (status, ct, content) {
+			if (status == 200) {
+				JOB = content;
+				if (content.status === "Completed") {
+					JOB = null;
+					if (content.result.isSuccess) {
+						document.getElementById("loader").style.display = "none";
+					} else {
+						span.removeChild(link);
+						span.appendChild(document.createTextNode("FAILURE: " + content.result.message));
+					}
+					callback(content.result.isSuccess)
+				} else {
+					window.setTimeout(doTrack, 2000);
+				}
+			}
+		}, jobId);
+	};
+	doTrack();
+}
+
+function displayError(text) {
+	var span = document.getElementById("loader-text");
+	while (span.hasChildNodes())
+		span.removeChild(span.lastChild);
+	span.appendChild(document.createTextNode("FAILURE: " + text));
+	document.getElementById("loader").style.display = "";
 }

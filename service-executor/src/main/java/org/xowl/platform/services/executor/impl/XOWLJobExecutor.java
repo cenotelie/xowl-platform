@@ -236,8 +236,13 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
         String type = null;
         for (ASTNode member : definition.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
-            String value = IOUtils.unescape(member.getChildren().get(1).getValue());
             head = head.substring(1, head.length() - 1);
+            ASTNode nodeValue = member.getChildren().get(1);
+            String value = null;
+            if (nodeValue.getValue() != null) {
+                value = IOUtils.unescape(nodeValue.getValue());
+                value = value.substring(1, value.length() - 1);
+            }
             if ("type".equals(head)) {
                 type = value;
             }

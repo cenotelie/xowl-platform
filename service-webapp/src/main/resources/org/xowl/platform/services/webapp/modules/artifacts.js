@@ -89,7 +89,6 @@ function prepareArtifacts() {
 function renderConnectors() {
 	var rows = document.getElementById("connectors");
 	for (var i = 0; i != CONNECTORS.length; i++) {
-		var connector = CONNECTORS[i];
 		if (CONNECTORS[i].canPullInput) {
 			var row = document.createElement("tr");
 			var cell1 = document.createElement("td");
@@ -99,15 +98,17 @@ function renderConnectors() {
 			img.width = 32;
 			img.height = 32;
 			var link = document.createElement("a");
-			link.href = "connectors.html?id=" + encodeURIComponent(connector.identifier);
+			link.href = "connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
-			link.appendChild(document.createTextNode(connector.name));
+			link.appendChild(document.createTextNode(CONNECTORS[i].name));
 			cell1.appendChild(link);
 			var button = document.createElement("button");
 			button.type = "button";
 			button.className = "btn btn-primary";
 			button.appendChild(document.createTextNode("Pull from client"));
-			button.onclick = function () { onClickPull(connector); }
+			(function (connector) {
+				button.onclick = function () { onClickPull(connector); }
+			})(CONNECTORS[i]);
 			cell2.appendChild(button);
 			row.appendChild(cell1);
 			row.appendChild(cell2);
@@ -122,18 +123,20 @@ function renderConnectors() {
 			img.height = 32;
 			var badge = document.createElement("span");
 			badge.className = "badge";
-			badge.appendChild(document.createTextNode(connector.queue.length.toString()));
+			badge.appendChild(document.createTextNode(CONNECTORS[i].queue.length.toString()));
 			var link = document.createElement("a");
-			link.href = "connectors.html?id=" + encodeURIComponent(connector.identifier);
+			link.href = "connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
-			link.appendChild(document.createTextNode(connector.name));
+			link.appendChild(document.createTextNode(CONNECTORS[i].name));
 			link.appendChild(badge);
 			cell1.appendChild(link);
 			var button = document.createElement("button");
 			button.type = "button";
 			button.className = "btn btn-primary";
 			button.appendChild(document.createTextNode("Pull from queue"));
-			button.onclick = function () { onClickPull(connector); }
+			(function (connector) {
+				button.onclick = function () { onClickPull(connector); }
+			})(CONNECTORS[i]);
 			cell2.appendChild(button);
 			row.appendChild(cell1);
 			row.appendChild(cell2);

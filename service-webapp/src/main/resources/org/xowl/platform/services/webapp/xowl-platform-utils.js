@@ -121,23 +121,3 @@ function isLangTagChar(c) {
     var code = c.charCodeAt(0);
     return (((code >= 65) && (code <= 90)) || ((code >= 97) && (code <= 122)));
 }
-
-function rdfToString(value) {
-    if (value.type === "uri" || value.type === "iri") {
-        return value.value;
-    } else if (value.type === "bnode") {
-        return '_:' + value.value;
-    } else if (value.type === "blank") {
-		return '_:' + value.id;
-    } else if (value.type === "variable") {
-		return '?' + value.value;
-    } else if (value.hasOwnProperty("lexical")) {
-		return '"' + value.lexical + '"' +
-			(value.datatype !== null ? '^^<' + value.datatype + '>' : '') +
-			(value.lang !== null ? '@' + value.lang : '');
-    } else {
-		return '"' + value.value + '"' +
-			(value.datatype !== null ? '^^<' + value.datatype + '>' : '') +
-			(value.hasOwnProperty("xml:lang") ? '@' + value["xml:lang"] : '');
-    }
-}

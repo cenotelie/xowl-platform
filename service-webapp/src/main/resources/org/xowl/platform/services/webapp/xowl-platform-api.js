@@ -148,21 +148,38 @@ XOWL.prototype.pushToLive = function (callback, artifactId) {
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/n-quads", content);
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts&id=" + encodeURIComponent(artifactId));
+	}, "artifacts?id=" + encodeURIComponent(artifactId));
 }
 
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/n-quads", content);
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts&content=true&id=" + encodeURIComponent(artifactId));
+	}, "artifacts?content=true&id=" + encodeURIComponent(artifactId));
+}
+
+XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			var leftIndex = content.indexOf("--xowlQuads");
+			var rightIndex = content.lastIndexOf("--xowlQuads");
+			var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
+			var contentRight = content.substring(rightIndex + "--xowlQuads".length);
+			callback(code, "application/json", {
+				left: contentLeft,
+				right: contentRight
+			});
+		} else {
+			callback(code, type, content);
+		}
+	}, "artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
 }
 
 XOWL.prototype.doQuery = function (callback, target) {

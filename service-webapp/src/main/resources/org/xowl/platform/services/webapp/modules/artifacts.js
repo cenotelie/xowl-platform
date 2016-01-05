@@ -196,7 +196,10 @@ function onClickShowMore(group, button, rows, parentRow, childRows) {
 					document.createElement("td"),
 					document.createElement("td")
 				];
-				cells[1].appendChild(document.createTextNode(group.artifacts[i].name));
+				var link = document.createElement("a");
+				link.href = "artifact.html?id=" + encodeURIComponent(group.artifacts[i].identifier);
+				link.appendChild(document.createTextNode(group.artifacts[i].name));
+				cells[1].appendChild(link);
 				cells[2].appendChild(document.createTextNode(group.artifacts[i].version));
 				var toggle = document.createElement("div");
 				toggle.className = "toggle-button" + (group.artifacts[i].isLive ? " toggle-button-selected" : "");

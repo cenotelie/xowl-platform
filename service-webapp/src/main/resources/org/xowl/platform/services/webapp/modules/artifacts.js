@@ -7,6 +7,8 @@ var ARTIFACTS_LIVE = null;
 var ARTIFACTS = null;
 var CONNECTORS = null;
 var JOB = null;
+var DIFF_LEFT = null;
+var DIFF_RIGHT = null;
 
 function init() {
 	xowl.getConnectors(function (status, ct, content) {
@@ -196,6 +198,14 @@ function onClickShowMore(group, button, rows, parentRow, childRows) {
 					document.createElement("td"),
 					document.createElement("td")
 				];
+				var diff = document.createElement("span");
+				diff.className = "badge";
+				diff.style.cursor = "pointer";
+				diff.appendChild(document.createTextNode("diff"));
+				(function (artifact) {
+					diff.onclick = function () { onClickSelectDiff(artifact); }
+				})(group.artifacts[i]);
+				cells[0].appendChild(diff);
 				var link = document.createElement("a");
 				link.href = "artifact.html?id=" + encodeURIComponent(group.artifacts[i].identifier);
 				link.appendChild(document.createTextNode(group.artifacts[i].name));
@@ -274,6 +284,49 @@ function onClickToggleLive(artifact) {
 		xowl.pullFromLive(callback, artifact.identifier);
 	else
 		xowl.pushToLive(callback, artifact.identifier);
+}
+
+function onClickSelectDiff(artifact) {
+	if (DIFF_LEFT == null) {
+		if (DIFF_RIGHT !== null && DIFF_RIGHT.base !== artifact.base)
+			return;
+		DIFF_LEFT = artifact;
+		document.getElementById("diff-left").value = artifact.name + " (" + artifact.version + ")";
+		if (DIFF_RIGHT !== null)
+			document.getElementById("diff-target").href = "diff?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
+	} else {
+		if (DIFF_LEFT !== null && DIFF_LEFT.base !== artifact.base)
+			return;
+		DIFF_RIGHT = artifact;
+		document.getElementById("diff-right").value = artifact.name + " (" + artifact.version + ")";
+		if (DIFF_LEFT !== null)
+			document.getElementById("diff-target").href = "diff?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
+	}
+}
+
+function onClickDiffClearLeft() {
+	DIFF_LEFT = null;
+	document.getElementById("diff-left").value = "";
+	document.getElementById("diff-target").href = null;
+}
+
+function onClickDiffClearRight() {
+	DIFF_RIGHT = null;
+	document.getElementById("diff-right").value = "";
+	document.getElementById("diff-target").href = null;
+}
+
+function onClickDiffInverse() {
+	var temp = DIFF_LEFT;
+	DIFF_LEFT = DIFF_RIGHT;
+	DIFF_RIGHT = temp;
+	var displayLeft = document.getElementById("diff-left");
+	var displayRight = document.getElementById("diff-right");
+	temp = displayLeft.value;
+	displayLeft.value = displayRight.value;
+	displayRight.value = temp;
+	if (DIFF_LEFT !== null && DIFF_RIGHT !== null)
+		document.getElementById("diff-target").href = "diff.html?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
 }
 
 function trackJob(jobId, text, callback) {

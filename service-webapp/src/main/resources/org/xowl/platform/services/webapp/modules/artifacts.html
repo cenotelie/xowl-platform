@@ -13,8 +13,8 @@
 </head>
 
 <body>
-	<object data="/web/assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
-	<object data="/web/assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
+	<object data="../assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
+	<object data="../assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
 	<div class="header">
 		<span style="margin-left: 5px; display: inline-block;">
       <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
@@ -33,7 +33,7 @@
 				<div class="col-md-8">
 					<div class="panel panel-default" id="loader">
 						<div class="panel-body">
-							<img src="../assets/xowl.gif" width="32" height="32"/>
+							<img src="../assets/xowl.gif" width="32" height="32" />
 							<span id="loader-text">Loading ...</span>
 						</div>
 					</div>
@@ -69,6 +69,42 @@
 								</tbody>
 							</table>
 							<a href="connectors.html">See all connectors</a>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Artifact diff
+						</div>
+						<div class="panel-body">
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label for="diff-left" class="col-sm-2 control-label">Left:</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" id="diff-left" readonly>
+									</div>
+									<div class="col-sm-2">
+										<a class="btn btn-default" onclick="onClickDiffClearLeft()">Clear</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="diff-right" class="col-sm-2 control-label">Right:</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" id="diff-right" readonly>
+									</div>
+									<div class="col-sm-2">
+										<a class="btn btn-default" onclick="onClickDiffClearRight()">Clear</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-2">
+										<a class="btn" id="diff-target">Go!</a>
+									</div>
+									<div class="col-sm-8">
+										<a class="btn btn-default" onclick="onClickDiffInverse()">Inverse left/right</a>
+									</div>
+									<div class="col-sm-2"></div>
+								</div>
+							</form>
 						</div>
 					</div>
 				</div>

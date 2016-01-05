@@ -145,6 +145,26 @@ XOWL.prototype.pushToLive = function (callback, artifactId) {
 	}, "artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
 }
 
+XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "artifacts&id=" + encodeURIComponent(artifactId));
+}
+
+XOWL.prototype.getArtifactContent = function (callback, artifactId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "artifacts&content=true&id=" + encodeURIComponent(artifactId));
+}
+
 XOWL.prototype.doQuery = function (callback, target) {
 	this.doJSQuery(callback, target);
 }

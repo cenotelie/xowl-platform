@@ -26,14 +26,19 @@ import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 import org.xowl.platform.utils.Utils;
+import org.xowl.store.AbstractRepository;
 import org.xowl.store.IOUtils;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
+import org.xowl.store.writers.NQuadsSerializer;
+import org.xowl.store.writers.RDFSerializer;
 import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
+import org.xowl.store.xsp.XSPReplyUtils;
+import org.xowl.utils.logging.BufferedLogger;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -199,12 +204,25 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         if (uri.equals(URI_API + "/sparql"))
             return onMessageSPARQL(content, accept);
         if (uri.equals(URI_API + "/artifacts")) {
+            // is it an action
             String[] actions = parameters.get("action");
             String action = actions != null && actions.length >= 1 ? actions[0] : null;
             if (action != null && action.equals("pull"))
                 return onMessagePullFromLive(parameters);
             if (action != null && action.equals("push"))
                 return onMessagePushToLive(parameters);
+            // not an action, is it a specific artifact?
+            String[] ids = parameters.get("id");
+            String id = (ids != null && ids.length > 0) ? ids[0] : null;
+            if (id != null) {
+                // yes, request the content of the just the header?
+                String[] contents = parameters.get("content");
+                boolean isContent = (contents != null && contents.length > 0 && contents[0].equalsIgnoreCase("true"));
+                if (isContent)
+                    return onMessageGetArtifactContent(id);
+                return onMessageGetArtifactMetadata(id);
+            }
+            // no, request a set of artifacts
             String[] lives = parameters.get("live");
             String[] bases = parameters.get("base");
             boolean live = (lives != null && lives.length > 0 && lives[0].equalsIgnoreCase("true"));
@@ -302,6 +320,53 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         }
         builder.append("]");
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request for the header of a specified artifact
+     *
+     * @param artifactId The identifier of an artifact
+     * @return The response
+     */
+    private IOUtils.HttpResponse onMessageGetArtifactMetadata(String artifactId) {
+        XSPReply reply = retrieve(artifactId);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        if (artifact == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+        BufferedLogger logger = new BufferedLogger();
+        StringWriter writer = new StringWriter();
+        RDFSerializer serializer = new NQuadsSerializer(writer);
+        serializer.serialize(logger, artifact.getMetadata().iterator());
+        if (!logger.getErrorMessages().isEmpty())
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+    }
+
+    /**
+     * Responds to a request for the content of a specified artifact
+     *
+     * @param artifactId The identifier of an artifact
+     * @return The artifact
+     */
+    private IOUtils.HttpResponse onMessageGetArtifactContent(String artifactId) {
+        XSPReply reply = retrieve(artifactId);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        if (artifact == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+        Collection<Quad> content = artifact.getContent();
+        if (content == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+        BufferedLogger logger = new BufferedLogger();
+        StringWriter writer = new StringWriter();
+        RDFSerializer serializer = new NQuadsSerializer(writer);
+        serializer.serialize(logger, content.iterator());
+        if (!logger.getErrorMessages().isEmpty())
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**

@@ -157,17 +157,15 @@ function renderArtifacts() {
 			document.createElement("td"),
 			document.createElement("td")
 		];
+		var childRows = [];
+		var button = document.createElement("span");
+		button.setAttribute("aria-hidden", "true");
+		button.className = "glyphicon glyphicon-chevron-down";
+		button.style.cursor = "pointer";
+		button.style.marginLeft = "10px";
+		cells[0].appendChild(button);
+		button.onclick = function () { onClickShowMore(group, button, rows, topRow, childRows) };
 		cells[0].appendChild(document.createTextNode((i + 1).toString()));
-		if (group.artifacts.length > 1) {
-			var childRows = [];
-			var button = document.createElement("span");
-			button.setAttribute("aria-hidden", "true");
-			button.className = "glyphicon glyphicon-chevron-down";
-			button.style.cursor = "pointer";
-			button.style.marginLeft = "10px";
-			cells[0].appendChild(button);
-			button.onclick = function () { onClickShowMore(group, button, rows, topRow, childRows) };
-		}
 		cells[1].appendChild(document.createTextNode(group.name));
 		cells[2].appendChild(document.createTextNode(group.version));
 		if (group.live.length == 0)
@@ -241,7 +239,7 @@ function onClickPull(connector) {
 	JOB = "reserved";
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function(isSuccess) {
+			trackJob(content.identifier, "Working ...", function (isSuccess) {
 				if (isSuccess)
 					window.location.reload(true);
 			});
@@ -260,7 +258,7 @@ function onClickToggleLive(artifact) {
 	JOB = "reserved";
 	var callback = function (status, ct, content) {
 		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function(isSuccess) {
+			trackJob(content.identifier, "Working ...", function (isSuccess) {
 				if (isSuccess)
 					window.location.reload(true);
 			});

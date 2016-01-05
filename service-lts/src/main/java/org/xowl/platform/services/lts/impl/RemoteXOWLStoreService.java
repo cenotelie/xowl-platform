@@ -28,6 +28,8 @@ import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 import org.xowl.platform.utils.Utils;
 import org.xowl.store.AbstractRepository;
 import org.xowl.store.IOUtils;
+import org.xowl.store.RDFUtils;
+import org.xowl.store.rdf.Changeset;
 import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
@@ -38,6 +40,7 @@ import org.xowl.store.xsp.XSPReply;
 import org.xowl.store.xsp.XSPReplyFailure;
 import org.xowl.store.xsp.XSPReplyResult;
 import org.xowl.store.xsp.XSPReplyUtils;
+import org.xowl.utils.Files;
 import org.xowl.utils.logging.BufferedLogger;
 
 import java.io.IOException;
@@ -222,6 +225,11 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
                     return onMessageGetArtifactContent(id);
                 return onMessageGetArtifactMetadata(id);
             }
+            // no, is it a diff?
+            String[] diffLefts = parameters.get("diffLeft");
+            String[] diffRights = parameters.get("diffRight");
+            if (diffLefts != null && diffRights != null && diffLefts.length > 0 && diffRights.length > 0)
+                return onMessageDiffArtifacts(diffLefts[0], diffRights[0]);
             // no, request a set of artifacts
             String[] lives = parameters.get("live");
             String[] bases = parameters.get("base");
@@ -364,6 +372,47 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
         serializer.serialize(logger, content.iterator());
+        if (!logger.getErrorMessages().isEmpty())
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+    }
+
+    /**
+     * Responds to a request for the computation of the diff between two artifacts
+     *
+     * @param artifactLeft  The identifier of the artifact on the left
+     * @param artifactRight The identifier of the artifact on the right
+     * @return The artifact
+     */
+    private IOUtils.HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight) {
+        XSPReply reply = retrieve(artifactLeft);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        if (artifact == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+        Collection<Quad> contentLeft = artifact.getContent();
+        if (contentLeft == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+
+        reply = retrieve(artifactRight);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        if (artifact == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+        Collection<Quad> contentRight = artifact.getContent();
+        if (contentRight == null)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+
+        Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
+        BufferedLogger logger = new BufferedLogger();
+        StringWriter writer = new StringWriter();
+        RDFSerializer serializer = new NQuadsSerializer(writer);
+        writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
+        serializer.serialize(logger, changeset.getAdded().iterator());
+        writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
+        serializer.serialize(logger, changeset.getRemoved().iterator());
         if (!logger.getErrorMessages().isEmpty())
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
         return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());

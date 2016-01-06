@@ -293,14 +293,14 @@ function onClickSelectDiff(artifact) {
 		DIFF_LEFT = artifact;
 		document.getElementById("diff-left").value = artifact.name + " (" + artifact.version + ")";
 		if (DIFF_RIGHT !== null)
-			document.getElementById("diff-target").href = "diff?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
+			document.getElementById("diff-target").href = "diff.html?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURIComponent(DIFF_RIGHT.identifier);
 	} else {
 		if (DIFF_LEFT !== null && DIFF_LEFT.base !== artifact.base)
 			return;
 		DIFF_RIGHT = artifact;
 		document.getElementById("diff-right").value = artifact.name + " (" + artifact.version + ")";
 		if (DIFF_LEFT !== null)
-			document.getElementById("diff-target").href = "diff?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
+			document.getElementById("diff-target").href = "diff.html?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURIComponent(DIFF_RIGHT.identifier);
 	}
 }
 
@@ -326,12 +326,12 @@ function onClickDiffInverse() {
 	displayLeft.value = displayRight.value;
 	displayRight.value = temp;
 	if (DIFF_LEFT !== null && DIFF_RIGHT !== null)
-		document.getElementById("diff-target").href = "diff.html?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURI(DIFF_RIGHT.identifier);
+		document.getElementById("diff-target").href = "diff.html?left=" + encodeURIComponent(DIFF_LEFT.identifier) + "&right=" + encodeURIComponent(DIFF_RIGHT.identifier);
 }
 
 function trackJob(jobId, text, callback) {
 	var link = document.createElement("a");
-	link.href = "job.html?" + jobId;
+	link.href = "job.html?id=" + encodeURIComponent(jobId);
 	link.appendChild(document.createTextNode(text));
 	var span = document.getElementById("loader-text");
 	while (span.hasChildNodes())

@@ -74,10 +74,115 @@ function renderDiff(left, right) {
 	for (var p = 0; p != namesLeft.length; p++) {
 		var entity = ARTIFACT_LEFT[namesLeft[p]];
 		var secondary = (ARTIFACT_RIGHT.hasOwnProperty(namesLeft[p]) ? ARTIFACT_RIGHT[namesLeft[p]] : null);
-		var rows = [];
-		var rowTitle = document.createElement();
+		table.appendChild(renderGetRowPad());
+		table.appendChild(renderGetRowHeader(namesLeft[p]));
+		var done = [];
+		for (var i = 0; i != entity.properties.length; i++) {
+			var property = entity.properties[i];
+			if (done.indexOf(property.id) >= 0)
+				continue;
+			for (var j = i; j != entity.properties.length; j++) {
+				if (entity.properties[j].id === property.id)
+					table.appendChild(renderGetRowDiff("minus", property.id, entity.properties[j].value));
+			}
+			if (secondary !== null) {
+				for (var j = i; j != secondary.properties.length; j++) {
+					if (secondary.properties[j].id === property.id)
+						table.appendChild(renderGetRowDiff("plus", property.id, secondary.properties[j].value));
+				}
+			}
+			done.push(property.id);
+		}
+		if (secondary === null)
+			continue;
+		for (var i = 0; i != secondary.properties.length; i++) {
+			var property = secondary.properties[i];
+			if (done.indexOf(property.id) >= 0)
+				continue;
+			for (var j = i; j != secondary.properties.length; j++) {
+				if (secondary.properties[j].id === property.id)
+					table.appendChild(renderGetRowDiff("plus", property.id, secondary.properties[j].value));
+			}
+		}
+	}
+	for (var p = 0; p != namesRight.length; p++) {
+		var entity = ARTIFACT_RIGHT[namesRight[p]];
+		var secondary = (ARTIFACT_LEFT.hasOwnProperty(namesRight[p]) ? ARTIFACT_LEFT[namesRight[p]] : null);
+		var done = [];
+		for (var i = 0; i != entity.properties.length; i++) {
+			var property = entity.properties[i];
+			if (done.indexOf(property.id) >= 0)
+				continue;
+			if (secondary !== null) {
+				var found = false;
+				for (var j = i; j != secondary.properties.length; j++) {
+					if (secondary.properties[j].id === property.id) {
+						found = true;
+						break;
+					}
+				}
+				if (found)
+					continue;
+			}
+			for (var j = i; j != entity.properties.length; j++) {
+				if (entity.properties[j].id === property.id)
+					table.appendChild(renderGetRowDiff("plus", property.id, entity.properties[j].value));
+			}
+			done.push(property.id);
+		}
 	}
 	onRendered();
+}
+
+function renderGetRowPad() {
+	var row = document.createElement("tr");
+	row.className = "diff-empty";
+	row.appendChild(document.createElement("td"));
+	row.appendChild(document.createElement("td"));
+	row.appendChild(document.createElement("td"));
+	row.appendChild(document.createElement("td"));
+	return row;
+}
+
+function renderGetRowHeader(name) {
+	var row = document.createElement("tr");
+	row.className = "diff-entity";
+	var cellTitle = document.createElement("td");
+	var title = document.createElement("strong");
+	title.appendChild(document.createTextNode(name));
+	cellTitle.appendChild(title);
+	var cellButton = document.createElement("td");
+	var span = document.createElement("span");
+	span.className = "badge";
+	span.style.cursor = "pointer";
+	span.appendChild(document.createTextNode("context"));
+	cellButton.appendChild(span);
+	row.appendChild(document.createElement("td"));
+	row.appendChild(cellTitle);
+	row.appendChild(document.createElement("td"));
+	row.appendChild(cellButton);
+	return row;
+}
+
+function renderGetRowDiff(type, property, value) {
+	var row = document.createElement("tr");
+	row.className = "diff-" + type;
+	var indicator = document.createElement("span");
+	indicator.className = "glyphicon glyphicon-" + type;
+	indicator.setAttribute("aria-hidden", "true");
+	var cell1 = document.createElement("td");
+	cell1.appendChild(indicator);
+	var cell2 = document.createElement("td");
+	cell2.appendChild(document.createTextNode(property));
+	var cell3 = document.createElement("td");
+	cell3.appendChild(document.createTextNode("="));
+	var cell4 = document.createElement("td");
+	cell4.appendChild(document.createTextNode(rdfToString(value)));
+	row.appendChild(cell1);
+	row.appendChild(cell2);
+	row.appendChild(cell3);
+	row.appendChild(cell4);
+	return row;
 }
 
 function onRendered() {
@@ -85,3 +190,4 @@ function onRendered() {
 	if (MARKER === 3)
 		document.getElementById("loader").style.display = "none";
 }
+

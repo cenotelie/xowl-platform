@@ -14,7 +14,7 @@ TODO: fill this
 
 ```
 $ docker pull xowl/xowl-platform:latest
-$ docker run -d -p 8080:8080/tcp -p 8443:8443/tcp --name my-xowl-platform -v /path/to/host/config:/config xowl-platform:latest
+$ docker run -d -i -p 8080:8080/tcp --name myxowl -v /path/to/config:/config xowl/xowl-platform:latest
 ```
 
 Replace the `/path/to/host/config` to a path where to store the configuration for the platform.

@@ -3,7 +3,7 @@
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>top</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>xOWL Federation</name>
 	<description>Infrastructure for the federation</description>
 	<url>https://xowl.org/</url>
@@ -25,7 +25,8 @@
 		<connection>scm:hg:https://bitbucket.org/laurentw/xowl-platform</connection>
 		<developerConnection>scm:hg:ssh://hg@bitbucket.org:laurentw/xowl-platform</developerConnection>
 		<url>https://bitbucket.org/laurentw/xowl-platform</url>
-	</scm>
+	  <tag>v0.1.0</tag>
+  </scm>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>

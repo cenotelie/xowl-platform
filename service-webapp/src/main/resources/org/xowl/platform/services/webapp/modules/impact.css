@@ -1,0 +1,28 @@
+.code {
+	background-color: lightgray;
+	border: 1px solid gray;
+	font-family: monospace;
+	padding: 1px;
+}
+
+.entity ellipse {
+	fill: #ef7c00;
+}
+
+.entity-selected ellipse {
+	fill: #bd1789;
+}
+
+.entity:hover ellipse {
+	stroke: red;
+	stroke-width: 1;
+}
+
+.entity path {
+	fill: lightgray;
+}
+
+.entity:hover path {
+	stroke: red;
+	stroke-width: 1;
+}

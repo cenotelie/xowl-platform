@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>xOWL: Impact Analysis</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="../favicon.png" />
+	<link rel="stylesheet" type="text/css" href="../app.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="impact.css">
+</head>
+
+<body>
+	<div class="header">
+		<span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+		<div style="display: inline-block; margin-left: 50px;">
+			<span style="display: inline-block;">
+        <strong>Impact Analysis</strong>
+      </span>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom: 5px;" />
+	</div>
+	<div class="body">
+		<div class="panel panel-default" id="loader">
+			<div class="panel-body">
+				<img src="../assets/xowl.gif" width="32" height="32" />
+				<span id="loader-text">Loading ...</span>
+			</div>
+		</div>
+		<div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<svg width="1024" height="700" id="display">
+					</svg>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-info" id="loader">
+			<div class="panel-body">
+				<ul>
+					<li>
+						Move node: <span class="code">click</span> to select, move mouse to target, <span class="code">click</span> to unselect.
+					</li>
+					<li>
+						Activate node: <span class="code">[Ctrl]</span> key + <span class="code">click</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<script src="../xowl-platform-api.js"></script>
+	<script src="../xowl-platform-utils.js"></script>
+	<script src="../xowl-platform-ui.js"></script>
+	<script src="impact.js"></script>
+	<script>
+		init();
+	</script>
+</body>
+
+</html>

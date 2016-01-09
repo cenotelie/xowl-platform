@@ -33,7 +33,35 @@
 				<span id="loader-text">Loading ...</span>
 			</div>
 		</div>
-		<div class="panel panel-default">
+		<div class="panel panel-primary" id="panel-selector">
+			<div class="panel-heading">
+				Root Element Selection
+			</div>
+			<div class="panel-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="selector-artifact" class="col-sm-2 control-label">Containing Artifact</label>
+						<div class="col-sm-10">
+							<select class="form-control" id="selector-artifact"></select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="selector-type" class="col-sm-2 control-label">Entity Type</label>
+						<div class="col-sm-10">
+							<select class="form-control" id="selector-type"></select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="selector-root" class="col-sm-2 control-label">Entity</label>
+						<div class="col-sm-10">
+							<select class="form-control" id="selector-root"></select>
+						</div>
+					</div>
+				</form>
+				<button class="btn btn-primary">Go!</button>
+			</div>
+		</div>
+		<div class="panel panel-default" id="panel-display">
 			<div class="panel-body">
 				<div>
 					<svg id="display" style="border: 1px solid gray;">
@@ -49,18 +77,16 @@
 					<a class="btn btn-default" onclick="onClickZoomMinus()">-</a>
 					<a class="btn btn-default" onclick="onClickZoomReset()">0</a>
 				</div>
-			</div>
-		</div>
-		<div class="panel panel-info" id="loader">
-			<div class="panel-body">
-				<ul>
-					<li>
-						Move node with drag and drop.
-					</li>
-					<li>
-						Activate node: <span class="code">[Ctrl]</span> key + <span class="code">click</span>.
-					</li>
-				</ul>
+				<div>
+					<ul>
+						<li>
+							Move node with drag and drop.
+						</li>
+						<li>
+							Activate node: <span class="code">[Ctrl]</span> key + <span class="code">click</span>.
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -4,6 +4,8 @@
 var NODE_SIZE = 30;
 var TEXT_SIZE = 12;
 var TEXT_PAD = 4;
+var ARROW_LENGTH = 20;
+var ARROW_WIDTH = 10;
 var SELECTED_NODE = null;
 var CANVAS_SELECTED = false;
 var CANVAS_DOWNX = 0;
@@ -148,7 +150,6 @@ GraphNode.prototype.onActivate = function () { }
 
 function GraphConnector(origin, target, text) {
 	this.domPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	this.domPath.setAttribute("d", "M " + origin.currentX + " " + origin.currentY + " L " + target.currentX + " " + target.currentY);
 	var length = getWidthOfText(text, "sans-serif", TEXT_SIZE);
 	var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	path.setAttribute("d", "M 0 0" +
@@ -178,14 +179,37 @@ function GraphConnector(origin, target, text) {
 	this.target = target;
 	origin.outgoings.push(this);
 	target.incomings.push(this);
+	this.updateLink();
 }
 GraphConnector.prototype.onOriginMoved = function (x, y) {
-	this.domPath.setAttribute("d", "M " + x + " " + y + " L " + this.target.currentX + " " + this.target.currentY);
 	this.domText.setAttribute("transform", "translate(" + ((this.target.currentX + x) / 2) + " " + ((this.target.currentY + y) / 2) + ")");
+	this.updateLink();
 }
 GraphConnector.prototype.onTargetMoved = function (x, y) {
-	this.domPath.setAttribute("d", "M " + this.origin.currentX + " " + this.origin.currentY + " L " + x + " " + y);
 	this.domText.setAttribute("transform", "translate(" + ((x + this.origin.currentX) / 2) + " " + ((y + this.origin.currentY) / 2) + ")");
+	this.updateLink();
+}
+GraphConnector.prototype.updateLink = function () {
+	var dx = this.target.currentX - this.origin.currentX;
+	var dy = this.target.currentY - this.origin.currentY;
+	var totalLength = Math.sqrt(dx * dx + dy * dy);
+	var ratioPoint = (totalLength - NODE_SIZE / 2) / totalLength;
+	var ratioRoot = (totalLength - NODE_SIZE / 2 - ARROW_LENGTH) / totalLength;
+	var ratioSide = (ARROW_WIDTH / (2 * totalLength));
+	var pointX = this.origin.currentX + dx * ratioPoint;
+	var pointY = this.origin.currentY + dy * ratioPoint;
+	var rootX = this.origin.currentX + dx * ratioRoot;
+	var rootY = this.origin.currentY + dy * ratioRoot;
+	var p1x = rootX + (-dy * ratioSide);
+	var p1y = rootY + (dx * ratioSide);
+	var p2x = rootX + (dy * ratioSide);
+	var p2y = rootY + (-dx * ratioSide);
+	this.domPath.setAttribute("d", "M " + this.origin.currentX + " " + this.origin.currentY +
+		" L " + pointX + " " + pointY +
+		" L " + p1x + " " + p1y +
+		" L " + pointX + " " + pointY +
+		" L " + p2x + " " + p2y +
+		" L " + pointX + " " + pointY);
 }
 
 var CTXT = document.createElement("canvas").getContext('2d');

@@ -33,11 +33,20 @@
 				<span id="loader-text">Loading ...</span>
 			</div>
 		</div>
-		<div>
-			<div class="panel panel-default">
-				<div class="panel-body">
-					<svg width="1024" height="700" id="display">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div>
+					<svg id="display" style="border: 1px solid gray;">
+						<g id="canvas">
+							<g id="display-connectors"></g>
+							<g id="display-nodes"></g>
+						</g>
 					</svg>
+				</div>
+				<div>
+					<a class="btn btn-default" onclick="onClickZoomPlus()">+</a>
+					<a class="btn btn-default" onclick="onClickZoomMinus()">-</a>
+					<a class="btn btn-default" onclick="onClickZoomReset()">0</a>
 				</div>
 			</div>
 		</div>
@@ -45,10 +54,10 @@
 			<div class="panel-body">
 				<ul>
 					<li>
-						Move node: <span class="code">click</span> to select, move mouse to target, <span class="code">click</span> to unselect.
+						Move node with drag and drop.
 					</li>
 					<li>
-						Activate node: <span class="code">[Ctrl]</span> key + <span class="code">click</span>
+						Activate node: <span class="code">[Ctrl]</span> key + <span class="code">click</span>.
 					</li>
 				</ul>
 			</div>

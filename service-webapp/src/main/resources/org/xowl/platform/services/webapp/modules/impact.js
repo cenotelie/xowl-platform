@@ -33,14 +33,19 @@ function init() {
 
 function instrumentCanvas() {
 	DISPLAY.onmousedown = function (evt) {
+		if (SELECTED_NODE !== null)
+			return;
 		CANVAS_SELECTED = true;
 		CANVAS_DOWNX = evt.clientX;
 		CANVAS_DOWNY = evt.clientY;
 	}
 	DISPLAY.onmouseup = function (evt) {
-		CANVAS_SELECTED = false;
-		CANVAS_STARTX = CANVAS_STARTX - (evt.clientX - CANVAS_DOWNX);
-		CANVAS_STARTY = CANVAS_STARTY - (evt.clientY - CANVAS_DOWNY);
+		if (SELECTED_NODE === null && CANVAS_SELECTED) {
+			CANVAS_SELECTED = false;
+			CANVAS_STARTX = CANVAS_STARTX - (evt.clientX - CANVAS_DOWNX);
+			CANVAS_STARTY = CANVAS_STARTY - (evt.clientY - CANVAS_DOWNY);
+			CANVAS.setAttribute("transform", "translate(" + -CANVAS_STARTX + " " + -CANVAS_STARTY + ") scale(" + ZOOM + ")");
+		}
 	}
 	DISPLAY.onmousemove = function (evt) {
 		if (SELECTED_NODE !== null) {

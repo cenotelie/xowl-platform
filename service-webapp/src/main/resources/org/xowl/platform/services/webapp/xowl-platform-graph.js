@@ -20,6 +20,9 @@ function GraphCanvas(width, height, svg) {
 	this.nodes = [];
 	this.connectors = [];
 	this.selectedNode = null;
+	this.usePhysics = true;
+	this.remaningEnergy = 0;
+	this.physicsTimeoutId = 0;
 	var canvasThis = this;
 
 	this.domSVG.onmousedown = function (evt) {
@@ -44,6 +47,8 @@ function GraphCanvas(width, height, svg) {
 			canvasThis.selectedNode.downX = evt.clientX;
 			canvasThis.selectedNode.downY = evt.clientY;
 			canvasThis.selectedNode.moveTo(targetX, targetY);
+			if (canvasThis.physicsTimeoutId === 0 && canvasThis.usePhysics)
+				simulatePhysics(canvasThis);
 		} else if (canvasThis.isCanvasSelected) {
 			var targetX = canvasThis.canvasStartX - (evt.clientX - canvasThis.canvasDownX);
 			var targetY = canvasThis.canvasStartY - (evt.clientY - canvasThis.canvasDownY);
@@ -87,6 +92,80 @@ GraphCanvas.prototype.removeConnector = function (connector) {
 	return connector;
 }
 
+var PHYSICS_DT = 0.01;
+var PHYSICS_FRICTION = 0.1;
+var SPRING_RELAXED = 150;
+var SPRING_K = 5;
+
+function simulatePhysics(canvas) {
+	canvas.remaningEnergy = 0;
+	for (var i = 0; i != canvas.nodes.length; i++) {
+		if (canvas.nodes[i] === canvas.selectedNode)
+			continue;
+		canvas.nodes[i].ax = 0;
+		canvas.nodes[i].ay = 0;
+		for (var j = 0; j != canvas.nodes[i].outgoings.length; j++) {
+			if (!canvas.nodes[i].outgoings[j].visible)
+				continue;
+			var f = getForce(canvas.nodes[i], canvas.nodes[i].outgoings[j].target);
+			canvas.nodes[i].ax += f.x;
+			canvas.nodes[i].ay += f.y;
+		}
+		for (var j = 0; j != canvas.nodes[i].incomings.length; j++) {
+			if (!canvas.nodes[i].incomings[j].visible)
+				continue;
+			var f = getForce(canvas.nodes[i], canvas.nodes[i].incomings[j].origin);
+			canvas.nodes[i].ax += f.x;
+			canvas.nodes[i].ay += f.y;
+		}
+		canvas.nodes[i].ax -= canvas.nodes[i].vx * PHYSICS_FRICTION;
+		canvas.nodes[i].ay -= canvas.nodes[i].vy * PHYSICS_FRICTION;
+	}
+	for (var i = 0; i != canvas.nodes.length; i++) {
+		if (canvas.nodes[i] === canvas.selectedNode)
+			continue;
+		var a = canvas.nodes[i].ax * canvas.nodes[i].ax + canvas.nodes[i].ay * canvas.nodes[i].ay;
+		if (a <= 5) {
+			canvas.nodes[i].ax = 0;
+			canvas.nodes[i].ay = 0;
+			a = 0;
+		}
+		canvas.nodes[i].vx += canvas.nodes[i].ax * PHYSICS_DT;
+		canvas.nodes[i].vy += canvas.nodes[i].ay * PHYSICS_DT;
+		var v = canvas.nodes[i].vx * canvas.nodes[i].vx + canvas.nodes[i].vy * canvas.nodes[i].vy;
+		canvas.nodes[i].moveTo(
+			canvas.nodes[i].currentX + canvas.nodes[i].vx * PHYSICS_DT,
+			canvas.nodes[i].currentY + canvas.nodes[i].vy * PHYSICS_DT);
+		canvas.remaningEnergy += v;
+	}
+	if (canvas.remaningEnergy > 0 && canvas.usePhysics) {
+		canvas.physicsTimeoutId = window.setTimeout(function () {
+			simulatePhysics(canvas);
+		}, 1000 * PHYSICS_DT);
+	} else {
+		canvas.physicsTimeoutId = 0;
+		for (var i = 0; i != canvas.nodes.length; i++) {
+			canvas.nodes[i].ax = 0;
+			canvas.nodes[i].ay = 0;
+			canvas.nodes[i].vx = 0;
+			canvas.nodes[i].vy = 0;
+		}
+	}
+}
+
+function getForce(n1, n2) {
+	var x = n2.currentX - n1.currentX;
+	var y = n2.currentY - n1.currentY;
+	var length = Math.sqrt(x * x + y * y);
+	var displacement = length - SPRING_RELAXED;
+	var ratio = SPRING_K * displacement / length;
+	return {
+		x: x * ratio,
+		y: y * ratio
+	};
+}
+
+
 var NODE_SIZE = 30;
 var TEXT_SIZE = 12;
 var TEXT_PAD = 4;
@@ -127,6 +206,10 @@ function GraphNode(x, y, text) {
 	this.isDown = false;
 	this.downX = 0;
 	this.downY = 0;
+	this.ax = 0;
+	this.ay = 0;
+	this.vx = 0;
+	this.vy = 0;
 	var node = this;
 	this.dom.onmousedown = function (evt) {
 		node.isDown = true;

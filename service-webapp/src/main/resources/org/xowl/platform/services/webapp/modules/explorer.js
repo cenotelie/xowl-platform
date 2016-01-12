@@ -195,3 +195,8 @@ function renderAttributes(entity) {
 		table.appendChild(row);
 	}
 }
+
+function onClickPhysics() {
+	GRAPH.usePhysics = !GRAPH.usePhysics;
+	document.getElementById("button-physics").className = "toggle-button" + (GRAPH.usePhysics ? " toggle-button-selected" : "");
+}

@@ -48,8 +48,8 @@ function renderMetadata(metadata) {
 			var row = document.createElement("tr");
 			var cell1 = document.createElement("td");
 			var cell2 = document.createElement("td");
-			cell1.appendChild(document.createTextNode(name));
-			cell2.appendChild(document.createTextNode(rdfToString(properties[i].value)));
+			cell1.appendChild(rdfToDom({ type: "iri", value: name }));
+			cell2.appendChild(rdfToDom(properties[i].value));
 			row.appendChild(cell1);
 			row.appendChild(cell2);
 			table.appendChild(row);
@@ -73,11 +73,11 @@ function renderContent(content) {
 			var cell3 = document.createElement("td");
 			cell0.appendChild(document.createTextNode((p + 1).toString() + "." + (j + 1).toString()));
 			cell0.className = "entity" + (p % 2).toString();
-			cell1.appendChild(document.createTextNode(entity.id));
+			cell1.appendChild(rdfToDom({ type: "iri", value: entity.id }));
 			cell1.className = "entity" + (p % 2).toString();
-			cell2.appendChild(document.createTextNode(property.id));
+			cell2.appendChild(rdfToDom({ type: "iri", value: property.id }));
 			cell2.className = "entity" + (p % 2).toString();
-			cell3.appendChild(document.createTextNode(rdfToString(property.value)));
+			cell3.appendChild(rdfToDom(property.value));
 			cell3.className = "entity" + (p % 2).toString();
 			row.appendChild(cell0);
 			row.appendChild(cell1);

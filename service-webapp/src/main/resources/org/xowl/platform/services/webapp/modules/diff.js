@@ -149,7 +149,7 @@ function renderGetRowHeader(name) {
 	row.className = "diff-entity";
 	var cellTitle = document.createElement("td");
 	var title = document.createElement("strong");
-	title.appendChild(document.createTextNode(name));
+	title.appendChild(rdfToDom({ type: "iri", value: name }));
 	cellTitle.appendChild(title);
 	var cellButton = document.createElement("td");
 	var span = document.createElement("span");
@@ -173,11 +173,11 @@ function renderGetRowDiff(type, property, value) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(indicator);
 	var cell2 = document.createElement("td");
-	cell2.appendChild(document.createTextNode(property));
+	cell2.appendChild(rdfToDom({ type: "iri", value: property }));
 	var cell3 = document.createElement("td");
 	cell3.appendChild(document.createTextNode("="));
 	var cell4 = document.createElement("td");
-	cell4.appendChild(document.createTextNode(rdfToString(value)));
+	cell4.appendChild(rdfToDom(value));
 	row.appendChild(cell1);
 	row.appendChild(cell2);
 	row.appendChild(cell3);

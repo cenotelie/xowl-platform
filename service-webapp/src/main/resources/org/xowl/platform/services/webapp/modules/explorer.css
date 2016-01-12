@@ -1,6 +1,8 @@
-.code {
-	background-color: lightgray;
-	border: 1px solid gray;
-	font-family: monospace;
-	padding: 1px;
+.body {
+  width: 100%;
+  margin-left: 0%;
+}
+
+.options td {
+  padding: 5px;
 }

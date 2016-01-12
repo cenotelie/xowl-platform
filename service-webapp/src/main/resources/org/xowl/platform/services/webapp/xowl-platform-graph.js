@@ -189,19 +189,26 @@ function GraphConnector(origin, target, text) {
 	this.dom.appendChild(this.domText);
 	this.origin = origin;
 	this.target = target;
+	this.visible = true;
 	origin.outgoings.push(this);
 	target.incomings.push(this);
 	this.updateLink();
 }
 GraphConnector.prototype.onOriginMoved = function (x, y) {
+	if (!this.visible)
+		return;
 	this.domText.setAttribute("transform", "translate(" + ((this.target.currentX + x) / 2) + " " + ((this.target.currentY + y) / 2) + ")");
 	this.updateLink();
 }
 GraphConnector.prototype.onTargetMoved = function (x, y) {
+	if (!this.visible)
+		return;
 	this.domText.setAttribute("transform", "translate(" + ((x + this.origin.currentX) / 2) + " " + ((y + this.origin.currentY) / 2) + ")");
 	this.updateLink();
 }
 GraphConnector.prototype.updateLink = function () {
+	if (!this.visible)
+		return;
 	var dx = this.target.currentX - this.origin.currentX;
 	var dy = this.target.currentY - this.origin.currentY;
 	var totalLength = Math.sqrt(dx * dx + dy * dy);
@@ -222,6 +229,20 @@ GraphConnector.prototype.updateLink = function () {
 		" L " + pointX + " " + pointY +
 		" L " + p2x + " " + p2y +
 		" L " + pointX + " " + pointY);
+}
+GraphConnector.prototype.hide = function () {
+	if (!this.visible)
+		return;
+	this.domParent = this.dom.parentElement;
+	this.domParent.removeChild(this.dom);
+	this.visible = false;
+}
+GraphConnector.prototype.show = function () {
+	if (this.visible)
+		return;
+	this.domParent.appendChild(this.dom);
+	this.visible = true;
+	this.updateLink();
 }
 
 var CTXT = document.createElement("canvas").getContext('2d');

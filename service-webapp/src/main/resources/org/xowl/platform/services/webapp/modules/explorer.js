@@ -6,7 +6,8 @@ var ENTITIES = {};
 var EXPANDED = [];
 var REQUESTED = [];
 var NODES = {};
-var GRAPH_WIDTH = 1280;
+var CONNECTORS = {};
+var GRAPH_WIDTH = document.getElementById("display").parentElement.clientWidth - 40;
 var GRAPH_HEIGHT = 800;
 var GRAPH_SPREAD = 150;
 var GRAPH = new GraphCanvas(GRAPH_WIDTH, GRAPH_HEIGHT, document.getElementById("display"));
@@ -82,7 +83,7 @@ function doExpand(entity) {
 				NODES[pair.value.value] = nodeTarget;
 				newNodes.push(nodeTarget);
 			}
-			GRAPH.addConnector(new GraphConnector(nodeOrigin, nodeTarget, pair.id));
+			instrumentConnector(GRAPH.addConnector(new GraphConnector(nodeOrigin, nodeTarget, pair.id)), pair.id);
 		}
 	}
 	displayMessage("Loading ...");
@@ -101,7 +102,7 @@ function doExpand(entity) {
 					NODES[s] = nodeTarget;
 					newNodes.push(nodeTarget);
 				}
-				GRAPH.addConnector(new GraphConnector(nodeTarget, nodeOrigin, p));
+				instrumentConnector(GRAPH.addConnector(new GraphConnector(nodeTarget, nodeOrigin, p)), p);
 			}
 			document.getElementById("loader").style.display = "none";
 		} else {
@@ -132,6 +133,42 @@ function instrumentNode(node, identifier) {
 		} else {
 			onNodeSelect(identifier);
 		}
+	}
+}
+
+function instrumentConnector(connector, identifier) {
+	if (CONNECTORS.hasOwnProperty(identifier)) {
+		CONNECTORS[identifier].elements.push(connector);
+		if (!CONNECTORS[identifier].visible)
+			connector.hide();
+	} else {
+		CONNECTORS[identifier] = {
+			visible: true,
+			elements: [connector]
+		};
+		var span = document.createElement("span");
+		span.appendChild(document.createTextNode(getShortURI(identifier)));
+		var cell1 = document.createElement("td");
+		cell1.appendChild(span);
+		var toggle = document.createElement("div");
+		toggle.className = "toggle-button toggle-button-selected";
+		toggle.appendChild(document.createElement("button"));
+		toggle.onclick = function () {
+			for (var i = 0; i != CONNECTORS[identifier].elements.length; i++) {
+				if (CONNECTORS[identifier].visible)
+					CONNECTORS[identifier].elements[i].hide();
+				else
+					CONNECTORS[identifier].elements[i].show();
+			}
+			CONNECTORS[identifier].visible = !CONNECTORS[identifier].visible;
+			toggle.className = "toggle-button" + (CONNECTORS[identifier].visible ? " toggle-button-selected" : "");
+		}
+		var cell2 = document.createElement("td");
+		cell2.appendChild(toggle);
+		var row = document.createElement("tr");
+		row.appendChild(cell1);
+		row.appendChild(cell2);
+		document.getElementById("options").appendChild(row);
 	}
 }
 

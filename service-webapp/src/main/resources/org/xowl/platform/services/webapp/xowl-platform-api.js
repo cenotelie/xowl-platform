@@ -216,3 +216,21 @@ XOWL.prototype.doJSCommand = function (callback, target, payload) {
 	xmlHttp.setRequestHeader("Content-Type", "application/json");
 	xmlHttp.send(JSON.stringify(payload));
 }
+
+XOWL.prototype.sparql = function (callback, payload) {
+	this.doJSSPARQL(callback, payload);
+}
+
+XOWL.prototype.doJSSPARQL = function (callback, payload) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function () {
+		if (xmlHttp.readyState == 4) {
+			var ct = xmlHttp.getResponseHeader("Content-Type");
+			callback(xmlHttp.status, ct, xmlHttp.responseText)
+		}
+	}
+	xmlHttp.open("POST", this.endpoint + "sparql", true);
+	xmlHttp.setRequestHeader("Accept", "application/sparql-results+json, application/n-quads");
+	xmlHttp.setRequestHeader("Content-Type", "application/sparql-query");
+	xmlHttp.send(payload);
+}

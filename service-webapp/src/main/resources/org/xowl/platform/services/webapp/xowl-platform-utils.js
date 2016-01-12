@@ -8,6 +8,12 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+var DEFAULT_URI_MAPPINGS = [
+    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["owl", "http://www.w3.org/2002/07/owl#"]];
+
 /**
  * Parses a string containing RDF quads and builds a dictionnary of entities with their properties.
  * The result is a map of entity identifier (iri, or blank id) to an object describing their property:

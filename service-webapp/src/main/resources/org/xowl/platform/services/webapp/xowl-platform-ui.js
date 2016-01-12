@@ -41,10 +41,14 @@ function rdfToString(value) {
 }
 
 function displayError(text) {
+	displayMessage("FAILURE: " + text);
+}
+
+function displayMessage(text) {
 	var span = document.getElementById("loader-text");
 	while (span.hasChildNodes())
 		span.removeChild(span.lastChild);
-	span.appendChild(document.createTextNode("FAILURE: " + text));
+	span.appendChild(document.createTextNode(text));
 	document.getElementById("loader").style.display = "";
 }
 
@@ -189,10 +193,7 @@ function GraphNode(x, y, text) {
 		node.parent.selectedNode = null;
 	}
 	this.dom.onclick = function (evt) {
-		if (evt.ctrlKey) {
-			node.onActivate();
-			return;
-		}
+		node.onActivate(evt);
 	};
 }
 GraphNode.prototype.moveTo = function (x, y) {
@@ -206,7 +207,7 @@ GraphNode.prototype.moveTo = function (x, y) {
 		this.outgoings[i].onOriginMoved(x, y);
 	}
 }
-GraphNode.prototype.onActivate = function () { }
+GraphNode.prototype.onActivate = function (evt) { }
 
 var ARROW_LENGTH = 20;
 var ARROW_WIDTH = 10;

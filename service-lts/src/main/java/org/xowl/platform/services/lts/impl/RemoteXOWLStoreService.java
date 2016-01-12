@@ -34,6 +34,7 @@ import org.xowl.store.rdf.Quad;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
 import org.xowl.store.sparql.ResultQuads;
+import org.xowl.store.sparql.ResultUtils;
 import org.xowl.store.writers.NQuadsSerializer;
 import org.xowl.store.writers.RDFSerializer;
 import org.xowl.store.xsp.XSPReply;
@@ -46,10 +47,7 @@ import org.xowl.utils.logging.BufferedLogger;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements a triple store service that is backed by a remote store connected to via HTTP
@@ -254,22 +252,14 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         String request = new String(content, Utils.DEFAULT_CHARSET);
         Result result = storeLive.sparql(request);
-        String responseType = Result.SYNTAX_JSON;
-        switch (accept) {
-            case Result.SYNTAX_CSV:
-            case Result.SYNTAX_TSV:
-            case Result.SYNTAX_XML:
-            case Result.SYNTAX_JSON:
-                responseType = accept;
-                break;
-        }
+        String resultType = ResultUtils.coerceContentType(result, accept != null ? IOUtils.httpNegotiateContentType(Collections.singletonList(accept)) : AbstractRepository.SYNTAX_NQUADS);
         StringWriter writer = new StringWriter();
         try {
-            result.print(writer, responseType);
+            result.print(writer, resultType);
         } catch (IOException exception) {
             // cannot happen
         }
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, responseType, writer.toString());
+        return new IOUtils.HttpResponse(result.isSuccess() ? HttpURLConnection.HTTP_OK : IOUtils.HTTP_UNKNOWN_ERROR, resultType, writer.toString());
     }
 
     /**

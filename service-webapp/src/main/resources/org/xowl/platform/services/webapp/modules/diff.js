@@ -17,24 +17,24 @@ function init() {
 	xowl.getArtifactMetadata(function (status, ct, content) {
 		if (status == 200) {
 			renderMetadataLeft(content);
+		} else {
+			displayError(content);
 		}
 	}, ARTIFACTID_LEFT);
 	xowl.getArtifactMetadata(function (status, ct, content) {
 		if (status == 200) {
 			renderMetadataRight(content);
+		} else {
+			displayError(content);
 		}
 	}, ARTIFACTID_RIGHT);
 	xowl.diffArtifacts(function (status, ct, content) {
 		if (status == 200) {
 			renderDiff(content.left, content.right);
+		} else {
+			displayError(content);
 		}
 	}, ARTIFACTID_LEFT, ARTIFACTID_RIGHT);
-	/*xowl.getArtifactContent(function (status, ct, content) {
-		if (status == 200) {
-			BASE = parseNQuads(content);
-			onRendered();
-		}
-	}, ARTIFACTID_LEFT);*/
 }
 
 function renderMetadataLeft(metadata) {
@@ -190,4 +190,3 @@ function onRendered() {
 	if (MARKER === 3)
 		document.getElementById("loader").style.display = "none";
 }
-

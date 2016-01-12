@@ -15,18 +15,24 @@ function init() {
 		if (status == 200) {
 			CONNECTORS = content;
 			renderConnectors();
+		} else {
+			displayError(content);
 		}
 	});
 	xowl.getAllArtifacts(function (status, ct, content) {
 		if (status == 200) {
 			ARTIFACTS_ALL = content;
 			prepareArtifacts();
+		} else {
+			displayError(content);
 		}
 	});
 	xowl.getLiveArtifacts(function (status, ct, content) {
 		if (status == 200) {
 			ARTIFACTS_LIVE = content;
 			prepareArtifacts();
+		} else {
+			displayError(content);
 		}
 	});
 }
@@ -358,12 +364,4 @@ function trackJob(jobId, text, callback) {
 		}, jobId);
 	};
 	doTrack();
-}
-
-function displayError(text) {
-	var span = document.getElementById("loader-text");
-	while (span.hasChildNodes())
-		span.removeChild(span.lastChild);
-	span.appendChild(document.createTextNode("FAILURE: " + text));
-	document.getElementById("loader").style.display = "";
 }

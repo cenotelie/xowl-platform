@@ -9,6 +9,9 @@ function init() {
 			renderQueue(content.scheduled);
 			renderRunning(content.running);
 			renderCompleted(content.completed);
+			document.getElementById("loader").style.display = "none";
+		} else {
+			displayError(content);
 		}
 	});
 }

@@ -8,6 +8,8 @@ function init() {
 	xowl.getConnector(function (status, ct, content) {
 		if (status == 200) {
 			render(content);
+		} else {
+			alert("Failed to retrieve connector data: " + content);
 		}
 	}, connectorId);
 }
@@ -24,7 +26,7 @@ function render(connector) {
 		else
 			url = "failed to retrieved"
 	}
-	
+
 	document.getElementById("connector-identifier").value = connector.identifier;
 	document.getElementById("connector-name").value = connector.name;
 	document.getElementById("connector-uri").value = url;

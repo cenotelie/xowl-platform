@@ -40,6 +40,13 @@ function rdfToString(value) {
     }
 }
 
+function displayError(text) {
+	var span = document.getElementById("loader-text");
+	while (span.hasChildNodes())
+		span.removeChild(span.lastChild);
+	span.appendChild(document.createTextNode("FAILURE: " + text));
+	document.getElementById("loader").style.display = "";
+}
 
 
 function GraphCanvas(width, height, svg) {

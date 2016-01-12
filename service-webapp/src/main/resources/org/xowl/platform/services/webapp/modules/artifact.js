@@ -12,6 +12,8 @@ function init() {
 	xowl.getArtifactMetadata(function (status, ct, content) {
 		if (status == 200) {
 			renderMetadata(content);
+		} else {
+			displayError(content);
 		}
 	}, ARTIFACTID);
 }
@@ -23,6 +25,8 @@ function onClickRetrieveContent() {
 	xowl.getArtifactContent(function (status, ct, content) {
 		if (status == 200) {
 			renderContent(content);
+		} else {
+			displayError(content);
 		}
 	}, ARTIFACTID);
 }

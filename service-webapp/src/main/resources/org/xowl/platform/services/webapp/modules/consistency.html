@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>xOWL: Consistency</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="../favicon.png" />
+	<link rel="stylesheet" type="text/css" href="../app.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+</head>
+
+<body>
+	<object data="../assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
+	<object data="../assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
+	<div class="header">
+		<span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+		<div style="display: inline-block; margin-left: 50px;">
+			<span style="display: inline-block;">
+        <strong>Global Consistency Management</strong>
+      </span>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom: 5px;" />
+	</div>
+	<div class="body">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-8">
+					<div class="panel panel-default" id="loader">
+						<div class="panel-body">
+							<img src="../assets/xowl.gif" width="32" height="32" />
+							<span id="loader-text">Loading ...</span>
+						</div>
+					</div>
+					<div>
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Description</th>
+									<th>Rule</th>
+								</tr>
+							</thead>
+							<tbody id="inconsistencies">
+								<tr>
+									<td>1</td>
+									<td>This is an inconsistency</td>
+									<td><a href="rule.html?id=xxxx">Rule 1</a></td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td>This is an inconsistency</td>
+									<td><a href="rule.html?id=xxxx">Rule 2</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Consistency Rules
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered table-hover">
+								<thead>
+									<tr>
+										<th>Rule</th>
+										<th>Active</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody id="rules">
+									<tr>
+										<td><a href="rule.html?id=xxxx">Rule 1</a></td>
+										<td>
+											<div class="toggle-button toggle-button-selected">
+												<button></button>
+											</div>
+										</td>
+										<td>
+											<button class="btn btn-danger">Delete</button>
+										</td>
+									</tr>
+									<tr>
+										<td><a href="rule.html?id=xxxx">Rule 2</a></td>
+										<td>
+											<div class="toggle-button">
+												<button></button>
+											</div>
+										</td>
+										<td>
+											<button class="btn btn-danger">Delete</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							New Consistency Rule
+						</div>
+						<div class="panel-body">
+							<div class="form-group">
+								<label for="input-name">Name</label>
+								<input type="text" class="form-control" id="input-name" placeholder="My Consistency Rule">
+							</div>
+							<div class="form-group">
+								<label for="input-description">Message</label>
+								<textarea class="form-control" rows="2" id="input-description" placeholder="While ?x has property p, it has not property q." aria-describedby="input-description-help"></textarea>
+								<span id="input-description-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
+							</div>
+							<div class="form-group">
+								<label for="input-prefixes">Prefixes</label>
+								<textarea class="form-control" rows="5" id="input-prefixes">@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix kernel: <http://xowl.org/platform/schemas/kernel#>.</textarea>
+							</div>
+							<div class="form-group">
+								<label for="input-antecedents">Conditions</label>
+								<textarea class="form-control" rows="5" id="input-antecedents" placeholder="?x rdf:type kernel:MyStuff"></textarea>
+							</div>
+							<button type="submit" class="btn btn-primary" onclick="onClickNewRule()">Submit</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script src="../xowl-platform-api.js"></script>
+	<script src="consistency.js"></script>
+	<script>
+		init();
+	</script>
+</body>
+
+</html>

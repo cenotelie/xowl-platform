@@ -16,7 +16,7 @@ function init() {
 			CONNECTORS = content;
 			renderConnectors();
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	});
 	xowl.getAllArtifacts(function (status, ct, content) {
@@ -24,7 +24,7 @@ function init() {
 			ARTIFACTS_ALL = content;
 			prepareArtifacts();
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	});
 	xowl.getLiveArtifacts(function (status, ct, content) {
@@ -32,7 +32,7 @@ function init() {
 			ARTIFACTS_LIVE = content;
 			prepareArtifacts();
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	});
 }
@@ -263,7 +263,7 @@ function onClickPull(connector) {
 					window.location.reload(true);
 			});
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 			JOB = null;
 		}
 	}, connector.identifier);
@@ -282,7 +282,7 @@ function onClickToggleLive(artifact) {
 					window.location.reload(true);
 			});
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 			JOB = null;
 		}
 	};

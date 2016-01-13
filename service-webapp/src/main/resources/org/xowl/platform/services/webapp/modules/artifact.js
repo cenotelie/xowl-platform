@@ -13,7 +13,7 @@ function init() {
 		if (status == 200) {
 			renderMetadata(content);
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID);
 }
@@ -26,7 +26,7 @@ function onClickRetrieveContent() {
 		if (status == 200) {
 			renderContent(content);
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID);
 }

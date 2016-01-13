@@ -30,6 +30,22 @@
 	<div class="body">
 		<div class="container-fluid">
 			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-warning">
+						<div class="panel-body">
+							<span class="text-warning">The data presented here come from</span>
+							<img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+							<strong class="text-warning">live</strong>
+							<span class="text-warning">. Data in artifacts not pushed to</span>
+							<img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+							<strong class="text-warning">live</strong>
+							<span class="text-warning">won't be checked for inconsistencies.</span>
+							<a href="artifacts.html">Manage artifacts</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-md-8">
 					<div class="panel panel-default" id="loader">
 						<div class="panel-body">
@@ -113,16 +129,18 @@
 							</div>
 							<div class="form-group">
 								<label for="input-description">Message</label>
-								<textarea class="form-control" rows="2" id="input-description" placeholder="While ?x has property p, it has not property q." aria-describedby="input-description-help"></textarea>
+								<textarea class="form-control" rows="2" id="input-description" placeholder="While ?x has property p, it has not property q."
+								aria-describedby="input-description-help"></textarea>
 								<span id="input-description-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
 							</div>
 							<div class="form-group">
 								<label for="input-prefixes">Prefixes</label>
-								<textarea class="form-control" rows="5" id="input-prefixes">@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
-@prefix owl: <http://www.w3.org/2002/07/owl#>.
-@prefix kernel: <http://xowl.org/platform/schemas/kernel#>.</textarea>
+								<textarea class="form-control" rows="5" id="input-prefixes">@prefix rdf:
+									<http://www.w3.org/1999/02/22-rdf-syntax-ns#>. @prefix rdfs:
+										<http://www.w3.org/2000/01/rdf-schema#>. @prefix xsd:
+											<http://www.w3.org/2001/XMLSchema#>. @prefix owl:
+												<http://www.w3.org/2002/07/owl#>. @prefix kernel:
+													<http://xowl.org/platform/schemas/kernel#>.</textarea>
 							</div>
 							<div class="form-group">
 								<label for="input-antecedents">Conditions</label>

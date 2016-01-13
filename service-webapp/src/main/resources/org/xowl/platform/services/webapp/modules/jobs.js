@@ -11,7 +11,7 @@ function init() {
 			renderCompleted(content.completed);
 			document.getElementById("loader").style.display = "none";
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	});
 }

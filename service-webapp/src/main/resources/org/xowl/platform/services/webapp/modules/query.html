@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>xOWL: Query</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="stylesheet" type="text/css" href="../app.css">
+  <link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+</head>
+
+<body>
+  <div class="header">
+    <span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+    <div style="display: inline-block; margin-left: 50px;">
+      <span style="display: inline-block;">
+        <strong>Query</strong>
+      </span>
+    </div>
+    <hr style="margin-top: 5px; margin-bottom: 5px;" />
+  </div>
+  <div class="body">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-warning">
+            <div class="panel-body">
+              <span class="text-warning">SPARQL queries are resolved against</span>
+              <img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+              <strong class="text-warning">live</strong>
+              <span class="text-warning">. Data in artifacts not pushed to</span>
+              <img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+              <strong class="text-warning">live</strong>
+              <span class="text-warning">won't appear here.</span>
+              <a href="artifacts.html">Manage artifacts</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-10">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              SPARQL Query
+            </div>
+            <div class="panel-body">
+              <form>
+                <div class="form-group">
+                  <textarea class="form-control" rows="15" id="sparql"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" ng-click="onExecute()">Execute</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              History
+            </div>
+            <div class="panel-body">
+              <div style="overflow:scroll; height:300px; margin-bottom: 10px;">
+                <table class="table" id="history">
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default" id="loader">
+            <div class="panel-body">
+              <img src="../assets/xowl.gif" width="32" height="32" />
+              <span id="loader-text">Loading ...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <table class="table table-bordered table-hover">
+                <thead id="result-heads">
+                </thead>
+                <tbody id="result-data">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="../xowl-platform-api.js"></script>
+  <script src="../xowl-platform-ui.js"></script>
+  <script src="query.js"></script>
+  <script>
+    init();
+  </script>
+</body>
+
+</html>

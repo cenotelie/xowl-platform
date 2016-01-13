@@ -18,21 +18,21 @@ function init() {
 		if (status == 200) {
 			renderMetadataLeft(content);
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_LEFT);
 	xowl.getArtifactMetadata(function (status, ct, content) {
 		if (status == 200) {
 			renderMetadataRight(content);
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_RIGHT);
 	xowl.diffArtifacts(function (status, ct, content) {
 		if (status == 200) {
 			renderDiff(content.left, content.right);
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_LEFT, ARTIFACTID_RIGHT);
 }

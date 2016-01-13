@@ -7,6 +7,13 @@ var DEFAULT_URI_MAPPINGS = [
     ["xsd", "http://www.w3.org/2001/XMLSchema#"],
     ["owl", "http://www.w3.org/2002/07/owl#"]];
 
+var MSG_ERROR_BAD_REQUEST = "Oops, wrong request.";
+var MSG_ERROR_UNAUTHORIZED = "You must be logged in to perform this operation.";
+var MSG_ERROR_FORBIDDEN = "You are not authorized to perform this operation.";
+var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
+var MSG_ERROR_INTERNAL_ERROR = "Something wrong happened ...";
+var MSG_ERROR_CONNECTION = "Error while accessing the server!";
+
 function getShortURI(value) {
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
 		if (value.indexOf(DEFAULT_URI_MAPPINGS[i][1]) === 0) {
@@ -104,14 +111,39 @@ function rdfToDom(value) {
     }
 }
 
-function displayError(text) {
-	displayMessage("FAILURE: " + text);
-}
-
 function displayMessage(text) {
+	var parts = text.split("\n");
 	var span = document.getElementById("loader-text");
 	while (span.hasChildNodes())
 		span.removeChild(span.lastChild);
-	span.appendChild(document.createTextNode(text));
+	if (parts.length > 0) {
+		span.appendChild(document.createTextNode(parts[0]));
+		for (var i = 1; i != parts.length; i++) {
+			span.appendChild(document.createElement("br"));
+			span.appendChild(document.createTextNode(parts[i]));
+		}
+	}
 	document.getElementById("loader").style.display = "";
+}
+
+function getErrorFor(code, content) {
+	if (content != null) {
+		if (content == '' || (typeof content) == 'undefined')
+			content = null;
+	}
+	switch (code) {
+		case 400:
+			return (MSG_ERROR_BAD_REQUEST + (content !== null ? "\n" + content : ""));
+		case 401:
+			return (MSG_ERROR_UNAUTHORIZED + (content !== null ? "\n" + content : ""));
+		case 403:
+			return (MSG_ERROR_FORBIDDEN + (content !== null ? "\n" + content : ""));
+		case 404:
+			return (MSG_ERROR_NOT_FOUND + (content !== null ? "\n" + content : ""));
+		case 500:
+		case 502:
+			return (MSG_ERROR_INTERNAL_ERROR + (content !== null ? "\n" + content : ""));
+		default:
+			return (MSG_ERROR_CONNECTION + (content !== null ? "\n" + content : ""));
+	}
 }

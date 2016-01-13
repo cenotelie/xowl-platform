@@ -15,7 +15,7 @@ var GRAPH = new GraphCanvas(GRAPH_WIDTH, GRAPH_HEIGHT, document.getElementById("
 function init() {
 	var rootId = getParameterByName("id")
 	if (typeof (rootId) === "undefined" || rootId === null || rootId === "") {
-		displayError("Undefined root entity!");
+		displayMessage("Undefined root entity!");
 		return;
 	}
 	ensureExpanded(rootId);
@@ -56,7 +56,7 @@ function ensureData(identifier, continuation) {
 			document.getElementById("loader").style.display = "none";
 		} else {
 			REQUESTED.splice(REQUESTED.indexOf(entity.id), 1);
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 	}, "DESCRIBE <" + identifier + ">");
 }
@@ -106,7 +106,7 @@ function doExpand(entity) {
 			}
 			document.getElementById("loader").style.display = "none";
 		} else {
-			displayError(content);
+			displayMessage(getErrorFor(status, content));
 		}
 		doLayout(nodeOrigin, newNodes);
 		EXPANDED.push(entity.id);

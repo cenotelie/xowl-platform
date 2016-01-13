@@ -172,7 +172,9 @@ function renderArtifacts() {
 		button.style.cursor = "pointer";
 		button.style.marginLeft = "10px";
 		cells[0].appendChild(button);
-		button.onclick = function () { onClickShowMore(group, button, rows, topRow, childRows) };
+		(function (group, button, rows, parentRow, childRows) {
+			button.onclick = function () { onClickShowMore(group, button, rows, topRow, childRows) };
+		})(group, button, rows, topRow, childRows);
 		cells[0].appendChild(document.createTextNode((i + 1).toString()));
 		cells[1].appendChild(document.createTextNode(group.name));
 		cells[2].appendChild(document.createTextNode(group.version));

@@ -109,6 +109,7 @@ function renderDiff(left, right) {
 		var entity = ARTIFACT_RIGHT[namesRight[p]];
 		var secondary = (ARTIFACT_LEFT.hasOwnProperty(namesRight[p]) ? ARTIFACT_LEFT[namesRight[p]] : null);
 		var done = [];
+		var emitHeader = true;
 		for (var i = 0; i != entity.properties.length; i++) {
 			var property = entity.properties[i];
 			if (done.indexOf(property.id) >= 0)
@@ -125,8 +126,14 @@ function renderDiff(left, right) {
 					continue;
 			}
 			for (var j = i; j != entity.properties.length; j++) {
-				if (entity.properties[j].id === property.id)
+				if (entity.properties[j].id === property.id) {
+					if (emitHeader) {
+						table.appendChild(renderGetRowPad());
+						table.appendChild(renderGetRowHeader(namesRight[p]));
+						emitHeader = false;
+					}
 					table.appendChild(renderGetRowDiff("plus", property.id, entity.properties[j].value));
+				}
 			}
 			done.push(property.id);
 		}

@@ -23,6 +23,7 @@ function GraphCanvas(width, height, svg) {
 	this.usePhysics = true;
 	this.remaningEnergy = 0;
 	this.physicsTimeoutId = 0;
+	this.physicsNodes = [];
 	var canvasThis = this;
 
 	this.domSVG.onmousedown = function (evt) {
@@ -47,8 +48,39 @@ function GraphCanvas(width, height, svg) {
 			canvasThis.selectedNode.downX = evt.clientX;
 			canvasThis.selectedNode.downY = evt.clientY;
 			canvasThis.selectedNode.moveTo(targetX, targetY);
-			if (canvasThis.physicsTimeoutId === 0 && canvasThis.usePhysics)
-				simulatePhysics(canvasThis);
+			canvasThis.selectedNode.pinned = true;
+			if (canvasThis.usePhysics) {
+				if (canvasThis.physicsNodes.indexOf(canvasThis.selectedNode) < 0) {
+					canvasThis.physicsNodes.push(canvasThis.selectedNode);
+					var i = canvasThis.physicsNodes.length - 1;
+					while (i < canvasThis.physicsNodes.length) {
+						for (var j = 0; j != canvasThis.physicsNodes[i].outgoings.length; j++) {
+							var connector = canvasThis.physicsNodes[i].outgoings[j];
+							if (!connector.visible)
+								continue;
+							var target = connector.target;
+							if (canvasThis.physicsNodes.indexOf(target) < 0) {
+								target.pinned = false;
+								canvasThis.physicsNodes.push(target);
+							}
+						}
+						for (var j = 0; j != canvasThis.physicsNodes[i].incomings.length; j++) {
+							var connector = canvasThis.physicsNodes[i].incomings[j];
+							if (!connector.visible)
+								continue;
+							var target = connector.origin;
+							if (canvasThis.physicsNodes.indexOf(target) < 0) {
+								target.pinned = false;
+								canvasThis.physicsNodes.push(target);
+							}
+						}
+						i++;
+					}
+				}
+				if (canvasThis.physicsTimeoutId === 0) {
+					simulatePhysics(canvasThis);
+				}
+			}
 		} else if (canvasThis.isCanvasSelected) {
 			var targetX = canvasThis.canvasStartX - (evt.clientX - canvasThis.canvasDownX);
 			var targetY = canvasThis.canvasStartY - (evt.clientY - canvasThis.canvasDownY);
@@ -99,43 +131,47 @@ var SPRING_K = 5;
 
 function simulatePhysics(canvas) {
 	canvas.remaningEnergy = 0;
-	for (var i = 0; i != canvas.nodes.length; i++) {
-		if (canvas.nodes[i] === canvas.selectedNode)
+	for (var i = 0; i != canvas.physicsNodes.length; i++) {
+		var node = canvas.physicsNodes[i];
+		if (node.pinned)
 			continue;
-		canvas.nodes[i].ax = 0;
-		canvas.nodes[i].ay = 0;
-		for (var j = 0; j != canvas.nodes[i].outgoings.length; j++) {
-			if (!canvas.nodes[i].outgoings[j].visible)
+		node.ax = 0;
+		node.ay = 0;
+		for (var j = 0; j != node.outgoings.length; j++) {
+			var connector = node.outgoings[j];
+			if (!connector.visible)
 				continue;
-			var f = getForce(canvas.nodes[i], canvas.nodes[i].outgoings[j].target);
-			canvas.nodes[i].ax += f.x;
-			canvas.nodes[i].ay += f.y;
+			var f = getForce(node, connector.target);
+			node.ax += f.x;
+			node.ay += f.y;
 		}
-		for (var j = 0; j != canvas.nodes[i].incomings.length; j++) {
-			if (!canvas.nodes[i].incomings[j].visible)
+		for (var j = 0; j != node.incomings.length; j++) {
+			var connector = node.incomings[j];
+			if (!connector.visible)
 				continue;
-			var f = getForce(canvas.nodes[i], canvas.nodes[i].incomings[j].origin);
-			canvas.nodes[i].ax += f.x;
-			canvas.nodes[i].ay += f.y;
+			var f = getForce(node, connector.origin);
+			node.ax += f.x;
+			node.ay += f.y;
 		}
-		canvas.nodes[i].ax -= canvas.nodes[i].vx * PHYSICS_FRICTION;
-		canvas.nodes[i].ay -= canvas.nodes[i].vy * PHYSICS_FRICTION;
+		node.ax -= node.vx * PHYSICS_FRICTION;
+		node.ay -= node.vy * PHYSICS_FRICTION;
 	}
-	for (var i = 0; i != canvas.nodes.length; i++) {
-		if (canvas.nodes[i] === canvas.selectedNode)
+	for (var i = 0; i != canvas.physicsNodes.length; i++) {
+		var node = canvas.physicsNodes[i];
+		if (node.pinned)
 			continue;
-		var a = canvas.nodes[i].ax * canvas.nodes[i].ax + canvas.nodes[i].ay * canvas.nodes[i].ay;
+		var a = node.ax * node.ax + node.ay * node.ay;
 		if (a <= 5) {
-			canvas.nodes[i].ax = 0;
-			canvas.nodes[i].ay = 0;
+			node.ax = 0;
+			node.ay = 0;
 			a = 0;
 		}
-		canvas.nodes[i].vx += canvas.nodes[i].ax * PHYSICS_DT;
-		canvas.nodes[i].vy += canvas.nodes[i].ay * PHYSICS_DT;
-		var v = canvas.nodes[i].vx * canvas.nodes[i].vx + canvas.nodes[i].vy * canvas.nodes[i].vy;
-		canvas.nodes[i].moveTo(
-			canvas.nodes[i].currentX + canvas.nodes[i].vx * PHYSICS_DT,
-			canvas.nodes[i].currentY + canvas.nodes[i].vy * PHYSICS_DT);
+		node.vx += node.ax * PHYSICS_DT;
+		node.vy += node.ay * PHYSICS_DT;
+		var v = node.vx * node.vx + node.vy * node.vy;
+		node.moveTo(
+			node.currentX + node.vx * PHYSICS_DT,
+			node.currentY + node.vy * PHYSICS_DT);
 		canvas.remaningEnergy += v;
 	}
 	if (canvas.remaningEnergy > 0 && canvas.usePhysics) {
@@ -144,11 +180,13 @@ function simulatePhysics(canvas) {
 		}, 1000 * PHYSICS_DT);
 	} else {
 		canvas.physicsTimeoutId = 0;
+		canvas.physicsNodes = [];
 		for (var i = 0; i != canvas.nodes.length; i++) {
-			canvas.nodes[i].ax = 0;
-			canvas.nodes[i].ay = 0;
-			canvas.nodes[i].vx = 0;
-			canvas.nodes[i].vy = 0;
+			node.ax = 0;
+			node.ay = 0;
+			node.vx = 0;
+			node.vy = 0;
+			node.pinned = true;
 		}
 	}
 }
@@ -210,6 +248,7 @@ function GraphNode(x, y, text) {
 	this.ay = 0;
 	this.vx = 0;
 	this.vy = 0;
+	this.pinned = false;
 	var node = this;
 	this.dom.onmousedown = function (evt) {
 		node.isDown = true;

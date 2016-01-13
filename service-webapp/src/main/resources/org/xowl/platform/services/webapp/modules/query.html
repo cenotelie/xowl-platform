@@ -54,7 +54,7 @@
                 <div class="form-group">
                   <textarea class="form-control" rows="15" id="sparql"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" ng-click="onExecute()">Execute</button>
+                <a class="btn btn-primary" onclick="onExecute()">Execute</a>
               </form>
             </div>
           </div>
@@ -75,7 +75,7 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="panel panel-default" id="loader">
+          <div class="panel panel-default" id="loader" style="display:none;">
             <div class="panel-body">
               <img src="../assets/xowl.gif" width="32" height="32" />
               <span id="loader-text">Loading ...</span>
@@ -101,6 +101,7 @@
   </div>
   </div>
   <script src="../xowl-platform-api.js"></script>
+  <script src="../xowl-platform-quads.js"></script>
   <script src="../xowl-platform-ui.js"></script>
   <script src="query.js"></script>
   <script>

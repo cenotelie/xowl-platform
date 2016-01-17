@@ -136,7 +136,9 @@ function renderConnectors() {
 			var link = document.createElement("a");
 			link.href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
+			link.appendChild(document.createTextNode(" "));
 			link.appendChild(document.createTextNode(CONNECTORS[i].name));
+			link.appendChild(document.createTextNode(" "));
 			link.appendChild(badge);
 			cell1.appendChild(link);
 			var button = document.createElement("button");

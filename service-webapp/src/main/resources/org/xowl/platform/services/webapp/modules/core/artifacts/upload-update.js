@@ -25,7 +25,7 @@ function renderArtifacts() {
 	for (var i = 0; i != ARTIFACTS_ALL.length; i++) {
 		var artifact = ARTIFACTS_ALL[i];
 		if (artifact.hasOwnProperty("base") && artifact.base != "") {
-			if (ARTIFACTS.hasOwnProperty(artifact.identifier)) {
+			if (ARTIFACTS.hasOwnProperty(artifact.base)) {
 				ARTIFACTS[artifact.base].push(artifact);
 			} else {
 				ARTIFACTS[artifact.base] = [artifact];
@@ -35,7 +35,7 @@ function renderArtifacts() {
 	var select = document.getElementById("input-artifact");
 	var names = Object.getOwnPropertyNames(ARTIFACTS);
 	for (var i = 0; i != names.length; i++) {
-		var elements = ARTIFACTS[name[i]];
+		var elements = ARTIFACTS[names[i]];
 		elements.sort(function (x, y) {
 			return y.version.localeCompare(x.version);
 		});

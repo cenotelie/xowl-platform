@@ -122,6 +122,20 @@ class ParametricDomainConnector extends BaseDomainConnector {
      */
     private IOUtils.HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
         String[] names = parameters.get("name");
+        String[] bases = parameters.get("base");
+        String[] versions = parameters.get("version");
+        if (names == null || names.length <= 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected name parameter");
+        if (bases == null || bases.length <= 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected base parameter");
+        if (versions == null || versions.length <= 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected version parameter");
+        if (contentType == null || contentType.isEmpty())
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected content type");
+        int index = contentType.indexOf(";");
+        if (index != -1)
+            contentType = contentType.substring(0, index);
+        contentType = contentType.trim();
         Loader loader = null;
         switch (contentType) {
             case AbstractRepository.SYNTAX_NTRIPLES:
@@ -153,7 +167,7 @@ class ParametricDomainConnector extends BaseDomainConnector {
         BufferedLogger logger = new BufferedLogger();
         String contentString = new String(content, Utils.DEFAULT_CHARSET);
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
-        RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, null);
+        RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, resource);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
@@ -163,8 +177,9 @@ class ParametricDomainConnector extends BaseDomainConnector {
         IRINode registry = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
         List<Quad> metadata = new ArrayList<>();
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(Vocabulary.rdfType), nodeManager.getIRINode(KernelSchema.ARTIFACT)));
-        if (names != null && names.length >= 1)
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(names[0], Vocabulary.xsdString, null)));
+        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(names[0], Vocabulary.xsdString, null)));
+        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.BASE), nodeManager.getIRINode(bases[0])));
+        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(versions[0], Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(identifier, Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>xOWL: Upload - New Artifact</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/web/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+  <div class="header">
+    <span style="margin-left: 5px; display: inline-block;">
+      <img class="img-responsive" src="/web/assets/xowl.svg" width="25px" style="display: inline-block;"/>
+      xOWL Federation Platform
+    </span>
+    <div style="display: inline-block; margin-left: 50px;">
+      <span style="display: inline-block;">
+        <ol class="breadcrumb">
+          <li><a href="/web/">Home</a></li>
+          <li><a href="/web/modules/core/">Core</a></li>
+          <li><a href="/web/modules/core/artifacts/">Artifacts</a></li>
+          <li class="active">Upload (New Artifact)</li>
+        </ol>
+      </span>
+    </div>
+    <hr style="margin-top: 5px; margin-bottom: 5px;" />
+  </div>
+  <div class="body">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="input-connector">Connector identifier:</label>
+          <input type="text" class="form-control" id="input-connector" readonly>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="input-name">Name:</label>
+          <input type="text" class="form-control" id="input-name" placeholder="My Artifact" onchange="onInput()">
+        </div>
+        <div class="form-group">
+          <label for="input-base">Base URI:</label>
+          <input type="url" class="form-control" id="input-base" placeholder="http://xowl.org/platform/artifacts/base/xxxx" onchange="onInput()">
+        </div>
+        <div class="form-group">
+          <label for="input-init-version">Initial version:</label>
+          <input type="text" class="form-control" id="input-init-version" placeholder="v1" onchange="onInput()">
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default" id="panel-next">
+      <div class="panel-body">
+        <div><a id="btn-file" class="btn">Import from file</a></div>
+        <div><a id="btn-content" class="btn">Import from raw text</a></div>
+      </div>
+    </div>
+  </div>
+  <script src="/web/xowl/xowl-utils.js"></script>
+  <script src="upload-new.js"></script>
+  <script>
+    init();
+  </script>
+</body>
+
+</html>

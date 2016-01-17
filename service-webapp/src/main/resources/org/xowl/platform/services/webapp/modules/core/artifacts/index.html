@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>xOWL: Artifacts</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/web/favicon.png" />
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+	<div class="header">
+		<span style="margin-left: 5px; display: inline-block;">
+			<img class="img-responsive" src="/web/assets/xowl.svg" width="25px" style="display: inline-block;"/>
+			xOWL Federation Platform
+		</span>
+		<div style="display: inline-block; margin-left: 50px;">
+			<span style="display: inline-block;">
+				<ol class="breadcrumb">
+					<li><a href="/web/">Home</a></li>
+					<li><a href="/web/modules/core/">Core</a></li>
+					<li class="active">Artifacts</li>
+				</ol>
+			</span>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom: 5px;" />
+	</div>
+	<div class="body">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-8">
+					<div class="panel panel-default" id="loader">
+						<div class="panel-body">
+							<img src="/web/assets/xowl.gif" width="32" height="32" />
+							<span id="loader-text">Loading ...</span>
+						</div>
+					</div>
+					<div>
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Name</th>
+									<th>Latest version</th>
+									<th>Live</th>
+								</tr>
+							</thead>
+							<tbody id="artifacts">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Incoming artifacts
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered table-hover">
+								<thead>
+									<tr>
+										<th>Connector</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody id="connectors">
+								</tbody>
+							</table>
+							<div><a href="/web/modules/core/connectors/">See all connectors</a></div>
+							<div><a href="/web/modules/core/artifacts/upload.html">Manually upload artifact</a></div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							Artifact diff
+						</div>
+						<div class="panel-body">
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label for="diff-left" class="col-sm-2 control-label">Left:</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" id="diff-left" readonly>
+									</div>
+									<div class="col-sm-2">
+										<a class="btn btn-default" onclick="onClickDiffClearLeft()">Clear</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="diff-right" class="col-sm-2 control-label">Right:</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" id="diff-right" readonly>
+									</div>
+									<div class="col-sm-2">
+										<a class="btn btn-default" onclick="onClickDiffClearRight()">Clear</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-2">
+										<a class="btn" id="diff-target">Go!</a>
+									</div>
+									<div class="col-sm-8">
+										<a class="btn btn-default" onclick="onClickDiffInverse()">Inverse left/right</a>
+									</div>
+									<div class="col-sm-2"></div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/web/xowl/xowl-api-platform.js"></script>
+	<script src="/web/xowl/xowl-ui.js"></script>
+	<script src="index.js"></script>
+	<script>
+		init();
+	</script>
+</body>
+
+</html>

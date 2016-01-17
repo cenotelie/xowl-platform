@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="utf-8">
-  <title>xOWL Platform</title>
+  <title>xOWL: Home</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="stylesheet" type="text/css" href="app.css">
   <link rel="stylesheet" type="text/css" href="vendors/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="vendors/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="app.css">
 </head>
 
 <body>
@@ -20,7 +20,9 @@
     </span>
     <div style="display: inline-block; margin-left: 50px;">
       <span style="display: inline-block;">
-        <strong>Management</strong>
+        <ol class="breadcrumb">
+          <li class="active">Home</li>
+        </ol>
       </span>
     </div>
     <hr style="margin-top: 5px; margin-bottom: 5px;" />
@@ -55,27 +57,27 @@
                       <div style="margin: 5px; text-align: center;">a => !a</div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><img src="assets/db.svg" width="50" height="75" /></div>
+                      <div style="margin: 5px; text-align: center;"><img src="/web/assets/db.svg" width="50" height="75" /></div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><img src="assets/db.svg" width="50" height="75" /></div>
+                      <div style="margin: 5px; text-align: center;"><img src="/web/assets/db.svg" width="50" height="75" /></div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><img src="assets/activity.svg" width="50" height="50" /></div>
+                      <div style="margin: 5px; text-align: center;"><img src="/web/assets/activity.svg" width="50" height="50" /></div>
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><a href="modules/consistency.html">Inconsistencies: <span class="badge">0</span></a></div>
+                      <div style="margin: 5px; text-align: center;"><a href="/web/modules/core/consistency/">Inconsistencies: <span class="badge">0</span></a></div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><a href="modules/artifacts.html">Artifacts: <span class="badge">20</span></a></div>
+                      <div style="margin: 5px; text-align: center;"><a href="/web/modules/core/artifacts/">Artifacts: <span class="badge">20</span></a></div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><a href="modules/artifacts.html">Artifacts: <span class="badge">150</span></a></div>
+                      <div style="margin: 5px; text-align: center;"><a href="/web/modules/core/artifacts/">Artifacts: <span class="badge">150</span></a></div>
                     </td>
                     <td>
-                      <div style="margin: 5px; text-align: center;"><a href="modules/workflow.html">Current activity</a></div>
+                      <div style="margin: 5px; text-align: center;"><a href="/web/modules/workflow/">Current activity</a></div>
                     </td>
                   </tr>
                 </table>
@@ -88,10 +90,10 @@
             </div>
             <div class="panel-body">
               <ul>
-                <li><a href="modules/query.html">Query</a></li>
-                <li><a href="modules/impact.html">Impact analysis</a></li>
-                <li><a href="modules/consistency.html">Global consistency</a></li>
-                <li><a href="modules/workflow.html">Workflow</a></li>
+                <li><a href="/web/modules/core/discovery/query.html">Query</a></li>
+                <li><a href="/web/modules/core/consistency/">Global consistency</a></li>
+                <li><a href="/web/modules/analyses/impact/">Impact analysis</a></li>
+                <li><a href="/web/modules/workflow/">Workflow</a></li>
               </ul>
             </div>
           </div>
@@ -103,10 +105,9 @@
             </div>
             <div class="panel-body">
               <ul>
-                <li><a href="modules/connectors.html">Manage connectors</a></li>
-                <li><a href="modules/artifacts.html">Manage artifacts</a></li>
-                <li><a href="modules/upload.html">Manually upload artifact</a></li>
-                <li><a href="modules/jobs.html">Manage platform jobs</a></li>
+                <li><a href="/web/modules/core/connectors/">Manage connectors</a></li>
+                <li><a href="/web/modules/core/artifacts/">Manage artifacts</a></li>
+                <li><a href="/web/modules/core/jobs/">Manage platform jobs</a></li>
               </ul>
             </div>
           </div>

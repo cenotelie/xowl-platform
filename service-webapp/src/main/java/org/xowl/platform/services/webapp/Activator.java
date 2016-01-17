@@ -57,7 +57,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(URI_WEB, "/org/xowl/platform/services/webapp", null);
+                    httpService.registerResources(URI_WEB, "/org/xowl/platform/services/webapp", new HttpDefaultContext(httpService));
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

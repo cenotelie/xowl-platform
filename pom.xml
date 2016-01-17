@@ -43,6 +43,7 @@
 		<module>service-workflow</module>
 		<module>service-httpapi</module>
 		<module>service-webapp</module>
+		<module>satellite-activiti</module>
 	</modules>
 	<build>
 		<plugins>

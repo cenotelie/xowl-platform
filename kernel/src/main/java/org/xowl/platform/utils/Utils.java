@@ -32,6 +32,8 @@ import org.xowl.utils.logging.Logger;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -86,13 +88,21 @@ public class Utils {
      */
     public static String encode(String input) {
         byte[] bytes = input.getBytes(Charset.forName("UTF-8"));
-        char[] chars = new char[bytes.length * 2];
-        int j = 0;
-        for (int i = 0; i != bytes.length; i++) {
-            chars[j++] = HEX[(bytes[i] & 0xF0) >>> 4];
-            chars[j++] = HEX[bytes[i] & 0x0F];
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+            bytes = md.digest(bytes);
+            char[] chars = new char[bytes.length * 2];
+            int j = 0;
+            for (int i = 0; i != bytes.length; i++) {
+                chars[j++] = HEX[(bytes[i] & 0xF0) >>> 4];
+                chars[j++] = HEX[bytes[i] & 0x0F];
+            }
+            return new String(chars);
+        } catch(NoSuchAlgorithmException exception) {
+            Logger.DEFAULT.error(exception);
+            return null;
         }
-        return new String(chars);
     }
 
     /**

@@ -60,6 +60,11 @@ class BasicRemoteXOWLStore extends RemoteXOWLStore {
     }
 
     @Override
+    protected String getDBName() {
+        return configName;
+    }
+
+    @Override
     protected HTTPConnection getConnection() {
         if (connection == null) {
             ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);

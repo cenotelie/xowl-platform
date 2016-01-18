@@ -55,6 +55,13 @@ abstract class RemoteXOWLStore implements TripleStore {
      */
     protected abstract HTTPConnection getConnection();
 
+    /**
+     * Gets the database name for this store
+     *
+     * @return The database name
+     */
+    protected abstract String getDBName();
+
     @Override
     public Result sparql(String query) {
         HTTPConnection connection = getConnection();
@@ -68,7 +75,7 @@ abstract class RemoteXOWLStore implements TripleStore {
         HTTPConnection connection = getConnection();
         if (connection == null)
             return new XSPReplyNetworkError("The connection to the remote host is not configured");
-        return connection.xsp(command);
+        return connection.xsp("DATABASE " + getDBName() + " " + command);
     }
 
     @Override

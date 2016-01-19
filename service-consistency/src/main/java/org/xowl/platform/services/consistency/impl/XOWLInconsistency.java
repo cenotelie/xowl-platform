@@ -23,6 +23,7 @@ package org.xowl.platform.services.consistency.impl;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.Inconsistency;
 import org.xowl.store.IOUtils;
+import org.xowl.store.rdf.LiteralNode;
 import org.xowl.store.rdf.Node;
 
 import java.util.Map;
@@ -60,7 +61,7 @@ class XOWLInconsistency implements Inconsistency {
      */
     public XOWLInconsistency(String iri, String message, ConsistencyRule rule, Map<String, Node> antecedents) {
         this.iri = iri;
-        this.message = message;
+        this.message = interpolate(message, antecedents);
         this.rule = rule;
         this.antecedents = antecedents;
     }
@@ -104,5 +105,41 @@ class XOWLInconsistency implements Inconsistency {
                 "\", \"rule\": \"" +
                 IOUtils.escapeStringJSON(rule.getIdentifier()) +
                 "}";
+    }
+
+    /**
+     * Builds the interpolated message string
+     *
+     * @param origin      The original message
+     * @param antecedents The mapped values
+     * @return The interpolated string
+     */
+    private static String interpolate(String origin, Map<String, Node> antecedents) {
+        if (!origin.contains("?"))
+            return origin;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i != origin.length(); i++) {
+            if (origin.charAt(i) == '?') {
+                int j = i + 1;
+                while (j < origin.length() && Character.isLetterOrDigit(origin.charAt(j)))
+                    j++;
+                if (j == i + 1)
+                    continue;
+                String name = origin.substring(i + 1, j);
+                Node value = antecedents.get(name);
+                if (value == null)
+                    continue;
+                if (value.getNodeType() == Node.TYPE_IRI || value.getNodeType() == Node.TYPE_BLANK) {
+                    builder.append(value.toString());
+                    i = j - 1;
+                } else if (value.getNodeType() == Node.TYPE_LITERAL) {
+                    builder.append(((LiteralNode) value).getLexicalValue());
+                    i = j - 1;
+                }
+            } else {
+                builder.append(origin.charAt(i));
+            }
+        }
+        return builder.toString();
     }
 }

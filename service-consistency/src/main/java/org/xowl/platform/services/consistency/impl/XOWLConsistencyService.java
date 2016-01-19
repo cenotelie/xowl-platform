@@ -30,19 +30,20 @@ import org.xowl.platform.utils.Utils;
 import org.xowl.store.IOUtils;
 import org.xowl.store.IRIs;
 import org.xowl.store.Vocabulary;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.LiteralNode;
-import org.xowl.store.rdf.QuerySolution;
+import org.xowl.store.loaders.RDFLoaderResult;
+import org.xowl.store.loaders.RDFTLoader;
+import org.xowl.store.rdf.*;
 import org.xowl.store.sparql.Result;
 import org.xowl.store.sparql.ResultFailure;
+import org.xowl.store.sparql.ResultQuads;
 import org.xowl.store.sparql.ResultSolutions;
+import org.xowl.store.storage.cache.CachedNodes;
 import org.xowl.store.xsp.*;
+import org.xowl.utils.logging.BufferedLogger;
 
+import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements a consistency service for the xOWL platform
@@ -62,25 +63,33 @@ public class XOWLConsistencyService implements ConsistencyService {
      */
     private static final String IRI_RULE_METADATA = "http://xowl.org/platform/consistency/metadata";
     /**
+     * IRI of the schema for inconsistencies
+     */
+    private static final String IRI_SCHEMA = "http://xowl.org/platform/schemas/consistency";
+    /**
      * The URI for the concept of rule
      */
-    private static final String IRI_RULE = "http://xowl.org/platform/schemas/consistency#Rule";
+    private static final String IRI_RULE = IRI_SCHEMA + "#Rule";
     /**
      * The URI for the concept of inconsistency
      */
-    private static final String IRI_INCONSISTENCY = "http://xowl.org/platform/schemas/consistency#Inconsistency";
+    private static final String IRI_INCONSISTENCY = IRI_SCHEMA + "##Inconsistency";
     /**
      * The URI for the concept of definition
      */
-    private static final String IRI_DEFINITION = "http://xowl.org/platform/schemas/consistency#definition";
+    private static final String IRI_DEFINITION = IRI_SCHEMA + "##definition";
     /**
      * The URI for the concept of message
      */
-    private static final String IRI_MESSAGE = "http://xowl.org/platform/schemas/consistency#message";
+    private static final String IRI_MESSAGE = IRI_SCHEMA + "##message";
+    /**
+     * The URI for the concept of antecedent
+     */
+    private static final String IRI_ANTECEDENT = IRI_SCHEMA + "/antecedent#";
     /**
      * The base URI for a consistency rule
      */
-    private static final String IRI_RULE_BASE = "http://xowl.org/platform/consistency/rule";
+    private static final String IRI_RULE_BASE = IRI_SCHEMA + "/rule";
 
     /**
      * The timeout for cache invalidation, in nano-seconds
@@ -195,26 +204,32 @@ public class XOWLConsistencyService implements ConsistencyService {
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        Result result = live.sparql("SELECT DISTINCT ?i ?r ?m WHERE { GRAPH <" +
+        Result result = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
                 IOUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
-                "> . ?i <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_MESSAGE) +
-                "> ?m . ?i <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
-                "> ?r } }");
+                "> } }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
-        ResultSolutions solutions = (ResultSolutions) result;
-        inconsistencies.clear();
-        for (QuerySolution solution : solutions.getSolutions()) {
-            String inconsistencyId = ((IRINode) solution.get("i")).getIRIValue();
-            String inconsistencyRuleId = ((LiteralNode) solution.get("r")).getLexicalValue();
-            String inconsistencyMessage = ((LiteralNode) solution.get("m")).getLexicalValue();
-            XSPReply reply = getRule(inconsistencyId);
+        Collection<Quad> quads = ((ResultQuads) result).getQuads();
+        Map<SubjectNode, Collection<Quad>> map = Utils.mapBySubject(quads);
+        for (Map.Entry<SubjectNode, Collection<Quad>> entry : map.entrySet()) {
+            String ruleId = null;
+            String msg = null;
+            Map<String, Node> antecedents = new HashMap<>();
+            for (Quad quad : entry.getValue()) {
+                if (IRI_DEFINITION.equals(((IRINode) quad.getProperty()).getIRIValue())) {
+                    ruleId = ((IRINode) quad.getObject()).getIRIValue();
+                } else if (IRI_MESSAGE.equals(((IRINode) quad.getProperty()).getIRIValue())) {
+                    msg = ((LiteralNode) quad.getObject()).getLexicalValue();
+                } else if (((IRINode) quad.getProperty()).getIRIValue().startsWith(IRI_ANTECEDENT)) {
+                    String name = ((IRINode) quad.getProperty()).getIRIValue().substring(IRI_ANTECEDENT.length());
+                    antecedents.put(name, quad.getObject());
+                }
+            }
+            XSPReply reply = getRule(ruleId);
             if (reply.isSuccess())
-                inconsistencies.add(new XOWLInconsistency(inconsistencyRuleId, inconsistencyMessage, ((XSPReplyResult<XOWLConsistencyRule>) reply).getData(), null));
+                inconsistencies.add(new XOWLInconsistency(IRI_SCHEMA + "/inconsistency#" + UUID.randomUUID().toString(), msg, ((XSPReplyResult<XOWLConsistencyRule>) reply).getData(), antecedents));
         }
         inconsistenciesTimestamp = System.nanoTime();
         return new XSPReplyResultCollection<>(inconsistencies);
@@ -280,11 +295,46 @@ public class XOWLConsistencyService implements ConsistencyService {
     @Override
     public XSPReply createRule(String name, String message, String prefixes, String conditions) {
         String id = IRI_RULE_BASE + "#" + Utils.encode(name);
-        String definition = prefixes + " rule <" + IOUtils.escapeAbsoluteURIW3C(id) + "> distinct {\n" + conditions + "\n} => {\n" +
-                "?e <" + IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) + ">\n" +
-                "?e <" + IOUtils.escapeAbsoluteURIW3C(IRI_MESSAGE) + "> \"" + IOUtils.escapeStringW3C(message) + "\"\n" +
-                "?e <" + IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> <" + IOUtils.escapeAbsoluteURIW3C(id) + ">\n" +
-                "}";
+        String definition = prefixes + " rule <" + IOUtils.escapeAbsoluteURIW3C(id) + "> distinct {\n" + conditions + "\n} => {}";
+        BufferedLogger logger = new BufferedLogger();
+        RDFTLoader loader = new RDFTLoader(new CachedNodes());
+        RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
+        if (!logger.getErrorMessages().isEmpty())
+            return new XSPReplyFailure(Utils.getLog(logger));
+        if (rdfResult == null || rdfResult.getRules().isEmpty())
+            return new XSPReplyFailure("Failed to load the rule");
+        Collection<String> variables = getVariablesIn(rdfResult.getRules().get(0));
+        StringBuilder builder = new StringBuilder(prefixes);
+        builder.append(" rule <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(id));
+        builder.append("> distinct {\n");
+        builder.append(conditions);
+        builder.append("\n} => {\n");
+        builder.append("?e <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType));
+        builder.append("> <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY));
+        builder.append(">\n");
+        builder.append("?e <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_MESSAGE));
+        builder.append("> \"");
+        builder.append(IOUtils.escapeStringW3C(message));
+        builder.append("\"\n");
+        builder.append("?e <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION));
+        builder.append("> <");
+        builder.append(IOUtils.escapeAbsoluteURIW3C(id));
+        builder.append(">\n");
+        for (String var : variables) {
+            builder.append("?e <");
+            builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_ANTECEDENT + var));
+            builder.append("> ?");
+            builder.append(var);
+            builder.append("\n");
+        }
+        builder.append("}");
+        definition = builder.toString();
+
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return new XSPReplyFailure("Failed to retrieve the LTS service");
@@ -362,5 +412,46 @@ public class XOWLConsistencyService implements ConsistencyService {
     @Override
     public XSPReply deleteRule(ConsistencyRule rule) {
         return deleteRule(rule.getIdentifier());
+    }
+
+    /**
+     * Gets all the variables used on the antecedents of a rule
+     *
+     * @param rule The rule
+     * @return The variables
+     */
+    private static Collection<String> getVariablesIn(Rule rule) {
+        Collection<String> result = new ArrayList<>(10);
+        for (Quad quad : rule.getAntecedentSourcePositives())
+            getVariablesIn(result, quad);
+        for (Quad quad : rule.getAntecedentMetaPositives())
+            getVariablesIn(result, quad);
+        return result;
+    }
+
+    /**
+     * Gets all the variables used in a quad
+     *
+     * @param buffer The buffer of variable names
+     * @param quad   The quad
+     */
+    private static void getVariablesIn(Collection<String> buffer, Quad quad) {
+        getVariablesIn(buffer, quad.getSubject());
+        getVariablesIn(buffer, quad.getProperty());
+        getVariablesIn(buffer, quad.getObject());
+    }
+
+    /**
+     * Gets the variable for the RDF node
+     *
+     * @param buffer The buffer of variable names
+     * @param node   The node
+     */
+    private static void getVariablesIn(Collection<String> buffer, Node node) {
+        if (node.getNodeType() == Node.TYPE_VARIABLE) {
+            String name = ((VariableNode) node).getName();
+            if (!buffer.contains(name))
+                buffer.add(name);
+        }
     }
 }

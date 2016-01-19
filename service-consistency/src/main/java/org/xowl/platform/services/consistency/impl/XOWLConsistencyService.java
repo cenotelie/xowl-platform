@@ -55,7 +55,8 @@ public class XOWLConsistencyService implements ConsistencyService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "consistency"
+            "consistency",
+            "inconsistencies"
     };
 
     /**
@@ -141,8 +142,43 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        if (uri.equals(URI_API + "/inconsistencies"))
+            return XSPReplyUtils.toHttpResponse(getInconsistencies(), Collections.singletonList(accept));
+        if (!uri.equals(URI_API + "/consistency"))
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        if ("GET".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0)
+                return XSPReplyUtils.toHttpResponse(getRules(), Collections.singletonList(accept));
+            return XSPReplyUtils.toHttpResponse(getRule(ids[0]), Collections.singletonList(accept));
+        }
+        String[] actions = parameters.get("action");
+        String[] ids = parameters.get("ids");
+        if (actions == null || actions.length == 0)
+            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        switch (actions[0]) {
+            case "create":
+                String[] names = parameters.get("name");
+                String[] messages = parameters.get("message");
+                String[] prefixes = parameters.get("prefixes");
+                String[] conditions = parameters.get("conditions");
+                if (names == null || names.length == 0 || messages == null || messages.length == 0 || prefixes == null || prefixes.length == 0 || conditions == null || conditions.length == 0)
+                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(createRule(names[0], messages[0], prefixes[0], conditions[0]), Collections.singletonList(accept));
+            case "activate":
+                if (ids == null || ids.length == 0)
+                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(activateRule(ids[0]), Collections.singletonList(accept));
+            case "deactivate":
+                if (ids == null || ids.length == 0)
+                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(deactivateRule(ids[0]), Collections.singletonList(accept));
+            case "delete":
+                if (ids == null || ids.length == 0)
+                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(deleteRule(ids[0]), Collections.singletonList(accept));
+        }
+        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override

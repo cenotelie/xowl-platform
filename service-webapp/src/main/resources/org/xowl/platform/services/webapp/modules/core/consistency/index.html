@@ -6,24 +6,26 @@
 	<title>xOWL: Consistency</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="../favicon.png" />
-	<link rel="stylesheet" type="text/css" href="../app.css">
-	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="../vendors/bootstrap-theme.min.css">
+	<link rel="icon" type="image/png" href="/web/favicon.png" />
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-	<object data="../assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
-	<object data="../assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
 	<div class="header">
 		<span style="margin-left: 5px; display: inline-block;">
-      <img class="img-responsive" src="../assets/xowl.svg" width="25px" style="display: inline-block;"/>
-      xOWL Federation Platform
-    </span>
+			<img class="img-responsive" src="/web/assets/xowl.svg" width="25px" style="display: inline-block;"/>
+			xOWL Federation Platform
+		</span>
 		<div style="display: inline-block; margin-left: 50px;">
 			<span style="display: inline-block;">
-        <strong>Global Consistency Management</strong>
-      </span>
+				<ol class="breadcrumb">
+					<li><a href="/web/">Home</a></li>
+					<li><a href="/web/modules/core/">Core</a></li>
+					<li class="active">Core</li>
+				</ol>
+			</span>
 		</div>
 		<hr style="margin-top: 5px; margin-bottom: 5px;" />
 	</div>
@@ -34,13 +36,13 @@
 					<div class="panel panel-warning">
 						<div class="panel-body">
 							<span class="text-warning">The data presented here come from</span>
-							<img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
 							<strong class="text-warning">live</strong>
 							<span class="text-warning">. Data in artifacts not pushed to</span>
-							<img src="../assets/db.svg" width="25px" style="display: inline-block;" />
+							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
 							<strong class="text-warning">live</strong>
 							<span class="text-warning">won't be checked for inconsistencies.</span>
-							<a href="artifacts.html">Manage artifacts</a>
+							<a href="/web/modules/core/artifacts/">Manage artifacts</a>
 						</div>
 					</div>
 				</div>
@@ -49,7 +51,7 @@
 				<div class="col-md-8">
 					<div class="panel panel-default" id="loader">
 						<div class="panel-body">
-							<img src="../assets/xowl.gif" width="32" height="32" />
+							<img src="/web/assets/xowl.gif" width="32" height="32" />
 							<span id="loader-text">Loading ...</span>
 						</div>
 					</div>
@@ -154,8 +156,8 @@
 		</div>
 	</div>
 	</div>
-	<script src="../xowl-platform-api.js"></script>
-	<script src="consistency.js"></script>
+	<script src="/web/xowl/xowl-api-platform.js"></script>
+	<script src="/web/xowl/xowl-ui.js"></script>
 	<script>
 		init();
 	</script>

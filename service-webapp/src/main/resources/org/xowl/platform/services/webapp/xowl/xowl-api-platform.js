@@ -182,6 +182,28 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 	}, "artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
 }
 
+XOWL.prototype.getConsistencyRules = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "consistency");
+}
+
+XOWL.prototype.getInconsistencies = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "inconsistencies");
+}
+
+
+
 XOWL.prototype.doQuery = function (callback, target) {
 	this.doJSQuery(callback, target);
 }

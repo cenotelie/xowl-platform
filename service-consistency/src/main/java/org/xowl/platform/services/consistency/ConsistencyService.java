@@ -45,6 +45,14 @@ public interface ConsistencyService extends Service, HttpAPIService {
     XSPReply getInconsistencies();
 
     /**
+     * Gets the rule for the specified identifier
+     *
+     * @param identifier The identifier of a rule
+     * @return The operation's result
+     */
+    XSPReply getRule(String identifier);
+
+    /**
      * Creates a new consistency rule
      *
      * @param name       The rule's name

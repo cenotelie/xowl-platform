@@ -2,15 +2,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.xowl.platform</groupId>
-		<artifactId>top</artifactId>
+		<artifactId>xowl-services</artifactId>
 		<version>0.1.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
-	<artifactId>xowl-service-lts</artifactId>
+	<artifactId>xowl-service-httpapi</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.1.1-SNAPSHOT</version>
-	<name>xOWL Federation - Service LTS</name>
-	<description>The LTS service</description>
+	<name>xOWL Federation - Service HTTP API</name>
+	<description>The service for serving the HTTP API of other services</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
@@ -19,9 +19,21 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-service-config</artifactId>
-			<version>0.1.1-SNAPSHOT</version>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.util.tracker</artifactId>
+			<version>1.5.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.http</artifactId>
+			<version>1.2.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
@@ -35,7 +47,7 @@
 				<configuration>
 					<excludeDependencies>*;scope=provided|runtime</excludeDependencies>
 					<instructions>
-						<Bundle-Activator>org.xowl.platform.services.lts.Activator</Bundle-Activator>
+						<Bundle-Activator>org.xowl.platform.services.httpapi.Activator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

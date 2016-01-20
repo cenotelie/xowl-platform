@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.xowl.platform</groupId>
-	<artifactId>top</artifactId>
+	<artifactId>xowl-platform</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1.1-SNAPSHOT</version>
 	<name>xOWL Federation</name>
-	<description>Infrastructure for the federation</description>
+	<description>A platform for the federation of models and data supported by semantic web technologies.</description>
 	<url>https://xowl.org/</url>
 	<licenses>
 		<license>
@@ -25,8 +25,8 @@
 		<connection>scm:hg:https://bitbucket.org/laurentw/xowl-platform</connection>
 		<developerConnection>scm:hg:ssh://hg@bitbucket.org:laurentw/xowl-platform</developerConnection>
 		<url>https://bitbucket.org/laurentw/xowl-platform</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -36,15 +36,8 @@
 	<modules>
 		<module>dependencies</module>
 		<module>kernel</module>
-		<module>service-config</module>
-		<module>service-executor</module>
-		<module>service-lts</module>
-		<module>service-consistency</module>
-		<module>service-domain</module>
-		<module>service-workflow</module>
-		<module>service-httpapi</module>
-		<module>service-webapp</module>
-		<module>satellite-activiti</module>
+		<module>services</module>
+		<module>satellites</module>
 	</modules>
 	<build>
 		<plugins>

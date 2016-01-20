@@ -27,7 +27,6 @@
 				<version>3.0.1</version>
 				<extensions>true</extensions>
 				<configuration>
-					<excludeDependencies>*;scope=provided|runtime</excludeDependencies>
 					<instructions>
 						<Bundle-Activator>org.xowl.platform.services.config.Activator</Bundle-Activator>
 					</instructions>

@@ -34,7 +34,6 @@
 		</snapshotRepository>
 	</distributionManagement>
 	<modules>
-		<module>dependencies</module>
 		<module>kernel</module>
 		<module>services</module>
 		<module>satellites</module>

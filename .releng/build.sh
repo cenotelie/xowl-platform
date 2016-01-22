@@ -8,8 +8,11 @@ ROOT="$(dirname "$RELENG")"
 VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -f "$ROOT/pom.xml" -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')
 echo "Building artifacts for version $VERSION"
 mvn package -f "$ROOT/pom.xml" -DskipTests -Dgpg.skip=true
+mvn dependency:copy-dependencies -f "$ROOT/kernel/pom.xml"
 
 # Extract the bundles
+cp "$ROOT/kernel/target/dependency/redist-"* "$RELENG/docker/"
+cp "$ROOT/kernel/target/dependency/xowl-"* "$RELENG/docker/"
 cp "$ROOT/kernel/target/xowl-kernel-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/config/target/xowl-service-config-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/consistency/target/xowl-service-consistency-$VERSION.jar" "$RELENG/docker/"
@@ -24,12 +27,4 @@ cp "$ROOT/services/workflow/target/xowl-service-workflow-$VERSION.jar" "$RELENG/
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
-rm "$RELENG/docker/xowl-kernel-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-config-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-consistency-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-domain-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-executor-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-httpapi-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-lts-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-webapp-$VERSION.jar"
-rm "$RELENG/docker/xowl-service-workflow-$VERSION.jar"
+rm "$RELENG/docker/"*.jar

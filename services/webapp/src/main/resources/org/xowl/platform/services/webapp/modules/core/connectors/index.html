@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>xOWL: Connectors</title>
+  <title>Connectors</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
@@ -17,7 +17,7 @@
   <object data="/web/assets/xowl.svg" type="image/svg+xml" id="xowlsvg" style="display: none"></object>
   <object data="/web/assets/connector.svg" type="image/svg+xml" id="connectorsvg" style="display: none"></object>
   <div class="header">
-    <object type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
+    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
     <div style="display: inline-block; margin-left: 50px;">
       <span style="display: inline-block;">
         <ol class="breadcrumb">
@@ -128,6 +128,7 @@
   <script src="/web/xowl/xowl-api-platform.js"></script>
   <script src="index.js"></script>
   <script>
+    document.getElementById("branding-title").onload = function () { document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title; };
     init();
   </script>
 </body>

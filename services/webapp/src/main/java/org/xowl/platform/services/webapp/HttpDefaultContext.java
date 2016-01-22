@@ -22,6 +22,7 @@ package org.xowl.platform.services.webapp;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.xowl.platform.kernel.ServiceUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,14 +40,32 @@ class HttpDefaultContext implements HttpContext {
      * The reference default context
      */
     private final HttpContext defaultContext;
+    /**
+     * The current branding service
+     */
+    private BrandingService brandingService;
 
     /**
      * Initialize this context
      *
-     * @param httpService The HTTP servoce
+     * @param httpService The HTTP service
      */
     public HttpDefaultContext(HttpService httpService) {
         this.defaultContext = httpService.createDefaultHttpContext();
+    }
+
+    /**
+     * Gets the branding service
+     *
+     * @return The branding service
+     */
+    private BrandingService getBrandingService() {
+        if (brandingService == null) {
+            brandingService = ServiceUtils.getService(BrandingService.class);
+            if (brandingService == null)
+                brandingService = new XOWLBrandingService();
+        }
+        return brandingService;
     }
 
     @Override
@@ -56,6 +75,10 @@ class HttpDefaultContext implements HttpContext {
 
     @Override
     public URL getResource(String name) {
+        if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + BrandingService.BRANDING)) {
+            String localName = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + BrandingService.BRANDING.length());
+            return getBrandingService().getResource(localName);
+        }
         URL result = defaultContext.getResource(name);
         if (name.endsWith("/")) {
             try {

@@ -37,6 +37,10 @@ public class Activator implements BundleActivator {
      * The URI prefix for web connections
      */
     public static final String URI_WEB = "/web";
+    /**
+     * The root resource for the web app files
+     */
+    public static final String WEBAPP_RESOURCE_ROOT = "/org/xowl/platform/services/webapp";
 
     /**
      * The tracker of the HTTP service
@@ -57,7 +61,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(URI_WEB, "/org/xowl/platform/services/webapp", new HttpDefaultContext(httpService));
+                    httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new HttpDefaultContext(httpService));
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

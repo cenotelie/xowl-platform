@@ -42,9 +42,4 @@ class XOWLBrandingService implements BrandingService {
     public URL getResource(String name) {
         return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + BRANDING + name);
     }
-
-    @Override
-    public String getTitleHeader() {
-        return "xOWL";
-    }
 }

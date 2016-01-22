@@ -54,11 +54,4 @@ public interface BrandingService extends Service {
      * @return The corresponding URL
      */
     URL getResource(String name);
-
-    /**
-     * Gets the header for page titles
-     *
-     * @return The header for page titles
-     */
-    String getTitleHeader();
 }

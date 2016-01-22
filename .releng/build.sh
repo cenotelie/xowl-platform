@@ -10,23 +10,23 @@ echo "Building artifacts for version $VERSION"
 mvn package -f "$ROOT/pom.xml" -DskipTests -Dgpg.skip=true
 
 # Extract the bundles
-cp "$ROOT/dependencies/target/xowl-dependencies-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/kernel/target/xowl-kernel-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-config/target/xowl-service-config-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-domain/target/xowl-service-domain-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-executor/target/xowl-service-executor-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-httpapi/target/xowl-service-httpapi-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/docker/"
-cp "$ROOT/service-workflow/target/xowl-service-workflow-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/config/target/xowl-service-config-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/consistency/target/xowl-service-consistency-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/domain/target/xowl-service-domain-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/executor/target/xowl-service-executor-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/httpapi/target/xowl-service-httpapi-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/workflow/target/xowl-service-workflow-$VERSION.jar" "$RELENG/docker/"
 
 # Build the docker image
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
-rm "$RELENG/docker/xowl-dependencies-$VERSION.jar"
 rm "$RELENG/docker/xowl-kernel-$VERSION.jar"
 rm "$RELENG/docker/xowl-service-config-$VERSION.jar"
+rm "$RELENG/docker/xowl-service-consistency-$VERSION.jar"
 rm "$RELENG/docker/xowl-service-domain-$VERSION.jar"
 rm "$RELENG/docker/xowl-service-executor-$VERSION.jar"
 rm "$RELENG/docker/xowl-service-httpapi-$VERSION.jar"

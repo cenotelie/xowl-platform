@@ -44,4 +44,14 @@ class XOWLBrandingService implements BrandingService {
             return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + BRANDING + BRANDING_TITLE);
         return null;
     }
+
+    @Override
+    public URL getFavicon() {
+        return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + "/favicon.png");
+    }
+
+    @Override
+    public String getTitleHeader() {
+        return "xOWL";
+    }
 }

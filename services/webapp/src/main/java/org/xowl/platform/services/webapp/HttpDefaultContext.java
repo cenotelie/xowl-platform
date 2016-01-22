@@ -79,9 +79,6 @@ class HttpDefaultContext implements HttpContext {
             String localName = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + BrandingService.BRANDING.length());
             return getBrandingService().getResource(localName);
         }
-        if (name.equals(Activator.WEBAPP_RESOURCE_ROOT + "/" + BrandingService.BRANDING_FAVICON)) {
-            return getBrandingService().getFavicon();
-        }
         URL result = defaultContext.getResource(name);
         if (name.endsWith("/")) {
             try {

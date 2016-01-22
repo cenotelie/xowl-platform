@@ -42,6 +42,10 @@ public interface BrandingService extends Service {
      * The name of the favicon resource
      */
     String BRANDING_FAVICON = "favicon.png";
+    /**
+     * The name of the spinner resource
+     */
+    String BRANDING_SPINNER = "spinner.gif";
 
     /**
      * Gets the URL for a branding resource
@@ -50,13 +54,6 @@ public interface BrandingService extends Service {
      * @return The corresponding URL
      */
     URL getResource(String name);
-
-    /**
-     * Gets the resource for the favicon
-     *
-     * @return The resource for the favicon
-     */
-    URL getFavicon();
 
     /**
      * Gets the header for page titles

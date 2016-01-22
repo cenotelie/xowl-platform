@@ -40,14 +40,7 @@ class XOWLBrandingService implements BrandingService {
 
     @Override
     public URL getResource(String name) {
-        if (BRANDING_TITLE.equals(name))
-            return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + BRANDING + BRANDING_TITLE);
-        return null;
-    }
-
-    @Override
-    public URL getFavicon() {
-        return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + "/favicon.png");
+        return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + BRANDING + name);
     }
 
     @Override

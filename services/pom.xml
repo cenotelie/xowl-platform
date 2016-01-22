@@ -18,6 +18,7 @@
 		<module>consistency</module>
 		<module>domain</module>
 		<module>workflow</module>
+		<module>statistics</module>
 		<module>httpapi</module>
 		<module>webapp</module>
 	</modules>

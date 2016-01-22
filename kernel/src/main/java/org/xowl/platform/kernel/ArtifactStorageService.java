@@ -79,7 +79,7 @@ public interface ArtifactStorageService extends Service {
      *
      * @return The list of the live artifacts
      */
-    Collection<Artifact> getAllLive();
+    Collection<Artifact> listLive();
 
     /**
      * Pushes an artifact to a live reasoning store

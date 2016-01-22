@@ -5,6 +5,26 @@ function XOWL() {
 	this.endpoint = "/api/";
 }
 
+XOWL.prototype.getBasicStats = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "statistics");
+}
+
+XOWL.prototype.getPlatformBundles = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "statistics?platform");
+}
+
 XOWL.prototype.getDomains = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {

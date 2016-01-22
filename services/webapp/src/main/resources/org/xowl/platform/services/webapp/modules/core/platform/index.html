@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>xOWL: Core</title>
+  <title>xOWL: Platform</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/favicon.png" />
@@ -22,24 +22,47 @@
       <span style="display: inline-block;">
         <ol class="breadcrumb">
           <li><a href="/web/">Home</a></li>
-          <li class="active">Core</li>
+          <li><a href="/web/modules/core/">Core</a></li>
+          <li class="active">Platform</li>
         </ol>
       </span>
     </div>
     <hr style="margin-top: 5px; margin-bottom: 5px;" />
   </div>
   <div class="body">
-    <div class="panel panel-default">
+    <div class="panel panel-default" id="loader">
       <div class="panel-body">
-        <div><a class="btn" href="/web/modules/core/platform/">Platform Properties</a></div>
-        <div><a class="btn" href="/web/modules/core/jobs/">Manage jobs</a></div>
-        <div><a class="btn" href="/web/modules/core/connectors/">Manage connectors</a></div>
-        <div><a class="btn" href="/web/modules/core/artifacts/">Manage artifacts</a></div>
-        <div><a class="btn" href="/web/modules/core/consistency/">Manage consistency</a></div>
-        <div><a class="btn" href="/web/modules/core/discovery/">Discovery</a></div>
+        <img src="/web/assets/xowl.gif" width="32" height="32" />
+        <span id="loader-text">Loading ...</span>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Bundles
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Vendor</th>
+              <th>Name</th>
+              <th>Version</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="bundles">
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+  <script src="/web/xowl/xowl-api-platform.js"></script>
+  <script src="/web/xowl/xowl-ui.js"></script>
+  <script src="index.js"></script>
+  <script>
+    init();
+  </script>
 </body>
 
 </html>

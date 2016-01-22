@@ -15,4 +15,4 @@ RUN wget -nv https://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.ma
 	&& wget -nv https://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.http.servlet-api/1.1.2/org.apache.felix.http.servlet-api-1.1.2.jar \
 	&& wget -nv https://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.http.jetty/3.1.6/org.apache.felix.http.jetty-3.1.6.jar \
 	&& mv *.jar felix-framework-5.4.0/bundle/
-COPY xowl-*.jar felix-framework-5.4.0/bundle/
+COPY *.jar felix-framework-5.4.0/bundle/

@@ -20,7 +20,7 @@
 				<ol class="breadcrumb">
 					<li><a href="/web/">Home</a></li>
 					<li><a href="/web/modules/core/">Core</a></li>
-					<li class="active">Core</li>
+					<li class="active">Consistency</li>
 				</ol>
 			</span>
 		</div>
@@ -62,99 +62,24 @@
 								</tr>
 							</thead>
 							<tbody id="inconsistencies">
-								<tr>
-									<td>1</td>
-									<td>This is an inconsistency</td>
-									<td><a href="rule.html?id=xxxx">Rule 1</a></td>
-								</tr>
-								<tr>
-									<td>2</td>
-									<td>This is an inconsistency</td>
-									<td><a href="rule.html?id=xxxx">Rule 2</a></td>
-								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 				<div class="col-md-4">
 					<div class="panel panel-default">
-						<div class="panel-heading">
-							Consistency Rules
-						</div>
 						<div class="panel-body">
-							<table class="table table-bordered table-hover">
-								<thead>
-									<tr>
-										<th>Rule</th>
-										<th>Active</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody id="rules">
-									<tr>
-										<td><a href="rule.html?id=xxxx">Rule 1</a></td>
-										<td>
-											<div class="toggle-button toggle-button-selected">
-												<button></button>
-											</div>
-										</td>
-										<td>
-											<button class="btn btn-danger">Delete</button>
-										</td>
-									</tr>
-									<tr>
-										<td><a href="rule.html?id=xxxx">Rule 2</a></td>
-										<td>
-											<div class="toggle-button">
-												<button></button>
-											</div>
-										</td>
-										<td>
-											<button class="btn btn-danger">Delete</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							New Consistency Rule
-						</div>
-						<div class="panel-body">
-							<div class="form-group">
-								<label for="input-name">Name</label>
-								<input type="text" class="form-control" id="input-name" placeholder="My Consistency Rule">
-							</div>
-							<div class="form-group">
-								<label for="input-description">Message</label>
-								<textarea class="form-control" rows="2" id="input-description" placeholder="While ?x has property p, it has not property q."
-								aria-describedby="input-description-help"></textarea>
-								<span id="input-description-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
-							</div>
-							<div class="form-group">
-								<label for="input-prefixes">Prefixes</label>
-								<textarea class="form-control" rows="5" id="input-prefixes">@prefix rdf:
-									<http://www.w3.org/1999/02/22-rdf-syntax-ns#>. @prefix rdfs:
-										<http://www.w3.org/2000/01/rdf-schema#>. @prefix xsd:
-											<http://www.w3.org/2001/XMLSchema#>. @prefix owl:
-												<http://www.w3.org/2002/07/owl#>. @prefix kernel:
-													<http://xowl.org/platform/schemas/kernel#>.</textarea>
-							</div>
-							<div class="form-group">
-								<label for="input-antecedents">Conditions</label>
-								<textarea class="form-control" rows="5" id="input-antecedents" placeholder="?x rdf:type kernel:MyStuff"></textarea>
-							</div>
-							<button type="submit" class="btn btn-primary" onclick="onClickNewRule()">Submit</button>
+							<div><a class="btn" href="rules.html">Manage consistency rules</a></div>
+							<div><a class="btn" href="new-rule.html">New consistency rule</a></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	</div>
 	<script src="/web/xowl/xowl-api-platform.js"></script>
 	<script src="/web/xowl/xowl-ui.js"></script>
+	<script src="index.js"></script>
 	<script>
 		document.getElementById("branding-title").onload = function () { document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title; };
 		init();

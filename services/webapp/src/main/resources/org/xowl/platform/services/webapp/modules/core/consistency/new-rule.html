@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>New Consistency Rule</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/web/branding/favicon.png" />
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+	<link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+	<div class="header">
+		<object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
+		<div style="display: inline-block; margin-left: 50px;">
+			<span style="display: inline-block;">
+				<ol class="breadcrumb">
+					<li><a href="/web/">Home</a></li>
+					<li><a href="/web/modules/core/">Core</a></li>
+					<li><a href="/web/modules/core/consistency/">Consistency</a></li>
+					<li><a href="/web/modules/core/consistency/rules.html">Rules</a></li>
+					<li class="active">New Rule</li>
+				</ol>
+			</span>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom: 5px;" />
+	</div>
+	<div class="body">
+		<div class="panel panel-default" id="loader">
+			<div class="panel-body">
+				<img src="/web/branding/spinner.gif" width="32" height="32" />
+				<span id="loader-text">Loading ...</span>
+			</div>
+		</div>
+		<div>
+			<div class="form-group">
+				<label for="input-name">Name</label>
+				<input type="text" class="form-control" id="input-name" placeholder="My Consistency Rule">
+			</div>
+			<div class="form-group">
+				<label for="input-message">Message</label>
+				<textarea class="form-control" rows="2" id="input-message" placeholder="While ?x has property p, it has not property q."
+				aria-describedby="input-message-help"></textarea>
+				<span id="input-message-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
+			</div>
+			<div class="form-group">
+				<label for="input-prefixes">Prefixes</label>
+				<textarea class="form-control" rows="10" id="input-prefixes"></textarea>
+			</div>
+			<div class="form-group">
+				<label for="input-conditions">Conditions</label>
+				<textarea class="form-control" rows="10" id="input-conditions" placeholder="?x rdf:type kernel:MyStuff"></textarea>
+			</div>
+			<a class="btn btn-primary" onclick="onClickNewRule()">Submit</a>
+		</div>
+	</div>
+	<script src="/web/xowl/xowl-api-platform.js"></script>
+	<script src="/web/xowl/xowl-ui.js"></script>
+	<script src="new-rule.js"></script>
+	<script>
+		document.getElementById("branding-title").onload = function () { document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title; };
+		init();
+	</script>
+</body>
+
+</html>

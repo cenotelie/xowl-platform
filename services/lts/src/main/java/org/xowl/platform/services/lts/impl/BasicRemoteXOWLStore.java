@@ -44,6 +44,10 @@ class BasicRemoteXOWLStore extends RemoteXOWLStore {
      */
     private final String configName;
     /**
+     * The cached database name
+     */
+    private String dbName;
+    /**
      * The cached HTTP connection
      */
     private HTTPConnection connection;
@@ -61,26 +65,37 @@ class BasicRemoteXOWLStore extends RemoteXOWLStore {
 
     @Override
     protected String getDBName() {
-        return configName;
+        if (dbName == null) {
+            resolveDetails();
+        }
+        return dbName;
     }
 
     @Override
     protected HTTPConnection getConnection() {
         if (connection == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-            if (configurationService == null)
-                return null;
-            Configuration configuration = configurationService.getConfigFor(service);
-            if (configuration == null)
-                return null;
-            String endpoint = configuration.get("endpoint");
-            if (endpoint == null)
-                return null;
-            connection = new HTTPConnection(
-                    endpoint + "/db/" + configuration.get(configName),
-                    configuration.get("login"),
-                    configuration.get("password"));
+            resolveDetails();
         }
         return connection;
+    }
+
+    /**
+     * Resolves the details of this database
+     */
+    private void resolveDetails() {
+        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        if (configurationService == null)
+            return;
+        Configuration configuration = configurationService.getConfigFor(service);
+        if (configuration == null)
+            return;
+        String endpoint = configuration.get("endpoint");
+        if (endpoint == null)
+            return;
+        dbName = configuration.get(configName);
+        connection = new HTTPConnection(
+                endpoint + "/db/" + dbName,
+                configuration.get("login"),
+                configuration.get("password"));
     }
 }

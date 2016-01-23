@@ -202,25 +202,76 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 	}, "artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
 }
 
+XOWL.prototype.getInconsistencies = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "inconsistencies");
+}
+
 XOWL.prototype.getConsistencyRules = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
 	}, "consistency");
 }
 
-XOWL.prototype.getInconsistencies = function (callback) {
+XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "consistency?id=" + encodeURIComponent(ruleId));
+}
+
+XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
+	this.doCommand(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "inconsistencies");
+	}, "consistency?action=create&name=" + encodeURIComponent(name) + "&message=" + encodeURIComponent(message) + "&prefixes=" + encodeURIComponent(prefixes) + "&conditions=" + encodeURIComponent(conditions), "");
 }
+
+XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "consistency?action=activate&id=" + encodeURIComponent(ruleId), "");
+}
+
+XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "consistency?action=deactivate&id=" + encodeURIComponent(ruleId), "");
+}
+
+XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "consistency?action=delete&id=" + encodeURIComponent(ruleId), "");
+}
+
 
 
 

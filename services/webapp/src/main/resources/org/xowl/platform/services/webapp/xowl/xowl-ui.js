@@ -80,7 +80,7 @@ function rdfToDom(value) {
     } else if (value.hasOwnProperty("lexical")) {
 		var span1 = document.createElement("span");
 		span1.appendChild(document.createTextNode('"' + value.lexical + '"'));
-		var dom = document.createElement("p");
+		var dom = document.createElement("span");
 		dom.classList.add("rdfLiteral");
 		dom.appendChild(span1);
 		if (value.datatype !== null) {
@@ -102,7 +102,7 @@ function rdfToDom(value) {
     } else {
 		var span1 = document.createElement("span");
 		span1.appendChild(document.createTextNode('"' + value.value + '"'));
-		var dom = document.createElement("p");
+		var dom = document.createElement("span");
 		dom.classList.add("rdfLiteral");
 		dom.appendChild(span1);
 		if (value.datatype !== null) {

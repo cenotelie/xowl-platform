@@ -74,15 +74,15 @@ public class XOWLConsistencyService implements ConsistencyService {
     /**
      * The URI for the concept of inconsistency
      */
-    private static final String IRI_INCONSISTENCY = IRI_SCHEMA + "##Inconsistency";
+    private static final String IRI_INCONSISTENCY = IRI_SCHEMA + "#Inconsistency";
     /**
      * The URI for the concept of definition
      */
-    private static final String IRI_DEFINITION = IRI_SCHEMA + "##definition";
+    private static final String IRI_DEFINITION = IRI_SCHEMA + "#definition";
     /**
      * The URI for the concept of message
      */
-    private static final String IRI_MESSAGE = IRI_SCHEMA + "##message";
+    private static final String IRI_MESSAGE = IRI_SCHEMA + "#message";
     /**
      * The URI for the concept of antecedent
      */
@@ -120,9 +120,9 @@ public class XOWLConsistencyService implements ConsistencyService {
      */
     public XOWLConsistencyService() {
         this.rules = new ArrayList<>(15);
-        this.rulesTimestamp = 0;
+        this.rulesTimestamp = System.nanoTime();
         this.inconsistencies = new ArrayList<>(150);
-        this.inconsistenciesTimestamp = 0;
+        this.inconsistenciesTimestamp = rulesTimestamp;
     }
 
     @Override
@@ -148,12 +148,12 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0)
-                return XSPReplyUtils.toHttpResponse(getRules(), Collections.singletonList(accept));
-            return XSPReplyUtils.toHttpResponse(getRule(ids[0]), Collections.singletonList(accept));
+            if (ids != null && ids.length > 0)
+                return XSPReplyUtils.toHttpResponse(getRule(ids[0]), Collections.singletonList(accept));
+            return XSPReplyUtils.toHttpResponse(getRules(), Collections.singletonList(accept));
         }
         String[] actions = parameters.get("action");
-        String[] ids = parameters.get("ids");
+        String[] ids = parameters.get("id");
         if (actions == null || actions.length == 0)
             return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         switch (actions[0]) {
@@ -249,6 +249,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> quads = ((ResultQuads) result).getQuads();
         Map<SubjectNode, Collection<Quad>> map = Utils.mapBySubject(quads);
+        inconsistencies.clear();
         for (Map.Entry<SubjectNode, Collection<Quad>> entry : map.entrySet()) {
             String ruleId = null;
             String msg = null;
@@ -315,6 +316,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             String ruleId = ((IRINode) solution.get("r")).getIRIValue();
             String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
             String ruleDefinition = ((LiteralNode) solution.get("d")).getLexicalValue();
+            ruleDefinition = IOUtils.unescape(ruleDefinition);
             if (!ruleNames.contains(ruleId))
                 continue;
             XOWLConsistencyRule rule = new XOWLConsistencyRule(ruleId, ruleName, activeRuleNames.contains(ruleId), ruleDefinition);

@@ -21,9 +21,9 @@
 package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.services.domain.DomainUtils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents an action in a workflow that consists in pulling an artifact from a connector to the platform

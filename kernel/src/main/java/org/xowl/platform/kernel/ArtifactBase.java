@@ -20,11 +20,11 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.LiteralNode;
-import org.xowl.store.rdf.Node;
-import org.xowl.store.rdf.Quad;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.LiteralNode;
+import org.xowl.infra.store.rdf.Node;
+import org.xowl.infra.store.rdf.Quad;
 
 import java.util.ArrayList;
 import java.util.Collection;

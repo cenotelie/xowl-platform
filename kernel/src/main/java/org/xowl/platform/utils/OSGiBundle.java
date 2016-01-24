@@ -22,9 +22,9 @@ package org.xowl.platform.utils;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.store.IOUtils;
-import org.xowl.store.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collection;

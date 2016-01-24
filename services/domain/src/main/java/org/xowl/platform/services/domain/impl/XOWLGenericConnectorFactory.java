@@ -20,12 +20,12 @@
 
 package org.xowl.platform.services.domain.impl;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.services.domain.DomainConnectorFactory;
 import org.xowl.platform.services.domain.DomainDescription;
 import org.xowl.platform.services.domain.DomainDescriptionBase;
 import org.xowl.platform.services.domain.DomainDescriptionParam;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyResult;
 
 import java.util.Arrays;
 import java.util.Collection;

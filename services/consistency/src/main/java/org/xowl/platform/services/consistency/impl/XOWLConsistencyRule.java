@@ -20,8 +20,9 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
-import org.xowl.store.IOUtils;
 
 /**
  * Implements a consistency rule on the xOWL platform
@@ -30,72 +31,67 @@ import org.xowl.store.IOUtils;
  */
 class XOWLConsistencyRule implements ConsistencyRule {
     /**
-     * The rule's unique IRI
+     * The original rule
      */
-    private final String iri;
+    private final XOWLRule original;
     /**
-     * The rule's name
+     * The user-friendly name
      */
     private final String name;
-    /**
-     * The rule's definition
-     */
-    private final String definition;
-    /**
-     * Whether the rule is active
-     */
-    private final boolean isActive;
 
     /**
      * Initializes this rule
      *
-     * @param iri        The rule's unique IRI
-     * @param name       The rule's name
-     * @param isActive   Whether the rule is active
-     * @param definition The rule's definition
+     * @param original The original rule
+     * @param name     The user-friendly name
      */
-    public XOWLConsistencyRule(String iri, String name, boolean isActive, String definition) {
-        this.iri = iri;
+    public XOWLConsistencyRule(XOWLRule original, String name) {
+        this.original = original;
         this.name = name;
-        this.definition = definition;
-        this.isActive = isActive;
     }
 
     @Override
     public String getIdentifier() {
-        return iri;
+        return original.getName();
     }
 
     @Override
     public String getName() {
-        return name;
+        return original.getName();
     }
 
     @Override
     public boolean isActive() {
-        return isActive;
+        return original.isActive();
     }
 
     @Override
     public String getDefinition() {
-        return definition;
+        return original.getDefinition();
+    }
+
+    @Override
+    public String getUserName() {
+        return name;
     }
 
     @Override
     public String serializedString() {
-        return iri;
+        return original.getName();
     }
 
     @Override
     public String serializedJSON() {
-        return "{\"id\": \"" +
-                IOUtils.escapeStringJSON(iri) +
+        return "{\"type\": \"" +
+                IOUtils.escapeStringJSON(XOWLConsistencyRule.class.getCanonicalName()) +
+                "\", \"id\": \"" +
+                IOUtils.escapeStringJSON(original.getName()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +
                 "\", \"definition\": \"" +
-                IOUtils.escapeStringJSON(definition) +
+                IOUtils.escapeStringJSON(original.getDefinition()) +
                 "\", \"isActive\": " +
-                Boolean.toString(isActive) +
+                Boolean.toString(original.isActive()) +
                 "}";
     }
 }

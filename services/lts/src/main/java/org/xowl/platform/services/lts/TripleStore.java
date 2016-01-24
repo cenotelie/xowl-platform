@@ -20,9 +20,10 @@
 
 package org.xowl.platform.services.lts;
 
+import org.xowl.infra.server.api.XOWLDatabase;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.sparql.Result;
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.store.sparql.Result;
-import org.xowl.store.xsp.XSPReply;
 
 import java.util.Collection;
 
@@ -31,7 +32,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface TripleStore {
+public interface TripleStore extends XOWLDatabase {
     /**
      * Executes a SPARQL command on the triple store
      *
@@ -39,14 +40,6 @@ public interface TripleStore {
      * @return The result
      */
     Result sparql(String query);
-
-    /**
-     * Executes an XSP command on the store
-     *
-     * @param command The command
-     * @return The reply
-     */
-    XSPReply execute(String command);
 
     /**
      * Gets the artifacts in this store

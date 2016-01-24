@@ -20,12 +20,12 @@
 
 package org.xowl.platform.services.config.impl;
 
+import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.utils.Utils;
-import org.xowl.utils.config.Configuration;
-import org.xowl.utils.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;

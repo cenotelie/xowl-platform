@@ -21,13 +21,15 @@
 package org.xowl.platform.services.executor.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.IOUtils;
-import org.xowl.utils.Files;
-import org.xowl.utils.config.Configuration;
-import org.xowl.utils.logging.Logger;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -402,13 +404,13 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         String[] ids = parameters.get("id");
         if (ids != null && ids.length > 0) {
             Job job = getJob(ids[0], JobStatus.Completed);
             if (job == null)
-                return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
         }
         return onRequestJobs();
     }
@@ -418,7 +420,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onRequestJobs() {
+    private HttpResponse onRequestJobs() {
         List<Job> scheduled = getQueue();
         List<Job> running = getRunning();
         List<Job> completed = getCompleted();
@@ -442,7 +444,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             builder.append(completed.get(i).serializedJSON());
         }
         builder.append("]}");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**

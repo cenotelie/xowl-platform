@@ -23,11 +23,11 @@ package org.xowl.platform.utils;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
-import org.xowl.store.loaders.JSONLDLoader;
-import org.xowl.store.rdf.Quad;
-import org.xowl.store.rdf.SubjectNode;
-import org.xowl.utils.logging.BufferedLogger;
-import org.xowl.utils.logging.Logger;
+import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.rdf.SubjectNode;
+import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;

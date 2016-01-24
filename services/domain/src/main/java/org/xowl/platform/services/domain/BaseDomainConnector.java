@@ -20,11 +20,13 @@
 
 package org.xowl.platform.services.domain;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.kernel.Artifact;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.store.xsp.XSPReplyResult;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -114,8 +116,8 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, serializedJSON());
     }
 
     @Override

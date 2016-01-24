@@ -20,24 +20,25 @@
 
 package org.xowl.platform.services.domain.impl;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.store.AbstractRepository;
+import org.xowl.infra.store.Vocabulary;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.loaders.*;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.storage.NodeManager;
+import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.domain.BaseDomainConnector;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.AbstractRepository;
-import org.xowl.store.IOUtils;
-import org.xowl.store.Vocabulary;
-import org.xowl.store.loaders.*;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.Quad;
-import org.xowl.store.storage.NodeManager;
-import org.xowl.store.storage.cache.CachedNodes;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.utils.logging.BufferedLogger;
-import org.xowl.utils.logging.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -104,12 +105,12 @@ class ParametricDomainConnector extends BaseDomainConnector {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET"))
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, serializedJSON());
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, serializedJSON());
         if (method.equals("POST"))
             return onMessagePostQuads(parameters, contentType, content);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected GET or POST request");
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected GET or POST request");
     }
 
     /**
@@ -120,18 +121,18 @@ class ParametricDomainConnector extends BaseDomainConnector {
      * @param content     The content
      * @return The response
      */
-    private IOUtils.HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
+    private HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
         String[] names = parameters.get("name");
         String[] bases = parameters.get("base");
         String[] versions = parameters.get("version");
         if (names == null || names.length <= 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected name parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
         if (bases == null || bases.length <= 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected base parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected base parameter");
         if (versions == null || versions.length <= 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected version parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected version parameter");
         if (contentType == null || contentType.isEmpty())
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected content type");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content type");
         int index = contentType.indexOf(";");
         if (index != -1)
             contentType = contentType.substring(0, index);
@@ -163,14 +164,14 @@ class ParametricDomainConnector extends BaseDomainConnector {
                 break;
         }
         if (loader == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
         BufferedLogger logger = new BufferedLogger();
         String contentString = new String(content, Utils.DEFAULT_CHARSET);
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, resource);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
         }
         Date artifactCreation = new Date();
         IRINode artifactNode = nodeManager.getIRINode(resource);
@@ -185,6 +186,6 @@ class ParametricDomainConnector extends BaseDomainConnector {
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
 
         queueInput(artifact);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, artifact.serializedJSON());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, artifact.serializedJSON());
     }
 }

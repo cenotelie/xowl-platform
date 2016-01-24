@@ -21,8 +21,8 @@
 package org.xowl.platform.services.workflow;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.JobBase;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * Implements a job for the workflow that encapsulate a workflow action

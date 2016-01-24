@@ -24,6 +24,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobExecutionService;
@@ -33,11 +40,6 @@ import org.xowl.platform.services.domain.*;
 import org.xowl.platform.services.domain.jobs.PullArtifactJob;
 import org.xowl.platform.services.domain.jobs.PushArtifactJob;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.*;
-import org.xowl.utils.config.Configuration;
-import org.xowl.utils.config.Section;
-import org.xowl.utils.logging.BufferedLogger;
 
 import java.net.HttpURLConnection;
 import java.util.*;
@@ -103,7 +105,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
             if (uri.equals(URI_API + "/domains"))
                 return onMessageListDomains();
@@ -113,10 +115,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                     return onMessageGetConnector(ids[0]);
                 return onMessageListConnectors();
             }
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }
         if (!method.equals("POST"))
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
 
         String[] actions = parameters.get("action");
         String action = actions != null && actions.length >= 1 ? actions[0] : null;
@@ -128,7 +130,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             return onMessagePullFromConnector(parameters);
         if (action != null && action.equals("push"))
             return onMessagePushToConnector(parameters);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override
@@ -315,7 +317,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageListConnectors() {
+    private HttpResponse onMessageListConnectors() {
         Collection<DomainConnectorService> connectors = ServiceUtils.getServices(DomainConnectorService.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
@@ -326,7 +328,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             builder.append(connector.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
@@ -335,11 +337,11 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param connectorId The identifier of a connector
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetConnector(String connectorId) {
+    private HttpResponse onMessageGetConnector(String connectorId) {
         DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
         if (connector == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, connector.serializedJSON());
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, connector.serializedJSON());
     }
 
     /**
@@ -347,7 +349,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageListDomains() {
+    private HttpResponse onMessageListDomains() {
         Collection<DomainDescription> domains = getDomains();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
@@ -358,7 +360,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             builder.append(domain.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
@@ -368,17 +370,17 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param content    The content
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content) {
+    private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content) {
         String[] domainIds = parameters.get("domain");
         if (domainIds == null || domainIds.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected domain parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected domain parameter");
         if (content == null || content.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected JSON content");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = Utils.parseJSON(logger, new String(content, Utils.DEFAULT_CHARSET));
         if (root == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
 
         DomainDescription domain = null;
         for (DomainDescription description : getDomains()) {
@@ -388,7 +390,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             }
         }
         if (domain == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
 
         String id = null;
         String name = null;
@@ -452,9 +454,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         }
 
         if (id == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Identifier for connector not specified");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Identifier for connector not specified");
         if (name == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Name for connector not specified");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Name for connector not specified");
 
         XSPReply reply = spawn(domain, id, name, uris.toArray(new String[uris.size()]), customParams);
         return XSPReplyUtils.toHttpResponse(reply, null);
@@ -466,10 +468,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param parameters The request parameters
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
+    private HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         XSPReply reply = delete(ids[0]);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
@@ -481,16 +483,16 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param parameters The request parameters
      * @return The response
      */
-    private IOUtils.HttpResponse onMessagePullFromConnector(Map<String, String[]> parameters) {
+    private HttpResponse onMessagePullFromConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
         Job job = new PullArtifactJob(ids[0]);
         executor.schedule(job);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
 
     /**
@@ -500,19 +502,19 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param parameters The request parameters
      * @return The response
      */
-    private IOUtils.HttpResponse onMessagePushToConnector(Map<String, String[]> parameters) {
+    private HttpResponse onMessagePushToConnector(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         String[] artifacts = parameters.get("artifact");
         if (artifacts == null || artifacts.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an artifact parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an artifact parameter");
 
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
         Job job = new PushArtifactJob(ids[0], artifacts[0]);
         executor.schedule(job);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
 }

@@ -21,10 +21,10 @@
 package org.xowl.platform.services.domain.jobs;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.JobBase;
 import org.xowl.platform.services.domain.DomainUtils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * A job for pulling artifact from a connector and storing it with the storage service

@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.workflow;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.store.Serializable;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents an action that can be triggered in a workflow within the platform

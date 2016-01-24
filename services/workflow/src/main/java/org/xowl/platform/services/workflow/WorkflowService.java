@@ -20,8 +20,8 @@
 
 package org.xowl.platform.services.workflow;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents a service that drives a workflow on the platform

@@ -20,7 +20,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReply;
 
 import java.util.Collection;
 

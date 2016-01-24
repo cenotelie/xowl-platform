@@ -20,11 +20,11 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.httpapi.HTTPServerService;
-import org.xowl.store.IOUtils;
-import org.xowl.utils.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -138,7 +138,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 Logger.DEFAULT.error(exception);
             }
         }
-        IOUtils.HttpResponse serviceResponse = service.onMessage(method,
+        HttpResponse serviceResponse = service.onMessage(method,
                 request.getRequestURI(),
                 request.getParameterMap(),
                 request.getContentType(),

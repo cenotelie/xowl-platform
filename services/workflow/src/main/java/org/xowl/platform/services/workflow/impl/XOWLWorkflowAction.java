@@ -21,10 +21,10 @@
 package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.services.workflow.WorkflowAction;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplySuccess;
 
 /**
  * Base class for workflow actions

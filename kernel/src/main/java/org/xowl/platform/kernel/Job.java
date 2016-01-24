@@ -20,8 +20,8 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.Serializable;
-import org.xowl.store.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.Serializable;
 
 /**
  * Represents a job to be executed on the platform

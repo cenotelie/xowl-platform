@@ -20,12 +20,12 @@
 
 package org.xowl.platform.services.domain;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.store.xsp.XSPReplyResult;
 
 /**
  * Utility APIs for the management of domains and related artifacts

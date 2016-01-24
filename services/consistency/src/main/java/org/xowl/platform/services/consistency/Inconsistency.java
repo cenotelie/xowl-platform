@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.consistency;
 
+import org.xowl.infra.store.Serializable;
+import org.xowl.infra.store.rdf.Node;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.store.Serializable;
-import org.xowl.store.rdf.Node;
 
 import java.util.Map;
 

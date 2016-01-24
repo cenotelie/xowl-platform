@@ -20,26 +20,20 @@
 
 package org.xowl.platform.services.consistency;
 
+import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.store.Serializable;
 
 /**
  * Represents a consistency rule
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyRule extends Identifiable, Serializable {
+public interface ConsistencyRule extends Identifiable, Serializable, XOWLRule {
     /**
-     * Gets whether this rule is active
+     * Gets the user-friendly name of this rule
      *
-     * @return Whether the rule is active
+     * @return The user-friendly name of this rule
      */
-    boolean isActive();
-
-    /**
-     * Gets the rule's definition
-     *
-     * @return The rule's definition
-     */
-    String getDefinition();
+    String getUserName();
 }

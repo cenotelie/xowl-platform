@@ -21,9 +21,9 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.store.IOUtils;
-import org.xowl.utils.concurrent.SafeRunnable;
-import org.xowl.utils.logging.Logger;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.concurrent.SafeRunnable;
+import org.xowl.infra.utils.logging.Logger;
 
 import java.text.DateFormat;
 import java.util.Date;

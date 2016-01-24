@@ -20,6 +20,22 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.server.api.base.BaseRule;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.IRIs;
+import org.xowl.infra.store.Vocabulary;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.loaders.RDFLoaderResult;
+import org.xowl.infra.store.loaders.RDFTLoader;
+import org.xowl.infra.store.rdf.*;
+import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultFailure;
+import org.xowl.infra.store.sparql.ResultQuads;
+import org.xowl.infra.store.sparql.ResultSolutions;
+import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
@@ -27,19 +43,6 @@ import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.IRIs;
-import org.xowl.store.Vocabulary;
-import org.xowl.store.loaders.RDFLoaderResult;
-import org.xowl.store.loaders.RDFTLoader;
-import org.xowl.store.rdf.*;
-import org.xowl.store.sparql.Result;
-import org.xowl.store.sparql.ResultFailure;
-import org.xowl.store.sparql.ResultQuads;
-import org.xowl.store.sparql.ResultSolutions;
-import org.xowl.store.storage.cache.CachedNodes;
-import org.xowl.store.xsp.*;
-import org.xowl.utils.logging.BufferedLogger;
 
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -92,38 +95,6 @@ public class XOWLConsistencyService implements ConsistencyService {
      */
     private static final String IRI_RULE_BASE = IRI_SCHEMA + "/rule";
 
-    /**
-     * The timeout for cache invalidation, in nano-seconds
-     * Set to 2 second (1 billion nano-seconds)
-     */
-    private static final long CACHE_INVALIDATION_TIMEOUT = 2000000000L;
-
-    /**
-     * The current consistency rules
-     */
-    private final Collection<XOWLConsistencyRule> rules;
-    /**
-     * Timestamp of the last time the rules were updated
-     */
-    private long rulesTimestamp;
-    /**
-     * The current inconsistencies
-     */
-    private final Collection<XOWLInconsistency> inconsistencies;
-    /**
-     * Time stamp of the last time the inconsistencies were updated
-     */
-    private long inconsistenciesTimestamp;
-
-    /**
-     * Initializes this service
-     */
-    public XOWLConsistencyService() {
-        this.rules = new ArrayList<>(15);
-        this.rulesTimestamp = System.nanoTime();
-        this.inconsistencies = new ArrayList<>(150);
-        this.inconsistenciesTimestamp = rulesTimestamp;
-    }
 
     @Override
     public String getIdentifier() {
@@ -141,11 +112,11 @@ public class XOWLConsistencyService implements ConsistencyService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (uri.equals(URI_API + "/inconsistencies"))
             return XSPReplyUtils.toHttpResponse(getInconsistencies(), Collections.singletonList(accept));
         if (!uri.equals(URI_API + "/consistency"))
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0)
@@ -155,7 +126,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         String[] actions = parameters.get("action");
         String[] ids = parameters.get("id");
         if (actions == null || actions.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         switch (actions[0]) {
             case "create":
                 String[] names = parameters.get("name");
@@ -163,46 +134,37 @@ public class XOWLConsistencyService implements ConsistencyService {
                 String[] prefixes = parameters.get("prefixes");
                 String[] conditions = parameters.get("conditions");
                 if (names == null || names.length == 0 || messages == null || messages.length == 0 || prefixes == null || prefixes.length == 0 || conditions == null || conditions.length == 0)
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
                 return XSPReplyUtils.toHttpResponse(createRule(names[0], messages[0], prefixes[0], conditions[0]), Collections.singletonList(accept));
             case "activate":
                 if (ids == null || ids.length == 0)
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
                 return XSPReplyUtils.toHttpResponse(activateRule(ids[0]), Collections.singletonList(accept));
             case "deactivate":
                 if (ids == null || ids.length == 0)
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
                 return XSPReplyUtils.toHttpResponse(deactivateRule(ids[0]), Collections.singletonList(accept));
             case "delete":
                 if (ids == null || ids.length == 0)
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
                 return XSPReplyUtils.toHttpResponse(deleteRule(ids[0]), Collections.singletonList(accept));
         }
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override
     public XSPReply getRules() {
-        long now = System.nanoTime();
-        long elapsed = now - rulesTimestamp;
-        if (elapsed < CACHE_INVALIDATION_TIMEOUT)
-            return new XSPReplyResultCollection<>(rules);
-
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return new XSPReplyFailure("Failed to retrieve the LTS service");
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        XSPReply reply = live.execute("LIST RULES");
+        XSPReply reply = live.getRules();
         if (!reply.isSuccess())
             return reply;
-        Collection<String> ruleNames = ((XSPReplyResultCollection<String>) reply).getData();
-        reply = live.execute("LIST ACTIVE RULES");
-        if (!reply.isSuccess())
-            return reply;
-        Collection<String> activeRuleNames = ((XSPReplyResultCollection<String>) reply).getData();
-        Result result = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
+        Collection<XOWLRule> rules = new ArrayList<>(((XSPReplyResultCollection<XOWLRule>) reply).getData());
+        Result sparqlResult = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { ?r a <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_RULE) +
@@ -211,29 +173,26 @@ public class XOWLConsistencyService implements ConsistencyService {
                 "> ?n . ?r <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
                 "> ?d } }");
-        if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
-        ResultSolutions solutions = (ResultSolutions) result;
-        rules.clear();
+        if (!sparqlResult.isSuccess())
+            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+        ResultSolutions solutions = (ResultSolutions) sparqlResult;
+        Collection<XOWLConsistencyRule> result = new ArrayList<>();
         for (QuerySolution solution : solutions.getSolutions()) {
             String ruleId = ((IRINode) solution.get("r")).getIRIValue();
             String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
-            String ruleDefinition = ((LiteralNode) solution.get("d")).getLexicalValue();
-            if (!ruleNames.contains(ruleId))
-                continue;
-            rules.add(new XOWLConsistencyRule(ruleId, ruleName, activeRuleNames.contains(ruleId), ruleDefinition));
+            for (XOWLRule rule : rules) {
+                if (rule.getName().equals(ruleId)) {
+                    result.add(new XOWLConsistencyRule(rule, ruleName));
+                    rules.remove(rule);
+                    break;
+                }
+            }
         }
-        rulesTimestamp = System.nanoTime();
-        return new XSPReplyResultCollection<>(rules);
+        return new XSPReplyResultCollection<>(result);
     }
 
     @Override
     public XSPReply getInconsistencies() {
-        long now = System.nanoTime();
-        long elapsed = now - inconsistenciesTimestamp;
-        if (elapsed < CACHE_INVALIDATION_TIMEOUT)
-            return new XSPReplyResultCollection<>(inconsistencies);
-
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return new XSPReplyFailure("Failed to retrieve the LTS service");
@@ -249,7 +208,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> quads = ((ResultQuads) result).getQuads();
         Map<SubjectNode, Collection<Quad>> map = Utils.mapBySubject(quads);
-        inconsistencies.clear();
+        Collection<XOWLInconsistency> inconsistencies = new ArrayList<>();
         for (Map.Entry<SubjectNode, Collection<Quad>> entry : map.entrySet()) {
             String ruleId = null;
             String msg = null;
@@ -268,66 +227,40 @@ public class XOWLConsistencyService implements ConsistencyService {
             if (reply.isSuccess())
                 inconsistencies.add(new XOWLInconsistency(IRI_SCHEMA + "/inconsistency#" + UUID.randomUUID().toString(), msg, ((XSPReplyResult<XOWLConsistencyRule>) reply).getData(), antecedents));
         }
-        inconsistenciesTimestamp = System.nanoTime();
         return new XSPReplyResultCollection<>(inconsistencies);
     }
 
     @Override
     public XSPReply getRule(String identifier) {
-        long now = System.nanoTime();
-        long elapsed = now - rulesTimestamp;
-        if (elapsed < CACHE_INVALIDATION_TIMEOUT) {
-            for (XOWLConsistencyRule rule : rules) {
-                if (rule.getIdentifier().equals(identifier))
-                    return new XSPReplyResult<>(rule);
-            }
-            return new XSPReplyFailure("Not found");
-        }
-
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return new XSPReplyFailure("Failed to retrieve the LTS service");
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        XSPReply reply = live.execute("LIST RULES");
+        XSPReply reply = live.getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        Collection<String> ruleNames = ((XSPReplyResultCollection<String>) reply).getData();
-        reply = live.execute("LIST ACTIVE RULES");
-        if (!reply.isSuccess())
-            return reply;
-        Collection<String> activeRuleNames = ((XSPReplyResultCollection<String>) reply).getData();
-        Result result = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
+        XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
+        Result sparqlResult = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
-                "> { ?r a <" +
+                "> { <" +
+                IOUtils.escapeAbsoluteURIW3C(identifier) +
+                "> a <" +
                 IOUtils.escapeAbsoluteURIW3C(IRI_RULE) +
-                "> . ?r <" +
+                "> . <" +
+                IOUtils.escapeAbsoluteURIW3C(identifier) +
+                "> <" +
                 IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
-                "> ?n . ?r <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
-                "> ?d } }");
-        if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
-        ResultSolutions solutions = (ResultSolutions) result;
-        XOWLConsistencyRule target = null;
-        rules.clear();
-        for (QuerySolution solution : solutions.getSolutions()) {
-            String ruleId = ((IRINode) solution.get("r")).getIRIValue();
-            String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
-            String ruleDefinition = ((LiteralNode) solution.get("d")).getLexicalValue();
-            ruleDefinition = IOUtils.unescape(ruleDefinition);
-            if (!ruleNames.contains(ruleId))
-                continue;
-            XOWLConsistencyRule rule = new XOWLConsistencyRule(ruleId, ruleName, activeRuleNames.contains(ruleId), ruleDefinition);
-            if (ruleId.equals(identifier))
-                target = rule;
-            rules.add(rule);
-        }
-        rulesTimestamp = System.nanoTime();
-        if (target == null)
-            return new XSPReplyFailure("Not found");
-        return new XSPReplyResult<>(target);
+                "> ?n . } }");
+        if (!sparqlResult.isSuccess())
+            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+        ResultSolutions solutions = (ResultSolutions) sparqlResult;
+        if (solutions.getSolutions().size() == 0)
+            return XSPReplyNotFound.instance();
+        QuerySolution solution = solutions.getSolutions().iterator().next();
+        String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
+        return new XSPReplyResult<>(new XOWLConsistencyRule(original, ruleName));
     }
 
     @Override
@@ -379,9 +312,10 @@ public class XOWLConsistencyService implements ConsistencyService {
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        XSPReply reply = live.execute("ADD RULE " + definition);
+        XSPReply reply = live.addRule(definition, false);
         if (!reply.isSuccess())
             return reply;
+        XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
         Result result = live.sparql("INSERT DATA { GRAPH <" + IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
                 "<" + IOUtils.escapeAbsoluteURIW3C(id) + "> <" + IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + IOUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
                 "<" + IOUtils.escapeAbsoluteURIW3C(id) + "> <" + IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + IOUtils.escapeStringW3C(name) + "\" ." +
@@ -389,8 +323,7 @@ public class XOWLConsistencyService implements ConsistencyService {
                 "} }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
-        XOWLConsistencyRule rule = new XOWLConsistencyRule(id, name, false, definition);
-        rules.add(rule);
+        XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
         return new XSPReplyResult<>(rule);
     }
 
@@ -402,7 +335,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        return live.execute("ACTIVATE " + identifier);
+        return live.activateRule(new BaseRule(identifier, null, false));
     }
 
     @Override
@@ -418,7 +351,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        return live.execute("DEACTIVATE " + identifier);
+        return live.deactivateRule(new BaseRule(identifier, null, false));
     }
 
     @Override
@@ -434,7 +367,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         TripleStore live = lts.getLiveStore();
         if (live == null)
             return new XSPReplyFailure("Failed to resolve the live store");
-        XSPReply reply = live.execute("REMOVE RULE " + identifier);
+        XSPReply reply = live.removeRule(new BaseRule(identifier, null, false));
         if (!reply.isSuccess())
             return reply;
         Result result = live.sparql("DELETE WHERE { GRAPH <" +

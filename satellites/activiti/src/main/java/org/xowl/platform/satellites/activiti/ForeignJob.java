@@ -21,10 +21,11 @@
 package org.xowl.platform.satellites.activiti;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.api.base.BaseFactory;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.JobBase;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyUtils;
 
 /**
  * Represents a job on the xOWL platform
@@ -51,7 +52,7 @@ public class ForeignJob extends JobBase {
             if ("result".equals(head)) {
                 ASTNode value = member.getChildren().get(1);
                 if (!value.getChildren().isEmpty())
-                    res = XSPReplyUtils.parseJSONResult(value);
+                    res = XSPReplyUtils.parseJSONResult(value, new BaseFactory());
             }
         }
         result = res;

@@ -21,14 +21,14 @@
 package org.xowl.platform.services.lts.jobs;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.JobBase;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.store.xsp.XSPReplyResult;
 
 /**
  * A job for pushing an artifact from the long-term store to the live store

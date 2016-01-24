@@ -21,26 +21,27 @@
 package org.xowl.platform.services.workflow.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.store.Vocabulary;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.LiteralNode;
+import org.xowl.infra.store.rdf.Node;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.storage.NodeManager;
+import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.workflow.*;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.Vocabulary;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.LiteralNode;
-import org.xowl.store.rdf.Node;
-import org.xowl.store.rdf.Quad;
-import org.xowl.store.storage.NodeManager;
-import org.xowl.store.storage.cache.CachedNodes;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.store.xsp.XSPReplyResult;
-import org.xowl.utils.Files;
-import org.xowl.utils.config.Configuration;
-import org.xowl.utils.logging.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -261,33 +262,33 @@ public class XOWLWorkflowService implements WorkflowService, HttpAPIService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (parameters == null || parameters.isEmpty()) {
             retrieveWorkflow();
             if (workflow == null)
-                return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, workflow.serializedJSON());
+                return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Workflow is not configured");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, workflow.serializedJSON());
         }
 
         String[] values = parameters.get("action");
         if (values == null || values.length < 1)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected action parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected action parameter");
         String actionID = values[0];
         retrieveWorkflow();
         if (workflow == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Workflow is not configured");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Workflow is not configured");
 
         String message = content == null ? null : new String(content, Utils.DEFAULT_CHARSET);
         for (WorkflowAction action : currentActivity.getActions()) {
             if (action.getIdentifier().equals(actionID)) {
                 XSPReply reply = execute(action, message);
                 if (reply.isSuccess())
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, reply.serializedJSON());
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, reply.serializedJSON());
                 else
-                    return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, reply.serializedString());
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, reply.serializedString());
             }
         }
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Action is unavailable");
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Action is unavailable");
     }
 
     /**

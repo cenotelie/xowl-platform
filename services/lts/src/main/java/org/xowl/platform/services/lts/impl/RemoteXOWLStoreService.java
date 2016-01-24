@@ -20,29 +20,36 @@
 
 package org.xowl.platform.services.lts.impl;
 
+import org.xowl.infra.server.api.XOWLDatabase;
+import org.xowl.infra.server.api.XOWLServer;
+import org.xowl.infra.server.api.remote.RemoteServer;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.store.AbstractRepository;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.RDFUtils;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.rdf.Changeset;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultFailure;
+import org.xowl.infra.store.sparql.ResultQuads;
+import org.xowl.infra.store.sparql.ResultUtils;
+import org.xowl.infra.store.writers.NQuadsSerializer;
+import org.xowl.infra.store.writers.RDFSerializer;
+import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
+import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.AbstractRepository;
-import org.xowl.store.IOUtils;
-import org.xowl.store.RDFUtils;
-import org.xowl.store.rdf.Changeset;
-import org.xowl.store.rdf.Quad;
-import org.xowl.store.sparql.Result;
-import org.xowl.store.sparql.ResultFailure;
-import org.xowl.store.sparql.ResultQuads;
-import org.xowl.store.sparql.ResultUtils;
-import org.xowl.store.writers.NQuadsSerializer;
-import org.xowl.store.writers.RDFSerializer;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyFailure;
-import org.xowl.store.xsp.XSPReplyResult;
-import org.xowl.store.xsp.XSPReplyUtils;
-import org.xowl.utils.Files;
-import org.xowl.utils.logging.BufferedLogger;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -76,14 +83,62 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * The service store
      */
     private final RemoteXOWLStore storeService;
+    /**
+     * The remote server
+     */
+    private XOWLServer server;
 
     /**
      * Initializes this service
      */
     public RemoteXOWLStoreService() {
-        this.storeLive = new BasicRemoteXOWLStore(this, "live");
-        this.storeLongTerm = new BasicRemoteXOWLStore(this, "longTerm");
-        this.storeService = new BasicRemoteXOWLStore(this, "service");
+        this.storeLive = new RemoteXOWLStore("live") {
+            @Override
+            protected XOWLDatabase resolveRemote() {
+                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            }
+        };
+        this.storeLongTerm = new RemoteXOWLStore("longTerm") {
+            @Override
+            protected XOWLDatabase resolveRemote() {
+                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            }
+        };
+        this.storeService = new RemoteXOWLStore("service") {
+            @Override
+            protected XOWLDatabase resolveRemote() {
+                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            }
+        };
+    }
+
+    /**
+     * Resolves the remote for this store
+     *
+     * @param name The name of this store
+     * @return The remote
+     */
+    private XOWLDatabase resolveRemote(String name) {
+        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        if (configurationService == null)
+            return null;
+        Configuration configuration = configurationService.getConfigFor(this);
+        if (configuration == null)
+            return null;
+        if (server == null) {
+            String endpoint = configuration.get("endpoint");
+            if (endpoint == null)
+                return null;
+            server = new RemoteServer(endpoint);
+            XSPReply reply = server.login(configuration.get("login"), configuration.get("password"));
+            if (!reply.isSuccess())
+                return null;
+        }
+        String dbName = configuration.get(name);
+        XSPReply reply = server.getDatabase(dbName);
+        if (!reply.isSuccess())
+            return null;
+        return ((XSPReplyResult<XOWLDatabase>) reply).getData();
     }
 
     @Override
@@ -191,7 +246,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (uri.equals(URI_API + "/sparql"))
             return onMessageSPARQL(content, accept);
         if (uri.equals(URI_API + "/artifacts")) {
@@ -227,7 +282,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
                 return onMessageGetArtifacts(base);
             return live ? onMessageGetLiveArtifacts() : onMessageGetArtifacts();
         }
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**
@@ -237,9 +292,9 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param accept  The accept HTTP header
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageSPARQL(byte[] content, String accept) {
+    private HttpResponse onMessageSPARQL(byte[] content, String accept) {
         if (content == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         String request = new String(content, Utils.DEFAULT_CHARSET);
         Result result = storeLive.sparql(request);
         String resultType = ResultUtils.coerceContentType(result, accept != null ? IOUtils.httpNegotiateContentType(Collections.singletonList(accept)) : AbstractRepository.SYNTAX_NQUADS);
@@ -249,7 +304,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         } catch (IOException exception) {
             // cannot happen
         }
-        return new IOUtils.HttpResponse(result.isSuccess() ? HttpURLConnection.HTTP_OK : IOUtils.HTTP_UNKNOWN_ERROR, resultType, writer.toString());
+        return new HttpResponse(result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpConstants.HTTP_UNKNOWN_ERROR, resultType, writer.toString());
     }
 
     /**
@@ -257,7 +312,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetArtifacts() {
+    private HttpResponse onMessageGetArtifacts() {
         Collection<Artifact> artifacts = list();
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -268,7 +323,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             builder.append(artifact.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
@@ -277,7 +332,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param base The base to look for
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetArtifacts(String base) {
+    private HttpResponse onMessageGetArtifacts(String base) {
         Collection<Artifact> artifacts = list(base);
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -288,7 +343,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             builder.append(artifact.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
@@ -296,7 +351,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetLiveArtifacts() {
+    private HttpResponse onMessageGetLiveArtifacts() {
         Collection<Artifact> artifacts = listLive();
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -307,7 +362,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             builder.append(artifact.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
@@ -316,20 +371,20 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param artifactId The identifier of an artifact
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetArtifactMetadata(String artifactId) {
+    private HttpResponse onMessageGetArtifactMetadata(String artifactId) {
         XSPReply reply = retrieve(artifactId);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
         serializer.serialize(logger, artifact.getMetadata().iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**
@@ -338,23 +393,23 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param artifactId The identifier of an artifact
      * @return The artifact
      */
-    private IOUtils.HttpResponse onMessageGetArtifactContent(String artifactId) {
+    private HttpResponse onMessageGetArtifactContent(String artifactId) {
         XSPReply reply = retrieve(artifactId);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
         Collection<Quad> content = artifact.getContent();
         if (content == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
         serializer.serialize(logger, content.iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**
@@ -364,26 +419,26 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param artifactRight The identifier of the artifact on the right
      * @return The artifact
      */
-    private IOUtils.HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight) {
+    private HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight) {
         XSPReply reply = retrieve(artifactLeft);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
         Collection<Quad> contentLeft = artifact.getContent();
         if (contentLeft == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
 
         reply = retrieve(artifactRight);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
         Collection<Quad> contentRight = artifact.getContent();
         if (contentRight == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
         BufferedLogger logger = new BufferedLogger();
@@ -394,8 +449,8 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getRemoved().iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, IOUtils.MIME_TEXT_PLAIN, Utils.getLog(logger));
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
+        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**
@@ -405,16 +460,16 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param parameters The request parameters
      * @return The response
      */
-    private IOUtils.HttpResponse onMessagePullFromLive(Map<String, String[]> parameters) {
+    private HttpResponse onMessagePullFromLive(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
         Job job = new PullArtifactFromLiveJob(ids[0]);
         executor.schedule(job);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
 
     /**
@@ -424,15 +479,15 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * @param parameters The request parameters
      * @return The response
      */
-    private IOUtils.HttpResponse onMessagePushToLive(Map<String, String[]> parameters) {
+    private HttpResponse onMessagePushToLive(Map<String, String[]> parameters) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Expected an id parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new IOUtils.HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, IOUtils.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
         Job job = new PushArtifactToLiveJob(ids[0]);
         executor.schedule(job);
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, job.serializedJSON());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
 }

@@ -20,8 +20,8 @@
 
 package org.xowl.platform.services.domain;
 
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.store.Serializable;
 
 /**
  * Represents a parameter for this domain

@@ -20,10 +20,10 @@
 
 package org.xowl.platform.services.domain;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.store.Serializable;
-import org.xowl.store.xsp.XSPReply;
 
 import java.util.List;
 

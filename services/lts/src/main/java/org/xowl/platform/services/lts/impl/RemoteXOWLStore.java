@@ -4,78 +4,197 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Laurent Wouters - lwouters@xowl.org
+ * Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
 package org.xowl.platform.services.lts.impl;
 
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.api.XOWLDatabase;
+import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.server.api.base.BaseDatabase;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.EntailmentRegime;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.Node;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultFailure;
+import org.xowl.infra.store.sparql.ResultQuads;
+import org.xowl.infra.store.writers.NTripleSerializer;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactDeferred;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.lts.TripleStore;
-import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.IRINode;
-import org.xowl.store.rdf.Node;
-import org.xowl.store.rdf.Quad;
-import org.xowl.store.sparql.Result;
-import org.xowl.store.sparql.ResultFailure;
-import org.xowl.store.sparql.ResultQuads;
-import org.xowl.store.storage.remote.HTTPConnection;
-import org.xowl.store.writers.NTripleSerializer;
-import org.xowl.store.xsp.*;
-import org.xowl.utils.logging.Logger;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents a remote xOWL store for this platform
  *
  * @author Laurent Wouters
  */
-abstract class RemoteXOWLStore implements TripleStore {
+abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
+    /**
+     * The remote backend
+     */
+    private XOWLDatabase remote;
+
+    /**
+     * Initializes this database
+     *
+     * @param name The database's name
+     */
+    public RemoteXOWLStore(String name) {
+        super(name);
+    }
+
+    /**
+     * Initializes this database
+     *
+     * @param root The database's definition
+     */
+    public RemoteXOWLStore(ASTNode root) {
+        super(root);
+    }
+
     /**
      * Gets the connection for this store
      *
      * @return The connection for this store
      */
-    protected abstract HTTPConnection getConnection();
+    private XOWLDatabase getRemote() {
+        if (remote == null)
+            remote = resolveRemote();
+        return remote;
+    }
 
     /**
-     * Gets the database name for this store
+     * Resolves the remote for this store
      *
-     * @return The database name
+     * @return The remote
      */
-    protected abstract String getDBName();
+    protected abstract XOWLDatabase resolveRemote();
 
     @Override
-    public Result sparql(String query) {
-        HTTPConnection connection = getConnection();
+    public XSPReply sparql(String sparql, List<String> defaultIRIs, List<String> namedIRIs) {
+        XOWLDatabase connection = getRemote();
         if (connection == null)
-            return new ResultFailure("The connection to the remote host is not configured");
-        return connection.sparql(query);
+            return XSPReplyNetworkError.instance();
+        return connection.sparql(sparql, defaultIRIs, namedIRIs);
     }
 
     @Override
-    public XSPReply execute(String command) {
-        HTTPConnection connection = getConnection();
+    public XSPReply getEntailmentRegime() {
+        XOWLDatabase connection = getRemote();
         if (connection == null)
-            return new XSPReplyNetworkError("The connection to the remote host is not configured");
-        return connection.xsp("DATABASE " + getDBName() + " " + command);
+            return XSPReplyNetworkError.instance();
+        return connection.getEntailmentRegime();
+    }
+
+    @Override
+    public XSPReply setEntailmentRegime(EntailmentRegime regime) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.setEntailmentRegime(regime);
+    }
+
+    @Override
+    public XSPReply getRule(String name) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRule(name);
+    }
+
+    @Override
+    public XSPReply getRules() {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRules();
+    }
+
+    @Override
+    public XSPReply addRule(String content, boolean activate) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.addRule(content, activate);
+    }
+
+    @Override
+    public XSPReply removeRule(XOWLRule rule) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.removeRule(rule);
+    }
+
+    @Override
+    public XSPReply activateRule(XOWLRule rule) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.activateRule(rule);
+    }
+
+    @Override
+    public XSPReply deactivateRule(XOWLRule rule) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.deactivateRule(rule);
+    }
+
+    @Override
+    public XSPReply getRuleStatus(XOWLRule rule) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRuleStatus(rule);
+    }
+
+    @Override
+    public XSPReply getQuadExplanation(Quad quad) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getQuadExplanation(quad);
+    }
+
+    @Override
+    public XSPReply upload(String syntax, String content) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.upload(syntax, content);
+    }
+
+    @Override
+    public Result sparql(String query) {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return new ResultFailure("The connection to the remote host is not configured");
+        XSPReply reply = connection.sparql(query, null, null);
+        if (!reply.isSuccess())
+            return new ResultFailure(reply.getMessage());
+        return ((XSPReplyResult<Result>) reply).getData();
     }
 
     @Override

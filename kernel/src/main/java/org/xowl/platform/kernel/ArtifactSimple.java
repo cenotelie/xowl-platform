@@ -20,7 +20,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.store.rdf.Quad;
+import org.xowl.infra.store.rdf.Quad;
 
 import java.util.ArrayList;
 import java.util.Collection;

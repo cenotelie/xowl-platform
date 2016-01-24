@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.consistency;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
-import org.xowl.store.xsp.XSPReply;
 
 /**
  * Represents a service that manages the consistency on the platform

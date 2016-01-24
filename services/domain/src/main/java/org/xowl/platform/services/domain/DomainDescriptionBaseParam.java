@@ -20,7 +20,7 @@
 
 package org.xowl.platform.services.domain;
 
-import org.xowl.store.IOUtils;
+import org.xowl.infra.store.IOUtils;
 
 /**
  * Base implementation of a domain parameter

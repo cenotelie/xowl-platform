@@ -20,10 +20,10 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.rdf.Node;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.Inconsistency;
-import org.xowl.store.IOUtils;
-import org.xowl.store.rdf.Node;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -107,7 +107,7 @@ class XOWLInconsistency implements Inconsistency {
         builder.append("\", \"ruleId\": \"");
         builder.append(IOUtils.escapeStringJSON(rule.getIdentifier()));
         builder.append("\", \"ruleName\": \"");
-        builder.append(IOUtils.escapeStringJSON(rule.getName()));
+        builder.append(IOUtils.escapeStringJSON(rule.getUserName()));
         builder.append("\", \"antecedents\": {");
         boolean first = true;
         for (Map.Entry<String, Node> antecedent : antecedents.entrySet()) {

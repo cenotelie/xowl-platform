@@ -25,13 +25,15 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.URIUtils;
+import org.xowl.infra.store.http.HttpConnection;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobStatus;
-import org.xowl.platform.utils.Http;
 import org.xowl.platform.utils.Utils;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.utils.logging.Logger;
 
 import java.net.HttpURLConnection;
 
@@ -72,7 +74,9 @@ public class PullFromConnectorAction implements JavaDelegate {
     public void execute(DelegateExecution delegateExecution) throws Exception {
         String uri = (String) platformUri.getValue(delegateExecution);
         String connector = (String) connectorId.getValue(delegateExecution);
-        IOUtils.HttpResponse response = Http.request(Logger.DEFAULT, "POST", uri + "/connectors?action=pull&id=" + connector, "text/plain", null, null, "application/json");
+
+        HttpConnection connection = new HttpConnection(uri, null, null);
+        HttpResponse response = connection.request("/connectors?action=pull&id=" + URIUtils.encodeComponent(connector), "POST", null, null, HttpConstants.MIME_TEXT_PLAIN + ", " + HttpConstants.MIME_JSON);
         if (response == null)
             throw new BpmnError("Failed to connect to the federation platform");
         if (response.getCode() != HttpURLConnection.HTTP_OK)
@@ -83,7 +87,7 @@ public class PullFromConnectorAction implements JavaDelegate {
         Job job = new ForeignJob(root);
         while (job.getStatus() != JobStatus.Completed) {
             Thread.sleep(500);
-            response = Http.request(Logger.DEFAULT, "GET", uri + "/jobs?id=" + job.getIdentifier(), "text/plain", null, null, "application/json");
+            response = connection.request("/jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", null, null, HttpConstants.MIME_TEXT_PLAIN + ", " + HttpConstants.MIME_JSON);
             if (response == null)
                 throw new BpmnError("Failed to connect to the federation platform");
             if (response.getCode() != HttpURLConnection.HTTP_OK)

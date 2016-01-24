@@ -20,8 +20,8 @@
 
 package org.xowl.platform.services.domain;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.store.xsp.XSPReply;
 
 import java.util.Collection;
 import java.util.Map;

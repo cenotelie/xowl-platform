@@ -20,7 +20,7 @@
 
 package org.xowl.platform.services.domain;
 
-import org.xowl.store.IOUtils;
+import org.xowl.infra.store.IOUtils;
 
 import java.util.Collection;
 import java.util.Collections;

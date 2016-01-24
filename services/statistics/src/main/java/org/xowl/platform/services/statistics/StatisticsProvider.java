@@ -20,6 +20,10 @@
 
 package org.xowl.platform.services.statistics;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
@@ -27,9 +31,6 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
 import org.xowl.platform.utils.OSGiBundle;
-import org.xowl.store.IOUtils;
-import org.xowl.store.xsp.XSPReply;
-import org.xowl.store.xsp.XSPReplyResultCollection;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
@@ -126,7 +127,7 @@ public class StatisticsProvider implements Service, HttpAPIService {
     }
 
     @Override
-    public IOUtils.HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         String[] platforms = parameters.get("platform");
         if (platforms != null && platforms.length > 0)
             return onMessageGetPlatformBundles();
@@ -138,9 +139,9 @@ public class StatisticsProvider implements Service, HttpAPIService {
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetBasicStats() {
+    private HttpResponse onMessageGetBasicStats() {
         updateStats();
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON,
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON,
                 "{\"nbArtifactsTotal\": " + nbArtifactsTotal +
                         ", \"nbArtifactsLive\": " + nbArtifactsLive +
                         ", \"nbInconsistencies\": " + nbInconsistencies + "}");
@@ -151,7 +152,7 @@ public class StatisticsProvider implements Service, HttpAPIService {
      *
      * @return The response
      */
-    private IOUtils.HttpResponse onMessageGetPlatformBundles() {
+    private HttpResponse onMessageGetPlatformBundles() {
         Collection<OSGiBundle> bundles = OSGiBundle.getBundles();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
@@ -162,6 +163,6 @@ public class StatisticsProvider implements Service, HttpAPIService {
             builder.append(bundle.serializedJSON());
         }
         builder.append("]");
-        return new IOUtils.HttpResponse(HttpURLConnection.HTTP_OK, IOUtils.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 }

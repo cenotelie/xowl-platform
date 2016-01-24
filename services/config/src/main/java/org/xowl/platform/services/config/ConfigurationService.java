@@ -20,9 +20,9 @@
 
 package org.xowl.platform.services.config;
 
+import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
-import org.xowl.utils.config.Configuration;
 
 import java.io.File;
 

@@ -152,8 +152,10 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         if (serviceResponse.getContentType() != null)
             response.setContentType(serviceResponse.getContentType());
         if (serviceResponse.getBodyAsBytes() != null) {
+            response.setContentLength(serviceResponse.getBodyAsBytes().length);
             try (OutputStream os = response.getOutputStream()) {
                 os.write(serviceResponse.getBodyAsBytes());
+                os.flush();
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
             }

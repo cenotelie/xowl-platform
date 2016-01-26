@@ -42,7 +42,7 @@ public class XOWLGenericConnectorFactory implements DomainConnectorFactory {
      * The description of the generic domain
      */
     private static final DomainDescription DESCRIPTION = new DomainDescriptionBase(
-            DomainDescription.class.getCanonicalName() + ".GenericDomain",
+            "org.xowl.platform.services.domain.GenericDomain",
             "Generic Domain",
             "This is a generic domain that accepts as input any form of semantic data (triples, quads, ontologies)."
     );

@@ -18,23 +18,33 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.config;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.Service;
 
-import java.util.List;
+import java.io.File;
 
 /**
- * Represents a workflow on the platform
+ * The configuration service that provides configuration elements to other entities
  *
  * @author Laurent Wouters
  */
-public interface Workflow extends Identifiable, Serializable {
+public interface ConfigurationService extends Service {
     /**
-     * Gets the phases in this workflow
+     * Gets the configuration for the specified entity
      *
-     * @return The phases in this workflow
+     * @param entity An entity
+     * @return The corresponding configuration element
      */
-    List<WorkflowPhase> getPhases();
+    Configuration getConfigFor(Identifiable entity);
+
+    /**
+     * Resolves the specified file name against the configuration repository represented by this service
+     *
+     * @param file The file to resolve
+     * @return The resolved file
+     */
+    File resolve(String file);
 }

@@ -12,12 +12,10 @@
 	<name>xOWL Federation - Services</name>
 	<description>The set of services for the xOWL platform</description>
 	<modules>
-		<module>config</module>
 		<module>executor</module>
 		<module>lts</module>
 		<module>consistency</module>
 		<module>domain</module>
-		<module>workflow</module>
 		<module>statistics</module>
 		<module>httpapi</module>
 		<module>webapp</module>

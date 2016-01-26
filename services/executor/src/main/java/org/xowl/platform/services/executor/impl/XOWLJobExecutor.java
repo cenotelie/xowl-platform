@@ -27,8 +27,8 @@ import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logger;
+import org.xowl.platform.config.ConfigurationService;
 import org.xowl.platform.kernel.*;
-import org.xowl.platform.services.config.ConfigurationService;
 import org.xowl.platform.utils.Utils;
 
 import java.io.*;

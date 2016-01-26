@@ -18,30 +18,26 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.workflow;
+package org.xowl.platform.kernel;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Identifiable;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.xowl.platform.config.ConfigurationService;
+import org.xowl.platform.config.impl.FSConfigurationService;
 
 /**
- * Represents an action that can be triggered in a workflow within the platform
+ * Activator for this bundle
  *
  * @author Laurent Wouters
  */
-public interface WorkflowAction extends Identifiable, Serializable {
-    /**
-     * Gets the action's type
-     *
-     * @return The action's type
-     */
-    String getType();
+public class Activator implements BundleActivator {
+    @Override
+    public void start(BundleContext bundleContext) throws Exception {
+        bundleContext.registerService(ConfigurationService.class, new FSConfigurationService(), null);
+    }
 
-    /**
-     * Executes/triggers this action
-     *
-     * @param parameter The parameter, if any
-     * @return The result
-     */
-    XSPReply execute(Object parameter);
+    @Override
+    public void stop(BundleContext bundleContext) throws Exception {
+
+    }
 }

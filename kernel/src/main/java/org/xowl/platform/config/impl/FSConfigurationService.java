@@ -18,13 +18,13 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.config.impl;
+package org.xowl.platform.config.impl;
 
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.services.config.ConfigurationService;
+import org.xowl.platform.config.ConfigurationService;
 import org.xowl.platform.utils.Utils;
 
 import java.io.File;

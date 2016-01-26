@@ -30,7 +30,7 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
-import org.xowl.platform.utils.OSGiBundle;
+import org.xowl.platform.kernel.OSGiBundle;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;

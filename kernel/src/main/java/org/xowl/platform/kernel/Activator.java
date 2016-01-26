@@ -22,8 +22,7 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.config.ConfigurationService;
-import org.xowl.platform.config.impl.FSConfigurationService;
+import org.xowl.platform.kernel.impl.FSConfigurationService;
 
 /**
  * Activator for this bundle

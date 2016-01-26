@@ -18,33 +18,18 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.config;
-
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.Service;
-
-import java.io.File;
+package org.xowl.platform.kernel;
 
 /**
- * The configuration service that provides configuration elements to other entities
+ * Represents the state of an OSGi bundle
  *
  * @author Laurent Wouters
  */
-public interface ConfigurationService extends Service {
-    /**
-     * Gets the configuration for the specified entity
-     *
-     * @param entity An entity
-     * @return The corresponding configuration element
-     */
-    Configuration getConfigFor(Identifiable entity);
-
-    /**
-     * Resolves the specified file name against the configuration repository represented by this service
-     *
-     * @param file The file to resolve
-     * @return The resolved file
-     */
-    File resolve(String file);
+public enum OSGiBundleState {
+    UNINSTALLED,
+    INSTALLED,
+    RESOLVED,
+    STARTING,
+    STOPPING,
+    ACTIVE
 }

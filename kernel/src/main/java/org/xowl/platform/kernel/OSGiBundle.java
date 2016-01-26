@@ -18,13 +18,12 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.utils;
+package org.xowl.platform.kernel;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.utils;
+package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.hime.redist.ParseError;
@@ -44,7 +44,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class Utils {
+public class PlatformUtils {
     /**
      * The default charset
      */

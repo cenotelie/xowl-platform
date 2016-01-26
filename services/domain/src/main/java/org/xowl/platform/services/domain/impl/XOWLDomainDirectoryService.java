@@ -31,7 +31,7 @@ import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.config.ConfigurationService;
+import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobExecutionService;
@@ -39,7 +39,7 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.domain.*;
 import org.xowl.platform.services.domain.jobs.PullArtifactJob;
 import org.xowl.platform.services.domain.jobs.PushArtifactJob;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.net.HttpURLConnection;
 import java.util.*;
@@ -387,9 +387,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = Utils.parseJSON(logger, new String(content, Utils.DEFAULT_CHARSET));
+        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, PlatformUtils.DEFAULT_CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
 
         DomainDescription domain = null;
         for (DomainDescription description : getDomains()) {

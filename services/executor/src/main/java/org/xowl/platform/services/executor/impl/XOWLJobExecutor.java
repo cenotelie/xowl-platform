@@ -27,9 +27,9 @@ import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.config.ConfigurationService;
+import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.*;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -230,7 +230,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * @param content The job's content
      */
     private void reloadJob(String file, String content) {
-        ASTNode definition = Utils.parseJSON(Logger.DEFAULT, content);
+        ASTNode definition = PlatformUtils.parseJSON(Logger.DEFAULT, content);
         if (definition == null) {
             Logger.DEFAULT.error("Failed to parse the job " + file);
             return;
@@ -454,7 +454,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * @return The file name
      */
     private static String getFileName(Job job) {
-        return "job-" + Utils.encode(job.getIdentifier()) + ".json";
+        return "job-" + PlatformUtils.encode(job.getIdentifier()) + ".json";
     }
 
     /**

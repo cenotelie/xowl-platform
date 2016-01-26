@@ -38,7 +38,7 @@ import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.services.domain.BaseDomainConnector;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -166,12 +166,12 @@ class ParametricDomainConnector extends BaseDomainConnector {
         if (loader == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
         BufferedLogger logger = new BufferedLogger();
-        String contentString = new String(content, Utils.DEFAULT_CHARSET);
+        String contentString = new String(content, PlatformUtils.DEFAULT_CHARSET);
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, resource);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, Utils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
         }
         Date artifactCreation = new Date();
         IRINode artifactNode = nodeManager.getIRINode(resource);

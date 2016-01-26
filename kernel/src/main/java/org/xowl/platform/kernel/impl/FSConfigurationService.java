@@ -18,14 +18,14 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.config.impl;
+package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.config.ConfigurationService;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +70,7 @@ public class FSConfigurationService implements ConfigurationService {
         File file = new File(root, entity.getIdentifier() + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
             try (FileInputStream stream = new FileInputStream(file)) {
-                configuration.load(stream, Utils.DEFAULT_CHARSET);
+                configuration.load(stream, PlatformUtils.DEFAULT_CHARSET);
             } catch (IOException exception) {
                 Logger.DEFAULT.error(exception);
             }

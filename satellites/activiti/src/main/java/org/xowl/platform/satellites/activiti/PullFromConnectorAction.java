@@ -33,7 +33,7 @@ import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobStatus;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.net.HttpURLConnection;
 
@@ -81,7 +81,7 @@ public class PullFromConnectorAction implements JavaDelegate {
             throw new BpmnError("Failed to connect to the federation platform");
         if (response.getCode() != HttpURLConnection.HTTP_OK)
             throw new BpmnError(response.getBodyAsString());
-        ASTNode root = Utils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
+        ASTNode root = PlatformUtils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
         if (root == null)
             throw new BpmnError("Failed to retrieve the job");
         Job job = new ForeignJob(root);
@@ -92,7 +92,7 @@ public class PullFromConnectorAction implements JavaDelegate {
                 throw new BpmnError("Failed to connect to the federation platform");
             if (response.getCode() != HttpURLConnection.HTTP_OK)
                 throw new BpmnError(response.getBodyAsString());
-            root = Utils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
+            root = PlatformUtils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
             if (root == null)
                 throw new BpmnError("Failed to retrieve the job");
             job = new ForeignJob(root);

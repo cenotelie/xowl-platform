@@ -42,7 +42,7 @@ import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
-import org.xowl.platform.utils.Utils;
+import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -207,7 +207,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> quads = ((ResultQuads) result).getQuads();
-        Map<SubjectNode, Collection<Quad>> map = Utils.mapBySubject(quads);
+        Map<SubjectNode, Collection<Quad>> map = PlatformUtils.mapBySubject(quads);
         Collection<XOWLInconsistency> inconsistencies = new ArrayList<>();
         for (Map.Entry<SubjectNode, Collection<Quad>> entry : map.entrySet()) {
             String ruleId = null;
@@ -265,13 +265,13 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply createRule(String name, String message, String prefixes, String conditions) {
-        String id = IRI_RULE_BASE + "#" + Utils.encode(name);
+        String id = IRI_RULE_BASE + "#" + PlatformUtils.encode(name);
         String definition = prefixes + " rule <" + IOUtils.escapeAbsoluteURIW3C(id) + "> distinct {\n" + conditions + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
         RDFTLoader loader = new RDFTLoader(new CachedNodes());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
         if (!logger.getErrorMessages().isEmpty())
-            return new XSPReplyFailure(Utils.getLog(logger));
+            return new XSPReplyFailure(PlatformUtils.getLog(logger));
         if (rdfResult == null || rdfResult.getRules().isEmpty())
             return new XSPReplyFailure("Failed to load the rule");
         Collection<String> variables = getVariablesIn(rdfResult.getRules().get(0));

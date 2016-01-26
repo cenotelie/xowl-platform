@@ -88,6 +88,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * The map of statically configured connectors to resolve
      */
     private Map<String, Section> toResolve;
+    /**
+     * Flag whether resolving operations are in progress
+     */
+    private boolean isResolving;
 
     @Override
     public String getIdentifier() {
@@ -232,6 +236,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param factory The new factory, if any
      */
     private void resolveConfigConnectors(DomainConnectorFactory factory) {
+        if (isResolving)
+            return;
+        isResolving = true;
         if (toResolve == null) {
             ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
             if (configurationService == null)
@@ -247,7 +254,8 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                 toResolve.put(domain, section);
             }
         }
-        for (Map.Entry<String, Section> entry : toResolve.entrySet()) {
+        List<Map.Entry<String, Section>> entries = new ArrayList<>(toResolve.entrySet());
+        for (Map.Entry<String, Section> entry : entries) {
             if (factory != null) {
                 // this is a new factory
                 for (DomainDescription domain : factory.getDomains()) {
@@ -273,6 +281,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                 }
             }
         }
+        isResolving = false;
     }
 
     /**

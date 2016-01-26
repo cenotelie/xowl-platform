@@ -20,25 +20,10 @@
 
 package org.xowl.platform.kernel;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.impl.FSConfigurationService;
-
 /**
- * Activator for this bundle
+ * Represents a service that provides the security for the platform
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
-    @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        ConfigurationService configurationService = new FSConfigurationService();
-        Security.initialize();
-        bundleContext.registerService(ConfigurationService.class, configurationService, null);
-    }
-
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+public interface SecurityService extends Service {
 }

@@ -11,10 +11,8 @@ var GRAPH_MIN_HEIGHT = 300;
 var GRAPH_HEIGHT = GRAPH_MIN_HEIGHT;
 var SVG_DB = null;
 var SVG_CONNECTOR = null;
-var SVG_DB_LOADED = false;
 var SVG_DB_SIZE = 1000;
 var SVG_DB_SCALE = 0.15;
-var SVG_CONNECTOR_LOADED = false;
 var SVG_CONNECTOR_SIZE = 256;
 var SVG_CONNECTOR_SCALE = 0.25;
 var GRAPH_DB_X = 20;
@@ -25,14 +23,6 @@ function init() {
 	var index = url.indexOf("/web/");
 	if (index > 0)
 		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
-	document.getElementById("xowlsvg").addEventListener('load', function () {
-		SVG_DB_LOADED = true;
-		render();
-	});
-	document.getElementById("connectorsvg").addEventListener('load', function () {
-		SVG_CONNECTOR_LOADED = true;
-		render();
-	});
 	xowl.getConnectors(function (status, ct, content) {
 		if (status == 200) {
 			CONNECTORS = content;
@@ -188,11 +178,6 @@ function onClickDeleteConnector() {
 	}, SELECTED_CONNECTOR.identifier);
 }
 
-function render() {
-	if (CONNECTORS != null && SVG_DB_LOADED && SVG_CONNECTOR_LOADED)
-		doRender(CONNECTORS);
-}
-
 function loadSVG() {
 	var doc = document.getElementById("xowlsvg").contentDocument.documentElement;
 	SVG_DB = doc.children[0];
@@ -265,15 +250,15 @@ function newLink(def, x1, y1, x2, y2) {
 	return link;
 }
 
-function doRender(connectors) {
+function render() {
 	loadSVG();
-	var svg = createCanvas(connectors.length);
+	var svg = createCanvas(CONNECTORS.length);
 	svg.appendChild(newDB(GRAPH_DB_X, (GRAPH_HEIGHT - SVG_DB_SIZE * SVG_DB_SCALE) / 2));
-	var pad = (GRAPH_HEIGHT - connectors.length * SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE) / (connectors.length + 1);
+	var pad = (GRAPH_HEIGHT - CONNECTORS.length * SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE) / (CONNECTORS.length + 1);
 	var y = pad;
-	for (var i = 0; i != connectors.length; i++) {
-		svg.appendChild(newLink(connectors[i], GRAPH_DB_X + SVG_DB_SIZE * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, GRAPH_CONNECTOR_X - 5, y + SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE / 2));
-		svg.appendChild(newConnector(connectors[i], GRAPH_CONNECTOR_X, y));
+	for (var i = 0; i != CONNECTORS.length; i++) {
+		svg.appendChild(newLink(CONNECTORS[i], GRAPH_DB_X + SVG_DB_SIZE * SVG_DB_SCALE + 5, GRAPH_HEIGHT / 2, GRAPH_CONNECTOR_X - 5, y + SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE / 2));
+		svg.appendChild(newConnector(CONNECTORS[i], GRAPH_CONNECTOR_X, y));
 		y += SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE + pad;
 	}
 }

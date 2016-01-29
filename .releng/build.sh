@@ -7,7 +7,7 @@ ROOT="$(dirname "$RELENG")"
 # Build
 VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -f "$ROOT/pom.xml" -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')
 echo "Building artifacts for version $VERSION"
-mvn package -f "$ROOT/pom.xml" -DskipTests -Dgpg.skip=true
+mvn install -f "$ROOT/pom.xml" -DskipTests -Dgpg.skip=true
 mvn dependency:copy-dependencies -f "$ROOT/kernel/pom.xml"
 
 # Extract the bundles

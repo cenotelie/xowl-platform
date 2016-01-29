@@ -27,13 +27,39 @@
 		<hr style="margin-top: 5px; margin-bottom: 5px;" />
 	</div>
 	<div class="body">
-		<div class="panel panel-default" id="loader">
-			<div class="panel-body">
-				<img src="/web/branding/spinner.gif" width="32" height="32" />
-				<span id="loader-text">Loading ...</span>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-warning">
+						<div class="panel-body">
+							<span class="text-warning">The data presented here come from</span>
+							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
+							<strong class="text-warning">live</strong>
+							<span class="text-warning">. Data in artifacts not pushed to</span>
+							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
+							<strong class="text-warning">live</strong>
+							<span class="text-warning">won't appear here.</span>
+							<a href="/web/modules/core/artifacts/">Manage artifacts</a>
+						</div>
+					</div>
+				</div>
 			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-default" id="loader">
+						<div class="panel-body">
+							<img src="/web/branding/spinner.gif" width="32" height="32" />
+							<span id="loader-text">Loading ...</span>
+						</div>
+					</div>
+				</div>
+			</div>
+            <div class="row">
+                <div class="col-md-12">
+
+                </div>
+            </div>
 		</div>
-		
 	</div>
 	<script src="/web/xowl/xowl-api-platform.js"></script>
 	<script src="/web/xowl/xowl-ui.js"></script>

@@ -31,10 +31,10 @@ import java.util.Collection;
  * An artifact may have a version tag attached to it.
  * In this case, the base identifier refer to the common identifier for all versions of the artifact.
  * The expected metadata schema is as follow:
- * v1 -- base --> xxx
- * v1 -- version --> v1
- * v2 -- base --> xxx
- * v2 -- version --> v2
+ * v1 -- base --&gt; xxx
+ * v1 -- version --&gt; v1
+ * v2 -- base --&gt; xxx
+ * v2 -- version --&gt; v2
  * An artifact contains two sets of quads:
  * - Metadata quads that express knowledge about the artifact itself.
  * Metadata quads must be contained in the platform artifact graph.

@@ -27,12 +27,15 @@ import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The activator for this bundle
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public class Activator implements BundleActivator, WebModuleDirectory {
     /**
      * The URI prefix for web connections
      */
@@ -46,9 +49,18 @@ public class Activator implements BundleActivator {
      * The tracker of the HTTP service
      */
     private ServiceTracker httpTracker;
+    /**
+     * The tracker of web module services
+     */
+    private ServiceTracker moduleTracker;
+    /**
+     * The current web module services
+     */
+    private Map<String, WebModuleService> moduleServices;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        moduleServices = new HashMap<>();
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
@@ -61,7 +73,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new HttpDefaultContext(httpService));
+                    httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new HttpDefaultContext(httpService, Activator.this));
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }
@@ -69,10 +81,30 @@ public class Activator implements BundleActivator {
             }
         };
         httpTracker.open();
+
+        moduleTracker = new ServiceTracker<WebModuleService, WebModuleService>(bundleContext, WebModuleService.class, null) {
+            public void removedService(ServiceReference reference, WebModuleService service) {
+                moduleServices.remove(service.getURI());
+            }
+
+            public WebModuleService addingService(ServiceReference reference) {
+                WebModuleService moduleService = (WebModuleService) bundleContext.getService(reference);
+                moduleServices.put(moduleService.getURI(), moduleService);
+                return moduleService;
+            }
+        };
+        moduleTracker.open();
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
         httpTracker.close();
+        moduleTracker.close();
+        moduleServices.clear();
+    }
+
+    @Override
+    public WebModuleService getServiceFor(String uri) {
+        return moduleServices.get(uri);
     }
 }

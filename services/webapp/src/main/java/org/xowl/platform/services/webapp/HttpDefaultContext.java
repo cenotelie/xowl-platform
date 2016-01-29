@@ -27,7 +27,6 @@ import org.xowl.platform.kernel.ServiceUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -44,14 +43,19 @@ class HttpDefaultContext implements HttpContext {
      * The current branding service
      */
     private BrandingService brandingService;
+    /**
+     * The directory of web module services
+     */
+    private final WebModuleDirectory moduleDirectory;
 
     /**
      * Initialize this context
      *
      * @param httpService The HTTP service
      */
-    public HttpDefaultContext(HttpService httpService) {
+    public HttpDefaultContext(HttpService httpService, WebModuleDirectory moduleDirectory) {
         this.defaultContext = httpService.createDefaultHttpContext();
+        this.moduleDirectory = moduleDirectory;
     }
 
     /**
@@ -75,19 +79,35 @@ class HttpDefaultContext implements HttpContext {
 
     @Override
     public URL getResource(String name) {
+        if (name.endsWith("/"))
+            name += "index.html";
         if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + BrandingService.BRANDING)) {
             String localName = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + BrandingService.BRANDING.length());
             return getBrandingService().getResource(localName);
-        }
-        URL result = defaultContext.getResource(name);
-        if (name.endsWith("/")) {
-            try {
-                result = new URL(result, "index.html");
-            } catch (MalformedURLException exception) {
-                // ignore this;
+        } else if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + WebModuleService.MODULES)) {
+            String rest = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + WebModuleService.MODULES.length());
+            int index = rest.indexOf("/");
+            if (index != -1) {
+                String moduleName = rest.substring(0, index);
+                if (!"core".equals(moduleName))
+                    return serveModule(moduleName, rest.substring(index + 1));
             }
         }
-        return result;
+        return defaultContext.getResource(name);
+    }
+
+    /**
+     * Serves a resource for a module
+     *
+     * @param moduleURI The URI part of the module
+     * @param resource  The module's resource
+     * @return The URL of the requested resource
+     */
+    private URL serveModule(String moduleURI, String resource) {
+        WebModuleService service = moduleDirectory.getServiceFor(moduleURI);
+        if (moduleURI == null)
+            return null;
+        return service.getResource(resource);
     }
 
     @Override

@@ -13,6 +13,8 @@ mvn dependency:copy-dependencies -f "$ROOT/kernel/pom.xml"
 # Extract the bundles
 cp "$ROOT/kernel/target/dependency/redist-"* "$RELENG/docker/"
 cp "$ROOT/kernel/target/dependency/xowl-"* "$RELENG/docker/"
+cp "$ROOT/kernel/target/dependency/shiro-"* "$RELENG/docker/"
+cp "$ROOT/kernel/target/dependency/slf4j-"* "$RELENG/docker/"
 cp "$ROOT/kernel/target/xowl-kernel-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/consistency/target/xowl-service-consistency-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/domain/target/xowl-service-domain-$VERSION.jar" "$RELENG/docker/"

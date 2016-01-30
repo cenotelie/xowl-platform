@@ -37,12 +37,12 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
-import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -65,35 +65,39 @@ public class XOWLConsistencyService implements ConsistencyService {
     /**
      * The URI of the graph for metadata on the consistency rules
      */
-    private static final String IRI_RULE_METADATA = "http://xowl.org/platform/consistency/metadata";
-    /**
-     * IRI of the schema for inconsistencies
-     */
-    private static final String IRI_SCHEMA = "http://xowl.org/platform/schemas/consistency";
-    /**
-     * The URI for the concept of rule
-     */
-    private static final String IRI_RULE = IRI_SCHEMA + "#Rule";
-    /**
-     * The URI for the concept of inconsistency
-     */
-    private static final String IRI_INCONSISTENCY = IRI_SCHEMA + "#Inconsistency";
-    /**
-     * The URI for the concept of definition
-     */
-    private static final String IRI_DEFINITION = IRI_SCHEMA + "#definition";
-    /**
-     * The URI for the concept of message
-     */
-    private static final String IRI_MESSAGE = IRI_SCHEMA + "#message";
-    /**
-     * The URI for the concept of antecedent
-     */
-    private static final String IRI_ANTECEDENT = IRI_SCHEMA + "/antecedent#";
+    private static final String IRI_RULE_METADATA = KernelSchema.URI_BASE + "/consistency/metadata";
     /**
      * The base URI for a consistency rule
      */
-    private static final String IRI_RULE_BASE = IRI_SCHEMA + "/rule";
+    private static final String IRI_RULE_BASE = KernelSchema.URI_BASE + "/consistency/rule";
+    /**
+     * The base URI for a consistency rule
+     */
+    private static final String IRI_INCONSISTENCY_BASE = KernelSchema.URI_BASE + "/consistency/inconsistency";
+    /**
+     * The URI for the concept of rule
+     */
+    private static final String IRI_RULE = KernelSchema.URI_KERNEL + "#Rule";
+    /**
+     * The URI for the concept of inconsistency
+     */
+    private static final String IRI_INCONSISTENCY = KernelSchema.URI_KERNEL + "#Inconsistency";
+    /**
+     * The URI for the concept of definition
+     */
+    private static final String IRI_DEFINITION = KernelSchema.URI_KERNEL + "#definition";
+    /**
+     * The URI for the concept of message
+     */
+    private static final String IRI_MESSAGE = KernelSchema.URI_KERNEL + "#message";
+    /**
+     * The URI for the concept of producedBy
+     */
+    private static final String IRI_PRODUCED_BY = KernelSchema.URI_KERNEL + "#producedBy";
+    /**
+     * The URI for the concept of antecedent
+     */
+    private static final String IRI_ANTECEDENT = KernelSchema.URI_KERNEL + "#antecedent_";
 
 
     @Override
@@ -193,6 +197,11 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply getInconsistencies() {
+        XSPReply reply = getRules();
+        if (!reply.isSuccess())
+            return reply;
+        Collection<XOWLConsistencyRule> rules = ((XSPReplyResultCollection<XOWLConsistencyRule>) reply).getData();
+
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return new XSPReplyFailure("Failed to retrieve the LTS service");
@@ -214,7 +223,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             String msg = null;
             Map<String, Node> antecedents = new HashMap<>();
             for (Quad quad : entry.getValue()) {
-                if (IRI_DEFINITION.equals(((IRINode) quad.getProperty()).getIRIValue())) {
+                if (IRI_PRODUCED_BY.equals(((IRINode) quad.getProperty()).getIRIValue())) {
                     ruleId = ((IRINode) quad.getObject()).getIRIValue();
                 } else if (IRI_MESSAGE.equals(((IRINode) quad.getProperty()).getIRIValue())) {
                     msg = ((LiteralNode) quad.getObject()).getLexicalValue();
@@ -223,9 +232,15 @@ public class XOWLConsistencyService implements ConsistencyService {
                     antecedents.put(name, quad.getObject());
                 }
             }
-            XSPReply reply = getRule(ruleId);
-            if (reply.isSuccess())
-                inconsistencies.add(new XOWLInconsistency(IRI_SCHEMA + "/inconsistency#" + UUID.randomUUID().toString(), msg, ((XSPReplyResult<XOWLConsistencyRule>) reply).getData(), antecedents));
+            XOWLConsistencyRule rule = null;
+            for (XOWLConsistencyRule potential : rules) {
+                if (potential.getIdentifier().equals(ruleId)) {
+                    rule = potential;
+                    break;
+                }
+            }
+            if (rule != null)
+                inconsistencies.add(new XOWLInconsistency(IRI_INCONSISTENCY_BASE + UUID.randomUUID().toString(), msg, rule, antecedents));
         }
         return new XSPReplyResultCollection<>(inconsistencies);
     }
@@ -292,7 +307,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         builder.append(IOUtils.escapeStringW3C(message));
         builder.append("\"\n");
         builder.append("?e <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION));
+        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_PRODUCED_BY));
         builder.append("> <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(id));
         builder.append(">\n");

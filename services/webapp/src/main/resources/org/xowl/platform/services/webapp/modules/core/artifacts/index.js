@@ -92,7 +92,7 @@ function prepareArtifacts() {
 	ARTIFACTS.sort(function (x, y) {
 		return x.name.localeCompare(y.name);
 	});
-	renderArtifacts();
+	renderArtifactFamilies();
 }
 
 function renderConnectors() {
@@ -156,100 +156,91 @@ function renderConnectors() {
 	}
 }
 
-function renderArtifacts() {
-	var rows = document.getElementById("artifacts");
+function renderArtifactFamilies() {
+	var table = document.getElementById("artifacts");
 	for (var i = 0; i != ARTIFACTS.length; i++) {
-		var group = ARTIFACTS[i];
-		var topRow = document.createElement("tr");
-		var cells = [
-			document.createElement("td"),
-			document.createElement("td"),
-			document.createElement("td"),
-			document.createElement("td")
-		];
-		var childRows = [];
-		var button = document.createElement("span");
-		button.setAttribute("aria-hidden", "true");
-		button.className = "glyphicon glyphicon-chevron-down";
-		button.style.cursor = "pointer";
-		button.style.marginLeft = "10px";
-		cells[0].appendChild(button);
-		(function (group, button, rows, parentRow, childRows) {
-			button.onclick = function () { onClickShowMore(group, button, rows, topRow, childRows) };
-		})(group, button, rows, topRow, childRows);
-		cells[0].appendChild(document.createTextNode((i + 1).toString()));
-		cells[1].appendChild(document.createTextNode(group.name));
-		cells[2].appendChild(document.createTextNode(group.version));
-		if (group.live.length == 0)
-			cells[3].appendChild(document.createTextNode("none"));
-		else if (group.live.length > 1)
-			cells[3].appendChild(document.createTextNode("multiple"));
-		else if (group.version === group.live[0].version)
-			cells[3].appendChild(document.createTextNode("latest"));
-		else
-			cells[3].appendChild(document.createTextNode("older version"));
-		for (var j = 0; j != cells.length; j++)
-			topRow.appendChild(cells[j]);
-		rows.appendChild(topRow);
+		var result = renderArtifactFamily(ARTIFACTS[i], i);
+		table.appendChild(result.top);
+		for (var j = 0; j != result.children.length; j++)
+			table.appendChild(result.children[j]);
 	}
 	document.getElementById("loader").style.display = "none";
 }
 
-function onClickShowMore(group, button, rows, parentRow, childRows) {
+function renderArtifactFamily(family, index) {
+	var topRow = document.createElement("tr");
+	var cells = [
+		document.createElement("td"),
+		document.createElement("td"),
+		document.createElement("td"),
+		document.createElement("td")
+	];
+	var childRows = [];
+	var button = document.createElement("span");
+	button.setAttribute("aria-hidden", "true");
+	button.className = "glyphicon glyphicon-chevron-down";
+	button.style.cursor = "pointer";
+	button.style.marginLeft = "10px";
+	button.onclick = function () { onClickShowMore(button, childRows) };
+	cells[0].appendChild(button);
+	cells[0].appendChild(document.createTextNode((index + 1).toString()));
+	cells[1].appendChild(document.createTextNode(family.name));
+	cells[2].appendChild(document.createTextNode(family.version));
+	if (family.live.length == 0)
+		cells[3].appendChild(document.createTextNode("none"));
+	else if (family.live.length > 1)
+		cells[3].appendChild(document.createTextNode("multiple"));
+	else if (family.version === family.live[0].version)
+		cells[3].appendChild(document.createTextNode("latest"));
+	else
+		cells[3].appendChild(document.createTextNode("older version"));
+	for (var i = 0; i != cells.length; i++)
+		topRow.appendChild(cells[i]);
+	for (var i = 0; i != family.artifacts.length; i++)
+		childRows.push(renderArtifact(family.artifacts[i]));
+	return { top: topRow, children: childRows };
+}
+
+function renderArtifact(artifact) {
+	var row = document.createElement("tr");
+	row.style.display = "none";
+	var cells = [
+		document.createElement("td"),
+		document.createElement("td"),
+		document.createElement("td"),
+		document.createElement("td")
+	];
+	var diff = document.createElement("span");
+	diff.className = "badge";
+	diff.style.cursor = "pointer";
+	diff.appendChild(document.createTextNode("diff"));
+	diff.onclick = function () { onClickSelectDiff(artifact); }
+	cells[0].appendChild(diff);
+	var link = document.createElement("a");
+	link.href = "artifact.html?id=" + encodeURIComponent(artifact.identifier);
+	link.appendChild(document.createTextNode(artifact.name));
+	cells[1].appendChild(link);
+	cells[2].appendChild(document.createTextNode(artifact.version));
+	var toggle = document.createElement("div");
+	toggle.className = "toggle-button" + (artifact.isLive ? " toggle-button-selected" : "");
+	toggle.appendChild(document.createElement("button"));
+	toggle.onclick = function () { onClickToggleLive(artifact); }
+	cells[3].appendChild(toggle);
+	for (var j = 0; j != cells.length; j++)
+		row.appendChild(cells[j]);
+	return row;
+}
+
+function onClickShowMore(button, childRows) {
 	if (button.className === "glyphicon glyphicon-chevron-down") {
 		// down
-		if (childRows.length === 0) {
-			// render the children
-			for (var i = 0; i != group.artifacts.length; i++) {
-				var row = document.createElement("tr");
-				var cells = [
-					document.createElement("td"),
-					document.createElement("td"),
-					document.createElement("td"),
-					document.createElement("td")
-				];
-				var diff = document.createElement("span");
-				diff.className = "badge";
-				diff.style.cursor = "pointer";
-				diff.appendChild(document.createTextNode("diff"));
-				(function (artifact) {
-					diff.onclick = function () { onClickSelectDiff(artifact); }
-				})(group.artifacts[i]);
-				cells[0].appendChild(diff);
-				var link = document.createElement("a");
-				link.href = "artifact.html?id=" + encodeURIComponent(group.artifacts[i].identifier);
-				link.appendChild(document.createTextNode(group.artifacts[i].name));
-				cells[1].appendChild(link);
-				cells[2].appendChild(document.createTextNode(group.artifacts[i].version));
-				var toggle = document.createElement("div");
-				toggle.className = "toggle-button" + (group.artifacts[i].isLive ? " toggle-button-selected" : "");
-				toggle.appendChild(document.createElement("button"));
-				(function (artifact) {
-					toggle.onclick = function () { onClickToggleLive(artifact); }
-				})(group.artifacts[i]);
-				cells[3].appendChild(toggle);
-				for (var j = 0; j != cells.length; j++)
-					row.appendChild(cells[j]);
-				childRows.push(row);
-			}
-		}
-		if (rows.lastChild === parentRow) {
-			for (var j = 0; j != childRows.length; j++) {
-				rows.appendChild(childRows[j]);
-			}
-		} else {
-			var index = rows.childNodes.indexOf(parentRow);
-			var target = rows.childNodes[index + 1];
-			for (var j = 0; j != childRows.length; j++) {
-				rows.insertBefore(childRows[j], target);
-			}
-		}
+		for (var i = 0; i != childRows.length; i++)
+			childRows[i].style.display = "";
 		button.className = "glyphicon glyphicon-chevron-up";
 	} else {
 		// up
-		for (var i = 0; i != childRows.length; i++) {
-			rows.removeChild(childRows[i]);
-		}
+		for (var i = 0; i != childRows.length; i++)
+			childRows[i].style.display = "none";
 		button.className = "glyphicon glyphicon-chevron-down";
 	}
 }

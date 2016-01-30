@@ -45,7 +45,7 @@ function renderRunning(jobs) {
 		data += jobs[i].timeRun;
 		data += "</td></tr>";
 	}
-	document.getElementById("jobs-scheduled").innerHTML = data;
+	document.getElementById("jobs-running").innerHTML = data;
 }
 
 function renderCompleted(jobs) {

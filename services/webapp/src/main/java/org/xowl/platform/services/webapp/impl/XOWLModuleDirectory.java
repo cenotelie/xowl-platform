@@ -20,7 +20,6 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -90,13 +89,7 @@ public class XOWLModuleDirectory extends HttpServlet implements WebModuleDirecto
             if (!first)
                 builder.append(", ");
             first = false;
-            builder.append("{\"id\": \"");
-            builder.append(IOUtils.escapeStringJSON(service.getIdentifier()));
-            builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(service.getName()));
-            builder.append("\", \"uri\": \"");
-            builder.append(IOUtils.escapeStringJSON(service.getURI()));
-            builder.append("\"}");
+            builder.append(service.serializedJSON());
         }
         builder.append("]");
         byte[] content = builder.toString().getBytes(PlatformUtils.DEFAULT_CHARSET);

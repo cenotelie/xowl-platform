@@ -20,42 +20,64 @@
 
 package org.xowl.platform.services.webapp;
 
+import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Service;
-
-import java.net.URL;
-import java.util.Collection;
 
 /**
- * Represents an additional module for the web application
+ * Represents a port of a web module
  *
  * @author Laurent Wouters
  */
-public interface WebModuleService extends Service, Serializable {
+public class WebModulePart implements Serializable {
     /**
-     * The modules folder
+     * The name of this part
      */
-    String MODULES = "/modules/";
+    private final String name;
+    /**
+     * The URI element for this part
+     */
+    private final String uri;
 
     /**
-     * Gets the URI part for this module
+     * Initializes this web module part
      *
-     * @return The URI part for this module
+     * @param name The name of this part
+     * @param uri  The URI element for this part
      */
-    String getURI();
+    public WebModulePart(String name, String uri) {
+        this.name = name;
+        this.uri = uri;
+    }
 
     /**
-     * Gets the parts for this module, if any
+     * Gets the name of this part
      *
-     * @return The parts for this module
+     * @return The name of this part
      */
-    Collection<WebModulePart> getParts();
+    public String getName() {
+        return name;
+    }
 
     /**
-     * Gets the URL for the requested resource
+     * Gets the URI element for this part
      *
-     * @param resource The requested resource, local to this module
-     * @return The URL for the requested resource
+     * @return The URI element for this part
      */
-    URL getResource(String resource);
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public String serializedString() {
+        return name;
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"name\": \"" +
+                IOUtils.escapeStringJSON(name) +
+                "\", \"uri\": \"" +
+                IOUtils.escapeStringJSON(uri) +
+                "\"}";
+    }
 }

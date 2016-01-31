@@ -76,7 +76,7 @@ public class StatisticsProvider implements Service, HttpAPIService {
      * Initializes this provider
      */
     public StatisticsProvider() {
-        this.lastUpdate = Long.MIN_VALUE;
+        this.lastUpdate = System.nanoTime() - REFRESH;
         this.nbArtifactsTotal = 0;
         this.nbArtifactsLive = 0;
         this.nbInconsistencies = 0;

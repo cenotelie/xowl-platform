@@ -93,8 +93,7 @@ public class XOWLHttpContext implements HttpContext {
             int index = rest.indexOf("/");
             if (index != -1) {
                 String moduleName = rest.substring(0, index);
-                if (!"core".equals(moduleName))
-                    return serveModule(moduleName, rest.substring(index + 1));
+                return serveModule(moduleName, rest.substring(index + 1));
             }
         }
         return defaultContext.getResource(name);

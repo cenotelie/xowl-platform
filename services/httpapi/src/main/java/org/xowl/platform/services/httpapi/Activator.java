@@ -27,6 +27,7 @@ import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.services.httpapi.impl.XOWLMainHTTPContext;
 import org.xowl.platform.services.httpapi.impl.XOWLMainHTTPServer;
 
 import java.util.Hashtable;
@@ -60,7 +61,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerServlet(HttpAPIService.URI_API, server, null, null);
+                    httpService.registerServlet(HttpAPIService.URI_API, server, null, new XOWLMainHTTPContext(httpService));
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }

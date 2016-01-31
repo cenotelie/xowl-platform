@@ -44,6 +44,7 @@ public class XOWLSecurityRealm extends AuthenticatingRealm {
      */
     public XOWLSecurityRealm(String endpoint) {
         this.server = new RemoteServer(endpoint);
+        this.setName("xOWL Server Realm");
     }
 
     @Override

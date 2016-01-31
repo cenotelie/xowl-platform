@@ -2,7 +2,45 @@
 // Provided under LGPLv3
 
 function XOWL() {
-	this.endpoint = "/api/";
+	this.endpoint = '/api';
+	this.authToken = localStorage.getItem('xowl.authToken');
+	this.userName = localStorage.getItem('xowl.userName');
+}
+
+XOWL.prototype.isLoggedIn = function () {
+	return (this.authToken !== null && this.userName !== null);
+}
+
+XOWL.prototype.getUser = function () {
+	return this.userName;
+}
+
+XOWL.prototype.login = function (callback, login, password) {
+	var _self = this;
+	var token = window.btoa(unescape(encodeURIComponent(login + ':' + password)));
+	this.authToken = token;
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			_self.authToken = token;
+			_self.userName = login;
+			localStorage.setItem('xowl.authToken', token);
+			localStorage.setItem('xowl.userName', login);
+			callback(code, type, content);
+		} else {
+			_self.authToken = null;
+			_self.userName = null;
+			localStorage.removeItem('xowl.authToken');
+			localStorage.removeItem('xowl.userName');
+			callback(code, type, content);
+		}
+	}, "/security");
+}
+
+XOWL.prototype.logout = function () {
+	this.authToken = null;
+	this.userName = null;
+	localStorage.removeItem('xowl.authToken');
+	localStorage.removeItem('xowl.userName');
 }
 
 XOWL.prototype.getBasicStats = function (callback) {
@@ -289,6 +327,8 @@ XOWL.prototype.doJSQuery = function (callback, target) {
 	}
 	xmlHttp.open("GET", this.endpoint + target, true);
 	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
+	if (this.authToken !== null)
+		xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	xmlHttp.send();
 }
 
@@ -307,6 +347,8 @@ XOWL.prototype.doJSCommand = function (callback, target, payload) {
 	xmlHttp.open("POST", this.endpoint + target, true);
 	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
 	xmlHttp.setRequestHeader("Content-Type", "application/json");
+	if (this.authToken !== null)
+		xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	xmlHttp.send(JSON.stringify(payload));
 }
 
@@ -325,6 +367,8 @@ XOWL.prototype.doJSSPARQL = function (callback, payload) {
 	xmlHttp.open("POST", this.endpoint + "sparql", true);
 	xmlHttp.setRequestHeader("Accept", "application/sparql-results+json, application/n-quads");
 	xmlHttp.setRequestHeader("Content-Type", "application/sparql-query");
+	if (this.authToken !== null)
+		xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	xmlHttp.send(payload);
 }
 
@@ -343,5 +387,7 @@ XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentTy
 	xmlHttp.open("POST", this.endpoint + connectorURI + "?name=" + encodeURIComponent(name) + "&base=" + encodeURIComponent(base) + "&version=" + encodeURIComponent(version), true);
 	xmlHttp.setRequestHeader("Accept", "application/json");
 	xmlHttp.setRequestHeader("Content-Type", contentType);
+	if (this.authToken !== null)
+		xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	xmlHttp.send(payload);
 }

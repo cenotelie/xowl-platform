@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -26,6 +26,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.xowl.platform.kernel.impl.XOWLSecurityRealm;
 
@@ -42,6 +43,16 @@ public class Security {
         AuthenticatingRealm realm = new XOWLSecurityRealm(null);
         RealmSecurityManager manager = new DefaultSecurityManager(realm);
         SecurityUtils.setSecurityManager(manager);
+    }
+
+    /**
+     * Gets the realm of this platform
+     *
+     * @return The realm of this platform
+     */
+    public static String getRealm() {
+        Realm realm = ((RealmSecurityManager) SecurityUtils.getSecurityManager()).getRealms().iterator().next();
+        return realm.getName();
     }
 
     /**

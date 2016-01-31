@@ -168,10 +168,10 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @param response The response to add headers to
      */
     private void addCORSHeader(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Cache-Control");
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Credentials", "false");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Cache-Control", "no-cache");
     }
 }

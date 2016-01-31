@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-platform</artifactId>
-		<version>0.1.2</version>
+		<version>0.1.3-SNAPSHOT</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-kernel</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.1.2</version>
+	<version>0.1.3-SNAPSHOT</version>
 	<name>xOWL Federation - Kernel</name>
 	<description>Kernel APIs for the xOWL federation platform</description>
 	<dependencies>

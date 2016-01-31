@@ -47,17 +47,16 @@ function renderModule(myModule) {
 	header.appendChild(linkModule);
 	var body = document.createElement("div");
 	body.classList.add("panel-body");
-	var list = document.createElement("ul");
 	for (var i = 0; i != myModule.parts.length; i++) {
 		var part = myModule.parts[i];
-		var li = document.createElement("li");
+		var li = document.createElement("div");
 		var link = document.createElement("a");
 		link.appendChild(document.createTextNode(part.name));
+		link.classList.add("btn");
 		link.href = "/web/modules/" + myModule.uri + "/" + part.uri + "/";
 		li.appendChild(link);
-		list.appendChild(li);
+		body.appendChild(li);
 	}
-	body.appendChild(list);
 	panel.appendChild(header);
 	panel.appendChild(body);
 	return panel;

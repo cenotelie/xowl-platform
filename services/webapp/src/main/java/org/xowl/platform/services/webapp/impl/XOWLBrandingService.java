@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -18,7 +18,10 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.webapp;
+package org.xowl.platform.services.webapp.impl;
+
+import org.xowl.platform.services.webapp.Activator;
+import org.xowl.platform.services.webapp.BrandingService;
 
 import java.net.URL;
 
@@ -27,7 +30,7 @@ import java.net.URL;
  *
  * @author Laurent Wouters
  */
-class XOWLBrandingService implements BrandingService {
+public class XOWLBrandingService implements BrandingService {
     @Override
     public String getIdentifier() {
         return XOWLBrandingService.class.getCanonicalName();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -18,11 +18,15 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.webapp;
+package org.xowl.platform.services.webapp.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.services.webapp.Activator;
+import org.xowl.platform.services.webapp.BrandingService;
+import org.xowl.platform.services.webapp.WebModuleDirectory;
+import org.xowl.platform.services.webapp.WebModuleService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +38,7 @@ import java.net.URL;
  *
  * @author Laurent Wouters
  */
-class HttpDefaultContext implements HttpContext {
+public class XOWLHttpContext implements HttpContext {
     /**
      * The reference default context
      */
@@ -53,7 +57,7 @@ class HttpDefaultContext implements HttpContext {
      *
      * @param httpService The HTTP service
      */
-    public HttpDefaultContext(HttpService httpService, WebModuleDirectory moduleDirectory) {
+    public XOWLHttpContext(HttpService httpService, WebModuleDirectory moduleDirectory) {
         this.defaultContext = httpService.createDefaultHttpContext();
         this.moduleDirectory = moduleDirectory;
     }

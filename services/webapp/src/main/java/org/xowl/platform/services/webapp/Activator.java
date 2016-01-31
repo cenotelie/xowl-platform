@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -26,16 +26,15 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.xowl.platform.services.webapp.impl.XOWLHttpContext;
+import org.xowl.platform.services.webapp.impl.XOWLModuleDirectory;
 
 /**
  * The activator for this bundle
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator, WebModuleDirectory {
+public class Activator implements BundleActivator {
     /**
      * The URI prefix for web connections
      */
@@ -54,13 +53,13 @@ public class Activator implements BundleActivator, WebModuleDirectory {
      */
     private ServiceTracker moduleTracker;
     /**
-     * The current web module services
+     * The directory of modules
      */
-    private Map<String, WebModuleService> moduleServices;
+    private XOWLModuleDirectory directory;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        moduleServices = new HashMap<>();
+        directory = new XOWLModuleDirectory();
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
@@ -73,7 +72,8 @@ public class Activator implements BundleActivator, WebModuleDirectory {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new HttpDefaultContext(httpService, Activator.this));
+                    httpService.registerServlet(URI_WEB + "/modules/index.json", directory, null, null);
+                    httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new XOWLHttpContext(httpService, directory));
                 } catch (Exception exception) {
                     Logger.DEFAULT.error(exception);
                 }
@@ -84,12 +84,12 @@ public class Activator implements BundleActivator, WebModuleDirectory {
 
         moduleTracker = new ServiceTracker<WebModuleService, WebModuleService>(bundleContext, WebModuleService.class, null) {
             public void removedService(ServiceReference reference, WebModuleService service) {
-                moduleServices.remove(service.getURI());
+                directory.unregister(service);
             }
 
             public WebModuleService addingService(ServiceReference reference) {
                 WebModuleService moduleService = (WebModuleService) bundleContext.getService(reference);
-                moduleServices.put(moduleService.getURI(), moduleService);
+                directory.register(moduleService);
                 return moduleService;
             }
         };
@@ -100,11 +100,5 @@ public class Activator implements BundleActivator, WebModuleDirectory {
     public void stop(BundleContext bundleContext) throws Exception {
         httpTracker.close();
         moduleTracker.close();
-        moduleServices.clear();
-    }
-
-    @Override
-    public WebModuleService getServiceFor(String uri) {
-        return moduleServices.get(uri);
     }
 }

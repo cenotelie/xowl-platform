@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var FLAG = false;
 
 function init() {
+	setupPage(xowl);
 	xowl.getConsistencyRules(function (status, ct, content) {
 		if (status == 200) {
 			renderRules(content);

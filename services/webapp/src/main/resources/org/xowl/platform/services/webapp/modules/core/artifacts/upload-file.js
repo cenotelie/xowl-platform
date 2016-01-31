@@ -10,6 +10,7 @@ var ARTIFACT_BASE = getParameterByName("base");
 var ARTIFACT_VERSION = getParameterByName("version");
 
 function init() {
+	setupPage(xowl);
 	if (!CONNECTOR || CONNECTOR === null || CONNECTOR === ""
 		|| !ARTIFACT_TYPE || ARTIFACT_TYPE === null || ARTIFACT_TYPE === ""
 		|| !ARTIFACT_NAME || ARTIFACT_NAME === null || ARTIFACT_NAME === ""

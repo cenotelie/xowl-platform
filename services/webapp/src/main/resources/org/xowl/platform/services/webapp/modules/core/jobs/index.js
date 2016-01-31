@@ -4,6 +4,7 @@
 var xowl = new XOWL();
 
 function init() {
+	setupPage(xowl);
 	xowl.getJobs(function (status, ct, content) {
 		if (status == 200) {
 			renderQueue(content.scheduled);

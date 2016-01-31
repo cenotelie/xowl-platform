@@ -6,6 +6,7 @@ var connectorId = getParameterByName("id");
 var JOB = null;
 
 function init() {
+	setupPage(xowl);
 	if (!connectorId || connectorId === null || connectorId === "")
 		return;
 	document.getElementById("placeholder-connector").innerHTML = connectorId;

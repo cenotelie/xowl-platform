@@ -1,2 +1,8 @@
-// Copyright (c) 2016 Laurent Wouters
-// Provided under LGPLv3
+// Copyright (c) 2015 Laurent Wouters
+// Provided under LGPL v3
+
+var xowl = new XOWL();
+
+function init() {
+	setupPage(xowl);
+}

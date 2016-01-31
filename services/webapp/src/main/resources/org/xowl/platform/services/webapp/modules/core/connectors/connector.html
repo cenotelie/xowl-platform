@@ -17,13 +17,16 @@
 		<object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
 		<div style="display: inline-block; margin-left: 50px;">
 			<span style="display: inline-block;">
-        <ol class="breadcrumb">
-          <li><a href="/web/">Home</a></li>
-          <li><a href="/web/modules/core/">Core</a></li>
-          <li><a href="/web/modules/core/connectors/">Connectors</a></li>
-          <li class="active" id="placeholder-connector">Connector</li>
-        </ol>
-      </span>
+				<ol class="breadcrumb">
+					<li><a href="/web/">Home</a></li>
+					<li><a href="/web/modules/core/">Core</a></li>
+					<li><a href="/web/modules/core/connectors/">Connectors</a></li>
+					<li class="active" id="placeholder-connector">Connector</li>
+				</ol>
+			</span>
+		</div>
+		<div style="float: right; margin-right: 20px;">
+			<div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
 		</div>
 		<hr style="margin-top: 5px; margin-bottom: 5px;" />
 	</div>
@@ -86,7 +89,6 @@
 	<script src="/web/xowl/xowl-utils.js"></script>
 	<script src="connector.js"></script>
 	<script>
-		document.getElementById("branding-title").onload = function () { document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title; };
 		init();
 	</script>
 </body>

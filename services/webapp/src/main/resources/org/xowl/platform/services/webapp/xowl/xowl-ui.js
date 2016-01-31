@@ -27,6 +27,21 @@ var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
 var MSG_ERROR_INTERNAL_ERROR = "Something wrong happened ...";
 var MSG_ERROR_CONNECTION = "Error while accessing the server!";
 
+function setupPage(xowl) {
+	if (!xowl.isLoggedIn()) {
+		document.location.href = "/web/login.html";
+		return;
+	}
+	document.getElementById("branding-title").onload = function () {
+		document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title;
+	};
+	document.getElementById("btn-logout").innerHTML = "Logout (" + xowl.getUser() + ")";
+	document.getElementById("btn-logout").onclick = function() {
+		xowl.logout();
+		document.location.href = "/web/login.html";
+	};
+}
+
 function getShortURI(value) {
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
 		if (value.indexOf(DEFAULT_URI_MAPPINGS[i][1]) === 0) {

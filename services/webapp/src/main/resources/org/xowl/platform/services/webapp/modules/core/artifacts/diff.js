@@ -10,6 +10,7 @@ var BASE = null;
 var MARKER = 0;
 
 function init() {
+	setupPage(xowl);
 	if (ARTIFACTID_LEFT === null || ARTIFACTID_LEFT == "")
 		return;
 	if (ARTIFACTID_RIGHT === null || ARTIFACTID_RIGHT == "")

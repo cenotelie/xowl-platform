@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var ruleId = getParameterByName("id");
 
 function init() {
+	setupPage(xowl);
 	if (!ruleId || ruleId === null || ruleId === "")
 		return;
 	document.getElementById("placeholder-rule").innerHTML = ruleId;

@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var jobId = getParameterByName("id");
 
 function init() {
+	setupPage(xowl);
 	if (!jobId || jobId === null || jobId === "")
 		return;
 	document.getElementById("placeholder-job").innerHTML = jobId;

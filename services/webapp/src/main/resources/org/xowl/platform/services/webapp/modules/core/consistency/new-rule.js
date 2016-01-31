@@ -4,6 +4,7 @@
 var xowl = new XOWL();
 
 function init() {
+	setupPage(xowl);
 	displayMessage(null);
 	var prefixes = "";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {

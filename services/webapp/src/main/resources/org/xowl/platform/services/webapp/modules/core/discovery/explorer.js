@@ -13,6 +13,7 @@ var GRAPH_SPREAD = 150;
 var GRAPH = new GraphCanvas(GRAPH_WIDTH, GRAPH_HEIGHT, document.getElementById("display"));
 
 function init() {
+	setupPage(xowl);
 	var rootId = getParameterByName("id")
 	if (typeof (rootId) === "undefined" || rootId === null || rootId === "") {
 		displayMessage("Undefined root entity!");

@@ -23,6 +23,9 @@
         </ol>
       </span>
     </div>
+    <div style="float: right; margin-right: 20px;">
+      <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
+    </div>
     <hr style="margin-top: 5px; margin-bottom: 5px;" />
   </div>
   <div class="body">
@@ -38,8 +41,11 @@
       </div>
     </div>
   </div>
+  <script src="xowl/xowl-api-platform.js"></script>
+  <script src="xowl/xowl-ui.js"></script>
+  <script src="index.js"></script>
   <script>
-    document.getElementById("branding-title").onload = function () { document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title; };
+    init();
   </script>
 </body>
 

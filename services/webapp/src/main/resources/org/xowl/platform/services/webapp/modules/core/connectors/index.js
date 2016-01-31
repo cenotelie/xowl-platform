@@ -19,6 +19,7 @@ var GRAPH_DB_X = 20;
 var GRAPH_CONNECTOR_X = 400;
 
 function init() {
+	setupPage(xowl);
 	var url = document.URL;
 	var index = url.indexOf("/web/");
 	if (index > 0)

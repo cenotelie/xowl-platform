@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var CONNECTORS = null;
 
 function init() {
+	setupPage(xowl);
 	document.getElementById("panel-next").style.display = "none";
 	xowl.getConnectors(function (status, ct, content) {
 		if (status == 200) {

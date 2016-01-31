@@ -7,6 +7,7 @@ var METADATA = null;
 var CONTENT = null;
 
 function init() {
+	setupPage(xowl);
 	if (ARTIFACTID === null || ARTIFACTID == "")
 		return;
 	document.getElementById("placeholder-artifact").innerHTML = ARTIFACTID;

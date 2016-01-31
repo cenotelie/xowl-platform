@@ -2,7 +2,7 @@
 // Provided under LGPLv3
 
 function XOWL() {
-	this.endpoint = '/api';
+	this.endpoint = '/api/';
 	this.authToken = localStorage.getItem('xowl.authToken');
 	this.userName = localStorage.getItem('xowl.userName');
 }
@@ -33,7 +33,7 @@ XOWL.prototype.login = function (callback, login, password) {
 			localStorage.removeItem('xowl.userName');
 			callback(code, type, content);
 		}
-	}, "/security");
+	}, "security");
 }
 
 XOWL.prototype.logout = function () {

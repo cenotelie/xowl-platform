@@ -12,6 +12,7 @@ var DEFAULT_QUERY =
 var HISTORY = [];
 
 function init() {
+	setupPage(xowl);
 	document.getElementById("sparql").value = DEFAULT_QUERY;
 }
 

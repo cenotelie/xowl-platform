@@ -11,6 +11,7 @@ var DIFF_LEFT = null;
 var DIFF_RIGHT = null;
 
 function init() {
+	setupPage(xowl);
 	xowl.getConnectors(function (status, ct, content) {
 		if (status == 200) {
 			CONNECTORS = content;

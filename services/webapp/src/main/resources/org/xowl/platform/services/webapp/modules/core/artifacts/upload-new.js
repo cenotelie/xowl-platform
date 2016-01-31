@@ -4,6 +4,7 @@
 var CONNECTOR = getParameterByName("connector");
 
 function init() {
+	setupPage(new XOWL());
 	if (!CONNECTOR || CONNECTOR === null || CONNECTOR === "")
 		document.location.href = "upload.html";
 	document.getElementById("panel-next").style.display = "none";

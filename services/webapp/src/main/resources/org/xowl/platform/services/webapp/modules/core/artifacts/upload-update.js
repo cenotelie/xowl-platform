@@ -7,6 +7,7 @@ var ARTIFACTS_ALL = null;
 var ARTIFACTS = {};
 
 function init() {
+	setupPage(xowl);
 	if (!CONNECTOR || CONNECTOR === null || CONNECTOR === "")
 		document.location.href = "upload.html";
 	document.getElementById("input-connector").value = CONNECTOR;

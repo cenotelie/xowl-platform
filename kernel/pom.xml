@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.xowl.infra</groupId>
 			<artifactId>xowl-server-api</artifactId>
-			<version>1.0-beta5</version>
+			<version>1.0-beta6</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

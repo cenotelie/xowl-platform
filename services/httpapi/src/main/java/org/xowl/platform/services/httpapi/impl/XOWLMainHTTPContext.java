@@ -22,7 +22,7 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.platform.kernel.Security;
+import org.xowl.platform.kernel.SecurityService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +55,7 @@ public class XOWLMainHTTPContext implements HttpContext {
     public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String headerAuth = httpServletRequest.getHeader("Authorization");
         if (headerAuth == null) {
-            httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + Security.getRealm() + "\"");
+            httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + SecurityService.getRealm() + "\"");
             httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
             return false;
         }
@@ -66,13 +66,13 @@ public class XOWLMainHTTPContext implements HttpContext {
             int indexColon = authToken.indexOf(58);
             String login = authToken.substring(0, indexColon);
             String password = authToken.substring(indexColon + 1);
-            if (Security.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
+            if (SecurityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
                 httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
                 httpServletRequest.setAttribute(REMOTE_USER, login);
                 return true;
             }
         }
-        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + Security.getRealm() + "\"");
+        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + SecurityService.getRealm() + "\"");
         httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
         return false;
     }

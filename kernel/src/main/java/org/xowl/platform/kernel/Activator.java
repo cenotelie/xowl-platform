@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         ConfigurationService configurationService = new FSConfigurationService();
-        Security.initialize();
+        SecurityService.initialize(configurationService);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
         bundleContext.registerService(HttpAPIService.class, new XOWLHttpSecurityService(), null);
     }

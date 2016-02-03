@@ -83,6 +83,19 @@ public class XOWLHttpContext implements HttpContext {
 
     @Override
     public URL getResource(String name) {
+        URL result = doGetResource(name);
+        if (result != null)
+            return result;
+        return defaultContext.getResource(Activator.WEBAPP_RESOURCE_ROOT + "/404.html");
+    }
+
+    /**
+     * Gets the resource URL for the requested name
+     *
+     * @param name The name of a resource
+     * @return The corresponding URL, or null if there is none
+     */
+    private URL doGetResource(String name) {
         if (name.endsWith("/"))
             name += "index.html";
         if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + BrandingService.BRANDING)) {

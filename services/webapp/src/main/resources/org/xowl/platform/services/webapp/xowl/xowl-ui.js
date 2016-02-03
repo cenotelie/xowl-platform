@@ -28,7 +28,7 @@ var MSG_ERROR_INTERNAL_ERROR = "Something wrong happened ...";
 var MSG_ERROR_CONNECTION = "Error while accessing the server!";
 
 function setupPage(xowl) {
-	if (!xowl.isLoggedIn()) {
+	if (xowl !== null && !xowl.isLoggedIn()) {
 		document.location.href = "/web/login.html";
 		return;
 	}

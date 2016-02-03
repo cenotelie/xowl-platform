@@ -24,8 +24,29 @@ cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/statistics/target/xowl-service-statistics-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/docker/"
 
+# Build the keystore for the certificate
+CERT_CN="platform.xowl.org"
+PASSWORD="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)"
+
+rm -f "$RELENG/pwd.txt"
+rm -f "$RELENG/docker/config-https.properties"
+rm -f "$RELENG/docker/keystore.jks"
+echo "$PASSWORD" >> "$RELENG/pwd.txt"
+echo "$PASSWORD" >> "$RELENG/pwd.txt"
+echo "" >> "$RELENG/pwd.txt"
+
+keytool -genkeypair -alias "$CERT_CN" -keyalg RSA -keysize 2048 -dname "CN=$CERT_CN, O=xowl.org" -validity 3650 -storetype JKS -keystore "$RELENG/docker/keystore.jks" < "$RELENG/pwd.txt"
+rm -f "$RELENG/pwd.txt"
+echo "org.osgi.service.http.port.secure=8443" >> "$RELENG/docker/config-https.properties"
+echo "org.apache.felix.https.enable=true" >> "$RELENG/docker/config-https.properties"
+echo "org.apache.felix.https.keystore=felix-framework-5.4.0/conf/keystore.jks" >> "$RELENG/docker/config-https.properties"
+echo "org.apache.felix.https.keystore.password=$PASSWORD" >> "$RELENG/docker/config-https.properties"
+echo "org.apache.felix.https.keystore.key.password=$PASSWORD" >> "$RELENG/docker/config-https.properties"
+
 # Build the docker image
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
 rm "$RELENG/docker/"*.jar
+rm "$RELENG/docker/config-https.properties"
+rm "$RELENG/docker/keystore.jks"

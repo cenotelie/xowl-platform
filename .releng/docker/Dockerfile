@@ -16,3 +16,7 @@ RUN wget -nv https://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.ma
 	&& wget -nv https://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.http.jetty/3.1.6/org.apache.felix.http.jetty-3.1.6.jar \
 	&& mv *.jar felix-framework-5.4.0/bundle/
 COPY *.jar felix-framework-5.4.0/bundle/
+COPY config-https.properties felix-framework-5.4.0/conf/
+COPY keystore.jks felix-framework-5.4.0/conf/
+RUN cat felix-framework-5.4.0/conf/config-https.properties >> felix-framework-5.4.0/conf/config.properties \
+    && rm felix-framework-5.4.0/conf/config-https.properties

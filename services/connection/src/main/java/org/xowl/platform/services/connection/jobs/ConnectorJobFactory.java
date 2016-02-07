@@ -25,14 +25,14 @@ import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobFactory;
 
 /**
- * The factory for domain jobs
+ * The factory for connector-related jobs
  *
  * @author Laurent Wouters
  */
-public class DomainJobFactory implements JobFactory {
+public class ConnectorJobFactory implements JobFactory {
     @Override
     public String getIdentifier() {
-        return DomainJobFactory.class.getCanonicalName();
+        return ConnectorJobFactory.class.getCanonicalName();
     }
 
     @Override

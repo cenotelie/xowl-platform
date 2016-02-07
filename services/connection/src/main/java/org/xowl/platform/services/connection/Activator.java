@@ -26,9 +26,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.services.connection.impl.XOWLDomainDirectoryService;
-import org.xowl.platform.services.connection.impl.XOWLGenericConnectorFactory;
-import org.xowl.platform.services.connection.jobs.DomainJobFactory;
+import org.xowl.platform.services.connection.impl.XOWLConnectorDirectory;
+import org.xowl.platform.services.connection.impl.GenericConnectorFactory;
+import org.xowl.platform.services.connection.jobs.ConnectorJobFactory;
 
 /**
  * Activator for the domain bundle
@@ -39,7 +39,7 @@ public class Activator implements BundleActivator {
     /**
      * The directory service
      */
-    private XOWLDomainDirectoryService directory;
+    private XOWLConnectorDirectory directory;
     /**
      * The tracker of the connector factories
      */
@@ -47,27 +47,27 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        directory = new XOWLDomainDirectoryService();
+        directory = new XOWLConnectorDirectory();
         bundleContext.registerService(HttpAPIService.class, directory, null);
-        bundleContext.registerService(DomainDirectoryService.class, directory, null);
+        bundleContext.registerService(ConnectorDirectoryService.class, directory, null);
 
-        factoryTracker = new ServiceTracker<DomainConnectorFactory, DomainConnectorFactory>(bundleContext, DomainConnectorFactory.class, null) {
+        factoryTracker = new ServiceTracker<ConnectorServiceFactory, ConnectorServiceFactory>(bundleContext, ConnectorServiceFactory.class, null) {
             @Override
-            public void removedService(ServiceReference reference, DomainConnectorFactory service) {
+            public void removedService(ServiceReference reference, ConnectorServiceFactory service) {
                 directory.onFactoryOffline(service);
             }
 
             @Override
-            public DomainConnectorFactory addingService(ServiceReference reference) {
-                DomainConnectorFactory factory = (DomainConnectorFactory) bundleContext.getService(reference);
+            public ConnectorServiceFactory addingService(ServiceReference reference) {
+                ConnectorServiceFactory factory = (ConnectorServiceFactory) bundleContext.getService(reference);
                 directory.onFactoryOnline(factory);
                 return factory;
             }
         };
         factoryTracker.open();
 
-        bundleContext.registerService(DomainConnectorFactory.class, new XOWLGenericConnectorFactory(), null);
-        bundleContext.registerService(JobFactory.class, new DomainJobFactory(), null);
+        bundleContext.registerService(ConnectorServiceFactory.class, new GenericConnectorFactory(), null);
+        bundleContext.registerService(JobFactory.class, new ConnectorJobFactory(), null);
     }
 
     @Override

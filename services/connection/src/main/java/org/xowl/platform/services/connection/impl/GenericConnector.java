@@ -37,7 +37,7 @@ import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.services.connection.BaseDomainConnector;
+import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.Reader;
@@ -51,7 +51,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-class ParametricDomainConnector extends BaseDomainConnector {
+class GenericConnector extends ConnectorServiceBase {
     /**
      * The identifier for this connector
      */
@@ -76,7 +76,7 @@ class ParametricDomainConnector extends BaseDomainConnector {
      * @param name       The name of this connector
      * @param uris       The URIs to access this connector
      */
-    public ParametricDomainConnector(String identifier, String name, String[] uris) {
+    public GenericConnector(String identifier, String name, String[] uris) {
         this.identifier = identifier;
         this.name = name;
         this.uris = uris;

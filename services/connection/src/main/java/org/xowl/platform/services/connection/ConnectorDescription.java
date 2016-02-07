@@ -20,34 +20,29 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.infra.store.Serializable;
+import org.xowl.platform.kernel.Identifiable;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
- * A factory that can create new connectors for the platform
+ * Represents the description of a domain from which a domain connector can be instantiated
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorFactory extends Service {
-    /**
-     * Gets the domains supported by this factory
-     *
-     * @return The supported domains
-     */
-    Collection<DomainDescription> getDomains();
+public interface ConnectorDescription extends Identifiable, Serializable {
 
     /**
-     * Instantiates a new connector for a domain
+     * Gets the description of this domain
      *
-     * @param description The domain's description
-     * @param identifier  The new connector's unique identifier
-     * @param name        The new connector's name
-     * @param uris        The new connector's API uris, if any
-     * @param parameters  The parameters for the new connector, if any
-     * @return The new connector
+     * @return The description
      */
-    XSPReply newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
+    String getDescription();
+
+    /**
+     * Gets the parameters for the instantiation of a connector for this domain
+     *
+     * @return The parameters
+     */
+    Collection<ConnectorDescriptionParam> getParameters();
 }

@@ -24,7 +24,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.JobBase;
-import org.xowl.platform.services.connection.DomainUtils;
+import org.xowl.platform.services.connection.ConnectorUtils;
 
 /**
  * A job for pulling artifact from a connector and storing it with the storage service
@@ -84,6 +84,6 @@ public class PullArtifactJob extends JobBase {
 
     @Override
     public void doRun() {
-        result = DomainUtils.pullArtifactFrom(connectorId);
+        result = ConnectorUtils.pullArtifactFrom(connectorId);
     }
 }

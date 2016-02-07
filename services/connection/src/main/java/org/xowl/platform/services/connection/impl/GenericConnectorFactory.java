@@ -22,10 +22,10 @@ package org.xowl.platform.services.connection.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.services.connection.DomainConnectorFactory;
-import org.xowl.platform.services.connection.DomainDescription;
-import org.xowl.platform.services.connection.DomainDescriptionBase;
-import org.xowl.platform.services.connection.DomainDescriptionParam;
+import org.xowl.platform.services.connection.ConnectorServiceFactory;
+import org.xowl.platform.services.connection.ConnectorDescription;
+import org.xowl.platform.services.connection.ConnectorDescriptionBase;
+import org.xowl.platform.services.connection.ConnectorDescriptionParam;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,12 +37,12 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLGenericConnectorFactory implements DomainConnectorFactory {
+public class GenericConnectorFactory implements ConnectorServiceFactory {
     /**
      * The description of the generic domain
      */
-    private static final DomainDescription DESCRIPTION = new DomainDescriptionBase(
-            "org.xowl.platform.services.domain.GenericDomain",
+    private static final ConnectorDescription DESCRIPTION = new ConnectorDescriptionBase(
+            "org.xowl.platform.services.connection.GenericDomain",
             "Generic Domain",
             "This is a generic domain that accepts as input any form of semantic data (triples, quads, ontologies)."
     );
@@ -50,11 +50,11 @@ public class XOWLGenericConnectorFactory implements DomainConnectorFactory {
     /**
      * The descriptions of the supported domains
      */
-    private static final Collection<DomainDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Arrays.asList(DESCRIPTION));
+    private static final Collection<ConnectorDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Arrays.asList(DESCRIPTION));
 
     @Override
     public String getIdentifier() {
-        return XOWLGenericConnectorFactory.class.getCanonicalName();
+        return GenericConnectorFactory.class.getCanonicalName();
     }
 
     @Override
@@ -63,12 +63,12 @@ public class XOWLGenericConnectorFactory implements DomainConnectorFactory {
     }
 
     @Override
-    public Collection<DomainDescription> getDomains() {
+    public Collection<ConnectorDescription> getDomains() {
         return DESCRIPTIONS;
     }
 
     @Override
-    public XSPReply newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
-        return new XSPReplyResult<>(new ParametricDomainConnector(identifier, name, uris));
+    public XSPReply newConnector(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+        return new XSPReplyResult<>(new GenericConnector(identifier, name, uris));
     }
 }

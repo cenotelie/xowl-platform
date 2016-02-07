@@ -31,13 +31,13 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface DomainDirectoryService extends HttpAPIService {
+public interface ConnectorDirectoryService extends HttpAPIService {
     /**
      * Gets the available connectors
      *
      * @return The available connectors
      */
-    Collection<DomainConnectorService> getConnectors();
+    Collection<ConnectorService> getConnectors();
 
     /**
      * Gets the connector for the specified identifier
@@ -45,14 +45,14 @@ public interface DomainDirectoryService extends HttpAPIService {
      * @param identifier The identifier of a connector
      * @return The connector, or null if it does not exist
      */
-    DomainConnectorService get(String identifier);
+    ConnectorService get(String identifier);
 
     /**
      * Gets all the supported domains
      *
      * @return The supported domains
      */
-    Collection<DomainDescription> getDomains();
+    Collection<ConnectorDescription> getDomains();
 
     /**
      * Spawns a new connector for a domain
@@ -64,7 +64,7 @@ public interface DomainDirectoryService extends HttpAPIService {
      * @param parameters  The parameters for the new connector, if any
      * @return The operation's result
      */
-    XSPReply spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
+    XSPReply spawn(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters);
 
     /**
      * Deletes a spawned connector

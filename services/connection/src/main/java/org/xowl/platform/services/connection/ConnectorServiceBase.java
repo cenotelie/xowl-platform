@@ -41,7 +41,7 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Laurent Wouters
  */
-public abstract class BaseDomainConnector implements DomainConnectorService {
+public abstract class ConnectorServiceBase implements ConnectorService {
     /**
      * The maximum number of queued data packages for input toward the platform
      */
@@ -55,7 +55,7 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     /**
      * Initializes this connector
      */
-    protected BaseDomainConnector() {
+    protected ConnectorServiceBase() {
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
     }
 
@@ -129,7 +129,7 @@ public abstract class BaseDomainConnector implements DomainConnectorService {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(DomainConnectorService.class.getCanonicalName()));
+        builder.append(IOUtils.escapeStringJSON(ConnectorService.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");

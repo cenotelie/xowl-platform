@@ -27,7 +27,7 @@ import org.xowl.infra.store.IOUtils;
  *
  * @author Laurent Wouters
  */
-public class DomainDescriptionBaseParam implements DomainDescriptionParam {
+public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam {
     /**
      * The parameter's unique identifier
      */
@@ -53,7 +53,7 @@ public class DomainDescriptionBaseParam implements DomainDescriptionParam {
      * @param isRequired Whether the parameter is required
      * @param typeHint   The type hint for the parameter
      */
-    public DomainDescriptionBaseParam(String id, String name, boolean isRequired, String typeHint) {
+    public ConnectorDescriptionBaseParam(String id, String name, boolean isRequired, String typeHint) {
         this.identifier = id;
         this.name = name;
         this.isRequired = isRequired;
@@ -88,7 +88,7 @@ public class DomainDescriptionBaseParam implements DomainDescriptionParam {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(DomainDescriptionParam.class.getCanonicalName()) +
+                IOUtils.escapeStringJSON(ConnectorDescriptionParam.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

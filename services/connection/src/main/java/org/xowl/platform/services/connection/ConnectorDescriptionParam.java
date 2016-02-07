@@ -23,26 +23,40 @@ package org.xowl.platform.services.connection;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
-import java.util.Collection;
-
 /**
- * Represents the description of a domain from which a domain connector can be instantiated
+ * Represents a parameter for this domain
  *
  * @author Laurent Wouters
  */
-public interface DomainDescription extends Identifiable, Serializable {
+public interface ConnectorDescriptionParam extends Identifiable, Serializable {
+    /**
+     * Type hint for a string parameter
+     */
+    String TYPE_HINT_STRING = "string";
+    /**
+     * Type hint for a password parameter
+     */
+    String TYPE_HINT_PASSWORD = "password";
+    /**
+     * Type hint for a number parameter
+     */
+    String TYPE_HINT_NUMBER = "number";
+    /**
+     * Type hint for an uri parameter
+     */
+    String TYPE_HINT_URI = "uri";
 
     /**
-     * Gets the description of this domain
+     * Gets whether the parameter is required
      *
-     * @return The description
+     * @return Whether the parameter is required
      */
-    String getDescription();
+    boolean isRequired();
 
     /**
-     * Gets the parameters for the instantiation of a connector for this domain
+     * Gets the type hint for this parameter
      *
-     * @return The parameters
+     * @return The type hint
      */
-    Collection<DomainDescriptionParam> getParameters();
+    String typeHint();
 }

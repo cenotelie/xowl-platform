@@ -49,7 +49,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLDomainDirectoryService implements DomainDirectoryService {
+public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * The data about a spawned connector
      */
@@ -57,7 +57,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         /**
          * The service
          */
-        public DomainConnectorService service;
+        public ConnectorService service;
         /**
          * The reference to this service as a domain connector
          */
@@ -83,7 +83,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     /**
      * The registered factories
      */
-    private final Collection<DomainConnectorFactory> factories = new ArrayList<>(8);
+    private final Collection<ConnectorServiceFactory> factories = new ArrayList<>(8);
     /**
      * The map of statically configured connectors to resolve
      */
@@ -95,7 +95,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
 
     @Override
     public String getIdentifier() {
-        return XOWLDomainDirectoryService.class.getCanonicalName();
+        return XOWLConnectorDirectory.class.getCanonicalName();
     }
 
     @Override
@@ -138,44 +138,44 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
     }
 
     @Override
-    public Collection<DomainConnectorService> getConnectors() {
+    public Collection<ConnectorService> getConnectors() {
         resolveConfigConnectors(null);
-        return ServiceUtils.getServices(DomainConnectorService.class);
+        return ServiceUtils.getServices(ConnectorService.class);
     }
 
     @Override
-    public DomainConnectorService get(String identifier) {
+    public ConnectorService get(String identifier) {
         resolveConfigConnectors(null);
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
             return registration.service;
-        return ServiceUtils.getService(DomainConnectorService.class, "id", identifier);
+        return ServiceUtils.getService(ConnectorService.class, "id", identifier);
     }
 
     @Override
-    public Collection<DomainDescription> getDomains() {
-        Collection<DomainDescription> result = new ArrayList<>(16);
-        for (DomainConnectorFactory factory : factories) {
+    public Collection<ConnectorDescription> getDomains() {
+        Collection<ConnectorDescription> result = new ArrayList<>(16);
+        for (ConnectorServiceFactory factory : factories) {
             result.addAll(factory.getDomains());
         }
         return result;
     }
 
     @Override
-    public XSPReply spawn(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters) {
+    public XSPReply spawn(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
         synchronized (connectorsById) {
-            DomainConnectorService service = get(identifier);
+            ConnectorService service = get(identifier);
             if (service != null)
                 // already exists
                 return new XSPReplyFailure("A connector with this identifier already exists");
 
-            for (DomainConnectorFactory factory : factories) {
+            for (ConnectorServiceFactory factory : factories) {
                 if (factory.getDomains().contains(description)) {
                     // this is the factory
                     XSPReply reply = factory.newConnector(description, identifier, name, uris, parameters);
                     if (!reply.isSuccess())
                         return reply;
-                    service = ((XSPReplyResult<DomainConnectorService>) reply).getData();
+                    service = ((XSPReplyResult<ConnectorService>) reply).getData();
                     break;
                 }
             }
@@ -187,8 +187,8 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
             registration.service = service;
             Dictionary<String, Object> properties = new Hashtable<>();
             properties.put("id", service.getIdentifier());
-            BundleContext context = FrameworkUtil.getBundle(DomainConnectorService.class).getBundleContext();
-            registration.refAsDomainConnector = context.registerService(DomainConnectorService.class, service, properties);
+            BundleContext context = FrameworkUtil.getBundle(ConnectorService.class).getBundleContext();
+            registration.refAsDomainConnector = context.registerService(ConnectorService.class, service, properties);
             registration.refAsServedService = context.registerService(HttpAPIService.class, service, null);
             connectorsById.put(identifier, registration);
             return new XSPReplyResult<>(registration.service);
@@ -212,7 +212,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @param factory The new factory
      */
-    public void onFactoryOnline(DomainConnectorFactory factory) {
+    public void onFactoryOnline(ConnectorServiceFactory factory) {
         synchronized (factories) {
             factories.add(factory);
         }
@@ -224,7 +224,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @param factory The factory
      */
-    public void onFactoryOffline(DomainConnectorFactory factory) {
+    public void onFactoryOffline(ConnectorServiceFactory factory) {
         synchronized (factories) {
             factories.remove(factory);
         }
@@ -235,7 +235,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      *
      * @param factory The new factory, if any
      */
-    private void resolveConfigConnectors(DomainConnectorFactory factory) {
+    private void resolveConfigConnectors(ConnectorServiceFactory factory) {
         if (isResolving)
             return;
         isResolving = true;
@@ -258,7 +258,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         for (Map.Entry<String, Section> entry : entries) {
             if (factory != null) {
                 // this is a new factory
-                for (DomainDescription domain : factory.getDomains()) {
+                for (ConnectorDescription domain : factory.getDomains()) {
                     if (domain.getIdentifier().equals(entry.getKey())) {
                         resolveConfigConnector(domain, entry.getValue());
                         break;
@@ -266,9 +266,9 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                 }
             } else {
                 synchronized (factories) {
-                    for (DomainConnectorFactory existingFactory : factories) {
+                    for (ConnectorServiceFactory existingFactory : factories) {
                         boolean found = false;
-                        for (DomainDescription domain : existingFactory.getDomains()) {
+                        for (ConnectorDescription domain : existingFactory.getDomains()) {
                             if (domain.getIdentifier().equals(entry.getKey())) {
                                 resolveConfigConnector(domain, entry.getValue());
                                 found = true;
@@ -290,18 +290,18 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @param domain  The domain
      * @param section The configuration
      */
-    private void resolveConfigConnector(DomainDescription domain, Section section) {
+    private void resolveConfigConnector(ConnectorDescription domain, Section section) {
         String id = section.getName();
         String name = section.get("name");
         if (id == null || name == null)
             return;
         List<String> uris = section.getAll("uris");
-        Map<DomainDescriptionParam, Object> customParams = new HashMap<>();
+        Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
         for (String property : section.getProperties()) {
             if (property.equals("name") || property.equals("uris"))
                 continue;
-            DomainDescriptionParam parameter = null;
-            for (DomainDescriptionParam p : domain.getParameters()) {
+            ConnectorDescriptionParam parameter = null;
+            for (ConnectorDescriptionParam p : domain.getParameters()) {
                 if (p.getIdentifier().equals(property)) {
                     parameter = p;
                     break;
@@ -327,10 +327,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @return The response
      */
     private HttpResponse onMessageListConnectors() {
-        Collection<DomainConnectorService> connectors = ServiceUtils.getServices(DomainConnectorService.class);
+        Collection<ConnectorService> connectors = ServiceUtils.getServices(ConnectorService.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (DomainConnectorService connector : connectors) {
+        for (ConnectorService connector : connectors) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -347,7 +347,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @return The response
      */
     private HttpResponse onMessageGetConnector(String connectorId) {
-        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
         if (connector == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, connector.serializedJSON());
@@ -359,10 +359,10 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
      * @return The response
      */
     private HttpResponse onMessageListDomains() {
-        Collection<DomainDescription> domains = getDomains();
+        Collection<ConnectorDescription> domains = getDomains();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (DomainDescription domain : domains) {
+        for (ConnectorDescription domain : domains) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -391,8 +391,8 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         if (root == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
 
-        DomainDescription domain = null;
-        for (DomainDescription description : getDomains()) {
+        ConnectorDescription domain = null;
+        for (ConnectorDescription description : getDomains()) {
             if (description.getIdentifier().equals(domainIds[0])) {
                 domain = description;
                 break;
@@ -404,7 +404,7 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
         String id = null;
         String name = null;
         List<String> uris = new ArrayList<>(2);
-        Map<DomainDescriptionParam, Object> customParams = new HashMap<>();
+        Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
         for (ASTNode member : root.getChildren()) {
             String head = IOUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -433,8 +433,8 @@ public class XOWLDomainDirectoryService implements DomainDirectoryService {
                     break;
                 }
                 default: {
-                    DomainDescriptionParam parameter = null;
-                    for (DomainDescriptionParam p : domain.getParameters()) {
+                    ConnectorDescriptionParam parameter = null;
+                    for (ConnectorDescriptionParam p : domain.getParameters()) {
                         if (p.getIdentifier().equals(head)) {
                             parameter = p;
                             break;

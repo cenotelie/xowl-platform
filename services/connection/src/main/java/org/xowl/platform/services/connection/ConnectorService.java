@@ -28,7 +28,7 @@ import org.xowl.platform.kernel.HttpAPIService;
 import java.util.List;
 
 /**
- * Represents a service that handles the connection of a domain to the platform.
+ * Represents a service that handles the connection of a technology for a domain to the platform.
  * In the context of the platform, a domain is a scientific or technological field of study that is supposed to be supported by some tooling.
  * A connector service must:
  * - handle the technology specific to a domain.
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorService extends HttpAPIService, Serializable {
+public interface ConnectorService extends HttpAPIService, Serializable {
     /**
      * Pushes an artifact to the associated client
      *

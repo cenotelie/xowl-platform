@@ -24,7 +24,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.JobBase;
-import org.xowl.platform.services.connection.DomainUtils;
+import org.xowl.platform.services.connection.ConnectorUtils;
 
 /**
  * A job for pushing artifact to a connector's client
@@ -108,6 +108,6 @@ public class PushArtifactJob extends JobBase {
 
     @Override
     public void doRun() {
-        result = DomainUtils.pushArtifactTo(connectorId, artifactId);
+        result = ConnectorUtils.pushArtifactTo(connectorId, artifactId);
     }
 }

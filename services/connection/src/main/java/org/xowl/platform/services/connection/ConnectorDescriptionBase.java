@@ -30,7 +30,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class DomainDescriptionBase implements DomainDescription {
+public class ConnectorDescriptionBase implements ConnectorDescription {
 
     /**
      * The domain's unique identifier
@@ -52,7 +52,7 @@ public class DomainDescriptionBase implements DomainDescription {
      * @param name        The domain's name
      * @param description The domain's description
      */
-    public DomainDescriptionBase(String identifier, String name, String description) {
+    public ConnectorDescriptionBase(String identifier, String name, String description) {
         this.identifier = identifier;
         this.name = name;
         this.description = description;
@@ -74,7 +74,7 @@ public class DomainDescriptionBase implements DomainDescription {
     }
 
     @Override
-    public Collection<DomainDescriptionParam> getParameters() {
+    public Collection<ConnectorDescriptionParam> getParameters() {
         return Collections.emptyList();
     }
 
@@ -86,7 +86,7 @@ public class DomainDescriptionBase implements DomainDescription {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(DomainDescription.class.getCanonicalName()));
+        builder.append(IOUtils.escapeStringJSON(ConnectorDescription.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
@@ -95,7 +95,7 @@ public class DomainDescriptionBase implements DomainDescription {
         builder.append(IOUtils.escapeStringJSON(description));
         builder.append("\", \"parameters\": [");
         boolean first = true;
-        for (DomainDescriptionParam param : getParameters()) {
+        for (ConnectorDescriptionParam param : getParameters()) {
             if (!first)
                 builder.append(", ");
             first = false;

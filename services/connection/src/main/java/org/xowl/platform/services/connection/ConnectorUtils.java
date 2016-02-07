@@ -32,7 +32,7 @@ import org.xowl.platform.kernel.ServiceUtils;
  *
  * @author Laurent Wouters
  */
-public class DomainUtils {
+public class ConnectorUtils {
     /**
      * Pulls an artifact from a connector into the long-term store
      *
@@ -40,7 +40,7 @@ public class DomainUtils {
      * @return The result of the operation
      */
     public static XSPReply pullArtifactFrom(String connectorId) {
-        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
         if (connector == null)
             return new XSPReplyFailure("Failed to resolve connector " + connectorId);
         return pullArtifactFrom(connector);
@@ -52,7 +52,7 @@ public class DomainUtils {
      * @param connector The connector to pull from
      * @return The result of the operation
      */
-    public static XSPReply pullArtifactFrom(DomainConnectorService connector) {
+    public static XSPReply pullArtifactFrom(ConnectorService connector) {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return new XSPReplyFailure("Failed to resolve an artifact storage service");
@@ -75,7 +75,7 @@ public class DomainUtils {
      * @return The result of the operation
      */
     public static XSPReply pushArtifactTo(String connectorId, String artifactId) {
-        DomainConnectorService connector = ServiceUtils.getService(DomainConnectorService.class, "id", connectorId);
+        ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
         if (connector == null)
             return new XSPReplyFailure("Failed to resolve connector " + connectorId);
         ArtifactStorageService storage = ServiceUtils.getService(ArtifactStorageService.class);

@@ -23,6 +23,7 @@ package org.xowl.platform.kernel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.impl.FSConfigurationService;
+import org.xowl.platform.kernel.impl.XOWLSecurityService;
 import org.xowl.platform.kernel.impl.XOWLHttpSecurityService;
 
 /**
@@ -34,8 +35,9 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         ConfigurationService configurationService = new FSConfigurationService();
-        SecurityService.initialize(configurationService);
+        SecurityService securityService = new XOWLSecurityService(configurationService);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
+        bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, new XOWLHttpSecurityService(), null);
     }
 

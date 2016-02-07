@@ -23,6 +23,7 @@ package org.xowl.platform.services.httpapi.impl;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.xowl.platform.kernel.SecurityService;
+import org.xowl.platform.kernel.ServiceUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,9 +54,15 @@ public class XOWLMainHTTPContext implements HttpContext {
 
     @Override
     public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null) {
+            httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+            return false;
+        }
+
         String headerAuth = httpServletRequest.getHeader("Authorization");
         if (headerAuth == null) {
-            httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + SecurityService.getRealm() + "\"");
+            httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm() + "\"");
             httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
             return false;
         }
@@ -66,13 +73,13 @@ public class XOWLMainHTTPContext implements HttpContext {
             int indexColon = authToken.indexOf(58);
             String login = authToken.substring(0, indexColon);
             String password = authToken.substring(indexColon + 1);
-            if (SecurityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
+            if (securityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
                 httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
                 httpServletRequest.setAttribute(REMOTE_USER, login);
                 return true;
             }
         }
-        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + SecurityService.getRealm() + "\"");
+        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm() + "\"");
         httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
         return false;
     }

@@ -23,6 +23,7 @@ package org.xowl.platform.services.httpapi.impl;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.httpapi.HTTPServerService;
 
@@ -101,6 +102,10 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         } catch (Throwable exception) {
             Logger.DEFAULT.error(exception);
             response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
+        } finally {
+            SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+            if (securityService != null)
+                securityService.logout();
         }
     }
 

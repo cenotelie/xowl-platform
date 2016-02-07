@@ -16,6 +16,7 @@
 		<module>lts</module>
 		<module>consistency</module>
 		<module>connection</module>
+		<module>domain</module>
 		<module>statistics</module>
 		<module>httpapi</module>
 		<module>webapp</module>

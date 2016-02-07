@@ -112,7 +112,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
             if (uri.equals(URI_API + "/descriptors"))
-                return onMessageListDomains();
+                return onMessageListDescriptors();
             if (uri.equals(URI_API + "/connectors")) {
                 String[] ids = parameters.get("id");
                 if (ids != null && ids.length > 0)
@@ -354,11 +354,11 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     }
 
     /**
-     * Responds to a request for the list of the domains
+     * Responds to a request for the list of the descriptors
      *
      * @return The response
      */
-    private HttpResponse onMessageListDomains() {
+    private HttpResponse onMessageListDescriptors() {
         Collection<ConnectorDescription> domains = getDescriptors();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;

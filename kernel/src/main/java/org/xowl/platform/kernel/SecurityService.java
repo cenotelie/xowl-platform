@@ -29,6 +29,11 @@ import org.apache.shiro.subject.Subject;
  */
 public interface SecurityService extends Service {
     /**
+     * The platform administration role
+     */
+    String ROLE_ADMIN = "org.xowl.platform.kernel.security.roles.Admin";
+
+    /**
      * Gets the realm of this platform
      *
      * @return The realm of this platform

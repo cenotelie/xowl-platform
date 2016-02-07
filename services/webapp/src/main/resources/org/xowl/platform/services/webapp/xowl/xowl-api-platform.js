@@ -56,7 +56,7 @@ XOWL.prototype.getBasicStats = function (callback) {
 XOWL.prototype.getPlatformBundles = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}

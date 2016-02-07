@@ -22,15 +22,13 @@ package org.xowl.platform.services.statistics;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.kernel.ArtifactStorageService;
-import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
-import org.xowl.platform.kernel.OSGiBundle;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
@@ -153,16 +151,11 @@ public class StatisticsProvider implements Service, HttpAPIService {
      * @return The response
      */
     private HttpResponse onMessageGetPlatformBundles() {
-        Collection<OSGiBundle> bundles = OSGiBundle.getBundles();
-        StringBuilder builder = new StringBuilder("[");
-        boolean first = true;
-        for (OSGiBundle bundle : bundles) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(bundle.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
+        if (securityService.getSubject().hasRole(SecurityService.ROLE_ADMIN))
+            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
+        return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(OSGiBundle.getBundles()), null);
     }
 }

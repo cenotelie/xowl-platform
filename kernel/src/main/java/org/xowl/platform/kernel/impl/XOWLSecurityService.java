@@ -94,6 +94,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         DefaultSubjectDAO subjectDAO = ((DefaultSubjectDAO) manager.getSubjectDAO());
         DefaultSessionStorageEvaluator storageEvaluator = (DefaultSessionStorageEvaluator) subjectDAO.getSessionStorageEvaluator();
         storageEvaluator.setSessionStorageEnabled(false);
+        manager.setAuthorizer(new XOWLSecurityAuthorizer());
     }
 
     @Override

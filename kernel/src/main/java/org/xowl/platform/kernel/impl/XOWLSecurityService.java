@@ -26,23 +26,38 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.SecurityService;
+import org.xowl.platform.kernel.ServiceUtils;
+
+import java.net.HttpURLConnection;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Manages the security on the platform
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityService implements SecurityService {
+public class XOWLSecurityService implements SecurityService, HttpAPIService {
+    /**
+     * The URIs for this service
+     */
+    private static final String[] URIS = new String[]{
+            "security"
+    };
+
     /**
      * The security manager for the platform
      */
@@ -89,6 +104,25 @@ public class XOWLSecurityService implements SecurityService {
     @Override
     public String getName() {
         return "xOWL Federation Platform - Security Service";
+    }
+
+    @Override
+    public Collection<String> getURIs() {
+        return Arrays.asList(URIS);
+    }
+
+    @Override
+    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
+        Subject subject = securityService.getSubject();
+        if (subject == null)
+            return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
+        Object principal = subject.getPrincipal();
+        if (principal == null)
+            return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, principal.toString(), HttpConstants.MIME_TEXT_PLAIN);
     }
 
     @Override

@@ -124,7 +124,6 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.identifier = id;
         this.name = name;
         this.type = type;
-
     }
 
     @Override

@@ -62,6 +62,10 @@ public interface KernelSchema {
      */
     String BASE = URI_KERNEL + "#base";
     /**
+     * The supersede property
+     */
+    String SUPERSEDE = URI_KERNEL + "#supersede";
+    /**
      * The version property
      */
     String VERSION = URI_KERNEL + "#version";

@@ -72,6 +72,12 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :base "The base element of which the artifact is a version of.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :base <http://xowl.org/platform/schemas/kernel>)
 
+    ObjectPropertyDomain(:supersedes :Artifact)
+    ObjectPropertyRange(:supersedes :Artifact)
+    DataPropertyAssertion(rdfs:label :supersedes "supersedes")
+    DataPropertyAssertion(rdfs:comment :supersedes "The artifacts that are superseded by this one.")
+    ObjectPropertyAssertion(rdfs:isDefinedBy :supersedes <http://xowl.org/platform/schemas/kernel>)
+
     FunctionalDataProperty(:version)
     DataPropertyDomain(:version :Artifact)
     DataPropertyRange(:version xsd:string)

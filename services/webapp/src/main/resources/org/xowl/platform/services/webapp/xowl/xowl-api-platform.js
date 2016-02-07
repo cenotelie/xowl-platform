@@ -63,14 +63,14 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 	}, "statistics?platform");
 }
 
-XOWL.prototype.getDomains = function (callback) {
+XOWL.prototype.getDescriptors = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "domains");
+	}, "descriptors");
 }
 
 XOWL.prototype.getConnectors = function (callback) {
@@ -100,7 +100,7 @@ XOWL.prototype.createConnector = function (callback, domain, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?action=spawn&domain=" + encodeURIComponent(domain.identifier), definition);
+	}, "connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
 }
 
 XOWL.prototype.deleteConnector = function (callback, connectorId) {

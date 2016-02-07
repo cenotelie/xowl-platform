@@ -48,11 +48,11 @@ public interface ConnectorDirectoryService extends HttpAPIService {
     ConnectorService get(String identifier);
 
     /**
-     * Gets all the supported domains
+     * Gets the descriptions of the supported connectors
      *
-     * @return The supported domains
+     * @return The descriptions of the supported connectors
      */
-    Collection<ConnectorDescription> getDomains();
+    Collection<ConnectorDescription> getDescriptors();
 
     /**
      * Spawns a new connector for a domain

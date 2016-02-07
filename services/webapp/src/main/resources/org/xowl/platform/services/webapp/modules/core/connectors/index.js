@@ -30,7 +30,7 @@ function init() {
 			render();
 		}
 	});
-	xowl.getDomains(function (status, ct, content) {
+	xowl.getDescriptors(function (status, ct, content) {
 		if (status == 200) {
 			DOMAINS = content;
 			var select = document.getElementById("input-domain");

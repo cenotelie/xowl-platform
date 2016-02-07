@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class GenericConnectorFactory implements ConnectorServiceFactory {
     /**
-     * The description of the generic domain
+     * The description of the generic connector
      */
     private static final ConnectorDescription DESCRIPTION = new ConnectorDescriptionBase(
             "org.xowl.platform.services.connection.GenericDomain",
@@ -63,12 +63,12 @@ public class GenericConnectorFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public Collection<ConnectorDescription> getDomains() {
+    public Collection<ConnectorDescription> getDescriptors() {
         return DESCRIPTIONS;
     }
 
     @Override
-    public XSPReply newConnector(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+    public XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
         return new XSPReplyResult<>(new GenericConnector(identifier, name, uris));
     }
 }

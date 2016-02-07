@@ -45,7 +45,7 @@ import java.net.HttpURLConnection;
 import java.util.*;
 
 /**
- * Implements a directory service for the domain connectors
+ * Implements a directory service for the connectors
  *
  * @author Laurent Wouters
  */
@@ -59,7 +59,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
          */
         public ConnectorService service;
         /**
-         * The reference to this service as a domain connector
+         * The reference to this service as a connector
          */
         ServiceRegistration refAsDomainConnector;
         /**
@@ -73,7 +73,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      */
     private static final String[] URIs = new String[]{
             "connectors",
-            "domains"
+            "descriptors"
     };
 
     /**
@@ -153,10 +153,10 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     }
 
     @Override
-    public Collection<ConnectorDescription> getDomains() {
+    public Collection<ConnectorDescription> getDescriptors() {
         Collection<ConnectorDescription> result = new ArrayList<>(16);
         for (ConnectorServiceFactory factory : factories) {
-            result.addAll(factory.getDomains());
+            result.addAll(factory.getDescriptors());
         }
         return result;
     }
@@ -170,7 +170,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 return new XSPReplyFailure("A connector with this identifier already exists");
 
             for (ConnectorServiceFactory factory : factories) {
-                if (factory.getDomains().contains(description)) {
+                if (factory.getDescriptors().contains(description)) {
                     // this is the factory
                     XSPReply reply = factory.newConnector(description, identifier, name, uris, parameters);
                     if (!reply.isSuccess())
@@ -248,19 +248,19 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 return;
             toResolve = new HashMap<>();
             for (Section section : configuration.getSections()) {
-                String domain = section.get("domain");
-                if (domain == null)
+                String descriptorId = section.get("descriptor");
+                if (descriptorId == null)
                     continue;
-                toResolve.put(domain, section);
+                toResolve.put(descriptorId, section);
             }
         }
         List<Map.Entry<String, Section>> entries = new ArrayList<>(toResolve.entrySet());
         for (Map.Entry<String, Section> entry : entries) {
             if (factory != null) {
                 // this is a new factory
-                for (ConnectorDescription domain : factory.getDomains()) {
-                    if (domain.getIdentifier().equals(entry.getKey())) {
-                        resolveConfigConnector(domain, entry.getValue());
+                for (ConnectorDescription description : factory.getDescriptors()) {
+                    if (description.getIdentifier().equals(entry.getKey())) {
+                        resolveConfigConnector(description, entry.getValue());
                         break;
                     }
                 }
@@ -268,9 +268,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 synchronized (factories) {
                     for (ConnectorServiceFactory existingFactory : factories) {
                         boolean found = false;
-                        for (ConnectorDescription domain : existingFactory.getDomains()) {
-                            if (domain.getIdentifier().equals(entry.getKey())) {
-                                resolveConfigConnector(domain, entry.getValue());
+                        for (ConnectorDescription description : existingFactory.getDescriptors()) {
+                            if (description.getIdentifier().equals(entry.getKey())) {
+                                resolveConfigConnector(description, entry.getValue());
                                 found = true;
                                 break;
                             }
@@ -287,10 +287,10 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * Resolves a statically configured connector
      *
-     * @param domain  The domain
+     * @param description  The description
      * @param section The configuration
      */
-    private void resolveConfigConnector(ConnectorDescription domain, Section section) {
+    private void resolveConfigConnector(ConnectorDescription description, Section section) {
         String id = section.getName();
         String name = section.get("name");
         if (id == null || name == null)
@@ -301,7 +301,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             if (property.equals("name") || property.equals("uris"))
                 continue;
             ConnectorDescriptionParam parameter = null;
-            for (ConnectorDescriptionParam p : domain.getParameters()) {
+            for (ConnectorDescriptionParam p : description.getParameters()) {
                 if (p.getIdentifier().equals(property)) {
                     parameter = p;
                     break;
@@ -315,9 +315,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             else if (values.size() > 1)
                 customParams.put(parameter, values.toArray());
         }
-        XSPReply reply = spawn(domain, id, name, uris.toArray(new String[uris.size()]), customParams);
+        XSPReply reply = spawn(description, id, name, uris.toArray(new String[uris.size()]), customParams);
         if (reply.isSuccess()) {
-            toResolve.remove(domain.getIdentifier());
+            toResolve.remove(description.getIdentifier());
         }
     }
 
@@ -359,14 +359,14 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * @return The response
      */
     private HttpResponse onMessageListDomains() {
-        Collection<ConnectorDescription> domains = getDomains();
+        Collection<ConnectorDescription> domains = getDescriptors();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (ConnectorDescription domain : domains) {
+        for (ConnectorDescription description : domains) {
             if (!first)
                 builder.append(", ");
             first = false;
-            builder.append(domain.serializedJSON());
+            builder.append(description.serializedJSON());
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
@@ -380,9 +380,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * @return The response
      */
     private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content) {
-        String[] domainIds = parameters.get("domain");
+        String[] domainIds = parameters.get("descriptor");
         if (domainIds == null || domainIds.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected domain parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected descriptor parameter");
         if (content == null || content.length == 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
@@ -391,15 +391,15 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (root == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
 
-        ConnectorDescription domain = null;
-        for (ConnectorDescription description : getDomains()) {
+        ConnectorDescription descriptor = null;
+        for (ConnectorDescription description : getDescriptors()) {
             if (description.getIdentifier().equals(domainIds[0])) {
-                domain = description;
+                descriptor = description;
                 break;
             }
         }
-        if (domain == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Failed to find domain " + domainIds[0]);
+        if (descriptor == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Failed to find descriptor " + domainIds[0]);
 
         String id = null;
         String name = null;
@@ -434,7 +434,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 }
                 default: {
                     ConnectorDescriptionParam parameter = null;
-                    for (ConnectorDescriptionParam p : domain.getParameters()) {
+                    for (ConnectorDescriptionParam p : descriptor.getParameters()) {
                         if (p.getIdentifier().equals(head)) {
                             parameter = p;
                             break;
@@ -467,7 +467,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (name == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Name for connector not specified");
 
-        XSPReply reply = spawn(domain, id, name, uris.toArray(new String[uris.size()]), customParams);
+        XSPReply reply = spawn(descriptor, id, name, uris.toArray(new String[uris.size()]), customParams);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 

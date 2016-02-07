@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -33,21 +33,21 @@ import java.util.Map;
  */
 public interface ConnectorServiceFactory extends Service {
     /**
-     * Gets the domains supported by this factory
+     * Gets the descriptions of the connectors supported by this factory
      *
-     * @return The supported domains
+     * @return The supported connectors
      */
-    Collection<ConnectorDescription> getDomains();
+    Collection<ConnectorDescription> getDescriptors();
 
     /**
      * Instantiates a new connector for a domain
      *
-     * @param description The domain's description
-     * @param identifier  The new connector's unique identifier
-     * @param name        The new connector's name
-     * @param uris        The new connector's API uris, if any
-     * @param parameters  The parameters for the new connector, if any
+     * @param descriptor The connector's description
+     * @param identifier The new connector's unique identifier
+     * @param name       The new connector's name
+     * @param uris       The new connector's API uris, if any
+     * @param parameters The parameters for the new connector, if any
      * @return The new connector
      */
-    XSPReply newConnector(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters);
+    XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters);
 }

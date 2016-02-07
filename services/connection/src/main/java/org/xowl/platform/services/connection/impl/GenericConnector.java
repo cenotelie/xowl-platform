@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -23,28 +23,23 @@ package org.xowl.platform.services.connection.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.store.AbstractRepository;
-import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.*;
-import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ArtifactBase;
-import org.xowl.platform.kernel.ArtifactSimple;
-import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
-import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.text.DateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Implementation of a domain connector that can be configured and deployed at runtime
@@ -124,6 +119,7 @@ class GenericConnector extends ConnectorServiceBase {
     private HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
         String[] names = parameters.get("name");
         String[] bases = parameters.get("base");
+        String[] supersedes = parameters.get("supersedes");
         String[] versions = parameters.get("version");
         if (names == null || names.length <= 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
@@ -173,18 +169,8 @@ class GenericConnector extends ConnectorServiceBase {
             logger.error("Failed to parse the content");
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
         }
-        Date artifactCreation = new Date();
-        IRINode artifactNode = nodeManager.getIRINode(resource);
-        IRINode registry = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
-        List<Quad> metadata = new ArrayList<>();
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(Vocabulary.rdfType), nodeManager.getIRINode(KernelSchema.ARTIFACT)));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(names[0], Vocabulary.xsdString, null)));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.BASE), nodeManager.getIRINode(bases[0])));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(versions[0], Vocabulary.xsdString, null)));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(identifier, Vocabulary.xsdString, null)));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
+        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], identifier);
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
-
         queueInput(artifact);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, artifact.serializedJSON());
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -24,15 +24,20 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.URIUtils;
+import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.storage.NodeManager;
+import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.platform.kernel.Artifact;
+import org.xowl.platform.kernel.KernelSchema;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -157,5 +162,43 @@ public abstract class ConnectorServiceBase implements ConnectorService {
         }
         builder.append("]}");
         return builder.toString();
+    }
+
+    /**
+     * Builds the metadata of an artifact
+     *
+     * @param artifactURI The URI of the artifact
+     * @param baseURI     The URI of the artifact family
+     * @param superseded  The URI of the artifacts superseded by this one
+     * @param name        The artifact's name
+     * @param version     The artifact's version string
+     * @param from        The identifier of the connector that produced the artifact
+     * @return The metadata, or null if some data were invalid
+     */
+    public static Collection<Quad> buildMetadata(String artifactURI, String baseURI, String[] superseded, String name, String version, String from) {
+        if (artifactURI == null || artifactURI.isEmpty() || !URIUtils.isAbsolute(artifactURI))
+            return null;
+        NodeManager nodeManager = new CachedNodes();
+        Date artifactCreation = new Date();
+        IRINode artifactNode = nodeManager.getIRINode(artifactURI);
+        IRINode registry = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
+        List<Quad> metadata = new ArrayList<>();
+        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(Vocabulary.rdfType), nodeManager.getIRINode(KernelSchema.ARTIFACT)));
+        if (name != null && !name.isEmpty())
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(name, Vocabulary.xsdString, null)));
+        if (baseURI != null && !baseURI.isEmpty() && URIUtils.isAbsolute(baseURI))
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.BASE), nodeManager.getIRINode(baseURI)));
+        if (superseded != null) {
+            for (int i = 0; i != superseded.length; i++) {
+                if (superseded[i] != null && !superseded[i].isEmpty() && URIUtils.isAbsolute(superseded[i]))
+                    metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.SUPERSEDE), nodeManager.getIRINode(superseded[0])));
+            }
+        }
+        if (version != null && version.isEmpty())
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(version, Vocabulary.xsdString, null)));
+        if (from != null && from.isEmpty())
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(from, Vocabulary.xsdString, null)));
+        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
+        return metadata;
     }
 }

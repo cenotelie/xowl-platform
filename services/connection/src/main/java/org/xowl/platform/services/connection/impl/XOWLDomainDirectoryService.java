@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain.impl;
+package org.xowl.platform.services.connection.impl;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -36,9 +36,9 @@ import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Job;
 import org.xowl.platform.kernel.JobExecutionService;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.services.domain.*;
-import org.xowl.platform.services.domain.jobs.PullArtifactJob;
-import org.xowl.platform.services.domain.jobs.PushArtifactJob;
+import org.xowl.platform.services.connection.*;
+import org.xowl.platform.services.connection.jobs.PullArtifactJob;
+import org.xowl.platform.services.connection.jobs.PushArtifactJob;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.net.HttpURLConnection;

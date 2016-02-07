@@ -18,28 +18,24 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain.jobs;
+package org.xowl.platform.services.connection.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.JobBase;
-import org.xowl.platform.services.domain.DomainUtils;
+import org.xowl.platform.services.connection.DomainUtils;
 
 /**
- * A job for pushing artifact to a connector's client
+ * A job for pulling artifact from a connector and storing it with the storage service
  *
  * @author Laurent Wouters
  */
-public class PushArtifactJob extends JobBase {
+public class PullArtifactJob extends JobBase {
     /**
      * The identifier of the target connector
      */
     private final String connectorId;
-    /**
-     * The identifier of the artifact to push
-     */
-    private final String artifactId;
     /**
      * The job's result
      */
@@ -49,10 +45,9 @@ public class PushArtifactJob extends JobBase {
      * Initializes this job
      *
      * @param connectorId The target connector
-     * @param artifactId  The identifier of the artifact to push
      */
-    public PushArtifactJob(String connectorId, String artifactId) {
-        this(PullArtifactJob.class.getCanonicalName(), connectorId, artifactId);
+    public PullArtifactJob(String connectorId) {
+        this(PullArtifactJob.class.getCanonicalName(), connectorId);
     }
 
     /**
@@ -60,12 +55,10 @@ public class PushArtifactJob extends JobBase {
      *
      * @param type        The custom type of this job
      * @param connectorId The target connector
-     * @param artifactId  The identifier of the artifact to push
      */
-    public PushArtifactJob(String type, String connectorId, String artifactId) {
-        super("Push artifact " + artifactId + " to " + connectorId, type);
+    public PullArtifactJob(String type, String connectorId) {
+        super("Pull artifact from " + connectorId, type);
         this.connectorId = connectorId;
-        this.artifactId = artifactId;
     }
 
     /**
@@ -73,32 +66,15 @@ public class PushArtifactJob extends JobBase {
      *
      * @param definition The job's definition
      */
-    public PushArtifactJob(ASTNode definition) {
+    public PullArtifactJob(ASTNode definition) {
         super(definition);
-        ASTNode payloadNode = getPayloadNode(definition);
-        String connector = null;
-        String artifact = null;
-        for (ASTNode member : payloadNode.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
-            String value = IOUtils.unescape(member.getChildren().get(1).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("connectorId".equals(head)) {
-                connector = value.substring(1, value.length() - 1);
-            } else if ("artifactId".equals(head)) {
-                artifact = value.substring(1, value.length() - 1);
-            }
-        }
-        this.connectorId = connector;
-        this.artifactId = artifact;
+        String connector = IOUtils.unescape(getPayloadNode(definition).getValue());
+        this.connectorId = connector.substring(1, connector.length() - 1);
     }
 
     @Override
     protected String getJSONSerializedPayload() {
-        return "{\"connectorId\": \"" +
-                IOUtils.escapeStringJSON(connectorId) +
-                "\", \"artifactId\": \"" +
-                IOUtils.escapeStringJSON(artifactId) +
-                "\"}";
+        return "\"" + connectorId + "\"";
     }
 
     @Override
@@ -108,6 +84,6 @@ public class PushArtifactJob extends JobBase {
 
     @Override
     public void doRun() {
-        result = DomainUtils.pushArtifactTo(connectorId, artifactId);
+        result = DomainUtils.pullArtifactFrom(connectorId);
     }
 }

@@ -18,14 +18,14 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain.impl;
+package org.xowl.platform.services.connection.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.services.domain.DomainConnectorFactory;
-import org.xowl.platform.services.domain.DomainDescription;
-import org.xowl.platform.services.domain.DomainDescriptionBase;
-import org.xowl.platform.services.domain.DomainDescriptionParam;
+import org.xowl.platform.services.connection.DomainConnectorFactory;
+import org.xowl.platform.services.connection.DomainDescription;
+import org.xowl.platform.services.connection.DomainDescriptionBase;
+import org.xowl.platform.services.connection.DomainDescriptionParam;
 
 import java.util.Arrays;
 import java.util.Collection;

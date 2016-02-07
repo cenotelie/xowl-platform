@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain;
+package org.xowl.platform.services.connection;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -26,9 +26,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.services.domain.impl.XOWLDomainDirectoryService;
-import org.xowl.platform.services.domain.impl.XOWLGenericConnectorFactory;
-import org.xowl.platform.services.domain.jobs.DomainJobFactory;
+import org.xowl.platform.services.connection.impl.XOWLDomainDirectoryService;
+import org.xowl.platform.services.connection.impl.XOWLGenericConnectorFactory;
+import org.xowl.platform.services.connection.jobs.DomainJobFactory;
 
 /**
  * Activator for the domain bundle

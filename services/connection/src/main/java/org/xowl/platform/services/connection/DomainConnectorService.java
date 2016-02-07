@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain;
+package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.Serializable;

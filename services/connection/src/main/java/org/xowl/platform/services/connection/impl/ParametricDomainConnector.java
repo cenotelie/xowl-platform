@@ -18,7 +18,7 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain.impl;
+package org.xowl.platform.services.connection.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
@@ -37,7 +37,7 @@ import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.ArtifactBase;
 import org.xowl.platform.kernel.ArtifactSimple;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.services.domain.BaseDomainConnector;
+import org.xowl.platform.services.connection.BaseDomainConnector;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.Reader;

@@ -18,36 +18,45 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.services.domain;
+package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
-
-import java.util.Collection;
-import java.util.Map;
+import org.xowl.infra.store.Serializable;
+import org.xowl.platform.kernel.Identifiable;
 
 /**
- * A factory that can create new connectors for the platform
+ * Represents a parameter for this domain
  *
  * @author Laurent Wouters
  */
-public interface DomainConnectorFactory extends Service {
+public interface DomainDescriptionParam extends Identifiable, Serializable {
     /**
-     * Gets the domains supported by this factory
-     *
-     * @return The supported domains
+     * Type hint for a string parameter
      */
-    Collection<DomainDescription> getDomains();
+    String TYPE_HINT_STRING = "string";
+    /**
+     * Type hint for a password parameter
+     */
+    String TYPE_HINT_PASSWORD = "password";
+    /**
+     * Type hint for a number parameter
+     */
+    String TYPE_HINT_NUMBER = "number";
+    /**
+     * Type hint for an uri parameter
+     */
+    String TYPE_HINT_URI = "uri";
 
     /**
-     * Instantiates a new connector for a domain
+     * Gets whether the parameter is required
      *
-     * @param description The domain's description
-     * @param identifier  The new connector's unique identifier
-     * @param name        The new connector's name
-     * @param uris        The new connector's API uris, if any
-     * @param parameters  The parameters for the new connector, if any
-     * @return The new connector
+     * @return Whether the parameter is required
      */
-    XSPReply newConnector(DomainDescription description, String identifier, String name, String[] uris, Map<DomainDescriptionParam, Object> parameters);
+    boolean isRequired();
+
+    /**
+     * Gets the type hint for this parameter
+     *
+     * @return The type hint
+     */
+    String typeHint();
 }

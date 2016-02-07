@@ -154,7 +154,7 @@ public class StatisticsProvider implements Service, HttpAPIService {
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
-        if (securityService.getSubject().hasRole(SecurityService.ROLE_ADMIN))
+        if (!securityService.getSubject().hasRole(SecurityService.ROLE_ADMIN))
             return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(OSGiBundle.getBundles()), null);
     }

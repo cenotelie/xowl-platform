@@ -111,7 +111,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
-            if (uri.equals(URI_API + "/domains"))
+            if (uri.equals(URI_API + "/descriptors"))
                 return onMessageListDomains();
             if (uri.equals(URI_API + "/connectors")) {
                 String[] ids = parameters.get("id");

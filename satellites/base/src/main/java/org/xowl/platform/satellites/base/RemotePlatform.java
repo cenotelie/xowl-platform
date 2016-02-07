@@ -22,6 +22,7 @@ package org.xowl.platform.satellites.base;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.hime.redist.ParseResult;
+import org.xowl.infra.store.URIUtils;
 import org.xowl.infra.store.http.HttpConnection;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
@@ -71,24 +72,42 @@ public class RemotePlatform {
     public Collection<RemoteConnector> getConnectors() {
         Collection<RemoteConnector> result = new ArrayList<>();
         HttpResponse response = connection.request("connectors", "GET", null, null, HttpConstants.MIME_JSON);
-        if (response == null)
+        ASTNode root = parseJson(response);
+        if (root == null)
             return result;
-        if (response.getCode() != HttpURLConnection.HTTP_OK)
-            return result;
-        JSONLDLoader loader = new JSONLDLoader(new CachedNodes()) {
-            @Override
-            protected Reader getReaderFor(Logger logger, String iri) {
-                return null;
-            }
-        };
-        BufferedLogger logger = new BufferedLogger();
-        ParseResult parseResult = loader.parse(logger, new StringReader(response.getBodyAsString()));
-        if (parseResult == null || !parseResult.isSuccess() || !parseResult.getErrors().isEmpty() || !logger.getErrorMessages().isEmpty())
-            return result;
-        for (ASTNode element : parseResult.getRoot().getChildren()) {
+        for (ASTNode element : root.getChildren()) {
             result.add(new RemoteConnector(element));
         }
         return result;
+    }
+
+    /**
+     * Pulls an artifact from a connector
+     *
+     * @param connectorId The connector to pull from
+     * @return The triggered job, or null if an error occurred
+     */
+    public RemoteJob pullFromConnector(String connectorId) {
+        HttpResponse response = connection.request("connectors?action=pull&id=" + URIUtils.encodeComponent(connectorId), "POST", null, null, HttpConstants.MIME_JSON);
+        ASTNode root = parseJson(response);
+        if (root == null)
+            return null;
+        return new RemoteJob(root, factory);
+    }
+
+    /**
+     * Pushes an artifact to a client through a connector
+     *
+     * @param connectorId The connector to push through
+     * @param artifactId  The artifact to push
+     * @return The triggered job, or null if an error occurred
+     */
+    public RemoteJob pushFromConnector(String connectorId, String artifactId) {
+        HttpResponse response = connection.request("connectors?action=push&id=" + URIUtils.encodeComponent(connectorId) + "&artifact=" + URIUtils.encodeComponent(artifactId), "POST", null, null, HttpConstants.MIME_JSON);
+        ASTNode root = parseJson(response);
+        if (root == null)
+            return null;
+        return new RemoteJob(root, factory);
     }
 
     /**
@@ -99,6 +118,36 @@ public class RemotePlatform {
      */
     public RemoteJob getJob(String identifier) {
         HttpResponse response = connection.request("connectors", "GET", null, null, HttpConstants.MIME_JSON);
+        ASTNode root = parseJson(response);
+        if (root == null)
+            return null;
+        return new RemoteJob(root, factory);
+    }
+
+    /**
+     * Wait for specified job to terminate
+     *
+     * @param job The job to wait for
+     * @return The job, or null if an error occurred
+     */
+    public RemoteJob waitFor(RemoteJob job) {
+        while (RemoteJob.STATUS_SCHEDULED.equals(job.getStatus()) || RemoteJob.STATUS_RUNNING.equals(job.getStatus())) {
+            HttpResponse response = connection.request("connectors", "GET", null, null, HttpConstants.MIME_JSON);
+            ASTNode root = parseJson(response);
+            if (root == null)
+                return null;
+            job.update(root, factory);
+        }
+        return job;
+    }
+
+    /**
+     * Parses a JSON response
+     *
+     * @param response The response
+     * @return The AST root, or null if an error occurred
+     */
+    private ASTNode parseJson(HttpResponse response) {
         if (response == null)
             return null;
         if (response.getCode() != HttpURLConnection.HTTP_OK)
@@ -113,6 +162,6 @@ public class RemotePlatform {
         ParseResult parseResult = loader.parse(logger, new StringReader(response.getBodyAsString()));
         if (parseResult == null || !parseResult.isSuccess() || !parseResult.getErrors().isEmpty() || !logger.getErrorMessages().isEmpty())
             return null;
-        return new RemoteJob(parseResult.getRoot(), factory);
+        return parseResult.getRoot();
     }
 }

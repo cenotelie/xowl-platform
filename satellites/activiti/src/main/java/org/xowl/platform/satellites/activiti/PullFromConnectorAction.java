@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -24,18 +24,8 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.URIUtils;
-import org.xowl.infra.store.http.HttpConnection;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.Job;
-import org.xowl.platform.kernel.JobStatus;
-import org.xowl.platform.kernel.PlatformUtils;
-
-import java.net.HttpURLConnection;
+import org.xowl.platform.satellites.base.RemoteJob;
+import org.xowl.platform.satellites.base.RemotePlatform;
 
 /**
  * An Activiti delegate for pulling an artifact from a connector
@@ -44,22 +34,9 @@ import java.net.HttpURLConnection;
  */
 public class PullFromConnectorAction implements JavaDelegate {
     /**
-     * The URI of the xOWL platform
-     */
-    private Expression platformUri;
-    /**
      * The identifier of the connector to pull from
      */
     private Expression connectorId;
-
-    /**
-     * Sets the expression for the URI of the xOWL platform
-     *
-     * @param expression The expression for the URI of the xOWL platform
-     */
-    public void setPlatformUri(Expression expression) {
-        this.platformUri = expression;
-    }
 
     /**
      * Sets the expression for the identifier of the connector to pull from
@@ -72,33 +49,17 @@ public class PullFromConnectorAction implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        String uri = (String) platformUri.getValue(delegateExecution);
+        String endpoint = (String) delegateExecution.getVariable("platformEndpoint");
+        String login = (String) delegateExecution.getVariable("platformLogin");
+        String password = (String) delegateExecution.getVariable("platformPassword");
         String connector = (String) connectorId.getValue(delegateExecution);
 
-        HttpConnection connection = new HttpConnection(uri, null, null);
-        HttpResponse response = connection.request("/connectors?action=pull&id=" + URIUtils.encodeComponent(connector), "POST", null, null, HttpConstants.MIME_TEXT_PLAIN + ", " + HttpConstants.MIME_JSON);
-        if (response == null)
-            throw new BpmnError("Failed to connect to the federation platform");
-        if (response.getCode() != HttpURLConnection.HTTP_OK)
-            throw new BpmnError(response.getBodyAsString());
-        ASTNode root = PlatformUtils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
-        if (root == null)
-            throw new BpmnError("Failed to retrieve the job");
-        Job job = new ForeignJob(root);
-        while (job.getStatus() != JobStatus.Completed) {
-            Thread.sleep(500);
-            response = connection.request("/jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", null, null, HttpConstants.MIME_TEXT_PLAIN + ", " + HttpConstants.MIME_JSON);
-            if (response == null)
-                throw new BpmnError("Failed to connect to the federation platform");
-            if (response.getCode() != HttpURLConnection.HTTP_OK)
-                throw new BpmnError(response.getBodyAsString());
-            root = PlatformUtils.parseJSON(Logger.DEFAULT, response.getBodyAsString());
-            if (root == null)
-                throw new BpmnError("Failed to retrieve the job");
-            job = new ForeignJob(root);
-        }
-        XSPReply result = job.getResult();
-        if (!result.isSuccess())
-            throw new BpmnError(result.getMessage());
+        RemotePlatform platform = new RemotePlatform(endpoint, login, password);
+        RemoteJob job = platform.pullFromConnector(connector);
+        if (job == null)
+            throw new BpmnError("Failed to access the platform");
+        job = platform.waitFor(job);
+        if (job == null)
+            throw new BpmnError("Failed to access the platform");
     }
 }

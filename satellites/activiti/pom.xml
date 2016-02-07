@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-kernel</artifactId>
+			<artifactId>xowl-satellite-base</artifactId>
 			<version>0.1.5-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

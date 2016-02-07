@@ -93,7 +93,7 @@ public class XOWLSecurityService implements SecurityService {
 
     @Override
     public String getRealm() {
-        Realm realm = ((RealmSecurityManager) SecurityUtils.getSecurityManager()).getRealms().iterator().next();
+        Realm realm = manager.getRealms().iterator().next();
         return realm.getName();
     }
 

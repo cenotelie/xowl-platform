@@ -21,19 +21,21 @@
 package org.xowl.platform.satellites.base;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
 import org.xowl.infra.store.URIUtils;
 import org.xowl.infra.store.http.HttpConnection;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -147,21 +149,66 @@ public class RemotePlatform {
      * @param response The response
      * @return The AST root, or null if an error occurred
      */
-    private ASTNode parseJson(HttpResponse response) {
+    public static ASTNode parseJson(HttpResponse response) {
         if (response == null)
             return null;
         if (response.getCode() != HttpURLConnection.HTTP_OK)
             return null;
-        JSONLDLoader loader = new JSONLDLoader(new CachedNodes()) {
+        return parseJson(Logger.DEFAULT, response.getBodyAsString());
+    }
+
+    /**
+     * Parses the JSON content
+     *
+     * @param logger  The logger to use
+     * @param content The content to parse
+     * @return The AST root node, or null of the parsing failed
+     */
+    public static ASTNode parseJson(Logger logger, String content) {
+        JSONLDLoader loader = new JSONLDLoader(null) {
             @Override
             protected Reader getReaderFor(Logger logger, String iri) {
                 return null;
             }
         };
-        BufferedLogger logger = new BufferedLogger();
-        ParseResult parseResult = loader.parse(logger, new StringReader(response.getBodyAsString()));
-        if (parseResult == null || !parseResult.isSuccess() || !parseResult.getErrors().isEmpty() || !logger.getErrorMessages().isEmpty())
+        ParseResult result = loader.parse(logger, new StringReader(content));
+        if (result == null)
             return null;
-        return parseResult.getRoot();
+        if (!result.getErrors().isEmpty()) {
+            for (ParseError error : result.getErrors())
+                logger.error(error);
+            return null;
+        }
+        return result.getRoot();
+    }
+
+    /**
+     * Hexadecimal characters
+     */
+    private static final char[] HEX = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    /**
+     * Encodes a string
+     *
+     * @param input The string to encode
+     * @return The encoded text
+     */
+    public static String encode(String input) {
+        byte[] bytes = input.getBytes(Charset.forName("UTF-8"));
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+            bytes = md.digest(bytes);
+            char[] chars = new char[bytes.length * 2];
+            int j = 0;
+            for (int i = 0; i != bytes.length; i++) {
+                chars[j++] = HEX[(bytes[i] & 0xF0) >>> 4];
+                chars[j++] = HEX[bytes[i] & 0x0F];
+            }
+            return new String(chars);
+        } catch (NoSuchAlgorithmException exception) {
+            Logger.DEFAULT.error(exception);
+            return null;
+        }
     }
 }

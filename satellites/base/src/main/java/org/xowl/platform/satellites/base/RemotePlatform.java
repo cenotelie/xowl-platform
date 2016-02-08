@@ -134,7 +134,7 @@ public class RemotePlatform {
      */
     public RemoteJob waitFor(RemoteJob job) {
         while (RemoteJob.STATUS_SCHEDULED.equals(job.getStatus()) || RemoteJob.STATUS_RUNNING.equals(job.getStatus())) {
-            HttpResponse response = connection.request("connectors", "GET", null, null, HttpConstants.MIME_JSON);
+            HttpResponse response = connection.request("jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", null, null, HttpConstants.MIME_JSON);
             ASTNode root = parseJson(response);
             if (root == null)
                 return null;

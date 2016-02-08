@@ -3,19 +3,19 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-services</artifactId>
-		<version>0.1.6-SNAPSHOT</version>
+		<version>0.1.6</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-service-lts</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.1.6-SNAPSHOT</version>
+	<version>0.1.6</version>
 	<name>xOWL Federation - Service LTS</name>
 	<description>The LTS service</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-kernel</artifactId>
-			<version>0.1.6-SNAPSHOT</version>
+			<version>0.1.6</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

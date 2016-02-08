@@ -194,9 +194,9 @@ public abstract class ConnectorServiceBase implements ConnectorService {
                     metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.SUPERSEDE), nodeManager.getIRINode(superseded[0])));
             }
         }
-        if (version != null && version.isEmpty())
+        if (version != null && !version.isEmpty())
             metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(version, Vocabulary.xsdString, null)));
-        if (from != null && from.isEmpty())
+        if (from != null && !from.isEmpty())
             metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(from, Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
         return metadata;

@@ -49,12 +49,12 @@ public class PullFromConnectorAction implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        String endpoint = (String) delegateExecution.getVariable("platformEndpoint");
-        String login = (String) delegateExecution.getVariable("platformLogin");
-        String password = (String) delegateExecution.getVariable("platformPassword");
+        RemotePlatform platform = ActionUtils.getPlatform();
+        if (platform == null)
+            throw new BpmnError("Failed to access the platform");
         String connector = (String) connectorId.getValue(delegateExecution);
-
-        RemotePlatform platform = new RemotePlatform(endpoint, login, password);
+        if (connector == null || connector.isEmpty())
+            throw new BpmnError("Missing connector configuration");
         RemoteJob job = platform.pullFromConnector(connector);
         if (job == null)
             throw new BpmnError("Failed to access the platform");

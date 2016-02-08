@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-platform</artifactId>
-		<version>0.1.6</version>
+		<version>0.1.7-SNAPSHOT</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-services</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.6</version>
+	<version>0.1.7-SNAPSHOT</version>
 	<name>xOWL Federation - Services</name>
 	<description>The set of services for the xOWL platform</description>
 	<modules>

@@ -40,6 +40,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
 
 
 
+    Declaration(DataProperty(:name))
     FunctionalDataProperty(:name)
     DataPropertyDomain(:name :Resource)
     DataPropertyRange(:name xsd:string)
@@ -47,6 +48,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :name "The human readable name of a resource.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :name <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(ObjectProperty(:creator))
     FunctionalObjectProperty(:creator)
     ObjectPropertyDomain(:creator :Resource)
     ObjectPropertyRange(:creator :User)
@@ -54,6 +56,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :creator "The user that created the resource.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :creator <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:created))
     FunctionalDataProperty(:created)
     DataPropertyDomain(:created :Resource)
     DataPropertyRange(:created xsd:date)
@@ -61,6 +64,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :created "The date at which the resource has been initially created.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :created <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:modified))
     FunctionalDataProperty(:modified)
     DataPropertyDomain(:modified :Resource)
     DataPropertyRange(:modified xsd:date)
@@ -69,18 +73,21 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     ObjectPropertyAssertion(rdfs:isDefinedBy :modified <http://xowl.org/platform/schemas/kernel>)
 
 
+    Declaration(ObjectProperty(:base))
     FunctionalObjectProperty(:base)
     ObjectPropertyDomain(:base :Artifact)
     DataPropertyAssertion(rdfs:label :base "base")
     DataPropertyAssertion(rdfs:comment :base "The base element of which the artifact is a version of.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :base <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(ObjectProperty(:supersedes))
     ObjectPropertyDomain(:supersedes :Artifact)
     ObjectPropertyRange(:supersedes :Artifact)
     DataPropertyAssertion(rdfs:label :supersedes "supersedes")
     DataPropertyAssertion(rdfs:comment :supersedes "The artifacts that are superseded by this one.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :supersedes <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:version))
     FunctionalDataProperty(:version)
     DataPropertyDomain(:version :Artifact)
     DataPropertyRange(:version xsd:string)
@@ -88,6 +95,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :version "The version tag of an artifact.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :version <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:from))
     FunctionalDataProperty(:from)
     DataPropertyDomain(:from :Artifact)
     DataPropertyRange(:from xsd:string)
@@ -95,6 +103,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :from "The identifier of the connector from which the artifact has been imported.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :from <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:definition))
     FunctionalDataProperty(:definition)
     DataPropertyDomain(:definition :Rule)
     DataPropertyRange(:definition xsd:string)
@@ -102,6 +111,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :definition "The definition of a consistency rule.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :definition <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(DataProperty(:message))
     FunctionalDataProperty(:message)
     DataPropertyDomain(:message :Inconsistency)
     DataPropertyRange(:message xsd:string)
@@ -109,6 +119,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :message "The warning message for an inconsistency.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :message <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(ObjectProperty(:producedBy))
     FunctionalObjectProperty(:producedBy)
     ObjectPropertyDomain(:producedBy :Inconsistency)
     ObjectPropertyRange(:producedBy :Rule)

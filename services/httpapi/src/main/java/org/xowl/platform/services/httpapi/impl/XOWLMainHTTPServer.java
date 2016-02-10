@@ -56,7 +56,8 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doCORSPreflight(response);
+        addCORSHeader(request, response);
+        response.setStatus(HttpURLConnection.HTTP_OK);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @param response The response
      */
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
-        addCORSHeader(response);
+        addCORSHeader(request, response);
         try {
             String uri = request.getRequestURI();
             uri = uri.substring(HttpAPIService.URI_API.length() + 1);
@@ -107,16 +108,6 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             if (securityService != null)
                 securityService.logout();
         }
-    }
-
-    /**
-     * Responds to a CORS pre-flight request
-     *
-     * @param response The HTTP response
-     */
-    private void doCORSPreflight(HttpServletResponse response) {
-        addCORSHeader(response);
-        response.setStatus(HttpURLConnection.HTTP_OK);
     }
 
     /**
@@ -170,12 +161,18 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     /**
      * Adds the headers required in a response for the support of Cross-Origin Resource Sharing
      *
+     * @param request  The request
      * @param response The response to add headers to
      */
-    private void addCORSHeader(HttpServletResponse response) {
+    private void addCORSHeader(HttpServletRequest request, HttpServletResponse response) {
+        String origin = request.getHeader("Origin");
+        if (origin == null) {
+            // the request is from the same host
+            origin = request.getHeader("Host");
+        }
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Cache-Control");
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, Cache-Control");
+        response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Cache-Control", "no-cache");
     }

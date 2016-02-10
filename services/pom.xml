@@ -15,6 +15,7 @@
 		<module>executor</module>
 		<module>lts</module>
 		<module>consistency</module>
+		<module>impact</module>
 		<module>connection</module>
 		<module>statistics</module>
 		<module>httpapi</module>

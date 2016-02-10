@@ -318,7 +318,7 @@ XOWL.prototype.doQuery = function (callback, target) {
 }
 
 XOWL.prototype.doJSQuery = function (callback, target) {
-	if (this.authToken === null)
+	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
@@ -339,7 +339,7 @@ XOWL.prototype.doCommand = function (callback, target, payload) {
 }
 
 XOWL.prototype.doJSCommand = function (callback, target, payload) {
-	if (this.authToken === null)
+	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
@@ -361,7 +361,7 @@ XOWL.prototype.sparql = function (callback, payload) {
 }
 
 XOWL.prototype.doJSSPARQL = function (callback, payload) {
-	if (this.authToken === null)
+	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
@@ -383,7 +383,7 @@ XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, 
 }
 
 XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentType, name, base, version) {
-	if (this.authToken === null)
+	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {

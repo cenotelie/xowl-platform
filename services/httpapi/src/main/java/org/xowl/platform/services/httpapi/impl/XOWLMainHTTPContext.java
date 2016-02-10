@@ -54,6 +54,10 @@ public class XOWLMainHTTPContext implements HttpContext {
 
     @Override
     public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        // do not perform authentication for pre-flight requests
+        if (httpServletRequest.getMethod().equals("OPTIONS"))
+            return true;
+
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null) {
             httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);

@@ -22,7 +22,6 @@ package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Implements the setup parameters of an impact analysis
@@ -53,12 +52,12 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
     @Override
     public String serializedString() {
         // FIXME: implement this
-        throw new NotImplementedException();
+        return null;
     }
 
     @Override
     public String serializedJSON() {
         // FIXME: implement this
-        throw new NotImplementedException();
+        return null;
     }
 }

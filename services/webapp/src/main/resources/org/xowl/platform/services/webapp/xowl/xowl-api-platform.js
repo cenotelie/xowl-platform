@@ -133,6 +133,66 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 	}, "services/core/connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
 }
 
+XOWL.prototype.getBusinessDomains = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/domains");
+}
+
+XOWL.prototype.getBusinessDomain = function (callback, domainId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/domain?id=" + encodeURIComponent(domainId));
+}
+
+XOWL.prototype.getArtifactArchetypes = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/archetypes");
+}
+
+XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/archetype?id=" + encodeURIComponent(archetypeId));
+}
+
+XOWL.prototype.getBusinessSchemas = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/schemas");
+}
+
+XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/business/schema?id=" + encodeURIComponent(schemaId));
+}
+
 XOWL.prototype.getJobs = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {

@@ -35,9 +35,9 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.writers.NTripleSerializer;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ArtifactDeferred;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
 import org.xowl.platform.services.lts.TripleStore;
 
 import java.io.StringWriter;

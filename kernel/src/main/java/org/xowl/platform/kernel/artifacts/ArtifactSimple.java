@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -18,44 +18,38 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.store.rdf.Quad;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Represents an artifact with content that is not yet loaded
+ * Implements a simple artifacts that contains all its data
  *
  * @author Laurent Wouters
  */
-public abstract class ArtifactDeferred extends ArtifactBase {
+public class ArtifactSimple extends ArtifactBase {
     /**
      * The payload quads
      */
-    protected Collection<Quad> content;
+    protected final Collection<Quad> content;
 
     /**
      * Initializes this data package
      *
      * @param metadata The metadata quads
+     * @param content  The payload quads
      */
-    public ArtifactDeferred(Collection<Quad> metadata) {
+    public ArtifactSimple(Collection<Quad> metadata, Collection<Quad> content) {
         super(metadata);
+        this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
     }
 
     @Override
     public Collection<Quad> getContent() {
-        if (content == null) {
-            content = load();
-        }
         return content;
     }
-
-    /**
-     * Loads the content of this artifact
-     *
-     * @return The loaded content
-     */
-    protected abstract Collection<Quad> load();
 }

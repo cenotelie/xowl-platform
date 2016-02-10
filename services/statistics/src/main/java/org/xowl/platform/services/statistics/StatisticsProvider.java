@@ -26,7 +26,12 @@ import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.SecurityService;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
 

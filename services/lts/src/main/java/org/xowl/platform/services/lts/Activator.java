@@ -22,9 +22,9 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.ArtifactStorageService;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.JobFactory;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
 import org.xowl.platform.services.lts.jobs.StorageJobFactory;
 

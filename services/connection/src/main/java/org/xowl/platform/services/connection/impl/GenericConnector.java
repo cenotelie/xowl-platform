@@ -31,7 +31,11 @@ import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactBase;
+import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.io.Reader;

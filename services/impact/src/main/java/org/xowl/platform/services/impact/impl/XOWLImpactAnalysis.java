@@ -28,9 +28,9 @@ import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.kernel.JobExecutionService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.impact.ImpactAnalysisService;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 

@@ -23,7 +23,7 @@ package org.xowl.platform.services.impact;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.JobFactory;
+import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.services.impact.impl.XOWLImpactAnalysis;
 import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisJobFactory;
 

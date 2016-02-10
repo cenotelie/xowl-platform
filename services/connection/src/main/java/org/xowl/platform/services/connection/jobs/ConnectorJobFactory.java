@@ -21,8 +21,8 @@
 package org.xowl.platform.services.connection.jobs;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.kernel.Job;
-import org.xowl.platform.kernel.JobFactory;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobFactory;
 
 /**
  * The factory for connector-related jobs

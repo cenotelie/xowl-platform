@@ -22,9 +22,9 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logger;
+import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.File;

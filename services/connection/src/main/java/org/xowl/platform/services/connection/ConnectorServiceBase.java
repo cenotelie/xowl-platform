@@ -32,8 +32,8 @@ import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.platform.kernel.Artifact;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.artifacts.Artifact;
 
 import java.net.HttpURLConnection;
 import java.text.DateFormat;

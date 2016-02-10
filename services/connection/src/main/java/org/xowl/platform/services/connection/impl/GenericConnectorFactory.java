@@ -22,10 +22,10 @@ package org.xowl.platform.services.connection.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.services.connection.ConnectorServiceFactory;
 import org.xowl.platform.services.connection.ConnectorDescription;
 import org.xowl.platform.services.connection.ConnectorDescriptionBase;
 import org.xowl.platform.services.connection.ConnectorDescriptionParam;
+import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
 import java.util.Arrays;
 import java.util.Collection;

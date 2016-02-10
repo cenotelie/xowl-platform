@@ -23,7 +23,7 @@ package org.xowl.platform.services.connection.jobs;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.JobBase;
+import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.connection.ConnectorUtils;
 
 /**

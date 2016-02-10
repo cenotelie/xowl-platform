@@ -21,8 +21,6 @@
 package org.xowl.platform.kernel;
 
 import org.xowl.infra.utils.config.Configuration;
-import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.Service;
 
 import java.io.File;
 

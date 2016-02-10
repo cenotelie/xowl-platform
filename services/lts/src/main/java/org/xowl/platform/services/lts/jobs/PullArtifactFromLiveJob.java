@@ -25,10 +25,10 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.Artifact;
-import org.xowl.platform.kernel.ArtifactStorageService;
-import org.xowl.platform.kernel.JobBase;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.jobs.JobBase;
 
 /**
  * A job for pulling an artifact from the live store

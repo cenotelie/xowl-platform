@@ -33,13 +33,13 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.Job;
-import org.xowl.platform.kernel.JobExecutionService;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.connection.*;
 import org.xowl.platform.services.connection.jobs.PullArtifactJob;
 import org.xowl.platform.services.connection.jobs.PushArtifactJob;
-import org.xowl.platform.kernel.PlatformUtils;
 
 import java.net.HttpURLConnection;
 import java.util.*;

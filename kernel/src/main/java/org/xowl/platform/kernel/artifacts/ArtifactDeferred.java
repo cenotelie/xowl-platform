@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -18,18 +18,44 @@
  *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.artifacts;
+
+import org.xowl.infra.store.rdf.Quad;
+
+import java.util.Collection;
 
 /**
- * Represents the state of an OSGi bundle
+ * Represents an artifact with content that is not yet loaded
  *
  * @author Laurent Wouters
  */
-public enum OSGiBundleState {
-    UNINSTALLED,
-    INSTALLED,
-    RESOLVED,
-    STARTING,
-    STOPPING,
-    ACTIVE
+public abstract class ArtifactDeferred extends ArtifactBase {
+    /**
+     * The payload quads
+     */
+    protected Collection<Quad> content;
+
+    /**
+     * Initializes this data package
+     *
+     * @param metadata The metadata quads
+     */
+    public ArtifactDeferred(Collection<Quad> metadata) {
+        super(metadata);
+    }
+
+    @Override
+    public Collection<Quad> getContent() {
+        if (content == null) {
+            content = load();
+        }
+        return content;
+    }
+
+    /**
+     * Loads the content of this artifact
+     *
+     * @return The loaded content
+     */
+    protected abstract Collection<Quad> load();
 }

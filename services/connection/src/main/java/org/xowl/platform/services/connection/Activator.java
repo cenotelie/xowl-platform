@@ -25,9 +25,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.JobFactory;
-import org.xowl.platform.services.connection.impl.XOWLConnectorDirectory;
+import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.services.connection.impl.GenericConnectorFactory;
+import org.xowl.platform.services.connection.impl.XOWLConnectorDirectory;
 import org.xowl.platform.services.connection.jobs.ConnectorJobFactory;
 
 /**

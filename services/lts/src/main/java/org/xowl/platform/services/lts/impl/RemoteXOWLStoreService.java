@@ -43,13 +43,15 @@ import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
-import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.IOException;
 import java.io.StringWriter;

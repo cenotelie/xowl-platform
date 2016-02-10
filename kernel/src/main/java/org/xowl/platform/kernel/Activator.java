@@ -22,6 +22,7 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.impl.FSConfigurationService;
 import org.xowl.platform.kernel.impl.XOWLBusinessDirectoryService;
 import org.xowl.platform.kernel.impl.XOWLSecurityService;
@@ -41,6 +42,9 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
+        bundleContext.registerService(BusinessSchema.class, KernelSchema.IMPL, null);
+        bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
+        bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
     }
 
     @Override

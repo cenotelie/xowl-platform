@@ -6,6 +6,9 @@ Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(:=<http://xowl.org/platform/schemas/kernel#>)
 
 Ontology(<http://xowl.org/platform/schemas/kernel>
+    DataPropertyAssertion(rdfs:label <http://xowl.org/platform/schemas/kernel> "Kernel Schema")
+
+
     Declaration(Class(:Resource))
     DataPropertyAssertion(rdfs:label :Resource "Resource")
     DataPropertyAssertion(rdfs:comment :Resource "Represents a resource on a xOWL federation platform.")

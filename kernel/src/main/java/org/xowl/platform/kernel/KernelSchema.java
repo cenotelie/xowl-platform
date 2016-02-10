@@ -20,6 +20,10 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.BusinessSchema;
+import org.xowl.platform.kernel.artifacts.BusinessSchemaResource;
+
 /**
  * Schema URIs for the core of the platform
  *
@@ -89,4 +93,10 @@ public interface KernelSchema {
      * The modified property
      */
     String MODIFIED = URI_KERNEL + "#modified";
+
+
+    /**
+     * The implementation of this schema
+     */
+    BusinessSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/schemas/kernel.fs", URI_KERNEL);
 }

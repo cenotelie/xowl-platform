@@ -117,9 +117,9 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (uri.equals(URI_API + "/inconsistencies"))
+        if (uri.equals("services/core/inconsistencies"))
             return XSPReplyUtils.toHttpResponse(getInconsistencies(), Collections.singletonList(accept));
-        if (!uri.equals(URI_API + "/consistency"))
+        if (!uri.equals("services/core/consistency"))
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");

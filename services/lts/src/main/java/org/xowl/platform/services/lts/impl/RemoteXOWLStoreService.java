@@ -247,9 +247,9 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (uri.equals(URI_API + "/sparql"))
+        if (uri.equals("services/core/sparql"))
             return onMessageSPARQL(content, accept);
-        if (uri.equals(URI_API + "/artifacts")) {
+        if (uri.equals("services/core/artifacts")) {
             // is it an action
             String[] actions = parameters.get("action");
             String action = actions != null && actions.length >= 1 ? actions[0] : null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -95,7 +95,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             Collection<HttpAPIService> services = ServiceUtils.getServices(HttpAPIService.class);
             for (HttpAPIService service : services) {
                 if (service.getURIs().contains(uri)) {
-                    doServedService(service, method, request, response);
+                    doServedService(service, method, uri, request, response);
                     return;
                 }
             }
@@ -114,11 +114,12 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * Responds on a request for a served service
      *
      * @param service  The served service
+     * @param uri      The service-specific part of the requested URI
      * @param method   The HTTP method
      * @param request  The request
      * @param response The response
      */
-    private void doServedService(HttpAPIService service, String method, HttpServletRequest request, HttpServletResponse response) {
+    private void doServedService(HttpAPIService service, String method, String uri, HttpServletRequest request, HttpServletResponse response) {
         byte[] content = null;
         if (request.getContentLength() > 0) {
             try (InputStream is = request.getInputStream()) {
@@ -135,7 +136,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             }
         }
         HttpResponse serviceResponse = service.onMessage(method,
-                request.getRequestURI(),
+                uri,
                 request.getParameterMap(),
                 request.getContentType(),
                 content,

@@ -16,6 +16,9 @@ function init() {
 }
 
 function renderBundles(bundles) {
+	bundles.sort(function (x, y) {
+		return x.id.localeCompare(y.id);
+	});
 	var table = document.getElementById("bundles");
 	for (var i = 0; i != bundles.length; i++) {
 		var cells = [

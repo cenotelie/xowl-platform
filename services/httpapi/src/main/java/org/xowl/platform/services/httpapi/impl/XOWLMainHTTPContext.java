@@ -75,12 +75,14 @@ public class XOWLMainHTTPContext implements HttpContext {
             byte[] buffer = Base64.getDecoder().decode(headerAuth.substring(index + 1));
             String authToken = new String(buffer);
             int indexColon = authToken.indexOf(58);
-            String login = authToken.substring(0, indexColon);
-            String password = authToken.substring(indexColon + 1);
-            if (securityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
-                httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
-                httpServletRequest.setAttribute(REMOTE_USER, login);
-                return true;
+            if (indexColon != -1) {
+                String login = authToken.substring(0, indexColon);
+                String password = authToken.substring(indexColon + 1);
+                if (securityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
+                    httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
+                    httpServletRequest.setAttribute(REMOTE_USER, login);
+                    return true;
+                }
             }
         }
         httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm() + "\"");

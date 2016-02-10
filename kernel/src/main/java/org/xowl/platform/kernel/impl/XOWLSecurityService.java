@@ -55,7 +55,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
      * The URIs for this service
      */
     private static final String[] URIS = new String[]{
-            "security"
+            "services/core/security"
     };
 
     /**

@@ -66,8 +66,8 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "sparql",
-            "artifacts"
+            "services/core/sparql",
+            "services/core/artifacts"
     };
 
 

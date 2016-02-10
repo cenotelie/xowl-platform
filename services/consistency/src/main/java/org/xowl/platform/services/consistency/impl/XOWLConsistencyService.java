@@ -58,8 +58,8 @@ public class XOWLConsistencyService implements ConsistencyService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "consistency",
-            "inconsistencies"
+            "services/core/consistency",
+            "services/core/inconsistencies"
     };
 
     /**

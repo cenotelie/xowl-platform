@@ -72,8 +72,8 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "connectors",
-            "descriptors"
+            "services/core/connectors",
+            "services/core/descriptors"
     };
 
     /**

@@ -33,7 +33,7 @@ XOWL.prototype.login = function (callback, login, password) {
 			localStorage.removeItem('xowl.userName');
 			callback(code, type, content);
 		}
-	}, "security");
+	}, "services/core/security");
 }
 
 XOWL.prototype.logout = function () {
@@ -50,7 +50,7 @@ XOWL.prototype.getBasicStats = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "statistics");
+	}, "services/core/statistics");
 }
 
 XOWL.prototype.getPlatformBundles = function (callback) {
@@ -60,7 +60,7 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "statistics?platform");
+	}, "services/core/statistics?platform");
 }
 
 XOWL.prototype.getDescriptors = function (callback) {
@@ -70,7 +70,7 @@ XOWL.prototype.getDescriptors = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "descriptors");
+	}, "services/core/descriptors");
 }
 
 XOWL.prototype.getConnectors = function (callback) {
@@ -80,7 +80,7 @@ XOWL.prototype.getConnectors = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors");
+	}, "services/core/connectors");
 }
 
 XOWL.prototype.getConnector = function (callback, connectorId) {
@@ -90,7 +90,7 @@ XOWL.prototype.getConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?id=" + encodeURIComponent(connectorId));
+	}, "services/core/connectors?id=" + encodeURIComponent(connectorId));
 }
 
 XOWL.prototype.createConnector = function (callback, domain, definition) {
@@ -100,7 +100,7 @@ XOWL.prototype.createConnector = function (callback, domain, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
+	}, "services/core/connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
 }
 
 XOWL.prototype.deleteConnector = function (callback, connectorId) {
@@ -110,7 +110,7 @@ XOWL.prototype.deleteConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?action=delete&id=" + encodeURIComponent(connectorId), {});
+	}, "services/core/connectors?action=delete&id=" + encodeURIComponent(connectorId), {});
 }
 
 XOWL.prototype.pullFromConnector = function (callback, connectorId) {
@@ -120,7 +120,7 @@ XOWL.prototype.pullFromConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?action=pull&id=" + encodeURIComponent(connectorId), {});
+	}, "services/core/connectors?action=pull&id=" + encodeURIComponent(connectorId), {});
 }
 
 XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
@@ -130,7 +130,7 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
+	}, "services/core/connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
 }
 
 XOWL.prototype.getJobs = function (callback) {
@@ -140,7 +140,7 @@ XOWL.prototype.getJobs = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "jobs");
+	}, "services/core/jobs");
 }
 
 XOWL.prototype.getJob = function (callback, jobId) {
@@ -150,7 +150,7 @@ XOWL.prototype.getJob = function (callback, jobId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "jobs?id=" + encodeURIComponent(jobId));
+	}, "services/core/jobs?id=" + encodeURIComponent(jobId));
 }
 
 XOWL.prototype.getAllArtifacts = function (callback) {
@@ -160,7 +160,7 @@ XOWL.prototype.getAllArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts");
+	}, "services/core/artifacts");
 }
 
 XOWL.prototype.getLiveArtifacts = function (callback) {
@@ -170,7 +170,7 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?live=true");
+	}, "services/core/artifacts?live=true");
 }
 
 XOWL.prototype.getArtifactVersions = function (callback, base) {
@@ -180,7 +180,7 @@ XOWL.prototype.getArtifactVersions = function (callback, base) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?base=" + encodeURIComponent(base));
+	}, "services/core/artifacts?base=" + encodeURIComponent(base));
 }
 
 XOWL.prototype.pullFromLive = function (callback, artifactId) {
@@ -190,7 +190,7 @@ XOWL.prototype.pullFromLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?action=pull&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts?action=pull&id=" + encodeURIComponent(artifactId), {});
 }
 
 XOWL.prototype.pushToLive = function (callback, artifactId) {
@@ -200,7 +200,7 @@ XOWL.prototype.pushToLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
 }
 
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
@@ -210,7 +210,7 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts?id=" + encodeURIComponent(artifactId));
 }
 
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
@@ -220,7 +220,7 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?content=true&id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts?content=true&id=" + encodeURIComponent(artifactId));
 }
 
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
@@ -237,7 +237,7 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
+	}, "services/core/artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
 }
 
 XOWL.prototype.getInconsistencies = function (callback) {
@@ -247,7 +247,7 @@ XOWL.prototype.getInconsistencies = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "inconsistencies");
+	}, "services/core/inconsistencies");
 }
 
 XOWL.prototype.getConsistencyRules = function (callback) {
@@ -257,7 +257,7 @@ XOWL.prototype.getConsistencyRules = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency");
+	}, "services/core/consistency");
 }
 
 XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
@@ -267,7 +267,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency?id=" + encodeURIComponent(ruleId));
+	}, "services/core/consistency?id=" + encodeURIComponent(ruleId));
 }
 
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
@@ -277,7 +277,7 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency?action=create&name=" + encodeURIComponent(name) + "&message=" + encodeURIComponent(message) + "&prefixes=" + encodeURIComponent(prefixes) + "&conditions=" + encodeURIComponent(conditions), "");
+	}, "services/core/consistency?action=create&name=" + encodeURIComponent(name) + "&message=" + encodeURIComponent(message) + "&prefixes=" + encodeURIComponent(prefixes) + "&conditions=" + encodeURIComponent(conditions), "");
 }
 
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
@@ -287,7 +287,7 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency?action=activate&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency?action=activate&id=" + encodeURIComponent(ruleId), "");
 }
 
 XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
@@ -297,7 +297,7 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency?action=deactivate&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency?action=deactivate&id=" + encodeURIComponent(ruleId), "");
 }
 
 XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
@@ -307,7 +307,7 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "consistency?action=delete&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency?action=delete&id=" + encodeURIComponent(ruleId), "");
 }
 
 
@@ -370,7 +370,7 @@ XOWL.prototype.doJSSPARQL = function (callback, payload) {
 			callback(xmlHttp.status, ct, xmlHttp.responseText)
 		}
 	}
-	xmlHttp.open("POST", this.endpoint + "sparql", true);
+	xmlHttp.open("POST", this.endpoint + "services/core/sparql", true);
 	xmlHttp.setRequestHeader("Accept", "application/sparql-results+json, application/n-quads");
 	xmlHttp.setRequestHeader("Content-Type", "application/sparql-query");
 	xmlHttp.withCredentials = true;

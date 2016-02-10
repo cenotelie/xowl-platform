@@ -45,7 +45,7 @@ public class StatisticsProvider implements Service, HttpAPIService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "statistics"
+            "services/core/statistics"
     };
 
     /**

@@ -36,6 +36,7 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
+import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.io.Reader;
@@ -129,11 +130,11 @@ class GenericConnector extends ConnectorServiceBase {
         if (names == null || names.length <= 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
         if (bases == null || bases.length <= 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected base parameter");
+            bases = new String[]{null};
         if (versions == null || versions.length <= 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected version parameter");
+            versions = new String[]{null};
         if (archetypes == null || archetypes.length <= 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected archetype parameter");
+            archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
         if (contentType == null || contentType.isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content type");
         int index = contentType.indexOf(";");

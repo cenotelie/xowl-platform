@@ -3,31 +3,31 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-services</artifactId>
-		<version>0.1.8-SNAPSHOT</version>
+		<version>0.1.8</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-service-statistics</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.1.8-SNAPSHOT</version>
+	<version>0.1.8</version>
 	<name>xOWL Federation - Service Statistics</name>
 	<description>The service for providing statistics about the platform</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-kernel</artifactId>
-			<version>0.1.8-SNAPSHOT</version>
+			<version>0.1.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-service-lts</artifactId>
-			<version>0.1.8-SNAPSHOT</version>
+			<version>0.1.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-service-consistency</artifactId>
-			<version>0.1.8-SNAPSHOT</version>
+			<version>0.1.8</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

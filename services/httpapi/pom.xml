@@ -3,19 +3,19 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-services</artifactId>
-		<version>0.1.8-SNAPSHOT</version>
+		<version>0.1.8</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-service-httpapi</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.1.8-SNAPSHOT</version>
+	<version>0.1.8</version>
 	<name>xOWL Federation - Service HTTP API</name>
 	<description>The service for serving the HTTP API of other services</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-kernel</artifactId>
-			<version>0.1.8-SNAPSHOT</version>
+			<version>0.1.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

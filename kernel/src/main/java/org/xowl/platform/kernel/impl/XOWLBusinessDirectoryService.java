@@ -62,6 +62,49 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     }
 
     @Override
+    public Collection<BusinessDomain> getDomains() {
+        return ServiceUtils.getServices(BusinessDomain.class);
+    }
+
+    @Override
+    public Collection<BusinessSchema> getSchemas() {
+        return ServiceUtils.getServices(BusinessSchema.class);
+    }
+
+    @Override
+    public Collection<ArtifactArchetype> getArchetypes() {
+        return ServiceUtils.getServices(ArtifactArchetype.class);
+    }
+
+    @Override
+    public BusinessDomain getDomain(String identifier) {
+        for (BusinessDomain domain : ServiceUtils.getServices(BusinessDomain.class)) {
+            if (domain.getIdentifier().equals(identifier))
+                return domain;
+        }
+        return null;
+    }
+
+    @Override
+    public BusinessSchema getSchema(String identifier) {
+        for (BusinessSchema schema : ServiceUtils.getServices(BusinessSchema.class)) {
+            if (schema.getIdentifier().equals(identifier))
+                return schema;
+        }
+        return null;
+    }
+
+    @Override
+    public ArtifactArchetype getArchetype(String identifier) {
+        for (ArtifactArchetype archetype : ServiceUtils.getServices(ArtifactArchetype.class)) {
+            if (archetype.getIdentifier().equals(identifier))
+                return archetype;
+        }
+        return null;
+    }
+
+
+    @Override
     public Collection<String> getURIs() {
         return Arrays.asList(URIS);
     }

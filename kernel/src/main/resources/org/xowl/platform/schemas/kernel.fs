@@ -80,6 +80,13 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     DataPropertyAssertion(rdfs:comment :base "The base element of which the artifact is a version of.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :base <http://xowl.org/platform/schemas/kernel>)
 
+    Declaration(ObjectProperty(:archetype))
+    FunctionalObjectProperty(:archetype)
+    ObjectPropertyDomain(:archetype :Artifact)
+    DataPropertyAssertion(rdfs:label :archetype "base")
+    DataPropertyAssertion(rdfs:comment :archetype "The base archetype of the artifact.")
+    ObjectPropertyAssertion(rdfs:isDefinedBy :archetype <http://xowl.org/platform/schemas/kernel>)
+
     Declaration(ObjectProperty(:supersedes))
     ObjectPropertyDomain(:supersedes :Artifact)
     ObjectPropertyRange(:supersedes :Artifact)

@@ -62,9 +62,21 @@ public abstract class ArtifactBase implements Artifact {
      */
     protected final String baseID;
     /**
+     * The artifacts superseded by this one
+     */
+    protected final String[] superseded;
+    /**
      * The version of this artifact
      */
     protected final String version;
+    /**
+     * The archetype of this artifact
+     */
+    protected final String archetype;
+    /**
+     * The identifier of the originating connector
+     */
+    protected final String from;
     /**
      * The metadata quads
      */
@@ -80,6 +92,9 @@ public abstract class ArtifactBase implements Artifact {
         String name = "";
         String version = "";
         String baseID = "";
+        String archetype = "";
+        String from = "";
+        Collection<String> superseded = new ArrayList<>(2);
         for (Quad quad : metadata) {
             if (identifier.isEmpty() && quad.getSubject().getNodeType() == Node.TYPE_IRI)
                 identifier = ((IRINode) quad.getSubject()).getIRIValue();
@@ -90,14 +105,23 @@ public abstract class ArtifactBase implements Artifact {
                     name = ((LiteralNode) quad.getObject()).getLexicalValue();
                 else if (KernelSchema.BASE.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     baseID = ((IRINode) quad.getObject()).getIRIValue();
+                else if (KernelSchema.SUPERSEDE.equals(((IRINode) quad.getProperty()).getIRIValue()))
+                    superseded.add(((IRINode) quad.getObject()).getIRIValue());
                 else if (KernelSchema.VERSION.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     version = ((LiteralNode) quad.getObject()).getLexicalValue();
+                else if (KernelSchema.ARCHETYPE.equals(((IRINode) quad.getProperty()).getIRIValue()))
+                    archetype = ((LiteralNode) quad.getObject()).getLexicalValue();
+                else if (KernelSchema.FROM.equals(((IRINode) quad.getProperty()).getIRIValue()))
+                    from = ((LiteralNode) quad.getObject()).getLexicalValue();
             }
         }
         this.identifier = identifier;
         this.name = name;
         this.baseID = baseID;
+        this.superseded = superseded.toArray(new String[superseded.size()]);
         this.version = version;
+        this.archetype = archetype;
+        this.from = from;
         this.metadata = Collections.unmodifiableCollection(new ArrayList<>(metadata));
     }
 
@@ -117,8 +141,23 @@ public abstract class ArtifactBase implements Artifact {
     }
 
     @Override
+    public String[] getSuperseded() {
+        return superseded;
+    }
+
+    @Override
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public String getArchetype() {
+        return archetype;
+    }
+
+    @Override
+    public String getOrigin() {
+        return from;
     }
 
     @Override
@@ -128,17 +167,30 @@ public abstract class ArtifactBase implements Artifact {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
-                + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(name)
-                + "\", \"type\": \""
-                + IOUtils.escapeStringJSON(Artifact.class.getCanonicalName())
-                + "\", \"base\": \""
-                + IOUtils.escapeStringJSON(baseID)
-                + "\", \"version\": \""
-                + IOUtils.escapeStringJSON(version)
-                + "\"}";
+        StringBuilder builder = new StringBuilder("{\"identifier\": \"");
+        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\":\"");
+        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append("\", \"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(Artifact.class.getCanonicalName()));
+        builder.append("\", \"base\": \"");
+        builder.append(IOUtils.escapeStringJSON(baseID));
+        builder.append("\", \"version\": \"");
+        builder.append(IOUtils.escapeStringJSON(version));
+        builder.append("\", \"from\": \"");
+        builder.append(IOUtils.escapeStringJSON(from));
+        builder.append("\", \"archetype\": \"");
+        builder.append(IOUtils.escapeStringJSON(archetype));
+        builder.append("\", \"supersede\": [");
+        for (int i = 0; i != superseded.length; i++) {
+            if (i != 0)
+                builder.append(", ");
+            builder.append("\"");
+            builder.append(IOUtils.escapeStringJSON(superseded[i]));
+            builder.append("\"");
+        }
+        builder.append("]}");
+        return builder.toString();
     }
 
     @Override

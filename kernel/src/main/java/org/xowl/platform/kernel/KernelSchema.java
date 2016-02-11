@@ -20,7 +20,6 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.BusinessSchema;
 import org.xowl.platform.kernel.artifacts.BusinessSchemaResource;
 
@@ -73,6 +72,10 @@ public interface KernelSchema {
      * The version property
      */
     String VERSION = URI_KERNEL + "#version";
+    /**
+     * The archetype property
+     */
+    String ARCHETYPE = URI_KERNEL + "#archetype";
     /**
      * The name property
      */

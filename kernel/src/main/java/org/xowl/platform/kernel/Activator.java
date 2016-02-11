@@ -42,6 +42,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
+        bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
         bundleContext.registerService(BusinessSchema.class, KernelSchema.IMPL, null);
         bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
         bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);

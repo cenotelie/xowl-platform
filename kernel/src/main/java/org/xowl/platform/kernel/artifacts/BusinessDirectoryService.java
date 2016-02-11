@@ -23,10 +23,56 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
 
+import java.util.Collection;
+
 /**
  * Represents a service that exposes a directory of business domains, schemas and archetypes
  *
  * @author Laurent Wouters
  */
 public interface BusinessDirectoryService extends Service, HttpAPIService {
+    /**
+     * Gets the registered domains
+     *
+     * @return The registered domains
+     */
+    Collection<BusinessDomain> getDomains();
+
+    /**
+     * Gets the registered schemas
+     *
+     * @return The registered schemas
+     */
+    Collection<BusinessSchema> getSchemas();
+
+    /**
+     * Gets the registered artifact archetypes
+     *
+     * @return The registered artifact archetypes
+     */
+    Collection<ArtifactArchetype> getArchetypes();
+
+    /**
+     * Gets the domain for the specified identifier
+     *
+     * @param identifier The identifier of a domain
+     * @return The associated domain, if any
+     */
+    BusinessDomain getDomain(String identifier);
+
+    /**
+     * Gets the schema for the specified identifier (usually its URI)
+     *
+     * @param identifier The identifier of a schema
+     * @return The associated schema, if any
+     */
+    BusinessSchema getSchema(String identifier);
+
+    /**
+     * Gets the artifact archetype for the specified identifier
+     *
+     * @param identifier The identifier of an artifact archetype
+     * @return The associated archetype, if any
+     */
+    ArtifactArchetype getArchetype(String identifier);
 }

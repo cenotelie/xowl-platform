@@ -54,11 +54,32 @@ public interface Artifact extends Identifiable, Serializable {
     String getBase();
 
     /**
+     * Gets the identifier of the artifacts superseded by this one
+     *
+     * @return The artifacts superseded by this one
+     */
+    String[] getSuperseded();
+
+    /**
      * Gets the version string of this artifact
      *
      * @return The version string, or null if there is none
      */
     String getVersion();
+
+    /**
+     * Gets the identifier of the archetype
+     *
+     * @return The identifier of the archetype
+     */
+    String getArchetype();
+
+    /**
+     * Gets the identifier of the originating connector
+     *
+     * @return The identifier of the originating connector
+     */
+    String getOrigin();
 
     /**
      * Gets the metadata quads

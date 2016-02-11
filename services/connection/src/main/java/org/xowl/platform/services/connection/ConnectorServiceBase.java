@@ -172,10 +172,11 @@ public abstract class ConnectorServiceBase implements ConnectorService {
      * @param superseded  The URI of the artifacts superseded by this one
      * @param name        The artifact's name
      * @param version     The artifact's version string
+     * @param archetype   The artifact's archetype
      * @param from        The identifier of the connector that produced the artifact
      * @return The metadata, or null if some data were invalid
      */
-    public static Collection<Quad> buildMetadata(String artifactURI, String baseURI, String[] superseded, String name, String version, String from) {
+    public static Collection<Quad> buildMetadata(String artifactURI, String baseURI, String[] superseded, String name, String version, String archetype, String from) {
         if (artifactURI == null || artifactURI.isEmpty() || !URIUtils.isAbsolute(artifactURI))
             return null;
         NodeManager nodeManager = new CachedNodes();
@@ -196,6 +197,8 @@ public abstract class ConnectorServiceBase implements ConnectorService {
         }
         if (version != null && !version.isEmpty())
             metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(version, Vocabulary.xsdString, null)));
+        if (archetype != null && !archetype.isEmpty())
+            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.ARCHETYPE), nodeManager.getLiteralNode(archetype, Vocabulary.xsdString, null)));
         if (from != null && !from.isEmpty())
             metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(from, Vocabulary.xsdString, null)));
         metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));

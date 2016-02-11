@@ -123,14 +123,17 @@ class GenericConnector extends ConnectorServiceBase {
     private HttpResponse onMessagePostQuads(Map<String, String[]> parameters, String contentType, byte[] content) {
         String[] names = parameters.get("name");
         String[] bases = parameters.get("base");
-        String[] supersedes = parameters.get("supersedes");
+        String[] supersedes = parameters.get("supersede");
         String[] versions = parameters.get("version");
+        String[] archetypes = parameters.get("archetype");
         if (names == null || names.length <= 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
         if (bases == null || bases.length <= 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected base parameter");
         if (versions == null || versions.length <= 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected version parameter");
+        if (archetypes == null || archetypes.length <= 0)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected archetype parameter");
         if (contentType == null || contentType.isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content type");
         int index = contentType.indexOf(";");
@@ -173,7 +176,7 @@ class GenericConnector extends ConnectorServiceBase {
             logger.error("Failed to parse the content");
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
         }
-        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], identifier);
+        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
         queueInput(artifact);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, artifact.serializedJSON());

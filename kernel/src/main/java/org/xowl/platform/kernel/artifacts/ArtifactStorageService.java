@@ -76,6 +76,14 @@ public interface ArtifactStorageService extends Service {
     Collection<Artifact> list(String base);
 
     /**
+     * Lists all the store artifacts of the specified archetype
+     *
+     * @param archetype The archetype to look for
+     * @return The list of the stored artifacts
+     */
+    Collection<Artifact> list(ArtifactArchetype archetype);
+
+    /**
      * Lists all the live artifacts
      *
      * @return The list of the live artifacts

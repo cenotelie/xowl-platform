@@ -45,7 +45,9 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.lts.TripleStore;
@@ -228,6 +230,25 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
+    public Collection<Artifact> list(ArtifactArchetype archetype) {
+        StringWriter writer = new StringWriter();
+        writer.write("DESCRIBE ?a WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(">. ?a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE));
+        writer.write("> \"");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(archetype.getDescription()));
+        writer.write("\" } }");
+
+        Result sparqlResult = storeLongTerm.sparql(writer.toString());
+        if (sparqlResult.isFailure())
+            return new ArrayList<>();
+        return storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+    }
+
+    @Override
     public Collection<Artifact> listLive() {
         return storeLive.getArtifacts();
     }
@@ -281,10 +302,14 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             // no, request a set of artifacts
             String[] lives = parameters.get("live");
             String[] bases = parameters.get("base");
+            String[] archetypes = parameters.get("archetype");
             boolean live = (lives != null && lives.length > 0 && lives[0].equalsIgnoreCase("true"));
             String base = (bases != null && bases.length > 0) ? bases[0] : null;
+            String archetype = (archetypes != null && archetypes.length > 0) ? archetypes[0] : null;
             if (base != null)
                 return onMessageGetArtifacts(base);
+            if (archetype != null)
+                return onMessageGetArtifactsForArchetype(archetype);
             return live ? onMessageGetLiveArtifacts() : onMessageGetArtifacts();
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -339,6 +364,30 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
      */
     private HttpResponse onMessageGetArtifacts(String base) {
         Collection<Artifact> artifacts = list(base);
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Artifact artifact : artifacts) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(artifact.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request to list the artifacts for a specified archetype
+     *
+     * @param archetypeId The archetype to look for
+     * @return The response
+     */
+    private HttpResponse onMessageGetArtifactsForArchetype(String archetypeId) {
+        BusinessDirectoryService directoryService = ServiceUtils.getService(BusinessDirectoryService.class);
+        if (directoryService == null)
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
+        ArtifactArchetype archetype = directoryService.getArchetype(archetypeId);
+        Collection<Artifact> artifacts = list(archetype);
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
         for (Artifact artifact : artifacts) {

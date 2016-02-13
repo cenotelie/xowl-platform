@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -30,6 +30,7 @@ import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.SecurityService;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.services.consistency.ConsistencyService;
@@ -100,8 +101,12 @@ public class StatisticsProvider implements Service, HttpAPIService {
     private void doUpdateStats() {
         ArtifactStorageService serviceArtifacts = ServiceUtils.getService(ArtifactStorageService.class);
         if (serviceArtifacts != null) {
-            nbArtifactsTotal = serviceArtifacts.getAllArtifacts().size();
-            nbArtifactsLive = serviceArtifacts.getLiveArtifacts().size();
+            XSPReply reply = serviceArtifacts.getAllArtifacts();
+            if (reply.isSuccess())
+                nbArtifactsTotal = ((XSPReplyResultCollection<Artifact>) reply).getData().size();
+            reply = serviceArtifacts.getLiveArtifacts();
+            if (reply.isSuccess())
+                nbArtifactsLive = ((XSPReplyResultCollection<Artifact>) reply).getData().size();
         }
         ConsistencyService serviceConsistency = ServiceUtils.getService(ConsistencyService.class);
         if (serviceConsistency != null) {

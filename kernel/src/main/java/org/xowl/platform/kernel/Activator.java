@@ -38,15 +38,15 @@ public class Activator implements BundleActivator {
         ConfigurationService configurationService = new FSConfigurationService();
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
+        directoryService.register(KernelSchema.IMPL);
+        directoryService.register(SchemaArtifactArchetype.INSTANCE);
+        directoryService.register(FreeArtifactArchetype.INSTANCE);
+        directoryService.register(SchemaDomain.INSTANCE);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
         bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
-        bundleContext.registerService(BusinessSchema.class, KernelSchema.IMPL, null);
-        bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
-        bundleContext.registerService(ArtifactArchetype.class, FreeArtifactArchetype.INSTANCE, null);
-        bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
     }
 
     @Override

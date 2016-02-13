@@ -21,7 +21,7 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Identifiable;
 
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface ArtifactArchetype extends Service, Serializable {
+public interface ArtifactArchetype extends Identifiable, Serializable {
     /**
      * Gets the human-readable description of this archetype
      *

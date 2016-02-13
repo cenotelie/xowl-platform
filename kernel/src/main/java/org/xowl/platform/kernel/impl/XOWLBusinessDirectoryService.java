@@ -22,16 +22,13 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
 import org.xowl.platform.kernel.artifacts.BusinessSchema;
 
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements the business directory service
@@ -51,6 +48,28 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
             "services/core/business/schema"
     };
 
+    /**
+     * The registered domains
+     */
+    private final Map<String, BusinessDomain> domains;
+    /**
+     * The registered schemas
+     */
+    private final Map<String, BusinessSchema> schemas;
+    /**
+     * The registered archetypes
+     */
+    private final Map<String, ArtifactArchetype> archetypes;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLBusinessDirectoryService() {
+        this.domains = new HashMap<>();
+        this.schemas = new HashMap<>();
+        this.archetypes = new HashMap<>();
+    }
+
     @Override
     public String getIdentifier() {
         return XOWLBusinessDirectoryService.class.getCanonicalName();
@@ -63,46 +82,48 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
 
     @Override
     public Collection<BusinessDomain> getDomains() {
-        return ServiceUtils.getServices(BusinessDomain.class);
+        return Collections.unmodifiableCollection(domains.values());
     }
 
     @Override
     public Collection<BusinessSchema> getSchemas() {
-        return ServiceUtils.getServices(BusinessSchema.class);
+        return Collections.unmodifiableCollection(schemas.values());
     }
 
     @Override
     public Collection<ArtifactArchetype> getArchetypes() {
-        return ServiceUtils.getServices(ArtifactArchetype.class);
+        return Collections.unmodifiableCollection(archetypes.values());
     }
 
     @Override
     public BusinessDomain getDomain(String identifier) {
-        for (BusinessDomain domain : ServiceUtils.getServices(BusinessDomain.class)) {
-            if (domain.getIdentifier().equals(identifier))
-                return domain;
-        }
-        return null;
+        return domains.get(identifier);
     }
 
     @Override
     public BusinessSchema getSchema(String identifier) {
-        for (BusinessSchema schema : ServiceUtils.getServices(BusinessSchema.class)) {
-            if (schema.getIdentifier().equals(identifier))
-                return schema;
-        }
-        return null;
+        return schemas.get(identifier);
     }
 
     @Override
     public ArtifactArchetype getArchetype(String identifier) {
-        for (ArtifactArchetype archetype : ServiceUtils.getServices(ArtifactArchetype.class)) {
-            if (archetype.getIdentifier().equals(identifier))
-                return archetype;
-        }
-        return null;
+        return archetypes.get(identifier);
     }
 
+    @Override
+    public void register(BusinessDomain domain) {
+        this.domains.put(domain.getIdentifier(), domain);
+    }
+
+    @Override
+    public void register(ArtifactArchetype archetype) {
+        this.archetypes.put(archetype.getIdentifier(), archetype);
+    }
+
+    @Override
+    public void register(BusinessSchema schema) {
+        this.schemas.put(schema.getIdentifier(), schema);
+    }
 
     @Override
     public Collection<String> getURIs() {
@@ -145,7 +166,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     private HttpResponse onGetArchetypes() {
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (ArtifactArchetype archetype : ServiceUtils.getServices(ArtifactArchetype.class)) {
+        for (ArtifactArchetype archetype : getArchetypes()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -161,10 +182,9 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
      * @return The response
      */
     private HttpResponse onGetArchetype(String identifier) {
-        for (ArtifactArchetype archetype : ServiceUtils.getServices(ArtifactArchetype.class)) {
-            if (archetype.getIdentifier().equals(identifier))
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, archetype.serializedJSON());
-        }
+        ArtifactArchetype archetype = getArchetype(identifier);
+        if (archetype != null)
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, archetype.serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -176,7 +196,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     private HttpResponse onGetDomains() {
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (BusinessDomain domain : ServiceUtils.getServices(BusinessDomain.class)) {
+        for (BusinessDomain domain : getDomains()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -192,10 +212,9 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
      * @return The response
      */
     private HttpResponse onGetDomain(String identifier) {
-        for (BusinessDomain domain : ServiceUtils.getServices(BusinessDomain.class)) {
-            if (domain.getIdentifier().equals(identifier))
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, domain.serializedJSON());
-        }
+        BusinessDomain domain = getDomain(identifier);
+        if (domain != null)
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, domain.serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -207,7 +226,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     private HttpResponse onGetSchemas() {
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (BusinessSchema schema : ServiceUtils.getServices(BusinessSchema.class)) {
+        for (BusinessSchema schema : getSchemas()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -223,10 +242,9 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
      * @return The response
      */
     private HttpResponse onGetSchema(String identifier) {
-        for (BusinessSchema schema : ServiceUtils.getServices(BusinessSchema.class)) {
-            if (schema.getIdentifier().equals(identifier))
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, schema.serializedJSON());
-        }
+        BusinessSchema schema = getSchema(identifier);
+        if (schema != null)
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, schema.serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 }

@@ -45,7 +45,7 @@ public class FreeArtifactArchetype implements ArtifactArchetype {
 
     @Override
     public String getIdentifier() {
-        return SchemaArtifactArchetype.class.getCanonicalName();
+        return FreeArtifactArchetype.class.getCanonicalName();
     }
 
     @Override

@@ -185,6 +185,12 @@ function renderArtifactFamily(family, index) {
 	button.onclick = function () { onClickShowMore(button, childRows) };
 	cells[0].appendChild(button);
 	cells[0].appendChild(document.createTextNode((index + 1).toString()));
+	var icon = document.createElement("img");
+	icon.src = "/web/assets/artifact_family.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	cells[1].appendChild(icon);
 	cells[1].appendChild(document.createTextNode(family.name));
 	cells[2].appendChild(document.createTextNode(family.version));
 	if (family.live.length == 0)
@@ -220,6 +226,12 @@ function renderArtifact(artifact) {
 	var link = document.createElement("a");
 	link.href = "artifact.html?id=" + encodeURIComponent(artifact.identifier);
 	link.appendChild(document.createTextNode(artifact.name));
+	var icon = document.createElement("img");
+	icon.src = "/web/assets/artifact.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	cells[1].appendChild(icon);
 	cells[1].appendChild(link);
 	cells[2].appendChild(document.createTextNode(artifact.version));
 	var toggle = document.createElement("div");

@@ -438,11 +438,11 @@ XOWL.prototype.doJSSPARQL = function (callback, payload) {
 	xmlHttp.send(payload);
 }
 
-XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version) {
-	this.doJSUpload(callback, connectorURI, payload, contentType, name, base, version);
+XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
+	this.doJSUpload(callback, connectorURI, payload, contentType, name, base, version, supersede, archetype);
 }
 
-XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentType, name, base, version) {
+XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
 	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
@@ -452,7 +452,12 @@ XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentTy
 			callback(xmlHttp.status, ct, xmlHttp.responseText)
 		}
 	}
-	xmlHttp.open("POST", this.endpoint + connectorURI + "?name=" + encodeURIComponent(name) + "&base=" + encodeURIComponent(base) + "&version=" + encodeURIComponent(version), true);
+	var uri = this.endpoint + connectorURI + "?name=" + encodeURIComponent(name) + "&base=" + encodeURIComponent(base) + "&version=" + encodeURIComponent(version);
+	if (supersede !== null && supersede !== "" && supersede !== "none")
+		uri += "&supersede=" + encodeURIComponent(supersede);
+	if (archetype !== null && archetype !== "")
+		uri += "&archetype=" + encodeURIComponent(archetype);
+	xmlHttp.open("POST", uri, true);
 	xmlHttp.setRequestHeader("Accept", "application/json");
 	xmlHttp.setRequestHeader("Content-Type", contentType);
 	xmlHttp.withCredentials = true;

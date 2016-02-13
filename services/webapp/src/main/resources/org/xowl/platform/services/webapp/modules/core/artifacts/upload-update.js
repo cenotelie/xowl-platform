@@ -3,7 +3,6 @@
 
 var xowl = new XOWL();
 var CONNECTOR = getParameterByName("connector");
-var ARTIFACTS_ALL = null;
 var ARTIFACTS = {};
 
 function init() {
@@ -14,17 +13,23 @@ function init() {
 	document.getElementById("panel-next").style.display = "none";
 	xowl.getAllArtifacts(function (status, ct, content) {
 		if (status == 200) {
-			ARTIFACTS_ALL = content;
-			renderArtifacts();
+			renderFamilies(content);
+		} else {
+			displayMessage(getErrorFor(status, content));
+		}
+	});
+	xowl.getArtifactArchetypes(function (status, ct, content) {
+		if (status == 200) {
+			renderArchetypes(content);
 		} else {
 			displayMessage(getErrorFor(status, content));
 		}
 	});
 }
 
-function renderArtifacts() {
-	for (var i = 0; i != ARTIFACTS_ALL.length; i++) {
-		var artifact = ARTIFACTS_ALL[i];
+function renderFamilies(data) {
+	for (var i = 0; i != data.length; i++) {
+		var artifact = data[i];
 		if (artifact.hasOwnProperty("base") && artifact.base != "") {
 			if (ARTIFACTS.hasOwnProperty(artifact.base)) {
 				ARTIFACTS[artifact.base].push(artifact);
@@ -33,7 +38,7 @@ function renderArtifacts() {
 			}
 		}
 	}
-	var select = document.getElementById("input-artifact");
+	var select = document.getElementById("input-family");
 	var names = Object.getOwnPropertyNames(ARTIFACTS);
 	for (var i = 0; i != names.length; i++) {
 		var elements = ARTIFACTS[names[i]];
@@ -42,36 +47,92 @@ function renderArtifacts() {
 		});
 		var option = document.createElement("option");
 		option.value = elements[0].base;
-		option.appendChild(document.createTextNode(elements[0].name + " (" + elements[0].version + ")"));
-		option.setAttribute("artifact-name", elements[0].name);
+		option.appendChild(document.createTextNode(elements[0].name));
 		select.appendChild(option);
 	}
-	if (names.length > 0)
+	if (names.length > 0) {
 		select.value = ARTIFACTS[names[0]][0].base;
+		renderArtifacts(ARTIFACTS[names[0]]);
+	}
 	displayMessage(null);
 }
 
+function renderArtifacts(artifacts) {
+	var base = document.getElementById("input-family").value;
+	if (base === null || base === "")
+		return;
+	var select = document.getElementById("input-superseded");
+	while (select.hasChildNodes())
+		select.removeChild(select.lastChild);
+	var option = document.createElement("option");
+	option.value = "none";
+	option.appendChild(document.createTextNode("None"));
+	select.appendChild(option);
+	for (var i = 0; i != ARTIFACTS[base].length; i++) {
+		var artifact = ARTIFACTS[base][i];
+		option = document.createElement("option");
+		option.value = artifact.identifier;
+		option.appendChild(document.createTextNode(artifact.name + " (" + artifact.version + ")"));
+		select.appendChild(option);
+	}
+	select.value = "none";
+}
+
+function renderArchetypes(data) {
+	var select = document.getElementById("input-archetype");
+	for (var i = 0; i != data.length; i++) {
+		var option = document.createElement("option");
+		option.value = data[i].id;
+		option.appendChild(document.createTextNode(data[i].name));
+		select.appendChild(option);
+	}
+	if (data.length > 0)
+		select.value = data[0].id;
+}
+
+function onFamilyChange() {
+	var base = document.getElementById("input-family").value;
+	if (base !== null || base !== "")
+		renderArtifacts(ARTIFACTS[base]);
+	onInput();
+}
+
 function onInput() {
-	var select = document.getElementById("input-artifact");
-	var base = select.value;
-	var name = select.childNodes.item(select.selectedIndex).getAttribute("artifact-name");
+	var base = document.getElementById("input-family").value;
+	var superseded = document.getElementById("input-superseded").value;
 	var version = document.getElementById("input-new-version").value;
-	if (name === null || name === "" || base === null || base === "" || version === null || version === "") {
+	var archetype = document.getElementById("input-archetype").value;
+	if (base === null || base === "" || version === null || version === "" || superseded === null || superseded === "" || archetype === null || archetype === "") {
 		document.getElementById("btn-file").href = "";
 		document.getElementById("btn-content").href = "";
 		document.getElementById("panel-next").style.display = "none";
 	} else {
-		var params = getParams(name, base, version);
+		var name = null;
+		if (superseded === "none") {
+			name = ARTIFACTS[base][0].name;
+		} else {
+			for (var i = 0; i != ARTIFACTS[base].length; i++) {
+				if (ARTIFACTS[base][i].identifier === superseded) {
+					name = ARTIFACTS[base][i].name;
+					break;
+				}
+			}
+			if (name === null)
+				name = ARTIFACTS[base][0].name;
+		}
+		var params = getParams(name, base, version, archetype, superseded);
 		document.getElementById("btn-file").href = "upload-file.html" + params;
 		document.getElementById("btn-content").href = "upload-content.html" + params;
 		document.getElementById("panel-next").style.display = "";
 	}
 }
 
-function getParams(name, base, version) {
+function getParams(name, base, version, archetype, superseded) {
 	return "?connector=" + encodeURIComponent(CONNECTOR) +
-		"&what=update" +
+		"&what=new" +
 		"&name=" + encodeURIComponent(name) +
 		"&base=" + encodeURIComponent(base) +
-		"&version=" + encodeURIComponent(version);
+		"&version=" + encodeURIComponent(version) +
+		"&archetype=" + encodeURIComponent(archetype) +
+		"&superseded=" + encodeURIComponent(superseded);
 }

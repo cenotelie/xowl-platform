@@ -8,6 +8,8 @@ var ARTIFACT_TYPE = getParameterByName("what");
 var ARTIFACT_NAME = getParameterByName("name");
 var ARTIFACT_BASE = getParameterByName("base");
 var ARTIFACT_VERSION = getParameterByName("version");
+var ARTIFACT_SUPERSEDED = getParameterByName("superseded");
+var ARTIFACT_ARCHETYPE = getParameterByName("archetype");
 
 function init() {
 	setupPage(xowl);
@@ -15,13 +17,16 @@ function init() {
 		|| !ARTIFACT_TYPE || ARTIFACT_TYPE === null || ARTIFACT_TYPE === ""
 		|| !ARTIFACT_NAME || ARTIFACT_NAME === null || ARTIFACT_NAME === ""
 		|| !ARTIFACT_BASE || ARTIFACT_BASE === null || ARTIFACT_BASE === ""
-		|| !ARTIFACT_VERSION || ARTIFACT_VERSION === null || ARTIFACT_VERSION === "")
+		|| !ARTIFACT_VERSION || ARTIFACT_VERSION === null || ARTIFACT_VERSION === ""
+		|| !ARTIFACT_SUPERSEDED || ARTIFACT_SUPERSEDED === null || ARTIFACT_SUPERSEDED === ""
+		|| !ARTIFACT_ARCHETYPE || ARTIFACT_ARCHETYPE === null || ARTIFACT_ARCHETYPE === "")
 		document.location.href = "upload.html";
 	document.getElementById("input-connector").value = CONNECTOR;
-	document.getElementById("input-artifact-type").value = (ARTIFACT_TYPE === "new" ? "New artifact" : "Update with new version");
 	document.getElementById("input-artifact-name").value = ARTIFACT_NAME;
 	document.getElementById("input-artifact-base").value = ARTIFACT_BASE;
 	document.getElementById("input-artifact-version").value = ARTIFACT_VERSION;
+	document.getElementById("input-artifact-superseded").value = ARTIFACT_SUPERSEDED;
+	document.getElementById("input-artifact-archetype").value = ARTIFACT_ARCHETYPE;
 	document.getElementById('input-file').addEventListener('change', onFileSelected, false);
 	var typesField = document.getElementById("input-syntax");
 	for (var i = 0; i != MIME_TYPES.length; i++) {
@@ -98,14 +103,14 @@ function onImport() {
 				progressBar.classList.add("progress-bar-success");
 				displayMessage(null);
 				alert("OK");
-				window.location.href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(CONNECTOR);
+				window.location.href = "/web/modules/core/artifacts/";
 			} else {
 				displayMessage(getErrorFor(code, content));
 				progressBar.classList.add("progress-bar-error");
 			}
 			progressBar['aria-valuenow'] = 100;
 			progressBar.style.width = "100%";
-		}, CONNECTOR_URI, reader.result, selectedMIME, ARTIFACT_NAME, ARTIFACT_BASE, ARTIFACT_VERSION);
+		}, CONNECTOR_URI, reader.result, selectedMIME, ARTIFACT_NAME, ARTIFACT_BASE, ARTIFACT_VERSION, ARTIFACT_SUPERSEDED, ARTIFACT_ARCHETYPE);
 	}
 	reader.readAsBinaryString(file);
 }

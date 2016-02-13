@@ -54,9 +54,39 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="artifact-base" class="col-sm-2 control-label">Base</label>
+            <label for="artifact-archetype" class="col-sm-2 control-label">Archetype</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="artifact-base" readonly>
+              <input type="text" class="form-control" id="artifact-archetype" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="artifact-origin" class="col-sm-2 control-label">Origin</label>
+            <div class="col-sm-10">
+              <div class="panel panel-default" style="margin-bottom: 0px;">
+                <div class="panel-body">
+                  <div style="width: 100%">
+                    <a id="artifact-origin"></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="artifact-creation" class="col-sm-2 control-label">Created on</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="artifact-creation" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="artifact-base" class="col-sm-2 control-label">Family</label>
+            <div class="col-sm-10">
+              <div class="panel panel-default" style="margin-bottom: 0px;">
+                <div class="panel-body">
+                  <div style="width: 100%">
+                    <a id="artifact-base"></a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -65,19 +95,18 @@
               <input type="text" class="form-control" id="artifact-version" readonly>
             </div>
           </div>
+          <div class="form-group">
+            <label for="artifact-supersede" class="col-sm-2 control-label">Supersedes</label>
+            <div class="col-sm-10">
+              <div class="panel panel-default" style="margin-bottom: 0px;">
+                <div class="panel-body">
+                  <div style="width: 100%" id="artifact-supersede">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </form>
-        <div>
-          <table class="table table-bordered table-hover">
-            <thead>
-              <tr>
-                <th>Metadata</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody id="metadata">
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
     <div class="panel panel-default">

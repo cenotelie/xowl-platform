@@ -38,24 +38,29 @@ function renderMetadata(metadata) {
 	METADATA = parseNQuads(metadata);
 	var properties = METADATA[ARTIFACTID].properties;
 	document.getElementById("artifact-identifier").value = ARTIFACTID;
-	var table = document.getElementById("metadata");
 	for (var i = 0; i != properties.length; i++) {
 		var name = properties[i].id;
 		if (name === "http://xowl.org/platform/schemas/kernel#name")
 			document.getElementById("artifact-name").value = properties[i].value.lexical;
-		else if (name === "http://xowl.org/platform/schemas/kernel#base")
-			document.getElementById("artifact-base").value = properties[i].value.value;
-		else if (name === "http://xowl.org/platform/schemas/kernel#version")
+		else if (name === "http://xowl.org/platform/schemas/kernel#archetype")
+			document.getElementById("artifact-archetype").value = properties[i].value.lexical;
+		else if (name === "http://xowl.org/platform/schemas/kernel#from") {
+			document.getElementById("artifact-origin").appendChild(document.createTextNode(properties[i].value.lexical));
+			document.getElementById("artifact-origin").href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(properties[i].value.lexical);
+		} else if (name === "http://xowl.org/platform/schemas/kernel#created")
+			document.getElementById("artifact-creation").value = properties[i].value.lexical;
+		else if (name === "http://xowl.org/platform/schemas/kernel#base") {
+			document.getElementById("artifact-base").appendChild(document.createTextNode(properties[i].value.value));
+			document.getElementById("artifact-base").href = "base.html?id=" + encodeURIComponent(properties[i].value.value);
+		} else if (name === "http://xowl.org/platform/schemas/kernel#version")
 			document.getElementById("artifact-version").value = properties[i].value.lexical;
-		else {
-			var row = document.createElement("tr");
-			var cell1 = document.createElement("td");
-			var cell2 = document.createElement("td");
-			cell1.appendChild(rdfToDom({ type: "iri", value: name }));
-			cell2.appendChild(rdfToDom(properties[i].value));
-			row.appendChild(cell1);
-			row.appendChild(cell2);
-			table.appendChild(row);
+		else if (name === "http://xowl.org/platform/schemas/kernel#supersede") {
+			var link = document.createElement("a");
+			link.href = "artifact.html?id=" + encodeURIComponent(properties[i].value.value);
+			link.appendChild(document.createTextNode(properties[i].value.value));
+			var container = document.createElement("div");
+			container.appendChild(link);
+			document.getElementById("artifact-supersede").appendChild(container);
 		}
 	}
 	displayMessage(null);

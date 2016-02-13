@@ -100,8 +100,8 @@ public class StatisticsProvider implements Service, HttpAPIService {
     private void doUpdateStats() {
         ArtifactStorageService serviceArtifacts = ServiceUtils.getService(ArtifactStorageService.class);
         if (serviceArtifacts != null) {
-            nbArtifactsTotal = serviceArtifacts.list().size();
-            nbArtifactsLive = serviceArtifacts.listLive().size();
+            nbArtifactsTotal = serviceArtifacts.getAllArtifacts().size();
+            nbArtifactsLive = serviceArtifacts.getLiveArtifacts().size();
         }
         ConsistencyService serviceConsistency = ServiceUtils.getService(ConsistencyService.class);
         if (serviceConsistency != null) {

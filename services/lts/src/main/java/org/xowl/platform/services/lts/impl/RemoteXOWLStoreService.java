@@ -23,10 +23,7 @@ package org.xowl.platform.services.lts.impl;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.remote.RemoteServer;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.AbstractRepository;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.RDFUtils;
@@ -45,9 +42,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
-import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
-import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.lts.TripleStore;
@@ -58,7 +53,10 @@ import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Implements a triple store service that is backed by a remote store connected to via HTTP
@@ -206,12 +204,12 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
-    public Collection<Artifact> list() {
+    public XSPReply getAllArtifacts() {
         return storeLongTerm.getArtifacts();
     }
 
     @Override
-    public Collection<Artifact> list(String base) {
+    public XSPReply getArtifactsForBase(String base) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -225,12 +223,12 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
         if (sparqlResult.isFailure())
-            return new ArrayList<>();
-        return storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
     }
 
     @Override
-    public Collection<Artifact> list(ArtifactArchetype archetype) {
+    public XSPReply getArtifactsForArchetype(String archetype) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -239,17 +237,17 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         writer.write(">. ?a <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE));
         writer.write("> \"");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(archetype.getDescription()));
+        writer.write(IOUtils.escapeAbsoluteURIW3C(archetype));
         writer.write("\" } }");
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
         if (sparqlResult.isFailure())
-            return new ArrayList<>();
-        return storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
     }
 
     @Override
-    public Collection<Artifact> listLive() {
+    public XSPReply getLiveArtifacts() {
         return storeLive.getArtifacts();
     }
 
@@ -303,14 +301,14 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             String[] lives = parameters.get("live");
             String[] bases = parameters.get("base");
             String[] archetypes = parameters.get("archetype");
-            boolean live = (lives != null && lives.length > 0 && lives[0].equalsIgnoreCase("true"));
-            String base = (bases != null && bases.length > 0) ? bases[0] : null;
-            String archetype = (archetypes != null && archetypes.length > 0) ? archetypes[0] : null;
-            if (base != null)
-                return onMessageGetArtifacts(base);
-            if (archetype != null)
-                return onMessageGetArtifactsForArchetype(archetype);
-            return live ? onMessageGetLiveArtifacts() : onMessageGetArtifacts();
+            if (lives != null && lives.length > 0)
+                return XSPReplyUtils.toHttpResponse(getLiveArtifacts(), null);
+            else if (bases != null && bases.length > 0)
+                return XSPReplyUtils.toHttpResponse(getArtifactsForBase(bases[0]), null);
+            else if (archetypes != null && archetypes.length > 0)
+                return XSPReplyUtils.toHttpResponse(getArtifactsForArchetype(archetypes[0]), null);
+            else
+                return XSPReplyUtils.toHttpResponse(getAllArtifacts(), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -335,88 +333,6 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             // cannot happen
         }
         return new HttpResponse(result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpConstants.HTTP_UNKNOWN_ERROR, resultType, writer.toString());
-    }
-
-    /**
-     * Responds to a request to list the artifacts
-     *
-     * @return The response
-     */
-    private HttpResponse onMessageGetArtifacts() {
-        Collection<Artifact> artifacts = list();
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("[");
-        for (Artifact artifact : artifacts) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(artifact.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    /**
-     * Responds to a request to list the artifacts for a specified base
-     *
-     * @param base The base to look for
-     * @return The response
-     */
-    private HttpResponse onMessageGetArtifacts(String base) {
-        Collection<Artifact> artifacts = list(base);
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("[");
-        for (Artifact artifact : artifacts) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(artifact.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    /**
-     * Responds to a request to list the artifacts for a specified archetype
-     *
-     * @param archetypeId The archetype to look for
-     * @return The response
-     */
-    private HttpResponse onMessageGetArtifactsForArchetype(String archetypeId) {
-        BusinessDirectoryService directoryService = ServiceUtils.getService(BusinessDirectoryService.class);
-        if (directoryService == null)
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
-        ArtifactArchetype archetype = directoryService.getArchetype(archetypeId);
-        Collection<Artifact> artifacts = list(archetype);
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("[");
-        for (Artifact artifact : artifacts) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(artifact.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    /**
-     * Responds to a request to list the live artifacts
-     *
-     * @return The response
-     */
-    private HttpResponse onMessageGetLiveArtifacts() {
-        Collection<Artifact> artifacts = listLive();
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("[");
-        for (Artifact artifact : artifacts) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(artifact.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**

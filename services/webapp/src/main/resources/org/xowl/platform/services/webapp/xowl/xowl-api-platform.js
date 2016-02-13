@@ -216,7 +216,7 @@ XOWL.prototype.getJob = function (callback, jobId) {
 XOWL.prototype.getAllArtifacts = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -226,7 +226,7 @@ XOWL.prototype.getAllArtifacts = function (callback) {
 XOWL.prototype.getLiveArtifacts = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -236,7 +236,7 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 XOWL.prototype.getArtifactVersions = function (callback, base) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -266,7 +266,7 @@ XOWL.prototype.pushToLive = function (callback, artifactId) {
 XOWL.prototype.getArtifact = function (callback, artifactId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/n-quads", content);
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}

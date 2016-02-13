@@ -23,8 +23,6 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
 
-import java.util.Collection;
-
 /**
  * Represents a service that stores artifacts
  * Artifacts are expected to be primarily stored in a long-term storage facility.
@@ -63,32 +61,32 @@ public interface ArtifactStorageService extends Service {
     /**
      * Lists all the stored artifacts
      *
-     * @return The list of the stored artifacts
+     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
      */
-    Collection<Artifact> list();
+    XSPReply getAllArtifacts();
 
     /**
      * Lists all the stored versions of a base artifact
      *
      * @param base The identifier of the base artifact
-     * @return The list of the stored versions
+     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
      */
-    Collection<Artifact> list(String base);
+    XSPReply getArtifactsForBase(String base);
 
     /**
      * Lists all the store artifacts of the specified archetype
      *
      * @param archetype The archetype to look for
-     * @return The list of the stored artifacts
+     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
      */
-    Collection<Artifact> list(ArtifactArchetype archetype);
+    XSPReply getArtifactsForArchetype(String archetype);
 
     /**
      * Lists all the live artifacts
      *
-     * @return The list of the live artifacts
+     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
      */
-    Collection<Artifact> listLive();
+    XSPReply getLiveArtifacts();
 
     /**
      * Pushes an artifact to a live reasoning store

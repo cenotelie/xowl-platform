@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -198,18 +198,21 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
-    public Collection<Artifact> getArtifacts() {
+    public XSPReply getArtifacts() {
+        XOWLDatabase connection = getRemote();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write("> } }");
-
-        Result sparqlResult = sparql(writer.toString());
-        if (sparqlResult.isFailure())
-            return new ArrayList<>();
-        return buildArtifacts(((ResultQuads) sparqlResult).getQuads());
+        XSPReply reply = connection.sparql(writer.toString(), null, null);
+        if (!reply.isSuccess())
+            return reply;
+        ResultQuads sparqlResult = ((XSPReplyResult<ResultQuads>) reply).getData();
+        return new XSPReplyResultCollection<>(buildArtifacts(sparqlResult.getQuads()));
     }
 
     @Override

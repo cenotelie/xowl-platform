@@ -44,9 +44,9 @@ public interface TripleStore extends XOWLDatabase {
     /**
      * Gets the artifacts in this store
      *
-     * @return The artifacts in this store
+     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
      */
-    Collection<Artifact> getArtifacts();
+    XSPReply getArtifacts();
 
     /**
      * Stores an artifact in this store
@@ -60,7 +60,7 @@ public interface TripleStore extends XOWLDatabase {
      * Retrieves the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return The operation's result
+     * @return The operation's result which can be casted to XSPReplyResult in case of success
      */
     XSPReply retrieve(String identifier);
 

@@ -22,8 +22,8 @@ package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 import org.xowl.platform.services.lts.TripleStore;
@@ -78,7 +78,7 @@ class XOWLImpactAnalysisJob extends JobBase {
     public void doRun() {
         TripleStoreService tripleStoreService = ServiceUtils.getService(TripleStoreService.class);
         if (tripleStoreService == null) {
-            result = new XSPReplyFailure("Failed to resolve the triple store service");
+            result = XSPReplyServiceUnavailable.instance();
             return;
         }
         TripleStore live = tripleStoreService.getLiveStore();

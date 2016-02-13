@@ -199,7 +199,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
-            return new XSPReplyFailure("No matching artifact");
+            return XSPReplyNotFound.instance();
         return new XSPReplyResult<>(storeLongTerm.buildArtifact(metadata));
     }
 

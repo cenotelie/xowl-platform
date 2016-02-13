@@ -21,9 +21,10 @@
 package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 
@@ -42,7 +43,7 @@ public class ConnectorUtils {
     public static XSPReply pullArtifactFrom(String connectorId) {
         ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
         if (connector == null)
-            return new XSPReplyFailure("Failed to resolve connector " + connectorId);
+            return XSPReplyNotFound.instance();
         return pullArtifactFrom(connector);
     }
 
@@ -55,7 +56,7 @@ public class ConnectorUtils {
     public static XSPReply pullArtifactFrom(ConnectorService connector) {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
-            return new XSPReplyFailure("Failed to resolve an artifact storage service");
+            return XSPReplyServiceUnavailable.instance();
         XSPReply replyArtifact = connector.getNextInput(false);
         if (!replyArtifact.isSuccess())
             return replyArtifact;
@@ -77,10 +78,10 @@ public class ConnectorUtils {
     public static XSPReply pushArtifactTo(String connectorId, String artifactId) {
         ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
         if (connector == null)
-            return new XSPReplyFailure("Failed to resolve connector " + connectorId);
+            return XSPReplyNotFound.instance();
         ArtifactStorageService storage = ServiceUtils.getService(ArtifactStorageService.class);
         if (storage == null)
-            return new XSPReplyFailure("Failed to resolve the artifact storage service");
+            return XSPReplyServiceUnavailable.instance();
         XSPReply reply = storage.retrieve(artifactId);
         if (!reply.isSuccess())
             return reply;

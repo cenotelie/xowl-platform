@@ -22,7 +22,6 @@ package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
@@ -30,6 +29,7 @@ import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.impact.ImpactAnalysisService;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
@@ -84,7 +84,7 @@ public class XOWLImpactAnalysis implements ImpactAnalysisService {
     public XSPReply perform(ImpactAnalysisSetup setup) {
         JobExecutionService executionService = ServiceUtils.getService(JobExecutionService.class);
         if (executionService == null)
-            return new XSPReplyFailure("Failed to resolve the job execution service");
+            return XSPReplyServiceUnavailable.instance();
         XOWLImpactAnalysisJob job = new XOWLImpactAnalysisJob(setup);
         executionService.schedule(job);
         return new XSPReplyResult<>(job);

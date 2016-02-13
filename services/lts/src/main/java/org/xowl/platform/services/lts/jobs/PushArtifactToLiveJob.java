@@ -22,10 +22,10 @@ package org.xowl.platform.services.lts.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobBase;
@@ -90,7 +90,7 @@ public class PushArtifactToLiveJob extends JobBase {
     public void doRun() {
         ArtifactStorageService storage = ServiceUtils.getService(ArtifactStorageService.class);
         if (storage == null) {
-            result = new XSPReplyFailure("Failed to resolve an artifact storage service");
+            result = XSPReplyServiceUnavailable.instance();
             return;
         }
         result = storage.retrieve(artifactId);

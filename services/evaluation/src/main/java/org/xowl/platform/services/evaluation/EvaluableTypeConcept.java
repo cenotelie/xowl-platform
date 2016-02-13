@@ -21,8 +21,8 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.services.lts.TripleStoreService;
 
@@ -54,7 +54,7 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
     public XSPReply getElements(String artifactId) {
         TripleStoreService service = ServiceUtils.getService(TripleStoreService.class);
         if (service == null)
-            return new XSPReplyFailure("Failed to resolve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         return null;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -200,7 +200,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         synchronized (connectorsById) {
             Registration registration = connectorsById.remove(identifier);
             if (registration == null)
-                return new XSPReplyFailure("No connector for the specified identifier");
+                return XSPReplyNotFound.instance();
             registration.refAsDomainConnector.unregister();
             registration.refAsServedService.unregister();
             return XSPReplySuccess.instance();

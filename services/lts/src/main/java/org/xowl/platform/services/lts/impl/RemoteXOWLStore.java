@@ -247,7 +247,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
-            return new XSPReplyFailure("Unknown artifact");
+            return XSPReplyNotFound.instance();
         return new XSPReplyResult<>(buildArtifact(metadata));
     }
 

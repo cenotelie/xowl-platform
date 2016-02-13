@@ -26,10 +26,16 @@ function renderRules(rules) {
 function renderRule(rule, index) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(document.createTextNode((index + 1).toString()));
+	var icon = document.createElement("img");
+	icon.src = "/web/assets/rule.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(rule.name));
 	link.href = "rule.html?id=" + encodeURIComponent(rule.id);
 	var cell2 = document.createElement("td");
+	cell2.appendChild(icon);
 	cell2.appendChild(link);
 	var toggle = document.createElement("div");
 	toggle.appendChild(document.createElement("button"));

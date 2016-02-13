@@ -84,9 +84,7 @@ function prepareArtifacts() {
 	for (var i = 0; i != ARTIFACTS.length; i++) {
 		if (ARTIFACTS[i].artifacts.length === 1)
 			continue;
-		ARTIFACTS[i].artifacts.sort(function (x, y) {
-			return y.version.localeCompare(x.version);
-		});
+		ARTIFACTS[i].artifacts.sort(compareArtifacts);
 		ARTIFACTS[i].name = ARTIFACTS[i].artifacts[0].name;
 		ARTIFACTS[i].version = ARTIFACTS[i].artifacts[0].version;
 	}

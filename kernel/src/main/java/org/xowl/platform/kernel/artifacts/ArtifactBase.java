@@ -78,6 +78,10 @@ public abstract class ArtifactBase implements Artifact {
      */
     protected final String from;
     /**
+     * The artifact's creation time
+     */
+    protected final String creation;
+    /**
      * The metadata quads
      */
     protected final Collection<Quad> metadata;
@@ -94,6 +98,7 @@ public abstract class ArtifactBase implements Artifact {
         String baseID = "";
         String archetype = "";
         String from = "";
+        String creation = "";
         Collection<String> superseded = new ArrayList<>(2);
         for (Quad quad : metadata) {
             if (identifier.isEmpty() && quad.getSubject().getNodeType() == Node.TYPE_IRI)
@@ -113,6 +118,8 @@ public abstract class ArtifactBase implements Artifact {
                     archetype = ((LiteralNode) quad.getObject()).getLexicalValue();
                 else if (KernelSchema.FROM.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     from = ((LiteralNode) quad.getObject()).getLexicalValue();
+                else if (KernelSchema.CREATED.equals(((IRINode) quad.getProperty()).getIRIValue()))
+                    creation = ((LiteralNode) quad.getObject()).getLexicalValue();
             }
         }
         this.identifier = identifier;
@@ -122,6 +129,7 @@ public abstract class ArtifactBase implements Artifact {
         this.version = version;
         this.archetype = archetype;
         this.from = from;
+        this.creation = creation;
         this.metadata = Collections.unmodifiableCollection(new ArrayList<>(metadata));
     }
 
@@ -161,6 +169,11 @@ public abstract class ArtifactBase implements Artifact {
     }
 
     @Override
+    public String getCreationDate() {
+        return creation;
+    }
+
+    @Override
     public String serializedString() {
         return identifier;
     }
@@ -179,6 +192,8 @@ public abstract class ArtifactBase implements Artifact {
         builder.append(IOUtils.escapeStringJSON(version));
         builder.append("\", \"from\": \"");
         builder.append(IOUtils.escapeStringJSON(from));
+        builder.append("\", \"creation\": \"");
+        builder.append(IOUtils.escapeStringJSON(creation));
         builder.append("\", \"archetype\": \"");
         builder.append(IOUtils.escapeStringJSON(archetype));
         builder.append("\", \"supersede\": [");

@@ -210,3 +210,9 @@ function trackJob(jobId, text, callback) {
 	};
 	doTrack();
 }
+
+function compareArtifacts(a1, a2) {
+	var d1 = new Date(a1.creation);
+	var d2 = new Date(a2.creation);
+	return d1.getTime() < d2.getTime();
+}

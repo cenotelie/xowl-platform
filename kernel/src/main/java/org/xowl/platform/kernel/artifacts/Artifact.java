@@ -82,6 +82,13 @@ public interface Artifact extends Identifiable, Serializable {
     String getOrigin();
 
     /**
+     * Gets the artifact's creation time
+     *
+     * @return The artifact's creation time
+     */
+    String getCreationDate();
+
+    /**
      * Gets the metadata quads
      *
      * @return The metadata quads

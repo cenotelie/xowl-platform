@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -264,11 +264,14 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             String id = (ids != null && ids.length > 0) ? ids[0] : null;
             if (id != null) {
                 // yes, request the content of the just the header?
-                String[] contents = parameters.get("content");
-                boolean isContent = (contents != null && contents.length > 0 && contents[0].equalsIgnoreCase("true"));
-                if (isContent)
+                String[] quads = parameters.get("quads");
+                if (quads == null || quads.length == 0)
+                    return XSPReplyUtils.toHttpResponse(retrieve(id), null);
+                if (quads[0].equals("metadata"))
+                    return onMessageGetArtifactMetadata(id);
+                else if (quads[0].equals("content"))
                     return onMessageGetArtifactContent(id);
-                return onMessageGetArtifactMetadata(id);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
             }
             // no, is it a diff?
             String[] diffLefts = parameters.get("diffLeft");

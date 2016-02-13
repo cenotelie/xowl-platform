@@ -42,9 +42,7 @@ function renderFamilies(data) {
 	var names = Object.getOwnPropertyNames(ARTIFACTS);
 	for (var i = 0; i != names.length; i++) {
 		var elements = ARTIFACTS[names[i]];
-		elements.sort(function (x, y) {
-			return y.version.localeCompare(x.version);
-		});
+		elements.sort(compareArtifacts);
 		var option = document.createElement("option");
 		option.value = elements[0].base;
 		option.appendChild(document.createTextNode(elements[0].name));

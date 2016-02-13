@@ -263,7 +263,7 @@ XOWL.prototype.pushToLive = function (callback, artifactId) {
 	}, "services/core/artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
 }
 
-XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
+XOWL.prototype.getArtifact = function (callback, artifactId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/n-quads", content);
@@ -273,6 +273,16 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 	}, "services/core/artifacts?id=" + encodeURIComponent(artifactId));
 }
 
+XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/n-quads", content);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/artifacts?quads=metadata&id=" + encodeURIComponent(artifactId));
+}
+
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
@@ -280,7 +290,7 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?content=true&id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts?quads=content&id=" + encodeURIComponent(artifactId));
 }
 
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {

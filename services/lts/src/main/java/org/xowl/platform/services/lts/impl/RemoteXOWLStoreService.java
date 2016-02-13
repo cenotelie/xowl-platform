@@ -436,7 +436,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PullArtifactFromLiveJob(ids[0]);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -455,7 +455,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PushArtifactToLiveJob(ids[0]);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());

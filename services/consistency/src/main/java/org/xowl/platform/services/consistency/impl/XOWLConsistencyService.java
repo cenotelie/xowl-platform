@@ -39,6 +39,7 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.lts.TripleStore;
@@ -160,10 +161,8 @@ public class XOWLConsistencyService implements ConsistencyService {
     public XSPReply getRules() {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         XSPReply reply = live.getRules();
         if (!reply.isSuccess())
             return reply;
@@ -204,10 +203,8 @@ public class XOWLConsistencyService implements ConsistencyService {
 
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         Result result = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
                 IOUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
@@ -249,10 +246,8 @@ public class XOWLConsistencyService implements ConsistencyService {
     public XSPReply getRule(String identifier) {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         XSPReply reply = live.getRule(identifier);
         if (!reply.isSuccess())
             return reply;
@@ -323,10 +318,8 @@ public class XOWLConsistencyService implements ConsistencyService {
 
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         XSPReply reply = live.addRule(definition, false);
         if (!reply.isSuccess())
             return reply;
@@ -346,10 +339,8 @@ public class XOWLConsistencyService implements ConsistencyService {
     public XSPReply activateRule(String identifier) {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         return live.activateRule(new BaseRule(identifier, null, false));
     }
 
@@ -362,10 +353,8 @@ public class XOWLConsistencyService implements ConsistencyService {
     public XSPReply deactivateRule(String identifier) {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         return live.deactivateRule(new BaseRule(identifier, null, false));
     }
 
@@ -378,10 +367,8 @@ public class XOWLConsistencyService implements ConsistencyService {
     public XSPReply deleteRule(String identifier) {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
-            return new XSPReplyFailure("Failed to retrieve the LTS service");
+            return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        if (live == null)
-            return new XSPReplyFailure("Failed to resolve the live store");
         XSPReply reply = live.removeRule(new BaseRule(identifier, null, false));
         if (!reply.isSuccess())
             return reply;

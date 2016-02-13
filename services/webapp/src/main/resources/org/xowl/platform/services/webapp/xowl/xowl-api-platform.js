@@ -7,6 +7,12 @@ function XOWL() {
 	this.userName = localStorage.getItem('xowl.userName');
 }
 
+
+
+////
+// Security Service
+////
+
 XOWL.prototype.isLoggedIn = function () {
 	return (this.authToken !== null && this.userName !== null);
 }
@@ -43,6 +49,12 @@ XOWL.prototype.logout = function () {
 	localStorage.removeItem('xowl.userName');
 }
 
+
+
+////
+// Statistics Service
+////
+
 XOWL.prototype.getBasicStats = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
@@ -63,75 +75,11 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 	}, "services/core/statistics?platform");
 }
 
-XOWL.prototype.getDescriptors = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/descriptors");
-}
 
-XOWL.prototype.getConnectors = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors");
-}
 
-XOWL.prototype.getConnector = function (callback, connectorId) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors?id=" + encodeURIComponent(connectorId));
-}
-
-XOWL.prototype.createConnector = function (callback, domain, definition) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
-}
-
-XOWL.prototype.deleteConnector = function (callback, connectorId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, null, null);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors?action=delete&id=" + encodeURIComponent(connectorId), {});
-}
-
-XOWL.prototype.pullFromConnector = function (callback, connectorId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors?action=pull&id=" + encodeURIComponent(connectorId), {});
-}
-
-XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
-}
+////
+// Business Directory Service
+////
 
 XOWL.prototype.getBusinessDomains = function (callback) {
 	this.doQuery(function (code, type, content) {
@@ -193,6 +141,12 @@ XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
 	}, "services/core/business/schema?id=" + encodeURIComponent(schemaId));
 }
 
+
+
+////
+// Job Execution Service
+////
+
 XOWL.prototype.getJobs = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
@@ -212,6 +166,12 @@ XOWL.prototype.getJob = function (callback, jobId) {
 		}
 	}, "services/core/jobs?id=" + encodeURIComponent(jobId));
 }
+
+
+
+////
+// Artifact Storage Service
+////
 
 XOWL.prototype.getAllArtifacts = function (callback) {
 	this.doQuery(function (code, type, content) {
@@ -233,7 +193,7 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 	}, "services/core/artifacts?live=true");
 }
 
-XOWL.prototype.getArtifactVersions = function (callback, base) {
+XOWL.prototype.getArtifactsForBase = function (callback, base) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content).payload);
@@ -243,24 +203,14 @@ XOWL.prototype.getArtifactVersions = function (callback, base) {
 	}, "services/core/artifacts?base=" + encodeURIComponent(base));
 }
 
-XOWL.prototype.pullFromLive = function (callback, artifactId) {
-	this.doCommand(function (code, type, content) {
+XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
+	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?action=pull&id=" + encodeURIComponent(artifactId), {});
-}
-
-XOWL.prototype.pushToLive = function (callback, artifactId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts?archetype=" + encodeURIComponent(archetype));
 }
 
 XOWL.prototype.getArtifact = function (callback, artifactId) {
@@ -309,6 +259,32 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 		}
 	}, "services/core/artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
 }
+
+XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/artifacts?action=pull&id=" + encodeURIComponent(artifactId), {});
+}
+
+XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
+}
+
+
+
+////
+// Consistency Service
+////
 
 XOWL.prototype.getInconsistencies = function (callback) {
 	this.doQuery(function (code, type, content) {
@@ -382,6 +358,99 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 
 
 
+////
+// Connection Service
+////
+
+XOWL.prototype.getDescriptors = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/descriptors");
+}
+
+XOWL.prototype.getConnectors = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors");
+}
+
+XOWL.prototype.getConnector = function (callback, connectorId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors?id=" + encodeURIComponent(connectorId));
+}
+
+XOWL.prototype.createConnector = function (callback, domain, definition) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
+}
+
+XOWL.prototype.deleteConnector = function (callback, connectorId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors?action=delete&id=" + encodeURIComponent(connectorId), {});
+}
+
+XOWL.prototype.pullFromConnector = function (callback, connectorId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors?action=pull&id=" + encodeURIComponent(connectorId), {});
+}
+
+XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
+}
+
+
+
+////
+// Other API
+////
+
+XOWL.prototype.sparql = function (callback, payload) {
+	this.doJSSPARQL(callback, payload);
+}
+
+XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
+	this.doJSUpload(callback, connectorURI, payload, contentType, name, base, version, supersede, archetype);
+}
+
+
+
+////
+// Low-Level Core API
+////
 
 XOWL.prototype.doQuery = function (callback, target) {
 	this.doJSQuery(callback, target);
@@ -426,10 +495,6 @@ XOWL.prototype.doJSCommand = function (callback, target, payload) {
 	xmlHttp.send(JSON.stringify(payload));
 }
 
-XOWL.prototype.sparql = function (callback, payload) {
-	this.doJSSPARQL(callback, payload);
-}
-
 XOWL.prototype.doJSSPARQL = function (callback, payload) {
 	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
@@ -446,10 +511,6 @@ XOWL.prototype.doJSSPARQL = function (callback, payload) {
 	xmlHttp.withCredentials = true;
 	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	xmlHttp.send(payload);
-}
-
-XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
-	this.doJSUpload(callback, connectorURI, payload, contentType, name, base, version, supersede, archetype);
 }
 
 XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {

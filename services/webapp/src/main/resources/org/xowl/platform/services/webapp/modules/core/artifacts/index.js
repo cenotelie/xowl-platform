@@ -293,9 +293,9 @@ function onClickToggleLive(artifact) {
 		}
 	};
 	if (artifact.isLive)
-		xowl.pullFromLive(callback, artifact.identifier);
+		xowl.pullArtifactFromLive(callback, artifact.identifier);
 	else
-		xowl.pushToLive(callback, artifact.identifier);
+		xowl.pushArtifactToLive(callback, artifact.identifier);
 }
 
 function onClickSelectDiff(artifact) {

@@ -73,7 +73,7 @@ public abstract class EvaluableTypeBase implements EvaluableType {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(EvaluableType.class.getCanonicalName()) +
+                IOUtils.escapeStringJSON(getClass().getCanonicalName()) +
                 "\", \"id\": \"" +
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

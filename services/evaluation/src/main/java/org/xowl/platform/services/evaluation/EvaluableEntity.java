@@ -179,7 +179,7 @@ public class EvaluableEntity implements Evaluable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(EvaluableEntity.class.getCanonicalName()) +
+                IOUtils.escapeStringJSON(getClass().getCanonicalName()) +
                 "\", \"id\": \"" +
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

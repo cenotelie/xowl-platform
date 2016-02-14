@@ -121,7 +121,7 @@ public class XOWLHttpContext implements HttpContext {
      */
     private URL serveModule(String moduleURI, String resource) {
         WebModuleService service = moduleDirectory.getServiceFor(moduleURI);
-        if (moduleURI == null)
+        if (service == null)
             return null;
         return service.getResource(resource);
     }

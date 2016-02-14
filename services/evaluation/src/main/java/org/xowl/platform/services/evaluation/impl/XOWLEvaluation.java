@@ -310,7 +310,7 @@ class XOWLEvaluation implements Evaluation {
     }
 
     /**
-     * Retrieves a list of URIs of evaluation (not their content)
+     * Retrieves a list of reference to evaluations (not their content)
      *
      * @return The response
      */
@@ -318,17 +318,21 @@ class XOWLEvaluation implements Evaluation {
         TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
         if (lts == null)
             return XSPReplyServiceUnavailable.instance();
-        Result sparqlResult = lts.getServiceStore().sparql("SELECT DISTINCT ?a WHERE { GRAPH <" +
+        Result sparqlResult = lts.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
                 IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
                 IOUtils.escapeAbsoluteURIW3C(EVALUATION) +
-                "> } }");
+                "> . ?a <" +
+                IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
+                "> ?n } }");
         if (!sparqlResult.isSuccess())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
-        Collection<String> result = new ArrayList<>();
+        Collection<EvaluationReference> result = new ArrayList<>();
         for (QuerySolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
-            IRINode node = (IRINode) solution.get("a");
-            result.add(node.getIRIValue());
+            result.add(new XOWLEvaluationReference(
+                    ((IRINode) solution.get("a")).getIRIValue(),
+                    ((LiteralNode) solution.get("n")).getLexicalValue()
+            ));
         }
         return new XSPReplyResultCollection<>(result);
     }

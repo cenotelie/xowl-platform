@@ -373,11 +373,21 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 XOWL.prototype.getEvaluations = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
 	}, "services/core/evaluation/evaluations");
+}
+
+XOWL.prototype.getEvaluation = function (callback, evaluationId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/evaluation?id=" + encodeURIComponent(evaluationId));
 }
 
 XOWL.prototype.getEvaluableTypes = function (callback) {
@@ -408,6 +418,16 @@ XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
 			callback(code, type, content);
 		}
 	}, "services/core/evaluation/criterionTypes?for=" + encodeURIComponent(typeId));
+}
+
+XOWL.prototype.newEvaluation = function (callback, definition) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/service", definition);
 }
 
 

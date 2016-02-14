@@ -35,6 +35,8 @@ import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.services.lts.TripleStoreService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -114,6 +116,14 @@ public class EvaluableEntity implements Evaluable {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Map<String, String> getParameters() {
+        Map<String, String> result = new HashMap<>();
+        result.put("artifact", artifactId);
+        result.put("element", elementURI);
+        return result;
     }
 
     @Override

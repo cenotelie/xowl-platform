@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var EVALUABLES = null;
 var CRITERIA_TYPES = [];
 var CRITERIA_SELECTED = [];
+var BUSY = false;
 
 function init() {
     setupPage(xowl);
@@ -130,7 +131,7 @@ function onCriterionAdd() {
         }
     }
     var criterion = {
-        parentType: criterionType,
+        typeId: criterionTypeId,
         name: criterionType.name,
         parameters: {}
     };
@@ -165,4 +166,27 @@ function renderCriterion(criterion) {
 }
 
 function onEvaluationGo() {
+    if (BUSY)
+        return;
+    var name = document.getElementById("input-eval-name").value;
+    if (name === null || name === "")
+        return;
+    var definition = {
+        name: name,
+        evaluableType: document.getElementById("input-evaluable-type").value,
+        evaluables: [],
+        criteria: CRITERIA_SELECTED
+    };
+    for (var i = 0; i != EVALUABLES.length; i++) {
+        if (EVALUABLES[i].selected)
+            definition.evaluables.push(EVALUABLES[i]);
+    }
+    BUSY = true;
+    xowl.newEvaluation(function (status, ct, content) {
+        if (status == 200) {
+            window.location.href = "eval.html?id=" + encodeURIComponent(content.id);
+        } else {
+            displayMessage(getErrorFor(status, content));
+        }
+    }, definition);
 }

@@ -44,6 +44,7 @@ public class XOWLEvaluationService implements EvaluationService {
      */
     private static final String[] URIs = new String[]{
             "services/core/evaluation/evaluations",
+            "services/core/evaluation/evaluation",
             "services/core/evaluation/evaluableTypes",
             "services/core/evaluation/evaluables",
             "services/core/evaluation/criterionTypes",
@@ -263,6 +264,7 @@ public class XOWLEvaluationService implements EvaluationService {
         XSPReply reply = evaluation.store();
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_TEXT_PLAIN, evaluation.getIdentifier());
+        XOWLEvaluationReference reference = new XOWLEvaluationReference(evaluation.getIdentifier(), evaluation.getName());
+        return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(reference), null);
     }
 }

@@ -42,6 +42,7 @@ public class XOWLCoreModule extends WebModuleServiceBase {
         this.parts.add(new WebModulePart("Consistency Management", "consistency"));
         this.parts.add(new WebModulePart("Traceability Exploration", "discovery"));
         this.parts.add(new WebModulePart("Impact Analysis", "impact"));
+        this.parts.add(new WebModulePart("Evaluation Analysis", "evaluation"));
         this.parts.add(new WebModulePart("Platform Connectors Management", "connectors"));
         this.parts.add(new WebModulePart("Platform Job Management", "jobs"));
         this.parts.add(new WebModulePart("Platform Properties", "platform"));

@@ -21,18 +21,11 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 
 /**
- * Represents a parameter for a criterion
+ * Represents the result of an evaluation criterion on an evaluable element
  *
  * @author Laurent Wouters
  */
-public interface CriterionParam extends Identifiable, Serializable {
-    /**
-     * Gets whether this parameter is required
-     *
-     * @return Whether this parameter is required
-     */
-    boolean isRequired();
+public interface CriterionResult extends Serializable {
 }

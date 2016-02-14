@@ -20,9 +20,6 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.api.XOWLFactory;
-import org.xowl.infra.server.api.XOWLUtils;
 import org.xowl.infra.store.IOUtils;
 
 import java.util.ArrayList;
@@ -46,7 +43,7 @@ public abstract class CriterionTypeBase implements CriterionType {
     /**
      * The parameters
      */
-    protected final Collection<CriterionParam> parameters;
+    protected final Collection<String> parameters;
 
     /**
      * Initializes this criterion type
@@ -60,41 +57,6 @@ public abstract class CriterionTypeBase implements CriterionType {
         this.parameters = new ArrayList<>();
     }
 
-    /**
-     * Initializes this criterion type
-     *
-     * @param definition The definition of this criterion type
-     * @param factory    The factory to use
-     */
-    public CriterionTypeBase(ASTNode definition, XOWLFactory factory) {
-        String identifier = null;
-        String name = null;
-        this.parameters = new ArrayList<>();
-        for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
-            memberName = memberName.substring(1, memberName.length() - 1);
-            switch (memberName) {
-                case "id":
-                    identifier = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    identifier = identifier.substring(1, identifier.length() - 1);
-                    break;
-                case "name":
-                    name = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    name = name.substring(1, name.length() - 1);
-                    break;
-                case "parameters": {
-                    for (ASTNode paramNode : member.getChildren().get(1).getChildren()) {
-                        Object obj = XOWLUtils.getJSONObject(paramNode, factory);
-                        if (obj != null && obj instanceof CriterionParam)
-                            parameters.add((CriterionParam) obj);
-                    }
-                }
-            }
-        }
-        this.identifier = identifier;
-        this.name = name;
-    }
-
     @Override
     public String getIdentifier() {
         return identifier;
@@ -106,7 +68,7 @@ public abstract class CriterionTypeBase implements CriterionType {
     }
 
     @Override
-    public Collection<CriterionParam> getParameters() {
+    public Collection<String> getParameters() {
         return Collections.unmodifiableCollection(parameters);
     }
 
@@ -125,11 +87,13 @@ public abstract class CriterionTypeBase implements CriterionType {
         builder.append(IOUtils.escapeStringJSON(name));
         builder.append("\", \"parameters\": [");
         boolean first = true;
-        for (CriterionParam param : parameters) {
+        for (String param : parameters) {
             if (!first)
                 builder.append(", ");
             first = false;
-            builder.append(param.serializedJSON());
+            builder.append("\"");
+            builder.append(IOUtils.escapeStringJSON(param));
+            builder.append("\"");
         }
         builder.append("]}");
         return builder.toString();

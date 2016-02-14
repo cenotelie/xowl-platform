@@ -23,6 +23,8 @@ package org.xowl.platform.services.evaluation;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
+import java.util.Map;
+
 /**
  * Represents a criterion for the evaluation of elements in the context of an evaluation
  *
@@ -30,9 +32,24 @@ import org.xowl.platform.kernel.Identifiable;
  */
 public interface Criterion extends Identifiable, Serializable {
     /**
-     * Gets the parent criterion type
+     * Gets the parent type of this criterion
      *
-     * @return The parent criterion type
+     * @return The parent type of this criterion
      */
-    CriterionType getParent();
+    CriterionType getType();
+
+    /**
+     * Gets the parameters for this criterion
+     *
+     * @return The parameters for this criterion
+     */
+    Map<String, String> getParameters();
+
+    /**
+     * Gets the result according to this criterion for an evaluable element
+     *
+     * @param element The evaluable element
+     * @return The result, or null if there is none
+     */
+    CriterionResult getResultFor(Evaluable element);
 }

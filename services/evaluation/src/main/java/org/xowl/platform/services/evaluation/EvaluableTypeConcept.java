@@ -46,6 +46,10 @@ import java.util.Map;
  */
 public class EvaluableTypeConcept extends EvaluableTypeBase {
     /**
+     * The archetype of artifacts to look into
+     */
+    private final ArtifactArchetype archetype;
+    /**
      * The URI of the concept that can be evaluated
      */
     private final String conceptyURI;
@@ -55,11 +59,12 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
      *
      * @param identifier  The type's unique identifier
      * @param name        The type's name
-     * @param archetype   The associated archetype
+     * @param archetype   The archetype of artifacts to look into
      * @param conceptyURI The URI of the concept that can be evaluated
      */
     public EvaluableTypeConcept(String identifier, String name, ArtifactArchetype archetype, String conceptyURI) {
-        super(identifier, name, archetype);
+        super(identifier, name);
+        this.archetype = archetype;
         this.conceptyURI = conceptyURI;
     }
 

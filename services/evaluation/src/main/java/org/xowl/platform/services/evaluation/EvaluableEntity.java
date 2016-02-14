@@ -52,10 +52,6 @@ public class EvaluableEntity implements Evaluable {
      */
     protected final String name;
     /**
-     * The parent type
-     */
-    protected final EvaluableType parentType;
-    /**
      * The identifier of the containing artifact
      */
     protected final String artifactId;
@@ -73,7 +69,6 @@ public class EvaluableEntity implements Evaluable {
      */
     public EvaluableEntity(EvaluableType parentType, String artifactId, String elementURI) {
         this.identifier = parentType.getIdentifier() + "#" + UUID.randomUUID().toString();
-        this.parentType = parentType;
         this.artifactId = artifactId;
         this.elementURI = elementURI;
         ArtifactStorageService artifactStorageService = ServiceUtils.getService(ArtifactStorageService.class);
@@ -122,11 +117,6 @@ public class EvaluableEntity implements Evaluable {
     }
 
     @Override
-    public EvaluableType getType() {
-        return parentType;
-    }
-
-    @Override
     public String serializedString() {
         return identifier;
     }
@@ -139,8 +129,6 @@ public class EvaluableEntity implements Evaluable {
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +
-                "\", \"parentType\": \"" +
-                IOUtils.escapeStringJSON(parentType.getIdentifier()) +
                 "\", \"artifact\": \"" +
                 IOUtils.escapeStringJSON(artifactId) +
                 "\", \"element\": \"" +

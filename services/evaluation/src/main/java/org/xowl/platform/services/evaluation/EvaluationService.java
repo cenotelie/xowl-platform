@@ -20,6 +20,7 @@
 
 package org.xowl.platform.services.evaluation;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
 
@@ -83,4 +84,30 @@ public interface EvaluationService extends Service, HttpAPIService {
      * @return The applicable criterion types
      */
     Collection<CriterionType> getCriterionTypes(EvaluableType evaluableType);
+
+    /**
+     * Gets the ongoing evaluations
+     *
+     * @return The ongoing evaluations
+     */
+    XSPReply getEvaluations();
+
+    /**
+     * Gets the evaluation for the specified identifier
+     *
+     * @param evalId The identifier of an evaluation
+     * @return The corresponding evaluation
+     */
+    XSPReply getEvaluation(String evalId);
+
+    /**
+     * Launches a new evaluation
+     *
+     * @param name          Then evaluation's name
+     * @param evaluableType The type of the evaluable elements
+     * @param evaluables    The evaluable elements
+     * @param criteria      The evaluation criteria
+     * @return The operation's result
+     */
+    XSPReply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria);
 }

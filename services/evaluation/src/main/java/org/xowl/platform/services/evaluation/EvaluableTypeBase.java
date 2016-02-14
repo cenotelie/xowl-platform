@@ -37,22 +37,16 @@ public abstract class EvaluableTypeBase implements EvaluableType {
      * The type's name
      */
     protected final String name;
-    /**
-     * The associated archetype
-     */
-    protected final ArtifactArchetype archetype;
 
     /**
      * Initializes this element
      *
      * @param identifier The type's unique identifier
      * @param name       The type's name
-     * @param archetype  The associated archetype
      */
-    public EvaluableTypeBase(String identifier, String name, ArtifactArchetype archetype) {
+    public EvaluableTypeBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
-        this.archetype = archetype;
     }
 
     @Override
@@ -78,13 +72,6 @@ public abstract class EvaluableTypeBase implements EvaluableType {
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +
-                "\", \"archetype\": " +
-                archetype.serializedJSON() +
-                "}";
-    }
-
-    @Override
-    public ArtifactArchetype getArtifactArchetype() {
-        return archetype;
+                "\"}";
     }
 }

@@ -37,7 +37,7 @@ public interface CriterionType extends Identifiable, Serializable {
      *
      * @return The parameters
      */
-    Collection<CriterionParam> getParameters();
+    Collection<String> getParameters();
 
     /**
      * Gets the criterion that corresponds to this type given the parameters
@@ -45,7 +45,7 @@ public interface CriterionType extends Identifiable, Serializable {
      * @param parameters The parameters
      * @return The criterion
      */
-    Criterion getCriterion(Map<CriterionParam, String> parameters);
+    Criterion getCriterion(Map<String, String> parameters);
 
     /**
      * Gets whether this criterion supports a type of evaluable element

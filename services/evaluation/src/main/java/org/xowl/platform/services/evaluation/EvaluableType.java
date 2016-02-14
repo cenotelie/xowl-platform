@@ -23,7 +23,6 @@ package org.xowl.platform.services.evaluation;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 
 import java.util.Map;
 
@@ -34,13 +33,6 @@ import java.util.Map;
  * @author Laurent Wouters
  */
 public interface EvaluableType extends Identifiable, Serializable {
-    /**
-     * Gets the archetype of artifacts that may contain elements of this type
-     *
-     * @return The associated archetype
-     */
-    ArtifactArchetype getArtifactArchetype();
-
     /**
      * Gets the evaluable elements of this type in the stored artifacts
      *

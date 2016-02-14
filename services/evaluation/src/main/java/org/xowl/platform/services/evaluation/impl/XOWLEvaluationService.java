@@ -20,16 +20,15 @@
 
 package org.xowl.platform.services.evaluation.impl;
 
-import org.omg.CORBA.PolicyListHelper;
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.services.evaluation.CriterionType;
-import org.xowl.platform.services.evaluation.EvaluableType;
-import org.xowl.platform.services.evaluation.EvaluationService;
+import org.xowl.platform.services.evaluation.*;
 
 import java.net.HttpURLConnection;
 import java.util.*;
@@ -87,14 +86,16 @@ public class XOWLEvaluationService implements EvaluationService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
             switch (uri) {
-                case "services/core/evaluation/evaluations":
-                    return onGetEvalations();
                 case "services/core/evaluation/evaluableTypes":
                     return onGetEvaluableTypes();
                 case "services/core/evaluation/evaluables":
                     return onGetEvaluables(parameters);
                 case "services/core/evaluation/criterionTypes":
                     return onGetCriterionTypes(parameters);
+                case "services/core/evaluation/evaluations":
+                    return onGetEvaluations();
+                case "services/core/evaluation/evaluation":
+                    return onGetEvaluation(parameters);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         } else if (method.equals("POST")) {
@@ -145,6 +146,25 @@ public class XOWLEvaluationService implements EvaluationService {
         return Collections.unmodifiableCollection(result);
     }
 
+    @Override
+    public XSPReply getEvaluations() {
+        return XOWLEvaluation.retrieveAll();
+    }
+
+    @Override
+    public XSPReply getEvaluation(String evalId) {
+        return XOWLEvaluation.retrieve(this, evalId);
+    }
+
+    @Override
+    public XSPReply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria) {
+        XOWLEvaluation evaluation = new XOWLEvaluation(null, name, evaluableType, evaluables, criteria);
+        XSPReply reply = evaluation.store();
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(evaluation);
+    }
+
     /**
      * Responds to a request for the evaluable types
      *
@@ -161,15 +181,6 @@ public class XOWLEvaluationService implements EvaluationService {
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    /**
-     * Responds to a request for the current evaluations
-     *
-     * @return The response
-     */
-    private HttpResponse onGetEvalations() {
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
     }
 
     /**
@@ -197,7 +208,7 @@ public class XOWLEvaluationService implements EvaluationService {
     private HttpResponse onGetCriterionTypes(Map<String, String[]> parameters) {
         String[] types = parameters.get("for");
         if (types == null || types.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected for parameter");
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'for' parameter");
         EvaluableType evaluableType = evaluableTypes.get(types[0]);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
@@ -214,7 +225,30 @@ public class XOWLEvaluationService implements EvaluationService {
     }
 
     /**
+     * Responds to a request for the current evaluations
+     *
+     * @return The response
+     */
+    private HttpResponse onGetEvaluations() {
+        return XSPReplyUtils.toHttpResponse(getEvaluations(), null);
+    }
+
+    /**
+     * Responds to a request for a particular evaluation
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private HttpResponse onGetEvaluation(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'id' parameter");
+        return XSPReplyUtils.toHttpResponse(getEvaluation(ids[0]), null);
+    }
+
+    /**
      * Responds to the request to launch a new evaluation
+     *
      * @param content The posted content
      * @return The response
      */
@@ -225,7 +259,10 @@ public class XOWLEvaluationService implements EvaluationService {
         ASTNode root = PlatformUtils.parseJSON(logger, new String(content, PlatformUtils.DEFAULT_CHARSET));
         if (root == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
-
-
+        XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
+        XSPReply reply = evaluation.store();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_TEXT_PLAIN, evaluation.getIdentifier());
     }
 }

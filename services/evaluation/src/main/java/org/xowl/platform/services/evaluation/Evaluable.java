@@ -23,6 +23,8 @@ package org.xowl.platform.services.evaluation;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
+import java.util.Map;
+
 /**
  * Represents an element that can be evaluated against criteria
  *
@@ -30,9 +32,9 @@ import org.xowl.platform.kernel.Identifiable;
  */
 public interface Evaluable extends Identifiable, Serializable {
     /**
-     * Gets the type of this evaluable
+     * Gets the parameters for this evaluable
      *
-     * @return The parent type
+     * @return The parameters for this evaluable
      */
-    EvaluableType getType();
+    Map<String, String> getParameters();
 }

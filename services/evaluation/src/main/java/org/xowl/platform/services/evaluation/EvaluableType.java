@@ -25,6 +25,8 @@ import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 
+import java.util.Map;
+
 /**
  * Represents a kind of element that can be evaluated.
  * API users must register
@@ -45,4 +47,12 @@ public interface EvaluableType extends Identifiable, Serializable {
      * @return The evaluable elements
      */
     XSPReply getElements();
+
+    /**
+     * Gets the evaluable elements given the specified parameters
+     *
+     * @param parameters The parameters
+     * @return The evaluable element
+     */
+    Evaluable getElement(Map<String, String> parameters);
 }

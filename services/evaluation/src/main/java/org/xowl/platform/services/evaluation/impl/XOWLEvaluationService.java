@@ -20,9 +20,13 @@
 
 package org.xowl.platform.services.evaluation.impl;
 
+import org.omg.CORBA.PolicyListHelper;
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.evaluation.CriterionType;
 import org.xowl.platform.services.evaluation.EvaluableType;
 import org.xowl.platform.services.evaluation.EvaluationService;
@@ -92,6 +96,10 @@ public class XOWLEvaluationService implements EvaluationService {
                 case "services/core/evaluation/criterionTypes":
                     return onGetCriterionTypes(parameters);
             }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        } else if (method.equals("POST")) {
+            if (uri.equals("services/core/evaluation/service"))
+                return onPostEvaluation(content);
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
@@ -203,5 +211,21 @@ public class XOWLEvaluationService implements EvaluationService {
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to the request to launch a new evaluation
+     * @param content The posted content
+     * @return The response
+     */
+    private HttpResponse onPostEvaluation(byte[] content) {
+        if (content == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content");
+        BufferedLogger logger = new BufferedLogger();
+        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, PlatformUtils.DEFAULT_CHARSET));
+        if (root == null)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+
+
     }
 }

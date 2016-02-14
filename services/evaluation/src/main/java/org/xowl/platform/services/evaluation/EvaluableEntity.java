@@ -20,7 +20,6 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
@@ -110,50 +109,6 @@ public class EvaluableEntity implements Evaluable {
             }
             this.name = name;
         }
-    }
-
-    /**
-     * Initializes this entity
-     *
-     * @param definition The definition of this entity
-     */
-    public EvaluableEntity(ASTNode definition) {
-        String identifier = null;
-        String name = null;
-        String parentId = null;
-        String artifactId = null;
-        String elementId = null;
-        for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
-            memberName = memberName.substring(1, memberName.length() - 1);
-            switch (memberName) {
-                case "id":
-                    identifier = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    identifier = identifier.substring(1, identifier.length() - 1);
-                    break;
-                case "name":
-                    name = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    name = name.substring(1, name.length() - 1);
-                    break;
-                case "parentType":
-                    parentId = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    parentId = parentId.substring(1, parentId.length() - 1);
-                    break;
-                case "artifact":
-                    artifactId = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    artifactId = artifactId.substring(1, artifactId.length() - 1);
-                    break;
-                case "element":
-                    elementId = IOUtils.unescape(member.getChildren().get(1).getValue());
-                    elementId = elementId.substring(1, elementId.length() - 1);
-                    break;
-            }
-        }
-        this.identifier = identifier;
-        this.name = name;
-        this.parentType = ServiceUtils.getService(EvaluationService.class).getEvaluableType(parentId);
-        this.artifactId = artifactId;
-        this.elementURI = elementId;
     }
 
     @Override

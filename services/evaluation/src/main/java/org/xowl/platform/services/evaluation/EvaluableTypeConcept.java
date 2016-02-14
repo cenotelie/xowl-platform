@@ -37,6 +37,7 @@ import org.xowl.platform.services.lts.TripleStoreService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Represents a type of evaluable element that is backed by a concept in a schema
@@ -88,5 +89,10 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
             result.add(new EvaluableEntity(this, artifactId, elementId));
         }
         return new XSPReplyResultCollection<>(result);
+    }
+
+    @Override
+    public Evaluable getElement(Map<String, String> parameters) {
+        return new EvaluableEntity(this, parameters.get("artifact"), parameters.get("element"));
     }
 }

@@ -4,18 +4,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- * <p>
+ *
  * Contributors:
- * Laurent Wouters - lwouters@xowl.org
+ *     Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
 package org.xowl.platform.services.evaluation.impl;
@@ -40,7 +40,7 @@ public class XOWLEvaluationService implements EvaluationService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "services/core/evaluation/evaluation",
+            "services/core/evaluation/evaluations",
             "services/core/evaluation/evaluableTypes",
             "services/core/evaluation/evaluables",
             "services/core/evaluation/criterionTypes",
@@ -83,7 +83,7 @@ public class XOWLEvaluationService implements EvaluationService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
             switch (uri) {
-                case "services/core/evaluation/evaluation":
+                case "services/core/evaluation/evaluations":
                     return onGetEvalations();
                 case "services/core/evaluation/evaluableTypes":
                     return onGetEvaluableTypes();

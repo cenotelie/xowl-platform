@@ -83,7 +83,7 @@ public class EvaluableEntity implements Evaluable {
             this.name = identifier;
         } else {
             String name = null;
-            Result sparqlResult = ltsService.getLiveStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
+            Result sparqlResult = ltsService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
                     IOUtils.escapeAbsoluteURIW3C(artifactId) +
                     "> { <" +
                     IOUtils.escapeAbsoluteURIW3C(elementURI) +

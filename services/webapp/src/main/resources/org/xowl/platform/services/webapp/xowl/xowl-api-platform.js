@@ -359,6 +359,60 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 
 
 ////
+// Impact Analysis Service
+////
+
+// TODO: add here
+
+
+
+////
+// Evaluation Analysis Service
+////
+
+XOWL.prototype.getEvaluations = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/evaluations");
+}
+
+XOWL.prototype.getEvaluableTypes = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/evaluableTypes");
+}
+
+XOWL.prototype.getEvaluables = function (callback, typeId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/evaluables?type=" + encodeURIComponent(typeId));
+}
+
+XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/evaluation/criterionTypes?for=" + encodeURIComponent(typeId));
+}
+
+
+
+////
 // Connection Service
 ////
 

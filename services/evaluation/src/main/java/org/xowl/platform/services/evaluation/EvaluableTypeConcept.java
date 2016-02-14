@@ -21,10 +21,22 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.QuerySolution;
+import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultFailure;
+import org.xowl.infra.store.sparql.ResultSolutions;
+import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.services.lts.TripleStoreService;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Represents a type of evaluable element that is backed by a concept in a schema
@@ -51,10 +63,30 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
     }
 
     @Override
-    public XSPReply getElements(String artifactId) {
+    public XSPReply getElements() {
         TripleStoreService service = ServiceUtils.getService(TripleStoreService.class);
         if (service == null)
             return XSPReplyServiceUnavailable.instance();
-        return null;
+        String query = "SELECT DISTINCT ?a ?e WHERE { GRAPH <" +
+                IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
+                "> { ?a a <" +
+                IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT) +
+                "> . ?a <" +
+                IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE) +
+                "> \"" +
+                IOUtils.escapeStringW3C(archetype.getIdentifier()) +
+                "\" } . GRAPH ?a { ?e a <" +
+                IOUtils.escapeAbsoluteURIW3C(conceptyURI) +
+                "> } }";
+        Result sparqlResult = service.getLongTermStore().sparql(query);
+        if (sparqlResult.isFailure())
+            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+        Collection<Evaluable> result = new ArrayList<>();
+        for (QuerySolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
+            String artifactId = ((IRINode) solution.get("a")).getIRIValue();
+            String elementId = ((IRINode) solution.get("e")).getIRIValue();
+            result.add(new EvaluableEntity(this, artifactId, elementId));
+        }
+        return new XSPReplyResultCollection<>(result);
     }
 }

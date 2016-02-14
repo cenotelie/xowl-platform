@@ -4,22 +4,23 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Laurent Wouters - lwouters@xowl.org
+ * Laurent Wouters - lwouters@xowl.org
  ******************************************************************************/
 
 package org.xowl.platform.services.evaluation.impl;
 
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.services.evaluation.CriterionType;
@@ -39,6 +40,7 @@ public class XOWLEvaluationService implements EvaluationService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
+            "services/core/evaluation/evaluation",
             "services/core/evaluation/evaluableTypes",
             "services/core/evaluation/evaluables",
             "services/core/evaluation/criterionTypes",
@@ -81,11 +83,16 @@ public class XOWLEvaluationService implements EvaluationService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET")) {
             switch (uri) {
+                case "services/core/evaluation/evaluation":
+                    return onGetEvalations();
                 case "services/core/evaluation/evaluableTypes":
-
+                    return onGetEvaluableTypes();
+                case "services/core/evaluation/evaluables":
+                    return onGetEvaluables(parameters);
+                case "services/core/evaluation/criterionTypes":
+                    return onGetCriterionTypes(parameters);
             }
-        } else if (method.endsWith("POST")) {
-
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
     }
@@ -108,6 +115,16 @@ public class XOWLEvaluationService implements EvaluationService {
     @Override
     public Collection<CriterionType> getCriterionTypes() {
         return Collections.unmodifiableCollection(criterionTypes.values());
+    }
+
+    @Override
+    public EvaluableType getEvaluableType(String typeId) {
+        return evaluableTypes.get(typeId);
+    }
+
+    @Override
+    public CriterionType getCriterionType(String typeId) {
+        return criterionTypes.get(typeId);
     }
 
     @Override
@@ -139,8 +156,34 @@ public class XOWLEvaluationService implements EvaluationService {
     }
 
     /**
+     * Responds to a request for the current evaluations
+     *
+     * @return The response
+     */
+    private HttpResponse onGetEvalations() {
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
+    }
+
+    /**
+     * Responds to a request for the evaluables of a given type
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private HttpResponse onGetEvaluables(Map<String, String[]> parameters) {
+        String[] types = parameters.get("type");
+        if (types == null || types.length == 0)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'type' parameter");
+        EvaluableType evaluableType = evaluableTypes.get(types[0]);
+        if (evaluableType == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return XSPReplyUtils.toHttpResponse(evaluableType.getElements(), null);
+    }
+
+    /**
      * Responds to a request for the criterion types applicable to an evaluable type
      *
+     * @param parameters The request parameters
      * @return The response
      */
     private HttpResponse onGetCriterionTypes(Map<String, String[]> parameters) {

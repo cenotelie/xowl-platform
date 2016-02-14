@@ -61,6 +61,22 @@ public interface EvaluationService extends Service, HttpAPIService {
     Collection<CriterionType> getCriterionTypes();
 
     /**
+     * Gets the evaluable type for the specified identifier
+     *
+     * @param typeId The identifier of an evaluable type
+     * @return The resolve evaluable type, if any
+     */
+    EvaluableType getEvaluableType(String typeId);
+
+    /**
+     * Gets the criterion type for the specified identifier
+     *
+     * @param typeId The identifier of a criterion type
+     * @return The resolve criterion type, if any
+     */
+    CriterionType getCriterionType(String typeId);
+
+    /**
      * Gets the criterion types applicable to the specified type of evaluable elements
      *
      * @param evaluableType The evaluable type

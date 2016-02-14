@@ -40,10 +40,9 @@ public interface EvaluableType extends Identifiable, Serializable {
     ArtifactArchetype getArtifactArchetype();
 
     /**
-     * Gets the evaluable elements of this type that are contained in the artifact identified by the provided identifier
+     * Gets the evaluable elements of this type in the stored artifacts
      *
-     * @param artifactId The identifier of an artifact
      * @return The evaluable elements
      */
-    XSPReply getElements(String artifactId);
+    XSPReply getElements();
 }

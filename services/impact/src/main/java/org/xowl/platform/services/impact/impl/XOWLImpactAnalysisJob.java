@@ -30,8 +30,6 @@ import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.store.rdf.QuerySolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultSolutions;
-import org.xowl.infra.store.storage.NodeManager;
-import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -77,8 +75,7 @@ class XOWLImpactAnalysisJob extends JobBase {
      */
     public XOWLImpactAnalysisJob(ASTNode definition) {
         super(definition);
-        NodeManager nodes = new CachedNodes();
-        this.setup = new XOWLImpactAnalysisSetup(nodes, getPayloadNode(definition));
+        this.setup = new XOWLImpactAnalysisSetup(getPayloadNode(definition));
     }
 
     @Override

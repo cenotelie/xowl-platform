@@ -24,6 +24,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.storage.NodeManager;
+import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
@@ -92,9 +93,10 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
      *
      * @param definition The definition
      */
-    public XOWLImpactAnalysisSetup(NodeManager nodes, ASTNode definition) {
+    public XOWLImpactAnalysisSetup(ASTNode definition) {
+        NodeManager nodes = new CachedNodes();
         String root = null;
-        String value = null;
+        String value;
         int degree = 0;
         boolean isFilterLinksInclusive = false;
         boolean isFilterResultsInclusive = false;

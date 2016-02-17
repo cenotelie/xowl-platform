@@ -28,5 +28,5 @@ import org.xowl.platform.kernel.Identifiable;
  *
  * @author Laurent Wouters
  */
-public interface ImpactAnalysisResult extends Identifiable, Serializable {
+public interface ImpactAnalysisResult extends Serializable {
 }

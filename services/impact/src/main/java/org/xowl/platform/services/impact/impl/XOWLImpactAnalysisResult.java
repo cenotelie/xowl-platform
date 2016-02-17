@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Laurent Wouters
+ * Copyright (c) 2016 Madeleine Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,12 +15,18 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * Contributors:
- *     Laurent Wouters - lwouters@xowl.org
+ *     Madeleine Wouters - woutersmadeleine@gmail.com
  ******************************************************************************/
 
 package org.xowl.platform.services.impact.impl;
 
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisResult;
+import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Implements the result of an impact analysis
@@ -28,23 +34,45 @@ import org.xowl.platform.services.impact.ImpactAnalysisResult;
  * @author Laurent Wouters
  */
 class XOWLImpactAnalysisResult implements ImpactAnalysisResult {
-    @Override
-    public String getIdentifier() {
-        return null;
+    /**
+     * The result parts
+     */
+    private final Collection<ImpactAnalysisResultPart> parts;
+
+    /**
+     * Initializes this result
+     *
+     * @param parts The result parts
+     */
+    public XOWLImpactAnalysisResult(Collection<XOWLImpactAnalysisResultPart> parts) {
+        this.parts = new ArrayList<>(parts.size());
+        for (ImpactAnalysisResultPart part : parts)
+            this.parts.add(part);
     }
 
     @Override
-    public String getName() {
-        return null;
+    public Collection<ImpactAnalysisResultPart> getParts() {
+        return Collections.unmodifiableCollection(parts);
     }
 
     @Override
     public String serializedString() {
-        return null;
+        return ImpactAnalysisResult.class.getCanonicalName();
     }
 
     @Override
     public String serializedJSON() {
-        return null;
+        StringBuilder builder = new StringBuilder("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(ImpactAnalysisResult.class.getCanonicalName()));
+        builder.append("\", \"parts\": [");
+        boolean first = true;
+        for (ImpactAnalysisResultPart part : parts) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(part.serializedJSON());
+        }
+        builder.append("]}");
+        return builder.toString();
     }
 }

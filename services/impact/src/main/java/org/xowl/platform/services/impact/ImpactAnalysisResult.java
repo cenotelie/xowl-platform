@@ -21,7 +21,8 @@
 package org.xowl.platform.services.impact;
 
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Identifiable;
+
+import java.util.Collection;
 
 /**
  * Represents the result of an impact analysis
@@ -29,4 +30,10 @@ import org.xowl.platform.kernel.Identifiable;
  * @author Laurent Wouters
  */
 public interface ImpactAnalysisResult extends Serializable {
+    /**
+     * Get the result parts of the analysis
+     *
+     * @return The result parts
+     */
+    Collection<ImpactAnalysisResultPart> getParts();
 }

@@ -4,22 +4,23 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- * <p>
+ *
  * Contributors:
- * Madeleine Wouters - woutersmadeleine@gmail.com
+ *     Madeleine Wouters - woutersmadeleine@gmail.com
  ******************************************************************************/
 
 package org.xowl.platform.services.impact.impl;
 
+import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
@@ -125,5 +126,50 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
         return Collections.unmodifiableCollection(paths);
     }
 
+    @Override
+    public String serializedString() {
+        return node.getIRIValue();
+    }
 
+    @Override
+    public String serializedJSON() {
+        StringBuilder builder = new StringBuilder("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(ImpactAnalysisResultPart.class.getCanonicalName()));
+        builder.append("\", \"node\": \"");
+        builder.append(IOUtils.escapeStringJSON(node.getIRIValue()));
+        builder.append("\", \"degree\": ");
+        builder.append(Integer.toString(degree));
+        builder.append(", \"types\": [");
+        boolean first = true;
+        for (IRINode type : types) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("\"");
+            builder.append(IOUtils.escapeStringJSON(type.getIRIValue()));
+            builder.append("\"");
+        }
+        builder.append("], \"paths\": [");
+        first = true;
+        for (Collection<Couple<IRINode, IRINode>> path : paths) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("{\"elements\": [");
+            boolean f = true;
+            for (Couple<IRINode, IRINode> couple : path) {
+                if (!f)
+                    builder.append(", ");
+                f = false;
+                builder.append("{\"target\": \"");
+                builder.append(IOUtils.escapeStringJSON(couple.x.getIRIValue()));
+                builder.append("\", \"property\": \"");
+                builder.append(IOUtils.escapeStringJSON(couple.y.getIRIValue()));
+                builder.append("\"}");
+            }
+            builder.append("]}");
+        }
+        builder.append("]}");
+        return builder.toString();
+    }
 }

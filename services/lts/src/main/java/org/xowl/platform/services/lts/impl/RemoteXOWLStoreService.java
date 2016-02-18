@@ -323,7 +323,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     private HttpResponse onMessageSPARQL(byte[] content, String accept) {
         if (content == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        String request = new String(content, PlatformUtils.DEFAULT_CHARSET);
+        String request = new String(content, Files.CHARSET);
         Result result = storeLive.sparql(request);
         String resultType = ResultUtils.coerceContentType(result, accept != null ? IOUtils.httpNegotiateContentType(Collections.singletonList(accept)) : AbstractRepository.SYNTAX_NQUADS);
         StringWriter writer = new StringWriter();
@@ -353,7 +353,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         RDFSerializer serializer = new NQuadsSerializer(writer);
         serializer.serialize(logger, artifact.getMetadata().iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
@@ -378,7 +378,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         RDFSerializer serializer = new NQuadsSerializer(writer);
         serializer.serialize(logger, content.iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 
@@ -419,7 +419,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getRemoved().iterator());
         if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
     }
 

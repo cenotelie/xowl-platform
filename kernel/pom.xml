@@ -21,13 +21,13 @@
 		<dependency>
 			<groupId>org.xowl.infra</groupId>
 			<artifactId>xowl-store</artifactId>
-			<version>1.0-beta7</version>
+			<version>1.0-beta8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.xowl.infra</groupId>
 			<artifactId>xowl-server-api</artifactId>
-			<version>1.0-beta7</version>
+			<version>1.0-beta8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

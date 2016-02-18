@@ -29,10 +29,10 @@ import org.xowl.infra.store.loaders.*;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
@@ -170,12 +170,12 @@ class GenericConnector extends ConnectorServiceBase {
         if (loader == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
         BufferedLogger logger = new BufferedLogger();
-        String contentString = new String(content, PlatformUtils.DEFAULT_CHARSET);
+        String contentString = new String(content, Files.CHARSET);
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, resource);
         if (!logger.getErrorMessages().isEmpty()) {
             logger.error("Failed to parse the content");
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         }
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());

@@ -275,13 +275,13 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply createRule(String name, String message, String prefixes, String conditions) {
-        String id = IRI_RULE_BASE + "#" + PlatformUtils.encode(name);
+        String id = IRI_RULE_BASE + "#" + IOUtils.hashSHA1(name);
         String definition = prefixes + " rule <" + IOUtils.escapeAbsoluteURIW3C(id) + "> distinct {\n" + conditions + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
         RDFTLoader loader = new RDFTLoader(new CachedNodes());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
         if (!logger.getErrorMessages().isEmpty())
-            return new XSPReplyFailure(PlatformUtils.getLog(logger));
+            return new XSPReplyFailure(logger.getErrorsAsString());
         if (rdfResult == null || rdfResult.getRules().isEmpty())
             return new XSPReplyFailure("Failed to load the rule");
         Collection<String> variables = getVariablesIn(rdfResult.getRules().get(0));

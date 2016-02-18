@@ -26,6 +26,7 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.evaluation.*;
@@ -257,9 +258,9 @@ public class XOWLEvaluationService implements EvaluationService {
         if (content == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content");
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, PlatformUtils.DEFAULT_CHARSET));
+        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
         XSPReply reply = evaluation.store();
         if (!reply.isSuccess())

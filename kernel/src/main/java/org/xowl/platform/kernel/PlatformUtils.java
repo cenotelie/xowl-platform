@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Laurent Wouters
+ * Copyright (c) 2016 Laurent Wouters
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -26,14 +26,10 @@ import org.xowl.hime.redist.ParseResult;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.rdf.SubjectNode;
-import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,11 +41,6 @@ import java.util.Map;
  * @author Laurent Wouters
  */
 public class PlatformUtils {
-    /**
-     * The default charset
-     */
-    public static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
     /**
      * Parses the JSON content
      *
@@ -73,51 +64,6 @@ public class PlatformUtils {
             return null;
         }
         return result.getRoot();
-    }
-
-    /**
-     * Hexadecimal characters
-     */
-    private static final char[] HEX = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-    /**
-     * Encodes a string
-     *
-     * @param input The string to encode
-     * @return The encoded text
-     */
-    public static String encode(String input) {
-        byte[] bytes = input.getBytes(Charset.forName("UTF-8"));
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-1");
-            bytes = md.digest(bytes);
-            char[] chars = new char[bytes.length * 2];
-            int j = 0;
-            for (int i = 0; i != bytes.length; i++) {
-                chars[j++] = HEX[(bytes[i] & 0xF0) >>> 4];
-                chars[j++] = HEX[bytes[i] & 0x0F];
-            }
-            return new String(chars);
-        } catch(NoSuchAlgorithmException exception) {
-            Logger.DEFAULT.error(exception);
-            return null;
-        }
-    }
-
-    /**
-     * Gets the content of the log
-     *
-     * @param logger The logger
-     * @return The content of the log
-     */
-    public static String getLog(BufferedLogger logger) {
-        StringBuilder builder = new StringBuilder();
-        for (Object error : logger.getErrorMessages()) {
-            builder.append(error.toString());
-            builder.append("\n");
-        }
-        return builder.toString();
     }
 
     /**

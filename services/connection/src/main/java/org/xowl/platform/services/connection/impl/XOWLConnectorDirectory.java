@@ -28,6 +28,7 @@ import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.BufferedLogger;
@@ -387,9 +388,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, PlatformUtils.DEFAULT_CHARSET));
+        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, PlatformUtils.getLog(logger));
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
 
         ConnectorDescription descriptor = null;
         for (ConnectorDescription description : getDescriptors()) {

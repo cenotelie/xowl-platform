@@ -459,7 +459,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * @return The file name
      */
     private static String getFileName(Job job) {
-        return "job-" + PlatformUtils.encode(job.getIdentifier()) + ".json";
+        return "job-" + IOUtils.hashSHA1(job.getIdentifier()) + ".json";
     }
 
     /**

@@ -22,6 +22,7 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
 
@@ -30,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Base64;
 
 /**
  * The main HTTP context
@@ -68,8 +68,7 @@ public class XOWLMainHTTPContext implements HttpContext {
         if (headerAuth != null) {
             int index = headerAuth.indexOf(32);
             if (index != -1 && headerAuth.substring(0, index).equals("Basic")) {
-                byte[] buffer = Base64.getDecoder().decode(headerAuth.substring(index + 1));
-                String authToken = new String(buffer);
+                String authToken = IOUtils.decodeBase64(headerAuth.substring(index + 1));
                 int indexColon = authToken.indexOf(58);
                 if (indexColon != -1) {
                     String login = authToken.substring(0, indexColon);

@@ -21,8 +21,8 @@
 package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.store.http.HttpConstants;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.webapp.WebModuleDirectory;
 import org.xowl.platform.services.webapp.WebModuleService;
 
@@ -92,7 +92,7 @@ public class XOWLModuleDirectory extends HttpServlet implements WebModuleDirecto
             builder.append(service.serializedJSON());
         }
         builder.append("]");
-        byte[] content = builder.toString().getBytes(PlatformUtils.DEFAULT_CHARSET);
+        byte[] content = builder.toString().getBytes(Files.CHARSET);
 
         addCORSHeader(response);
         response.setStatus(HttpURLConnection.HTTP_OK);

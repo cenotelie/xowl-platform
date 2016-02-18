@@ -115,6 +115,8 @@ public class BusinessSchemaResource implements BusinessSchema {
             Iterator<ProxyObject> iterator = repository.getProxiesIn(ontology);
             while (iterator.hasNext()) {
                 proxy = iterator.next();
+                if (proxy.getIRIString() == null)
+                    continue;
                 for (ProxyObject proxyType : proxy.getObjectValues(Vocabulary.rdfType)) {
                     switch (proxyType.getIRIString()) {
                         case Vocabulary.owlClass:

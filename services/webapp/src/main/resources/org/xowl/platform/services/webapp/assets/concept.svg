@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" id="concept" version="1.1">
+  <rect style="fill:#034091;fill-opacity:1" width="90" height="90" x="5" y="5" />
+  <path
+     style="fill:none;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-opacity:1"
+     d="m 15,15 70,0 0,70.00004 -70,0 z" />
+  <rect style="fill:#ffffff;fill-opacity:1;" width="50" height="10" x="25" y="65" />
+  <rect style="fill:#ffffff;fill-opacity:1;" width="50" height="10" x="25" y="45" />
+  <rect style="fill:#ffffff;fill-opacity:1;" width="50" height="10" x="25" y="25" />
+</svg>

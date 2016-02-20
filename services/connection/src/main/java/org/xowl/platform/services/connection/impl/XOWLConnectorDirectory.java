@@ -88,7 +88,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * The map of statically configured connectors to resolve
      */
-    private Map<String, Section> toResolve;
+    private Map<String, List<Section>> toResolve;
     /**
      * Flag whether resolving operations are in progress
      */
@@ -252,16 +252,21 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 String descriptorId = section.get("descriptor");
                 if (descriptorId == null)
                     continue;
-                toResolve.put(descriptorId, section);
+                List<Section> sections = toResolve.get(descriptorId);
+                if (sections == null) {
+                    sections = new ArrayList<>();
+                    toResolve.put(descriptorId, sections);
+                }
+                sections.add(section);
             }
         }
-        List<Map.Entry<String, Section>> entries = new ArrayList<>(toResolve.entrySet());
-        for (Map.Entry<String, Section> entry : entries) {
+        List<Map.Entry<String, List<Section>>> entries = new ArrayList<>(toResolve.entrySet());
+        for (Map.Entry<String, List<Section>> entry : entries) {
             if (factory != null) {
                 // this is a new factory
                 for (ConnectorDescription description : factory.getDescriptors()) {
                     if (description.getIdentifier().equals(entry.getKey())) {
-                        resolveConfigConnector(description, entry.getValue());
+                        resolveConfigConnectors(description, entry.getValue());
                         break;
                     }
                 }
@@ -271,7 +276,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                         boolean found = false;
                         for (ConnectorDescription description : existingFactory.getDescriptors()) {
                             if (description.getIdentifier().equals(entry.getKey())) {
-                                resolveConfigConnector(description, entry.getValue());
+                                resolveConfigConnectors(description, entry.getValue());
                                 found = true;
                                 break;
                             }
@@ -288,14 +293,30 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * Resolves a statically configured connector
      *
-     * @param description  The description
-     * @param section The configuration
+     * @param description The description
+     * @param sections    The configurations to resolve
      */
-    private void resolveConfigConnector(ConnectorDescription description, Section section) {
+    private void resolveConfigConnectors(ConnectorDescription description, List<Section> sections) {
+        for (int i = sections.size() - 1; i != -1; i--) {
+            if (resolveConfigConnector(description, sections.get(i)))
+                sections.remove(i);
+        }
+        if (sections.isEmpty())
+            toResolve.remove(description.getIdentifier());
+    }
+
+    /**
+     * Resolves a statically configured connector
+     *
+     * @param description The description
+     * @param section     The configuration to resolve
+     * @return Whether the operation succeeded
+     */
+    private boolean resolveConfigConnector(ConnectorDescription description, Section section) {
         String id = section.getName();
         String name = section.get("name");
         if (id == null || name == null)
-            return;
+            return false;
         List<String> uris = section.getAll("uris");
         Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
         for (String property : section.getProperties()) {
@@ -317,9 +338,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 customParams.put(parameter, values.toArray());
         }
         XSPReply reply = spawn(description, id, name, uris.toArray(new String[uris.size()]), customParams);
-        if (reply.isSuccess()) {
-            toResolve.remove(description.getIdentifier());
-        }
+        return reply.isSuccess();
     }
 
     /**

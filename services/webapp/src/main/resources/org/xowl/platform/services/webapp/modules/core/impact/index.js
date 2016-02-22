@@ -2,7 +2,220 @@
 // Provided under LGPL v3
 
 var xowl = new XOWL();
+var SCHEMAS = null;
+var LINKS = [];
+var TYPES = [];
+var FILTER_LINKS = [];
+var FILTER_TYPES = [];
 
 function init() {
-	setupPage(xowl);
+    setupPage(xowl);
+    xowl.getBusinessSchemas(function (status, ct, content) {
+        if (status == 200) {
+            SCHEMAS = content;
+            renderSchemas(content);
+        } else {
+            displayMessage(getErrorFor(status, content));
+        }
+    });
+}
+
+function renderSchemas(schemas) {
+    schemas.sort(function (x, y) {
+        return x.name.localeCompare(y.name);
+    });
+    var select = document.getElementById("root-schema");
+    var select_links = document.getElementById("filters-links-schema");
+    var select_types = document.getElementById("filters-types-schema");
+
+    for (var i = 0; i != schemas.length; i++) {
+        var option = document.createElement("option");
+        option.value = schemas[i].id;
+        option.appendChild(document.createTextNode(schemas[i].name));
+        select.appendChild(option);
+        var optgroup1 = document.createElement("optgroup");
+        optgroup1.label = schemas[i].name;
+        var optgroup2 = document.createElement("optgroup");
+        optgroup2.label = schemas[i].name;
+        select_links.appendChild(optgroup1);
+        select_types.appendChild(optgroup2);
+        for (var j = 0; j != schemas[i].objectProperties.length; j++) {
+            LINKS.push({
+                id: schemas[i].objectProperties[j].id,
+                name: schemas[i].objectProperties[j].name,
+                schemaName: schemas[i].name
+            });
+            option = document.createElement("option");
+            option.value = schemas[i].objectProperties[j].id;
+            option.appendChild(document.createTextNode(schemas[i].objectProperties[j].name));
+            optgroup1.appendChild(option);
+        }
+        for (var j = 0; j != schemas[i].classes.length; j++) {
+            TYPES.push({
+                id: schemas[i].classes[j].id,
+                name: schemas[i].classes[j].name,
+                schemaName: schemas[i].name
+            });
+            option = document.createElement("option");
+            option.value = schemas[i].classes[j].id;
+            option.appendChild(document.createTextNode(schemas[i].classes[j].name));
+            optgroup2.appendChild(option);
+        }
+    }
+
+    if (schemas.length > 0) {
+        select.value = schemas[0].id;
+        onSchemaChange();
+    } else {
+        displayMessage(null);
+    }
+}
+
+function onSchemaChange() {
+    var id = document.getElementById("root-schema").value;
+    var schema = null;
+    for (var i = 0; i != SCHEMAS.length; i++) {
+        if (SCHEMAS[i].id === id) {
+            schema = SCHEMAS[i];
+            break;
+        }
+    }
+    var select = document.getElementById("root-type");
+    while (select.hasChildNodes()) {
+        select.removeChild(select.lastChild);
+    }
+    for (var i = 0; i != schema.classes.length; i++) {
+        var option = document.createElement("option");
+        option.value = schema.classes[i].id;
+        option.appendChild(document.createTextNode(schema.classes[i].name));
+        select.appendChild(option);
+    }
+    if (schema.classes.length > 0) {
+        select.value = schema.classes[0].id;
+        onTypeChange();
+    }
+}
+
+function onTypeChange() {
+    var type = document.getElementById("root-type").value;
+    displayMessage("Loading ...");
+    xowl.sparql(function (status, ct, content) {
+        if (status == 200) {
+            renderElements(content);
+            displayMessage(null);
+        } else {
+            displayMessage(getErrorFor(status, content));
+        }
+    }, "DESCRIBE ?x WHERE { GRAPH ?g { ?x a <" + type + "> }}");
+}
+
+function renderElements(data) {
+    var entities = parseNQuads(data);
+    var names = Object.getOwnPropertyNames(entities);
+    var select = document.getElementById("root-element");
+    while (select.hasChildNodes()) {
+        select.removeChild(select.lastChild);
+    }
+    for (var p = 0; p != names.length; p++) {
+        var entity = entities[names[p]];
+        if (!entity.isIRI)
+            continue;
+        var name = entity.id;
+        for (var j = 0; j != entity.properties.length; j++) {
+            var property = entity.properties[j];
+            // TODO: look for the entity name here
+        }
+        var option = document.createElement("option");
+        option.value = entity.id;
+        option.appendChild(document.createTextNode(name));
+        select.appendChild(option);
+    }
+}
+
+function onClickNewFilterLink() {
+    var select_links = document.getElementById("filters-links-schema");
+    var link = LINKS[select_links.selectedIndex];
+    FILTER_LINKS.push(link.id);
+    var table = document.getElementById("filters-links");
+    var row = document.createElement("tr");
+    var cell1 = document.createElement("td");
+    cell1.appendChild(document.createTextNode(link.schemaName + " - " + link.name));
+    var cell2 = document.createElement("td");
+
+    var span = document.createElement("span");
+    span.classList.add("glyphicon");
+    span.classList.add("glyphicon-minus");
+    span.setAttribute("aria-hidden", "true");
+    var button = document.createElement("a");
+    button.classList.add("btn");
+    button.classList.add("btn-xs");
+    button.classList.add("btn-danger");
+    button.title = "DELETE";
+    button.appendChild(span);
+    button.onclick = function (evt) {
+        table.removeChild(row);
+        FILTER_LINKS.splice(FILTER_LINKS.indexOf(link.id), 1);
+    };
+    cell2.appendChild(button);
+    row.appendChild(cell1);
+    row.appendChild(cell2);
+    table.appendChild(row);
+}
+
+function onClickNewFilterType() {
+    var select_types = document.getElementById("filters-types-schema");
+    var type = TYPES[select_types.selectedIndex];
+    FILTER_TYPES.push(type.id);
+    var table = document.getElementById("filters-types");
+    var row = document.createElement("tr");
+    var cell1 = document.createElement("td");
+    cell1.appendChild(document.createTextNode(type.schemaName + " - " + type.name));
+    var cell2 = document.createElement("td");
+
+    var span = document.createElement("span");
+    span.classList.add("glyphicon");
+    span.classList.add("glyphicon-minus");
+    span.setAttribute("aria-hidden", "true");
+    var button = document.createElement("a");
+    button.classList.add("btn");
+    button.classList.add("btn-xs");
+    button.classList.add("btn-danger");
+    button.title = "DELETE";
+    button.appendChild(span);
+    button.onclick = function (evt) {
+        table.removeChild(row);
+        FILTER_TYPES.splice(FILTER_TYPES.indexOf(type.id), 1);
+    };
+    cell2.appendChild(button);
+    row.appendChild(cell1);
+    row.appendChild(cell2);
+    table.appendChild(row);
+}
+
+function onClickRun() {
+    var select_root = document.getElementById("root-element");
+    var select_degree = document.getElementById("degree");
+    var select_is_links_inclusive = document.getElementById("filters-links-inclusive");
+    var select_is_types_inclusive = document.getElementById("filters-types-inclusive");
+    if (select_root.selectedIndex < 0) {
+        return;
+    }
+    var definition = {
+        root: select_root.value,
+        degree: select_degree.value,
+        isFilterLinksInclusive: (select_is_links_inclusive.selectedIndex === 0),
+        isFilterResultsInclusive: (select_is_types_inclusive.selectedIndex === 0),
+        filterLinks: LINKS,
+        filterResults: TYPES
+    };
+    xowl.newImpactAnalysis(function (status, ct, content) {
+        if (status == 200) {
+            trackJob(content.identifier, "Working ...", function (isSuccess) {
+				if (isSuccess)
+					window.location.href = "results.html?id=" + encodeURIComponent(content.identifier);
+			});
+        } else {
+            displayMessage(getErrorFor(status, content));
+        }
+    }, definition);
 }

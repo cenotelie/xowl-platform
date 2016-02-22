@@ -83,7 +83,7 @@ Ontology(<http://xowl.org/platform/schemas/kernel>
     Declaration(ObjectProperty(:archetype))
     FunctionalObjectProperty(:archetype)
     ObjectPropertyDomain(:archetype :Artifact)
-    DataPropertyAssertion(rdfs:label :archetype "base")
+    DataPropertyAssertion(rdfs:label :archetype "archetype")
     DataPropertyAssertion(rdfs:comment :archetype "The base archetype of the artifact.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :archetype <http://xowl.org/platform/schemas/kernel>)
 

@@ -362,7 +362,15 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 // Impact Analysis Service
 ////
 
-// TODO: add here
+XOWL.prototype.newImpactAnalysis = function (callback, definition) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/impact", definition);
+}
 
 
 

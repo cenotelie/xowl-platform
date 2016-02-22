@@ -205,15 +205,15 @@ function onClickRun() {
         degree: select_degree.value,
         isFilterLinksInclusive: (select_is_links_inclusive.selectedIndex === 0),
         isFilterResultsInclusive: (select_is_types_inclusive.selectedIndex === 0),
-        filterLinks: LINKS,
-        filterResults: TYPES
+        filterLinks: FILTER_LINKS,
+        filterResults: FILTER_TYPES
     };
     xowl.newImpactAnalysis(function (status, ct, content) {
         if (status == 200) {
             trackJob(content.identifier, "Working ...", function (isSuccess) {
-				if (isSuccess)
-					window.location.href = "results.html?id=" + encodeURIComponent(content.identifier);
-			});
+                if (isSuccess)
+                    window.location.href = "results.html?id=" + encodeURIComponent(content.identifier);
+            });
         } else {
             displayMessage(getErrorFor(status, content));
         }

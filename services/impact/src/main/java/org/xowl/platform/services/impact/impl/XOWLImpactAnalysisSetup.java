@@ -112,6 +112,8 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
                     break;
                 case "degree":
                     value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    if (value.startsWith("\""))
+                        value = value.substring(1, value.length() - 1);
                     degree = Integer.parseInt(value);
                     break;
                 case "filterLinks":
@@ -121,6 +123,8 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
                     break;
                 case "isFilterLinksInclusive":
                     value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    if (value.startsWith("\""))
+                        value = value.substring(1, value.length() - 1);
                     isFilterLinksInclusive = "true".equalsIgnoreCase(value);
                     break;
                 case "filterResults":
@@ -130,6 +134,8 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
                     break;
                 case "isFilterResultsInclusive":
                     value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    if (value.startsWith("\""))
+                        value = value.substring(1, value.length() - 1);
                     isFilterResultsInclusive = "true".equalsIgnoreCase(value);
                     break;
             }

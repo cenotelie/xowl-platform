@@ -73,7 +73,13 @@ function renderEvaluables(data) {
 
 function renderEvaluable(evaluable) {
     evaluable.selected = false;
-    var cell1 = document.createElement("td");
+    var icon = document.createElement("img");
+	icon.src = "/web/assets/element.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	var cell1 = document.createElement("td");
+    cell1.appendChild(icon);
     cell1.appendChild(document.createTextNode(evaluable.name));
     var toggle = document.createElement("div");
     toggle.appendChild(document.createElement("button"));
@@ -158,7 +164,13 @@ function renderCriterion(criterion) {
     };
     var cell1 = document.createElement("td");
     cell1.appendChild(button);
-    var cell2 = document.createElement("td");
+    var icon = document.createElement("img");
+	icon.src = "/web/assets/evaluation.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	var cell2 = document.createElement("td");
+    cell2.appendChild(icon);
     cell2.appendChild(document.createTextNode(criterion.name));
     row.appendChild(cell1);
     row.appendChild(cell2);

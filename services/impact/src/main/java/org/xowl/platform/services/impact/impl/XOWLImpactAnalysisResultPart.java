@@ -95,14 +95,20 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
      * @param property The property between the previous node and the current node
      */
     public void addPaths(XOWLImpactAnalysisResultPart previous, IRINode property) {
-        for (Collection<Couple<IRINode, IRINode>> path : previous.paths) {
+        if (previous.paths.isEmpty()) {
             Collection<Couple<IRINode, IRINode>> newPath = new ArrayList<>();
-            for (Couple<IRINode, IRINode> couple : path) {
-                Couple<IRINode, IRINode> newCouple = new Couple<>(couple.x, couple.y);
-                newPath.add(newCouple);
-            }
             newPath.add(new Couple<>(previous.node, property));
             paths.add(newPath);
+        } else {
+            for (Collection<Couple<IRINode, IRINode>> path : previous.paths) {
+                Collection<Couple<IRINode, IRINode>> newPath = new ArrayList<>();
+                for (Couple<IRINode, IRINode> couple : path) {
+                    Couple<IRINode, IRINode> newCouple = new Couple<>(couple.x, couple.y);
+                    newPath.add(newCouple);
+                }
+                newPath.add(new Couple<>(previous.node, property));
+                paths.add(newPath);
+            }
         }
     }
 

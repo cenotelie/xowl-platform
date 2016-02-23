@@ -200,20 +200,29 @@ function onClickRun() {
     if (select_root.selectedIndex < 0) {
         return;
     }
+    var  filterLinks = [];
+    for (var i = 0; i != FILTER_LINKS.length; i++) {
+        filterLinks.push({
+            filtered: FILTER_LINKS[i]
+        });
+    }
+    var  filterTypes = [];
+    for (var i = 0; i != FILTER_TYPES.length; i++) {
+        filterTypes.push({
+            filtered: FILTER_TYPES[i]
+        });
+    }
     var definition = {
         root: select_root.value,
         degree: select_degree.value,
         isFilterLinksInclusive: (select_is_links_inclusive.selectedIndex === 0),
         isFilterResultsInclusive: (select_is_types_inclusive.selectedIndex === 0),
-        filterLinks: FILTER_LINKS,
-        filterResults: FILTER_TYPES
+        filterLinks: filterLinks,
+        filterResults: filterTypes
     };
     xowl.newImpactAnalysis(function (status, ct, content) {
         if (status == 200) {
-            trackJob(content.identifier, "Working ...", function (isSuccess) {
-                if (isSuccess)
-                    window.location.href = "results.html?id=" + encodeURIComponent(content.identifier);
-            });
+            window.location.href = "result.html?id=" + encodeURIComponent(content.identifier);
         } else {
             displayMessage(getErrorFor(status, content));
         }

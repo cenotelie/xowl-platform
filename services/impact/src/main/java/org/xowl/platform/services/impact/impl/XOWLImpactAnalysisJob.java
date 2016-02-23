@@ -207,6 +207,14 @@ class XOWLImpactAnalysisJob extends JobBase {
                     }
                 }
             }
+            if (current.getDegree() == setup.getDegree()){
+                Collection<Couple<IRINode, IRINode>> neighbours = neighbours(current.getNode(), live);
+                for (Couple<IRINode, IRINode> couple : neighbours) {
+                    if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
+                        current.addTpye(couple.x);
+                    }
+                }
+            }
             i++;
         }
         return parts;

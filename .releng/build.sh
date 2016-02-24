@@ -21,6 +21,7 @@ cp "$ROOT/services/consistency/target/xowl-service-consistency-$VERSION.jar" "$R
 cp "$ROOT/services/evaluation/target/xowl-service-evaluation-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/executor/target/xowl-service-executor-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/httpapi/target/xowl-service-httpapi-$VERSION.jar" "$RELENG/docker/"
+cp "$ROOT/services/impact/target/xowl-service-impact-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/statistics/target/xowl-service-statistics-$VERSION.jar" "$RELENG/docker/"
 cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/docker/"

@@ -103,16 +103,16 @@ function renderResult(content) {
             icon.height = 40;
             icon.style.marginRight = "20px";
             cell2.appendChild(icon);
-            cell2.appendChild(document.createTextNode(map[names[i]][j].node));
+            cell2.appendChild(document.createTextNode(map[names[i]][j].name));
             cell2.classList.add("entity" + (i % 2).toString());
 
-            cell3.appendChild(renderPaths(map[names[i]][j].paths, map[names[i]][j].node));
+            cell3.appendChild(renderPaths(map[names[i]][j].paths, map[names[i]][j].name));
             cell3.classList.add("entity" + (i % 2).toString());
         }
     }
 }
 
-function renderPath(path, node) {
+function renderPath(path, name) {
     var div = document.createElement("div");
     div.classList.add("path");
     for (var i = 0; i != path.elements.length; i++) {
@@ -138,7 +138,7 @@ function renderPath(path, node) {
         div.appendChild(span_property);
     }
     var span_node = document.createElement("span");
-    span_node.appendChild(document.createTextNode(node));
+    span_node.appendChild(document.createTextNode(name));
     span_node.classList.add("node");
     var span_design_target = document.createElement("span");
     span_design_target.classList.add("glyphicon");

@@ -4,18 +4,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Madeleine Wouters - woutersmadeleine@gmail.com
+ * Madeleine Wouters - woutersmadeleine@gmail.com
  ******************************************************************************/
 
 package org.xowl.platform.services.impact.impl;
@@ -26,6 +26,7 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.store.rdf.QuerySolution;
 import org.xowl.infra.store.sparql.Result;
@@ -112,21 +113,22 @@ class XOWLImpactAnalysisJob extends JobBase {
      * @param live    Live data base
      * @return The collection of neighbours founded and their property
      */
-    private Collection<Couple<IRINode, IRINode>> neighbours(IRINode subject, TripleStore live) {
+    private Collection<Couple<Node, IRINode>> neighbours(IRINode subject, TripleStore live) {
         Result result = live.sparql("SELECT DISTINCT ?x ?p WHERE { GRAPH ?g { <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + "> ?p ?x" + " } }");
-        Collection<Couple<IRINode, IRINode>> values = new ArrayList<>();
+        Collection<Couple<Node, IRINode>> values = new ArrayList<>();
         for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
             Node neighbour = solution.get("x");
             Node property = solution.get("p");
-            if (neighbour.getNodeType() == Node.TYPE_IRI)
-                values.add(new Couple<>((IRINode) neighbour, (IRINode) property));
+            if ((neighbour.getNodeType() == Node.TYPE_IRI) || (neighbour.getNodeType() == Node.TYPE_LITERAL))
+                values.add(new Couple<>(neighbour, (IRINode) property));
         }
         result = live.sparql("SELECT DISTINCT ?x ?p WHERE { GRAPH ?g {?x ?p <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + "> " + "}}");
         for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
             Node neighbour = solution.get("x");
             Node property = solution.get("p");
-            if (neighbour.getNodeType() == Node.TYPE_IRI)
-                values.add(new Couple<>((IRINode) neighbour, (IRINode) property));
+            if (neighbour.getNodeType() == Node.TYPE_IRI) {
+                values.add(new Couple<>(neighbour, (IRINode) property));
+            }
         }
         return values;
     }
@@ -186,32 +188,48 @@ class XOWLImpactAnalysisJob extends JobBase {
         while (i != parts.size()) {
             XOWLImpactAnalysisResultPart current = parts.get(i);
             if (current.getDegree() < setup.getDegree()) {
-                Collection<Couple<IRINode, IRINode>> neighbours = neighbours(current.getNode(), live);
-                for (Couple<IRINode, IRINode> couple : neighbours) {
-                    if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
-                        current.addTpye(couple.x);
-                        continue;
-                    }
-                    if (!applyLinkFilters(couple.y))
-                        continue;
-                    boolean found = false;
-                    for (XOWLImpactAnalysisResultPart part : parts) {
-                        if (part.getNode().equals(couple.x)) {
-                            part.addPaths(current, couple.y);
-                            found = true;
-                            break;
+                Collection<Couple<Node, IRINode>> neighbours = neighbours(current.getNode(), live);
+                for (Couple<Node, IRINode> couple : neighbours) {
+                    String propertyName = couple.y.getIRIValue();
+                    if (couple.x.getNodeType() == Node.TYPE_LITERAL) {
+                        boolean isName = propertyName.endsWith("label") || propertyName.endsWith("name") || propertyName.endsWith("title");
+                        if (isName) {
+                            current.setName((LiteralNode) couple.x);
                         }
-                    }
-                    if (!found) {
-                        parts.add(new XOWLImpactAnalysisResultPart(current, couple.y, couple.x));
+                    } else {
+                        if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
+                            current.addTpye((IRINode) couple.x);
+                            continue;
+                        }
+                        if (!applyLinkFilters(couple.y))
+                            continue;
+                        boolean found = false;
+                        for (XOWLImpactAnalysisResultPart part : parts) {
+                            if (part.getNode().equals(couple.x)) {
+                                part.addPaths(current, couple.y);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            parts.add(new XOWLImpactAnalysisResultPart(current, couple.y, (IRINode) couple.x));
+                        }
                     }
                 }
             }
-            if (current.getDegree() == setup.getDegree()){
-                Collection<Couple<IRINode, IRINode>> neighbours = neighbours(current.getNode(), live);
-                for (Couple<IRINode, IRINode> couple : neighbours) {
-                    if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
-                        current.addTpye(couple.x);
+            if (current.getDegree() == setup.getDegree()) {
+                Collection<Couple<Node, IRINode>> neighbours = neighbours(current.getNode(), live);
+                for (Couple<Node, IRINode> couple : neighbours) {
+                    String propertyName = couple.y.getIRIValue();
+                    if (couple.x.getNodeType() == Node.TYPE_LITERAL) {
+                        boolean isName = propertyName.endsWith("label") || propertyName.endsWith("name") || propertyName.endsWith("title");
+                        if (isName) {
+                            current.setName((LiteralNode) couple.x);
+                        }
+                    } else {
+                        if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
+                            current.addTpye((IRINode) couple.x);
+                        }
                     }
                 }
             }

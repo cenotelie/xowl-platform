@@ -58,5 +58,5 @@ public interface ImpactAnalysisResultPart extends Serializable {
      *
      * @return The associated paths
      */
-    Collection<Collection<Couple<IRINode, IRINode>>> getPaths();
+    Collection<Collection<Couple<String, IRINode>>> getPaths();
 }

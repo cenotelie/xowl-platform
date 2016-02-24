@@ -4,24 +4,26 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- *
+ * <p>
  * Contributors:
- *     Madeleine Wouters - woutersmadeleine@gmail.com
+ * Madeleine Wouters - woutersmadeleine@gmail.com
  ******************************************************************************/
 
 package org.xowl.platform.services.impact.impl;
 
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.LiteralNode;
+import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 
@@ -46,11 +48,15 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     /**
      * All the paths to reach the node
      */
-    private final Collection<Collection<Couple<IRINode, IRINode>>> paths;
+    private final Collection<Collection<Couple<String, IRINode>>> paths;
     /**
      * All the types of the node
      */
     private final Collection<IRINode> types;
+    /**
+     * The name of the node
+     */
+    private String name;
 
     /**
      * Initialization of this result part
@@ -64,6 +70,7 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
         this.degree = previous.degree + 1;
         this.paths = new ArrayList<>();
         this.types = new ArrayList<>();
+        this.name = node.getIRIValue();
         addPaths(previous, property);
     }
 
@@ -89,6 +96,14 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     }
 
     /**
+     * Set his name to the node
+     * @param node
+     */
+    public void setName(LiteralNode node) {
+        name = node.getLexicalValue();
+    }
+
+    /**
      * Add the new paths for reaching this node
      *
      * @param previous The previous node : where we come from
@@ -96,17 +111,17 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
      */
     public void addPaths(XOWLImpactAnalysisResultPart previous, IRINode property) {
         if (previous.paths.isEmpty()) {
-            Collection<Couple<IRINode, IRINode>> newPath = new ArrayList<>();
-            newPath.add(new Couple<>(previous.node, property));
+            Collection<Couple<String, IRINode>> newPath = new ArrayList<>();
+            newPath.add(new Couple<>(previous.name, property));
             paths.add(newPath);
         } else {
-            for (Collection<Couple<IRINode, IRINode>> path : previous.paths) {
-                Collection<Couple<IRINode, IRINode>> newPath = new ArrayList<>();
-                for (Couple<IRINode, IRINode> couple : path) {
-                    Couple<IRINode, IRINode> newCouple = new Couple<>(couple.x, couple.y);
+            for (Collection<Couple<String, IRINode>> path : previous.paths) {
+                Collection<Couple<String, IRINode>> newPath = new ArrayList<>();
+                for (Couple<String, IRINode> couple : path) {
+                    Couple<String, IRINode> newCouple = new Couple<>(couple.x, couple.y);
                     newPath.add(newCouple);
                 }
-                newPath.add(new Couple<>(previous.node, property));
+                newPath.add(new Couple<>(previous.name, property));
                 paths.add(newPath);
             }
         }
@@ -128,7 +143,7 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     }
 
     @Override
-    public Collection<Collection<Couple<IRINode, IRINode>>> getPaths() {
+    public Collection<Collection<Couple<String, IRINode>>> getPaths() {
         return Collections.unmodifiableCollection(paths);
     }
 
@@ -145,7 +160,9 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
         builder.append(IOUtils.escapeStringJSON(node.getIRIValue()));
         builder.append("\", \"degree\": ");
         builder.append(Integer.toString(degree));
-        builder.append(", \"types\": [");
+        builder.append(", \"name\": \"");
+        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append("\", \"types\": [");
         boolean first = true;
         for (IRINode type : types) {
             if (!first)
@@ -157,18 +174,18 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
         }
         builder.append("], \"paths\": [");
         first = true;
-        for (Collection<Couple<IRINode, IRINode>> path : paths) {
+        for (Collection<Couple<String, IRINode>> path : paths) {
             if (!first)
                 builder.append(", ");
             first = false;
             builder.append("{\"elements\": [");
             boolean f = true;
-            for (Couple<IRINode, IRINode> couple : path) {
+            for (Couple<String, IRINode> couple : path) {
                 if (!f)
                     builder.append(", ");
                 f = false;
                 builder.append("{\"target\": \"");
-                builder.append(IOUtils.escapeStringJSON(couple.x.getIRIValue()));
+                builder.append(IOUtils.escapeStringJSON(couple.x));
                 builder.append("\", \"property\": \"");
                 builder.append(IOUtils.escapeStringJSON(couple.y.getIRIValue()));
                 builder.append("\"}");

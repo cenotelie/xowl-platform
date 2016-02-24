@@ -3,6 +3,8 @@
 
 var xowl = new XOWL();
 var jobId = getParameterByName("id");
+var SCHEMAS = null;
+var RESULTS = null;
 
 function init() {
     setupPage(xowl);
@@ -10,13 +12,50 @@ function init() {
         if (isSuccess) {
             xowl.getJob(function (status, ct, content) {
                 if (status == 200) {
-                    renderResult(content);
+                    RESULTS = content;
+                    render();
                 } else {
                     displayMessage(getErrorFor(status, content));
                 }
             }, jobId);
         }
     });
+    xowl.getBusinessSchemas(function (status, ct, content) {
+        if (status == 200) {
+            SCHEMAS = content;
+            render();
+        } else {
+            displayMessage(getErrorFor(status, content));
+        }
+    });
+}
+
+function getTypeName(idType) {
+    for (var i = 0; i != SCHEMAS.length; i++) {
+        for (var j = 0; j != SCHEMAS[i].classes.length; j++) {
+            if (idType === SCHEMAS[i].classes[j].id) {
+                return SCHEMAS[i].name + " - " + SCHEMAS[i].classes[j].name;
+            }
+        }
+    }
+    return idType;
+}
+
+function getLinkName(idLink) {
+    for (var i = 0; i != SCHEMAS.length; i++) {
+        for (var j = 0; j != SCHEMAS[i].objectProperties.length; j++) {
+            if (idLink === SCHEMAS[i].objectProperties[j].id) {
+                return SCHEMAS[i].objectProperties[j].name;
+            }
+        }
+    }
+    return idLink;
+}
+
+function render() {
+    if (SCHEMAS === null || RESULTS === null)
+        return;
+    renderResult(RESULTS);
 }
 
 function renderResult(content) {
@@ -46,6 +85,7 @@ function renderResult(content) {
             row.appendChild(cell1);
             row.appendChild(cell2);
             row.appendChild(cell3);
+
             table.appendChild(row);
 
             var icon = document.createElement("img");
@@ -54,7 +94,8 @@ function renderResult(content) {
             icon.height = 40;
             icon.style.marginRight = "20px";
             cell1.appendChild(icon);
-            cell1.appendChild(document.createTextNode(names[i]));
+            cell1.appendChild(document.createTextNode(getTypeName(names[i])));
+            cell1.classList.add("entity" + (i % 2).toString());
 
             icon = document.createElement("img");
             icon.src = "/web/assets/element.svg";
@@ -63,8 +104,10 @@ function renderResult(content) {
             icon.style.marginRight = "20px";
             cell2.appendChild(icon);
             cell2.appendChild(document.createTextNode(map[names[i]][j].node));
+            cell2.classList.add("entity" + (i % 2).toString());
 
             cell3.appendChild(renderPaths(map[names[i]][j].paths, map[names[i]][j].node));
+            cell3.classList.add("entity" + (i % 2).toString());
         }
     }
 }
@@ -77,13 +120,30 @@ function renderPath(path, node) {
         span_target.appendChild(document.createTextNode(path.elements[i].target));
         span_target.classList.add("node");
         var span_property = document.createElement("span");
-        span_property.appendChild(document.createTextNode(path.elements[i].property));
+        span_property.appendChild(document.createTextNode(getLinkName(path.elements[i].property)));
         span_property.classList.add("link");
+
+        var span_design_target = document.createElement("span");
+        span_design_target.classList.add("glyphicon");
+        span_design_target.classList.add("glyphicon-asterisk");
+        div.appendChild(span_design_target);
+
         div.appendChild(span_target);
+
+        var span_design_property = document.createElement("span");
+        span_design_property.classList.add("glyphicon");
+        span_design_property.classList.add("glyphicon-resize-horizontal");
+        div.appendChild(span_design_property);
+
         div.appendChild(span_property);
     }
     var span_node = document.createElement("span");
     span_node.appendChild(document.createTextNode(node));
+    span_node.classList.add("node");
+    var span_design_target = document.createElement("span");
+    span_design_target.classList.add("glyphicon");
+    span_design_target.classList.add("glyphicon-asterisk");
+    div.appendChild(span_design_target);
     div.appendChild(span_node);
     return div;
 }

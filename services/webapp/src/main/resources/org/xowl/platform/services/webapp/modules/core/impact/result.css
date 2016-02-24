@@ -1,5 +1,5 @@
 .node {
-    color:red;
+    color: blueviolet;
 }
 
 .link {
@@ -10,4 +10,12 @@
     border: solid 1px black;
     display: block;
     margin: 2, 2, 2, 2;
+}
+
+.entity0 {
+	background-color: #EEEEFF;
+}
+
+.entity1 {
+	background-color: #EEFFEE;
 }

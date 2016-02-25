@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-platform</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.2.1-SNAPSHOT</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-satellites</artifactId>
 	<packaging>pom</packaging>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.1-SNAPSHOT</version>
 	<name>xOWL Federation - Satellites</name>
 	<description>The set of satellites components (deployed into client application) for the platform</description>
 	<modules>

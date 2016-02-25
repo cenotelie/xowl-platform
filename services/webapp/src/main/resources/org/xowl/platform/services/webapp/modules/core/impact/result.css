@@ -1,13 +1,13 @@
 .node {
-    color: blueviolet;
+    color: darkblue;
 }
 
 .link {
-    color: blue;
+    color: blueviolet;
 }
 
 .path {
-    border: solid 1px black;
+    border: dashed 1px black;
     display: block;
     margin: 2, 2, 2, 2;
 }

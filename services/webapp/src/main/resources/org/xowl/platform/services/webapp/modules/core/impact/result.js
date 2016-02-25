@@ -122,29 +122,34 @@ function renderPath(path, name) {
         var span_property = document.createElement("span");
         span_property.appendChild(document.createTextNode(getLinkName(path.elements[i].property)));
         span_property.classList.add("link");
-
-        var span_design_target = document.createElement("span");
-        span_design_target.classList.add("glyphicon");
-        span_design_target.classList.add("glyphicon-asterisk");
-        div.appendChild(span_design_target);
-
+        
+        var icon_element = document.createElement("img");
+        icon_element.src = "/web/assets/element.svg";
+        icon_element.width = 20;
+        icon_element.height = 20;
+        icon_element.style.marginRight = "5px";
+        div.appendChild(icon_element);
         div.appendChild(span_target);
-
-        var span_design_property = document.createElement("span");
-        span_design_property.classList.add("glyphicon");
-        span_design_property.classList.add("glyphicon-resize-horizontal");
-        div.appendChild(span_design_property);
-
+        
+        var icon_link = document.createElement("img");
+        icon_link.src = "/web/assets/relation.svg";
+        icon_link.width = 20;
+        icon_link.height = 20;
+        icon_link.style.marginRight = "5px";
+        div.appendChild(icon_link);
         div.appendChild(span_property);
     }
     var span_node = document.createElement("span");
     span_node.appendChild(document.createTextNode(name));
     span_node.classList.add("node");
-    var span_design_target = document.createElement("span");
-    span_design_target.classList.add("glyphicon");
-    span_design_target.classList.add("glyphicon-asterisk");
-    div.appendChild(span_design_target);
+    var icon_element = document.createElement("img");
+    icon_element.src = "/web/assets/element.svg";
+    icon_element.width = 20;
+    icon_element.height = 20;
+    icon_element.style.marginRight = "5px";
+    div.appendChild(icon_element);
     div.appendChild(span_node);
+
     return div;
 }
 

@@ -165,7 +165,7 @@ function renderCriterion(criterion) {
     var cell1 = document.createElement("td");
     cell1.appendChild(button);
     var icon = document.createElement("img");
-	icon.src = "/web/assets/evaluation.svg";
+	icon.src = "/web/assets/criterion.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

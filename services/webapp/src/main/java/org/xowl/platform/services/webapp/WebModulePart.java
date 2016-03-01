@@ -37,16 +37,22 @@ public class WebModulePart implements Serializable {
      * The URI element for this part
      */
     private final String uri;
+    /**
+     * The URI for the icon, if any
+     */
+    private final String icon;
 
     /**
      * Initializes this web module part
      *
      * @param name The name of this part
      * @param uri  The URI element for this part
+     * @param icon The URI for the icon, if any
      */
-    public WebModulePart(String name, String uri) {
+    public WebModulePart(String name, String uri, String icon) {
         this.name = name;
         this.uri = uri;
+        this.icon = icon;
     }
 
     /**
@@ -78,6 +84,8 @@ public class WebModulePart implements Serializable {
                 IOUtils.escapeStringJSON(name) +
                 "\", \"uri\": \"" +
                 IOUtils.escapeStringJSON(uri) +
+                "\", \"icon\": \"" +
+                (icon == null ? "" : IOUtils.escapeStringJSON(icon)) +
                 "\"}";
     }
 }

@@ -45,6 +45,13 @@ public interface WebModuleService extends Service, Serializable {
     String getURI();
 
     /**
+     * Gets the icon for this module, if any
+     *
+     * @return The icon for this module, if any
+     */
+    String getIcon();
+
+    /**
      * Gets the parts for this module, if any
      *
      * @return The parts for this module

@@ -41,19 +41,31 @@ function renderModule(myModule) {
 	panel.classList.add("panel-default");
 	var header = document.createElement("div");
 	header.classList.add("panel-heading");
+	var icon = document.createElement("img");
+	icon.src = myModule.icon;
+	icon.width = 30;
+	icon.height = 30;
+	icon.style.marginRight = "20px";
 	var linkModule = document.createElement("a");
 	linkModule.appendChild(document.createTextNode(myModule.name));
 	linkModule.href = "/web/modules/" + myModule.uri + "/";
+	header.appendChild(icon);
 	header.appendChild(linkModule);
 	var body = document.createElement("div");
 	body.classList.add("panel-body");
 	for (var i = 0; i != myModule.parts.length; i++) {
 		var part = myModule.parts[i];
 		var li = document.createElement("div");
+		icon = document.createElement("img");
+		icon.src = part.icon;
+		icon.width = 30;
+		icon.height = 30;
+		icon.style.marginRight = "20px";
 		var link = document.createElement("a");
 		link.appendChild(document.createTextNode(part.name));
 		link.classList.add("btn");
 		link.href = "/web/modules/" + myModule.uri + "/" + part.uri + "/";
+		li.appendChild(icon);
 		li.appendChild(link);
 		body.appendChild(li);
 	}

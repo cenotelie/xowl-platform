@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-satellites</artifactId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.2.1</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-satellite-base</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.2.1-SNAPSHOT</version>
+	<version>0.2.1</version>
 	<name>xOWL Federation - Satellite Base</name>
 	<description>Base API for accessing a remote platform</description>
 	<dependencies>

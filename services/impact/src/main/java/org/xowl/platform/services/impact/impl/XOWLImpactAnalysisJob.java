@@ -36,6 +36,7 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
+import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
@@ -161,8 +162,8 @@ class XOWLImpactAnalysisJob extends JobBase {
      */
     private boolean applyTypeFilter(XOWLImpactAnalysisResultPart part) {
         for (IRINode type : part.getTypes()) {
-            for (ImpactAnalysisFilterLink filter : setup.getWalkerFilters()) {
-                boolean match = filter.apply(type);
+            for (ImpactAnalysisFilterType filter : setup.getResultFilter()) {
+                boolean match = filter.apply(type, type);
                 if (setup.isResultFilterInclusive()) {
                     if (match)
                         return true;

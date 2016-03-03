@@ -37,15 +37,15 @@ public class XOWLCoreModule extends WebModuleServiceBase {
      * Initializes this service
      */
     public XOWLCoreModule() {
-        super(XOWLCoreModule.class.getCanonicalName(), "Core Module", "core");
-        this.parts.add(new WebModulePart("Artifacts Management", "artifacts"));
-        this.parts.add(new WebModulePart("Consistency Management", "consistency"));
-        this.parts.add(new WebModulePart("Traceability Exploration", "discovery"));
-        this.parts.add(new WebModulePart("Impact Analysis", "impact"));
-        this.parts.add(new WebModulePart("Evaluation Analysis", "evaluation"));
-        this.parts.add(new WebModulePart("Platform Connectors Management", "connectors"));
-        this.parts.add(new WebModulePart("Platform Job Management", "jobs"));
-        this.parts.add(new WebModulePart("Platform Properties", "platform"));
+        super(XOWLCoreModule.class.getCanonicalName(), "Core Module", "core", "/web/assets/xowl.svg");
+        this.parts.add(new WebModulePart("Artifacts Management", "artifacts", "/web/assets/artifact.svg"));
+        this.parts.add(new WebModulePart("Consistency Management", "consistency", "/web/assets/consistency.svg"));
+        this.parts.add(new WebModulePart("Traceability Exploration", "discovery", "/web/assets/exploration.svg"));
+        this.parts.add(new WebModulePart("Impact Analysis", "impact", "/web/assets/impact.svg"));
+        this.parts.add(new WebModulePart("Evaluation Analysis", "evaluation", "/web/assets/evaluation.svg"));
+        this.parts.add(new WebModulePart("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
+        this.parts.add(new WebModulePart("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
+        this.parts.add(new WebModulePart("Platform Properties", "platform", "/web/assets/information.svg"));
     }
 
     @Override

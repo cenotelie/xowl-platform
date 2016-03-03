@@ -47,6 +47,10 @@ public abstract class WebModuleServiceBase implements WebModuleService {
      */
     protected final String uri;
     /**
+     * The icon for this module, if any
+     */
+    protected final String icon;
+    /**
      * The parts of this module
      */
     protected final List<WebModulePart> parts;
@@ -57,11 +61,13 @@ public abstract class WebModuleServiceBase implements WebModuleService {
      * @param identifier The service's identifier
      * @param name       The service's human readable name
      * @param uri        The service URI part
+     * @param icon       The icon for this module, if any
      */
-    public WebModuleServiceBase(String identifier, String name, String uri) {
+    public WebModuleServiceBase(String identifier, String name, String uri, String icon) {
         this.identifier = identifier;
         this.name = name;
         this.uri = uri;
+        this.icon = icon;
         this.parts = new ArrayList<>(5);
     }
 
@@ -78,6 +84,11 @@ public abstract class WebModuleServiceBase implements WebModuleService {
     @Override
     public String getURI() {
         return uri;
+    }
+
+    @Override
+    public String getIcon() {
+        return icon;
     }
 
     @Override
@@ -102,6 +113,8 @@ public abstract class WebModuleServiceBase implements WebModuleService {
         builder.append(IOUtils.escapeStringJSON(getName()));
         builder.append("\", \"uri\": \"");
         builder.append(IOUtils.escapeStringJSON(getURI()));
+        builder.append("\", \"icon\": \"");
+        builder.append(getIcon() == null ? "" : IOUtils.escapeStringJSON(getIcon()));
         builder.append("\", \"parts\": [");
         for (int i = 0; i != parts.size(); i++) {
             if (i != 0)

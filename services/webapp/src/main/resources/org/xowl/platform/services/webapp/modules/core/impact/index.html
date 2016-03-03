@@ -59,7 +59,7 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <label>Choose the root:</label>
+                            <label>Analysis Root:</label>
                             <p>This is the element the analysis will begin with.</p>
                         </div>
                     </div>
@@ -67,21 +67,21 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <img src="/web/assets/schema.svg" width="40" height="40"></img>
-                                <label for="root-schema">First, choose the schema:</label>
+                                <label for="root-schema">Schema for root's type:</label>
                                 <select class="form-control" id="root-schema" onchange="onSchemaChange()"></select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <img src="/web/assets/concept.svg" width="40" height="40"></img>
-                                <label for="root-type">Then, choose the type:</label>
+                                <label for="root-type">Root's type:</label>
                                 <select class="form-control" id="root-type" onchange="onTypeChange()"></select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <img src="/web/assets/element.svg" width="40" height="40"></img>
-                                <label for="root-element">Finally, choose the element:</label>
+                                <label for="root-element">Root element:</label>
                                 <select class="form-control" id="root-element"></select>
                             </div>
                         </div>
@@ -92,9 +92,9 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="form-group">
-                            <label for="degree">Choose a degree:</label>
-                            <input type="number" class="form-control" id="degree" min="1" step="1" value="1">
-                            <p>Number of hops between the root and the last node found</p>
+                            <label for="degree">Max Distance:</label>
+                            <input type="number" class="form-control" id="degree" min="1" step="1" value="5">
+                            <p>The maximum number of hops between an element and the root.</p>
                         </div>
                     </div>
                 </div>

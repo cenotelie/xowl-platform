@@ -29,6 +29,12 @@ function renderSchemas(schemas) {
     var select_types = document.getElementById("filters-types-schema");
 
     for (var i = 0; i != schemas.length; i++) {
+        schemas[i].classes.sort(function(x, y) {
+             return x.name.localeCompare(y.name);
+        });
+        schemas[i].objectProperties.sort(function(x, y) {
+             return x.name.localeCompare(y.name);
+        });
         var option = document.createElement("option");
         option.value = schemas[i].id;
         option.appendChild(document.createTextNode(schemas[i].name));

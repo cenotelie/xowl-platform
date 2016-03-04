@@ -24,9 +24,9 @@ import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisResult;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Implements the result of an impact analysis
@@ -37,17 +37,15 @@ class XOWLImpactAnalysisResult implements ImpactAnalysisResult {
     /**
      * The result parts
      */
-    private final Collection<ImpactAnalysisResultPart> parts;
+    private final List<? extends ImpactAnalysisResultPart> parts;
 
     /**
      * Initializes this result
      *
      * @param parts The result parts
      */
-    public XOWLImpactAnalysisResult(Collection<XOWLImpactAnalysisResultPart> parts) {
-        this.parts = new ArrayList<>(parts.size());
-        for (ImpactAnalysisResultPart part : parts)
-            this.parts.add(part);
+    public XOWLImpactAnalysisResult(List<XOWLImpactAnalysisResultPart> parts) {
+        this.parts = parts;
     }
 
     @Override
@@ -65,12 +63,10 @@ class XOWLImpactAnalysisResult implements ImpactAnalysisResult {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
         builder.append(IOUtils.escapeStringJSON(ImpactAnalysisResult.class.getCanonicalName()));
         builder.append("\", \"parts\": [");
-        boolean first = true;
-        for (ImpactAnalysisResultPart part : parts) {
-            if (!first)
+        for (int i = 0; i != parts.size(); i++) {
+            if (i > 0)
                 builder.append(", ");
-            first = false;
-            builder.append(part.serializedJSON());
+            builder.append(parts.get(i).serializedJSON());
         }
         builder.append("]}");
         return builder.toString();

@@ -96,13 +96,9 @@ class XOWLImpactAnalysisJob extends JobBase {
             return;
         }
         TripleStore live = tripleStoreService.getLiveStore();
-        List<XOWLImpactAnalysisResultPart> parts = browseGraph(live);
         List<XOWLImpactAnalysisResultPart> finalParts = new ArrayList<>();
-        for (XOWLImpactAnalysisResultPart part : parts) {
-            if (applyTypeFilter(part))
-                finalParts.add(part);
-        }
         result = new XSPReplyResult<>(new XOWLImpactAnalysisResult(finalParts));
+        browseGraph(live, finalParts);
     }
 
     /**
@@ -181,10 +177,10 @@ class XOWLImpactAnalysisJob extends JobBase {
     /**
      * Browse the graph while applying the link filters on it
      *
-     * @param live The live data base
-     * @return The list of nodes founded with their characteristics
+     * @param live       The live data base
+     * @param finalParts The result parts to build
      */
-    private List<XOWLImpactAnalysisResultPart> browseGraph(TripleStore live) {
+    private void browseGraph(TripleStore live, List<XOWLImpactAnalysisResultPart> finalParts) {
         List<XOWLImpactAnalysisResultPart> parts = new ArrayList<>();
         parts.add(new XOWLImpactAnalysisResultPart(setup.getRoot()));
         int i = 0;
@@ -236,8 +232,9 @@ class XOWLImpactAnalysisJob extends JobBase {
                     }
                 }
             }
+            if (applyTypeFilter(current))
+                finalParts.add(current);
             i++;
         }
-        return parts;
     }
 }

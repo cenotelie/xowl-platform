@@ -29,6 +29,7 @@ import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Define the result node
@@ -47,7 +48,7 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     /**
      * All the paths to reach the node
      */
-    private final Collection<Collection<Couple<String, IRINode>>> paths;
+    private final Collection<List<Couple<ImpactAnalysisResultPart, IRINode>>> paths;
     /**
      * All the types of the node
      */
@@ -111,17 +112,23 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
      */
     public void addPaths(XOWLImpactAnalysisResultPart previous, IRINode property) {
         if (previous.paths.isEmpty()) {
-            Collection<Couple<String, IRINode>> newPath = new ArrayList<>();
-            newPath.add(new Couple<>(previous.name, property));
+            // the previous node is the root
+            List<Couple<ImpactAnalysisResultPart, IRINode>> newPath = new ArrayList<>();
+            newPath.add(new Couple<ImpactAnalysisResultPart, IRINode>(previous, property));
             paths.add(newPath);
         } else {
-            for (Collection<Couple<String, IRINode>> path : previous.paths) {
-                Collection<Couple<String, IRINode>> newPath = new ArrayList<>();
-                for (Couple<String, IRINode> couple : path) {
-                    Couple<String, IRINode> newCouple = new Couple<>(couple.x, couple.y);
-                    newPath.add(newCouple);
+            for (List<Couple<ImpactAnalysisResultPart, IRINode>> path : previous.paths) {
+                boolean isValid = true; // flag whether the path already contains this node as an antecedent
+                for (Couple<ImpactAnalysisResultPart, IRINode> part : path) {
+                    if (part.x == this) {
+                        isValid = false;
+                        break;
+                    }
                 }
-                newPath.add(new Couple<>(previous.name, property));
+                if (!isValid)
+                    continue;
+                List<Couple<ImpactAnalysisResultPart, IRINode>> newPath = new ArrayList<>(path);
+                newPath.add(new Couple<ImpactAnalysisResultPart, IRINode>(previous, property));
                 paths.add(newPath);
             }
         }
@@ -143,7 +150,12 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     }
 
     @Override
-    public Collection<Collection<Couple<String, IRINode>>> getPaths() {
+    public String getName() {
+        return name != null ? name : node.getIRIValue();
+    }
+
+    @Override
+    public Collection<List<Couple<ImpactAnalysisResultPart, IRINode>>> getPaths() {
         return Collections.unmodifiableCollection(paths);
     }
 
@@ -174,20 +186,19 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
         }
         builder.append("], \"paths\": [");
         first = true;
-        for (Collection<Couple<String, IRINode>> path : paths) {
+        for (List<Couple<ImpactAnalysisResultPart, IRINode>> path : paths) {
             if (!first)
                 builder.append(", ");
             first = false;
             builder.append("{\"elements\": [");
-            boolean f = true;
-            for (Couple<String, IRINode> couple : path) {
-                if (!f)
+            for (int i = 0; i != path.size(); i++) {
+                if (i > 0)
                     builder.append(", ");
-                f = false;
+                Couple<ImpactAnalysisResultPart, IRINode> part = path.get(i);
                 builder.append("{\"target\": \"");
-                builder.append(IOUtils.escapeStringJSON(couple.x));
+                builder.append(IOUtils.escapeStringJSON(part.x.getName()));
                 builder.append("\", \"property\": \"");
-                builder.append(IOUtils.escapeStringJSON(couple.y.getIRIValue()));
+                builder.append(IOUtils.escapeStringJSON(part.y.getIRIValue()));
                 builder.append("\"}");
             }
             builder.append("]}");

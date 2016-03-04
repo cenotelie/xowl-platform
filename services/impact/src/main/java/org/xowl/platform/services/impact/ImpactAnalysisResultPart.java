@@ -25,6 +25,7 @@ import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.utils.collections.Couple;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * An element of result for an impact analysis
@@ -54,9 +55,17 @@ public interface ImpactAnalysisResultPart extends Serializable {
     Collection<IRINode> getTypes();
 
     /**
+     * Gets the name of the associated node
+     *
+     * @return The name of the associated node
+     */
+    String getName();
+
+    /**
      * Get the associated paths : all the paths to reach this node from the root
+     * A path is an ordered list of couples representing transitions as the previous node and the used property
      *
      * @return The associated paths
      */
-    Collection<Collection<Couple<String, IRINode>>> getPaths();
+    Collection<List<Couple<ImpactAnalysisResultPart, IRINode>>> getPaths();
 }

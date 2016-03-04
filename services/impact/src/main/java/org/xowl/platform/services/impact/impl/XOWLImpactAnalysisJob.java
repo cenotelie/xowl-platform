@@ -28,7 +28,6 @@ import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -117,16 +116,6 @@ class XOWLImpactAnalysisJob extends JobBase {
                 Node property = quad.getProperty();
                 if ((neighbour.getNodeType() == Node.TYPE_IRI) || (neighbour.getNodeType() == Node.TYPE_LITERAL))
                     values.add(new Couple<>(neighbour, (IRINode) property));
-            }
-        }
-        result = live.sparql("SELECT DISTINCT ?x ?p WHERE { GRAPH ?g {?x ?p <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + "> " + "}}");
-        if (result.isSuccess()) {
-            for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
-                Node neighbour = solution.get("x");
-                Node property = solution.get("p");
-                if (neighbour.getNodeType() == Node.TYPE_IRI) {
-                    values.add(new Couple<>(neighbour, (IRINode) property));
-                }
             }
         }
         return values;

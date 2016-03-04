@@ -243,6 +243,16 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 	}, "services/core/artifacts?quads=content&id=" + encodeURIComponent(artifactId));
 }
 
+XOWL.prototype.deleteArtifact = function (callback, artifactId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/artifacts?action=delete&id=" + encodeURIComponent(artifactId), {});
+}
+
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {

@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var ARTIFACTID = getParameterByName("id");
 var METADATA = null;
 var CONTENT = null;
+var JOB = null;
 
 function init() {
 	setupPage(xowl);
@@ -24,12 +25,42 @@ function init() {
 function onClickRetrieveContent() {
 	if (ARTIFACTID === null || ARTIFACTID == "")
 		return;
+	if (JOB !== null) {
+		alert("Please wait for the previous action to terminate.");
+		return;
+	}
+	JOB = "reserved";
 	displayMessage("Loading ...");
 	xowl.getArtifactContent(function (status, ct, content) {
 		if (status == 200) {
 			renderContent(content);
+			JOB = null;
 		} else {
 			displayMessage(getErrorFor(status, content));
+			JOB = null;
+		}
+	}, ARTIFACTID);
+}
+
+function onClickDelete() {
+	if (ARTIFACTID === null || ARTIFACTID == "")
+		return;
+	if (JOB !== null) {
+		alert("Please wait for the previous action to terminate.");
+		return;
+	}
+	JOB = "reserved";
+	displayMessage("Working ...");
+	xowl.deleteArtifact(function (status, ct, content) {
+		if (status == 200) {
+			trackJob(content.identifier, "Working ...", function (isSuccess) {
+				if (isSuccess)
+					window.location.href = "/web/modules/core/artifacts/";
+				JOB = null;
+			});
+		} else {
+			displayMessage(getErrorFor(status, content));
+			JOB = null;
 		}
 	}, ARTIFACTID);
 }

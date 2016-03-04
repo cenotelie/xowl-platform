@@ -4,18 +4,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Lesser General
  * Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
- * <p>
+ *
  * Contributors:
- * Madeleine Wouters - woutersmadeleine@gmail.com
+ *     Madeleine Wouters - woutersmadeleine@gmail.com
  ******************************************************************************/
 
 package org.xowl.platform.services.impact.impl;
@@ -25,11 +25,9 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.store.rdf.LiteralNode;
-import org.xowl.infra.store.rdf.Node;
-import org.xowl.infra.store.rdf.QuerySolution;
+import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -115,20 +113,24 @@ class XOWLImpactAnalysisJob extends JobBase {
      * @return The collection of neighbours founded and their property
      */
     private Collection<Couple<Node, IRINode>> neighbours(IRINode subject, TripleStore live) {
-        Result result = live.sparql("SELECT DISTINCT ?x ?p WHERE { GRAPH ?g { <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + "> ?p ?x" + " } }");
         Collection<Couple<Node, IRINode>> values = new ArrayList<>();
-        for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
-            Node neighbour = solution.get("x");
-            Node property = solution.get("p");
-            if ((neighbour.getNodeType() == Node.TYPE_IRI) || (neighbour.getNodeType() == Node.TYPE_LITERAL))
-                values.add(new Couple<>(neighbour, (IRINode) property));
+        Result result = live.sparql("DESCRIBE <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + ">");
+        if (result.isSuccess()) {
+            for (Quad quad : ((ResultQuads) result).getQuads()) {
+                Node neighbour = quad.getObject();
+                Node property = quad.getProperty();
+                if ((neighbour.getNodeType() == Node.TYPE_IRI) || (neighbour.getNodeType() == Node.TYPE_LITERAL))
+                    values.add(new Couple<>(neighbour, (IRINode) property));
+            }
         }
         result = live.sparql("SELECT DISTINCT ?x ?p WHERE { GRAPH ?g {?x ?p <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + "> " + "}}");
-        for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
-            Node neighbour = solution.get("x");
-            Node property = solution.get("p");
-            if (neighbour.getNodeType() == Node.TYPE_IRI) {
-                values.add(new Couple<>(neighbour, (IRINode) property));
+        if (result.isSuccess()) {
+            for (QuerySolution solution : ((ResultSolutions) result).getSolutions()) {
+                Node neighbour = solution.get("x");
+                Node property = solution.get("p");
+                if (neighbour.getNodeType() == Node.TYPE_IRI) {
+                    values.add(new Couple<>(neighbour, (IRINode) property));
+                }
             }
         }
         return values;

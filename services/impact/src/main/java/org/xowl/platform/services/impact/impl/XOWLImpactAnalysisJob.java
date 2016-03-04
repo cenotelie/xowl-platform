@@ -24,11 +24,14 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.logging.Logger;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
@@ -41,6 +44,7 @@ import org.xowl.platform.services.lts.TripleStoreService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a job that performs an impact analysis
@@ -101,27 +105,6 @@ class XOWLImpactAnalysisJob extends JobBase {
     }
 
     /**
-     * Find all neighbours and their property associated of a subject (the current node)
-     *
-     * @param subject The current node
-     * @param live    Live data base
-     * @return The collection of neighbours founded and their property
-     */
-    private Collection<Couple<Node, IRINode>> neighbours(IRINode subject, TripleStore live) {
-        Collection<Couple<Node, IRINode>> values = new ArrayList<>();
-        Result result = live.sparql("DESCRIBE <" + IOUtils.escapeStringW3C(subject.getIRIValue()) + ">");
-        if (result.isSuccess()) {
-            for (Quad quad : ((ResultQuads) result).getQuads()) {
-                Node neighbour = quad.getObject();
-                Node property = quad.getProperty();
-                if ((neighbour.getNodeType() == Node.TYPE_IRI) || (neighbour.getNodeType() == Node.TYPE_LITERAL))
-                    values.add(new Couple<>(neighbour, (IRINode) property));
-            }
-        }
-        return values;
-    }
-
-    /**
      * Compare the current link to the filters
      *
      * @param link The current link
@@ -174,56 +157,102 @@ class XOWLImpactAnalysisJob extends JobBase {
         parts.add(new XOWLImpactAnalysisResultPart(setup.getRoot()));
         int i = 0;
         while (i != parts.size()) {
-            XOWLImpactAnalysisResultPart current = parts.get(i);
-            if (current.getDegree() < setup.getDegree()) {
-                Collection<Couple<Node, IRINode>> neighbours = neighbours(current.getNode(), live);
-                for (Couple<Node, IRINode> couple : neighbours) {
-                    String propertyName = couple.y.getIRIValue();
-                    if (couple.x.getNodeType() == Node.TYPE_LITERAL) {
-                        boolean isName = propertyName.endsWith("label") || propertyName.endsWith("name") || propertyName.endsWith("title");
-                        if (isName) {
-                            current.setName((LiteralNode) couple.x);
-                        }
-                    } else {
-                        if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
-                            current.addTpye((IRINode) couple.x);
-                            continue;
-                        }
-                        if (!applyLinkFilters(couple.y))
-                            continue;
-                        boolean found = false;
-                        for (XOWLImpactAnalysisResultPart part : parts) {
-                            if (part.getNode().equals(couple.x)) {
-                                part.addPaths(current, couple.y);
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            parts.add(new XOWLImpactAnalysisResultPart(current, couple.y, (IRINode) couple.x));
-                        }
+            int length = browseGraph(live, parts, i);
+            if (length == 0)
+                return;
+            for (int j = i; j != i + length; j++) {
+                XOWLImpactAnalysisResultPart current = parts.get(j);
+                if (applyTypeFilter(current))
+                    finalParts.add(current);
+            }
+            i += length;
+        }
+    }
+
+    /**
+     * Browses the graph for a range of nodes
+     *
+     * @param live  The live data base
+     * @param parts The current parts
+     * @param start The starting index of the parts to explorer
+     * @return The number of parts explored
+     */
+    private int browseGraph(TripleStore live, List<XOWLImpactAnalysisResultPart> parts, int start) {
+        int length = parts.size() - start;
+        StringBuilder builder = new StringBuilder("DESCRIBE");
+        for (int i = start; i != parts.size(); i++) {
+            builder.append(" <");
+            builder.append(IOUtils.escapeAbsoluteURIW3C(parts.get(i).getNode().getIRIValue()));
+            builder.append(">");
+        }
+        Result result = live.sparql(builder.toString());
+        if (!result.isSuccess()) {
+            Logger.DEFAULT.error(((ResultFailure) result).getMessage());
+            return 0;
+        }
+        Collection<Quad> quads = ((ResultQuads) result).getQuads();
+        Map<SubjectNode, Collection<Quad>> data = PlatformUtils.mapBySubject(quads);
+        for (Map.Entry<SubjectNode, Collection<Quad>> entry : data.entrySet()) {
+            if (entry.getKey().getNodeType() == Node.TYPE_IRI)
+                browseGraph(parts, start, (IRINode) entry.getKey(), entry.getValue());
+        }
+        return length;
+    }
+
+    /**
+     * Browses the graph for a set of new quads
+     *
+     * @param parts   The current parts
+     * @param start   The starting index of the parts to explorer
+     * @param subject The subject to look for
+     * @param quads   The incoming quads
+     */
+    private void browseGraph(List<XOWLImpactAnalysisResultPart> parts, int start, IRINode subject, Collection<Quad> quads) {
+        for (int i = start; i != parts.size(); i++) {
+            if (RDFUtils.same(parts.get(i).getNode(), subject)) {
+                browseGraph(parts, parts.get(i), quads);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Browses the graph for a set of new quads
+     *
+     * @param parts   The current parts
+     * @param current The current part to explore
+     * @param quads   The incoming quads
+     */
+    private void browseGraph(List<XOWLImpactAnalysisResultPart> parts, XOWLImpactAnalysisResultPart current, Collection<Quad> quads) {
+        for (Quad quad : quads) {
+            IRINode property = (IRINode) quad.getProperty();
+            String propertyName = property.getIRIValue();
+            if (quad.getObject().getNodeType() == Node.TYPE_LITERAL) {
+                boolean isName = propertyName.endsWith("label") || propertyName.endsWith("name") || propertyName.endsWith("title");
+                if (isName) {
+                    current.setName((LiteralNode) quad.getObject());
+                }
+            } else if (quad.getObject().getNodeType() == Node.TYPE_IRI) {
+                if (Vocabulary.rdfType.equals(propertyName)) {
+                    current.addTpye((IRINode) quad.getObject());
+                    continue;
+                }
+                if (!applyLinkFilters(property))
+                    continue;
+                if (current.getDegree() >= setup.getDegree())
+                    continue;
+                boolean found = false;
+                for (XOWLImpactAnalysisResultPart part : parts) {
+                    if (part.getNode().equals(quad.getObject())) {
+                        part.addPaths(current, property);
+                        found = true;
+                        break;
                     }
                 }
-            }
-            if (current.getDegree() == setup.getDegree()) {
-                Collection<Couple<Node, IRINode>> neighbours = neighbours(current.getNode(), live);
-                for (Couple<Node, IRINode> couple : neighbours) {
-                    String propertyName = couple.y.getIRIValue();
-                    if (couple.x.getNodeType() == Node.TYPE_LITERAL) {
-                        boolean isName = propertyName.endsWith("label") || propertyName.endsWith("name") || propertyName.endsWith("title");
-                        if (isName) {
-                            current.setName((LiteralNode) couple.x);
-                        }
-                    } else {
-                        if (Vocabulary.rdfType.equals(couple.y.getIRIValue())) {
-                            current.addTpye((IRINode) couple.x);
-                        }
-                    }
+                if (!found) {
+                    parts.add(new XOWLImpactAnalysisResultPart(current, property, (IRINode) quad.getObject()));
                 }
             }
-            if (applyTypeFilter(current))
-                finalParts.add(current);
-            i++;
         }
     }
 }

@@ -29,11 +29,11 @@ function renderSchemas(schemas) {
     var select_types = document.getElementById("filters-types-schema");
 
     for (var i = 0; i != schemas.length; i++) {
-        schemas[i].classes.sort(function(x, y) {
-             return x.name.localeCompare(y.name);
+        schemas[i].classes.sort(function (x, y) {
+            return x.name.localeCompare(y.name);
         });
-        schemas[i].objectProperties.sort(function(x, y) {
-             return x.name.localeCompare(y.name);
+        schemas[i].objectProperties.sort(function (x, y) {
+            return x.name.localeCompare(y.name);
         });
         var option = document.createElement("option");
         option.value = schemas[i].id;
@@ -129,7 +129,11 @@ function renderElements(data) {
         var name = entity.id;
         for (var j = 0; j != entity.properties.length; j++) {
             var property = entity.properties[j];
-            // TODO: look for the entity name here
+            if (property.id.endsWith("name") || property.id.endsWith("label") || property.id.endsWith("title")) {
+                var value = property.value;
+                name = value.hasOwnProperty("lexical") ? value.lexical : value.value;
+                name += " (" + entity.id + ")";
+            }
         }
         var option = document.createElement("option");
         option.value = entity.id;
@@ -206,13 +210,13 @@ function onClickRun() {
     if (select_root.selectedIndex < 0) {
         return;
     }
-    var  filterLinks = [];
+    var filterLinks = [];
     for (var i = 0; i != FILTER_LINKS.length; i++) {
         filterLinks.push({
             filtered: FILTER_LINKS[i]
         });
     }
-    var  filterTypes = [];
+    var filterTypes = [];
     for (var i = 0; i != FILTER_TYPES.length; i++) {
         filterTypes.push({
             filtered: FILTER_TYPES[i]

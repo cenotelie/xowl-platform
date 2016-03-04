@@ -60,9 +60,10 @@ function render() {
 
 function renderResult(content) {
     var table = document.getElementById("result");
+
+    var isFilterInclusive = content.payload.isFilterResultsInclusive;
     var parts = content.result.payload.parts;
     var map = {};
-
 
     for (var i = 0; i != parts.length; i++) {
         var types = parts[i].types;
@@ -77,6 +78,16 @@ function renderResult(content) {
 
     var names = Object.getOwnPropertyNames(map);
     for (var i = 0; i != names.length; i++) {
+        var isMatch = false;
+        for (var j = 0; j != content.payload.filterResults.length; j++) {
+            if (content.payload.filterResults[j].filtered === names[i]) {
+                isMatch = true;
+                break;
+            }
+        }
+        if (isMatch !== content.payload.isFilterResultsInclusive)
+            continue;
+
         for (var j = 0; j != map[names[i]].length; j++) {
             var row = document.createElement("tr");
             var cell1 = document.createElement("td");
@@ -122,7 +133,7 @@ function renderPath(path, name) {
         var span_property = document.createElement("span");
         span_property.appendChild(document.createTextNode(getLinkName(path.elements[i].property)));
         span_property.classList.add("link");
-        
+
         var icon_element = document.createElement("img");
         icon_element.src = "/web/assets/element.svg";
         icon_element.width = 20;
@@ -130,7 +141,7 @@ function renderPath(path, name) {
         icon_element.style.marginRight = "5px";
         div.appendChild(icon_element);
         div.appendChild(span_target);
-        
+
         var icon_link = document.createElement("img");
         icon_link.src = "/web/assets/relation.svg";
         icon_link.width = 20;

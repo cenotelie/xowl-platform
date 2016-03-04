@@ -3,7 +3,7 @@
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-platform</artifactId>
 	<packaging>pom</packaging>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.3</version>
 	<name>xOWL Federation</name>
 	<description>A platform for the federation of models and data supported by semantic web technologies.</description>
 	<url>https://xowl.org/</url>
@@ -29,7 +29,7 @@
 		<connection>scm:hg:https://bitbucket.org/laurentw/xowl-platform</connection>
 		<developerConnection>scm:hg:ssh://hg@bitbucket.org:laurentw/xowl-platform</developerConnection>
 		<url>https://bitbucket.org/laurentw/xowl-platform</url>
-		<tag>HEAD</tag>
+		<tag>v0.2.3</tag>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>

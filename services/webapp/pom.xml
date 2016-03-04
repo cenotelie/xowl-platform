@@ -3,19 +3,19 @@
 	<parent>
 		<groupId>org.xowl.platform</groupId>
 		<artifactId>xowl-services</artifactId>
-		<version>0.2.3-SNAPSHOT</version>
+		<version>0.2.3</version>
 	</parent>
 	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-service-webapp</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.3</version>
 	<name>xOWL Federation - Service Web Application</name>
 	<description>The web application client for the xOWL platform</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-kernel</artifactId>
-			<version>0.2.3-SNAPSHOT</version>
+			<version>0.2.3</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

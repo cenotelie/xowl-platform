@@ -2,18 +2,40 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var DEFAULT_QUERY =
-	"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-	"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-	"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
-	"PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>\n\n" +
-	"SELECT DISTINCT ?x ?y WHERE { GRAPH ?g { ?x a ?y } }";
+var SCHEMAS = null;
 var HISTORY = [];
 
 function init() {
 	setupPage(xowl);
-	document.getElementById("sparql").value = DEFAULT_QUERY;
+	displayMessage("Loading ...");
+	xowl.getBusinessSchemas(function (status, ct, content) {
+		if (status == 200) {
+			SCHEMAS = content;
+			renderQuery();
+		} else {
+			displayMessage(getErrorFor(status, content));
+		}
+	});
+}
+
+function renderQuery() {
+	var query = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+		"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+		"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
+	for (var i = 0; i != SCHEMAS.length; i++) {
+		var iri = SCHEMAS[i].id;
+		var prefix = null;
+		var index = iri.lastIndexOf("/");
+		if (index < 0)
+			prefix = "schema" + i.toString();
+		else
+			prefix = iri.substring(index + 1);
+		query += "PREFIX " + prefix + ": <" + iri + "#>\n";
+	}
+	query += "\nSELECT DISTINCT ?x ?y WHERE { GRAPH ?g { ?x a ?y } }";
+	document.getElementById("sparql").value = query;
+	displayMessage(null);
 }
 
 function onExecute() {

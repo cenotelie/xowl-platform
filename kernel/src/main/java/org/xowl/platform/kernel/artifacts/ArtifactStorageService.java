@@ -59,6 +59,22 @@ public interface ArtifactStorageService extends Service {
     XSPReply retrieve(String base, String version);
 
     /**
+     * Completely delete an artifact from the long term and live stores
+     *
+     * @param identifier The identifier of the artifact to delete
+     * @return The operation's result
+     */
+    XSPReply delete(String identifier);
+
+    /**
+     * Completely delete an artifact from the long term and live stores
+     *
+     * @param artifact The artifact to delete
+     * @return The operation's result
+     */
+    XSPReply delete(Artifact artifact);
+
+    /**
      * Lists all the stored artifacts
      *
      * @return The operation's result which can be casted to XSPReplyResultCollection in case of success

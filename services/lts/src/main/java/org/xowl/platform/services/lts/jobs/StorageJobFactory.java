@@ -43,7 +43,8 @@ public class StorageJobFactory implements JobFactory {
     @Override
     public boolean canDeserialize(String type) {
         return (type.equals(PullArtifactFromLiveJob.class.getCanonicalName()) ||
-                type.equals(PushArtifactToLiveJob.class.getCanonicalName()));
+                type.equals(PushArtifactToLiveJob.class.getCanonicalName()) ||
+                type.equals(DeleteArtifactJob.class.getCanonicalName()));
     }
 
     @Override
@@ -52,6 +53,8 @@ public class StorageJobFactory implements JobFactory {
             return new PullArtifactFromLiveJob(definition);
         if (type.equals(PushArtifactToLiveJob.class.getCanonicalName()))
             return new PushArtifactToLiveJob(definition);
+        if (type.equals(DeleteArtifactJob.class.getCanonicalName()))
+            return new DeleteArtifactJob(definition);
         return null;
     }
 }

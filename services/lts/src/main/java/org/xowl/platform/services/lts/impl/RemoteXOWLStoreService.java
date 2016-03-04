@@ -47,6 +47,7 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 
@@ -204,6 +205,19 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     }
 
     @Override
+    public XSPReply delete(String identifier) {
+        XSPReply result = storeLive.delete(identifier);
+        if (!result.isSuccess())
+            return result;
+        return storeLongTerm.delete(identifier);
+    }
+
+    @Override
+    public XSPReply delete(Artifact artifact) {
+        return delete(artifact.getIdentifier());
+    }
+
+    @Override
     public XSPReply getAllArtifacts() {
         return storeLongTerm.getArtifacts();
     }
@@ -274,6 +288,8 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
             // is it an action
             String[] actions = parameters.get("action");
             String action = actions != null && actions.length >= 1 ? actions[0] : null;
+            if (action != null && action.equals("delete"))
+                return onMessageDeleteArtifact(parameters);
             if (action != null && action.equals("pull"))
                 return onMessagePullFromLive(parameters);
             if (action != null && action.equals("push"))
@@ -380,6 +396,24 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
         if (!logger.getErrorMessages().isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+    }
+
+    /**
+     * Responds to a request to delete an artifact
+     *
+     * @param parameters The request parameters
+     * @return The response
+     */
+    private HttpResponse onMessageDeleteArtifact(Map<String, String[]> parameters) {
+        String[] ids = parameters.get("id");
+        if (ids == null || ids.length == 0)
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
+        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        if (executor == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        Job job = new DeleteArtifactJob(ids[0]);
+        executor.schedule(job);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
 
     /**

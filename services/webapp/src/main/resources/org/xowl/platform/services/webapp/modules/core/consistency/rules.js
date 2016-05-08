@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Laurent Wouters
+// Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
 var xowl = new XOWL();

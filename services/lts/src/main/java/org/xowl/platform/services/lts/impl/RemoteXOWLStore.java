@@ -168,14 +168,6 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
-    public XSPReply getQuadExplanation(Quad quad) {
-        XOWLDatabase connection = getRemote();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.getQuadExplanation(quad);
-    }
-
-    @Override
     public XSPReply upload(String syntax, String content) {
         XOWLDatabase connection = getRemote();
         if (connection == null)

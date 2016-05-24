@@ -177,7 +177,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         Collection<XOWLConsistencyRule> result = new ArrayList<>();
-        for (QuerySolution solution : solutions.getSolutions()) {
+        for (RDFPatternSolution solution : solutions.getSolutions()) {
             String ruleId = ((IRINode) solution.get("r")).getIRIValue();
             String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
             for (XOWLRule rule : rules) {
@@ -265,7 +265,7 @@ public class XOWLConsistencyService implements ConsistencyService {
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
             return XSPReplyNotFound.instance();
-        QuerySolution solution = solutions.getSolutions().iterator().next();
+        RDFPatternSolution solution = solutions.getSolutions().iterator().next();
         String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
         return new XSPReplyResult<>(new XOWLConsistencyRule(original, ruleName));
     }
@@ -281,7 +281,7 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new XSPReplyFailure(logger.getErrorsAsString());
         if (rdfResult == null || rdfResult.getRules().isEmpty())
             return new XSPReplyFailure("Failed to load the rule");
-        Collection<String> variables = getVariablesIn(rdfResult.getRules().get(0));
+        Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
         StringBuilder builder = new StringBuilder(prefixes);
         builder.append(" rule <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(id));
@@ -292,23 +292,23 @@ public class XOWLConsistencyService implements ConsistencyService {
         builder.append(IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType));
         builder.append("> <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY));
-        builder.append(">\n");
+        builder.append(">.\n");
         builder.append("?e <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_MESSAGE));
         builder.append("> \"");
         builder.append(IOUtils.escapeStringW3C(message));
-        builder.append("\"\n");
+        builder.append("\".\n");
         builder.append("?e <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_PRODUCED_BY));
         builder.append("> <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(id));
-        builder.append(">\n");
-        for (String var : variables) {
+        builder.append(">.\n");
+        for (VariableNode variable : variables) {
             builder.append("?e <");
-            builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_ANTECEDENT + var));
+            builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_ANTECEDENT + variable.getName()));
             builder.append("> ?");
-            builder.append(var);
-            builder.append("\n");
+            builder.append(variable.getName());
+            builder.append(".\n");
         }
         builder.append("}");
         definition = builder.toString();
@@ -382,21 +382,6 @@ public class XOWLConsistencyService implements ConsistencyService {
     @Override
     public XSPReply deleteRule(ConsistencyRule rule) {
         return deleteRule(rule.getIdentifier());
-    }
-
-    /**
-     * Gets all the variables used on the antecedents of a rule
-     *
-     * @param rule The rule
-     * @return The variables
-     */
-    private static Collection<String> getVariablesIn(Rule rule) {
-        Collection<String> result = new ArrayList<>(10);
-        for (Quad quad : rule.getAntecedentSourcePositives())
-            getVariablesIn(result, quad);
-        for (Quad quad : rule.getAntecedentMetaPositives())
-            getVariablesIn(result, quad);
-        return result;
     }
 
     /**

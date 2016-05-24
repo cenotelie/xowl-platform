@@ -325,7 +325,7 @@ class XOWLEvaluation implements Evaluation {
         if (!sparqlResult.isSuccess())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
         Collection<EvaluationReference> result = new ArrayList<>();
-        for (QuerySolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
+        for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             result.add(new XOWLEvaluationReference(
                     ((IRINode) solution.get("a")).getIRIValue(),
                     ((LiteralNode) solution.get("n")).getLexicalValue()

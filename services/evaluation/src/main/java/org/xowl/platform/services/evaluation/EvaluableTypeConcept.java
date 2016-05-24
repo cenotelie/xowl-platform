@@ -22,7 +22,7 @@ import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.store.rdf.QuerySolution;
+import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultSolutions;
@@ -85,7 +85,7 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
         if (sparqlResult.isFailure())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
         Collection<Evaluable> result = new ArrayList<>();
-        for (QuerySolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
+        for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             String artifactId = ((IRINode) solution.get("a")).getIRIValue();
             String elementId = ((IRINode) solution.get("e")).getIRIValue();
             result.add(new EvaluableEntity(this, artifactId, elementId));

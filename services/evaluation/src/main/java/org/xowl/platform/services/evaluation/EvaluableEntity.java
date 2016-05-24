@@ -23,7 +23,7 @@ import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
-import org.xowl.infra.store.rdf.QuerySolution;
+import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.platform.kernel.KernelSchema;
@@ -84,7 +84,7 @@ public class EvaluableEntity implements Evaluable {
             if (!sparqlResult.isSuccess()) {
                 name = elementURI;
             } else {
-                for (QuerySolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
+                for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
                     String property = ((IRINode) solution.get("p")).getIRIValue();
                     if (KernelSchema.NAME.equals("name") || property.equals(Vocabulary.rdfs + "label") || property.endsWith("#name") || property.endsWith("#title")) {
                         name = ((LiteralNode) solution.get("o")).getLexicalValue();

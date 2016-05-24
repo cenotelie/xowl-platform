@@ -22,8 +22,6 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.platform.kernel.artifacts.Artifact;
 
-import java.util.Collection;
-
 /**
  * Represents a triple store for the platform
  *

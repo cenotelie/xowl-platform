@@ -273,7 +273,7 @@ public class XOWLConsistencyService implements ConsistencyService {
     @Override
     public XSPReply createRule(String name, String message, String prefixes, String conditions) {
         String id = IRI_RULE_BASE + "#" + IOUtils.hashSHA1(name);
-        String definition = prefixes + " rule <" + IOUtils.escapeAbsoluteURIW3C(id) + "> distinct {\n" + conditions + "\n} => {}";
+        String definition = prefixes + " rule distinct <" + IOUtils.escapeAbsoluteURIW3C(id) + "> {\n" + conditions + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
         RDFTLoader loader = new RDFTLoader(new CachedNodes());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
@@ -283,9 +283,9 @@ public class XOWLConsistencyService implements ConsistencyService {
             return new XSPReplyFailure("Failed to load the rule");
         Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
         StringBuilder builder = new StringBuilder(prefixes);
-        builder.append(" rule <");
+        builder.append(" rule distinct <");
         builder.append(IOUtils.escapeAbsoluteURIW3C(id));
-        builder.append("> distinct {\n");
+        builder.append("> {\n");
         builder.append(conditions);
         builder.append("\n} => {\n");
         builder.append("?e <");

@@ -8,10 +8,10 @@ function init() {
 	displayMessage(null);
 	var prefixes = "";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
-		prefixes += "@prefix " + DEFAULT_URI_MAPPINGS[i][0] + ": <" + DEFAULT_URI_MAPPINGS[i][1] + ">.\n";
+		prefixes += "PREFIX " + DEFAULT_URI_MAPPINGS[i][0] + ": <" + DEFAULT_URI_MAPPINGS[i][1] + ">\n";
 	}
-	prefixes += "@prefix kernel: <http://xowl.org/platform/schemas/kernel#>.\n";
-	prefixes += "@prefix consistency: <http://xowl.org/platform/schemas/consistency#>.\n";
+	prefixes += "PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>\n";
+	prefixes += "PREFIX consistency: <http://xowl.org/platform/schemas/consistency#>\n";
 	document.getElementById("input-prefixes").value = prefixes;
 }
 

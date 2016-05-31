@@ -31,7 +31,7 @@ import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.writers.NTripleSerializer;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
@@ -217,11 +217,11 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
         writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ");
         NTripleSerializer serializer = new NTripleSerializer(writer);
-        serializer.serialize(Logger.DEFAULT, metadata.iterator());
+        serializer.serialize(Logging.getDefault(), metadata.iterator());
         writer.write(" } }; INSERT DATA { GRAPH <");
         writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
         writer.write("> {");
-        serializer.serialize(Logger.DEFAULT, content.iterator());
+        serializer.serialize(Logging.getDefault(), content.iterator());
         writer.write(" } }");
         Result result = sparql(writer.toString());
         if (result.isSuccess())

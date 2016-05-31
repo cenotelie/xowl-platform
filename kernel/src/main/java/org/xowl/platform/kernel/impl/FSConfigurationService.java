@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Identifiable;
@@ -69,7 +69,7 @@ public class FSConfigurationService implements ConfigurationService {
             try (FileInputStream stream = new FileInputStream(file)) {
                 configuration.load(stream, Files.CHARSET);
             } catch (IOException exception) {
-                Logger.DEFAULT.error(exception);
+                Logging.getDefault().error(exception);
             }
         }
         return configuration;

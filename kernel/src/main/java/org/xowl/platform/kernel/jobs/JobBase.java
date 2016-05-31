@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.jobs;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -68,7 +68,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param type The job's type
      */
     public JobBase(String name, String type) {
-        super(Logger.DEFAULT);
+        super(Logging.getDefault());
         this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
@@ -84,7 +84,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param definition The JSON definition
      */
     public JobBase(ASTNode definition) {
-        super(Logger.DEFAULT);
+        super(Logging.getDefault());
         String id = null;
         String name = null;
         String type = null;

@@ -19,7 +19,7 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.services.webapp.WebModuleDirectory;
 import org.xowl.platform.services.webapp.WebModuleService;
 
@@ -99,7 +99,7 @@ public class XOWLModuleDirectory extends HttpServlet implements WebModuleDirecto
             os.write(content);
             os.flush();
         } catch (IOException exception) {
-            Logger.DEFAULT.error(exception);
+            Logging.getDefault().error(exception);
         }
     }
 

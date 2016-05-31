@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.infra.lang.owl2.Ontology;
 import org.xowl.infra.store.*;
 import org.xowl.infra.store.storage.StoreFactory;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -89,7 +89,7 @@ public class BusinessSchemaResource implements BusinessSchema {
         this.repository = new Repository(StoreFactory.create().inMemory().make());
         InputStream stream = type.getResourceAsStream(resource);
         if (stream != null) {
-            this.ontology = this.repository.loadResource(Logger.DEFAULT,
+            this.ontology = this.repository.loadResource(Logging.getDefault(),
                     new InputStreamReader(stream),
                     AbstractRepository.SCHEME_RESOURCE + resource,
                     iri, AbstractRepository.getSyntax(resource));

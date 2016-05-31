@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.services.webapp.impl.XOWLCoreModule;
 import org.xowl.platform.services.webapp.impl.XOWLHttpContext;
 import org.xowl.platform.services.webapp.impl.XOWLModuleDirectory;
@@ -74,7 +74,7 @@ public class Activator implements BundleActivator {
                     httpService.registerServlet(URI_WEB + "/modules/index.json", directory, null, null);
                     httpService.registerResources(URI_WEB, WEBAPP_RESOURCE_ROOT, new XOWLHttpContext(httpService, directory));
                 } catch (Exception exception) {
-                    Logger.DEFAULT.error(exception);
+                    Logging.getDefault().error(exception);
                 }
                 return httpService;
             }

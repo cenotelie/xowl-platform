@@ -26,6 +26,7 @@ import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -148,7 +149,7 @@ public class RemotePlatform {
             return null;
         if (response.getCode() != HttpURLConnection.HTTP_OK)
             return null;
-        return parseJson(Logger.DEFAULT, response.getBodyAsString());
+        return parseJson(Logging.getDefault(), response.getBodyAsString());
     }
 
     /**

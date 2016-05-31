@@ -23,7 +23,7 @@ import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -197,7 +197,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
         File file = new File(storage, getFileName(job));
         if (file.exists()) {
             if (!file.delete()) {
-                Logger.DEFAULT.error("Failed to delete " + file.getAbsolutePath());
+                Logging.getDefault().error("Failed to delete " + file.getAbsolutePath());
             }
         }
         // callback on completion
@@ -218,7 +218,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
                         String content = Files.read(reader);
                         reloadJob(files[i].getAbsolutePath(), content);
                     } catch (IOException exception) {
-                        Logger.DEFAULT.error(exception);
+                        Logging.getDefault().error(exception);
                     }
                 }
             }
@@ -232,9 +232,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * @param content The job's content
      */
     private void reloadJob(String file, String content) {
-        ASTNode definition = PlatformUtils.parseJSON(Logger.DEFAULT, content);
+        ASTNode definition = PlatformUtils.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
-            Logger.DEFAULT.error("Failed to parse the job " + file);
+            Logging.getDefault().error("Failed to parse the job " + file);
             return;
         }
         String type = null;
@@ -252,7 +252,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             }
         }
         if (type == null) {
-            Logger.DEFAULT.error("Unknown job type " + file);
+            Logging.getDefault().error("Unknown job type " + file);
             return;
         }
         Collection<JobFactory> factories = ServiceUtils.getServices(JobFactory.class);
@@ -264,7 +264,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
                 return;
             }
         }
-        Logger.DEFAULT.error("Could not find a factory for job " + file);
+        Logging.getDefault().error("Could not find a factory for job " + file);
     }
 
     @Override
@@ -288,10 +288,10 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             try (Writer write = Files.getWriter(new File(storage, getFileName(job)).getAbsolutePath())) {
                 write.write(job.serializedJSON());
             } catch (IOException exception) {
-                Logger.DEFAULT.error(exception);
+                Logging.getDefault().error(exception);
             }
         } else {
-            Logger.DEFAULT.error("Cannot serialize the job, storage is inaccessible");
+            Logging.getDefault().error("Cannot serialize the job, storage is inaccessible");
         }
         job.onScheduled();
         pool.execute(job);

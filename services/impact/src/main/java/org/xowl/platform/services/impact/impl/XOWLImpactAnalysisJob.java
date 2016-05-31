@@ -27,7 +27,7 @@ import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -184,7 +184,7 @@ class XOWLImpactAnalysisJob extends JobBase {
         }
         Result result = live.sparql(builder.toString());
         if (!result.isSuccess()) {
-            Logger.DEFAULT.error(((ResultFailure) result).getMessage());
+            Logging.getDefault().error(((ResultFailure) result).getMessage());
             return 0;
         }
         Collection<Quad> quads = ((ResultQuads) result).getQuads();

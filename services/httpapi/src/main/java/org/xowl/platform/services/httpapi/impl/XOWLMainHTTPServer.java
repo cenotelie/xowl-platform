@@ -18,7 +18,7 @@
 package org.xowl.platform.services.httpapi.impl;
 
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.infra.utils.logging.Logger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -98,7 +98,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             }
             response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
         } catch (Throwable exception) {
-            Logger.DEFAULT.error(exception);
+            Logging.getDefault().error(exception);
             response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
         } finally {
             SecurityService securityService = ServiceUtils.getService(SecurityService.class);
@@ -129,7 +129,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 }
                 content = output.toByteArray();
             } catch (IOException exception) {
-                Logger.DEFAULT.error(exception);
+                Logging.getDefault().error(exception);
             }
         }
         HttpResponse serviceResponse = service.onMessage(method,
@@ -151,7 +151,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 os.write(serviceResponse.getBodyAsBytes());
                 os.flush();
             } catch (IOException exception) {
-                Logger.DEFAULT.error(exception);
+                Logging.getDefault().error(exception);
             }
         }
     }

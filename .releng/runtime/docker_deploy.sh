@@ -23,16 +23,7 @@ echo "OK!"
 echo ""
 echo ""
 echo " 3. Setup xOWL Triple Store"
-rm -f "$TARGET/upload"
-echo -n "federation12345" > "$TARGET/upload"
-curl --insecure -u admin:admin -X PUT -T "$TARGET/upload" "$URI_LTS/user/federation" 2>/dev/null >/dev/null
-rm -f "$TARGET/upload"
-curl --insecure -u admin:admin -X PUT "$URI_LTS/db/federation_live" 2>/dev/null >/dev/null
-curl --insecure -u admin:admin -X PUT "$URI_LTS/db/federation_long_term" 2>/dev/null >/dev/null
-curl --insecure -u admin:admin -X PUT "$URI_LTS/db/federation_services" 2>/dev/null >/dev/null
-curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp" "$URI_LTS/db/federation_live/privileges?action=grant&user=federation&access=ADMIN"  2>/dev/null >/dev/null
-curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp" "$URI_LTS/db/federation_long_term/privileges?action=grant&user=federation&access=ADMIN"  2>/dev/null >/dev/null
-curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp" "$URI_LTS/db/federation_services/privileges?action=grant&user=federation&access=ADMIN" 2>/dev/null >/dev/null
+sh "$TARGET/db_init.sh"
 echo "OK!"
 
 echo ""

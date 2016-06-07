@@ -70,9 +70,8 @@ tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$REL
 
 
 # Build the docker image
+mv "$RELENG/felix-framework-5.4.0" "$RELENG/docker/felix-framework-5.4.0"
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
-rm "$RELENG/docker/"*.jar
-rm "$RELENG/docker/config-https.properties"
-rm "$RELENG/docker/keystore.jks"
+rm -rf "$RELENG/docker/felix-framework-5.4.0"

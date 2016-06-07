@@ -24,7 +24,7 @@ echo ""
 echo ""
 echo " 3. Setup xOWL Triple Store"
 rm -f "$TARGET/upload"
-echo "federation12345" > "$TARGET/upload"
+echo -n "federation12345" > "$TARGET/upload"
 curl --insecure -u admin:admin -X PUT -T "$TARGET/upload" "$URI_LTS/user/federation" 2>/dev/null >/dev/null
 rm -f "$TARGET/upload"
 curl --insecure -u admin:admin -X PUT "$URI_LTS/db/federation_live" 2>/dev/null >/dev/null
@@ -34,3 +34,8 @@ curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp"
 curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp" "$URI_LTS/db/federation_long_term/privileges?action=grant&user=federation&access=ADMIN"  2>/dev/null >/dev/null
 curl --insecure -u admin:admin -X POST -H "Content-Type: application/x-xowl-xsp" "$URI_LTS/db/federation_services/privileges?action=grant&user=federation&access=ADMIN" 2>/dev/null >/dev/null
 echo "OK!"
+
+echo ""
+echo ""
+echo " 4. Launching xOWL Federation Platform"
+docker run -d -i -p 8443:8443/tcp --name xowl-core -v "$TARGET/config":/config --link xowl-lts:xowl-lts "xowl/xowl-platform:$VERSION_FED"

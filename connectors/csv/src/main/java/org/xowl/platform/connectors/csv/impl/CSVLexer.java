@@ -18,6 +18,7 @@
 package org.xowl.platform.connectors.csv.impl;
 
 import java.io.Reader;
+import java.util.Arrays;
 
 /**
  * Represents a lexer for a CSV document
@@ -181,6 +182,8 @@ class CSVLexer {
                 input.rewind(1);
                 break;
             }
+            if (length >= builder.length)
+                builder = Arrays.copyOf(builder, builder.length + BUFFER_SIZE);
             builder[length] = c;
             length++;
         }
@@ -239,6 +242,8 @@ class CSVLexer {
                 return getTokenError();
             }
             if (c != textMarker) {
+                if (length >= builder.length)
+                    builder = Arrays.copyOf(builder, builder.length + BUFFER_SIZE);
                 builder[length] = c;
                 length++;
             } else {
@@ -246,6 +251,8 @@ class CSVLexer {
                 c = input.read();
                 if (c == textMarker) {
                     // This is a double marker
+                    if (length >= builder.length)
+                        builder = Arrays.copyOf(builder, builder.length + BUFFER_SIZE);
                     builder[length] = c;
                     length++;
                 } else {

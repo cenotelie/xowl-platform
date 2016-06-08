@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Jobs</title>
+  <title>Platform</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
@@ -19,8 +19,8 @@
       <span style="display: inline-block;">
         <ol class="breadcrumb">
           <li><a href="/web/">Home</a></li>
-          <li><a href="/web/modules/core/">Core</a></li>
-          <li class="active">Jobs</li>
+          <li><a href="/web/modules/admin/">Admin</a></li>
+          <li class="active">Platform</li>
         </ol>
       </span>
     </div>
@@ -38,55 +38,20 @@
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">
-        Job Queue
+        Bundles
       </div>
       <div class="panel-body">
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>#</th>
+              <th>Id</th>
+              <th>Vendor</th>
               <th>Name</th>
-              <th>Scheduled on</th>
+              <th>Version</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody id="jobs-scheduled">
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Running Jobs
-      </div>
-      <div class="panel-body">
-        <table class="table table-bordered table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Running since</th>
-            </tr>
-          </thead>
-          <tbody id="jobs-running">
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Completed Jobs
-      </div>
-      <div class="panel-body">
-        <table class="table table-bordered table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Completed on</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody id="jobs-completed">
+          <tbody id="bundles">
           </tbody>
         </table>
       </div>

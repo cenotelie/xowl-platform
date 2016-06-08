@@ -182,7 +182,7 @@ function getErrorFor(code, content) {
 
 function trackJob(jobId, text, callback) {
 	var link = document.createElement("a");
-	link.href = "/web/modules/core/jobs/job.html?id=" + encodeURIComponent(jobId);
+	link.href = "/web/modules/admin/jobs/job.html?id=" + encodeURIComponent(jobId);
 	link.appendChild(document.createTextNode(text));
 	var span = document.getElementById("loader-text");
 	while (span.hasChildNodes())

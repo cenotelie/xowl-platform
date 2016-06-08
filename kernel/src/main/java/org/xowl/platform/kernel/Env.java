@@ -27,4 +27,9 @@ public interface Env {
      * Directory of configuration elements
      */
     String CONF_DIR = "xowl.conf.dir";
+
+    /**
+     * Root directory for the distribution
+     */
+    String ROOT = "xowl.root";
 }

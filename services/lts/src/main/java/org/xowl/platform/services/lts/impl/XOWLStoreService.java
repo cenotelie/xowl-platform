@@ -78,7 +78,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * The remote server
      */
-    private XOWLServer server;
+    private final XOWLServer server;
     /**
      * The live store
      */
@@ -96,19 +96,22 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * Initializes this service
      */
     public XOWLStoreService() {
-        this.storeLive = new XOWLFederationStore("live") {
+        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        Configuration configuration = configurationService.getConfigFor(this);
+        this.server = resolveServer(configuration);
+        this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
-        this.storeLongTerm = new XOWLFederationStore("longTerm") {
+        this.storeLongTerm = new XOWLFederationStore(configuration.get("databases", "longTerm")) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
-        this.storeService = new XOWLFederationStore("service") {
+        this.storeService = new XOWLFederationStore(configuration.get("databases", "service")) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStoreService.this.resolveRemote(this.getName());
@@ -121,34 +124,37 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      *
      * @return The backing server
      */
-    private XOWLServer resolveServer() {
-        if (server != null)
-            return server;
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        if (configurationService == null)
-            return null;
-        Configuration configuration = configurationService.getConfigFor(this);
-        if (configuration == null)
-            return null;
+    private XOWLServer resolveServer(Configuration configuration) {
         String backendType = configuration.get("backend");
         if (backendType.equalsIgnoreCase("remote")) {
             String endpoint = configuration.get("remote", "endpoint");
             if (endpoint == null)
                 return null;
-            server = new RemoteServer(endpoint);
+            XOWLServer server = new RemoteServer(endpoint);
             XSPReply reply = server.login(configuration.get("remote", "login"), configuration.get("remote", "password"));
-            if (!reply.isSuccess()) {
-                server = null;
-            }
+            if (!reply.isSuccess())
+                return null;
+            return server;
         } else {
             try {
-                String location = (new File(configuration.get("embedded", "location"))).getAbsolutePath();
-                server = new EmbeddedServer(new ServerConfiguration(location));
+                String location = (new File(System.getenv(Env.ROOT), configuration.get("embedded", "location"))).getAbsolutePath();
+                XOWLServer server = new EmbeddedServer(new ServerConfiguration(location));
+                XSPReply reply = server.getDatabase(configuration.get("databases", "live"));
+                if (!reply.isSuccess()) {
+                    // initialize
+                    if (!server.createDatabase(configuration.get("databases", "live")).isSuccess())
+                        return null;
+                    if (!server.createDatabase(configuration.get("databases", "longTerm")).isSuccess())
+                        return null;
+                    if (!server.createDatabase(configuration.get("databases", "service")).isSuccess())
+                        return null;
+                }
+                return null;
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
+                return null;
             }
         }
-        return server;
     }
 
     /**
@@ -158,17 +164,9 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * @return The remote
      */
     private XOWLDatabase resolveRemote(String name) {
-        XOWLServer server = resolveServer();
         if (server == null)
             return null;
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        if (configurationService == null)
-            return null;
-        Configuration configuration = configurationService.getConfigFor(this);
-        if (configuration == null)
-            return null;
-        String dbName = configuration.get(name);
-        XSPReply reply = server.getDatabase(dbName);
+        XSPReply reply = server.getDatabase(name);
         if (!reply.isSuccess())
             return null;
         return ((XSPReplyResult<XOWLDatabase>) reply).getData();

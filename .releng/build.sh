@@ -8,7 +8,7 @@ ROOT="$(dirname "$RELENG")"
 VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -f "$ROOT/pom.xml" -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')
 echo "Building artifacts for version $VERSION"
 mvn install -f "$ROOT/pom.xml" -DskipTests -Dgpg.skip=true
-mvn dependency:copy-dependencies -f "$ROOT/kernel/pom.xml"
+mvn dependency:copy-dependencies -f "$ROOT/pom.xml"
 
 
 
@@ -47,6 +47,7 @@ cp "$ROOT/kernel/target/dependency/redist-"* "$RELENG/felix-framework-5.4.0/bund
 cp "$ROOT/kernel/target/dependency/xowl-"* "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/kernel/target/dependency/shiro-"* "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/kernel/target/dependency/slf4j-"* "$RELENG/felix-framework-5.4.0/bundle/"
+cp "$ROOT/services/lts/target/dependency/xowl-"* "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/kernel/target/xowl-kernel-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/connection/target/xowl-service-connection-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/consistency/target/xowl-service-consistency-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"

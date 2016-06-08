@@ -219,21 +219,10 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         Collection<Quad> content = artifact.getContent();
         if (content == null)
             return new XSPReplyFailure("Failed to fetch the artifact's content");
-        StringWriter writer = new StringWriter();
-        writer.write("INSERT DATA { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
-        writer.write("> { ");
-        NTripleSerializer serializer = new NTripleSerializer(writer);
-        serializer.serialize(Logging.getDefault(), metadata.iterator());
-        writer.write(" } }; INSERT DATA { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(artifact.getIdentifier()));
-        writer.write("> {");
-        serializer.serialize(Logging.getDefault(), content.iterator());
-        writer.write(" } }");
-        Result result = sparql(writer.toString());
-        if (result.isSuccess())
-            return XSPReplySuccess.instance();
-        return new XSPReplyFailure(((ResultFailure) result).getMessage());
+        XSPReply reply = upload(metadata);
+        if (!reply.isSuccess())
+            return reply;
+        return upload(content);
     }
 
     @Override

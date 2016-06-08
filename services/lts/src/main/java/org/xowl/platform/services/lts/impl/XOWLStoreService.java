@@ -20,6 +20,8 @@ package org.xowl.platform.services.lts.impl;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.remote.RemoteServer;
+import org.xowl.infra.server.base.ServerConfiguration;
+import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.AbstractRepository;
 import org.xowl.infra.store.IOUtils;
@@ -37,6 +39,7 @@ import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -48,6 +51,7 @@ import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -72,6 +76,10 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
 
     /**
+     * The remote server
+     */
+    private XOWLServer server;
+    /**
      * The live store
      */
     private final XOWLFederationStore storeLive;
@@ -83,10 +91,6 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * The service store
      */
     private final XOWLFederationStore storeService;
-    /**
-     * The remote server
-     */
-    private XOWLServer server;
 
     /**
      * Initializes this service
@@ -113,27 +117,56 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     }
 
     /**
-     * Resolves the remote for this store
+     * Resolves the server
      *
-     * @param name The name of this store
-     * @return The remote
+     * @return The backing server
      */
-    private XOWLDatabase resolveRemote(String name) {
+    private XOWLServer resolveServer() {
+        if (server != null)
+            return server;
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
         if (configurationService == null)
             return null;
         Configuration configuration = configurationService.getConfigFor(this);
         if (configuration == null)
             return null;
-        if (server == null) {
-            String endpoint = configuration.get("endpoint");
+        String backendType = configuration.get("backend");
+        if (backendType.equalsIgnoreCase("remote")) {
+            String endpoint = configuration.get("remote", "endpoint");
             if (endpoint == null)
                 return null;
             server = new RemoteServer(endpoint);
-            XSPReply reply = server.login(configuration.get("login"), configuration.get("password"));
-            if (!reply.isSuccess())
-                return null;
+            XSPReply reply = server.login(configuration.get("remote", "login"), configuration.get("remote", "password"));
+            if (!reply.isSuccess()) {
+                server = null;
+            }
+        } else {
+            try {
+                String location = (new File(configuration.get("embedded", "location"))).getAbsolutePath();
+                server = new EmbeddedServer(new ServerConfiguration(location));
+            } catch (IOException exception) {
+                Logging.getDefault().error(exception);
+            }
         }
+        return server;
+    }
+
+    /**
+     * Resolves the remote for this store
+     *
+     * @param name The name of this store
+     * @return The remote
+     */
+    private XOWLDatabase resolveRemote(String name) {
+        XOWLServer server = resolveServer();
+        if (server == null)
+            return null;
+        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        if (configurationService == null)
+            return null;
+        Configuration configuration = configurationService.getConfigFor(this);
+        if (configuration == null)
+            return null;
         String dbName = configuration.get(name);
         XSPReply reply = server.getDatabase(dbName);
         if (!reply.isSuccess())

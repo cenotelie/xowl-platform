@@ -22,7 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
-import org.xowl.platform.services.lts.impl.RemoteXOWLStoreService;
+import org.xowl.platform.services.lts.impl.XOWLStoreService;
 import org.xowl.platform.services.lts.jobs.StorageJobFactory;
 
 /**
@@ -33,7 +33,7 @@ import org.xowl.platform.services.lts.jobs.StorageJobFactory;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        RemoteXOWLStoreService service = new RemoteXOWLStoreService();
+        XOWLStoreService service = new XOWLStoreService();
         bundleContext.registerService(TripleStoreService.class, service, null);
         bundleContext.registerService(ArtifactStorageService.class, service, null);
         bundleContext.registerService(HttpAPIService.class, service, null);

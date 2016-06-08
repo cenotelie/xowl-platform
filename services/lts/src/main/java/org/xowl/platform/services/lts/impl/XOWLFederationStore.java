@@ -17,7 +17,6 @@
 
 package org.xowl.platform.services.lts.impl;
 
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.api.base.BaseDatabase;
@@ -27,6 +26,7 @@ import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
@@ -41,32 +41,23 @@ import java.io.StringWriter;
 import java.util.*;
 
 /**
- * Represents a remote xOWL store for this platform
+ * Represents a federation store
  *
  * @author Laurent Wouters
  */
-abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
+abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     /**
      * The remote backend
      */
-    private XOWLDatabase remote;
+    private XOWLDatabase backend;
 
     /**
      * Initializes this database
      *
      * @param name The database's name
      */
-    public RemoteXOWLStore(String name) {
+    public XOWLFederationStore(String name) {
         super(name);
-    }
-
-    /**
-     * Initializes this database
-     *
-     * @param root The database's definition
-     */
-    public RemoteXOWLStore(ASTNode root) {
-        super(root);
     }
 
     /**
@@ -74,30 +65,38 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
      *
      * @return The connection for this store
      */
-    private XOWLDatabase getRemote() {
-        if (remote == null)
-            remote = resolveRemote();
-        return remote;
+    private XOWLDatabase getBackend() {
+        if (backend == null)
+            backend = resolveBackend();
+        return backend;
     }
 
     /**
-     * Resolves the remote for this store
+     * Resolves the backend for this store
      *
-     * @return The remote
+     * @return The backend
      */
-    protected abstract XOWLDatabase resolveRemote();
+    protected abstract XOWLDatabase resolveBackend();
 
     @Override
     public XSPReply sparql(String sparql, List<String> defaultIRIs, List<String> namedIRIs) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.sparql(sparql, defaultIRIs, namedIRIs);
     }
 
     @Override
+    public XSPReply sparql(Command sparql) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.sparql(sparql);
+    }
+
+    @Override
     public XSPReply getEntailmentRegime() {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.getEntailmentRegime();
@@ -105,7 +104,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply setEntailmentRegime(EntailmentRegime regime) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.setEntailmentRegime(regime);
@@ -113,7 +112,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getRule(String name) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.getRule(name);
@@ -121,7 +120,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getRules() {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.getRules();
@@ -129,7 +128,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply addRule(String content, boolean activate) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.addRule(content, activate);
@@ -137,7 +136,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply removeRule(XOWLRule rule) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.removeRule(rule);
@@ -145,7 +144,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply activateRule(XOWLRule rule) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.activateRule(rule);
@@ -153,7 +152,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply deactivateRule(XOWLRule rule) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.deactivateRule(rule);
@@ -161,7 +160,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getRuleStatus(XOWLRule rule) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.getRuleStatus(rule);
@@ -169,15 +168,23 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply upload(String syntax, String content) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         return connection.upload(syntax, content);
     }
 
     @Override
+    public XSPReply upload(Collection<Quad> quads) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.upload(quads);
+    }
+
+    @Override
     public Result sparql(String query) {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return new ResultFailure("The connection to the remote host is not configured");
         XSPReply reply = connection.sparql(query, null, null);
@@ -188,7 +195,7 @@ abstract class RemoteXOWLStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getArtifacts() {
-        XOWLDatabase connection = getRemote();
+        XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
         StringWriter writer = new StringWriter();

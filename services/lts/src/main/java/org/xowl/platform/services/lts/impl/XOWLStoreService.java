@@ -57,11 +57,11 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Implements a triple store service that is backed by a remote store connected to via HTTP
+ * Implements a triple store service that is backed by a xOWL Server
  *
  * @author Laurent Wouters
  */
-public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService {
+public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService {
     /**
      * The URIs for this service
      */
@@ -74,15 +74,15 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     /**
      * The live store
      */
-    private final RemoteXOWLStore storeLive;
+    private final XOWLFederationStore storeLive;
     /**
      * The long term store
      */
-    private final RemoteXOWLStore storeLongTerm;
+    private final XOWLFederationStore storeLongTerm;
     /**
      * The service store
      */
-    private final RemoteXOWLStore storeService;
+    private final XOWLFederationStore storeService;
     /**
      * The remote server
      */
@@ -91,23 +91,23 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
     /**
      * Initializes this service
      */
-    public RemoteXOWLStoreService() {
-        this.storeLive = new RemoteXOWLStore("live") {
+    public XOWLStoreService() {
+        this.storeLive = new XOWLFederationStore("live") {
             @Override
-            protected XOWLDatabase resolveRemote() {
-                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            protected XOWLDatabase resolveBackend() {
+                return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
-        this.storeLongTerm = new RemoteXOWLStore("longTerm") {
+        this.storeLongTerm = new XOWLFederationStore("longTerm") {
             @Override
-            protected XOWLDatabase resolveRemote() {
-                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            protected XOWLDatabase resolveBackend() {
+                return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
-        this.storeService = new RemoteXOWLStore("service") {
+        this.storeService = new XOWLFederationStore("service") {
             @Override
-            protected XOWLDatabase resolveRemote() {
-                return RemoteXOWLStoreService.this.resolveRemote(this.getName());
+            protected XOWLDatabase resolveBackend() {
+                return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
     }
@@ -143,7 +143,7 @@ public class RemoteXOWLStoreService implements TripleStoreService, ArtifactStora
 
     @Override
     public String getIdentifier() {
-        return RemoteXOWLStoreService.class.getCanonicalName();
+        return XOWLStoreService.class.getCanonicalName();
     }
 
     @Override

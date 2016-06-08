@@ -15,57 +15,59 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.connection.impl;
+package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.services.connection.ConnectorDescription;
-import org.xowl.platform.services.connection.ConnectorDescriptionBase;
 import org.xowl.platform.services.connection.ConnectorDescriptionParam;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
- * Implements a factory of generic connectors
+ * Factory of CSV connectors
  *
  * @author Laurent Wouters
  */
-public class GenericConnectorFactory implements ConnectorServiceFactory {
+public class CSVFactory implements ConnectorServiceFactory {
     /**
-     * The description of the generic connector
+     * The descriptions for this factory
      */
-    private static final ConnectorDescription DESCRIPTION = new ConnectorDescriptionBase(
-            "org.xowl.platform.services.connection.GenericDomain",
-            "Generic Domain - RDF and OWL Syntaxes",
-            "This is a generic domain that accepts as input any form of semantic data (triples, quads, ontologies)."
-    );
+    private final Collection<ConnectorDescription> descriptions;
 
     /**
-     * The descriptions of the supported domains
+     * The singleton instance of the factory
      */
-    private static final Collection<ConnectorDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Arrays.asList(DESCRIPTION));
+    public static final CSVFactory INSTANCE = new CSVFactory();
+
+    /**
+     * Initializes the factory
+     */
+    private CSVFactory() {
+        descriptions = new ArrayList<>(1);
+        descriptions.add(CSVDescription.INSTANCE);
+    }
 
     @Override
     public String getIdentifier() {
-        return GenericConnectorFactory.class.getCanonicalName();
+        return CSVFactory.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Generic Connector Factory";
+        return "xOWL Federation Platform - CSV Connector Factory";
     }
 
     @Override
     public Collection<ConnectorDescription> getDescriptors() {
-        return DESCRIPTIONS;
+        return descriptions;
     }
 
     @Override
-    public XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
-        return new XSPReplyResult<>(new GenericConnector(identifier, name, uris));
+    public XSPReply newConnector(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+        return new XSPReplyResult<>(new CSVConnector(identifier, name, uris));
     }
 }

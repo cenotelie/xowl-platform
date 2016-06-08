@@ -58,6 +58,7 @@ cp "$ROOT/services/impact/target/xowl-service-impact-$VERSION.jar" "$RELENG/feli
 cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/statistics/target/xowl-service-statistics-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
+cp "$ROOT/connectors/csv/target/xowl-connector-csv-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 
 mv "$RELENG/keystore.jks" "$RELENG/felix-framework-5.4.0/conf/"
 cat "$RELENG/config-https.properties" >> "$RELENG/felix-framework-5.4.0/conf/config.properties"

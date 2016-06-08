@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-class ImportMappingContext {
+public class ImportMappingContext {
     /**
      * The used text marker
      */
@@ -61,11 +61,13 @@ class ImportMappingContext {
      *
      * @param textMarker The used text marker
      * @param nodes      The node manager
+     * @param graphURI   The URI of the graph for the produced quads
+     * @param baseURI    The base URI for the resolved entities
      */
-    public ImportMappingContext(String textMarker, NodeManager nodes, String baseURI) {
+    public ImportMappingContext(String textMarker, NodeManager nodes, String graphURI, String baseURI) {
         this.textMarker = textMarker;
         this.nodes = nodes;
-        this.graph = nodes.getIRINode(baseURI);
+        this.graph = nodes.getIRINode(graphURI);
         this.baseURI = baseURI;
         this.entities = new HashMap<>();
         this.quads = new ArrayList<>();

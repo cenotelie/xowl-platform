@@ -28,7 +28,7 @@ import org.xowl.infra.store.rdf.IRINode;
  *
  * @author Laurent Wouters
  */
-class ImportMappingColumn implements Serializable {
+public class ImportMappingColumn implements Serializable {
     /**
      * The column is not mapped
      */

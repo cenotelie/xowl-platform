@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-class ImportMapping implements Serializable {
+public class ImportMapping implements Serializable {
     /**
      * The mapping for the columns
      */
@@ -75,10 +75,16 @@ class ImportMapping implements Serializable {
     /**
      * Applies the mapping to an input document
      *
-     * @param document The input document
-     * @param context  The context
+     * @param document     The input document
+     * @param context      The context
+     * @param skipFirstRow Whether to skip the first row
      */
-    public void apply(Iterator<Iterator<String>> document, ImportMappingContext context) {
+    public void apply(Iterator<Iterator<String>> document, ImportMappingContext context, boolean skipFirstRow) {
+        if (skipFirstRow && document.hasNext()) {
+            Iterator<String> row = document.next();
+            while (row.hasNext())
+                row.next();
+        }
         while (document.hasNext()) {
             Iterator<String> row = document.next();
             applyRow(row, context);

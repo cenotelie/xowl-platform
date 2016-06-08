@@ -20,6 +20,7 @@ package org.xowl.platform.connectors.csv.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
+import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 
 /**
@@ -66,18 +67,21 @@ class ImportMappingColumn implements Serializable {
      * Initializes as not mapping a column
      */
     public ImportMappingColumn() {
-        this(false);
+        this.type = TYPE_NONE;
+        this.schemaRelation = null;
+        this.schemaAttributeType = null;
+        this.multivalued = false;
     }
 
     /**
-     * Initializes as not mapping a column
+     * Initializes as an ID column
      *
-     * @param isId Whether to map the column to the ID, or not at all
+     * @param relation The URI of the mapped relation, or null if the ID is noe mapped as an additional property
      */
-    public ImportMappingColumn(boolean isId) {
-        this.type = isId ? TYPE_ID : TYPE_NONE;
-        this.schemaRelation = null;
-        this.schemaAttributeType = null;
+    public ImportMappingColumn(String relation) {
+        this.type = TYPE_ID;
+        this.schemaRelation = relation;
+        this.schemaAttributeType = Vocabulary.xsdString;
         this.multivalued = false;
     }
 
@@ -161,18 +165,31 @@ class ImportMappingColumn implements Serializable {
      * @param context The current context
      */
     public void apply(IRINode entity, String value, ImportMappingContext context) {
-        if (type.equals(TYPE_RELATION)) {
-            context.addQuad(
-                    entity,
-                    context.getIRI(schemaRelation),
-                    context.resolveEntity(value)
-            );
-        } else if (type.equals(TYPE_ATTRIBUTE)) {
-            context.addQuad(
-                    entity,
-                    context.getIRI(schemaRelation),
-                    context.getLiteral(value, schemaAttributeType)
-            );
+        if (value.startsWith(context.getTextMarker()) && value.endsWith(context.getTextMarker()))
+            value = value.substring(1, value.length() - 1);
+        switch (type) {
+            case TYPE_ID:
+                if (schemaRelation != null)
+                    context.addQuad(
+                            entity,
+                            context.getIRI(schemaRelation),
+                            context.getLiteral(value, schemaAttributeType)
+                    );
+                break;
+            case TYPE_RELATION:
+                context.addQuad(
+                        entity,
+                        context.getIRI(schemaRelation),
+                        context.resolveEntity(value)
+                );
+                break;
+            case TYPE_ATTRIBUTE:
+                context.addQuad(
+                        entity,
+                        context.getIRI(schemaRelation),
+                        context.getLiteral(value, schemaAttributeType)
+                );
+                break;
         }
     }
 

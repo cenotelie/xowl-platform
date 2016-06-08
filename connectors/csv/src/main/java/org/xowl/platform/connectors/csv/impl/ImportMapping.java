@@ -64,6 +64,15 @@ class ImportMapping implements Serializable {
     }
 
     /**
+     * Adds a mapping for a column
+     *
+     * @param column The next column
+     */
+    public void addColumn(ImportMappingColumn column) {
+        this.columns.add(column);
+    }
+
+    /**
      * Applies the mapping to an input document
      *
      * @param document The input document
@@ -105,7 +114,7 @@ class ImportMapping implements Serializable {
             id = context.newEntity();
 
         for (i = 0; i != columns.size(); i++) {
-            if (values[i] != null && !values[i].isEmpty() && !columns.get(i).isIdMapping()) {
+            if (values[i] != null && !values[i].isEmpty()) {
                 columns.get(i).apply(id, values[i], context);
             }
         }

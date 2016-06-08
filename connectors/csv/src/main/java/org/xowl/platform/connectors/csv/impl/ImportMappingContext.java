@@ -32,6 +32,10 @@ import java.util.*;
  */
 class ImportMappingContext {
     /**
+     * The used text marker
+     */
+    private final String textMarker;
+    /**
      * The node manager
      */
     private final NodeManager nodes;
@@ -55,14 +59,25 @@ class ImportMappingContext {
     /**
      * Initializes this context
      *
-     * @param nodes The node manager
+     * @param textMarker The used text marker
+     * @param nodes      The node manager
      */
-    public ImportMappingContext(NodeManager nodes, String baseURI) {
+    public ImportMappingContext(String textMarker, NodeManager nodes, String baseURI) {
+        this.textMarker = textMarker;
         this.nodes = nodes;
         this.graph = nodes.getIRINode(baseURI);
         this.baseURI = baseURI;
         this.entities = new HashMap<>();
         this.quads = new ArrayList<>();
+    }
+
+    /**
+     * Gets the used text marker
+     *
+     * @return The used text marker
+     */
+    public String getTextMarker() {
+        return textMarker;
     }
 
     /**

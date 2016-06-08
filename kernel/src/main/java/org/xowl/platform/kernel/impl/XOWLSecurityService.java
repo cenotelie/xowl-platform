@@ -71,6 +71,8 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         AuthenticatingRealm realm = null;
         if (XOWLSecurityRealm.class.getCanonicalName().equals(realmId)) {
             realm = new XOWLSecurityRealm(configuration.get(realmId, "endpoint"));
+        } else if (XOWLNosecRealm.class.getCanonicalName().equals(realmId)) {
+            realm = new XOWLNosecRealm();
         } else if (JndiLdapRealm.class.getCanonicalName().equals(realmId)) {
             JndiLdapContextFactory factory = new JndiLdapContextFactory();
             factory.setUrl(configuration.get(realmId, "url"));

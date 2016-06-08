@@ -66,12 +66,14 @@ rm "$RELENG/config-https.properties"
 
 
 # Package distribution
-tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG" "felix-framework-5.4.0/" -C "$RELENG/runtime" "run.sh" "db_init.sh" "config/"
+tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG" "felix-framework-5.4.0/" -C "$RELENG/runtime" "run.sh" "config/"
 tar -czf "$RELENG/xowl-platform-deployer-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG/runtime" "docker_deploy.sh" "db_init.sh" "config/"
 
 # Build the docker image
 mv "$RELENG/felix-framework-5.4.0" "$RELENG/docker/felix-framework-5.4.0"
+cp -r "$RELENG/runtime/config" "$RELENG/docker/config"
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
 rm -rf "$RELENG/docker/felix-framework-5.4.0"
+rm -rf "$RELENG/docker/config"

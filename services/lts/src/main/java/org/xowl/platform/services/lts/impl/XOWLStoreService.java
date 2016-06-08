@@ -149,7 +149,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
                     if (!server.createDatabase(configuration.get("databases", "service")).isSuccess())
                         return null;
                 }
-                return null;
+                return server;
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
                 return null;

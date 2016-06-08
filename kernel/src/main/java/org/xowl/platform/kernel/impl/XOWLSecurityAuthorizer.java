@@ -148,8 +148,6 @@ public class XOWLSecurityAuthorizer implements Authorizer {
      * @return Whether the principal has the role
      */
     private boolean hasRole(String principal, String role) {
-        if (SecurityService.ROLE_ADMIN.equals(role))
-            return "admin".equals(principal);
         // FIXME: properly implement this
         return true;
     }

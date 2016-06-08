@@ -94,6 +94,9 @@ class ImportMapping implements Serializable {
         IRINode id = null;
         for (i = 0; i != columns.size(); i++) {
             if (columns.get(i).isIdMapping()) {
+                if (values[i] == null || values[i].isEmpty())
+                    // no id => skip this
+                    return;
                 id = context.resolveEntity(values[i]);
                 break;
             }

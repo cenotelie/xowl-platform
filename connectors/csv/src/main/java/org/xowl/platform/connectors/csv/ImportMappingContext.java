@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.connectors.csv.impl;
+package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;

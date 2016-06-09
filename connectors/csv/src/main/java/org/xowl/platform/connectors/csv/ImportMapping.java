@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.connectors.csv.impl;
+package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.IOUtils;

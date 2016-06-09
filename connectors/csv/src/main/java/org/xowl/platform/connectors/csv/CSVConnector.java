@@ -21,7 +21,6 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.connectors.csv.impl.ImportDocument;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
@@ -93,8 +92,8 @@ public class CSVConnector extends ConnectorServiceBase {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         if (method.equals("GET"))
             return onMessageGet();
-        if (method.equals("POST"))
-            return onMessagePostDocument(parameters, content);
+        if (method.equals("PUT"))
+            return onMessagePutDocument(parameters, content);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
     }
 
@@ -108,13 +107,13 @@ public class CSVConnector extends ConnectorServiceBase {
     }
 
     /**
-     * Responds to a POST message for a document
+     * Responds to a PUT message for a document
      *
      * @param parameters The request parameters
      * @param content    The content, if any
      * @return The response
      */
-    private HttpResponse onMessagePostDocument(Map<String, String[]> parameters, byte[] content) {
+    private HttpResponse onMessagePutDocument(Map<String, String[]> parameters, byte[] content) {
         String[] names = parameters.get("name");
         String[] bases = parameters.get("base");
         String[] supersedes = parameters.get("supersede");

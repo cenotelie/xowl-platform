@@ -21,7 +21,7 @@ XOWL.prototype.getCSVDocument = function (callback, docId) {
 	}, "services/import/csv", {document: docId});
 }
 
-XOWL.prototype.getCSVFirstLines = function (callback, docId, separator, textMarker) {
+XOWL.prototype.getCSVFirstLines = function (callback, docId, separator, textMarker, rowCount) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content).payload);
@@ -31,7 +31,8 @@ XOWL.prototype.getCSVFirstLines = function (callback, docId, separator, textMark
 	}, "services/import/csv", {
 		document: docId,
 		separator: separator,
-		textMarker: textMarker
+		textMarker: textMarker,
+		rowCount: rowCount
 	});
 }
 

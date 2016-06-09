@@ -23,7 +23,8 @@ function init() {
 function onPreview() {
 	var separator = document.getElementById("document-separator").value;
 	var textMarker = document.getElementById("document-text-marker").value;
-	if (separator === null || textMarker === null || separator == "" || textMarker == "")
+	var rowCount = document.getElementById("document-row-count").value;
+    if (separator === null || textMarker === null || rowCount <= 0 || separator == "" || textMarker == "")
 		return;
     displayMessage("Loading ...");
     xowl.getCSVFirstLines(function (status, ct, content) {
@@ -33,7 +34,7 @@ function onPreview() {
 		} else {
 			displayMessage(getErrorFor(status, content));
 		}
-	}, docId, separator, textMarker);
+	}, docId, separator, textMarker, rowCount);
 }
 
 function renderPreview(data) {

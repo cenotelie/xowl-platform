@@ -41,11 +41,6 @@ import java.util.List;
  */
 public class CSVImportDocument implements Identifiable, Serializable {
     /**
-     * Number of lines to return when the first lines of a document are requested
-     */
-    private static final int FIRST_LINES_COUNT = 10;
-
-    /**
      * The document's identifier
      */
     private final String identifier;
@@ -95,23 +90,24 @@ public class CSVImportDocument implements Identifiable, Serializable {
      *
      * @param separator  The character that separates values in rows
      * @param textMarker The character that marks the beginning and end of raw text
+     * @param rowCount   The maximum number of rows to get
      * @return The first lines of this document
      */
-    public Serializable getFirstLines(char separator, char textMarker) {
+    public Serializable getFirstLines(char separator, char textMarker, int rowCount) {
         ByteArrayInputStream byteStream = new ByteArrayInputStream(content);
         InputStreamReader reader = new InputStreamReader(byteStream, Files.CHARSET);
         CSVParser parser = new CSVParser(reader, separator, textMarker);
         Iterator<Iterator<String>> document = parser.parse();
 
         final List<List<String>> data = new ArrayList<>();
-        int rowCount = 0;
-        while (document.hasNext() && rowCount < FIRST_LINES_COUNT) {
+        int count = 0;
+        while (document.hasNext() && count < rowCount) {
             Iterator<String> row = document.next();
             List<String> rowData = new ArrayList<>();
             while (row.hasNext())
                 rowData.add(row.next());
             data.add(rowData);
-            rowCount++;
+            count++;
         }
         return new Serializable() {
             @Override

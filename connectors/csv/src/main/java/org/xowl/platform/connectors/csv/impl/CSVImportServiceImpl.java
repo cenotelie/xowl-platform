@@ -105,11 +105,11 @@ public class CSVImportServiceImpl implements CSVImportService {
     }
 
     @Override
-    public XSPReply getFirstLines(String documentId, char separator, char textMarker) {
+    public XSPReply getFirstLines(String documentId, char separator, char textMarker, int rowCount) {
         CSVImportDocument document = documents.get(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
-        Serializable data = document.getFirstLines(separator, textMarker);
+        Serializable data = document.getFirstLines(separator, textMarker, rowCount);
         return new XSPReplyResult<>(data);
     }
 
@@ -155,8 +155,9 @@ public class CSVImportServiceImpl implements CSVImportService {
                     return XSPReplyUtils.toHttpResponse(getDocuments(), null);
                 String[] separators = parameters.get("separator");
                 String[] textMarkers = parameters.get("textMarker");
-                if (separators != null && textMarkers != null && separators.length > 0 && textMarkers.length > 0)
-                    return XSPReplyUtils.toHttpResponse(getFirstLines(docIds[0], separators[0].charAt(0), textMarkers[0].charAt(0)), null);
+                String[] rowCounts = parameters.get("rowCount");
+                if (separators != null && textMarkers != null && rowCounts != null && separators.length > 0 && textMarkers.length > 0 && rowCounts.length > 0)
+                    return XSPReplyUtils.toHttpResponse(getFirstLines(docIds[0], separators[0].charAt(0), textMarkers[0].charAt(0), Integer.parseInt(rowCounts[0])), null);
                 return XSPReplyUtils.toHttpResponse(getDocument(docIds[0]), null);
             }
             case "PUT": {

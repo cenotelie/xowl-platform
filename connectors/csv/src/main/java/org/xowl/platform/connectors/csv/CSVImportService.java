@@ -47,9 +47,10 @@ public interface CSVImportService extends HttpAPIService {
      * @param documentId The identifier of a document
      * @param separator  The character that separates values in rows
      * @param textMarker The character that marks the beginning and end of raw text
+     * @param rowCount   The maximum number of rows to get
      * @return The result
      */
-    XSPReply getFirstLines(String documentId, char separator, char textMarker);
+    XSPReply getFirstLines(String documentId, char separator, char textMarker, int rowCount);
 
     /**
      * Uploads a new document

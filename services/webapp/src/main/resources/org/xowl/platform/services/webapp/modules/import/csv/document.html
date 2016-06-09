@@ -74,47 +74,27 @@
     <div class="panel panel-default">
       <div class="panel-heading">
         Import mapping definition
+        <button class="btn btn-default" onclick="onInitMapping()" style="margin-left: 20px;">Initialize from preview</button>
       </div>
       <div class="panel-body">
-        <div class="panel panel-default">
-          <table class="table">
-            <tbody>
-              <tr>
-                <td>
-                  Column 1
-                </td>
-                <td>
-                  <select class="form-control">
-                    <option>Not mapped</option>
-                    <option>Entity identifier</option>
-                    <option>Entity attribute (single value)</option>
-                    <option>Entity attribute (multivalued)</option>
-                    <option>Relation (single value)</option>
-                    <option>Relation (multivalued)</option>
-                  </select>
-                </td>
-                <td>
-                  Property:
-                </td>
-                <td>
-                  <input type="text" placeholder="http://xowl.org/property">
-                </td>
-                <td>
-                  Datatype:
-                </td>
-                <td>
-                  <select class="form-control">
-                    <option>N/A</option>
-                    <option>xsd:string</option>
-                    <option>xsd:integer</option>
-                    <option>xsd:boolean</option>
-                    <option>xsd:float</option>
-                  </select>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <td>Column</td>
+              <td>Mapping</td>
+              <td>Property</td>
+              <td>Datatype</td>
+              <td>Multivalued</td>
+            </tr>
+          </thead>
+          <tbody id="mapping">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <button class="btn btn-primary" onclick="onImport()">Map and Import</button>
       </div>
     </div>
   </div>

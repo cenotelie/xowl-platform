@@ -3,6 +3,8 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
+var lastPreview = null;
+var mapping = [];
 
 function init() {
 	setupPage(xowl);
@@ -38,10 +40,11 @@ function onPreview() {
 }
 
 function renderPreview(data) {
+	lastPreview = data;
 	var tableHead = document.getElementById("document-heads");
-    while (tableHead.hasChildNodes())
-    	tableHead.removeChild(tableHead.lastChild);
-    var tableBody = document.getElementById("document-rows");
+	while (tableHead.hasChildNodes())
+		tableHead.removeChild(tableHead.lastChild);
+	var tableBody = document.getElementById("document-rows");
 	while (tableBody.hasChildNodes())
 		tableBody.removeChild(tableBody.lastChild);
 	if (data.rows.length == 0)
@@ -70,4 +73,109 @@ function renderPreviewCell(cell) {
 		cell = cell.substring(0, 100) + " ...";
 	result.appendChild(document.createTextNode(cell));
 	return result;
+}
+
+function onInitMapping() {
+	mapping = [];
+	var table = document.getElementById("mapping");
+	while (table.hasChildNodes())
+		table.removeChild(table.lastChild);
+	if (lastPreview == null || lastPreview.rows.length <= 0)
+		return;
+	for (var i = 0; i != lastPreview.rows[0].cells.length; i++) {
+		table.appendChild(mappingNewColumn(i, lastPreview.rows[0].cells[i]));
+	}
+}
+
+function mappingNewColumn(index, name) {
+	mapping[index] = {
+	    type: "none",
+	    schemaRelation: null,
+	    schemaAttributeType: null,
+	    multivalued: "false"
+	};
+	var result = document.createElement("tr");
+	var cell1 = document.createElement("td");
+	var cell2 = document.createElement("td");
+	var cell3 = document.createElement("td");
+	var cell4 = document.createElement("td");
+	var cell5 = document.createElement("td");
+	cell1.appendChild(document.createTextNode(name));
+	var selectType = createNewSelectMappingType();
+	cell2.appendChild(selectType);
+	var propertyInput = createNewPropertyInput();
+	cell3.appendChild(propertyInput);
+	var selectDatatype = createNewSelectDatatype();
+	cell4.appendChild(selectDatatype);
+	var toggle = createNewSelectMultivalued();
+	cell5.appendChild(toggle);
+	result.appendChild(cell1);
+	result.appendChild(cell2);
+	result.appendChild(cell3);
+	result.appendChild(cell4);
+	result.appendChild(cell5);
+	return result;
+}
+
+function createNewSelectMappingType() {
+	var selectType = document.createElement("select");
+	var option1 = document.createElement("option");
+	var option2 = document.createElement("option");
+	var option3 = document.createElement("option");
+	var option4 = document.createElement("option");
+	option1.appendChild(document.createTextNode("No mapping"));
+	option2.appendChild(document.createTextNode("Entity identifier"));
+	option3.appendChild(document.createTextNode("Entity attribute"));
+	option4.appendChild(document.createTextNode("Relation"));
+	option1.value = "none";
+	option2.value = "id";
+	option3.value = "attribute";
+	option4.value = "relation";
+	selectType.appendChild(option1);
+	selectType.appendChild(option2);
+	selectType.appendChild(option3);
+	selectType.appendChild(option4);
+	return selectType;
+}
+
+function createNewPropertyInput() {
+	var input = document.createElement("input");
+	input.type = "text";
+	input.placeholder = "http://xowl.org/property";
+	return input;
+}
+
+function createNewSelectDatatype() {
+	var selectType = document.createElement("select");
+	var option1 = document.createElement("option");
+	var option2 = document.createElement("option");
+	var option3 = document.createElement("option");
+	var option4 = document.createElement("option");
+	option1.appendChild(document.createTextNode("N/A"));
+	option2.appendChild(document.createTextNode("xsd:string"));
+	option3.appendChild(document.createTextNode("xsd:integer"));
+	option4.appendChild(document.createTextNode("xsd:float"));
+	option1.value = "";
+	option2.value = "http://www.w3.org/2001/XMLSchema#string";
+	option3.value = "http://www.w3.org/2001/XMLSchema#integer";
+	option4.value = "http://www.w3.org/2001/XMLSchema#float";
+	selectType.appendChild(option1);
+	selectType.appendChild(option2);
+	selectType.appendChild(option3);
+	selectType.appendChild(option4);
+	return selectType;
+}
+
+function createNewSelectMultivalued() {
+	var toggle = document.createElement("div");
+	toggle.className = "toggle-button";
+	toggle.appendChild(document.createElement("button"));
+	toggle.onclick = function () {
+		toggle.classList.toggle("toggle-button-selected");
+	}
+	return toggle;
+}
+
+function onImport() {
+
 }

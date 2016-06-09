@@ -41,6 +41,11 @@ import java.util.List;
  */
 public class CSVImportDocument implements Identifiable, Serializable {
     /**
+     * Number of lines to return when the first lines of a document are requested
+     */
+    private static final int FIRST_LINES_COUNT = 10;
+
+    /**
      * The document's identifier
      */
     private final String identifier;
@@ -100,7 +105,7 @@ public class CSVImportDocument implements Identifiable, Serializable {
 
         final List<List<String>> data = new ArrayList<>();
         int rowCount = 0;
-        while (document.hasNext() && rowCount < 4) {
+        while (document.hasNext() && rowCount < FIRST_LINES_COUNT) {
             Iterator<String> row = document.next();
             List<String> rowData = new ArrayList<>();
             while (row.hasNext())

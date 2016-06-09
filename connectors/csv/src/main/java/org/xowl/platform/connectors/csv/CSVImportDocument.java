@@ -23,7 +23,6 @@ import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.BaseStore;
 import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
-import org.xowl.platform.connectors.csv.impl.CSVParser;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;

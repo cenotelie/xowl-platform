@@ -2,59 +2,54 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var CONNECTOR = getParameterByName("connector");
 
 function init() {
 	setupPage(xowl);
-	if (!CONNECTOR || CONNECTOR === null || CONNECTOR === "")
-		document.location.href = "upload.html";
-	document.getElementById("panel-next").style.display = "none";
-	document.getElementById("input-connector").value = CONNECTOR;
-	xowl.getArtifactArchetypes(function (status, ct, content) {
-		if (status == 200) {
-			renderArchetypes(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	});
-}
-
-function renderArchetypes(data) {
-	var select = document.getElementById("input-archetype");
-	for (var i = 0; i != data.length; i++) {
-		var option = document.createElement("option");
-		option.value = data[i].id;
-		option.appendChild(document.createTextNode(data[i].name));
-		select.appendChild(option);
-	}
-	if (data.length > 0)
-		select.value = data[0].id;
 	displayMessage(null);
 }
 
-function onInput() {
+function onUpload() {
 	var name = document.getElementById("input-name").value;
-	var base = document.getElementById("input-base").value;
-	var version = document.getElementById("input-init-version").value;
-	var archetype = document.getElementById("input-archetype").value;
-	if (name === null || name === "" || base === null || base === "" || version === null || version === "" || archetype === null || archetype === "") {
-		document.getElementById("btn-file").href = "";
-		document.getElementById("btn-content").href = "";
-		document.getElementById("panel-next").style.display = "none";
-	} else {
-		var params = getParams(name, base, version, archetype);
-		document.getElementById("btn-file").href = "upload-file.html" + params;
-		document.getElementById("btn-content").href = "upload-content.html" + params;
-		document.getElementById("panel-next").style.display = "";
+	if (name === null)
+		return;
+	if (document.getElementById("input-file").files.length == 0)
+		return;
+	var file = document.getElementById("input-file").files[0];
+	var progressBar = document.getElementById("import-progress");
+	progressBar['aria-valuenow'] = 0;
+	progressBar.style.width = "0%";
+	progressBar.classList.remove("progress-bar-success");
+	progressBar.classList.remove("progress-bar-error");
+	progressBar.innerHTML = null;
+	var reader = new FileReader();
+	reader.onprogress = function (event) {
+		var ratio = 50 * event.loaded / event.total;
+		progressBar['aria-valuenow'] = ratio;
+		progressBar.style.width = ratio.toString() + "%";
+		displayMessage("Reading ...");
 	}
-}
-
-function getParams(name, base, version, archetype) {
-	return "?connector=" + encodeURIComponent(CONNECTOR) +
-		"&what=new" +
-		"&name=" + encodeURIComponent(name) +
-		"&base=" + encodeURIComponent(base) +
-		"&version=" + encodeURIComponent(version) +
-		"&archetype=" + encodeURIComponent(archetype) +
-		"&superseded=none";
+	reader.onloadend = function (event) {
+		if (reader.error !== null) {
+			displayMessage("Error: " + reader.error.toString());
+			progressBar['aria-valuenow'] = 100;
+			progressBar.style.width = "100%";
+			progressBar.classList.add("progress-bar-error");
+			return;
+		}
+		displayMessage("Sending ...");
+		xowl.uploadCSV(function (code, type, content) {
+			if (code === 200) {
+				progressBar.classList.add("progress-bar-success");
+				displayMessage(null);
+				alert("OK");
+				window.location.href = "index.html";
+			} else {
+				displayMessage(getErrorFor(code, content));
+				progressBar.classList.add("progress-bar-error");
+			}
+			progressBar['aria-valuenow'] = 100;
+			progressBar.style.width = "100%";
+		}, name, reader.result);
+	}
+	reader.readAsBinaryString(file);
 }

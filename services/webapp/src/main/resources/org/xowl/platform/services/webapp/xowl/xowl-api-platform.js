@@ -323,7 +323,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency" {id: ruleId});
+	}, "services/core/consistency", {id: ruleId});
 }
 
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
@@ -593,12 +593,13 @@ XOWL.prototype.doJSRequest = function (callback, verb, uriComplement, parameters
 		}
 	}
 	var uri = this.endpoint + uriComplement;
-	if (uriComplement != null) {
+	if (parameters != null) {
 		var names = Object.getOwnPropertyNames(parameters);
 		for (var p = 0; p != names.length; p++) {
 			var value = parameters[names[p]];
 			uri += (p === 0) ? "?" : "&";
 			uri += names[p];
+			uri += "=";
 			uri += encodeURIComponent(value);
 		}
 	}

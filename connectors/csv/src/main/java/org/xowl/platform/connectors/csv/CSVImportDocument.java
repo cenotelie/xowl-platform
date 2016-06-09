@@ -25,10 +25,7 @@ import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
-import org.xowl.platform.kernel.artifacts.ArtifactSimple;
-import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -52,22 +49,6 @@ public class CSVImportDocument implements Identifiable, Serializable {
      */
     private final String name;
     /**
-     * The document's base family URI
-     */
-    private final String base;
-    /**
-     * URI of the superseded document, if any
-     */
-    private final String[] supersede;
-    /**
-     * The version of this document
-     */
-    private final String version;
-    /**
-     * The archetype for this document
-     */
-    private final String archetype;
-    /**
      * The document's content
      */
     private final byte[] content;
@@ -75,34 +56,25 @@ public class CSVImportDocument implements Identifiable, Serializable {
     /**
      * Initializes this document
      *
-     * @param name      The document's name
-     * @param base      The document's base family URI
-     * @param supersede URI of the superseded document, if any
-     * @param version   The version of this document
-     * @param archetype The archetype for this document
-     * @param content   The document's content
+     * @param name    The document's name
+     * @param content The document's content
      */
-    public CSVImportDocument(String name, String base, String[] supersede, String version, String archetype, byte[] content) {
+    public CSVImportDocument(String name, byte[] content) {
         this.identifier = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         this.name = name;
-        this.base = base;
-        this.supersede = supersede;
-        this.version = version;
-        this.archetype = archetype;
         this.content = content;
     }
 
     /**
-     * Builds the artifact from this document
+     * Maps this document to quads
      *
-     * @param connector    The parent connector's identifier
      * @param mapping      The mapping to use for the import
      * @param separator    The character that separates values in rows
      * @param textMarker   The character that marks the beginning and end of raw text
      * @param skipFirstRow Whether to skip the first row
      * @return The artifact
      */
-    public Artifact buildArtifact(String connector, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow) {
+    public Collection<Quad> map(CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow) {
         ByteArrayInputStream byteStream = new ByteArrayInputStream(content);
         InputStreamReader reader = new InputStreamReader(byteStream, Files.CHARSET);
         CSVParser parser = new CSVParser(reader, separator, textMarker);
@@ -110,8 +82,7 @@ public class CSVImportDocument implements Identifiable, Serializable {
         BaseStore store = StoreFactory.create().inMemory().make();
         CSVImportMappingContext context = new CSVImportMappingContext(Character.toString(textMarker), store, identifier, identifier);
         mapping.apply(document, context, skipFirstRow);
-        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(identifier, base, supersede, name, version, archetype, connector);
-        return new ArtifactSimple(metadata, context.getQuads());
+        return context.getQuads();
     }
 
     /**
@@ -183,25 +154,8 @@ public class CSVImportDocument implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder("{\"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
-        builder.append("\", \"name\":\"");
-        builder.append(IOUtils.escapeStringJSON(name));
-        builder.append("\", \"base\": \"");
-        builder.append(IOUtils.escapeStringJSON(base));
-        builder.append("\", \"version\": \"");
-        builder.append(IOUtils.escapeStringJSON(version));
-        builder.append("\", \"archetype\": \"");
-        builder.append(IOUtils.escapeStringJSON(archetype));
-        builder.append("\", \"supersede\": [");
-        for (int i = 0; i != supersede.length; i++) {
-            if (i != 0)
-                builder.append(", ");
-            builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(supersede[i]));
-            builder.append("\"");
-        }
-        builder.append("]}");
-        return builder.toString();
+        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) +
+                "\", \"name\":\"" + IOUtils.escapeStringJSON(name) +
+                "\"}";
     }
 }

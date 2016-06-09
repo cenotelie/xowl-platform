@@ -24,6 +24,7 @@ import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.Files;
@@ -37,8 +38,10 @@ import org.xowl.platform.connectors.csv.CSVImportService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
+import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -111,8 +114,8 @@ public class CSVImportServiceImpl implements CSVImportService {
     }
 
     @Override
-    public XSPReply upload(String name, String base, String[] supersede, String version, String archetype, byte[] content) {
-        CSVImportDocument document = new CSVImportDocument(name, base, supersede, version, archetype, content);
+    public XSPReply upload(String name, byte[] content) {
+        CSVImportDocument document = new CSVImportDocument(name, content);
         documents.put(document.getIdentifier(), document);
         return new XSPReplyResult<>(document);
     }
@@ -126,17 +129,20 @@ public class CSVImportServiceImpl implements CSVImportService {
     }
 
     @Override
-    public XSPReply importDocument(String documentId, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow) {
+    public XSPReply importDocument(String documentId, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow, String base, String[] supersede, String version, String archetype) {
         CSVImportDocument document = documents.get(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        Artifact artifact = document.buildArtifact(getIdentifier(), mapping, separator, textMarker, skipFirstRow);
+        Collection<Quad> quads = document.map(mapping, separator, textMarker, skipFirstRow);
+        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(documentId, base, supersede, document.getName(), version, archetype, getIdentifier());
+        Artifact artifact = new ArtifactSimple(metadata, quads);
         XSPReply reply = storageService.store(artifact);
         if (!reply.isSuccess())
             return reply;
+        documents.remove(documentId);
         return new XSPReplyResult<>(artifact);
     }
 
@@ -153,55 +159,55 @@ public class CSVImportServiceImpl implements CSVImportService {
                     return XSPReplyUtils.toHttpResponse(getFirstLines(docIds[0], separators[0].charAt(0), textMarkers[0].charAt(0)), null);
                 return XSPReplyUtils.toHttpResponse(getDocument(docIds[0]), null);
             }
+            case "PUT": {
+                String[] names = parameters.get("name");
+                if (names != null && names.length > 0)
+                    return XSPReplyUtils.toHttpResponse(upload(names[0], content), null);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            }
             case "POST": {
                 String[] drops = parameters.get("drop");
                 if (drops != null && drops.length > 0)
                     return XSPReplyUtils.toHttpResponse(drop(drops[0]), null);
 
-                String[] names = parameters.get("name");
-                String[] bases = parameters.get("base");
-                String[] supersedes = parameters.get("supersede");
-                String[] versions = parameters.get("version");
-                String[] archetypes = parameters.get("archetype");
-                if (names != null && bases != null && supersedes != null && versions != null) {
-                    if (archetypes == null || archetypes.length <= 0)
-                        archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
-                    return XSPReplyUtils.toHttpResponse(upload(names[0], bases[0], supersedes, versions[0], archetypes[0], content), null);
-                }
-
                 String[] imports = parameters.get("import");
                 String[] separators = parameters.get("separator");
                 String[] textMarkers = parameters.get("textMarker");
                 String[] skipFirsts = parameters.get("skipFirst");
-                if (imports != null && separators != null && textMarkers != null && skipFirsts != null) {
-                    NodeManager nodeManager = new CachedNodes();
-                    JSONLDLoader loader = new JSONLDLoader(nodeManager) {
-                        @Override
-                        protected Reader getReaderFor(Logger logger, String iri) {
-                            return null;
-                        }
-                    };
-                    BufferedLogger bufferedLogger = new BufferedLogger();
-                    DispatchLogger dispatchLogger = new DispatchLogger(Logging.getDefault(), bufferedLogger);
-                    ParseResult parseResult = loader.parse(dispatchLogger, new StringReader(new String(content, Files.CHARSET)));
-                    if (parseResult == null || !parseResult.isSuccess()) {
-                        dispatchLogger.error("Failed to parse the response");
-                        if (parseResult != null) {
-                            for (ParseError error : parseResult.getErrors()) {
-                                dispatchLogger.error(error);
-                            }
-                        }
-                        StringBuilder builder = new StringBuilder();
-                        for (Object error : bufferedLogger.getErrorMessages()) {
-                            builder.append(error.toString());
-                            builder.append("\n");
-                        }
-                        return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_JSON, builder.toString());
+                String[] bases = parameters.get("base");
+                String[] supersedes = parameters.get("supersede");
+                String[] versions = parameters.get("version");
+                String[] archetypes = parameters.get("archetype");
+                if (archetypes == null || archetypes.length <= 0)
+                    archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
+
+                NodeManager nodeManager = new CachedNodes();
+                JSONLDLoader loader = new JSONLDLoader(nodeManager) {
+                    @Override
+                    protected Reader getReaderFor(Logger logger, String iri) {
+                        return null;
                     }
-                    CSVImportMapping mapping = new CSVImportMapping(parseResult.getRoot());
-                    return XSPReplyUtils.toHttpResponse(importDocument(imports[0], mapping, separators[0].charAt(0), textMarkers[0].charAt(0), skipFirsts[0].equalsIgnoreCase("true")), null);
+                };
+                BufferedLogger bufferedLogger = new BufferedLogger();
+                DispatchLogger dispatchLogger = new DispatchLogger(Logging.getDefault(), bufferedLogger);
+                ParseResult parseResult = loader.parse(dispatchLogger, new StringReader(new String(content, Files.CHARSET)));
+                if (parseResult == null || !parseResult.isSuccess()) {
+                    dispatchLogger.error("Failed to parse the response");
+                    if (parseResult != null) {
+                        for (ParseError error : parseResult.getErrors()) {
+                            dispatchLogger.error(error);
+                        }
+                    }
+                    StringBuilder builder = new StringBuilder();
+                    for (Object error : bufferedLogger.getErrorMessages()) {
+                        builder.append(error.toString());
+                        builder.append("\n");
+                    }
+                    return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_JSON, builder.toString());
                 }
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                CSVImportMapping mapping = new CSVImportMapping(parseResult.getRoot());
+                XSPReply reply = importDocument(imports[0], mapping, separators[0].charAt(0), textMarkers[0].charAt(0), skipFirsts[0].equalsIgnoreCase("true"), bases[0], supersedes, versions[0], archetypes[0]);
+                return XSPReplyUtils.toHttpResponse(reply, null);
             }
             default:
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);

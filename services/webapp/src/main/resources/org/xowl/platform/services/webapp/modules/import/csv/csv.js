@@ -45,23 +45,17 @@ XOWL.prototype.dropCSVDocument = function (callback, docId) {
 	}, "services/import/csv", {drop: docId}, {});
 }
 
-XOWL.prototype.uploadCSV = function (callback, name, base, supersede, version, archetype, content) {
+XOWL.prototype.uploadCSV = function (callback, name, content) {
 	this.doJSRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
-	}, "POST", "services/import/csv", {
-		name: name,
-		base: base,
-        supersede: supersede,
-        version: version,
-        archetype: archetype
-	}, content, "text/csv", "application/json");
+	}, "PUT", "services/import/csv", {name: name}, content, "text/csv", "application/json");
 }
 
-XOWL.prototype.importCSV = function (callback, docId, separator, textMarker, skipFirst, mapping) {
+XOWL.prototype.importCSV = function (callback, docId, separator, textMarker, skipFirst, mapping, base, supersede, version, archetype) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content).payload);
@@ -72,6 +66,10 @@ XOWL.prototype.importCSV = function (callback, docId, separator, textMarker, ski
 		import: docId,
 		separator: separator,
 		textMarker: textMarker,
-		skipFirst: skipFirst
+		skipFirst: skipFirst,
+		base: base,
+		supersede: supersede,
+		version: version,
+		archetype: archetype
 	}, mapping);
 }

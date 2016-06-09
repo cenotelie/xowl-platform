@@ -19,16 +19,13 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.kernel.artifacts.Artifact;
-import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,10 +46,6 @@ public class CSVConnector extends ConnectorServiceBase {
      * The API URIs for this connector
      */
     private final String[] uris;
-    /**
-     * The documents being imported
-     */
-    private final Map<String, CSVImportDocument> documents;
 
     /**
      * Initializes this connector
@@ -65,7 +58,6 @@ public class CSVConnector extends ConnectorServiceBase {
         this.identifier = identifier;
         this.name = name;
         this.uris = uris;
-        this.documents = new HashMap<>();
     }
 
     @Override
@@ -90,46 +82,6 @@ public class CSVConnector extends ConnectorServiceBase {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (method.equals("GET"))
-            return onMessageGet();
-        if (method.equals("PUT"))
-            return onMessagePutDocument(parameters, content);
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
-    }
-
-    /**
-     * Responds to a GET message
-     *
-     * @return The response
-     */
-    private HttpResponse onMessageGet() {
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, serializedJSON());
-    }
-
-    /**
-     * Responds to a PUT message for a document
-     *
-     * @param parameters The request parameters
-     * @param content    The content, if any
-     * @return The response
-     */
-    private HttpResponse onMessagePutDocument(Map<String, String[]> parameters, byte[] content) {
-        String[] names = parameters.get("name");
-        String[] bases = parameters.get("base");
-        String[] supersedes = parameters.get("supersede");
-        String[] versions = parameters.get("version");
-        String[] archetypes = parameters.get("archetype");
-        if (names == null || names.length <= 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
-        if (bases == null || bases.length <= 0)
-            bases = new String[]{null};
-        if (versions == null || versions.length <= 0)
-            versions = new String[]{null};
-        if (archetypes == null || archetypes.length <= 0)
-            archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
-
-        CSVImportDocument document = new CSVImportDocument(names[0], bases[0], supersedes, versions[0], archetypes[0], content);
-        documents.put(document.getIdentifier(), document);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
     }
 }

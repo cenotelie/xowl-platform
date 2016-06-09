@@ -54,15 +54,11 @@ public interface CSVImportService extends HttpAPIService {
     /**
      * Uploads a new document
      *
-     * @param name      The document's name
-     * @param base      The document's base family URI
-     * @param supersede URI of the superseded document, if any
-     * @param version   The version of this document
-     * @param archetype The archetype for this document
-     * @param content   The document's content
+     * @param name    The document 's name
+     * @param content The document's content
      * @return The document
      */
-    XSPReply upload(String name, String base, String[] supersede, String version, String archetype, byte[] content);
+    XSPReply upload(String name, byte[] content);
 
     /**
      * Drops the specified document
@@ -73,14 +69,18 @@ public interface CSVImportService extends HttpAPIService {
     XSPReply drop(String documentId);
 
     /**
-     * Finalizes a document import
+     * Finalizes a document import as an artifact
      *
      * @param documentId   The identifier of the document to import
      * @param mapping      The mapping to use for the import
      * @param separator    The character that separates values in rows
      * @param textMarker   The character that marks the beginning and end of raw text
      * @param skipFirstRow Whether to skip the first row
+     * @param base         The artifact's base family URI
+     * @param supersede    URI of the superseded artifacts, if any
+     * @param version      The version of the artifact
+     * @param archetype    The archetype for the artifact
      * @return The result
      */
-    XSPReply importDocument(String documentId, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow);
+    XSPReply importDocument(String documentId, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow, String base, String[] supersede, String version, String archetype);
 }

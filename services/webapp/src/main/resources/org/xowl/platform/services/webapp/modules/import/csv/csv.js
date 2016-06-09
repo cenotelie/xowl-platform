@@ -8,5 +8,70 @@ XOWL.prototype.getCSVDocuments = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "domains/syseng/collaboration?type=stakeholders");
+	}, "services/import/csv", null);
+}
+
+XOWL.prototype.getCSVDocument = function (callback, docId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/import/csv", {document: docId});
+}
+
+XOWL.prototype.getCSVFirstLines = function (callback, docId, separator, textMarker) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/import/csv", {
+		document: docId,
+		separator: separator,
+		textMarker: textMarker
+	});
+}
+
+XOWL.prototype.dropCSVDocument = function (callback, docId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/import/csv", {drop: docId}, {});
+}
+
+XOWL.prototype.uploadCSV = function (callback, name, base, supersede, version, archetype, content) {
+	this.doJSRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "POST", "services/import/csv", {
+		name: name,
+		base: base,
+        supersede: supersede,
+        version: version,
+        archetype: archetype
+	}, content, "text/csv", "application/json");
+}
+
+XOWL.prototype.importCSV = function (callback, docId, separator, textMarker, skipFirst, mapping) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/import/csv", {
+		import: docId,
+		separator: separator,
+		textMarker: textMarker,
+		skipFirst: skipFirst
+	}, mapping);
 }

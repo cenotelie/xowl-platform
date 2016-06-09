@@ -39,7 +39,7 @@ XOWL.prototype.login = function (callback, login, password) {
 			localStorage.removeItem('xowl.userName');
 			callback(code, type, content);
 		}
-	}, "services/core/security");
+	}, "services/core/security", null);
 }
 
 XOWL.prototype.logout = function () {
@@ -62,7 +62,7 @@ XOWL.prototype.getBasicStats = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/statistics");
+	}, "services/core/statistics", null);
 }
 
 XOWL.prototype.getPlatformBundles = function (callback) {
@@ -72,7 +72,7 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/statistics?platform");
+	}, "services/core/statistics?platform", null);
 }
 
 
@@ -88,7 +88,7 @@ XOWL.prototype.getBusinessDomains = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/domains");
+	}, "services/core/business/domains", null);
 }
 
 XOWL.prototype.getBusinessDomain = function (callback, domainId) {
@@ -98,7 +98,7 @@ XOWL.prototype.getBusinessDomain = function (callback, domainId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/domain?id=" + encodeURIComponent(domainId));
+	}, "services/core/business/domain", {id: domainId});
 }
 
 XOWL.prototype.getArtifactArchetypes = function (callback) {
@@ -108,7 +108,7 @@ XOWL.prototype.getArtifactArchetypes = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/archetypes");
+	}, "services/core/business/archetypes", null);
 }
 
 XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
@@ -118,7 +118,7 @@ XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/archetype?id=" + encodeURIComponent(archetypeId));
+	}, "services/core/business/archetype", {id: archetypeId});
 }
 
 XOWL.prototype.getBusinessSchemas = function (callback) {
@@ -128,7 +128,7 @@ XOWL.prototype.getBusinessSchemas = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/schemas");
+	}, "services/core/business/schemas", null);
 }
 
 XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
@@ -138,7 +138,7 @@ XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/business/schema?id=" + encodeURIComponent(schemaId));
+	}, "services/core/business/schema", {id: schemaId});
 }
 
 
@@ -154,7 +154,7 @@ XOWL.prototype.getJobs = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/jobs");
+	}, "services/core/jobs", null);
 }
 
 XOWL.prototype.getJob = function (callback, jobId) {
@@ -164,7 +164,7 @@ XOWL.prototype.getJob = function (callback, jobId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/jobs?id=" + encodeURIComponent(jobId));
+	}, "services/core/jobs", {id: jobId});
 }
 
 
@@ -180,7 +180,7 @@ XOWL.prototype.getAllArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts");
+	}, "services/core/artifacts", null);
 }
 
 XOWL.prototype.getLiveArtifacts = function (callback) {
@@ -190,7 +190,7 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?live=true");
+	}, "services/core/artifacts", {live: "true"});
 }
 
 XOWL.prototype.getArtifactsForBase = function (callback, base) {
@@ -200,7 +200,7 @@ XOWL.prototype.getArtifactsForBase = function (callback, base) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?base=" + encodeURIComponent(base));
+	}, "services/core/artifacts", {base: base});
 }
 
 XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
@@ -210,7 +210,7 @@ XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?archetype=" + encodeURIComponent(archetype));
+	}, "services/core/artifacts", {archetype: archetype});
 }
 
 XOWL.prototype.getArtifact = function (callback, artifactId) {
@@ -220,7 +220,7 @@ XOWL.prototype.getArtifact = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts", {id: artifactId});
 }
 
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
@@ -230,7 +230,7 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?quads=metadata&id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts", {quads: "metadata", id: artifactId});
 }
 
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
@@ -240,7 +240,7 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?quads=content&id=" + encodeURIComponent(artifactId));
+	}, "services/core/artifacts", {quads: "content", id: artifactId});
 }
 
 XOWL.prototype.deleteArtifact = function (callback, artifactId) {
@@ -250,7 +250,7 @@ XOWL.prototype.deleteArtifact = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?action=delete&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts", {action: "delete", id: artifactId}, {});
 }
 
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
@@ -267,7 +267,7 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?diffLeft=" + encodeURIComponent(artifactLeft) + "&diffRight=" + encodeURIComponent(artifactRight));
+	}, "services/core/artifacts", {diffLeft: artifactLeft, diffRight: artifactRight});
 }
 
 XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
@@ -277,7 +277,7 @@ XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?action=pull&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts", {action: "pull", id: artifactId}, {});
 }
 
 XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
@@ -287,7 +287,7 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts?action=push&id=" + encodeURIComponent(artifactId), {});
+	}, "services/core/artifacts", {action: "push", id: artifactId}, {});
 }
 
 
@@ -303,7 +303,7 @@ XOWL.prototype.getInconsistencies = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/inconsistencies");
+	}, "services/core/inconsistencies", null);
 }
 
 XOWL.prototype.getConsistencyRules = function (callback) {
@@ -313,7 +313,7 @@ XOWL.prototype.getConsistencyRules = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency");
+	}, "services/core/consistency", null);
 }
 
 XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
@@ -323,7 +323,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency?id=" + encodeURIComponent(ruleId));
+	}, "services/core/consistency" {id: ruleId});
 }
 
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
@@ -333,7 +333,13 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency?action=create&name=" + encodeURIComponent(name) + "&message=" + encodeURIComponent(message) + "&prefixes=" + encodeURIComponent(prefixes) + "&conditions=" + encodeURIComponent(conditions), "");
+	}, "services/core/consistency", {
+		action: "create",
+		name: name,
+		message: message,
+		prefixes: prefixes,
+		conditions: conditions
+	}, {});
 }
 
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
@@ -343,7 +349,7 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency?action=activate&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency", {action: "activate", id: ruleId}, {});
 }
 
 XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
@@ -353,7 +359,7 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency?action=deactivate&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency", {action: "deactivate", id: ruleId}, {});
 }
 
 XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
@@ -363,7 +369,7 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency?action=delete&id=" + encodeURIComponent(ruleId), "");
+	}, "services/core/consistency", {action: "delete", id: ruleId}, {});
 }
 
 
@@ -379,7 +385,7 @@ XOWL.prototype.newImpactAnalysis = function (callback, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/impact", definition);
+	}, "services/core/impact", null, definition);
 }
 
 
@@ -395,7 +401,7 @@ XOWL.prototype.getEvaluations = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluations");
+	}, "services/core/evaluation/evaluations", null);
 }
 
 XOWL.prototype.getEvaluation = function (callback, evaluationId) {
@@ -405,7 +411,7 @@ XOWL.prototype.getEvaluation = function (callback, evaluationId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluation?id=" + encodeURIComponent(evaluationId));
+	}, "services/core/evaluation/evaluation", {id: evaluationId});
 }
 
 XOWL.prototype.getEvaluableTypes = function (callback) {
@@ -415,7 +421,7 @@ XOWL.prototype.getEvaluableTypes = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluableTypes");
+	}, "services/core/evaluation/evaluableTypes", null);
 }
 
 XOWL.prototype.getEvaluables = function (callback, typeId) {
@@ -425,7 +431,7 @@ XOWL.prototype.getEvaluables = function (callback, typeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluables?type=" + encodeURIComponent(typeId));
+	}, "services/core/evaluation/evaluables", {type: typeId});
 }
 
 XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
@@ -435,7 +441,7 @@ XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/criterionTypes?for=" + encodeURIComponent(typeId));
+	}, "services/core/evaluation/criterionTypes", {"for": typeId});
 }
 
 XOWL.prototype.newEvaluation = function (callback, definition) {
@@ -445,7 +451,7 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/service", definition);
+	}, "services/core/evaluation/service", null, definition);
 }
 
 
@@ -461,7 +467,7 @@ XOWL.prototype.getDescriptors = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/descriptors");
+	}, "services/core/descriptors", null);
 }
 
 XOWL.prototype.getConnectors = function (callback) {
@@ -471,7 +477,7 @@ XOWL.prototype.getConnectors = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors");
+	}, "services/core/connectors", null);
 }
 
 XOWL.prototype.getConnector = function (callback, connectorId) {
@@ -481,7 +487,7 @@ XOWL.prototype.getConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors?id=" + encodeURIComponent(connectorId));
+	}, "services/core/connectors", {id: connectorId});
 }
 
 XOWL.prototype.createConnector = function (callback, domain, definition) {
@@ -491,7 +497,7 @@ XOWL.prototype.createConnector = function (callback, domain, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors?action=spawn&descriptor=" + encodeURIComponent(domain.identifier), definition);
+	}, "services/core/connectors", {action: "spawn", descriptor: domain.identifier}, definition);
 }
 
 XOWL.prototype.deleteConnector = function (callback, connectorId) {
@@ -501,7 +507,7 @@ XOWL.prototype.deleteConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors?action=delete&id=" + encodeURIComponent(connectorId), {});
+	}, "services/core/connectors", {action: "delete", id: connectorId}, {});
 }
 
 XOWL.prototype.pullFromConnector = function (callback, connectorId) {
@@ -511,7 +517,7 @@ XOWL.prototype.pullFromConnector = function (callback, connectorId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors?action=pull&id=" + encodeURIComponent(connectorId), {});
+	}, "services/core/connectors", {action: "pull", id: connectorId}, {});
 }
 
 XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
@@ -521,7 +527,7 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/connectors?action=push&id=" + encodeURIComponent(connectorId) + "&artifact=" + encodeURIComponent(artifactId), {});
+	}, "services/core/connectors", {action: "push", id: connectorId, artifact: artifactId}, {});
 }
 
 
@@ -544,68 +550,39 @@ XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, 
 // Low-Level Core API
 ////
 
-XOWL.prototype.doQuery = function (callback, target) {
-	this.doJSQuery(callback, target);
+XOWL.prototype.doQuery = function (callback, target, parameters) {
+	this.doJSQuery(callback, target, parameters);
 }
 
-XOWL.prototype.doJSQuery = function (callback, target) {
-	if (this.authToken === null || this.authToken == "")
-		callback(401, "text/plain", "");
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState == 4) {
-			var ct = xmlHttp.getResponseHeader("Content-Type");
-			callback(xmlHttp.status, ct, xmlHttp.responseText)
-		}
-	}
-	xmlHttp.open("GET", this.endpoint + target, true);
-	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
-	xmlHttp.withCredentials = true;
-	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
-	xmlHttp.send();
+XOWL.prototype.doCommand = function (callback, target, parameters, payload) {
+	this.doJSCommand(callback, target, parameters, payload);
 }
 
-XOWL.prototype.doCommand = function (callback, target, payload) {
-	this.doJSCommand(callback, target, payload);
+XOWL.prototype.doJSQuery = function (callback, target, parameters) {
+	this.doJSRequest(callback, "GET", target, parameters, null, null, "text/plain, application/json");
 }
 
-XOWL.prototype.doJSCommand = function (callback, target, payload) {
-	if (this.authToken === null || this.authToken == "")
-		callback(401, "text/plain", "");
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState == 4) {
-			var ct = xmlHttp.getResponseHeader("Content-Type");
-			callback(xmlHttp.status, ct, xmlHttp.responseText)
-		}
-	}
-	xmlHttp.open("POST", this.endpoint + target, true);
-	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
-	xmlHttp.setRequestHeader("Content-Type", "application/json");
-	xmlHttp.withCredentials = true;
-	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
-	xmlHttp.send(JSON.stringify(payload));
+XOWL.prototype.doJSCommand = function (callback, target, parameters, payload) {
+	this.doJSRequest(callback, "POST", target, parameters, payload, "application/json", "text/plain, application/json");
 }
 
 XOWL.prototype.doJSSPARQL = function (callback, payload) {
-	if (this.authToken === null || this.authToken == "")
-		callback(401, "text/plain", "");
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState == 4) {
-			var ct = xmlHttp.getResponseHeader("Content-Type");
-			callback(xmlHttp.status, ct, xmlHttp.responseText)
-		}
-	}
-	xmlHttp.open("POST", this.endpoint + "services/core/sparql", true);
-	xmlHttp.setRequestHeader("Accept", "application/sparql-results+json, application/n-quads");
-	xmlHttp.setRequestHeader("Content-Type", "application/sparql-query");
-	xmlHttp.withCredentials = true;
-	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
-	xmlHttp.send(payload);
+	this.doJSRequest(callback, "POST", "services/core/sparql", null, payload, "application/sparql-query", "application/sparql-results+json, application/n-quads");
 }
 
 XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
+	var parameters = {
+		name: name,
+		base: base,
+		version: version };
+	if (supersede !== null && supersede !== "" && supersede !== "none")
+		parameters.supersede = supersede;
+	if (archetype !== null && archetype !== "")
+		parameters.archetype = archetype;
+	this.doJSRequest(callback, "POST", connectorURI, parameters, payload, contentType, "application/json");
+}
+
+XOWL.prototype.doJSRequest = function (callback, verb, uriComplement, parameters, payload, contentType, accept) {
 	if (this.authToken === null || this.authToken == "")
 		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
@@ -615,15 +592,26 @@ XOWL.prototype.doJSUpload = function (callback, connectorURI, payload, contentTy
 			callback(xmlHttp.status, ct, xmlHttp.responseText)
 		}
 	}
-	var uri = this.endpoint + connectorURI + "?name=" + encodeURIComponent(name) + "&base=" + encodeURIComponent(base) + "&version=" + encodeURIComponent(version);
-	if (supersede !== null && supersede !== "" && supersede !== "none")
-		uri += "&supersede=" + encodeURIComponent(supersede);
-	if (archetype !== null && archetype !== "")
-		uri += "&archetype=" + encodeURIComponent(archetype);
-	xmlHttp.open("POST", uri, true);
-	xmlHttp.setRequestHeader("Accept", "application/json");
-	xmlHttp.setRequestHeader("Content-Type", contentType);
+	var uri = this.endpoint + uriComplement;
+	if (uriComplement != null) {
+		var names = Object.getOwnPropertyNames(parameters);
+		for (var p = 0; p != names.length; p++) {
+			var value = parameters[names[p]];
+			uri += (p === 0) ? "?" : "&";
+			uri += names[p];
+			uri += encodeURIComponent(value);
+		}
+	}
+	xmlHttp.open(verb, uri, true);
+	xmlHttp.setRequestHeader("Accept", accept);
+	if (contentType != null)
+		xmlHttp.setRequestHeader("Content-Type", contentType);
 	xmlHttp.withCredentials = true;
 	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
-	xmlHttp.send(payload);
+	if (payload === null)
+		xmlHttp.send();
+	else if (contentType === "application/json")
+		xmlHttp.send(JSON.stringify(payload));
+	else
+		xmlHttp.send(payload);
 }

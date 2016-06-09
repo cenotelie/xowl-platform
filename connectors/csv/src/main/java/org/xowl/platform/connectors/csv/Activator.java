@@ -19,6 +19,8 @@ package org.xowl.platform.connectors.csv;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.connectors.csv.impl.CSVImportServiceImpl;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
 /**
@@ -29,6 +31,7 @@ import org.xowl.platform.services.connection.ConnectorServiceFactory;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
+        bundleContext.registerService(HttpAPIService.class, new CSVImportServiceImpl(), null);
         bundleContext.registerService(ConnectorServiceFactory.class, CSVFactory.INSTANCE, null);
     }
 

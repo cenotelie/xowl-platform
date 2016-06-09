@@ -32,8 +32,10 @@ import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents a document to be imported
@@ -110,6 +112,58 @@ public class CSVImportDocument implements Identifiable, Serializable {
         mapping.apply(document, context, skipFirstRow);
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(identifier, base, supersede, name, version, archetype, connector);
         return new ArtifactSimple(metadata, context.getQuads());
+    }
+
+    /**
+     * Gets the first lines (serialized in JSON) of this document
+     *
+     * @param separator  The character that separates values in rows
+     * @param textMarker The character that marks the beginning and end of raw text
+     * @return The first lines of this document
+     */
+    public Serializable getFirstLines(char separator, char textMarker) {
+        ByteArrayInputStream byteStream = new ByteArrayInputStream(content);
+        InputStreamReader reader = new InputStreamReader(byteStream, Files.CHARSET);
+        CSVParser parser = new CSVParser(reader, separator, textMarker);
+        Iterator<Iterator<String>> document = parser.parse();
+
+        final List<List<String>> data = new ArrayList<>();
+        int rowCount = 0;
+        while (document.hasNext() && rowCount < 4) {
+            Iterator<String> row = document.next();
+            List<String> rowData = new ArrayList<>();
+            while (row.hasNext())
+                rowData.add(row.next());
+            data.add(rowData);
+            rowCount++;
+        }
+        return new Serializable() {
+            @Override
+            public String serializedString() {
+                return serializedJSON();
+            }
+
+            @Override
+            public String serializedJSON() {
+                StringBuilder builder = new StringBuilder("{\"rows\": [");
+                for (int i = 0; i != data.size(); i++) {
+                    if (i != 0)
+                        builder.append(", ");
+                    List<String> row = data.get(i);
+                    builder.append("{\"cells\": [");
+                    for (int j = 0; j != row.size(); j++) {
+                        if (j != 0)
+                            builder.append(", ");
+                        builder.append("\"");
+                        builder.append(IOUtils.escapeStringJSON(row.get(j)));
+                        builder.append("\"");
+                    }
+                    builder.append("]}");
+                }
+                builder.append("]}");
+                return builder.toString();
+            }
+        };
     }
 
     @Override

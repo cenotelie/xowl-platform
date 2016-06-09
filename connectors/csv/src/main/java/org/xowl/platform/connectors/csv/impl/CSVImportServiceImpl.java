@@ -153,26 +153,22 @@ public class CSVImportServiceImpl implements CSVImportService {
                     return XSPReplyUtils.toHttpResponse(getFirstLines(docIds[0], separators[0].charAt(0), textMarkers[0].charAt(0)), null);
                 return XSPReplyUtils.toHttpResponse(getDocument(docIds[0]), null);
             }
-            case "PUT": {
+            case "POST": {
+                String[] drops = parameters.get("drop");
+                if (drops != null && drops.length > 0)
+                    return XSPReplyUtils.toHttpResponse(drop(drops[0]), null);
+
                 String[] names = parameters.get("name");
                 String[] bases = parameters.get("base");
                 String[] supersedes = parameters.get("supersede");
                 String[] versions = parameters.get("version");
                 String[] archetypes = parameters.get("archetype");
-                if (names == null || names.length <= 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected name parameter");
-                if (bases == null || bases.length <= 0)
-                    bases = new String[]{null};
-                if (versions == null || versions.length <= 0)
-                    versions = new String[]{null};
-                if (archetypes == null || archetypes.length <= 0)
-                    archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
-                return XSPReplyUtils.toHttpResponse(upload(names[0], bases[0], supersedes, versions[0], archetypes[0], content), null);
-            }
-            case "POST": {
-                String[] drops = parameters.get("drop");
-                if (drops != null && drops.length > 0)
-                    return XSPReplyUtils.toHttpResponse(drop(drops[0]), null);
+                if (names != null && bases != null && supersedes != null && versions != null) {
+                    if (archetypes == null || archetypes.length <= 0)
+                        archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
+                    return XSPReplyUtils.toHttpResponse(upload(names[0], bases[0], supersedes, versions[0], archetypes[0], content), null);
+                }
+
                 String[] imports = parameters.get("import");
                 String[] separators = parameters.get("separator");
                 String[] textMarkers = parameters.get("textMarker");

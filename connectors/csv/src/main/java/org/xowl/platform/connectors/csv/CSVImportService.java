@@ -17,8 +17,15 @@
 
 package org.xowl.platform.connectors.csv;
 
+import org.xowl.platform.kernel.HttpAPIService;
+
 /**
- * Created by laurent on 09/06/16.
+ * An importation service of CSV documents
+ *
+ * @author Laurent Wouters
  */
-public interface CSVImportService {
+public interface CSVImportService extends HttpAPIService {
+
+
+
 }

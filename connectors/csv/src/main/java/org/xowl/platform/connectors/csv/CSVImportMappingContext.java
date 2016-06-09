@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class ImportMappingContext {
+public class CSVImportMappingContext {
     /**
      * The used text marker
      */
@@ -64,7 +64,7 @@ public class ImportMappingContext {
      * @param graphURI   The URI of the graph for the produced quads
      * @param baseURI    The base URI for the resolved entities
      */
-    public ImportMappingContext(String textMarker, NodeManager nodes, String graphURI, String baseURI) {
+    public CSVImportMappingContext(String textMarker, NodeManager nodes, String graphURI, String baseURI) {
         this.textMarker = textMarker;
         this.nodes = nodes;
         this.graph = nodes.getIRINode(graphURI);

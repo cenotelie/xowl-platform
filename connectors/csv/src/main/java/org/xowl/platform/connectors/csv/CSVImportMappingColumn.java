@@ -28,7 +28,7 @@ import org.xowl.infra.store.rdf.IRINode;
  *
  * @author Laurent Wouters
  */
-public class ImportMappingColumn implements Serializable {
+public class CSVImportMappingColumn implements Serializable {
     /**
      * The column is not mapped
      */
@@ -66,7 +66,7 @@ public class ImportMappingColumn implements Serializable {
     /**
      * Initializes as not mapping a column
      */
-    public ImportMappingColumn() {
+    public CSVImportMappingColumn() {
         this.type = TYPE_NONE;
         this.schemaRelation = null;
         this.schemaAttributeType = null;
@@ -78,7 +78,7 @@ public class ImportMappingColumn implements Serializable {
      *
      * @param relation The URI of the mapped relation, or null if the ID is noe mapped as an additional property
      */
-    public ImportMappingColumn(String relation) {
+    public CSVImportMappingColumn(String relation) {
         this.type = TYPE_ID;
         this.schemaRelation = relation;
         this.schemaAttributeType = Vocabulary.xsdString;
@@ -91,7 +91,7 @@ public class ImportMappingColumn implements Serializable {
      * @param relation    The URI of the relation
      * @param multivalued Whether the column is multivalued
      */
-    public ImportMappingColumn(String relation, boolean multivalued) {
+    public CSVImportMappingColumn(String relation, boolean multivalued) {
         this.type = TYPE_RELATION;
         this.schemaRelation = relation;
         this.schemaAttributeType = null;
@@ -105,7 +105,7 @@ public class ImportMappingColumn implements Serializable {
      * @param datatype    The URI of the datatype for the values
      * @param multivalued Whether the column is multivalued
      */
-    public ImportMappingColumn(String attribute, String datatype, boolean multivalued) {
+    public CSVImportMappingColumn(String attribute, String datatype, boolean multivalued) {
         this.type = TYPE_ATTRIBUTE;
         this.schemaRelation = attribute;
         this.schemaAttributeType = datatype;
@@ -117,7 +117,7 @@ public class ImportMappingColumn implements Serializable {
      *
      * @param node The AST node
      */
-    public ImportMappingColumn(ASTNode node) {
+    public CSVImportMappingColumn(ASTNode node) {
         String tType = TYPE_NONE;
         String tRelation = "";
         String tAttribute = "";
@@ -164,7 +164,7 @@ public class ImportMappingColumn implements Serializable {
      * @param value   The column's value
      * @param context The current context
      */
-    public void apply(IRINode entity, String value, ImportMappingContext context) {
+    public void apply(IRINode entity, String value, CSVImportMappingContext context) {
         if (value.startsWith(context.getTextMarker()) && value.endsWith(context.getTextMarker()))
             value = value.substring(1, value.length() - 1);
         switch (type) {

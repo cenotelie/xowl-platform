@@ -38,8 +38,10 @@ import java.util.Iterator;
 
 /**
  * Represents a document to be imported
+ *
+ * @author Laurent Wouters
  */
-public class ImportDocument implements Identifiable, Serializable {
+public class CSVImportDocument implements Identifiable, Serializable {
     /**
      * The document's identifier
      */
@@ -79,7 +81,7 @@ public class ImportDocument implements Identifiable, Serializable {
      * @param archetype The archetype for this document
      * @param content   The document's content
      */
-    public ImportDocument(String name, String base, String[] supersede, String version, String archetype, byte[] content) {
+    public CSVImportDocument(String name, String base, String[] supersede, String version, String archetype, byte[] content) {
         this.identifier = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         this.name = name;
         this.base = base;
@@ -99,13 +101,13 @@ public class ImportDocument implements Identifiable, Serializable {
      * @param skipFirstRow Whether to skip the first row
      * @return The artifact
      */
-    public Artifact buildArtifact(String connector, ImportMapping mapping, char separator, char textMarker, boolean skipFirstRow) {
+    public Artifact buildArtifact(String connector, CSVImportMapping mapping, char separator, char textMarker, boolean skipFirstRow) {
         ByteArrayInputStream byteStream = new ByteArrayInputStream(content);
         InputStreamReader reader = new InputStreamReader(byteStream, Files.CHARSET);
         CSVParser parser = new CSVParser(reader, separator, textMarker);
         Iterator<Iterator<String>> document = parser.parse();
         BaseStore store = StoreFactory.create().inMemory().make();
-        ImportMappingContext context = new ImportMappingContext(Character.toString(textMarker), store, identifier, identifier);
+        CSVImportMappingContext context = new CSVImportMappingContext(Character.toString(textMarker), store, identifier, identifier);
         mapping.apply(document, context, skipFirstRow);
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(identifier, base, supersede, name, version, archetype, connector);
         return new ArtifactSimple(metadata, context.getQuads());

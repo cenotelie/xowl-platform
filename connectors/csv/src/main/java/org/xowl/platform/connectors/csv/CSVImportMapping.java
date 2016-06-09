@@ -32,16 +32,16 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class ImportMapping implements Serializable {
+public class CSVImportMapping implements Serializable {
     /**
      * The mapping for the columns
      */
-    private final List<ImportMappingColumn> columns;
+    private final List<CSVImportMappingColumn> columns;
 
     /**
      * Initializes an empty mapping
      */
-    public ImportMapping() {
+    public CSVImportMapping() {
         this.columns = new ArrayList<>();
     }
 
@@ -50,14 +50,14 @@ public class ImportMapping implements Serializable {
      *
      * @param node The AST node
      */
-    public ImportMapping(ASTNode node) {
+    public CSVImportMapping(ASTNode node) {
         this.columns = new ArrayList<>();
         for (ASTNode child : node.getChildren()) {
             String key = IOUtils.unescape(child.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             if (key.equals("columns")) {
                 for (ASTNode columnNode : child.getChildren().get(1).getChildren()) {
-                    this.columns.add(new ImportMappingColumn(columnNode));
+                    this.columns.add(new CSVImportMappingColumn(columnNode));
                 }
             }
         }
@@ -68,7 +68,7 @@ public class ImportMapping implements Serializable {
      *
      * @param column The next column
      */
-    public void addColumn(ImportMappingColumn column) {
+    public void addColumn(CSVImportMappingColumn column) {
         this.columns.add(column);
     }
 
@@ -79,7 +79,7 @@ public class ImportMapping implements Serializable {
      * @param context      The context
      * @param skipFirstRow Whether to skip the first row
      */
-    public void apply(Iterator<Iterator<String>> document, ImportMappingContext context, boolean skipFirstRow) {
+    public void apply(Iterator<Iterator<String>> document, CSVImportMappingContext context, boolean skipFirstRow) {
         if (skipFirstRow && document.hasNext()) {
             Iterator<String> row = document.next();
             while (row.hasNext())
@@ -97,7 +97,7 @@ public class ImportMapping implements Serializable {
      * @param row     The input row
      * @param context The context
      */
-    private void applyRow(Iterator<String> row, ImportMappingContext context) {
+    private void applyRow(Iterator<String> row, CSVImportMappingContext context) {
         String[] values = new String[columns.size()];
         int i = 0;
         while (row.hasNext()) {

@@ -52,7 +52,7 @@ public class CSVConnector extends ConnectorServiceBase {
     /**
      * The documents being imported
      */
-    private final Map<String, ImportDocument> documents;
+    private final Map<String, CSVImportDocument> documents;
 
     /**
      * Initializes this connector
@@ -128,7 +128,7 @@ public class CSVConnector extends ConnectorServiceBase {
         if (archetypes == null || archetypes.length <= 0)
             archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
 
-        ImportDocument document = new ImportDocument(names[0], bases[0], supersedes, versions[0], archetypes[0], content);
+        CSVImportDocument document = new CSVImportDocument(names[0], bases[0], supersedes, versions[0], archetypes[0], content);
         documents.put(document.getIdentifier(), document);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
     }

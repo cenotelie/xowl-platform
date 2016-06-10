@@ -90,9 +90,9 @@ function onInitMapping() {
 function mappingNewColumn(index, name) {
 	mapping[index] = {
 	    type: "none",
-	    schemaRelation: null,
-	    schemaAttributeType: null,
-	    multivalued: "false"
+	    property: "",
+	    datatype: "",
+	    regexp: ""
 	};
 	var result = document.createElement("tr");
 	var cell1 = document.createElement("td");
@@ -101,13 +101,13 @@ function mappingNewColumn(index, name) {
 	var cell4 = document.createElement("td");
 	var cell5 = document.createElement("td");
 	cell1.appendChild(document.createTextNode(name));
-	var selectType = createNewSelectMappingType();
+	var selectType = createNewSelectMappingType(index);
 	cell2.appendChild(selectType);
-	var propertyInput = createNewPropertyInput();
+	var propertyInput = createNewPropertyInput(index);
 	cell3.appendChild(propertyInput);
-	var selectDatatype = createNewSelectDatatype();
+	var selectDatatype = createNewSelectDatatype(index);
 	cell4.appendChild(selectDatatype);
-	var toggle = createNewSelectMultivalued();
+	var toggle = createNewSelectMultivalued(index);
 	cell5.appendChild(toggle);
 	result.appendChild(cell1);
 	result.appendChild(cell2);
@@ -117,7 +117,7 @@ function mappingNewColumn(index, name) {
 	return result;
 }
 
-function createNewSelectMappingType() {
+function createNewSelectMappingType(index) {
 	var selectType = document.createElement("select");
 	var option1 = document.createElement("option");
 	var option2 = document.createElement("option");
@@ -135,17 +135,23 @@ function createNewSelectMappingType() {
 	selectType.appendChild(option2);
 	selectType.appendChild(option3);
 	selectType.appendChild(option4);
+	selectType.onchange = function() {
+		mapping[index].type = selectType.value;
+	};
 	return selectType;
 }
 
-function createNewPropertyInput() {
+function createNewPropertyInput(index) {
 	var input = document.createElement("input");
 	input.type = "text";
 	input.placeholder = "http://xowl.org/property";
+	selectType.onchange = function() {
+		mapping[index].property = input.value;
+	};
 	return input;
 }
 
-function createNewSelectDatatype() {
+function createNewSelectDatatype(index) {
 	var selectType = document.createElement("select");
 	var option1 = document.createElement("option");
 	var option2 = document.createElement("option");
@@ -163,17 +169,19 @@ function createNewSelectDatatype() {
 	selectType.appendChild(option2);
 	selectType.appendChild(option3);
 	selectType.appendChild(option4);
+	selectType.onchange = function() {
+		mapping[index].datatype = selectType.value;
+	};
 	return selectType;
 }
 
-function createNewSelectMultivalued() {
-	var toggle = document.createElement("div");
-	toggle.className = "toggle-button";
-	toggle.appendChild(document.createElement("button"));
-	toggle.onclick = function () {
-		toggle.classList.toggle("toggle-button-selected");
-	}
-	return toggle;
+function createNewSelectRegexp(index) {
+	var input = document.createElement("input");
+	input.type = "text";
+	selectType.onchange = function() {
+		mapping[index].regexp = input.value;
+	};
+	return input;
 }
 
 function onImport() {

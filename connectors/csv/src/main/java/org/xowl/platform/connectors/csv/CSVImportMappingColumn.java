@@ -23,6 +23,9 @@ import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Represents the import mapping for a column
  *
@@ -51,65 +54,65 @@ public class CSVImportMappingColumn implements Serializable {
      */
     private final String type;
     /**
-     * The mapped schema relation
+     * The mapped schema property
      */
-    private final String schemaRelation;
+    private final String property;
     /**
      * The datatype for the values in the case of a attribute mapping
      */
-    private final String schemaAttributeType;
+    private final String datatype;
     /**
-     * Whether the column is multivalued
+     * The regular expression matching the values
      */
-    private final boolean multivalued;
+    private final Pattern regexp;
 
     /**
      * Initializes as not mapping a column
      */
     public CSVImportMappingColumn() {
         this.type = TYPE_NONE;
-        this.schemaRelation = null;
-        this.schemaAttributeType = null;
-        this.multivalued = false;
+        this.property = null;
+        this.datatype = null;
+        this.regexp = null;
     }
 
     /**
      * Initializes as an ID column
      *
-     * @param relation The URI of the mapped relation, or null if the ID is noe mapped as an additional property
+     * @param property The mapped schema property, or null if the ID is not mapped as an additional property
      */
-    public CSVImportMappingColumn(String relation) {
+    public CSVImportMappingColumn(String property) {
         this.type = TYPE_ID;
-        this.schemaRelation = relation;
-        this.schemaAttributeType = Vocabulary.xsdString;
-        this.multivalued = false;
+        this.property = property;
+        this.datatype = Vocabulary.xsdString;
+        this.regexp = null;
     }
 
     /**
      * Initializes as a mapping to a relation
      *
-     * @param relation    The URI of the relation
-     * @param multivalued Whether the column is multivalued
+     * @param property The mapped schema property
+     * @param regexp   The regular expression matching the values
      */
-    public CSVImportMappingColumn(String relation, boolean multivalued) {
+    public CSVImportMappingColumn(String property, String regexp) {
         this.type = TYPE_RELATION;
-        this.schemaRelation = relation;
-        this.schemaAttributeType = null;
-        this.multivalued = multivalued;
+        this.property = property;
+        this.datatype = null;
+        this.regexp = Pattern.compile(regexp);
     }
 
     /**
      * Initializes as a mapping to an attribute
      *
-     * @param attribute   The URI of the attribute
-     * @param datatype    The URI of the datatype for the values
-     * @param multivalued Whether the column is multivalued
+     * @param property The mapped schema property
+     * @param datatype The URI of the datatype for the values
+     * @param regexp   The regular expression matching the values
      */
-    public CSVImportMappingColumn(String attribute, String datatype, boolean multivalued) {
+    public CSVImportMappingColumn(String property, String datatype, String regexp) {
         this.type = TYPE_ATTRIBUTE;
-        this.schemaRelation = attribute;
-        this.schemaAttributeType = datatype;
-        this.multivalued = multivalued;
+        this.property = property;
+        this.datatype = datatype;
+        this.regexp = Pattern.compile(regexp);
     }
 
     /**
@@ -119,9 +122,9 @@ public class CSVImportMappingColumn implements Serializable {
      */
     public CSVImportMappingColumn(ASTNode node) {
         String tType = TYPE_NONE;
-        String tRelation = "";
-        String tAttribute = "";
-        String tMulti = "false";
+        String tProperty = "";
+        String tDatatype = "";
+        String tRegexp = "";
         for (ASTNode child : node.getChildren()) {
             String key = IOUtils.unescape(child.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -131,21 +134,21 @@ public class CSVImportMappingColumn implements Serializable {
                 case "type":
                     tType = value;
                     break;
-                case "schemaRelation":
-                    tRelation = value;
+                case "property":
+                    tProperty = value;
                     break;
-                case "schemaAttributeType":
-                    tAttribute = value;
+                case "datatype":
+                    tDatatype = value;
                     break;
                 case "multivalued":
-                    tMulti = value;
+                    tRegexp = value;
                     break;
             }
         }
         this.type = tType;
-        this.schemaRelation = tRelation.isEmpty() ? null : tRelation;
-        this.schemaAttributeType = tAttribute.isEmpty() ? null : tAttribute;
-        this.multivalued = tMulti.equalsIgnoreCase("true");
+        this.property = tProperty.isEmpty() ? null : tProperty;
+        this.datatype = tDatatype.isEmpty() ? null : tDatatype;
+        this.regexp = tRegexp.isEmpty() ? null : Pattern.compile(tRegexp);
     }
 
     /**
@@ -169,26 +172,51 @@ public class CSVImportMappingColumn implements Serializable {
             value = value.substring(1, value.length() - 1);
         switch (type) {
             case TYPE_ID:
-                if (schemaRelation != null)
+                value = value.trim();
+                if (property != null)
                     context.addQuad(
                             entity,
-                            context.getIRI(schemaRelation),
-                            context.getLiteral(value, schemaAttributeType)
+                            context.getIRI(property),
+                            context.getLiteral(value, datatype)
                     );
                 break;
             case TYPE_RELATION:
-                context.addQuad(
-                        entity,
-                        context.getIRI(schemaRelation),
-                        context.resolveEntity(value)
-                );
+                if (regexp == null) {
+                    context.addQuad(
+                            entity,
+                            context.getIRI(property),
+                            context.resolveEntity(value.trim())
+                    );
+                } else {
+                    Matcher matcher = regexp.matcher(value);
+                    while (matcher.find()) {
+                        String v = matcher.group();
+                        context.addQuad(
+                                entity,
+                                context.getIRI(property),
+                                context.resolveEntity(v)
+                        );
+                    }
+                }
                 break;
             case TYPE_ATTRIBUTE:
-                context.addQuad(
-                        entity,
-                        context.getIRI(schemaRelation),
-                        context.getLiteral(value, schemaAttributeType)
-                );
+                if (regexp == null) {
+                    context.addQuad(
+                            entity,
+                            context.getIRI(property),
+                            context.getLiteral(value.trim(), datatype)
+                    );
+                } else {
+                    Matcher matcher = regexp.matcher(value);
+                    while (matcher.find()) {
+                        String v = matcher.group();
+                        context.addQuad(
+                                entity,
+                                context.getIRI(property),
+                                context.getLiteral(v, datatype)
+                        );
+                    }
+                }
                 break;
         }
     }
@@ -202,12 +230,12 @@ public class CSVImportMappingColumn implements Serializable {
     public String serializedJSON() {
         return "{\"type\": \"" +
                 IOUtils.escapeStringJSON(type) +
-                "\", \"schemaRelation\": \"" +
-                IOUtils.escapeStringJSON(schemaRelation != null ? schemaRelation : "") +
-                "\", \"schemaAttributeType\": \"" +
-                IOUtils.escapeStringJSON(schemaAttributeType != null ? schemaAttributeType : "") +
-                "\", \"multivalued\": \"" +
-                Boolean.toString(multivalued) +
+                "\", \"property\": \"" +
+                IOUtils.escapeStringJSON(property != null ? property : "") +
+                "\", \"datatype\": \"" +
+                IOUtils.escapeStringJSON(datatype != null ? datatype : "") +
+                "\", \"regexp\": \"" +
+                IOUtils.escapeStringJSON(regexp != null ? regexp.pattern() : "") +
                 "\"}";
     }
 }

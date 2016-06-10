@@ -112,7 +112,7 @@ public class CSVImportMapping implements Serializable {
                 if (values[i] == null || values[i].isEmpty())
                     // no id => skip this
                     return;
-                id = context.resolveEntity(values[i]);
+                id = context.resolveEntity(values[i].trim());
                 break;
             }
         }

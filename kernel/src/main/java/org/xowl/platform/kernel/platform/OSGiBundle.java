@@ -18,13 +18,9 @@
 package org.xowl.platform.kernel.platform;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Encapsulates an OSGi bundle at runtime
@@ -32,20 +28,6 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public class OSGiBundle implements Identifiable, Serializable {
-    /**
-     * Gets the bundles on this platform
-     *
-     * @return The bundles on this platform
-     */
-    public static Collection<OSGiBundle> getBundles() {
-        Bundle[] bundles = FrameworkUtil.getBundle(OSGiBundle.class).getBundleContext().getBundles();
-        Collection<OSGiBundle> result = new ArrayList<>(bundles.length);
-        for (int i = 0; i != bundles.length; i++) {
-            result.add(new OSGiBundle(bundles[i]));
-        }
-        return result;
-    }
-
     /**
      * The encapsulated OSGi bundle
      */
@@ -56,7 +38,7 @@ public class OSGiBundle implements Identifiable, Serializable {
      *
      * @param bundle The encapsulated bundle
      */
-    private OSGiBundle(Bundle bundle) {
+    public OSGiBundle(Bundle bundle) {
         this.bundle = bundle;
     }
 

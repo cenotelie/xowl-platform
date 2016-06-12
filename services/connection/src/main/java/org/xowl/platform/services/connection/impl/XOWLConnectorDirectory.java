@@ -70,7 +70,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "services/core/connectors",
+            "services/admin/connectors",
             "services/core/descriptors"
     };
 
@@ -111,7 +111,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (method.equals("GET")) {
             if (uri.equals("services/core/descriptors"))
                 return onMessageListDescriptors();
-            if (uri.equals("services/core/connectors")) {
+            if (uri.equals("services/admin/connectors")) {
                 String[] ids = parameters.get("id");
                 if (ids != null && ids.length > 0)
                     return onMessageGetConnector(ids[0]);

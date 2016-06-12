@@ -52,7 +52,125 @@ XOWL.prototype.logout = function () {
 
 
 ////
-// Statistics Service
+// Admin Module - Platform Descriptor Service
+////
+
+XOWL.prototype.getPlatformBundles = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/platform", null);
+}
+
+
+
+////
+// Admin Module - Job Execution Service
+////
+
+XOWL.prototype.getJobs = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/jobs", null);
+}
+
+XOWL.prototype.getJob = function (callback, jobId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/jobs", {id: jobId});
+}
+
+
+
+////
+// Admin Module - Connection Service
+////
+
+XOWL.prototype.getDescriptors = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/descriptors", null);
+}
+
+XOWL.prototype.getConnectors = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", null);
+}
+
+XOWL.prototype.getConnector = function (callback, connectorId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", {id: connectorId});
+}
+
+XOWL.prototype.createConnector = function (callback, domain, definition) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", {action: "spawn", descriptor: domain.identifier}, definition);
+}
+
+XOWL.prototype.deleteConnector = function (callback, connectorId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", {action: "delete", id: connectorId}, {});
+}
+
+XOWL.prototype.pullFromConnector = function (callback, connectorId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", {action: "pull", id: connectorId}, {});
+}
+
+XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/connectors", {action: "push", id: connectorId, artifact: artifactId}, {});
+}
+
+
+
+////
+// Core Module - Statistics Service
 ////
 
 XOWL.prototype.getBasicStats = function (callback) {
@@ -65,20 +183,10 @@ XOWL.prototype.getBasicStats = function (callback) {
 	}, "services/core/statistics", null);
 }
 
-XOWL.prototype.getPlatformBundles = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/statistics?platform", null);
-}
-
 
 
 ////
-// Business Directory Service
+// Core Module - Business Directory Service
 ////
 
 XOWL.prototype.getBusinessDomains = function (callback) {
@@ -144,33 +252,7 @@ XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
 
 
 ////
-// Job Execution Service
-////
-
-XOWL.prototype.getJobs = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/jobs", null);
-}
-
-XOWL.prototype.getJob = function (callback, jobId) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/jobs", {id: jobId});
-}
-
-
-
-////
-// Artifact Storage Service
+// Core Module - Artifact Storage Service
 ////
 
 XOWL.prototype.getAllArtifacts = function (callback) {
@@ -293,7 +375,7 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 
 
 ////
-// Consistency Service
+// Core Module - Consistency Service
 ////
 
 XOWL.prototype.getInconsistencies = function (callback) {
@@ -375,7 +457,7 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 
 
 ////
-// Impact Analysis Service
+// Core Module - Impact Analysis Service
 ////
 
 XOWL.prototype.newImpactAnalysis = function (callback, definition) {
@@ -391,7 +473,7 @@ XOWL.prototype.newImpactAnalysis = function (callback, definition) {
 
 
 ////
-// Evaluation Analysis Service
+// Core Module - Evaluation Analysis Service
 ////
 
 XOWL.prototype.getEvaluations = function (callback) {
@@ -457,83 +539,7 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 
 
 ////
-// Connection Service
-////
-
-XOWL.prototype.getDescriptors = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/descriptors", null);
-}
-
-XOWL.prototype.getConnectors = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", null);
-}
-
-XOWL.prototype.getConnector = function (callback, connectorId) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", {id: connectorId});
-}
-
-XOWL.prototype.createConnector = function (callback, domain, definition) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", {action: "spawn", descriptor: domain.identifier}, definition);
-}
-
-XOWL.prototype.deleteConnector = function (callback, connectorId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, null, null);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", {action: "delete", id: connectorId}, {});
-}
-
-XOWL.prototype.pullFromConnector = function (callback, connectorId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", {action: "pull", id: connectorId}, {});
-}
-
-XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
-	this.doCommand(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/connectors", {action: "push", id: connectorId, artifact: artifactId}, {});
-}
-
-
-
-////
-// Other API
+// Core Module - Other API
 ////
 
 XOWL.prototype.sparql = function (callback, payload) {

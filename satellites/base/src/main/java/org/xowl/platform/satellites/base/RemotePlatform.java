@@ -68,7 +68,7 @@ public class RemotePlatform {
      */
     public Collection<RemoteConnector> getConnectors() {
         Collection<RemoteConnector> result = new ArrayList<>();
-        HttpResponse response = connection.request("services/core/connectors", "GET", null, null, HttpConstants.MIME_JSON);
+        HttpResponse response = connection.request("services/admin/connectors", "GET", "", null, HttpConstants.MIME_JSON);
         ASTNode root = parseJson(response);
         if (root == null)
             return result;
@@ -85,7 +85,7 @@ public class RemotePlatform {
      * @return The triggered job, or null if an error occurred
      */
     public RemoteJob pullFromConnector(String connectorId) {
-        HttpResponse response = connection.request("services/core/connectors?action=pull&id=" + URIUtils.encodeComponent(connectorId), "POST", null, null, HttpConstants.MIME_JSON);
+        HttpResponse response = connection.request("services/admin/connectors?action=pull&id=" + URIUtils.encodeComponent(connectorId), "POST", "", null, HttpConstants.MIME_JSON);
         ASTNode root = parseJson(response);
         if (root == null)
             return null;
@@ -100,7 +100,7 @@ public class RemotePlatform {
      * @return The triggered job, or null if an error occurred
      */
     public RemoteJob pushFromConnector(String connectorId, String artifactId) {
-        HttpResponse response = connection.request("services/core/connectors?action=push&id=" + URIUtils.encodeComponent(connectorId) + "&artifact=" + URIUtils.encodeComponent(artifactId), "POST", null, null, HttpConstants.MIME_JSON);
+        HttpResponse response = connection.request("services/admin/connectors?action=push&id=" + URIUtils.encodeComponent(connectorId) + "&artifact=" + URIUtils.encodeComponent(artifactId), "POST", null, null, HttpConstants.MIME_JSON);
         ASTNode root = parseJson(response);
         if (root == null)
             return null;
@@ -114,7 +114,7 @@ public class RemotePlatform {
      * @return The job, or null if it cannot be found
      */
     public RemoteJob getJob(String identifier) {
-        HttpResponse response = connection.request("services/core/connectors", "GET", null, null, HttpConstants.MIME_JSON);
+        HttpResponse response = connection.request("services/admin/connectors", "GET", "", null, HttpConstants.MIME_JSON);
         ASTNode root = parseJson(response);
         if (root == null)
             return null;
@@ -129,7 +129,7 @@ public class RemotePlatform {
      */
     public RemoteJob waitFor(RemoteJob job) {
         while (RemoteJob.STATUS_SCHEDULED.equals(job.getStatus()) || RemoteJob.STATUS_RUNNING.equals(job.getStatus())) {
-            HttpResponse response = connection.request("services/core/jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", null, null, HttpConstants.MIME_JSON);
+            HttpResponse response = connection.request("services/admin/jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", "", null, HttpConstants.MIME_JSON);
             ASTNode root = parseJson(response);
             if (root == null)
                 return null;

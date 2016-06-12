@@ -77,7 +77,7 @@ function renderMetadata(metadata) {
 			document.getElementById("artifact-archetype").value = properties[i].value.lexical;
 		else if (name === "http://xowl.org/platform/schemas/kernel#from") {
 			document.getElementById("artifact-origin").appendChild(document.createTextNode(properties[i].value.lexical));
-			document.getElementById("artifact-origin").href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(properties[i].value.lexical);
+			document.getElementById("artifact-origin").href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(properties[i].value.lexical);
 		} else if (name === "http://xowl.org/platform/schemas/kernel#created")
 			document.getElementById("artifact-creation").value = properties[i].value.lexical;
 		else if (name === "http://xowl.org/platform/schemas/kernel#base") {

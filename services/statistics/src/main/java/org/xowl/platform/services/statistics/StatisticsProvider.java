@@ -19,17 +19,13 @@ package org.xowl.platform.services.statistics;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.SecurityService;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
-import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
 
@@ -133,9 +129,6 @@ public class StatisticsProvider implements Service, HttpAPIService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        String[] platforms = parameters.get("platform");
-        if (platforms != null && platforms.length > 0)
-            return onMessageGetPlatformBundles();
         return onMessageGetBasicStats();
     }
 
@@ -150,19 +143,5 @@ public class StatisticsProvider implements Service, HttpAPIService {
                 "{\"nbArtifactsTotal\": " + nbArtifactsTotal +
                         ", \"nbArtifactsLive\": " + nbArtifactsLive +
                         ", \"nbInconsistencies\": " + nbInconsistencies + "}");
-    }
-
-    /**
-     * Responds to a request for the platform bundles
-     *
-     * @return The response
-     */
-    private HttpResponse onMessageGetPlatformBundles() {
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
-        if (!securityService.getSubject().hasRole(SecurityService.ROLE_ADMIN))
-            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
-        return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(OSGiBundle.getBundles()), null);
     }
 }

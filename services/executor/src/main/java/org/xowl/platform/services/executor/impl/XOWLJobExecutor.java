@@ -67,7 +67,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "services/core/jobs"
+            "services/admin/jobs"
     };
 
 

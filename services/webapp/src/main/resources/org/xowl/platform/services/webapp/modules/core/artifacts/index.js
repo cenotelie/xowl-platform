@@ -106,7 +106,7 @@ function renderConnectors() {
 			img.width = 32;
 			img.height = 32;
 			var link = document.createElement("a");
-			link.href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
+			link.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
 			link.appendChild(document.createTextNode(CONNECTORS[i].name));
 			cell1.appendChild(link);
@@ -133,7 +133,7 @@ function renderConnectors() {
 			badge.className = "badge";
 			badge.appendChild(document.createTextNode(CONNECTORS[i].queue.length.toString()));
 			var link = document.createElement("a");
-			link.href = "/web/modules/core/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
+			link.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
 			link.appendChild(document.createTextNode(" "));
 			link.appendChild(document.createTextNode(CONNECTORS[i].name));

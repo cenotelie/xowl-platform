@@ -17,6 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.Job;
 
@@ -25,14 +27,21 @@ import org.xowl.platform.kernel.jobs.Job;
  *
  * @author Laurent Wouters
  */
-public interface Importer extends Service {
+public abstract class Importer implements Service, Serializable {
+    /**
+     * Gets the URI for the web wizard
+     *
+     * @return The URI for the web wizard
+     */
+    protected abstract String getWebWizardURI();
+
     /**
      * Gets the configuration from the specified serialized definition
      *
      * @param definition The configuration's definition
      * @return The configuration
      */
-    ImporterConfiguration getConfiguration(String definition);
+    public abstract ImporterConfiguration getConfiguration(String definition);
 
     /**
      * Gets the preview of a document to be imported
@@ -41,7 +50,7 @@ public interface Importer extends Service {
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    DocumentPreview getPreview(Document document, ImporterConfiguration configuration);
+    public abstract DocumentPreview getPreview(Document document, ImporterConfiguration configuration);
 
     /**
      * Gets the job for importing a document
@@ -50,5 +59,21 @@ public interface Importer extends Service {
      * @param configuration The configuration for this import
      * @return The job for importing the document
      */
-    Job getImportJob(Document document, ImporterConfiguration configuration);
+    public abstract Job getImportJob(Document document, ImporterConfiguration configuration);
+
+    @Override
+    public String serializedString() {
+        return serializedJSON();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"identifier\": \"" +
+                IOUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                IOUtils.escapeStringJSON(getName()) +
+                "\", \"wizardUri\": \"" +
+                IOUtils.escapeStringJSON(getWebWizardURI()) +
+                "\"}";
+    }
 }

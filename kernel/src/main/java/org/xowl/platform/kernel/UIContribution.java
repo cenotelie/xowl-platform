@@ -15,35 +15,29 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.webapp;
+package org.xowl.platform.kernel;
 
-import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.UIContribution;
-
-import java.util.Collection;
+import java.net.URL;
 
 /**
- * Represents an additional module for the web application
+ * Represents a contribution to the web interface
  *
  * @author Laurent Wouters
  */
-public interface WebModuleService extends UIContribution, Serializable {
+public interface UIContribution extends Service {
     /**
-     * The modules folder
+     * Gets the contribution-specific part of the URI
+     * This essentially is what identifies this contribution
+     *
+     * @return The contribution-specific part of the URI
      */
-    String MODULES = "/modules/";
+    String getURI();
 
     /**
-     * Gets the icon for this module, if any
+     * Gets the URL for the requested resource
      *
-     * @return The icon for this module, if any
+     * @param resource The requested resource, local to this contribution
+     * @return The URL for the requested resource
      */
-    String getIcon();
-
-    /**
-     * Gets the parts for this module, if any
-     *
-     * @return The parts for this module
-     */
-    Collection<WebModulePart> getParts();
+    URL getResource(String resource);
 }

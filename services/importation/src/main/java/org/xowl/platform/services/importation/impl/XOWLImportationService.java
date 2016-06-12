@@ -18,7 +18,6 @@
 package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
@@ -272,11 +271,7 @@ public class XOWLImportationService implements ImportationService {
             if (!first)
                 builder.append(", ");
             first = false;
-            builder.append("{\"identifier\": \"");
-            builder.append(IOUtils.escapeStringJSON(importer.getIdentifier()));
-            builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(importer.getName()));
-            builder.append("\"}");
+            builder.append(importer.serializedJSON());
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());

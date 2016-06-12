@@ -52,7 +52,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class CSVImporter implements Importer {
+public class CSVImporter extends Importer {
     @Override
     public String getIdentifier() {
         return CSVImporter.class.getCanonicalName();
@@ -61,6 +61,11 @@ public class CSVImporter implements Importer {
     @Override
     public String getName() {
         return "xOWL Federation Platform - CSV Importer";
+    }
+
+    @Override
+    protected String getWebWizardURI() {
+        return "contributions/csv/wizard";
     }
 
     @Override

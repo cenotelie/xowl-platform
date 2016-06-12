@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Upload - New Artifact</title>
+  <title>Uploaded Document</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
@@ -48,8 +48,15 @@
           <select id="importers">
           </select>
         </div>
-        <button class="btn btn-primary" onclick="onImport()">Import</button>
-        <button class="btn btn-danger" onclick="onDrop()">Drop document</button>
+        <div>
+          <button class="btn btn-primary" onclick="onImportNew()">Import as new artifact</button>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="onImportUpdate()">Import as new version of existing artifact</button>
+        </div>
+        <div>
+          <button class="btn btn-danger" onclick="onDrop()">Drop document</button>
+        </div>
       </div>
     </div>
   </div>

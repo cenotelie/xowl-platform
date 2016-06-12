@@ -22,7 +22,7 @@ function init() {
 				} else {
 					displayMessage(getErrorFor(status, content));
 				}
-			}, docId);
+			});
 		} else {
 			displayMessage(getErrorFor(status, content));
 		}
@@ -34,14 +34,19 @@ function renderImporters(importers) {
 	for (var i = 0; i != importers.length; i++) {
 		var option = document.createElement("option");
 		option.appendChild(document.createTextNode(importers[i].name));
-		option.value = importers[i].wizardUri;
+		option.value = importers[i].identifier;
 		select.appendChild(option);
 	}
 }
 
-function onImport() {
-	var wizard = document.getElementById("importers").value;
-	window.location.href = wizard + "?id=" + encodeURIComponent(docId);
+function onImportNew() {
+	var importerId = document.getElementById("importers").value;
+	window.location.href = "document-new.html?id=" + encodeURIComponent(docId) + "&importer=" + encodeURIComponent(importerId);
+}
+
+function onImportUpdate() {
+	var importerId = document.getElementById("importers").value;
+	window.location.href = "document-update.html?id=" + encodeURIComponent(docId) + "&importer=" + encodeURIComponent(importerId);
 }
 
 function onDrop() {

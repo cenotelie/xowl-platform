@@ -424,6 +424,16 @@ XOWL.prototype.getDocumentImporters = function (callback) {
 	}, "services/core/importation", {what: "importer"});
 }
 
+XOWL.prototype.getDocumentImporter = function (callback, importerId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {importer: importerId});
+}
+
 XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {

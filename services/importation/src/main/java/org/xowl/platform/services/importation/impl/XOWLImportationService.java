@@ -18,6 +18,8 @@
 package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
@@ -33,6 +35,7 @@ import org.xowl.platform.services.importation.ImportationService;
 import org.xowl.platform.services.importation.Importer;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -140,7 +143,171 @@ public class XOWLImportationService implements ImportationService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return null;
+        switch (method) {
+            case "GET": {
+                String[] docIds = parameters.get("document");
+                if (docIds != null && docIds.length > 0)
+                    return onGetDocument(docIds[0]);
+                String[] whats = parameters.get("what");
+                if (whats != null && whats.length > 0) {
+                    if (whats[0].equals("document"))
+                        return onGetDocuments();
+                    else if (whats[0].equals("importer"))
+                        return onGetImporters();
+                }
+                String[] previews = parameters.get("preview");
+                String[] importers = parameters.get("importer");
+                if (previews != null && previews.length > 0 && importers != null && importers.length > 0)
+                    return onGetPreview(previews[0], importers[0], new String(content, Files.CHARSET));
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            }
+            case "PUT": {
+                String[] names = parameters.get("name");
+                if (names != null && names.length > 0)
+                    return onPutDocument(names[0], content);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            }
+            case "POST": {
+                String[] drops = parameters.get("drop");
+                if (drops != null && drops.length > 0)
+                    return onPostDropDocument(drops[0]);
+                String[] imports = parameters.get("import");
+                String[] importers = parameters.get("importer");
+                if (imports != null && imports.length > 0 && importers != null && importers.length > 0)
+                    return onBeginImport(imports[0], importers[0], new String(content, Files.CHARSET));
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            }
+            default:
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+        }
+    }
+
+    /**
+     * When the documents are requested
+     *
+     * @return The HTTP response
+     */
+    private HttpResponse onGetDocuments() {
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (Document document : getDocuments()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(document.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * When a single document is requested
+     *
+     * @param documentId The identifier of the document
+     * @return The HTTP response
+     */
+    private HttpResponse onGetDocument(String documentId) {
+        Document document = getDocument(documentId);
+        if (document == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
+    }
+
+    /**
+     * When a new document is uploaded
+     *
+     * @param name    The document 's name
+     * @param content The document's content
+     * @return The document
+     */
+    private HttpResponse onPutDocument(String name, byte[] content) {
+        Document document = upload(name, content);
+        if (document == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
+    }
+
+    /**
+     * When a drop request for a document is received
+     *
+     * @param documentId The identifier of the document
+     * @return The HTTP response
+     */
+    private HttpResponse onPostDropDocument(String documentId) {
+        Document document = getDocument(documentId);
+        if (document == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        drop(document);
+        return new HttpResponse(HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * When the preview of a document is requested
+     *
+     * @param documentId    The identifier of the document
+     * @param importerId    The identifier of the importer to use
+     * @param configuration The importer's configuration
+     * @return The HTTP response
+     */
+    private HttpResponse onGetPreview(String documentId, String importerId, String configuration) {
+        Document document = getDocument(documentId);
+        if (document == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        for (Importer importer : importers) {
+            if (importer.getIdentifier().equals(importerId)) {
+                DocumentPreview preview = getPreview(document, importer, configuration);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, preview.serializedJSON());
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * When the registered importers are requested
+     *
+     * @return The HTTP response
+     */
+    private HttpResponse onGetImporters() {
+        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (Importer importer : importers) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("{\"identifier\": \"");
+            builder.append(IOUtils.escapeStringJSON(importer.getIdentifier()));
+            builder.append("\", \"name\": \"");
+            builder.append(IOUtils.escapeStringJSON(importer.getName()));
+            builder.append("\"}");
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * When the importation of a document is requested
+     *
+     * @param documentId    The identifier of the document
+     * @param importerId    The identifier of the importer to use
+     * @param configuration The importer's configuration
+     * @return The HTTP response
+     */
+    private HttpResponse onBeginImport(String documentId, String importerId, String configuration) {
+        Document document = getDocument(documentId);
+        if (document == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        for (Importer importer : importers) {
+            if (importer.getIdentifier().equals(importerId)) {
+                Job job = beginImport(document, importer, configuration);
+                if (job == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to import");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override

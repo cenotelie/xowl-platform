@@ -15,30 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.connectors.csv;
+package org.xowl.platform.connectors.csv.impl;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.connectors.csv.impl.CSVimportationJobFactory;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobFactory;
-import org.xowl.platform.services.connection.ConnectorServiceFactory;
-import org.xowl.platform.services.importation.Importer;
 
 /**
- * The activator for this bundle
+ * The factory for CSV importation jobs
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public class CSVimportationJobFactory implements JobFactory {
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(Importer.class, new CSVImporter(), null);
-        bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
-        bundleContext.registerService(ConnectorServiceFactory.class, CSVFactory.INSTANCE, null);
+    public String getIdentifier() {
+        return CSVimportationJobFactory.class.getCanonicalName();
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {
+    public String getName() {
+        return "xOWL Federation Platform - CSV Importation Job Factory";
+    }
 
+    @Override
+    public boolean canDeserialize(String type) {
+        return (type.equals(CSVImportationJob.class.getCanonicalName()));
+    }
+
+    @Override
+    public Job newJob(String type, ASTNode definition) {
+        if (type.equals(CSVImportationJob.class.getCanonicalName()))
+            return new CSVImportationJob(definition);
+        return null;
     }
 }

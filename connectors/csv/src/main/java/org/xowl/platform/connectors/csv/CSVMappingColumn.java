@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  *
  * @author Laurent Wouters
  */
-public class CSVImportMappingColumn implements Serializable {
+public class CSVMappingColumn implements Serializable {
     /**
      * The column is not mapped
      */
@@ -69,7 +69,7 @@ public class CSVImportMappingColumn implements Serializable {
     /**
      * Initializes as not mapping a column
      */
-    public CSVImportMappingColumn() {
+    public CSVMappingColumn() {
         this.type = TYPE_NONE;
         this.property = null;
         this.datatype = null;
@@ -81,7 +81,7 @@ public class CSVImportMappingColumn implements Serializable {
      *
      * @param property The mapped schema property, or null if the ID is not mapped as an additional property
      */
-    public CSVImportMappingColumn(String property) {
+    public CSVMappingColumn(String property) {
         this.type = TYPE_ID;
         this.property = property;
         this.datatype = Vocabulary.xsdString;
@@ -94,7 +94,7 @@ public class CSVImportMappingColumn implements Serializable {
      * @param property The mapped schema property
      * @param regexp   The regular expression matching the values
      */
-    public CSVImportMappingColumn(String property, String regexp) {
+    public CSVMappingColumn(String property, String regexp) {
         this.type = TYPE_RELATION;
         this.property = property;
         this.datatype = null;
@@ -108,7 +108,7 @@ public class CSVImportMappingColumn implements Serializable {
      * @param datatype The URI of the datatype for the values
      * @param regexp   The regular expression matching the values
      */
-    public CSVImportMappingColumn(String property, String datatype, String regexp) {
+    public CSVMappingColumn(String property, String datatype, String regexp) {
         this.type = TYPE_ATTRIBUTE;
         this.property = property;
         this.datatype = datatype;
@@ -120,7 +120,7 @@ public class CSVImportMappingColumn implements Serializable {
      *
      * @param node The AST node
      */
-    public CSVImportMappingColumn(ASTNode node) {
+    public CSVMappingColumn(ASTNode node) {
         String tType = TYPE_NONE;
         String tProperty = "";
         String tDatatype = "";
@@ -167,7 +167,7 @@ public class CSVImportMappingColumn implements Serializable {
      * @param value   The column's value
      * @param context The current context
      */
-    public void apply(IRINode entity, String value, CSVImportMappingContext context) {
+    public void apply(IRINode entity, String value, CSVImportationContext context) {
         if (value.startsWith(context.getTextMarker()) && value.endsWith(context.getTextMarker()))
             value = value.substring(1, value.length() - 1);
         switch (type) {

@@ -48,7 +48,7 @@ public class XOWLImportationService implements ImportationService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "services/admin/importation"
+            "services/core/importation"
     };
 
     /**
@@ -152,10 +152,6 @@ public class XOWLImportationService implements ImportationService {
                     else if (whats[0].equals("importer"))
                         return onGetImporters();
                 }
-                String[] previews = parameters.get("preview");
-                String[] importers = parameters.get("importer");
-                if (previews != null && previews.length > 0 && importers != null && importers.length > 0)
-                    return onGetPreview(previews[0], importers[0], new String(content, Files.CHARSET));
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
             }
             case "PUT": {
@@ -168,8 +164,11 @@ public class XOWLImportationService implements ImportationService {
                 String[] drops = parameters.get("drop");
                 if (drops != null && drops.length > 0)
                     return onPostDropDocument(drops[0]);
-                String[] imports = parameters.get("import");
+                String[] previews = parameters.get("preview");
                 String[] importers = parameters.get("importer");
+                if (previews != null && previews.length > 0 && importers != null && importers.length > 0)
+                    return onGetPreview(previews[0], importers[0], new String(content, Files.CHARSET));
+                String[] imports = parameters.get("import");
                 if (imports != null && imports.length > 0 && importers != null && importers.length > 0)
                     return onBeginImport(imports[0], importers[0], new String(content, Files.CHARSET));
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);

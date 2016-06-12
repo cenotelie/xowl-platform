@@ -375,6 +375,82 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 
 
 ////
+// Core Module - Data Import Service
+////
+
+XOWL.prototype.getUploadedDocuments = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {what: "document"});
+}
+
+XOWL.prototype.getUploadedDocument = function (callback, docId) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {document: docId});
+}
+
+XOWL.prototype.getDocumentImporters = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {what: "importer"});
+}
+
+XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {preview: docId, importer: importer}, configuration);
+}
+
+XOWL.prototype.dropUploadedDocument = function (callback, docId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {drop: docId}, {});
+}
+
+XOWL.prototype.importUploadedDocument = function (callback, docId, importer, configuration) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/core/importation", {import: docId, importer: importer}, configuration);
+}
+
+XOWL.prototype.uploadDocument = function (callback, name, content) {
+	this.doJSRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "PUT", "services/core/importation", {name: name}, content, "application/octet-stream", "application/json");
+}
+
+
+
+////
 // Core Module - Consistency Service
 ////
 

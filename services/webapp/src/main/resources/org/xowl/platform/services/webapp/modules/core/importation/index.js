@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	setupPage(xowl);
-	xowl.getCSVDocuments(function (status, ct, content) {
+	xowl.getUploadedDocuments(function (status, ct, content) {
 		if (status == 200) {
 			renderDocuments(content);
 			displayMessage(null);
@@ -27,7 +27,7 @@ function renderDocument(index, doc) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(document.createTextNode((index + 1).toString()));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/csv.svg";
+	icon.src = "/web/assets/document.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

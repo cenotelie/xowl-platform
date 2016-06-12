@@ -36,6 +36,7 @@ public class XOWLCoreModule extends WebModuleServiceBase {
     public XOWLCoreModule() {
         super(XOWLCoreModule.class.getCanonicalName(), "Core Services", "core", "/web/assets/xowl.svg");
         this.parts.add(new WebModulePart("Artifacts Management", "artifacts", "/web/assets/artifact.svg"));
+        this.parts.add(new WebModulePart("Data Import", "importation", "/web/assets/import.svg"));
         this.parts.add(new WebModulePart("Consistency Management", "consistency", "/web/assets/consistency.svg"));
         this.parts.add(new WebModulePart("Traceability Exploration", "discovery", "/web/assets/exploration.svg"));
         this.parts.add(new WebModulePart("Impact Analysis", "impact", "/web/assets/impact.svg"));

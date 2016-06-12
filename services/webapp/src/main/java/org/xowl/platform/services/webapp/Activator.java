@@ -57,7 +57,6 @@ public class Activator implements BundleActivator {
     public void start(final BundleContext bundleContext) throws Exception {
         directory = new XOWLModuleDirectory();
         directory.register(new XOWLCoreModule());
-        directory.register(new XOWLImportModule());
         directory.register(new XOWLAdminModule());
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {

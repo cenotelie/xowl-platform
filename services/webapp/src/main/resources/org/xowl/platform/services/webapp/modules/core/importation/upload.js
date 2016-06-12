@@ -37,7 +37,7 @@ function onUpload() {
 			return;
 		}
 		displayMessage("Sending ...");
-		xowl.uploadCSV(function (code, type, content) {
+		xowl.uploadDocument(function (code, type, content) {
 			if (code === 200) {
 				progressBar.classList.add("progress-bar-success");
 				displayMessage(null);

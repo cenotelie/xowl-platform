@@ -318,12 +318,15 @@ public class XOWLImportationService implements ImportationService {
         onActivated();
         if (storage == null)
             return null;
+        if (!storage.exists() && !storage.mkdirs())
+            return null;
         Document document = new Document(name);
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         try (FileOutputStream stream = new FileOutputStream(fileDescriptor)) {
             OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
             writer.write(document.serializedJSON());
+            writer.flush();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return null;

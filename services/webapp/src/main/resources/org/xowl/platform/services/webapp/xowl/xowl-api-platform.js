@@ -170,6 +170,22 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 
 
 ////
+// Core Module - Web Application Modules Service
+////
+
+XOWL.prototype.getWebModules = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/webapp/modules", null);
+}
+
+
+
+////
 // Core Module - Statistics Service
 ////
 
@@ -381,7 +397,7 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 XOWL.prototype.getUploadedDocuments = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -391,7 +407,7 @@ XOWL.prototype.getUploadedDocuments = function (callback) {
 XOWL.prototype.getUploadedDocument = function (callback, docId) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -401,7 +417,7 @@ XOWL.prototype.getUploadedDocument = function (callback, docId) {
 XOWL.prototype.getDocumentImporters = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -411,7 +427,7 @@ XOWL.prototype.getDocumentImporters = function (callback) {
 XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -421,7 +437,7 @@ XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer,
 XOWL.prototype.dropUploadedDocument = function (callback, docId) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -431,7 +447,7 @@ XOWL.prototype.dropUploadedDocument = function (callback, docId) {
 XOWL.prototype.importUploadedDocument = function (callback, docId, importer, configuration) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -441,7 +457,7 @@ XOWL.prototype.importUploadedDocument = function (callback, docId, importer, con
 XOWL.prototype.uploadDocument = function (callback, name, content) {
 	this.doJSRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}

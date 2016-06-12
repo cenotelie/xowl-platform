@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.UIContribution;
 import org.xowl.platform.services.webapp.impl.*;
 
@@ -58,8 +59,9 @@ public class Activator implements BundleActivator {
         contributionDirectory = new XOWLContributionDirectory();
         contributionDirectory.register(new XOWLMainContribution());
         moduleDirectory = new XOWLWebModuleDirectory();
-        moduleDirectory.register(new XOWLWebModuleAdmin());
         moduleDirectory.register(new XOWLWebModuleCore());
+        moduleDirectory.register(new XOWLWebModuleAdmin());
+        bundleContext.registerService(HttpAPIService.class, moduleDirectory, null);
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
@@ -72,7 +74,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(UIContribution.URI_WEB, XOWLMainContribution.RESOURCES, new XOWLHttpContext(httpService, contributionDirectory));
+                    httpService.registerResources(UIContribution.URI_WEB, UIContribution.URI_WEB, new XOWLHttpContext(httpService, contributionDirectory));
                 } catch (Exception exception) {
                     Logging.getDefault().error(exception);
                 }

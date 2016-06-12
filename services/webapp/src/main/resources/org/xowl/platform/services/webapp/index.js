@@ -5,19 +5,11 @@ var xowl = new XOWL();
 
 function init() {
 	setupPage(xowl);
-
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState == 4) {
-			if (xmlHttp.status === 200) {
-				renderModules(JSON.parse(xmlHttp.responseText));
-			}
+	xowl.getWebModules(function (status, ct, content) {
+		if (status == 200) {
+			renderModules(content);
 		}
-	}
-	xmlHttp.open("GET", "/web/modules/index.json", true);
-	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
-	xmlHttp.send();
-
+	});
 	xowl.getBasicStats(function (code, type, content) {
 		if (code === 200) {
 			document.getElementById("stat-inconsistencies").innerHTML = content.nbInconsistencies;
@@ -53,8 +45,8 @@ function renderModule(myModule) {
 	header.appendChild(linkModule);
 	var body = document.createElement("div");
 	body.classList.add("panel-body");
-	for (var i = 0; i != myModule.parts.length; i++) {
-		var part = myModule.parts[i];
+	for (var i = 0; i != myModule.items.length; i++) {
+		var part = myModule.items[i];
 		var li = document.createElement("div");
 		icon = document.createElement("img");
 		icon.src = part.icon;

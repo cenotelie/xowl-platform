@@ -196,6 +196,7 @@ public class CSVConfiguration extends ImporterConfiguration {
                 }
                 case "rowCount": {
                     String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                    value = value.substring(1, value.length() - 1);
                     tRowCount = Integer.parseInt(value);
                     break;
                 }
@@ -233,8 +234,9 @@ public class CSVConfiguration extends ImporterConfiguration {
         builder.append(IOUtils.escapeStringJSON(Character.toString(separator)));
         builder.append("\", \"textMarker\": \"");
         builder.append(IOUtils.escapeStringJSON(Character.toString(textMarker)));
-        builder.append("\", \"rowCount\": ");
+        builder.append("\", \"rowCount\": \"");
         builder.append(Integer.toString(rowCount));
+        builder.append("\"");
         if (mapping != null) {
             builder.append(", \"mapping\": ");
             builder.append(mapping.serializedJSON());

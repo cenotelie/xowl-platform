@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
+var importerId = "org.xowl.platform.connectors.csv.CSVImporter"
 var lastPreview = null;
 var mapping = [];
 
@@ -12,7 +13,7 @@ function init() {
     	return;
 	document.getElementById("placeholder-doc").innerHTML = docId;
 	displayMessage("Loading ...");
-	xowl.getCSVDocument(function (status, ct, content) {
+	xowl.getUploadedDocument(function (status, ct, content) {
 		if (status == 200) {
 			document.getElementById("document-name").value = content.name;
 			displayMessage(null);
@@ -29,14 +30,18 @@ function onPreview() {
     if (separator === null || textMarker === null || rowCount <= 0 || separator == "" || textMarker == "")
 		return;
     displayMessage("Loading ...");
-    xowl.getCSVFirstLines(function (status, ct, content) {
+    xowl.getUploadedDocumentPreview(function (status, ct, content) {
 		if (status == 200) {
 			renderPreview(content);
 			displayMessage(null);
 		} else {
 			displayMessage(getErrorFor(status, content));
 		}
-	}, docId, separator, textMarker, rowCount);
+	}, docId, importerId, {
+		separator: separator,
+		textMarker: textMarker,
+		rowCount: rowCount
+	});
 }
 
 function renderPreview(data) {
@@ -145,7 +150,7 @@ function createNewPropertyInput(index) {
 	var input = document.createElement("input");
 	input.type = "text";
 	input.placeholder = "http://xowl.org/property";
-	selectType.onchange = function() {
+	input.onchange = function() {
 		mapping[index].property = input.value;
 	};
 	return input;
@@ -178,7 +183,7 @@ function createNewSelectDatatype(index) {
 function createNewSelectRegexp(index) {
 	var input = document.createElement("input");
 	input.type = "text";
-	selectType.onchange = function() {
+	input.onchange = function() {
 		mapping[index].regexp = input.value;
 	};
 	return input;

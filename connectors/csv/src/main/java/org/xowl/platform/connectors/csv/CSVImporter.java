@@ -29,6 +29,7 @@ import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
+import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -65,7 +66,7 @@ public class CSVImporter extends Importer {
 
     @Override
     protected String getWebWizardURI() {
-        return "contributions/csv/wizard";
+        return CSVUIContribution.PREFIX + "/wizard.html";
     }
 
     @Override

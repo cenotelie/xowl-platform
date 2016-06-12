@@ -19,7 +19,6 @@ package org.xowl.platform.services.webapp;
 
 import org.xowl.infra.store.IOUtils;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,11 +29,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public abstract class WebModuleServiceBase implements WebModuleService {
-    /**
-     * The service's identifier
-     */
-    protected final String identifier;
+public abstract class WebModuleBase implements WebModule {
     /**
      * The service's human readable name
      */
@@ -48,29 +43,22 @@ public abstract class WebModuleServiceBase implements WebModuleService {
      */
     protected final String icon;
     /**
-     * The parts of this module
+     * The items of this module
      */
-    protected final List<WebModulePart> parts;
+    protected final List<WebModuleItem> items;
 
     /**
      * Initializes this service
      *
-     * @param identifier The service's identifier
-     * @param name       The service's human readable name
-     * @param uri        The service URI part
-     * @param icon       The icon for this module, if any
+     * @param name The service's human readable name
+     * @param uri  The service URI part
+     * @param icon The icon for this module, if any
      */
-    public WebModuleServiceBase(String identifier, String name, String uri, String icon) {
-        this.identifier = identifier;
+    public WebModuleBase(String name, String uri, String icon) {
         this.name = name;
         this.uri = uri;
         this.icon = icon;
-        this.parts = new ArrayList<>(5);
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
+        this.items = new ArrayList<>(5);
     }
 
     @Override
@@ -89,34 +77,29 @@ public abstract class WebModuleServiceBase implements WebModuleService {
     }
 
     @Override
-    public Collection<WebModulePart> getParts() {
-        return Collections.unmodifiableCollection(parts);
+    public Collection<WebModuleItem> getItems() {
+        return Collections.unmodifiableCollection(items);
     }
 
     @Override
-    public abstract URL getResource(String resource);
-
-    @Override
     public String serializedString() {
-        return identifier;
+        return serializedJSON();
     }
 
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{\"id\": \"");
-        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
-        builder.append("\", \"name\": \"");
+        builder.append("{\"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
         builder.append("\", \"uri\": \"");
         builder.append(IOUtils.escapeStringJSON(getURI()));
         builder.append("\", \"icon\": \"");
         builder.append(getIcon() == null ? "" : IOUtils.escapeStringJSON(getIcon()));
-        builder.append("\", \"parts\": [");
-        for (int i = 0; i != parts.size(); i++) {
+        builder.append("\", \"items\": [");
+        for (int i = 0; i != items.size(); i++) {
             if (i != 0)
                 builder.append(", ");
-            builder.append(parts.get(i).serializedJSON());
+            builder.append(items.get(i).serializedJSON());
         }
         builder.append("]}");
         return builder.toString();

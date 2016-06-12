@@ -19,11 +19,8 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.services.webapp.Activator;
-import org.xowl.platform.services.webapp.BrandingService;
-import org.xowl.platform.services.webapp.WebModuleDirectory;
-import org.xowl.platform.services.webapp.WebModuleService;
+import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,36 +38,18 @@ public class XOWLHttpContext implements HttpContext {
      */
     private final HttpContext defaultContext;
     /**
-     * The current branding service
+     * The directory for the web contributions
      */
-    private BrandingService brandingService;
-    /**
-     * The directory of web module services
-     */
-    private final WebModuleDirectory moduleDirectory;
+    private final ContributionDirectory directory;
 
     /**
      * Initialize this context
      *
      * @param httpService The HTTP service
      */
-    public XOWLHttpContext(HttpService httpService, WebModuleDirectory moduleDirectory) {
+    public XOWLHttpContext(HttpService httpService, ContributionDirectory directory) {
         this.defaultContext = httpService.createDefaultHttpContext();
-        this.moduleDirectory = moduleDirectory;
-    }
-
-    /**
-     * Gets the branding service
-     *
-     * @return The branding service
-     */
-    private BrandingService getBrandingService() {
-        if (brandingService == null) {
-            brandingService = ServiceUtils.getService(BrandingService.class);
-            if (brandingService == null)
-                brandingService = new XOWLBrandingService();
-        }
-        return brandingService;
+        this.directory = directory;
     }
 
     @Override
@@ -95,32 +74,7 @@ public class XOWLHttpContext implements HttpContext {
     private URL doGetResource(String name) {
         if (name.endsWith("/"))
             name += "index.html";
-        if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + BrandingService.BRANDING)) {
-            String localName = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + BrandingService.BRANDING.length());
-            return getBrandingService().getResource(localName);
-        } else if (name.startsWith(Activator.WEBAPP_RESOURCE_ROOT + WebModuleService.MODULES)) {
-            String rest = name.substring(Activator.WEBAPP_RESOURCE_ROOT.length() + WebModuleService.MODULES.length());
-            int index = rest.indexOf("/");
-            if (index != -1) {
-                String moduleName = rest.substring(0, index);
-                return serveModule(moduleName, rest.substring(index + 1));
-            }
-        }
-        return defaultContext.getResource(name);
-    }
-
-    /**
-     * Serves a resource for a module
-     *
-     * @param moduleURI The URI part of the module
-     * @param resource  The module's resource
-     * @return The URL of the requested resource
-     */
-    private URL serveModule(String moduleURI, String resource) {
-        WebModuleService service = moduleDirectory.getServiceFor(moduleURI);
-        if (service == null)
-            return null;
-        return service.getResource(resource);
+        return directory.resolveResource(name);
     }
 
     @Override

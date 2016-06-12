@@ -15,31 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.webapp.impl;
+package org.xowl.platform.services.webapp;
 
-import org.xowl.platform.services.webapp.Activator;
-import org.xowl.platform.services.webapp.BrandingService;
+import org.xowl.platform.kernel.UIContribution;
 
 import java.net.URL;
 
 /**
- * The default branding service for the platform
+ * Represents a directory of the registered UI contributions
  *
  * @author Laurent Wouters
  */
-public class XOWLBrandingService implements BrandingService {
-    @Override
-    public String getIdentifier() {
-        return XOWLBrandingService.class.getCanonicalName();
-    }
+public interface ContributionDirectory {
+    /**
+     * Registers a contribution
+     *
+     * @param contribution The contribution to register
+     */
+    void register(UIContribution contribution);
 
-    @Override
-    public String getName() {
-        return "xOWL Federation Platform - Webapp Branding Service";
-    }
+    /**
+     * Unregisters a contribution
+     *
+     * @param contribution The contribution to unregister
+     */
+    void unregister(UIContribution contribution);
 
-    @Override
-    public URL getResource(String name) {
-        return XOWLBrandingService.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + BRANDING + name);
-    }
+    /**
+     * Resolves the resource URL for the specified requested URI
+     *
+     * @param uri The requested URI
+     * @return The resolved URL, or null if it cannot be resolve
+     */
+    URL resolveResource(String uri);
 }

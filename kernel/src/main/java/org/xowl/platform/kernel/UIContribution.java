@@ -26,12 +26,25 @@ import java.net.URL;
  */
 public interface UIContribution extends Service {
     /**
-     * Gets the contribution-specific part of the URI
+     * The URI prefix for web connections
+     */
+    String URI_WEB = "/web";
+
+    /**
+     * Gets the contribution-specific prefix of the URI
      * This essentially is what identifies this contribution
      *
-     * @return The contribution-specific part of the URI
+     * @return The contribution-specific prefix of the URI
      */
-    String getURI();
+    String getPrefix();
+
+    /**
+     * Gets the priority of this prefix
+     * Greater has more priority
+     *
+     * @return The priority of this prefix
+     */
+    int getPriority();
 
     /**
      * Gets the URL for the requested resource

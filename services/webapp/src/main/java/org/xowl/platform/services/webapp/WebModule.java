@@ -17,38 +17,41 @@
 
 package org.xowl.platform.services.webapp;
 
-import org.xowl.platform.kernel.Service;
+import org.xowl.infra.store.Serializable;
 
-import java.net.URL;
+import java.util.Collection;
 
 /**
- * Represents a service for branding the web application
+ * Represents an additional module for the web application
  *
  * @author Laurent Wouters
  */
-public interface BrandingService extends Service {
+public interface WebModule extends Serializable {
     /**
-     * The branding folder
+     * Gets the name of this module
+     *
+     * @return The name of this module
      */
-    String BRANDING = "/branding/";
-    /**
-     * The name of the title branding resource
-     */
-    String BRANDING_TITLE = "title.html";
-    /**
-     * The name of the favicon resource
-     */
-    String BRANDING_FAVICON = "favicon.png";
-    /**
-     * The name of the spinner resource
-     */
-    String BRANDING_SPINNER = "spinner.gif";
+    String getName();
 
     /**
-     * Gets the URL for a branding resource
+     * Gets the URI for this module
      *
-     * @param name The name of the branding resource, for example title.html
-     * @return The corresponding URL
+     * @return the URI for this module
      */
-    URL getResource(String name);
+    String getURI();
+
+    /**
+     * Gets the icon for this module, if any
+     *
+     * @return The icon for this module, if any
+     */
+    String getIcon();
+
+    /**
+     * Gets the items for this module, if any
+     *
+     * @return The items for this module
+     */
+    Collection<WebModuleItem> getItems();
 }

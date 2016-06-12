@@ -15,19 +15,45 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.webapp;
+package org.xowl.platform.services.webapp.impl;
+
+import org.xowl.platform.kernel.UIContribution;
+
+import java.net.URL;
 
 /**
- * Represents a directory of web modules
+ * Represents the main contribution to the web user interface
  *
  * @author Laurent Wouters
  */
-public interface WebModuleDirectory {
+public class XOWLMainContribution implements UIContribution {
     /**
-     * Gets the web module service for the specified uri part
-     *
-     * @param uri The uri part of a module
-     * @return The corresponding service, if any
+     * The root resource for the web app files
      */
-    WebModuleService getServiceFor(String uri);
+    public static final String RESOURCES = "/org/xowl/platform/services/webapp";
+
+    @Override
+    public String getIdentifier() {
+        return XOWLMainContribution.class.getCanonicalName();
+    }
+
+    @Override
+    public String getName() {
+        return "xOWL Federation Platform - Main UI Contribution";
+    }
+
+    @Override
+    public String getPrefix() {
+        return URI_WEB;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public URL getResource(String resource) {
+        return XOWLMainContribution.class.getResource(RESOURCES + resource.substring(getPrefix().length()));
+    }
 }

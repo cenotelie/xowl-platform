@@ -18,9 +18,9 @@
 package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.platform.services.webapp.Activator;
-import org.xowl.platform.services.webapp.WebModulePart;
-import org.xowl.platform.services.webapp.WebModuleService;
-import org.xowl.platform.services.webapp.WebModuleServiceBase;
+import org.xowl.platform.services.webapp.WebModuleItem;
+import org.xowl.platform.services.webapp.WebModule;
+import org.xowl.platform.services.webapp.WebModuleBase;
 
 import java.net.URL;
 
@@ -29,19 +29,19 @@ import java.net.URL;
  *
  * @author Laurent Wouters
  */
-public class XOWLAdminModule extends WebModuleServiceBase {
+public class XOWLAdminModule extends WebModuleBase {
     /**
      * Initializes this service
      */
     public XOWLAdminModule() {
         super(XOWLCoreModule.class.getCanonicalName(), "Administration", "admin", "/web/assets/xowl.svg");
-        this.parts.add(new WebModulePart("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
-        this.parts.add(new WebModulePart("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
-        this.parts.add(new WebModulePart("Platform Properties", "platform", "/web/assets/information.svg"));
+        this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
+        this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
+        this.items.add(new WebModuleItem("Platform Properties", "platform", "/web/assets/information.svg"));
     }
 
     @Override
     public URL getResource(String resource) {
-        return XOWLCoreModule.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + WebModuleService.MODULES + "admin/" + resource);
+        return XOWLCoreModule.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + WebModule.MODULES + "admin/" + resource);
     }
 }

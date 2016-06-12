@@ -21,17 +21,17 @@ import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
 
 /**
- * Represents a port of a web module
+ * Represents an item in a web module
  *
  * @author Laurent Wouters
  */
-public class WebModulePart implements Serializable {
+public class WebModuleItem implements Serializable {
     /**
-     * The name of this part
+     * The name of this item
      */
     private final String name;
     /**
-     * The URI element for this part
+     * The URI element for this item
      */
     private final String uri;
     /**
@@ -40,31 +40,31 @@ public class WebModulePart implements Serializable {
     private final String icon;
 
     /**
-     * Initializes this web module part
+     * Initializes this web module item
      *
-     * @param name The name of this part
-     * @param uri  The URI element for this part
+     * @param name The name of this item
+     * @param uri  The URI element for this item
      * @param icon The URI for the icon, if any
      */
-    public WebModulePart(String name, String uri, String icon) {
+    public WebModuleItem(String name, String uri, String icon) {
         this.name = name;
         this.uri = uri;
         this.icon = icon;
     }
 
     /**
-     * Gets the name of this part
+     * Gets the name of this item
      *
-     * @return The name of this part
+     * @return The name of this item
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Gets the URI element for this part
+     * Gets the URI element for this item
      *
-     * @return The URI element for this part
+     * @return The URI element for this item
      */
     public String getUri() {
         return uri;

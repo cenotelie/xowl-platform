@@ -22,7 +22,9 @@ import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.impl.FSConfigurationService;
 import org.xowl.platform.kernel.impl.XOWLBusinessDirectoryService;
+import org.xowl.platform.kernel.impl.XOWLPlatformDescriptorService;
 import org.xowl.platform.kernel.impl.XOWLSecurityService;
+import org.xowl.platform.kernel.platform.PlatformDescriptorService;
 
 /**
  * Activator for this bundle
@@ -32,6 +34,7 @@ import org.xowl.platform.kernel.impl.XOWLSecurityService;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
+        PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
         ConfigurationService configurationService = new FSConfigurationService();
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
@@ -39,11 +42,13 @@ public class Activator implements BundleActivator {
         directoryService.register(SchemaArtifactArchetype.INSTANCE);
         directoryService.register(FreeArtifactArchetype.INSTANCE);
         directoryService.register(SchemaDomain.INSTANCE);
+        bundleContext.registerService(PlatformDescriptorService.class, platformDescriptorService, null);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
         bundleContext.registerService(SecurityService.class, securityService, null);
+        bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
+        bundleContext.registerService(HttpAPIService.class, platformDescriptorService, null);
         bundleContext.registerService(HttpAPIService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
-        bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
     }
 
     @Override

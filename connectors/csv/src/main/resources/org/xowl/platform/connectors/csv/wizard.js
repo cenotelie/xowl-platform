@@ -112,8 +112,8 @@ function mappingNewColumn(index, name) {
 	cell3.appendChild(propertyInput);
 	var selectDatatype = createNewSelectDatatype(index);
 	cell4.appendChild(selectDatatype);
-	var toggle = createNewSelectMultivalued(index);
-	cell5.appendChild(toggle);
+	var matcher = createNewSelectRegexp(index);
+	cell5.appendChild(matcher);
 	result.appendChild(cell1);
 	result.appendChild(cell2);
 	result.appendChild(cell3);

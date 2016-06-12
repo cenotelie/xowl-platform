@@ -8,6 +8,14 @@ function init() {
 	displayMessage(null);
 }
 
+function onFileSelected() {
+	var file = document.getElementById("input-file").files[0];
+	var name = document.getElementById("input-name").value;
+	if (name == null || name.length == 0) {
+		document.getElementById("input-name").value = file.name;
+	}
+}
+
 function onUpload() {
 	var name = document.getElementById("input-name").value;
 	if (name === null)
@@ -23,7 +31,7 @@ function onUpload() {
 	progressBar.innerHTML = null;
 	var reader = new FileReader();
 	reader.onprogress = function (event) {
-		var ratio = 50 * event.loaded / event.total;
+		var ratio = 100 * event.loaded / event.total;
 		progressBar['aria-valuenow'] = ratio;
 		progressBar.style.width = ratio.toString() + "%";
 		displayMessage("Reading ...");
@@ -41,7 +49,6 @@ function onUpload() {
 			if (code === 200) {
 				progressBar.classList.add("progress-bar-success");
 				displayMessage(null);
-				alert("OK");
 				window.location.href = "document.html?id=" + encodeURIComponent(content.identifier);
 			} else {
 				displayMessage(getErrorFor(code, content));

@@ -62,7 +62,7 @@ public class XOWLHttpContext implements HttpContext {
         URL result = doGetResource(name);
         if (result != null)
             return result;
-        return defaultContext.getResource(Activator.WEBAPP_RESOURCE_ROOT + "/404.html");
+        return defaultContext.getResource(XOWLMainContribution.RESOURCES + "/404.html");
     }
 
     /**

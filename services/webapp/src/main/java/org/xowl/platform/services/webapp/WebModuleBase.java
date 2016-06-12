@@ -31,6 +31,10 @@ import java.util.List;
  */
 public abstract class WebModuleBase implements WebModule {
     /**
+     * The service's identifier
+     */
+    protected final String identifier;
+    /**
      * The service's human readable name
      */
     protected final String name;
@@ -50,15 +54,22 @@ public abstract class WebModuleBase implements WebModule {
     /**
      * Initializes this service
      *
-     * @param name The service's human readable name
-     * @param uri  The service URI part
-     * @param icon The icon for this module, if any
+     * @param identifier The service's identifier
+     * @param name       The service's human readable name
+     * @param uri        The service URI part
+     * @param icon       The icon for this module, if any
      */
-    public WebModuleBase(String name, String uri, String icon) {
+    public WebModuleBase(String identifier, String name, String uri, String icon) {
+        this.identifier = identifier;
         this.name = name;
         this.uri = uri;
         this.icon = icon;
         this.items = new ArrayList<>(5);
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
     @Override
@@ -89,7 +100,9 @@ public abstract class WebModuleBase implements WebModule {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{\"name\": \"");
+        builder.append("{\"identifier\": \"");
+        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
+        builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));
         builder.append("\", \"uri\": \"");
         builder.append(IOUtils.escapeStringJSON(getURI()));

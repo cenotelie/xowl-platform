@@ -17,31 +17,22 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.platform.services.webapp.Activator;
-import org.xowl.platform.services.webapp.WebModuleItem;
-import org.xowl.platform.services.webapp.WebModule;
 import org.xowl.platform.services.webapp.WebModuleBase;
-
-import java.net.URL;
+import org.xowl.platform.services.webapp.WebModuleItem;
 
 /**
  * Represents the administration module in the web application
  *
  * @author Laurent Wouters
  */
-public class XOWLAdminModule extends WebModuleBase {
+public class XOWLWebModuleAdmin extends WebModuleBase {
     /**
      * Initializes this service
      */
-    public XOWLAdminModule() {
-        super(XOWLCoreModule.class.getCanonicalName(), "Administration", "admin", "/web/assets/xowl.svg");
+    public XOWLWebModuleAdmin() {
+        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Administration", "admin", "/web/assets/xowl.svg");
         this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
         this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
         this.items.add(new WebModuleItem("Platform Properties", "platform", "/web/assets/information.svg"));
-    }
-
-    @Override
-    public URL getResource(String resource) {
-        return XOWLCoreModule.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + WebModule.MODULES + "admin/" + resource);
     }
 }

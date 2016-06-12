@@ -24,9 +24,7 @@ import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.UIContribution;
-import org.xowl.platform.services.webapp.impl.XOWLContributionDirectory;
-import org.xowl.platform.services.webapp.impl.XOWLHttpContext;
-import org.xowl.platform.services.webapp.impl.XOWLMainContribution;
+import org.xowl.platform.services.webapp.impl.*;
 
 /**
  * The activator for this bundle
@@ -43,14 +41,25 @@ public class Activator implements BundleActivator {
      */
     private ServiceTracker contributionTracker;
     /**
+     * The tracker of web modules
+     */
+    private ServiceTracker modulesTracker;
+    /**
      * The directory of UI contributions
      */
-    private ContributionDirectory directory;
+    private ContributionDirectory contributionDirectory;
+    /**
+     * The directory of web modules
+     */
+    private XOWLWebModuleDirectory moduleDirectory;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        directory = new XOWLContributionDirectory();
-        directory.register(new XOWLMainContribution());
+        contributionDirectory = new XOWLContributionDirectory();
+        contributionDirectory.register(new XOWLMainContribution());
+        moduleDirectory = new XOWLWebModuleDirectory();
+        moduleDirectory.register(new XOWLWebModuleAdmin());
+        moduleDirectory.register(new XOWLWebModuleCore());
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
@@ -63,7 +72,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(UIContribution.URI_WEB, XOWLMainContribution.RESOURCES, new XOWLHttpContext(httpService, directory));
+                    httpService.registerResources(UIContribution.URI_WEB, XOWLMainContribution.RESOURCES, new XOWLHttpContext(httpService, contributionDirectory));
                 } catch (Exception exception) {
                     Logging.getDefault().error(exception);
                 }
@@ -74,21 +83,35 @@ public class Activator implements BundleActivator {
 
         contributionTracker = new ServiceTracker<UIContribution, UIContribution>(bundleContext, UIContribution.class, null) {
             public void removedService(ServiceReference reference, UIContribution contribution) {
-                directory.unregister(contribution);
+                contributionDirectory.unregister(contribution);
             }
 
             public UIContribution addingService(ServiceReference reference) {
                 UIContribution contribution = (UIContribution) bundleContext.getService(reference);
-                directory.register(contribution);
+                contributionDirectory.register(contribution);
                 return contribution;
             }
         };
         contributionTracker.open();
+
+        modulesTracker = new ServiceTracker<WebModule, WebModule>(bundleContext, WebModule.class, null) {
+            public void removedService(ServiceReference reference, WebModule module) {
+                moduleDirectory.unregister(module);
+            }
+
+            public WebModule addingService(ServiceReference reference) {
+                WebModule module = (WebModule) bundleContext.getService(reference);
+                moduleDirectory.register(module);
+                return module;
+            }
+        };
+        modulesTracker.open();
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
         httpTracker.close();
         contributionTracker.close();
+        modulesTracker.close();
     }
 }

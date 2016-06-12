@@ -17,34 +17,25 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.platform.services.webapp.Activator;
-import org.xowl.platform.services.webapp.WebModuleItem;
-import org.xowl.platform.services.webapp.WebModule;
 import org.xowl.platform.services.webapp.WebModuleBase;
-
-import java.net.URL;
+import org.xowl.platform.services.webapp.WebModuleItem;
 
 /**
  * Represents the core module in the web application
  *
  * @author Laurent Wouters
  */
-public class XOWLCoreModule extends WebModuleBase {
+public class XOWLWebModuleCore extends WebModuleBase {
     /**
      * Initializes this service
      */
-    public XOWLCoreModule() {
-        super(XOWLCoreModule.class.getCanonicalName(), "Core Services", "core", "/web/assets/xowl.svg");
+    public XOWLWebModuleCore() {
+        super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/web/assets/xowl.svg");
         this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/web/assets/artifact.svg"));
         this.items.add(new WebModuleItem("Data Import", "importation", "/web/assets/import.svg"));
         this.items.add(new WebModuleItem("Consistency Management", "consistency", "/web/assets/consistency.svg"));
         this.items.add(new WebModuleItem("Traceability Exploration", "discovery", "/web/assets/exploration.svg"));
         this.items.add(new WebModuleItem("Impact Analysis", "impact", "/web/assets/impact.svg"));
         this.items.add(new WebModuleItem("Evaluation Analysis", "evaluation", "/web/assets/evaluation.svg"));
-    }
-
-    @Override
-    public URL getResource(String resource) {
-        return XOWLCoreModule.class.getResource(Activator.WEBAPP_RESOURCE_ROOT + WebModule.MODULES + "core/" + resource);
     }
 }

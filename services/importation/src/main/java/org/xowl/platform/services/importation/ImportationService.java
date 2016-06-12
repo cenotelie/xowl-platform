@@ -74,7 +74,7 @@ public interface ImportationService extends HttpAPIService {
      * @param configuration The importer's configuration
      * @return The document preview, or null if it cannot be produced
      */
-    DocumentPreview getPreview(Document document, Importer importer, String configuration);
+    DocumentPreview getPreview(Document document, Importer importer, ImporterConfiguration configuration);
 
     /**
      * Gets the registered importers
@@ -91,5 +91,5 @@ public interface ImportationService extends HttpAPIService {
      * @param configuration The importer's configuration
      * @return The job, or null if the job cannot be created
      */
-    Job beginImport(Document document, Importer importer, String configuration);
+    Job beginImport(Document document, Importer importer, ImporterConfiguration configuration);
 }

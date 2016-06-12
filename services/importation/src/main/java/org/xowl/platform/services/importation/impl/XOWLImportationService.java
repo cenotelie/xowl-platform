@@ -29,10 +29,7 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.services.importation.Document;
-import org.xowl.platform.services.importation.DocumentPreview;
-import org.xowl.platform.services.importation.ImportationService;
-import org.xowl.platform.services.importation.Importer;
+import org.xowl.platform.services.importation.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -256,7 +253,7 @@ public class XOWLImportationService implements ImportationService {
         Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
         for (Importer importer : importers) {
             if (importer.getIdentifier().equals(importerId)) {
-                DocumentPreview preview = getPreview(document, importer, configuration);
+                DocumentPreview preview = getPreview(document, importer, importer.getConfiguration(configuration));
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, preview.serializedJSON());
             }
         }
@@ -301,7 +298,7 @@ public class XOWLImportationService implements ImportationService {
         Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
         for (Importer importer : importers) {
             if (importer.getIdentifier().equals(importerId)) {
-                Job job = beginImport(document, importer, configuration);
+                Job job = beginImport(document, importer, importer.getConfiguration(configuration));
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to import");
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -380,7 +377,7 @@ public class XOWLImportationService implements ImportationService {
     }
 
     @Override
-    public DocumentPreview getPreview(Document document, Importer importer, String configuration) {
+    public DocumentPreview getPreview(Document document, Importer importer, ImporterConfiguration configuration) {
         return importer.getPreview(document, configuration);
     }
 
@@ -390,7 +387,7 @@ public class XOWLImportationService implements ImportationService {
     }
 
     @Override
-    public Job beginImport(Document document, Importer importer, String configuration) {
+    public Job beginImport(Document document, Importer importer, ImporterConfiguration configuration) {
         Job job = importer.getImportJob(document, configuration);
         JobExecutionService executionService = ServiceUtils.getService(JobExecutionService.class);
         if (executionService == null)

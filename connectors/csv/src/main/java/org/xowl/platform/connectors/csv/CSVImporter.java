@@ -28,6 +28,7 @@ import org.xowl.infra.store.storage.BaseStore;
 import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -36,10 +37,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
-import org.xowl.platform.services.importation.Document;
-import org.xowl.platform.services.importation.DocumentPreview;
-import org.xowl.platform.services.importation.ImportationService;
-import org.xowl.platform.services.importation.Importer;
+import org.xowl.platform.services.importation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,14 +64,21 @@ public class CSVImporter implements Importer {
     }
 
     @Override
-    public DocumentPreview getPreview(Document document, String configuration) {
+    public ImporterConfiguration getConfiguration(String definition) {
+        ASTNode root = PlatformUtils.parseJSON(Logging.getDefault(), definition);
+        if (root == null)
+            return null;
+        return new CSVConfiguration(root);
+    }
+
+    @Override
+    public DocumentPreview getPreview(Document document, ImporterConfiguration configuration) {
         ImportationService service = ServiceUtils.getService(ImportationService.class);
         if (service == null)
             return null;
-        ASTNode definition = PlatformUtils.parseJSON(Logging.getDefault(), configuration);
-        if (definition == null)
+        if (!(configuration instanceof CSVConfiguration))
             return null;
-        CSVConfiguration csvConfiguration = new CSVConfiguration(definition);
+        CSVConfiguration csvConfiguration = (CSVConfiguration) configuration;
         try (InputStream stream = service.getStreamFor(document)) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             CSVParser parser = new CSVParser(reader, csvConfiguration.getSeparator(), csvConfiguration.getTextMarker());
@@ -122,8 +127,10 @@ public class CSVImporter implements Importer {
     }
 
     @Override
-    public Job getImportJob(Document document, String configuration) {
-        return null;
+    public Job getImportJob(Document document, ImporterConfiguration configuration) {
+        if (!(configuration instanceof CSVConfiguration))
+            return null;
+        return new CSVImportationJob(document.getIdentifier(), (CSVConfiguration) configuration);
     }
 
     /**

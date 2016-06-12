@@ -27,13 +27,21 @@ import org.xowl.platform.kernel.jobs.Job;
  */
 public interface Importer extends Service {
     /**
+     * Gets the configuration from the specified serialized definition
+     *
+     * @param definition The configuration's definition
+     * @return The configuration
+     */
+    ImporterConfiguration getConfiguration(String definition);
+
+    /**
      * Gets the preview of a document to be imported
      *
      * @param document      The document to preview
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    DocumentPreview getPreview(Document document, String configuration);
+    DocumentPreview getPreview(Document document, ImporterConfiguration configuration);
 
     /**
      * Gets the job for importing a document
@@ -42,5 +50,5 @@ public interface Importer extends Service {
      * @param configuration The configuration for this import
      * @return The job for importing the document
      */
-    Job getImportJob(Document document, String configuration);
+    Job getImportJob(Document document, ImporterConfiguration configuration);
 }

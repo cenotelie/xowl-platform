@@ -55,6 +55,7 @@ cp "$ROOT/services/evaluation/target/xowl-service-evaluation-$VERSION.jar" "$REL
 cp "$ROOT/services/executor/target/xowl-service-executor-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/httpapi/target/xowl-service-httpapi-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/impact/target/xowl-service-impact-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
+cp "$ROOT/services/importation/target/xowl-service-importation-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/statistics/target/xowl-service-statistics-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"

@@ -3,7 +3,7 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
-var importerId = getParameterByName("importerId");
+var importerId = getParameterByName("importer");
 var importerWizard = null;
 var lastPreview = null;
 var mapping = [];

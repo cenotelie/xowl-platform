@@ -16,6 +16,7 @@
 		<module>lts</module>
 		<module>consistency</module>
 		<module>impact</module>
+		<module>importation</module>
 		<module>evaluation</module>
 		<module>connection</module>
 		<module>statistics</module>

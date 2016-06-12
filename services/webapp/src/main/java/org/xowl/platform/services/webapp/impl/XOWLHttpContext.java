@@ -19,7 +19,6 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.platform.services.webapp.Activator;
 import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import javax.servlet.http.HttpServletRequest;

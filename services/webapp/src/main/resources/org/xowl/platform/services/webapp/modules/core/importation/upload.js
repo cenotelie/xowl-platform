@@ -42,7 +42,7 @@ function onUpload() {
 				progressBar.classList.add("progress-bar-success");
 				displayMessage(null);
 				alert("OK");
-				window.location.href = "index.html";
+				window.location.href = "document.html?id=" + encodeURIComponent(content.identifier);
 			} else {
 				displayMessage(getErrorFor(code, content));
 				progressBar.classList.add("progress-bar-error");

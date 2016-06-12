@@ -437,7 +437,7 @@ XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer,
 XOWL.prototype.dropUploadedDocument = function (callback, docId) {
 	this.doCommand(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}

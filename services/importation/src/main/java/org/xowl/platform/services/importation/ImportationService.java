@@ -84,6 +84,14 @@ public interface ImportationService extends HttpAPIService {
     Collection<Importer> getImporters();
 
     /**
+     * Gets the importer for the specified identifier
+     *
+     * @param importerId The identifier of an importer
+     * @return The importer, or null it cannot be found
+     */
+    Importer getImporter(String importerId);
+
+    /**
      * Begins the importation job of a document
      *
      * @param document      The document to import

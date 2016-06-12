@@ -144,6 +144,9 @@ public class XOWLImportationService implements ImportationService {
                 String[] docIds = parameters.get("document");
                 if (docIds != null && docIds.length > 0)
                     return onGetDocument(docIds[0]);
+                String[] importerIds = parameters.get("importer");
+                if (importerIds != null && importerIds.length > 0)
+                    return onGetImporter(importerIds[0]);
                 String[] whats = parameters.get("what");
                 if (whats != null && whats.length > 0) {
                     if (whats[0].equals("document"))
@@ -278,6 +281,19 @@ public class XOWLImportationService implements ImportationService {
     }
 
     /**
+     * When an importer is requested
+     *
+     * @param importerId The identifier of the requested importer
+     * @return The HTTP response
+     */
+    private HttpResponse onGetImporter(String importerId) {
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, importer.serializedJSON());
+    }
+
+    /**
      * When the importation of a document is requested
      *
      * @param documentId    The identifier of the document
@@ -381,6 +397,16 @@ public class XOWLImportationService implements ImportationService {
     @Override
     public Collection<Importer> getImporters() {
         return ServiceUtils.getServices(Importer.class);
+    }
+
+    @Override
+    public Importer getImporter(String importerId) {
+        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        for (Importer importer : importers) {
+            if (importer.getIdentifier().equals(importerId))
+                return importer;
+        }
+        return null;
     }
 
     @Override

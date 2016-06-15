@@ -216,3 +216,19 @@ function compareArtifacts(a1, a2) {
 	var d2 = new Date(a2.creation);
 	return d1.getTime() < d2.getTime();
 }
+
+
+function Loader(count) {
+	this.count = count;
+	this.message = null;
+}
+Loader.prototype.onLoaded = function () {
+	this.count--;
+	if (this.count <= 0 && this.message == null)
+		displayMessage(null);
+}
+Loader.prototype.onError = function (code, content) {
+	this.count--;
+	this.message = getErrorFor(code, content);
+	displayMessage(message);
+}

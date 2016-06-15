@@ -12,21 +12,23 @@ function init() {
     	return;
 	document.getElementById("placeholder-doc").innerHTML = docId;
 	displayMessage("Loading ...");
+	var loader = new Loader(2);
 	xowl.getUploadedDocument(function (status, ct, content) {
 		if (status == 200) {
 			document.getElementById("document-name").value = content.name;
-			xowl.getDocumentImporters(function (status, ct, content) {
-				if (status == 200) {
-					renderImporters(content);
-					displayMessage(null);
-				} else {
-					displayMessage(getErrorFor(status, content));
-				}
-			});
+			loader.onLoaded();
 		} else {
-			displayMessage(getErrorFor(status, content));
+			loader.onError(status, content);
 		}
 	}, docId);
+	xowl.getDocumentImporters(function (status, ct, content) {
+		if (status == 200) {
+			renderImporters(content);
+			loader.onLoaded();
+		} else {
+			loader.onError(status, content);
+		}
+	});
 }
 
 function renderImporters(importers) {

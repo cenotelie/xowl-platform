@@ -45,6 +45,7 @@ import org.xowl.platform.services.importation.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 /**
  * Implements a DOORS 9 importer
@@ -133,7 +134,7 @@ public class DOORS9Importer extends Importer {
      * @param context The current context
      */
     private static void importProject(ASTNode project, DOORS9Context context) {
-        String projectName;
+        String projectName="";
         for (ASTNode member : project.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -143,11 +144,17 @@ public class DOORS9Importer extends Importer {
                     projectName = projectName.substring(1, projectName.length() - 1);
                     break;
                 }
-                case "contents": {
-                    importContents(member.getChildren().get(1), context);
-                    break;
-                }
             }
+        }
+            for (ASTNode member : project.getChildren()) {
+                String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+                key = key.substring(1, key.length() - 1);
+                switch (key) {
+                    case "contents": {
+                        importContents(member.getChildren().get(1), context, "/"+projectName);
+                        break;
+                    }
+                }
         }
     }
 
@@ -157,18 +164,22 @@ public class DOORS9Importer extends Importer {
      * @param contents The AST node for the content objects
      * @param context  The current context
      */
-    private static void importContents(ASTNode contents, DOORS9Context context) {
+    private static void importContents(ASTNode contents, DOORS9Context context, String path) {
         for (ASTNode child : contents.getChildren()) {
             for (ASTNode member : child.getChildren()) {
                 String key = IOUtils.unescape(member.getChildren().get(0).getValue());
                 key = key.substring(1, key.length() - 1);
                 switch (key) {
                     case "Folder": {
-                        importFolder(member.getChildren().get(1), context);
+                        importFolder(member.getChildren().get(1), context, path);
                         break;
                     }
                     case "Formal": {
-                        importFormalModule(member.getChildren().get(1), context);
+                        importFormalModule(member.getChildren().get(1), context, path);
+                        break;
+                    }
+                    case "Link": {
+                        importLinkModule(member.getChildren().get(1), context, path);
                         break;
                     }
                 }
@@ -182,8 +193,8 @@ public class DOORS9Importer extends Importer {
      * @param folder  The AST node for the folder
      * @param context The current context
      */
-    private static void importFolder(ASTNode folder, DOORS9Context context) {
-        String folderName;
+    private static void importFolder(ASTNode folder, DOORS9Context context, String path) {
+        String folderName="";
         for (ASTNode member : folder.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -193,8 +204,14 @@ public class DOORS9Importer extends Importer {
                     folderName = folderName.substring(1, folderName.length() - 1);
                     break;
                 }
+            }
+        }
+        for (ASTNode member : folder.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
                 case "contents": {
-                    importContents(member.getChildren().get(1), context);
+                    importContents(member.getChildren().get(1), context, path+"/"+folderName);
                     break;
                 }
             }
@@ -207,8 +224,9 @@ public class DOORS9Importer extends Importer {
      * @param module  The AST node for the formal module
      * @param context The current context
      */
-    private static void importFormalModule(ASTNode module, DOORS9Context context) {
-        String moduleName;
+    private static void importFormalModule(ASTNode module, DOORS9Context context, String path) {
+        String moduleName="";
+        IRINode modIRI = null;
         for (ASTNode member : module.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -216,25 +234,175 @@ public class DOORS9Importer extends Importer {
                 case "Name": {
                     moduleName = IOUtils.unescape(member.getChildren().get(1).getValue());
                     moduleName = moduleName.substring(1, moduleName.length() - 1);
-                    break;
-                }
-                case "contents": {
-                    for (ASTNode child : member.getChildren().get(1).getChildren()) {
-                        importRequirement(child, context);
-                    }
+                    modIRI = context.resolveEntity(path +"/"+moduleName);
+
                     break;
                 }
             }
         }
-    }
+        context.addQuad(
+                modIRI,
+                context.getIRI(Vocabulary.rdfType),
+                context.getIRI("http://toto.com/FormalModule"));
 
+        for (ASTNode member : module.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "contents": {
+                    for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                        importRequirement(child, context, path + "/" + moduleName);
+                    }
+                    break;
+                }
+                case "Created By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+                }
+                case "Created On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "Last Modified By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/lastModifiedBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Last Modified On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/lastModifiedOn"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "URB ID Prefix - Requirement" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/urbPrefix"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "PRJ Project Baseline" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/prjBaseline"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+            }
+        }
+    }
     /**
-     * Imports a requirement
+     * Imports a link module
+     *
+     * @param module  The AST node for the formal module
+     * @param context The current context
+     */
+    private static void importLinkModule(ASTNode module, DOORS9Context context, String path) {
+        String moduleName="";
+        IRINode modIRI = null;
+        for (ASTNode member : module.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "Name": {
+                    moduleName = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    moduleName = moduleName.substring(1, moduleName.length() - 1);
+                    modIRI = context.resolveEntity(path+"/"+moduleName);
+
+                    break;
+                }
+            }
+        }
+        context.addQuad(
+                modIRI,
+                context.getIRI(Vocabulary.rdfType),
+                context.getIRI("http://toto.com/LinkModule"));
+
+        for (ASTNode member : module.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "contents": {
+                    for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                        importLink(child, context, moduleName, path+"/"+moduleName);
+                    }
+                    break;
+                }
+                case "Created By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+                }
+                case "Created On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "Last Modified By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/lastModifiedBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Last Modified On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            modIRI,
+                            context.getIRI("http://toto.com/lastModifiedOn"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+            }
+        }
+    }
+    /**
+     * Imports a link
      *
      * @param requirement The AST node for the requirement
      * @param context     The current context
      */
-    private static void importRequirement(ASTNode requirement, DOORS9Context context) {
+    private static void importLink(ASTNode requirement, DOORS9Context context, String relation, String path) {
         IRINode reqIRI = null;
         for (ASTNode member : requirement.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
@@ -243,7 +411,107 @@ public class DOORS9Importer extends Importer {
                 case "Absolute Number": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
-                    reqIRI = context.resolveEntity(text);
+                    reqIRI = context.resolveEntity(path+"#"+text);
+                    break;
+                }
+            }
+        }
+
+        context.addQuad(
+                reqIRI,
+                context.getIRI(Vocabulary.rdfType),
+                context.getIRI("http://toto.com/Link"));
+
+        context.addQuad(
+                reqIRI,
+                context.getIRI("http://toto.com/Relation"),
+                context.getIRI("http://toto.com/"+ relation));
+
+        for (ASTNode member : requirement.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "Created By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+                }
+                case "Created On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "Last Modified By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/lastModifiedBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Last Modified On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/lastModifiedOn"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "Source" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    IRINode sourceIRI = context.resolveEntity(text);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/source"),
+                            sourceIRI);
+                    break;
+
+                }
+                case "Target" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    IRINode targetIRI = context.resolveEntity(text);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/target"),
+                            targetIRI);
+                    break;
+
+                }
+
+            }
+        }
+    }
+    /**
+     * Imports a requirement
+     *
+     * @param requirement The AST node for the requirement
+     * @param context     The current context
+     */
+    private static void importRequirement(ASTNode requirement, DOORS9Context context, String path) {
+        IRINode reqIRI = null;
+        for (ASTNode member : requirement.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "Absolute Number": {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    reqIRI = context.resolveEntity(path+"#"+text);
                     break;
                 }
             }
@@ -258,6 +526,11 @@ public class DOORS9Importer extends Importer {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             switch (key) {
+
+                /********************************************************************/
+                /*           REGULAR DOORS ATTRIBUTES                                */
+                /********************************************************************/
+
                 case "Object Text": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
@@ -267,7 +540,375 @@ public class DOORS9Importer extends Importer {
                             context.getLiteral(text, Vocabulary.xsdString));
                     break;
                 }
+                case "Created By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Created On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/createdBy"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                case "Created Thru" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/created Thru"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Last Modified By" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/lastModifiedBy"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Last Modified On" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/lastModifiedOn"),
+                            context.getLiteral(text, Vocabulary.xsdDate));
+                    break;
+
+                }
+                /********************************************************************/
+                /*           link references                                        */
+                /********************************************************************/
+
+                case "incomingLinks": {
+                    ASTNode inLinks =  member.getChildren().get(1);
+                    for (ASTNode inLink : inLinks.getChildren()) {
+                        String abs_num = "";
+                        String store = "";
+                        for (ASTNode pair : inLink.getChildren()){
+                            String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
+                            attr = attr.substring(1, key.length() - 1);
+                            switch (attr){
+                                case "Store" :{
+                                    store = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    break;
+                                }
+                                case "Absolute Number":{
+                                    abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    break;
+                                }
+                            }
+                        }
+                        IRINode linkIRI = context.resolveEntity(store +"#"+abs_num);
+                        context.addQuad(
+                                reqIRI,
+                                context.getIRI("http://toto.com/incomingLink"),
+                                linkIRI);
+                        // add a direct link to destination?
+                    }
+                    break;
+                }
+                case "outcomingLinks": {
+                    ASTNode inLinks =  member.getChildren().get(1);
+                    for (ASTNode inLink : inLinks.getChildren()) {
+                        String abs_num = "";
+                        String store = "";
+                        for (ASTNode pair : inLink.getChildren()){
+                            String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
+                            attr = attr.substring(1, key.length() - 1);
+                            switch (attr){
+                                case "Store" :{
+                                    store = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    break;
+                                }
+                                case "Absolute Number":{
+                                    abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    break;
+                                }
+                            }
+                        }
+                        IRINode linkIRI = context.resolveEntity(store +"#"+abs_num);
+                        context.addQuad(
+                                reqIRI,
+                                context.getIRI("http://toto.com/outcomingLink"),
+                                linkIRI);
+                        // add a direct link to source?
+                    }
+                    break;
+                }
+                /********************************************************************/
+                /*           URBALIS ATTRIBUTES                                     */
+                /********************************************************************/
+
+                case "URB Review Status" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/urbReviewStatus"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "URB Category Type" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/urbCategoryType"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "URB Object Type" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/urbObjectType"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "URB Activity" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/urbActivity"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "URB Compliance Status" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/urbComplianceStatus"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                /********************************************************************/
+                /*           TGS ATTRIBUTES                                         */
+                /********************************************************************/
+
+                case "TGS Category" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tgsCategory"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TGS Status" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tgsStatus"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TGS ID" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tgsID"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TGS PBS": {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    String[] parts = text.split("\n");
+                    for (int i=0; i != parts.length; i++) {
+                        context.addQuad(
+                                reqIRI,
+                                context.getIRI("http://toto.com/tgsPBS"),
+                                context.getLiteral(parts[i], Vocabulary.xsdString));
+                    }
+                    break;
+                }
+
+                /********************************************************************/
+                /*           TIS ATTRIBUTES                                         */
+                /********************************************************************/
+
+                case "TIS Object Identifier" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisObjectIdentifier"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS ID" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisID"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Status" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisStatus"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Type" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisStatus"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Rationale" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisRationale"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Allocation" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisAllocation"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Assignment" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisAssignment"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TIS Comment" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/tisComment"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+
+
+
+                /********************************************************************/
+                /*           other ATTRIBUTES TO BE Discussed                       */
+                /********************************************************************/
+
+                case "PRJ Coverage Level" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/prjCoverageLevel"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "Section" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/section"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "InputModule" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/inputModule"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "TMP upstream ID" : {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    context.addQuad(
+                            reqIRI,
+                            context.getIRI("http://toto.com/inputModule"),
+                            context.getLiteral(text, Vocabulary.xsdString));
+                    break;
+
+                }
+                case "OBS": {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    String[] parts = text.split("\n");
+                    for (int i=0; i != parts.length; i++) {
+                        context.addQuad(
+                                reqIRI,
+                                context.getIRI("http://toto.com/OBS"),
+                                context.getLiteral(parts[i], Vocabulary.xsdString));
+                    }
+                    break;
+                }
+                case "ABS": {
+                    String text = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    text = text.substring(1, text.length() - 1);
+                    String[] parts = text.split("\n");
+                    for (int i=0; i != parts.length; i++) {
+                        context.addQuad(
+                                reqIRI,
+                                context.getIRI("http://toto.com/ABS"),
+                                context.getLiteral(parts[i], Vocabulary.xsdString));
+                    }
+                    break;
+                }
             }
         }
     }
+
+
 }

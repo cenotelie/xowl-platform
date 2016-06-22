@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>CSV Document Importation</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+  <div class="header">
+    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
+    <div style="display: inline-block; margin-left: 50px;">
+      <span style="display: inline-block;">
+        <ol class="breadcrumb">
+          <li><a href="/web/">Home</a></li>
+          <li><a href="/web/modules/core/">Core</a></li>
+          <li><a href="/web/modules/core/importation/">Data Import</a></li>
+          <li class="active" id="placeholder-doc">CSV Import</li>
+        </ol>
+      </span>
+    </div>
+    <div style="float: right; margin-right: 20px;">
+      <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
+    </div>
+    <hr style="margin-top: 5px; margin-bottom: 5px;" />
+  </div>
+  <div class="body">
+    <div class="panel panel-default" id="loader">
+      <div class="panel-body">
+        <img src="/web/branding/spinner.gif" width="32" height="32" />
+        <span id="loader-text">Loading ...</span>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="document-name">Name:</label>
+          <input type="text" class="form-control" id="document-name" readonly>
+        </div>
+        <div class="form-group">
+          <label for="document-separator">Cell separator:</label>
+          <input type="text" class="form-control" id="document-separator" value=",">
+        </div>
+        <div class="form-group">
+          <label for="document-text-marker">Text delimiter:</label>
+          <input type="text" class="form-control" id="document-text-marker" value='"'>
+        </div>
+        <div class="form-group">
+          <label for="document-row-count">Preview row count:</label>
+          <input type="number" class="form-control" id="document-row-count" value="4">
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" id="document-has-title-row"> First row is title
+          </label>
+        </div>
+        <button class="btn btn-default" onclick="onPreview()">Preview</button>
+        <div class="form-group" style="margin-top: 10px;">
+          <table class="table table-bordered table-hover">
+            <thead id="document-heads">
+            </thead>
+            <tbody id="document-rows">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Import mapping definition
+        <button class="btn btn-default" onclick="onInitMapping()" style="margin-left: 20px;">Initialize from preview</button>
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <td>Column</td>
+              <td>Mapping</td>
+              <td>Property</td>
+              <td>Datatype</td>
+              <td>Value matching regexp</td>
+            </tr>
+          </thead>
+          <tbody id="mapping">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <button class="btn btn-primary" onclick="onImport()">Map and Import</button>
+      </div>
+    </div>
+  </div>
+  <script src="/web/xowl/xowl-api-platform.js"></script>
+  <script src="/web/xowl/xowl-ui.js"></script>
+  <script src="/web/xowl/xowl-utils.js"></script>
+  <script src="wizard.js"></script>
+  <script>
+    init();
+  </script>
+</body>
+
+</html>

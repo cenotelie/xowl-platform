@@ -10,7 +10,7 @@
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
 	<name>xOWL Federation - Connector DOORS 9</name>
-	<description>The CSV Connector</description>
+	<description>The DOORS 9 Connector and Importer</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>

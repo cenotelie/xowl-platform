@@ -30,8 +30,6 @@ import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.store.writers.NTripleSerializer;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;

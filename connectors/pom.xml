@@ -13,5 +13,6 @@
 	<description>The set of connectors for the xOWL platform</description>
 	<modules>
 		<module>csv</module>
+		<module>doors9</module>
 	</modules>
 </project>

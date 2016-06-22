@@ -19,8 +19,6 @@ package org.xowl.platform.kernel;
 
 import org.xowl.infra.utils.config.Configuration;
 
-import java.io.File;
-
 /**
  * The configuration service that provides configuration elements to other entities
  *
@@ -34,12 +32,4 @@ public interface ConfigurationService extends Service {
      * @return The corresponding configuration element
      */
     Configuration getConfigFor(Identifiable entity);
-
-    /**
-     * Resolves the specified file name against the configuration repository represented by this service
-     *
-     * @param file The file to resolve
-     * @return The resolved file
-     */
-    File resolve(String file);
 }

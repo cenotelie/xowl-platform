@@ -74,9 +74,4 @@ public class FSConfigurationService implements ConfigurationService {
         }
         return configuration;
     }
-
-    @Override
-    public File resolve(String file) {
-        return new File(root, file);
-    }
 }

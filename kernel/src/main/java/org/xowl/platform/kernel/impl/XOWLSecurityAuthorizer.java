@@ -21,7 +21,6 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.xowl.platform.kernel.SecurityService;
 
 import java.util.Arrays;
 import java.util.Collection;

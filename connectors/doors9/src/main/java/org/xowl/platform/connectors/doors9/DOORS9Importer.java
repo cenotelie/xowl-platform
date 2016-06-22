@@ -45,7 +45,6 @@ import org.xowl.platform.services.importation.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.StringTokenizer;
 
 /**
  * Implements a DOORS 9 importer
@@ -134,7 +133,7 @@ public class DOORS9Importer extends Importer {
      * @param context The current context
      */
     private static void importProject(ASTNode project, DOORS9Context context) {
-        String projectName="";
+        String projectName = "";
         for (ASTNode member : project.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -146,15 +145,15 @@ public class DOORS9Importer extends Importer {
                 }
             }
         }
-            for (ASTNode member : project.getChildren()) {
-                String key = IOUtils.unescape(member.getChildren().get(0).getValue());
-                key = key.substring(1, key.length() - 1);
-                switch (key) {
-                    case "contents": {
-                        importContents(member.getChildren().get(1), context, "/"+projectName);
-                        break;
-                    }
+        for (ASTNode member : project.getChildren()) {
+            String key = IOUtils.unescape(member.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "contents": {
+                    importContents(member.getChildren().get(1), context, "/" + projectName);
+                    break;
                 }
+            }
         }
     }
 
@@ -194,7 +193,7 @@ public class DOORS9Importer extends Importer {
      * @param context The current context
      */
     private static void importFolder(ASTNode folder, DOORS9Context context, String path) {
-        String folderName="";
+        String folderName = "";
         for (ASTNode member : folder.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -211,7 +210,7 @@ public class DOORS9Importer extends Importer {
             key = key.substring(1, key.length() - 1);
             switch (key) {
                 case "contents": {
-                    importContents(member.getChildren().get(1), context, path+"/"+folderName);
+                    importContents(member.getChildren().get(1), context, path + "/" + folderName);
                     break;
                 }
             }
@@ -225,7 +224,7 @@ public class DOORS9Importer extends Importer {
      * @param context The current context
      */
     private static void importFormalModule(ASTNode module, DOORS9Context context, String path) {
-        String moduleName="";
+        String moduleName = "";
         IRINode modIRI = null;
         for (ASTNode member : module.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
@@ -234,7 +233,7 @@ public class DOORS9Importer extends Importer {
                 case "Name": {
                     moduleName = IOUtils.unescape(member.getChildren().get(1).getValue());
                     moduleName = moduleName.substring(1, moduleName.length() - 1);
-                    modIRI = context.resolveEntity(path +"/"+moduleName);
+                    modIRI = context.resolveEntity(path + "/" + moduleName);
 
                     break;
                 }
@@ -255,7 +254,7 @@ public class DOORS9Importer extends Importer {
                     }
                     break;
                 }
-                case "Created By" : {
+                case "Created By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -264,7 +263,7 @@ public class DOORS9Importer extends Importer {
                             context.getLiteral(text, Vocabulary.xsdString));
                     break;
                 }
-                case "Created On" : {
+                case "Created On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -274,7 +273,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified By" : {
+                case "Last Modified By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -284,7 +283,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified On" : {
+                case "Last Modified On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -294,7 +293,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "URB ID Prefix - Requirement" : {
+                case "URB ID Prefix - Requirement": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -304,7 +303,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "PRJ Project Baseline" : {
+                case "PRJ Project Baseline": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -317,6 +316,7 @@ public class DOORS9Importer extends Importer {
             }
         }
     }
+
     /**
      * Imports a link module
      *
@@ -324,7 +324,7 @@ public class DOORS9Importer extends Importer {
      * @param context The current context
      */
     private static void importLinkModule(ASTNode module, DOORS9Context context, String path) {
-        String moduleName="";
+        String moduleName = "";
         IRINode modIRI = null;
         for (ASTNode member : module.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
@@ -333,7 +333,7 @@ public class DOORS9Importer extends Importer {
                 case "Name": {
                     moduleName = IOUtils.unescape(member.getChildren().get(1).getValue());
                     moduleName = moduleName.substring(1, moduleName.length() - 1);
-                    modIRI = context.resolveEntity(path+"/"+moduleName);
+                    modIRI = context.resolveEntity(path + "/" + moduleName);
 
                     break;
                 }
@@ -350,11 +350,11 @@ public class DOORS9Importer extends Importer {
             switch (key) {
                 case "contents": {
                     for (ASTNode child : member.getChildren().get(1).getChildren()) {
-                        importLink(child, context, moduleName, path+"/"+moduleName);
+                        importLink(child, context, moduleName, path + "/" + moduleName);
                     }
                     break;
                 }
-                case "Created By" : {
+                case "Created By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -363,7 +363,7 @@ public class DOORS9Importer extends Importer {
                             context.getLiteral(text, Vocabulary.xsdString));
                     break;
                 }
-                case "Created On" : {
+                case "Created On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -373,7 +373,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified By" : {
+                case "Last Modified By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -383,7 +383,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified On" : {
+                case "Last Modified On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -396,6 +396,7 @@ public class DOORS9Importer extends Importer {
             }
         }
     }
+
     /**
      * Imports a link
      *
@@ -411,7 +412,7 @@ public class DOORS9Importer extends Importer {
                 case "Absolute Number": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
-                    reqIRI = context.resolveEntity(path+"#"+text);
+                    reqIRI = context.resolveEntity(path + "#" + text);
                     break;
                 }
             }
@@ -425,13 +426,13 @@ public class DOORS9Importer extends Importer {
         context.addQuad(
                 reqIRI,
                 context.getIRI("http://toto.com/Relation"),
-                context.getIRI("http://toto.com/"+ relation));
+                context.getIRI("http://toto.com/" + relation));
 
         for (ASTNode member : requirement.getChildren()) {
             String key = IOUtils.unescape(member.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             switch (key) {
-                case "Created By" : {
+                case "Created By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -440,7 +441,7 @@ public class DOORS9Importer extends Importer {
                             context.getLiteral(text, Vocabulary.xsdString));
                     break;
                 }
-                case "Created On" : {
+                case "Created On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -450,7 +451,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified By" : {
+                case "Last Modified By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -460,7 +461,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified On" : {
+                case "Last Modified On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -470,7 +471,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Source" : {
+                case "Source": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     IRINode sourceIRI = context.resolveEntity(text);
@@ -481,7 +482,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Target" : {
+                case "Target": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     IRINode targetIRI = context.resolveEntity(text);
@@ -496,6 +497,7 @@ public class DOORS9Importer extends Importer {
             }
         }
     }
+
     /**
      * Imports a requirement
      *
@@ -511,7 +513,7 @@ public class DOORS9Importer extends Importer {
                 case "Absolute Number": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
-                    reqIRI = context.resolveEntity(path+"#"+text);
+                    reqIRI = context.resolveEntity(path + "#" + text);
                     break;
                 }
             }
@@ -540,7 +542,7 @@ public class DOORS9Importer extends Importer {
                             context.getLiteral(text, Vocabulary.xsdString));
                     break;
                 }
-                case "Created By" : {
+                case "Created By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -550,7 +552,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Created On" : {
+                case "Created On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -560,7 +562,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Created Thru" : {
+                case "Created Thru": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -570,7 +572,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified By" : {
+                case "Last Modified By": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -580,7 +582,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Last Modified On" : {
+                case "Last Modified On": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -595,25 +597,25 @@ public class DOORS9Importer extends Importer {
                 /********************************************************************/
 
                 case "incomingLinks": {
-                    ASTNode inLinks =  member.getChildren().get(1);
+                    ASTNode inLinks = member.getChildren().get(1);
                     for (ASTNode inLink : inLinks.getChildren()) {
                         String abs_num = "";
                         String store = "";
-                        for (ASTNode pair : inLink.getChildren()){
+                        for (ASTNode pair : inLink.getChildren()) {
                             String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
                             attr = attr.substring(1, key.length() - 1);
-                            switch (attr){
-                                case "Store" :{
+                            switch (attr) {
+                                case "Store": {
                                     store = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
-                                case "Absolute Number":{
+                                case "Absolute Number": {
                                     abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
                             }
                         }
-                        IRINode linkIRI = context.resolveEntity(store +"#"+abs_num);
+                        IRINode linkIRI = context.resolveEntity(store + "#" + abs_num);
                         context.addQuad(
                                 reqIRI,
                                 context.getIRI("http://toto.com/incomingLink"),
@@ -623,25 +625,25 @@ public class DOORS9Importer extends Importer {
                     break;
                 }
                 case "outcomingLinks": {
-                    ASTNode inLinks =  member.getChildren().get(1);
+                    ASTNode inLinks = member.getChildren().get(1);
                     for (ASTNode inLink : inLinks.getChildren()) {
                         String abs_num = "";
                         String store = "";
-                        for (ASTNode pair : inLink.getChildren()){
+                        for (ASTNode pair : inLink.getChildren()) {
                             String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
                             attr = attr.substring(1, key.length() - 1);
-                            switch (attr){
-                                case "Store" :{
+                            switch (attr) {
+                                case "Store": {
                                     store = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
-                                case "Absolute Number":{
+                                case "Absolute Number": {
                                     abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
                             }
                         }
-                        IRINode linkIRI = context.resolveEntity(store +"#"+abs_num);
+                        IRINode linkIRI = context.resolveEntity(store + "#" + abs_num);
                         context.addQuad(
                                 reqIRI,
                                 context.getIRI("http://toto.com/outcomingLink"),
@@ -654,7 +656,7 @@ public class DOORS9Importer extends Importer {
                 /*           URBALIS ATTRIBUTES                                     */
                 /********************************************************************/
 
-                case "URB Review Status" : {
+                case "URB Review Status": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -664,7 +666,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "URB Category Type" : {
+                case "URB Category Type": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -674,7 +676,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "URB Object Type" : {
+                case "URB Object Type": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -684,7 +686,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "URB Activity" : {
+                case "URB Activity": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -694,7 +696,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "URB Compliance Status" : {
+                case "URB Compliance Status": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -708,7 +710,7 @@ public class DOORS9Importer extends Importer {
                 /*           TGS ATTRIBUTES                                         */
                 /********************************************************************/
 
-                case "TGS Category" : {
+                case "TGS Category": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -718,7 +720,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TGS Status" : {
+                case "TGS Status": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -728,7 +730,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TGS ID" : {
+                case "TGS ID": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -742,7 +744,7 @@ public class DOORS9Importer extends Importer {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     String[] parts = text.split("\n");
-                    for (int i=0; i != parts.length; i++) {
+                    for (int i = 0; i != parts.length; i++) {
                         context.addQuad(
                                 reqIRI,
                                 context.getIRI("http://toto.com/tgsPBS"),
@@ -755,7 +757,7 @@ public class DOORS9Importer extends Importer {
                 /*           TIS ATTRIBUTES                                         */
                 /********************************************************************/
 
-                case "TIS Object Identifier" : {
+                case "TIS Object Identifier": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -765,7 +767,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS ID" : {
+                case "TIS ID": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -775,7 +777,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Status" : {
+                case "TIS Status": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -785,7 +787,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Type" : {
+                case "TIS Type": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -795,7 +797,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Rationale" : {
+                case "TIS Rationale": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -805,7 +807,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Allocation" : {
+                case "TIS Allocation": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -815,7 +817,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Assignment" : {
+                case "TIS Assignment": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -825,7 +827,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TIS Comment" : {
+                case "TIS Comment": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -837,12 +839,11 @@ public class DOORS9Importer extends Importer {
                 }
 
 
-
                 /********************************************************************/
                 /*           other ATTRIBUTES TO BE Discussed                       */
                 /********************************************************************/
 
-                case "PRJ Coverage Level" : {
+                case "PRJ Coverage Level": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -852,7 +853,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "Section" : {
+                case "Section": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -862,7 +863,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "InputModule" : {
+                case "InputModule": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -872,7 +873,7 @@ public class DOORS9Importer extends Importer {
                     break;
 
                 }
-                case "TMP upstream ID" : {
+                case "TMP upstream ID": {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
@@ -886,7 +887,7 @@ public class DOORS9Importer extends Importer {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     String[] parts = text.split("\n");
-                    for (int i=0; i != parts.length; i++) {
+                    for (int i = 0; i != parts.length; i++) {
                         context.addQuad(
                                 reqIRI,
                                 context.getIRI("http://toto.com/OBS"),
@@ -898,7 +899,7 @@ public class DOORS9Importer extends Importer {
                     String text = IOUtils.unescape(member.getChildren().get(1).getValue());
                     text = text.substring(1, text.length() - 1);
                     String[] parts = text.split("\n");
-                    for (int i=0; i != parts.length; i++) {
+                    for (int i = 0; i != parts.length; i++) {
                         context.addQuad(
                                 reqIRI,
                                 context.getIRI("http://toto.com/ABS"),

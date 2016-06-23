@@ -50,7 +50,7 @@ public class DOORS9ImportationJob extends JobBase {
      * @param configuration The configuration for the importer
      */
     public DOORS9ImportationJob(String documentId, DOORS9Configuration configuration) {
-        super("Importation of CSV document " + documentId, DOORS9ImportationJob.class.getCanonicalName());
+        super("Importation of DOORS 9 document " + documentId, DOORS9ImportationJob.class.getCanonicalName());
         this.documentId = documentId;
         this.configuration = configuration;
     }

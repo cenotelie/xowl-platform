@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>CSV Document Importation</title>
+  <title>DOORS 9 JSON Importation</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
@@ -21,7 +21,7 @@
           <li><a href="/web/">Home</a></li>
           <li><a href="/web/modules/core/">Core</a></li>
           <li><a href="/web/modules/core/importation/">Data Import</a></li>
-          <li class="active" id="placeholder-doc">CSV Import</li>
+          <li class="active" id="placeholder-doc">DOORS 9 JSON Import</li>
         </ol>
       </span>
     </div>
@@ -43,58 +43,10 @@
           <label for="document-name">Name:</label>
           <input type="text" class="form-control" id="document-name" readonly>
         </div>
-        <div class="form-group">
-          <label for="document-separator">Cell separator:</label>
-          <input type="text" class="form-control" id="document-separator" value=",">
-        </div>
-        <div class="form-group">
-          <label for="document-text-marker">Text delimiter:</label>
-          <input type="text" class="form-control" id="document-text-marker" value='"'>
-        </div>
-        <div class="form-group">
-          <label for="document-row-count">Preview row count:</label>
-          <input type="number" class="form-control" id="document-row-count" value="4">
-        </div>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" id="document-has-title-row"> First row is title
-          </label>
-        </div>
-        <button class="btn btn-default" onclick="onPreview()">Preview</button>
-        <div class="form-group" style="margin-top: 10px;">
-          <table class="table table-bordered table-hover">
-            <thead id="document-heads">
-            </thead>
-            <tbody id="document-rows">
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Import mapping definition
-        <button class="btn btn-default" onclick="onInitMapping()" style="margin-left: 20px;">Initialize from preview</button>
-      </div>
-      <div class="panel-body">
-        <table class="table table-bordered table-hover">
-          <thead>
-            <tr>
-              <td>Column</td>
-              <td>Mapping</td>
-              <td>Property</td>
-              <td>Datatype</td>
-              <td>Value matching regexp</td>
-            </tr>
-          </thead>
-          <tbody id="mapping">
-          </tbody>
-        </table>
-      </div>
     </div>
     <div class="panel panel-default">
       <div class="panel-body">
-        <button class="btn btn-primary" onclick="onImport()">Map and Import</button>
+        <button class="btn btn-primary" onclick="onImport()">Import</button>
       </div>
     </div>
   </div>

@@ -607,27 +607,27 @@ public class DOORS9Importer extends Importer {
                 case "incomingLinks": {
                     ASTNode inLinks = member.getChildren().get(1);
                     for (ASTNode inLink : inLinks.getChildren()) {
-                        String abs_num = "";
-                        String store = "";
+                        String abs_name = "";
+                        String type_link = "";
                         for (ASTNode pair : inLink.getChildren()) {
                             String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
-                            attr = attr.substring(1, key.length() - 1);
+                            attr = attr.substring(1, attr.length() - 1);
                             switch (attr) {
-                                case "Store": {
-                                    store = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                case "Type": {
+                                    type_link = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
-                                case "Absolute Number": {
-                                    abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                case "Source": {
+                                    abs_name = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
                             }
                         }
-                        IRINode linkIRI = context.resolveEntity(store + "#" + abs_num);
+                        IRINode sourceIRI = context.resolveEntity(abs_name);
                         context.addQuad(
                                 reqIRI,
-                                context.getIRI("http://toto.com/incomingLink"),
-                                linkIRI);
+                                context.getIRI("http://toto.com/Rev"+type_link),
+                                sourceIRI);
                         // add a direct link to destination?
                     }
                     break;
@@ -635,27 +635,28 @@ public class DOORS9Importer extends Importer {
                 case "outcomingLinks": {
                     ASTNode inLinks = member.getChildren().get(1);
                     for (ASTNode inLink : inLinks.getChildren()) {
-                        String abs_num = "";
-                        String store = "";
+                        String abs_name = "";
+                        String type_link = "";
                         for (ASTNode pair : inLink.getChildren()) {
-                            String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
-                            attr = attr.substring(1, key.length() - 1);
+                            String toto = IOUtils.unescape(pair.getChildren().get(0).getValue());
+                            int l = toto.length();
+                            String attr = toto.substring(1, l-1);
                             switch (attr) {
-                                case "Store": {
-                                    store = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                case "Type": {
+                                    type_link = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
-                                case "Absolute Number": {
-                                    abs_num = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                case "Target": {
+                                    abs_name = IOUtils.unescape(member.getChildren().get(1).getValue());
                                     break;
                                 }
                             }
                         }
-                        IRINode linkIRI = context.resolveEntity(store + "#" + abs_num);
+                        IRINode targetIRI = context.resolveEntity(abs_name);
                         context.addQuad(
                                 reqIRI,
-                                context.getIRI("http://toto.com/outcomingLink"),
-                                linkIRI);
+                                context.getIRI("http://toto.com/"+type_link),
+                                targetIRI);
                         // add a direct link to source?
                     }
                     break;

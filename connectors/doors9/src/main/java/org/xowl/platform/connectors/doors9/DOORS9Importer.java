@@ -565,7 +565,7 @@ public class DOORS9Importer extends Importer {
                     text = text.substring(1, text.length() - 1);
                     context.addQuad(
                             reqIRI,
-                            context.getIRI("http://toto.com/createdBy"),
+                            context.getIRI("http://toto.com/createdOn"),
                             context.getLiteral(text, Vocabulary.xsdDate));
                     break;
 
@@ -614,11 +614,13 @@ public class DOORS9Importer extends Importer {
                             attr = attr.substring(1, attr.length() - 1);
                             switch (attr) {
                                 case "Type": {
-                                    type_link = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    type_link = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                                    type_link = type_link.substring(1, type_link.length() - 1);
                                     break;
                                 }
                                 case "Source": {
-                                    abs_name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    abs_name = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                                    abs_name = abs_name.substring(1, abs_name.length() - 1);
                                     break;
                                 }
                             }
@@ -638,16 +640,17 @@ public class DOORS9Importer extends Importer {
                         String abs_name = "";
                         String type_link = "";
                         for (ASTNode pair : inLink.getChildren()) {
-                            String toto = IOUtils.unescape(pair.getChildren().get(0).getValue());
-                            int l = toto.length();
-                            String attr = toto.substring(1, l-1);
+                            String attr = IOUtils.unescape(pair.getChildren().get(0).getValue());
+                            attr = attr.substring(1, attr.length() - 1);
                             switch (attr) {
                                 case "Type": {
-                                    type_link = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    type_link = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                                    type_link = type_link.substring(1, type_link.length() - 1);
                                     break;
                                 }
                                 case "Target": {
-                                    abs_name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                                    abs_name = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                                    abs_name = abs_name.substring(1, abs_name.length() - 1);
                                     break;
                                 }
                             }

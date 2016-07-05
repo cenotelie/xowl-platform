@@ -181,6 +181,14 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
+    public XSPReply getStatistics() {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getStatistics();
+    }
+
+    @Override
     public Result sparql(String query) {
         XOWLDatabase connection = getBackend();
         if (connection == null)

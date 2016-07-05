@@ -94,6 +94,32 @@ XOWL.prototype.getJob = function (callback, jobId) {
 
 
 ////
+// Admin Module - Statistics Service
+////
+
+XOWL.prototype.getDatabasesStatistics = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/statistics/databases", null);
+}
+
+XOWL.prototype.getBasicStatistics = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/statistics", null);
+}
+
+
+
+////
 // Admin Module - Connection Service
 ////
 
@@ -181,22 +207,6 @@ XOWL.prototype.getWebModules = function (callback) {
 			callback(code, type, content);
 		}
 	}, "services/webapp/modules", null);
-}
-
-
-
-////
-// Core Module - Statistics Service
-////
-
-XOWL.prototype.getBasicStats = function (callback) {
-	this.doQuery(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/statistics", null);
 }
 
 

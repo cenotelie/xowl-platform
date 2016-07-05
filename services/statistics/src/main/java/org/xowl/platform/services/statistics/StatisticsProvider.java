@@ -18,16 +18,21 @@
 package org.xowl.platform.services.statistics;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.storage.StoreStatistics;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.consistency.Inconsistency;
+import org.xowl.platform.services.lts.TripleStoreService;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
@@ -44,7 +49,8 @@ public class StatisticsProvider implements Service, HttpAPIService {
      * The URIs for this service
      */
     private static final String[] URIs = new String[]{
-            "services/core/statistics"
+            "services/admin/statistics",
+            "services/admin/statistics/databases"
     };
 
     /**
@@ -129,7 +135,40 @@ public class StatisticsProvider implements Service, HttpAPIService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        if (uri.equals("services/admin/statistics/databases"))
+            return onMessageGetDBStats();
         return onMessageGetBasicStats();
+    }
+
+    /**
+     * Responds to a request for the database stats
+     *
+     * @return The response
+     */
+    private HttpResponse onMessageGetDBStats() {
+        TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
+        if (ltsService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = ltsService.getLongTermStore().getStatistics();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        StoreStatistics statsLongTerm = ((XSPReplyResult<StoreStatistics>) reply).getData();
+        reply = ltsService.getLiveStore().getStatistics();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        StoreStatistics statsLive = ((XSPReplyResult<StoreStatistics>) reply).getData();
+        reply = ltsService.getServiceStore().getStatistics();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        StoreStatistics statsService = ((XSPReplyResult<StoreStatistics>) reply).getData();
+        String result = "{\"longTerm\": " +
+                statsLongTerm.serializedJSON() +
+                ", \"live\": " +
+                statsLive.serializedJSON() +
+                ", \"service\": " +
+                statsService.serializedJSON()
+                + "}";
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, result);
     }
 
     /**

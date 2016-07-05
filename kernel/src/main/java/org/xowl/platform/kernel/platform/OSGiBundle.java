@@ -104,7 +104,7 @@ public class OSGiBundle implements Identifiable, Serializable {
 
     @Override
     public String getIdentifier() {
-        return bundle.getSymbolicName();
+        return bundle.getSymbolicName() != null ? bundle.getSymbolicName() : "";
     }
 
     @Override

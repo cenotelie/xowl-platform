@@ -10,7 +10,7 @@ function init() {
 			renderModules(content);
 		}
 	});
-	xowl.getBasicStats(function (code, type, content) {
+	xowl.getBasicStatistics(function (code, type, content) {
 		if (code === 200) {
 			document.getElementById("stat-inconsistencies").innerHTML = content.nbInconsistencies;
 			document.getElementById("stat-artifacts-all").innerHTML = content.nbArtifactsTotal;

@@ -51,6 +51,7 @@ import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -65,7 +66,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService {
+public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, Closeable {
     /**
      * The URIs for this service
      */
@@ -521,5 +522,10 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         Job job = new PushArtifactToLiveJob(ids[0]);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+    }
+
+    @Override
+    public void close() {
+        server.onShutdown();
     }
 }

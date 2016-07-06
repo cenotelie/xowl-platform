@@ -31,18 +31,24 @@ import org.xowl.platform.services.lts.jobs.StorageJobFactory;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The store service registered by this bundle
+     */
+    private XOWLStoreService storeService;
+
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        XOWLStoreService service = new XOWLStoreService();
-        bundleContext.registerService(TripleStoreService.class, service, null);
-        bundleContext.registerService(ArtifactStorageService.class, service, null);
-        bundleContext.registerService(HttpAPIService.class, service, null);
+        storeService = new XOWLStoreService();
+        bundleContext.registerService(TripleStoreService.class, storeService, null);
+        bundleContext.registerService(ArtifactStorageService.class, storeService, null);
+        bundleContext.registerService(HttpAPIService.class, storeService, null);
 
         bundleContext.registerService(JobFactory.class, new StorageJobFactory(), null);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        if (storeService != null)
+            storeService.close();
     }
 }

@@ -40,7 +40,7 @@ function renderFile(stats) {
 		document.createElement("td")];
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(stats.fileName));
-	link.href="dbFile?file=" + encodeURIComponent(stats.fileName);
+	link.href="dbFile.html?file=" + encodeURIComponent(stats.fileName);
 	cells[0].appendChild(link);
 	cells[1].appendChild(document.createTextNode(stats.accessesPerSecond));
 	cells[2].appendChild(document.createTextNode(stats.accessesContention));

@@ -90,9 +90,11 @@ public class PushArtifactToLiveJob extends JobBase {
             result = XSPReplyServiceUnavailable.instance();
             return;
         }
-        result = storage.retrieve(artifactId);
-        if (!result.isSuccess())
+        XSPReply reply = storage.retrieve(artifactId);
+        if (!reply.isSuccess()) {
+            result = reply;
             return;
-        result = storage.pushToLive(((XSPReplyResult<Artifact>) result).getData());
+        }
+        result = storage.pushToLive(((XSPReplyResult<Artifact>) reply).getData());
     }
 }

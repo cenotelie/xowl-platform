@@ -62,7 +62,7 @@ public class ConnectorUtils {
         if (!reply.isSuccess())
             return reply;
         // reply with the artifact
-        return replyArtifact;
+        return new XSPReplyResult<>(artifact.getIdentifier());
     }
 
     /**

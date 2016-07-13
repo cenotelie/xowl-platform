@@ -172,7 +172,7 @@ public class CSVImporter extends Importer {
             if (!reply.isSuccess())
                 return reply;
             importationService.drop(document);
-            return new XSPReplyResult<>(artifact);
+            return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyFailure(exception.getMessage());

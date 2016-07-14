@@ -63,8 +63,11 @@ function renderXSPReply(xsp) {
 	if (!xsp.isSuccess) {
 		return "FAILURE: " + xsp.message;
 	} else if (xsp.hasOwnProperty("payload")) {
-		// TODO: complete this
-		return xsp.payload.name;
+		if (xsp.payload == null)
+			return "SUCCESS: " + xsp.message;
+		if (xsp.payload instanceof String)
+			return xsp.payload;
+		return JSON.stringify(xsp.payload);
 	} else {
 		return "SUCCESS: " + xsp.message;
 	}

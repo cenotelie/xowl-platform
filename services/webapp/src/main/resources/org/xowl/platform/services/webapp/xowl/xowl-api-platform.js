@@ -91,6 +91,16 @@ XOWL.prototype.getJob = function (callback, jobId) {
 	}, "services/admin/jobs", {id: jobId});
 }
 
+XOWL.prototype.cancelJob = function (callback, jobId) {
+	this.doCommand(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/jobs", {cancel: jobId}, null);
+}
+
 
 
 ////

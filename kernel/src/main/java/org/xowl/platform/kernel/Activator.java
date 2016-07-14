@@ -19,12 +19,15 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.artifacts.*;
-import org.xowl.platform.kernel.impl.FSConfigurationService;
-import org.xowl.platform.kernel.impl.XOWLBusinessDirectoryService;
-import org.xowl.platform.kernel.impl.XOWLPlatformDescriptorService;
-import org.xowl.platform.kernel.impl.XOWLSecurityService;
+import org.xowl.infra.utils.logging.*;
+import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
+import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
+import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
+import org.xowl.platform.kernel.artifacts.SchemaDomain;
+import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
+
+import java.io.File;
 
 /**
  * Activator for this bundle
@@ -34,6 +37,9 @@ import org.xowl.platform.kernel.platform.PlatformDescriptorService;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
+        Logger mainLogger = new DispatchLogger(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
+        Logging.setDefault(mainLogger);
+        mainLogger.info("=== Platform startup ===");
         PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
         ConfigurationService configurationService = new FSConfigurationService();
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
@@ -53,6 +59,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        Logging.getDefault().info("=== Platform shutdown ===");
     }
 }

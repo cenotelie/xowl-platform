@@ -42,6 +42,27 @@ public interface Job extends Identifiable, Serializable, Runnable {
     XSPReply getResult();
 
     /**
+     * Gets an estimation of the current completion rate
+     *
+     * @return An estimation of the current completion rate (between 0.0 and 1.0)
+     */
+    float getCompletionRate();
+
+    /**
+     * Gets whether this job can be cancelled
+     *
+     * @return Whether this job can be cancelled
+     */
+    boolean canCancel();
+
+    /**
+     * Tries to cancel this job
+     *
+     * @return The result of the attemps to cancel the job
+     */
+    XSPReply cancel();
+
+    /**
      * Event when the job is being scheduled
      */
     void onScheduled();
@@ -52,7 +73,9 @@ public interface Job extends Identifiable, Serializable, Runnable {
     void onRun();
 
     /**
-     * Callback when the job has been completed
+     * Callback when the job has been terminated
+     *
+     * @param cancelled Whether the job was cancelled (instead of normal termination)
      */
-    void onCompleted();
+    void onTerminated(boolean cancelled);
 }

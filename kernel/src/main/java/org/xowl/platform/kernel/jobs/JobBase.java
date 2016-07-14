@@ -18,6 +18,8 @@
 package org.xowl.platform.kernel.jobs;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
@@ -60,6 +62,10 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * The job's status
      */
     protected JobStatus status;
+    /**
+     * The current completion rate
+     */
+    protected float completionRate;
 
     /**
      * Initializes this job
@@ -76,6 +82,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.timeScheduled = "";
         this.timeRun = "";
         this.timeCompleted = "";
+        this.completionRate = 0.0f;
     }
 
     /**
@@ -116,6 +123,9 @@ public abstract class JobBase extends SafeRunnable implements Job {
             } else if ("timeCompleted".equals(head)) {
                 String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeCompleted = value.substring(1, value.length() - 1);
+            } else if ("completionRate".equals(head)) {
+                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                this.completionRate = Float.parseFloat(value.substring(1, value.length() - 1));
             }
         }
         this.identifier = id;
@@ -154,6 +164,8 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + IOUtils.escapeStringJSON(timeRun)
                 + "\", \"timeCompleted\": \""
                 + IOUtils.escapeStringJSON(timeCompleted)
+                + "\", \"completionRate\": \""
+                + Float.toString(completionRate)
                 + "\", \"payload\": "
                 + getJSONSerializedPayload()
                 + ", \"result\": "
@@ -167,6 +179,21 @@ public abstract class JobBase extends SafeRunnable implements Job {
     }
 
     @Override
+    public float getCompletionRate() {
+        return completionRate;
+    }
+
+    @Override
+    public boolean canCancel() {
+        return false;
+    }
+
+    @Override
+    public XSPReply cancel() {
+        return XSPReplyFailure.instance();
+    }
+
+    @Override
     public void onScheduled() {
         status = JobStatus.Scheduled;
         timeScheduled = DateFormat.getDateTimeInstance().format(new Date());
@@ -176,12 +203,14 @@ public abstract class JobBase extends SafeRunnable implements Job {
     public void onRun() {
         status = JobStatus.Running;
         timeRun = DateFormat.getDateTimeInstance().format(new Date());
+        completionRate = 0.0f;
     }
 
     @Override
-    public void onCompleted() {
-        status = JobStatus.Completed;
+    public void onTerminated(boolean cancelled) {
+        status = cancelled ? JobStatus.Cancelled : JobStatus.Completed;
         timeCompleted = DateFormat.getDateTimeInstance().format(new Date());
+        completionRate = 1.0f;
     }
 
     /**

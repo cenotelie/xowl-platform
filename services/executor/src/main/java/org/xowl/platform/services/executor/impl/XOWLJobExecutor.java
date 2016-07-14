@@ -18,6 +18,10 @@
 package org.xowl.platform.services.executor.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
@@ -45,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
+public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Closeable {
     /**
      * The bound of the executor queue
      */
@@ -201,7 +205,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
             }
         }
         // callback on completion
-        job.onCompleted();
+        job.onTerminated(job.getStatus() == JobStatus.Cancelled);
     }
 
     /**
@@ -268,6 +272,13 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
+    public void close() {
+        if (executorPool != null) {
+            executorPool.shutdownNow();
+        }
+    }
+
+    @Override
     public String getIdentifier() {
         return XOWLJobExecutor.class.getCanonicalName();
     }
@@ -298,8 +309,26 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
     }
 
     @Override
-    public void cancel(Job job) {
-        getExecutorPool().remove(job);
+    public XSPReply cancel(Job job) {
+        boolean success = getExecutorPool().remove(job);
+        if (success) {
+            // the job was queued and prevented from running
+            job.onTerminated(true);
+            return XSPReplySuccess.instance();
+        }
+        switch (job.getStatus()) {
+            case Unscheduled:
+            case Scheduled:
+                job.onTerminated(true);
+                return XSPReplySuccess.instance();
+            case Running:
+                return job.cancel();
+            case Completed:
+                return new XSPReplyFailure("Already completed");
+            case Cancelled:
+                return new XSPReplyFailure("Already cancelled");
+        }
+        return XSPReplyFailure.instance();
     }
 
     @Override
@@ -407,14 +436,26 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        String[] ids = parameters.get("id");
-        if (ids != null && ids.length > 0) {
-            Job job = getJob(ids[0], JobStatus.Completed);
-            if (job == null)
-                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+        if (method.equals("GET")) {
+            String[] ids = parameters.get("id");
+            if (ids != null && ids.length > 0) {
+                Job job = getJob(ids[0], JobStatus.Completed);
+                if (job == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+            }
+            return onRequestJobs();
+        } else if (method.equals("POST")) {
+            String[] ids = parameters.get("cancel");
+            if (ids != null && ids.length > 0) {
+                Job job = getJob(ids[0], JobStatus.Scheduled);
+                if (job == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return XSPReplyUtils.toHttpResponse(cancel(job), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
-        return onRequestJobs();
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
     }
 
     /**

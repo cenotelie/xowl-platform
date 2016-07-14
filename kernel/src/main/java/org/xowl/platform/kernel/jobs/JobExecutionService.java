@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.jobs;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
 
 import java.util.List;
@@ -35,11 +36,12 @@ public interface JobExecutionService extends Service {
     void schedule(Job job);
 
     /**
-     * Cancels a job that is scheduled, but not running yet
+     * Cancels a job
      *
      * @param job The job to cancel
+     * @return The operation's result
      */
-    void cancel(Job job);
+    XSPReply cancel(Job job);
 
     /**
      * Gets the current queue

@@ -38,5 +38,9 @@ public enum JobStatus {
     /**
      * The job is completed
      */
-    Completed
+    Completed,
+    /**
+     * The job was cancelled
+     */
+    Cancelled
 }

@@ -29,15 +29,21 @@ import org.xowl.platform.services.executor.impl.XOWLJobExecutor;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The registered execution service
+     */
+    private XOWLJobExecutor service;
+
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        XOWLJobExecutor service = new XOWLJobExecutor();
+        service = new XOWLJobExecutor();
         bundleContext.registerService(JobExecutionService.class, service, null);
         bundleContext.registerService(HttpAPIService.class, service, null);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        if (service != null)
+            service.close();
     }
 }

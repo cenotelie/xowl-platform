@@ -5,7 +5,6 @@
 		<artifactId>xowl-platform</artifactId>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-connectors</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.4-SNAPSHOT</version>

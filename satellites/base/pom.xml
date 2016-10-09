@@ -5,7 +5,6 @@
 		<artifactId>xowl-satellites</artifactId>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-satellite-base</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>

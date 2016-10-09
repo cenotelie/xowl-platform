@@ -5,7 +5,6 @@
 		<artifactId>xowl-connectors</artifactId>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-connector-doors9</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>

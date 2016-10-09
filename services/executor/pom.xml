@@ -5,7 +5,6 @@
 		<artifactId>xowl-services</artifactId>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<groupId>org.xowl.platform</groupId>
 	<artifactId>xowl-service-executor</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>

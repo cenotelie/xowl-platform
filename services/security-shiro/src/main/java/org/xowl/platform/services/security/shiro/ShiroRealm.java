@@ -24,6 +24,7 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.Subject;
@@ -71,6 +72,8 @@ public class ShiroRealm implements Realm {
             JndiLdapRealm jndiLdapRealm = new JndiLdapRealm();
             jndiLdapRealm.setContextFactory(factory);
             realm = jndiLdapRealm;
+        } else {
+            realm = new SimpleAccountRealm();
         }
 
         manager = new DefaultSecurityManager(realm);

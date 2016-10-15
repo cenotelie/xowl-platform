@@ -93,4 +93,11 @@ public class XOWLInternalRealm implements Realm {
     public boolean checkHasRole(String userId, String roleId) {
         return true;
     }
+
+    /**
+     * When the platform is stopping
+     */
+    public void onStop() {
+        server.onShutdown();
+    }
 }

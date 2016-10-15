@@ -242,8 +242,6 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             if (configurationService == null)
                 return;
             Configuration configuration = configurationService.getConfigFor(this);
-            if (configuration == null)
-                return;
             toResolve = new HashMap<>();
             for (Section section : configuration.getSections()) {
                 String descriptorId = section.get("descriptor");

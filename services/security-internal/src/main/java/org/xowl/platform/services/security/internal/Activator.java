@@ -30,15 +30,22 @@ import java.util.Hashtable;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The realm to register
+     */
+    private XOWLInternalRealm realm;
+
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(Realm.PROPERTY_ID, XOWLInternalRealm.class.getCanonicalName());
-        bundleContext.registerService(Realm.class, new XOWLInternalRealm(), properties);
+        realm = new XOWLInternalRealm();
+        bundleContext.registerService(Realm.class, realm, properties);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-
+        if (realm != null)
+            realm.onStop();
     }
 }

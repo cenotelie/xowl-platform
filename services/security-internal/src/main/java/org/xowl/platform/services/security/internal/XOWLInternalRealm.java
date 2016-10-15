@@ -19,11 +19,12 @@ package org.xowl.platform.services.security.internal;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
+import org.xowl.infra.server.api.XOWLUser;
 import org.xowl.infra.server.base.ServerConfiguration;
 import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
@@ -39,7 +40,7 @@ import java.io.IOException;
  *
  * @author Laurent Wouters
  */
-public class XOWLInternalRealm implements Realm {
+class XOWLInternalRealm implements Realm {
     /**
      * The embedded server for this realm
      */
@@ -81,7 +82,10 @@ public class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply authenticate(String userId, char[] key) {
-        return server.login(userId, new String(key));
+        XSPReply reply = server.login(userId, new String(key));
+        if (!reply.isSuccess())
+            return XSPReplyFailure.instance();
+        return new XSPReplyResult<>(new XOWLInternalUser(((XSPReplyResult<XOWLUser>) reply).getData().getName()));
     }
 
     @Override

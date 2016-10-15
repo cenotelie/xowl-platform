@@ -15,9 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.security;
 
-import org.apache.shiro.subject.Subject;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.platform.kernel.Service;
 
 /**
  * Manages the security on the platform
@@ -38,24 +39,34 @@ public interface SecurityService extends Service {
     String getRealm();
 
     /**
-     * Performs the login of a user on this thread
+     * On a new request, performs the authentication of a user
      *
-     * @param host     The requesting host
-     * @param username The username
-     * @param password The password
+     * @param client The requesting client
+     * @param userId The identifier of a user
+     * @param key    The key used to identified the user (e.g. a password)
      * @return Whether the operation succeed
      */
-    boolean login(String host, String username, char[] password);
+    XSPReply authenticate(String client, String userId, char[] key);
 
     /**
-     * Logout the current user
-     */
-    void logout();
-
-    /**
-     * Gets the current subject
+     * Event when the request terminated
      *
-     * @return The current subject, if any
+     * @param client The requesting client
      */
-    Subject getSubject();
+    void onRequestEnd(String client);
+
+    /**
+     * Checks whether the current user has a role
+     *
+     * @param roleId The identifier of a role
+     * @return Whether the user has the role
+     */
+    boolean checkCurrentHasRole(String roleId);
+
+    /**
+     * Gets the current user
+     *
+     * @return The current user
+     */
+    User getCurrentUser();
 }

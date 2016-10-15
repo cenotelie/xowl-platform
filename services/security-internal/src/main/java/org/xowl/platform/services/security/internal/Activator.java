@@ -15,46 +15,30 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.services.security.internal;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.security.Realm;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 /**
- * A realm with no security
+ * Activator for this bundle
  *
  * @author Laurent Wouters
  */
-public class XOWLNosecRealm implements Realm {
-    /**
-     * Initializes this realm provider
-     */
-    public XOWLNosecRealm() {
+public class Activator implements BundleActivator {
+    @Override
+    public void start(BundleContext bundleContext) throws Exception {
+        Dictionary<String, String> properties = new Hashtable<>();
+        properties.put(Realm.PROPERTY_ID, XOWLInternalRealm.class.getCanonicalName());
+        bundleContext.registerService(Realm.class, new XOWLInternalRealm(), properties);
     }
 
     @Override
-    public String getIdentifier() {
-        return XOWLNosecRealm.class.getCanonicalName();
-    }
+    public void stop(BundleContext bundleContext) throws Exception {
 
-    @Override
-    public String getName() {
-        return "xOWL Nosec Realm";
-    }
-
-    @Override
-    public XSPReply authenticate(String userId, char[] key) {
-        return new XSPReplyResult<>(userId);
-    }
-
-    @Override
-    public void onRequestEnd(String userId) {
-        // do nothing
-    }
-
-    @Override
-    public boolean checkHasRole(String userId, String roleId) {
-        return true;
     }
 }

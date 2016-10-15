@@ -19,8 +19,9 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.SecurityService;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +71,8 @@ public class XOWLMainHTTPContext implements HttpContext {
                 if (indexColon != -1) {
                     String login = authToken.substring(0, indexColon);
                     String password = authToken.substring(indexColon + 1);
-                    if (securityService.login(httpServletRequest.getRemoteAddr(), login, password.toCharArray())) {
+                    XSPReply reply = securityService.authenticate(httpServletRequest.getRemoteAddr(), login, password.toCharArray());
+                    if (reply.isSuccess()) {
                         httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
                         httpServletRequest.setAttribute(REMOTE_USER, login);
                         return true;

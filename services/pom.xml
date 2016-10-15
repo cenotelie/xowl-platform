@@ -11,6 +11,8 @@
 	<name>xOWL Federation - Services</name>
 	<description>The set of services for the xOWL platform</description>
 	<modules>
+		<module>security-internal</module>
+		<module>security-shiro</module>
 		<module>executor</module>
 		<module>lts</module>
 		<module>consistency</module>

@@ -26,6 +26,7 @@ import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaDomain;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.io.File;
 

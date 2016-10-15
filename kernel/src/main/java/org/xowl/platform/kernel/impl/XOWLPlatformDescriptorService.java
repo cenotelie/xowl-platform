@@ -23,7 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.kernel.SecurityService;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
@@ -73,7 +73,7 @@ public class XOWLPlatformDescriptorService implements PlatformDescriptorService 
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
-        if (!securityService.getSubject().hasRole(SecurityService.ROLE_ADMIN))
+        if (!securityService.checkCurrentHasRole(SecurityService.ROLE_ADMIN))
             return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);
     }

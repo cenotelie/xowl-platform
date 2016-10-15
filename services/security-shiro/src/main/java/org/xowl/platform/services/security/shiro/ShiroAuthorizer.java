@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.services.security.shiro;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Authorizer;
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityAuthorizer implements Authorizer {
+public class ShiroAuthorizer implements Authorizer {
     @Override
     public boolean isPermitted(PrincipalCollection principalCollection, String permission) {
         return false;

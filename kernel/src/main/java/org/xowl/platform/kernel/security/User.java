@@ -15,46 +15,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.infra.store.Serializable;
+import org.xowl.platform.kernel.Identifiable;
 
 /**
- * A realm with no security
+ * Represents a user on this platform
  *
  * @author Laurent Wouters
  */
-public class XOWLNosecRealm implements Realm {
+public interface User extends Identifiable, Serializable {
     /**
-     * Initializes this realm provider
+     * Checks whether this user has the specified role
+     *
+     * @param role A role
+     * @return Whether the user has the role
      */
-    public XOWLNosecRealm() {
-    }
-
-    @Override
-    public String getIdentifier() {
-        return XOWLNosecRealm.class.getCanonicalName();
-    }
-
-    @Override
-    public String getName() {
-        return "xOWL Nosec Realm";
-    }
-
-    @Override
-    public XSPReply authenticate(String userId, char[] key) {
-        return new XSPReplyResult<>(userId);
-    }
-
-    @Override
-    public void onRequestEnd(String userId) {
-        // do nothing
-    }
-
-    @Override
-    public boolean checkHasRole(String userId, String roleId) {
-        return true;
-    }
+    boolean hasRole(String role);
 }

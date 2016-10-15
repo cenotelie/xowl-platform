@@ -15,46 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.infra.store.Serializable;
+import org.xowl.platform.kernel.Identifiable;
+
+import java.util.Collection;
 
 /**
- * A realm with no security
+ * Represents a group of users on this platform
  *
  * @author Laurent Wouters
  */
-public class XOWLNosecRealm implements Realm {
+public interface Group extends Identifiable, Serializable {
     /**
-     * Initializes this realm provider
+     * Gets the users in this group
+     *
+     * @return The users in this group
      */
-    public XOWLNosecRealm() {
-    }
+    Collection<User> getUsers();
 
-    @Override
-    public String getIdentifier() {
-        return XOWLNosecRealm.class.getCanonicalName();
-    }
+    /**
+     * Gets the admins for this group
+     *
+     * @return The admins for this group
+     */
+    Collection<User> getAdmins();
 
-    @Override
-    public String getName() {
-        return "xOWL Nosec Realm";
-    }
-
-    @Override
-    public XSPReply authenticate(String userId, char[] key) {
-        return new XSPReplyResult<>(userId);
-    }
-
-    @Override
-    public void onRequestEnd(String userId) {
-        // do nothing
-    }
-
-    @Override
-    public boolean checkHasRole(String userId, String roleId) {
-        return true;
-    }
+    /**
+     * Gets the user roles associated to this group
+     *
+     * @return The user roles associated to this group
+     */
+    Collection<Role> getRoles();
 }

@@ -48,10 +48,6 @@ public class XOWLInternalRealm implements Realm {
      * The user database
      */
     private final XOWLDatabase database;
-    /**
-     * The compiled SPARQL command to check for a role
-     */
-    private final Command commandCheckRole;
 
     /**
      * Initialize this realm
@@ -95,7 +91,6 @@ public class XOWLInternalRealm implements Realm {
 
     @Override
     public boolean checkHasRole(String userId, String roleId) {
-        database.sparql("", null, null);
-        return false;
+        return true;
     }
 }

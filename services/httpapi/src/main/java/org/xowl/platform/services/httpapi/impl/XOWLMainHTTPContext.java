@@ -80,7 +80,7 @@ public class XOWLMainHTTPContext implements HttpContext {
                 }
             }
         }
-        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm() + "\"");
+        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm().getIdentifier() + "\"");
         httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
         return false;
     }

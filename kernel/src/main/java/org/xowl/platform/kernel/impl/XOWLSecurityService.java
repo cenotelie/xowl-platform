@@ -124,8 +124,13 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     }
 
     @Override
-    public String getRealm() {
-        return resolveRealm().getIdentifier();
+    public Realm getRealm() {
+        if (realm != null)
+            return realm;
+        realm = ServiceUtils.getService(Realm.class, Realm.PROPERTY_ID, realmId);
+        if (realm == null)
+            realm = new XOWLNosecRealm();
+        return realm;
     }
 
     @Override
@@ -137,7 +142,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             Logging.getDefault().info("Login failure for " + userId + " from " + client);
             return banned ? null : XSPReplyFailure.instance();
         }
-        XSPReply reply = resolveRealm().authenticate(userId, key);
+        XSPReply reply = getRealm().authenticate(userId, key);
         if (reply.isSuccess()) {
             CONTEXT.set(((XSPReplyResult<User>) reply).getData());
             return reply;
@@ -150,32 +155,13 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     @Override
     public void onRequestEnd(String userId) {
         CONTEXT.remove();
-        resolveRealm().onRequestEnd(userId);
+        getRealm().onRequestEnd(userId);
     }
 
     @Override
     public boolean checkCurrentHasRole(String roleId) {
         User user = CONTEXT.get();
-        return user != null && resolveRealm().checkHasRole(user.getIdentifier(), roleId);
-    }
-
-    @Override
-    public User getCurrentUser() {
-        return CONTEXT.get();
-    }
-
-    /**
-     * Resolves the security realm
-     *
-     * @return The security realm
-     */
-    private Realm resolveRealm() {
-        if (realm != null)
-            return realm;
-        realm = ServiceUtils.getService(Realm.class, Realm.PROPERTY_ID, realmId);
-        if (realm == null)
-            realm = new XOWLNosecRealm();
-        return realm;
+        return user != null && getRealm().checkHasRole(user.getIdentifier(), roleId);
     }
 
     /**

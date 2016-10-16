@@ -36,7 +36,7 @@ public interface SecurityService extends Service {
      *
      * @return The realm of this platform
      */
-    String getRealm();
+    Realm getRealm();
 
     /**
      * On a new request, performs the authentication of a user
@@ -62,11 +62,4 @@ public interface SecurityService extends Service {
      * @return Whether the user has the role
      */
     boolean checkCurrentHasRole(String roleId);
-
-    /**
-     * Gets the current user
-     *
-     * @return The current user
-     */
-    User getCurrentUser();
 }

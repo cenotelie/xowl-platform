@@ -26,16 +26,16 @@ import org.xowl.platform.kernel.security.Realm;
  *
  * @author Laurent Wouters
  */
-public class XOWLNosecRealm implements Realm {
+public class XOWLSecurityNosecRealm implements Realm {
     /**
      * Initializes this realm provider
      */
-    public XOWLNosecRealm() {
+    public XOWLSecurityNosecRealm() {
     }
 
     @Override
     public String getIdentifier() {
-        return XOWLNosecRealm.class.getCanonicalName();
+        return XOWLSecurityNosecRealm.class.getCanonicalName();
     }
 
     @Override

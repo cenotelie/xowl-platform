@@ -129,7 +129,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             return realm;
         realm = ServiceUtils.getService(Realm.class, Realm.PROPERTY_ID, realmId);
         if (realm == null)
-            realm = new XOWLNosecRealm();
+            realm = new XOWLSecurityNosecRealm();
         return realm;
     }
 

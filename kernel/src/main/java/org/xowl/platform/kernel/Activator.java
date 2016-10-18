@@ -25,6 +25,7 @@ import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaDomain;
 import org.xowl.platform.kernel.impl.*;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -36,30 +37,51 @@ import java.io.File;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The job executor service
+     */
+    private XOWLJobExecutor serviceJobExecutor;
+
     @Override
     public void start(BundleContext bundleContext) throws Exception {
+        // initializes the logger
         Logger mainLogger = new DispatchLogger(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
         Logging.setDefault(mainLogger);
         mainLogger.info("=== Platform startup ===");
-        PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
+
+        // register the configuration service
         ConfigurationService configurationService = new FSConfigurationService();
+        bundleContext.registerService(ConfigurationService.class, configurationService, null);
+
+        // register the security service
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
+        bundleContext.registerService(SecurityService.class, securityService, null);
+        bundleContext.registerService(HttpAPIService.class, securityService, null);
+
+        // register the platform descriptor service
+        PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
+        bundleContext.registerService(PlatformDescriptorService.class, platformDescriptorService, null);
+        bundleContext.registerService(HttpAPIService.class, platformDescriptorService, null);
+
+        // register the job executor service
+        serviceJobExecutor = new XOWLJobExecutor();
+        bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
+        bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
+
+        // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
         directoryService.register(KernelSchema.IMPL);
         directoryService.register(SchemaArtifactArchetype.INSTANCE);
         directoryService.register(FreeArtifactArchetype.INSTANCE);
         directoryService.register(SchemaDomain.INSTANCE);
-        bundleContext.registerService(PlatformDescriptorService.class, platformDescriptorService, null);
-        bundleContext.registerService(ConfigurationService.class, configurationService, null);
-        bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
-        bundleContext.registerService(HttpAPIService.class, platformDescriptorService, null);
-        bundleContext.registerService(HttpAPIService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
+        if (serviceJobExecutor != null)
+            serviceJobExecutor.close();
         Logging.getDefault().info("=== Platform shutdown ===");
     }
 }

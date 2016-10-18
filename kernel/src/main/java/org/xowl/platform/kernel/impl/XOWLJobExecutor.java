@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.executor.impl;
+package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;

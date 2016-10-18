@@ -58,7 +58,6 @@ cp "$ROOT/services/importation/target/xowl-service-importation-$VERSION.jar" "$R
 cp "$ROOT/services/lts/target/xowl-service-lts-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/security-internal/target/xowl-service-security-internal-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/security-shiro/target/xowl-service-security-shiro-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
-cp "$ROOT/services/statistics/target/xowl-service-statistics-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/services/webapp/target/xowl-service-webapp-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/connectors/csv/target/xowl-connector-csv-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"
 cp "$ROOT/connectors/doors9/target/xowl-connector-doors9-$VERSION.jar" "$RELENG/felix-framework-5.4.0/bundle/"

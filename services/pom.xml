@@ -19,7 +19,6 @@
 		<module>importation</module>
 		<module>evaluation</module>
 		<module>connection</module>
-		<module>statistics</module>
 		<module>httpapi</module>
 		<module>webapp</module>
 	</modules>

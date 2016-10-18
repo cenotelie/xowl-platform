@@ -28,6 +28,7 @@ import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.statistics.StatisticsService;
 
 import java.io.File;
 
@@ -62,6 +63,11 @@ public class Activator implements BundleActivator {
         PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
         bundleContext.registerService(PlatformDescriptorService.class, platformDescriptorService, null);
         bundleContext.registerService(HttpAPIService.class, platformDescriptorService, null);
+
+        // register the statistics service
+        StatisticsService statisticsService = new XOWLStatisticsService();
+        bundleContext.registerService(StatisticsService.class, statisticsService, null);
+        bundleContext.registerService(HttpAPIService.class, statisticsService, null);
 
         // register the job executor service
         serviceJobExecutor = new XOWLJobExecutor();

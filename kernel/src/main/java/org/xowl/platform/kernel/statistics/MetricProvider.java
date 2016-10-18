@@ -15,26 +15,31 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.statistics;
+package org.xowl.platform.kernel.statistics;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.infra.store.Serializable;
+import org.xowl.platform.kernel.Service;
+
+import java.util.Collection;
 
 /**
- * The activator for this bundle
+ * Represents a platform entity that can provides values for a metric
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
-    @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        StatisticsProvider service = new StatisticsProvider();
-        bundleContext.registerService(HttpAPIService.class, service, null);
-    }
+public interface MetricProvider extends Service {
+    /**
+     * Gets the metrics provided by this provider
+     *
+     * @return The provided metrics
+     */
+    Collection<Metric> getMetrics();
 
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+    /**
+     * Gets the last value for the specified metric
+     *
+     * @param metric The requested metric
+     * @return The last value (or null if the metric is not provided)
+     */
+    Serializable update(Metric metric);
 }

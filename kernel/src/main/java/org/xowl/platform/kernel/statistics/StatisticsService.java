@@ -37,6 +37,13 @@ public interface StatisticsService extends Service, HttpAPIService {
     void registerProvider(MetricProvider provider);
 
     /**
+     * Unregisters a metric provider
+     *
+     * @param provider A metric provider
+     */
+    void unregisterProvider(MetricProvider provider);
+
+    /**
      * Gets the known metrics
      *
      * @return The known metrics

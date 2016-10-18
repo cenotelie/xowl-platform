@@ -106,6 +106,14 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     @Override
+    public void unregisterProvider(MetricProvider provider) {
+        for (Metric metric : provider.getMetrics()) {
+            metrics.remove(metric.getIdentifier());
+            providers.remove(metric.getIdentifier());
+        }
+    }
+
+    @Override
     public Collection<Metric> getMetrics() {
         return metrics.values();
     }

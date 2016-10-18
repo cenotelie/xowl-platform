@@ -22,6 +22,7 @@ import org.xowl.infra.server.api.base.BaseRule;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.IRIs;
+import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
@@ -37,6 +38,10 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricBase;
+import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.ConsistencyService;
 import org.xowl.platform.services.lts.TripleStore;
@@ -51,7 +56,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConsistencyService implements ConsistencyService {
+public class XOWLConsistencyService implements ConsistencyService, MetricProvider {
     /**
      * The URIs for this service
      */
@@ -59,6 +64,10 @@ public class XOWLConsistencyService implements ConsistencyService {
             "services/core/consistency",
             "services/core/inconsistencies"
     };
+    /**
+     * The inconsistency count metric
+     */
+    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount", "Inconsistency count", XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount");
 
     /**
      * The URI of the graph for metadata on the consistency rules
@@ -97,6 +106,14 @@ public class XOWLConsistencyService implements ConsistencyService {
      */
     private static final String IRI_ANTECEDENT = KernelSchema.URI_KERNEL + "#antecedent_";
 
+    /**
+     * Initializes this service
+     */
+    public XOWLConsistencyService() {
+        StatisticsService statisticsService = ServiceUtils.getService(StatisticsService.class);
+        if (statisticsService != null)
+            statisticsService.registerProvider(this);
+    }
 
     @Override
     public String getIdentifier() {
@@ -237,6 +254,27 @@ public class XOWLConsistencyService implements ConsistencyService {
                 inconsistencies.add(new XOWLInconsistency(IRI_INCONSISTENCY_BASE + UUID.randomUUID().toString(), msg, rule, antecedents));
         }
         return new XSPReplyResultCollection<>(inconsistencies);
+    }
+
+    /**
+     * Gets the number of inconsistencies
+     *
+     * @return The number of inconsistencies
+     */
+    private int getInconsistenciesCount() {
+        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
+        if (lts == null)
+            return -1;
+        TripleStore live = lts.getLiveStore();
+        Result result = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
+                IOUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
+                "> { ?i a <" +
+                IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
+                "> } }");
+        if (!result.isSuccess())
+            return -1;
+        RDFPatternSolution solution = ((ResultSolutions) result).getSolutions().iterator().next();
+        return Integer.parseInt(((LiteralNode) solution.get("c")).getLexicalValue());
     }
 
     @Override
@@ -384,29 +422,26 @@ public class XOWLConsistencyService implements ConsistencyService {
         return deleteRule(rule.getIdentifier());
     }
 
-    /**
-     * Gets all the variables used in a quad
-     *
-     * @param buffer The buffer of variable names
-     * @param quad   The quad
-     */
-    private static void getVariablesIn(Collection<String> buffer, Quad quad) {
-        getVariablesIn(buffer, quad.getSubject());
-        getVariablesIn(buffer, quad.getProperty());
-        getVariablesIn(buffer, quad.getObject());
+    @Override
+    public Collection<Metric> getMetrics() {
+        return Collections.singletonList(METRIC_INCONSISTENCY_COUNT);
     }
 
-    /**
-     * Gets the variable for the RDF node
-     *
-     * @param buffer The buffer of variable names
-     * @param node   The node
-     */
-    private static void getVariablesIn(Collection<String> buffer, Node node) {
-        if (node.getNodeType() == Node.TYPE_VARIABLE) {
-            String name = ((VariableNode) node).getName();
-            if (!buffer.contains(name))
-                buffer.add(name);
-        }
+    @Override
+    public Serializable update(Metric metric) {
+        if (metric != METRIC_INCONSISTENCY_COUNT)
+            return null;
+        final int count = getInconsistenciesCount();
+        return new Serializable() {
+            @Override
+            public String serializedString() {
+                return Integer.toString(count);
+            }
+
+            @Override
+            public String serializedJSON() {
+                return "{\"count\": " + Integer.toString(count) + "}";
+            }
+        };
     }
 }

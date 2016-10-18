@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
@@ -91,10 +92,23 @@ public class XOWLStatisticsService implements StatisticsService {
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
-        Serializable value = update(ids[0]);
-        if (value == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, value.serializedJSON());
+
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("{");
+        for (int i = 0; i != ids.length; i++) {
+            Serializable value = update(ids[i]);
+            if (value == null)
+                continue;
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("\"");
+            builder.append(IOUtils.escapeStringJSON(ids[i]));
+            builder.append("\": ");
+            builder.append(value.serializedJSON());
+        }
+        builder.append("}");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     @Override

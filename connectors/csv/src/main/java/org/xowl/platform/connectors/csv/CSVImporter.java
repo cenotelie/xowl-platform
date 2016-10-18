@@ -30,7 +30,6 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
 import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -71,7 +70,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public ImporterConfiguration getConfiguration(String definition) {
-        ASTNode root = PlatformUtils.parseJSON(Logging.getDefault(), definition);
+        ASTNode root = IOUtils.parseJSON(Logging.getDefault(), definition);
         if (root == null)
             return null;
         return new CSVConfiguration(root);

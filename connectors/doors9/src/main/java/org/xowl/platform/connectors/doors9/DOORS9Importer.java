@@ -32,7 +32,6 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.connectors.doors9.impl.DOORS9ImportationJob;
 import org.xowl.platform.connectors.doors9.impl.DOORS9UIContribution;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -69,7 +68,7 @@ public class DOORS9Importer extends Importer {
 
     @Override
     public ImporterConfiguration getConfiguration(String definition) {
-        ASTNode root = PlatformUtils.parseJSON(Logging.getDefault(), definition);
+        ASTNode root = IOUtils.parseJSON(Logging.getDefault(), definition);
         if (root == null)
             return null;
         return new DOORS9Configuration(root);
@@ -108,7 +107,7 @@ public class DOORS9Importer extends Importer {
         try (InputStream stream = importationService.getStreamFor(document)) {
             String json = Files.read(stream, Files.CHARSET);
             BufferedLogger logger = new BufferedLogger();
-            ASTNode root = PlatformUtils.parseJSON(logger, json);
+            ASTNode root = IOUtils.parseJSON(logger, json);
             if (root == null)
                 return new XSPReplyFailure(logger.getErrorsAsString());
             DOORS9Context context = new DOORS9Context(new CachedNodes(), documentId, documentId);

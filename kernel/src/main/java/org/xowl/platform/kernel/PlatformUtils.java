@@ -17,16 +17,9 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.ParseError;
-import org.xowl.hime.redist.ParseResult;
-import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.rdf.SubjectNode;
-import org.xowl.infra.utils.logging.Logger;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,31 +31,6 @@ import java.util.Map;
  * @author Laurent Wouters
  */
 public class PlatformUtils {
-    /**
-     * Parses the JSON content
-     *
-     * @param logger  The logger to use
-     * @param content The content to parse
-     * @return The AST root node, or null of the parsing failed
-     */
-    public static ASTNode parseJSON(Logger logger, String content) {
-        JSONLDLoader loader = new JSONLDLoader(null) {
-            @Override
-            protected Reader getReaderFor(Logger logger, String iri) {
-                return null;
-            }
-        };
-        ParseResult result = loader.parse(logger, new StringReader(content));
-        if (result == null)
-            return null;
-        if (!result.getErrors().isEmpty()) {
-            for (ParseError error : result.getErrors())
-                logger.error(error);
-            return null;
-        }
-        return result.getRoot();
-    }
-
     /**
      * Maps a collection of quads by their subject
      *

@@ -31,7 +31,6 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -402,7 +401,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = PlatformUtils.parseJSON(logger, new String(content, Files.CHARSET));
+        ASTNode root = IOUtils.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
 

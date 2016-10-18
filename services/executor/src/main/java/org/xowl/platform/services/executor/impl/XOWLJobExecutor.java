@@ -30,7 +30,6 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -236,7 +235,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
      * @param content The job's content
      */
     private void reloadJob(String file, String content) {
-        ASTNode definition = PlatformUtils.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = IOUtils.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
             Logging.getDefault().error("Failed to parse the job " + file);
             return;

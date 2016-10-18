@@ -35,6 +35,7 @@ import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultUtils;
+import org.xowl.infra.store.storage.StoreStatistics;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
@@ -61,10 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements a triple store service that is backed by a xOWL Server
@@ -322,7 +320,13 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
     @Override
     public Collection<Metric> getMetrics() {
-        return Arrays.asList(METRIC_LIVE_ARTIFACTS_COUNT, METRIC_TOTAL_ARTIFACTS_COUNT);
+        List<Metric> metrics = new ArrayList<>();
+        metrics.add(METRIC_TOTAL_ARTIFACTS_COUNT);
+        metrics.add(METRIC_LIVE_ARTIFACTS_COUNT);
+        metrics.add(storeService.getMetricStatistics());
+        metrics.add(storeLongTerm.getMetricStatistics());
+        metrics.add(storeLive.getMetricStatistics());
+        return metrics;
     }
 
     @Override
@@ -353,6 +357,21 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
                     return "{\"count\": " + Integer.toString(count) + "}";
                 }
             };
+        } else if (metric == storeService.getMetricStatistics()) {
+            XSPReply reply = storeService.getStatistics();
+            if (!reply.isSuccess())
+                return null;
+            return ((XSPReplyResult<StoreStatistics>) reply).getData();
+        } else if (metric == storeLongTerm.getMetricStatistics()) {
+            XSPReply reply = storeLongTerm.getStatistics();
+            if (!reply.isSuccess())
+                return null;
+            return ((XSPReplyResult<StoreStatistics>) reply).getData();
+        } else if (metric == storeLive.getMetricStatistics()) {
+            XSPReply reply = storeLive.getStatistics();
+            if (!reply.isSuccess())
+                return null;
+            return ((XSPReplyResult<StoreStatistics>) reply).getData();
         }
         return null;
     }

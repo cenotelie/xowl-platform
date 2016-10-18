@@ -28,6 +28,8 @@ import org.xowl.infra.store.sparql.*;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricBase;
 import org.xowl.platform.services.lts.TripleStore;
 
 import java.io.StringWriter;
@@ -40,6 +42,15 @@ import java.util.*;
  */
 abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     /**
+     * The metric type for database statistics
+     */
+    private static final String METRIC_DB_STATS = XOWLFederationStore.class.getCanonicalName() + ".DatabaseStatistics";
+
+    /**
+     * The metric for the statistics of this database
+     */
+    private final Metric metricStatistics;
+    /**
      * The remote backend
      */
     private XOWLDatabase backend;
@@ -51,6 +62,9 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
      */
     public XOWLFederationStore(String name) {
         super(name);
+        this.metricStatistics = new MetricBase(XOWLFederationStore.class.getCanonicalName() + "." + name,
+                "Database statistics for store" + name,
+                METRIC_DB_STATS);
     }
 
     /**
@@ -62,6 +76,15 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         if (backend == null)
             backend = resolveBackend();
         return backend;
+    }
+
+    /**
+     * Gets the metric for the statistics of this database
+     *
+     * @return The metric for the statistics of this database
+     */
+    public Metric getMetricStatistics() {
+        return metricStatistics;
     }
 
     /**

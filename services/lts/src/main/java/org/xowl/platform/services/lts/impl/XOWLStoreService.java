@@ -26,6 +26,7 @@ import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.AbstractRepository;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.RDFUtils;
+import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.rdf.Changeset;
@@ -45,6 +46,10 @@ import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricBase;
+import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
@@ -66,7 +71,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, Closeable {
+public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, MetricProvider, Closeable {
     /**
      * The URIs for this service
      */
@@ -74,6 +79,14 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             "services/core/sparql",
             "services/core/artifacts"
     };
+    /**
+     * The total artifacts count metric
+     */
+    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount", "Total artifacts count", XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount");
+    /**
+     * The total artifacts count metric
+     */
+    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount", "Live artifacts count", XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount");
 
 
     /**
@@ -118,6 +131,9 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
                 return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
+        StatisticsService statisticsService = ServiceUtils.getService(StatisticsService.class);
+        if (statisticsService != null)
+            statisticsService.registerProvider(this);
     }
 
     /**
@@ -302,6 +318,43 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     @Override
     public XSPReply pullFromLive(Artifact artifact) {
         return storeLive.delete(artifact.getIdentifier());
+    }
+
+    @Override
+    public Collection<Metric> getMetrics() {
+        return Arrays.asList(METRIC_LIVE_ARTIFACTS_COUNT, METRIC_TOTAL_ARTIFACTS_COUNT);
+    }
+
+    @Override
+    public Serializable update(Metric metric) {
+        if (metric == METRIC_LIVE_ARTIFACTS_COUNT) {
+            final int count = storeLive.getArtifactsCount();
+            return new Serializable() {
+                @Override
+                public String serializedString() {
+                    return Integer.toString(count);
+                }
+
+                @Override
+                public String serializedJSON() {
+                    return "{\"count\": " + Integer.toString(count) + "}";
+                }
+            };
+        } else if (metric == METRIC_TOTAL_ARTIFACTS_COUNT) {
+            final int count = storeLongTerm.getArtifactsCount();
+            return new Serializable() {
+                @Override
+                public String serializedString() {
+                    return Integer.toString(count);
+                }
+
+                @Override
+                public String serializedJSON() {
+                    return "{\"count\": " + Integer.toString(count) + "}";
+                }
+            };
+        }
+        return null;
     }
 
     @Override

@@ -23,13 +23,8 @@ import org.xowl.infra.server.api.base.BaseDatabase;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.EntailmentRegime;
 import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.store.rdf.Node;
-import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.store.sparql.Command;
-import org.xowl.infra.store.sparql.Result;
-import org.xowl.infra.store.sparql.ResultFailure;
-import org.xowl.infra.store.sparql.ResultQuads;
+import org.xowl.infra.store.rdf.*;
+import org.xowl.infra.store.sparql.*;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
@@ -215,6 +210,29 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return reply;
         ResultQuads sparqlResult = ((XSPReplyResult<ResultQuads>) reply).getData();
         return new XSPReplyResultCollection<>(buildArtifacts(sparqlResult.getQuads()));
+    }
+
+    /**
+     * Gets the number of artifacts in this store
+     *
+     * @return The number of artifacts
+     */
+    public int getArtifactsCount() {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return -1;
+        StringWriter writer = new StringWriter();
+        writer.write("SELECT (COUNT(?a) AS ?c) WHERE { GRAPH <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write("> { ?a a <");
+        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write("> } }");
+        XSPReply reply = connection.sparql(writer.toString(), null, null);
+        if (!reply.isSuccess())
+            return -1;
+        ResultSolutions sparqlResult = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        RDFPatternSolution solution = sparqlResult.getSolutions().iterator().next();
+        return Integer.parseInt(((LiteralNode) solution.get("c")).getLexicalValue());
     }
 
     @Override

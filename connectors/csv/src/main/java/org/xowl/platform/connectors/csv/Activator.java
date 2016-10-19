@@ -21,7 +21,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
 import org.xowl.platform.connectors.csv.impl.CSVimportationJobFactory;
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 import org.xowl.platform.services.importation.Importer;
@@ -37,7 +37,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(Importer.class, new CSVImporter(), null);
         bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
         bundleContext.registerService(ConnectorServiceFactory.class, CSVFactory.INSTANCE, null);
-        bundleContext.registerService(UIContribution.class, new CSVUIContribution(), null);
+        bundleContext.registerService(WebUIContribution.class, new CSVUIContribution(), null);
     }
 
     @Override

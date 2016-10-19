@@ -21,7 +21,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.connectors.doors9.impl.DOORS9ImportationJobFactory;
 import org.xowl.platform.connectors.doors9.impl.DOORS9UIContribution;
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.services.importation.Importer;
 
@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
         bundleContext.registerService(Importer.class, new DOORS9Importer(), null);
         bundleContext.registerService(JobFactory.class, new DOORS9ImportationJobFactory(), null);
-        bundleContext.registerService(UIContribution.class, new DOORS9UIContribution(), null);
+        bundleContext.registerService(WebUIContribution.class, new DOORS9UIContribution(), null);
     }
 
     @Override

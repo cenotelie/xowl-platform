@@ -17,14 +17,14 @@
 
 package org.xowl.platform.connectors.csv.impl;
 
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
 
 /**
  * Implementation of the UI contributions for the CSV importer
  */
-public class CSVUIContribution implements UIContribution {
+public class CSVUIContribution implements WebUIContribution {
     /**
      * The root resource for the web app files
      */

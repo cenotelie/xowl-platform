@@ -24,7 +24,7 @@ import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.webapp.impl.*;
 
 /**
@@ -65,7 +65,7 @@ public class Activator implements BundleActivator {
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
-                    service.unregister(UIContribution.URI_WEB);
+                    service.unregister(WebUIContribution.URI_WEB);
                 } catch (IllegalArgumentException exception) {
                     // ignore this
                 }
@@ -74,7 +74,7 @@ public class Activator implements BundleActivator {
             public HttpService addingService(ServiceReference reference) {
                 HttpService httpService = (HttpService) bundleContext.getService(reference);
                 try {
-                    httpService.registerResources(UIContribution.URI_WEB, UIContribution.URI_WEB, new XOWLHttpContext(httpService, contributionDirectory));
+                    httpService.registerResources(WebUIContribution.URI_WEB, WebUIContribution.URI_WEB, new XOWLHttpContext(httpService, contributionDirectory));
                 } catch (Exception exception) {
                     Logging.getDefault().error(exception);
                 }
@@ -83,13 +83,13 @@ public class Activator implements BundleActivator {
         };
         httpTracker.open();
 
-        contributionTracker = new ServiceTracker<UIContribution, UIContribution>(bundleContext, UIContribution.class, null) {
-            public void removedService(ServiceReference reference, UIContribution contribution) {
+        contributionTracker = new ServiceTracker<WebUIContribution, WebUIContribution>(bundleContext, WebUIContribution.class, null) {
+            public void removedService(ServiceReference reference, WebUIContribution contribution) {
                 contributionDirectory.unregister(contribution);
             }
 
-            public UIContribution addingService(ServiceReference reference) {
-                UIContribution contribution = (UIContribution) bundleContext.getService(reference);
+            public WebUIContribution addingService(ServiceReference reference) {
+                WebUIContribution contribution = (WebUIContribution) bundleContext.getService(reference);
                 contributionDirectory.register(contribution);
                 return contribution;
             }

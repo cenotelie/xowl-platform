@@ -18,7 +18,7 @@
 package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.store.URIUtils;
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import java.net.URL;
@@ -41,7 +41,7 @@ public class XOWLContributionDirectory implements ContributionDirectory {
         /**
          * The contributions at this stage
          */
-        public final List<UIContribution> contributions;
+        public final List<WebUIContribution> contributions;
 
         /**
          * Initializes this folder
@@ -55,9 +55,9 @@ public class XOWLContributionDirectory implements ContributionDirectory {
     /**
      * The priority comparator for the contributions
      */
-    private static final Comparator<UIContribution> COMPARATOR = new Comparator<UIContribution>() {
+    private static final Comparator<WebUIContribution> COMPARATOR = new Comparator<WebUIContribution>() {
         @Override
-        public int compare(UIContribution c1, UIContribution c2) {
+        public int compare(WebUIContribution c1, WebUIContribution c2) {
             return Integer.compare(c2.getPriority(), c1.getPriority());
         }
     };
@@ -75,7 +75,7 @@ public class XOWLContributionDirectory implements ContributionDirectory {
     }
 
     @Override
-    public void register(UIContribution contribution) {
+    public void register(WebUIContribution contribution) {
         List<String> segments = URIUtils.getSegments(contribution.getPrefix());
         Folder current = root;
         for (int i = 0; i != segments.size(); i++) {
@@ -95,7 +95,7 @@ public class XOWLContributionDirectory implements ContributionDirectory {
     }
 
     @Override
-    public void unregister(UIContribution contribution) {
+    public void unregister(WebUIContribution contribution) {
         // not supported
     }
 

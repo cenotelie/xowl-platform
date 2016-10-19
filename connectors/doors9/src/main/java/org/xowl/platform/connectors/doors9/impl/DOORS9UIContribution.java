@@ -17,7 +17,7 @@
 
 package org.xowl.platform.connectors.doors9.impl;
 
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
 
@@ -26,7 +26,7 @@ import java.net.URL;
  *
  * @author Elie Soubiran
  */
-public class DOORS9UIContribution implements UIContribution {
+public class DOORS9UIContribution implements WebUIContribution {
     /**
      * The root resource for the web app files
      */

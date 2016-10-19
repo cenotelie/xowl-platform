@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.webapp;
 
-import org.xowl.platform.kernel.UIContribution;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
 
@@ -32,14 +32,14 @@ public interface ContributionDirectory {
      *
      * @param contribution The contribution to register
      */
-    void register(UIContribution contribution);
+    void register(WebUIContribution contribution);
 
     /**
      * Unregisters a contribution
      *
      * @param contribution The contribution to unregister
      */
-    void unregister(UIContribution contribution);
+    void unregister(WebUIContribution contribution);
 
     /**
      * Resolves the resource URL for the specified requested URI

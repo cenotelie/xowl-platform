@@ -15,7 +15,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.ui;
+
+import org.xowl.platform.kernel.Service;
 
 import java.net.URL;
 
@@ -24,7 +26,7 @@ import java.net.URL;
  *
  * @author Laurent Wouters
  */
-public interface UIContribution extends Service {
+public interface WebUIContribution extends Service {
     /**
      * The URI prefix for web connections
      */

@@ -13,8 +13,8 @@ var SVG_DB = null;
 var SVG_CONNECTOR = null;
 var SVG_DB_SIZE = 1000;
 var SVG_DB_SCALE = 0.15;
-var SVG_CONNECTOR_SIZE = 256;
-var SVG_CONNECTOR_SCALE = 0.25;
+var SVG_CONNECTOR_SIZE = 100;
+var SVG_CONNECTOR_SCALE = 0.50;
 var GRAPH_DB_X = 20;
 var GRAPH_CONNECTOR_X = 400;
 
@@ -226,7 +226,7 @@ function newConnector(def, x, y) {
 	text.setAttribute("y", (SVG_CONNECTOR_SIZE / 2).toString());
 	text.setAttribute("text-anchor", "start");
 	text.setAttribute("font-family", "sans-serif");
-	text.setAttribute("font-size", "60");
+	text.setAttribute("font-size", "30");
 	text.appendChild(document.createTextNode(def.name));
 	node.appendChild(text);
 	return node;

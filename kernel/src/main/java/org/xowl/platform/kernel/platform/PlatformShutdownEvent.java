@@ -27,6 +27,10 @@ import org.xowl.platform.kernel.events.EventBase;
  */
 public class PlatformShutdownEvent extends EventBase {
     /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformStartupEvent.class.getCanonicalName();
+    /**
      * The singleton instance
      */
     public static final Event INSTANCE = new PlatformShutdownEvent();
@@ -35,8 +39,6 @@ public class PlatformShutdownEvent extends EventBase {
      * Initializes this event
      */
     private PlatformShutdownEvent() {
-        super("Platform is shutting down",
-                PlatformStartupEvent.class.getCanonicalName(),
-                PlatformDescriptor.INSTANCE);
+        super("Platform is shutting down", TYPE, PlatformDescriptor.INSTANCE);
     }
 }

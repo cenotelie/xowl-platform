@@ -32,8 +32,11 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.connection.*;
 import org.xowl.platform.services.connection.jobs.PullArtifactJob;
 import org.xowl.platform.services.connection.jobs.PushArtifactJob;
@@ -481,7 +484,15 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (name == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Name for connector not specified");
 
-        XSPReply reply = spawn(descriptor, id, name, uris.toArray(new String[uris.size()]), customParams);
+        // check for platform admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+
+        reply = spawn(descriptor, id, name, uris.toArray(new String[uris.size()]), customParams);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
@@ -495,7 +506,16 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
-        XSPReply reply = delete(ids[0]);
+
+        // check for platform admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+
+        reply = delete(ids[0]);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 

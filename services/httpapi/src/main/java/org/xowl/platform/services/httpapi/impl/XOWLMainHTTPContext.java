@@ -72,7 +72,11 @@ public class XOWLMainHTTPContext implements HttpContext {
                     String login = authToken.substring(0, indexColon);
                     String password = authToken.substring(indexColon + 1);
                     XSPReply reply = securityService.authenticate(httpServletRequest.getRemoteAddr(), login, password.toCharArray());
-                    if (reply.isSuccess()) {
+                    if (reply == null) {
+                        // client is banned
+                        httpServletResponse.setStatus(HttpURLConnection.HTTP_FORBIDDEN);
+                        return false;
+                    } else if (reply.isSuccess()) {
                         httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
                         httpServletRequest.setAttribute(REMOTE_USER, login);
                         return true;

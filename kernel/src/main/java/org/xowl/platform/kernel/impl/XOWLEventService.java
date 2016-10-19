@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.store.Serializable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Identifiable;
@@ -24,11 +25,10 @@ import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -60,6 +60,10 @@ public class XOWLEventService implements EventService {
      * The routes for the events
      */
     private final Map<Identifiable, Map<String, List<EventConsumer>>> routes;
+    /**
+     * The total number of processed events
+     */
+    private int totalProcessed;
 
     /**
      * Initializes this service
@@ -74,6 +78,7 @@ public class XOWLEventService implements EventService {
         this.mustStop = new AtomicBoolean(false);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
         this.routes = new HashMap<>();
+        this.totalProcessed = 0;
     }
 
     /**
@@ -97,6 +102,20 @@ public class XOWLEventService implements EventService {
     @Override
     public String getName() {
         return "xOWL Federation Platform - EVent Dispatch Service";
+    }
+
+    @Override
+    public Collection<Metric> getMetrics() {
+        return Arrays.asList(METRIC_TOTAL_PROCESSED_EVENTS, METRIC_QUEUED_EVENTS);
+    }
+
+    @Override
+    public Serializable update(Metric metric) {
+        if (metric == METRIC_TOTAL_PROCESSED_EVENTS)
+            return new MetricValueScalar<>(totalProcessed);
+        if (metric == METRIC_QUEUED_EVENTS)
+            return new MetricValueScalar<>(queue.size());
+        return null;
     }
 
     @Override
@@ -167,6 +186,7 @@ public class XOWLEventService implements EventService {
                         Logging.getDefault().error(throwable);
                     }
                 }
+                totalProcessed++;
 
                 // stop on platform shutdown
                 if (event == PlatformShutdownEvent.INSTANCE)

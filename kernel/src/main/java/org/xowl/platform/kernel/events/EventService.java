@@ -19,13 +19,25 @@ package org.xowl.platform.kernel.events;
 
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricBase;
+import org.xowl.platform.kernel.statistics.MetricProvider;
 
 /**
  * Represents a service on the platform for managing events
  *
  * @author Laurent Wouters
  */
-public interface EventService extends Service {
+public interface EventService extends Service, MetricProvider {
+    /**
+     * The metric for the total number of processed events
+     */
+    Metric METRIC_TOTAL_PROCESSED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".TotalProcessedEvents", "Event Service - Total processed events");
+    /**
+     * The metric for the number of queued events
+     */
+    Metric METRIC_QUEUED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".QueuedEvents", "Event Service - Queued events");
+
     /**
      * When an event happened
      * This will propagate the event to the appropriate consumers, if any

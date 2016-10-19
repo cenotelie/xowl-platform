@@ -17,13 +17,39 @@
 
 package org.xowl.platform.kernel.statistics;
 
+import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 
 /**
- * Represents a metric for statistics on the platform
+ * Implements a scalar value for a metric
  *
+ * @param <T> The type of the metric
  * @author Laurent Wouters
  */
-public interface Metric extends Identifiable, Serializable {
+public class MetricValueScalar<T> implements Serializable {
+    /**
+     * The encapsulated value
+     */
+    private final T value;
+
+    /**
+     * Initializes this value
+     *
+     * @param value The encapsulated value
+     */
+    public MetricValueScalar(T value) {
+        this.value = value;
+    }
+
+    @Override
+    public String serializedString() {
+        return value.toString();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"value\": \"" +
+                IOUtils.escapeStringJSON(value.toString()) +
+                "\"}";
+    }
 }

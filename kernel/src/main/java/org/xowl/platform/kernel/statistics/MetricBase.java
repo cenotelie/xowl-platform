@@ -33,22 +33,16 @@ public class MetricBase implements Metric {
      * The metric's human readable name
      */
     private final String name;
-    /**
-     * The metric's type
-     */
-    private final String type;
 
     /**
      * Initializes this metric
      *
      * @param identifier The metric's unique identifier
      * @param name       The metric's human readable name
-     * @param type       The metric's type
      */
-    public MetricBase(String identifier, String name, String type) {
+    public MetricBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
-        this.type = type;
     }
 
     @Override
@@ -62,11 +56,6 @@ public class MetricBase implements Metric {
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
     public String serializedString() {
         return identifier;
     }
@@ -77,8 +66,6 @@ public class MetricBase implements Metric {
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)
-                + "\", \"type\": \""
-                + IOUtils.escapeStringJSON(type)
                 + "\"}";
     }
 }

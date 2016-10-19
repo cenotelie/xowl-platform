@@ -138,8 +138,6 @@ public class XOWLEventService implements EventService {
                 consumers.clear();
                 // get an event
                 Event event = queue.take();
-                if (event == PlatformShutdownEvent.INSTANCE)
-                    return;
 
                 // build the list of consumers
                 Map<String, List<EventConsumer>> sub = routes.get(event.getOrigin());
@@ -161,6 +159,7 @@ public class XOWLEventService implements EventService {
                         consumers.addAll(sub2);
                 }
 
+                // dispatch
                 for (EventConsumer consumer : consumers) {
                     try {
                         consumer.onEvent(event);
@@ -168,6 +167,10 @@ public class XOWLEventService implements EventService {
                         Logging.getDefault().error(throwable);
                     }
                 }
+
+                // stop on platform shutdown
+                if (event == PlatformShutdownEvent.INSTANCE)
+                    return;
             } catch (InterruptedException exception) {
                 Logging.getDefault().error(exception);
             }

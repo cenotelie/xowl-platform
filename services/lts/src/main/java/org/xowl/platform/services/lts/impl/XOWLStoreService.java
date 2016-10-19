@@ -80,11 +80,11 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * The total artifacts count metric
      */
-    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount", "Total artifacts count", XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount");
+    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount", "Storage Service - Total artifacts count");
     /**
      * The total artifacts count metric
      */
-    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount", "Live artifacts count", XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount");
+    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount", "Storage Service - Live artifacts count");
 
 
     /**

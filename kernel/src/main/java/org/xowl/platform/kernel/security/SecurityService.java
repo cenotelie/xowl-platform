@@ -27,11 +27,6 @@ import org.xowl.platform.kernel.Service;
  */
 public interface SecurityService extends Service {
     /**
-     * The platform administration role
-     */
-    String ROLE_ADMIN = "http://xowl.org/platform/kernel/security/roles/PlatformAdministrator";
-
-    /**
      * Gets the realm of this platform
      *
      * @return The realm of this platform

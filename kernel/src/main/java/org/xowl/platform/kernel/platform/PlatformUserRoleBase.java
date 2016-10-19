@@ -15,33 +15,34 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
- * Represents a user on this platform
+ * Base implementation of a user role for the platform
  *
  * @author Laurent Wouters
  */
-class XOWLInternalUser implements PlatformUser {
+public class PlatformUserRoleBase implements PlatformUserRole {
     /**
-     * The identifier of this user
+     * The unique identifier of this role
      */
     private final String identifier;
+    /**
+     * The human-readable name of this role
+     */
+    private final String name;
 
     /**
-     * Initializes this user
+     * Initializes this role
      *
-     * @param identifier The identifier of this user
+     * @param identifier The unique identifier of this role
+     * @param name       The human-readable name of this role
      */
-    public XOWLInternalUser(String identifier) {
+    public PlatformUserRoleBase(String identifier, String name) {
         this.identifier = identifier;
+        this.name = name;
     }
 
     @Override
@@ -51,27 +52,20 @@ class XOWLInternalUser implements PlatformUser {
 
     @Override
     public String getName() {
-        return identifier;
+        return name;
     }
 
     @Override
     public String serializedString() {
-        return getIdentifier();
+        return identifier;
     }
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(XOWLInternalUser.class.getCanonicalName()) +
-                "\", \"id\": \"" +
-                IOUtils.escapeStringJSON(getIdentifier()) +
-                "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(getName()) +
-                "\"}";
-    }
-
-    @Override
-    public Collection<PlatformUserRole> getRoles() {
-        return Collections.emptyList();
+        return "{\"identifier\": \""
+                + IOUtils.escapeStringJSON(identifier)
+                + "\", \"name\":\""
+                + IOUtils.escapeStringJSON(name)
+                + "\"}";
     }
 }

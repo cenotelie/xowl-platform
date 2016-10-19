@@ -62,9 +62,8 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
      */
     public XOWLFederationStore(String name) {
         super(name);
-        this.metricStatistics = new MetricBase(XOWLFederationStore.class.getCanonicalName() + "." + name,
-                "Database statistics for store" + name,
-                METRIC_DB_STATS);
+        this.metricStatistics = new MetricBase(METRIC_DB_STATS + "." + name,
+                "Storage Service - Database statistics for store" + name);
     }
 
     /**

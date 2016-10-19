@@ -67,7 +67,7 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
     /**
      * The inconsistency count metric
      */
-    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount", "Inconsistency count", XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount");
+    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount", "Consistency Service - Inconsistency count");
 
     /**
      * The URI of the graph for metadata on the consistency rules

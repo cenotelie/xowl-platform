@@ -38,6 +38,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -145,7 +146,7 @@ class XOWLInternalRealm implements Realm {
         XSPReply reply = database.getStoredProcedures();
         if (!reply.isSuccess() || !((XSPReplyResultCollection<?>) reply).getData().isEmpty())
             return;
-        database.sparql("INSERT DATA { GRAPH <" + GRAPH + "> { <" + SCHEMA_USER_PREFIX + "admin> <" + SCHEMA_HASROLE + "> <" + SecurityService.ROLE_ADMIN + "> } }", null, null);
+        database.sparql("INSERT DATA { GRAPH <" + GRAPH + "> { <" + SCHEMA_USER_PREFIX + "admin> <" + SCHEMA_HASROLE + "> <" + PlatformUserRoleAdmin.INSTANCE.getIdentifier() + "> } }", null, null);
         database.addStoredProcedure(PROCEDURE_ADD_ROLE, "INSERT DATA { GRAPH <" + GRAPH + "> { ?user <" + SCHEMA_HASROLE + "> ?role } }", Arrays.asList("user", "role"));
         database.addStoredProcedure(PROCEDURE_REMOVE_ROLE, "DELETE DATA { GRAPH <" + GRAPH + "> { ?user <" + SCHEMA_HASROLE + "> ?role } }", Arrays.asList("user", "role"));
         database.addStoredProcedure(PROCEDURE_CHECK_ROLE, "ASK { GRAPH ?g { ?user <" + SCHEMA_HASROLE + "> ?role } }", Arrays.asList("user", "role"));

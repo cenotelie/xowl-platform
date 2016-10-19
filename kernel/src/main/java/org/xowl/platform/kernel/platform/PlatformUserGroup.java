@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.security;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
@@ -27,25 +27,25 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface Group extends Identifiable, Serializable {
+public interface PlatformUserGroup extends Identifiable, Serializable {
     /**
      * Gets the users in this group
      *
      * @return The users in this group
      */
-    Collection<User> getUsers();
+    Collection<PlatformUser> getUsers();
 
     /**
      * Gets the admins for this group
      *
      * @return The admins for this group
      */
-    Collection<User> getAdmins();
+    Collection<PlatformUser> getAdmins();
 
     /**
      * Gets the user roles associated to this group
      *
      * @return The user roles associated to this group
      */
-    Collection<Role> getRoles();
+    Collection<PlatformUserRole> getRoles();
 }

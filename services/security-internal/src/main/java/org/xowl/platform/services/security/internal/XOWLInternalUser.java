@@ -18,14 +18,14 @@
 package org.xowl.platform.services.security.internal;
 
 import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.security.User;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
  * Represents a user on this platform
  *
  * @author Laurent Wouters
  */
-class XOWLInternalUser implements User {
+class XOWLInternalUser implements PlatformUser {
     /**
      * The identifier of this user
      */

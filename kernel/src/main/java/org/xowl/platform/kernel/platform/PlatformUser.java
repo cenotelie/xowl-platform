@@ -15,22 +15,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.security;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
+
+import java.util.Collection;
 
 /**
  * Represents a user on this platform
  *
  * @author Laurent Wouters
  */
-public interface User extends Identifiable, Serializable {
+public interface PlatformUser extends Identifiable, Serializable {
     /**
-     * Checks whether this user has the specified role
+     * Gets the roles associated specifically to this user
      *
-     * @param role A role
-     * @return Whether the user has the role
+     * @return The roles associated specifically to this user
      */
-    boolean hasRole(String role);
+    Collection<PlatformUserRole> getRoles();
 }

@@ -27,9 +27,9 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.security.User;
 
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -65,7 +65,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     /**
      * The context of a thread
      */
-    private static final ThreadLocal<User> CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<PlatformUser> CONTEXT = new ThreadLocal<>();
     /**
      * The maximum number of login failure before ban
      */
@@ -117,7 +117,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        User principal = CONTEXT.get();
+        PlatformUser principal = CONTEXT.get();
         if (principal == null)
             return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
         return new HttpResponse(HttpURLConnection.HTTP_OK, principal.serializedJSON(), HttpConstants.MIME_JSON);
@@ -144,7 +144,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         }
         XSPReply reply = getRealm().authenticate(userId, key);
         if (reply.isSuccess()) {
-            CONTEXT.set(((XSPReplyResult<User>) reply).getData());
+            CONTEXT.set(((XSPReplyResult<PlatformUser>) reply).getData());
             return reply;
         }
         boolean banned = onLoginFailure(client);
@@ -160,7 +160,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
 
     @Override
     public boolean checkCurrentHasRole(String roleId) {
-        User user = CONTEXT.get();
+        PlatformUser user = CONTEXT.get();
         return user != null && getRealm().checkHasRole(user.getIdentifier(), roleId);
     }
 

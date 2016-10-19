@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.security;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
@@ -25,5 +25,5 @@ import org.xowl.platform.kernel.Identifiable;
  *
  * @author Laurent Wouters
  */
-public interface Role extends Identifiable, Serializable {
+public interface PlatformUserRole extends Identifiable, Serializable {
 }

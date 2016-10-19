@@ -24,6 +24,7 @@ import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaDomain;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
@@ -42,6 +43,10 @@ public class Activator implements BundleActivator {
      * The job executor service
      */
     private XOWLJobExecutor serviceJobExecutor;
+    /**
+     * The event service
+     */
+    private XOWLEventService eventService;
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
@@ -74,6 +79,9 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
 
+        eventService = new XOWLEventService();
+        bundleContext.registerService(EventService.class, eventService, null);
+
         // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
         directoryService.register(KernelSchema.IMPL);
@@ -88,6 +96,8 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext bundleContext) throws Exception {
         if (serviceJobExecutor != null)
             serviceJobExecutor.close();
+        if (eventService != null)
+            eventService.close();
         Logging.getDefault().info("=== Platform shutdown ===");
     }
 }

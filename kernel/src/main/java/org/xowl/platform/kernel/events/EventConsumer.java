@@ -25,4 +25,10 @@ import org.xowl.platform.kernel.Service;
  * @author Laurent Wouters
  */
 public interface EventConsumer extends Service {
+    /**
+     * When a subscribed event happened
+     *
+     * @param event The event that happened
+     */
+    void onEvent(Event event);
 }

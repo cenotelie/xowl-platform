@@ -29,10 +29,9 @@ public interface EventService extends Service {
      * When an event happened
      * This will propagate the event to the appropriate consumers, if any
      *
-     * @param originator The entity of origin for the event
-     * @param event      The event
+     * @param event The event
      */
-    void onEvent(EventOriginator originator, Event event);
+    void onEvent(Event event);
 
     /**
      * Subscribe to a flow of event

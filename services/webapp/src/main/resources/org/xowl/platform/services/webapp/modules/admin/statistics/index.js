@@ -5,9 +5,9 @@ var xowl = new XOWL();
 
 function init() {
 	setupPage(xowl);
-	xowl.getDatabasesStatistics(function (status, ct, content) {
+	xowl.getStatisticsList(function (status, ct, content) {
 		if (status == 200) {
-			renderDatabasesStats(content);
+			renderMetrics(content);
 			document.getElementById("loader").style.display = "none";
 		} else {
 			displayMessage(getErrorFor(status, content));
@@ -15,41 +15,23 @@ function init() {
 	});
 }
 
-function renderDatabasesStats(stats) {
-	renderDatabaseStat("longTerm", stats.longTerm);
-	renderDatabaseStat("live", stats.live);
-	renderDatabaseStat("service", stats.service);
-}
-
-function renderDatabaseStat(dbName, stats) {
-	renderFiles(dbName, stats.files);
-}
-
-function renderFiles(dbName, stats) {
-	for (var  i = 0; i != stats.length; i++) {
-		document.getElementById("files").appendChild(renderFile(stats[i]));
+function renderMetrics(metrics) {
+	metrics.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("metrics");
+	for (var  i = 0; i != metrics.length; i++) {
+		table.appendChild(renderMetric(metrics[i]));
 	}
 }
 
-function renderFile(stats) {
+function renderMetric(metric) {
 	var row = document.createElement("tr");
-	var cells = [ document.createElement("td"),
-		document.createElement("td"),
-		document.createElement("td"),
-		document.createElement("td"),
-		document.createElement("td")];
+	var cell = document.createElement("td");
 	var link = document.createElement("a");
-	link.appendChild(document.createTextNode(stats.fileName));
-	link.href="dbFile.html?file=" + encodeURIComponent(stats.fileName);
-	cells[0].appendChild(link);
-	cells[1].appendChild(document.createTextNode(stats.accessesPerSecond));
-	cells[2].appendChild(document.createTextNode(stats.accessesContention));
-	cells[3].appendChild(document.createTextNode(stats.loadedBlocks));
-	cells[4].appendChild(document.createTextNode(stats.dirtyBlocks));
-	row.appendChild(cells[0]);
-	row.appendChild(cells[1]);
-	row.appendChild(cells[2]);
-	row.appendChild(cells[3]);
-	row.appendChild(cells[4]);
+	link.appendChild(document.createTextNode(metric.name));
+	link.href="metric.html?id=" + encodeURIComponent(metric.identifier);
+	cell.appendChild(link);
+	row.appendChild(cell);
 	return row;
 }

@@ -107,17 +107,17 @@ XOWL.prototype.cancelJob = function (callback, jobId) {
 // Admin Module - Statistics Service
 ////
 
-XOWL.prototype.getDatabasesStatistics = function (callback) {
+XOWL.prototype.getStatisticsList = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/statistics/databases", null);
+	}, "services/admin/statistics", null);
 }
 
-XOWL.prototype.getBasicStatistics = function (callback) {
+XOWL.prototype.getStatisticsValues = function (callback) {
 	this.doQuery(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));

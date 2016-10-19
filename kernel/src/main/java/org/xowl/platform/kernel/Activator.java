@@ -54,7 +54,6 @@ public class Activator implements BundleActivator {
         Logging.setDefault(loggingService);
         bundleContext.registerService(LoggingService.class, loggingService, null);
         bundleContext.registerService(HttpAPIService.class, loggingService, null);
-        loggingService.info("=== Platform startup ===");
 
         // register the configuration service
         ConfigurationService configurationService = new FSConfigurationService();
@@ -104,6 +103,5 @@ public class Activator implements BundleActivator {
             eventService.close();
         if (serviceJobExecutor != null)
             serviceJobExecutor.close();
-        Logging.getDefault().info("=== Platform shutdown ===");
     }
 }

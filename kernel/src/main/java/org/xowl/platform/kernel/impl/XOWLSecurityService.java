@@ -187,6 +187,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             } else {
                 // not banned anymore
                 clients.remove(client);
+                Logging.getDefault().info("Client " + client + " is no longer banned");
                 return false;
             }
         }

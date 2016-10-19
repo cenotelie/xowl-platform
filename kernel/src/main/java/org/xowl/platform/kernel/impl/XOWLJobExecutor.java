@@ -176,6 +176,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         // event before running
         job.onRun();
+        Logging.getDefault().info("Begin running job " + job.getIdentifier());
     }
 
     /**
@@ -211,6 +212,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         // callback on completion
         job.onTerminated(job.getStatus() == JobStatus.Cancelled);
+        Logging.getDefault().info("Ended job " + job.getIdentifier());
     }
 
     /**
@@ -327,6 +329,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         job.onScheduled();
         pool.execute(job);
+        Logging.getDefault().info("Scheduled job " + job.getIdentifier());
     }
 
     @Override

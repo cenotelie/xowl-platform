@@ -120,6 +120,7 @@ public class XOWLEventService implements EventService {
 
     @Override
     public void onEvent(Event event) {
+        Logging.getDefault().info(event);
         while (true) {
             try {
                 if (queue.add(event))

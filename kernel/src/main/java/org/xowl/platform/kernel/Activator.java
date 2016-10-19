@@ -19,7 +19,7 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.infra.utils.logging.*;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
@@ -31,8 +31,6 @@ import org.xowl.platform.kernel.platform.PlatformDescriptorService;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
-
-import java.io.File;
 
 /**
  * Activator for this bundle
@@ -51,10 +49,12 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        // initializes the logger
-        Logger mainLogger = new DispatchLogger(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
-        Logging.setDefault(mainLogger);
-        mainLogger.info("=== Platform startup ===");
+        // register the logging service
+        LoggingService loggingService = new XOWLLoggingService();
+        Logging.setDefault(loggingService);
+        bundleContext.registerService(LoggingService.class, loggingService, null);
+        bundleContext.registerService(HttpAPIService.class, loggingService, null);
+        loggingService.info("=== Platform startup ===");
 
         // register the configuration service
         ConfigurationService configurationService = new FSConfigurationService();

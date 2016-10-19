@@ -79,9 +79,12 @@ public class Activator implements BundleActivator {
         serviceJobExecutor = new XOWLJobExecutor();
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
+        statisticsService.registerProvider(serviceJobExecutor);
 
+        // register the event service
         eventService = new XOWLEventService();
         bundleContext.registerService(EventService.class, eventService, null);
+        statisticsService.registerProvider(eventService);
 
         // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();

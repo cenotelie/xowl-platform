@@ -23,6 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.Files;
@@ -35,6 +36,8 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -285,6 +288,22 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
     @Override
     public String getName() {
         return "xOWL Federation Platform - Job Execution Service";
+    }
+
+    @Override
+    public Collection<Metric> getMetrics() {
+        return Arrays.asList(METRIC_TOTAL_PROCESSED_JOBS, METRIC_SCHEDULED_JOBS, METRIC_EXECUTING_JOBS);
+    }
+
+    @Override
+    public Serializable update(Metric metric) {
+        if (metric == METRIC_TOTAL_PROCESSED_JOBS)
+            return new MetricValueScalar<>(executorPool.getCompletedTaskCount());
+        if (metric == METRIC_SCHEDULED_JOBS)
+            return new MetricValueScalar<>(executorPool.getQueue().size());
+        if (metric == METRIC_EXECUTING_JOBS)
+            return new MetricValueScalar<>(executorPool.getActiveCount());
+        return null;
     }
 
     @Override

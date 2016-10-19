@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Administration</title>
+  <title>Log</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
@@ -19,7 +19,8 @@
       <span style="display: inline-block;">
         <ol class="breadcrumb">
           <li><a href="/web/">Home</a></li>
-          <li class="active">Administration</li>
+          <li><a href="/web/modules/admin/">Administration</a></li>
+          <li class="active">Log</li>
         </ol>
       </span>
     </div>
@@ -29,28 +30,28 @@
     <hr style="margin-top: 5px; margin-bottom: 5px;" />
   </div>
   <div class="body">
-    <div class="panel panel-default">
+    <div class="panel panel-default" id="loader">
       <div class="panel-body">
-        <div>
-          <img src="/web/assets/connector.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/admin/connectors/">Platform Connectors Management</a>
-        </div>
-        <div>
-          <img src="/web/assets/jobs.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/admin/jobs/">Platform Job Management</a>
-        </div>
-        <div>
-          <img src="/web/assets/statistics.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/admin/statistics/">Platform Statistics</a>
-        </div>
-        <div>
-          <img src="/web/assets/log.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/admin/log/">Platform Log</a>
-        </div>
-        <div>
-          <img src="/web/assets/information.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/admin/platform/">Platform Properties</a>
-        </div>
+        <img src="/web/branding/spinner.gif" width="32" height="32" />
+        <span id="loader-text">Loading ...</span>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Log messages
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Date</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="messages">
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

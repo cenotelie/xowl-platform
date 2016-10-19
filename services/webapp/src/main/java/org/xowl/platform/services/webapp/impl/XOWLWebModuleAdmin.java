@@ -34,6 +34,7 @@ public class XOWLWebModuleAdmin extends WebModuleBase {
         this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
         this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
         this.items.add(new WebModuleItem("Platform Statistics", "statistics", "/web/assets/statistics.svg"));
+        this.items.add(new WebModuleItem("Platform Log", "log", "/web/assets/log.svg"));
         this.items.add(new WebModuleItem("Platform Properties", "platform", "/web/assets/information.svg"));
     }
 }

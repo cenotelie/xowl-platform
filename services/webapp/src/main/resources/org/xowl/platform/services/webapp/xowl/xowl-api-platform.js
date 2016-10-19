@@ -68,6 +68,22 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 
 
 ////
+// Admin Module - Logging Service
+////
+
+XOWL.prototype.getLogMessages = function (callback) {
+	this.doQuery(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/log", null);
+}
+
+
+
+////
 // Admin Module - Job Execution Service
 ////
 

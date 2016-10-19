@@ -1,67 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100"
-   height="100"
-   id="exploration"
-   version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="exploration.svg">
-  <metadata
-     id="metadata19">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs17" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1871"
-     inkscape:window-height="1056"
-     id="namedview15"
-     showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="60.169492"
-     inkscape:cy="50"
-     inkscape:window-x="49"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="exploration" />
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="exploration" version="1.1">
   <circle
      style="fill:none;fill-opacity:1;stroke:#034091;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     id="path4147"
-     cx="50"
-     cy="50"
-     r="40" />
+     cx="50" cy="50" r="40" />
   <path
      style="fill:#00914d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="M 75,25 40,40 25,75 60,60 Z"
-     id="path4149"
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="ccccc" />
+     d="M 75,25 40,40 25,75 60,60 Z"/>
   <circle
      style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     id="path4151"
-     cx="50"
-     cy="50"
-     r="5" />
+     cx="50" cy="50" r="5" />
 </svg>

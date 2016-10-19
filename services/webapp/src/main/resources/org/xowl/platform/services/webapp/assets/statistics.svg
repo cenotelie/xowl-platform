@@ -1,57 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100"
-   height="100"
-   id="statistics"
-   version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="statistics.svg">
-  <metadata
-     id="metadata11">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs9" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1871"
-     inkscape:window-height="1056"
-     id="namedview7"
-     showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="50"
-     inkscape:cy="50"
-     inkscape:window-x="49"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="statistics" />
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="statistics" version="1.1">
   <path
      style="fill:#ffffff;fill-opacity:1;stroke:#034091;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     d="m 5,15 90,0 0,70 -90,0 z"
-     id="path3" />
+     d="m 5,15 90,0 0,70 -90,0 z"/>
   <path
      style="fill:none;fill-rule:evenodd;stroke:#00914d;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-     d="m 15,50 25,0 5,-20 10,40 5,-20 25,0"
-     id="path5" />
+     d="m 15,50 25,0 5,-20 10,40 5,-20 25,0"/>
 </svg>

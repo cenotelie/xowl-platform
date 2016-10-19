@@ -17,11 +17,12 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.kernel.platform.PlatformDescriptor;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
@@ -69,11 +70,13 @@ public class XOWLPlatformDescriptorService implements PlatformDescriptorService 
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
-        if (!securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUtils.toHttpResponse(XSPReplyUnauthorized.instance(), null);
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);
     }
 

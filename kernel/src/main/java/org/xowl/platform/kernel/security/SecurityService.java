@@ -56,5 +56,5 @@ public interface SecurityService extends Service {
      * @param roleId The identifier of a role
      * @return Whether the user has the role
      */
-    boolean checkCurrentHasRole(String roleId);
+    XSPReply checkCurrentHasRole(String roleId);
 }

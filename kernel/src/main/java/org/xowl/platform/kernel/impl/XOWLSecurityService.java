@@ -17,9 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.config.Configuration;
@@ -159,9 +157,13 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     }
 
     @Override
-    public boolean checkCurrentHasRole(String roleId) {
+    public XSPReply checkCurrentHasRole(String roleId) {
         PlatformUser user = CONTEXT.get();
-        return user != null && getRealm().checkHasRole(user.getIdentifier(), roleId);
+        if (user == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!getRealm().checkHasRole(user.getIdentifier(), roleId))
+            return XSPReplyUnauthorized.instance();
+        return XSPReplySuccess.instance();
     }
 
     /**

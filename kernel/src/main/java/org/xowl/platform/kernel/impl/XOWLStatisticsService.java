@@ -17,10 +17,16 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.http.HttpConstants;
 import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricProvider;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -79,19 +85,44 @@ public class XOWLStatisticsService implements StatisticsService {
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0) {
-            // get all the metrics
-            boolean first = true;
-            StringBuilder builder = new StringBuilder("[");
-            for (Metric metric : metrics.values()) {
-                if (!first)
-                    builder.append(", ");
-                first = false;
-                builder.append(metric.serializedJSON());
-            }
-            builder.append("]");
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        if (ids == null || ids.length == 0)
+            return onMessageGetStatList();
+        return onMessageGetStatValues(ids);
+    }
+
+    /**
+     * Responds to a request for the list of available statistics
+     *
+     * @return The statistics
+     */
+    private HttpResponse onMessageGetStatList() {
+        // get all the metrics
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Metric metric : metrics.values()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(metric.serializedJSON());
         }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Responds to a request for the values of statistics
+     *
+     * @param ids The requested statistics
+     * @return The statistics' values
+     */
+    private HttpResponse onMessageGetStatValues(String[] ids) {
+        // check for platform admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
 
         boolean first = true;
         StringBuilder builder = new StringBuilder("{");

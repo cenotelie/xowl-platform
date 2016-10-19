@@ -17,18 +17,16 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.http.HttpResponse;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.OSGiBundle;
+import org.xowl.platform.kernel.platform.PlatformDescriptor;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
+import org.xowl.platform.kernel.security.SecurityService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -80,11 +78,6 @@ public class XOWLPlatformDescriptorService implements PlatformDescriptorService 
 
     @Override
     public Collection<OSGiBundle> getPlatformBundles() {
-        Bundle[] bundles = FrameworkUtil.getBundle(OSGiBundle.class).getBundleContext().getBundles();
-        Collection<OSGiBundle> result = new ArrayList<>(bundles.length);
-        for (int i = 0; i != bundles.length; i++) {
-            result.add(new OSGiBundle(bundles[i]));
-        }
-        return result;
+        return PlatformDescriptor.INSTANCE.getPlatformBundles();
     }
 }

@@ -17,23 +17,36 @@
 
 package org.xowl.platform.kernel.platform;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.xowl.platform.kernel.Identifiable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The descriptor of the platform
  *
  * @author Laurent Wouters
  */
-class PlatformDescriptor implements Identifiable {
+public class PlatformDescriptor implements Identifiable {
     /**
      * The singleton instance
      */
     public static final PlatformDescriptor INSTANCE = new PlatformDescriptor();
 
     /**
+     * The cache of bundles
+     */
+    private final List<OSGiBundle> bundles;
+
+    /**
      * Initializes the descriptor
      */
     private PlatformDescriptor() {
+        bundles = new ArrayList<>();
     }
 
     @Override
@@ -44,5 +57,20 @@ class PlatformDescriptor implements Identifiable {
     @Override
     public String getName() {
         return "xOWL Federation Platform";
+    }
+
+    /**
+     * Gets the description of the bundles on this platform
+     *
+     * @return The bundle on this platform
+     */
+    public Collection<OSGiBundle> getPlatformBundles() {
+        if (bundles.isEmpty()) {
+            Bundle[] bundles = FrameworkUtil.getBundle(OSGiBundle.class).getBundleContext().getBundles();
+            for (int i = 0; i != bundles.length; i++) {
+                this.bundles.add(new OSGiBundle(bundles[i]));
+            }
+        }
+        return Collections.unmodifiableCollection(bundles);
     }
 }

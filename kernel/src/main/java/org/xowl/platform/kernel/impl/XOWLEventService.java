@@ -19,7 +19,11 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.events.*;
+import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventConsumer;
+import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,10 +43,6 @@ public class XOWLEventService implements EventService {
      * The maximum number of queued events
      */
     private static final int QUEUE_LENGTH = 128;
-    /**
-     * The event when the platform is shutting down
-     */
-    private static final Event CLOSING_EVENT = new EventBase("Platform close", XOWLEventService.class.getCanonicalName(), null);
 
     /**
      * The thread dispatching events
@@ -59,7 +59,7 @@ public class XOWLEventService implements EventService {
     /**
      * The routes for the events
      */
-    private final Map<EventOriginator, Map<String, List<EventConsumer>>> routes;
+    private final Map<Identifiable, Map<String, List<EventConsumer>>> routes;
 
     /**
      * Initializes this service
@@ -81,7 +81,7 @@ public class XOWLEventService implements EventService {
      */
     public void close() {
         mustStop.set(true);
-        onEvent(CLOSING_EVENT);
+        onEvent(PlatformShutdownEvent.INSTANCE);
         try {
             dispatchThread.join();
         } catch (InterruptedException exception) {
@@ -112,7 +112,7 @@ public class XOWLEventService implements EventService {
     }
 
     @Override
-    public void subscribe(EventConsumer consumer, EventOriginator originator, String eventType) {
+    public void subscribe(EventConsumer consumer, Identifiable originator, String eventType) {
         synchronized (routes) {
             Map<String, List<EventConsumer>> sub = routes.get(originator);
             if (sub == null) {
@@ -138,7 +138,7 @@ public class XOWLEventService implements EventService {
                 consumers.clear();
                 // get an event
                 Event event = queue.take();
-                if (event == CLOSING_EVENT)
+                if (event == PlatformShutdownEvent.INSTANCE)
                     return;
 
                 // build the list of consumers

@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.events;
 
 import org.xowl.infra.store.IOUtils;
+import org.xowl.platform.kernel.Identifiable;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -48,7 +49,7 @@ public class EventBase implements Event {
     /**
      * The originator of this event
      */
-    private final EventOriginator originator;
+    private final Identifiable originator;
 
     /**
      * Initializes this event
@@ -57,7 +58,7 @@ public class EventBase implements Event {
      * @param type       The event type
      * @param originator The originator of this event
      */
-    public EventBase(String name, String type, EventOriginator originator) {
+    public EventBase(String name, String type, Identifiable originator) {
         this.identifier = Event.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
@@ -87,7 +88,7 @@ public class EventBase implements Event {
     }
 
     @Override
-    public EventOriginator getOrigin() {
+    public Identifiable getOrigin() {
         return originator;
     }
 

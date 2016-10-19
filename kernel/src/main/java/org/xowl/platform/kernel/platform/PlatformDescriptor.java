@@ -15,31 +15,34 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.events;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.Service;
 
 /**
- * Represents a service on the platform for managing events
+ * The descriptor of the platform
  *
  * @author Laurent Wouters
  */
-public interface EventService extends Service {
+class PlatformDescriptor implements Identifiable {
     /**
-     * When an event happened
-     * This will propagate the event to the appropriate consumers, if any
-     *
-     * @param event The event
+     * The singleton instance
      */
-    void onEvent(Event event);
+    public static final PlatformDescriptor INSTANCE = new PlatformDescriptor();
 
     /**
-     * Subscribe to a flow of event
-     *
-     * @param consumer   The subscribing consumer
-     * @param originator The specific event originator to observe, or null if any origin is acceptable
-     * @param eventType  The specific event type to wait for, or null if any event type is acceptable
+     * Initializes the descriptor
      */
-    void subscribe(EventConsumer consumer, Identifiable originator, String eventType);
+    private PlatformDescriptor() {
+    }
+
+    @Override
+    public String getIdentifier() {
+        return PlatformDescriptor.class.getCanonicalName();
+    }
+
+    @Override
+    public String getName() {
+        return "xOWL Federation Platform";
+    }
 }

@@ -15,31 +15,28 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.events;
+package org.xowl.platform.kernel.platform;
 
-import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Represents a service on the platform for managing events
+ * Event when the platform is shutting down
  *
  * @author Laurent Wouters
  */
-public interface EventService extends Service {
+public class PlatformShutdownEvent extends EventBase {
     /**
-     * When an event happened
-     * This will propagate the event to the appropriate consumers, if any
-     *
-     * @param event The event
+     * The singleton instance
      */
-    void onEvent(Event event);
+    public static final Event INSTANCE = new PlatformShutdownEvent();
 
     /**
-     * Subscribe to a flow of event
-     *
-     * @param consumer   The subscribing consumer
-     * @param originator The specific event originator to observe, or null if any origin is acceptable
-     * @param eventType  The specific event type to wait for, or null if any event type is acceptable
+     * Initializes this event
      */
-    void subscribe(EventConsumer consumer, Identifiable originator, String eventType);
+    private PlatformShutdownEvent() {
+        super("Platform is shutting down",
+                PlatformStartupEvent.class.getCanonicalName(),
+                PlatformDescriptor.INSTANCE);
+    }
 }

@@ -15,14 +15,28 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.events;
+package org.xowl.platform.kernel.platform;
 
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Represents a platform entity that can emit events
+ * Event when the platform has started-up
  *
  * @author Laurent Wouters
  */
-public interface EventOriginator extends Service {
+public class PlatformStartupEvent extends EventBase {
+    /**
+     * The singleton instance
+     */
+    public static final Event INSTANCE = new PlatformStartupEvent();
+
+    /**
+     * Initializes this event
+     */
+    private PlatformStartupEvent() {
+        super("Platform startup",
+                PlatformStartupEvent.class.getCanonicalName(),
+                PlatformDescriptor.INSTANCE);
+    }
 }

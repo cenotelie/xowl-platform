@@ -47,5 +47,5 @@ public interface Event extends Identifiable, Serializable {
      *
      * @return The entity of origin
      */
-    EventOriginator getOrigin();
+    Identifiable getOrigin();
 }

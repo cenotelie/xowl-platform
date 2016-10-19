@@ -28,6 +28,7 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
+import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 
@@ -90,14 +91,16 @@ public class Activator implements BundleActivator {
         directoryService.register(SchemaDomain.INSTANCE);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
+
+        eventService.onEvent(PlatformStartupEvent.INSTANCE);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (serviceJobExecutor != null)
-            serviceJobExecutor.close();
         if (eventService != null)
             eventService.close();
+        if (serviceJobExecutor != null)
+            serviceJobExecutor.close();
         Logging.getDefault().info("=== Platform shutdown ===");
     }
 }

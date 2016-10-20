@@ -33,11 +33,14 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.connection.*;
+import org.xowl.platform.services.connection.events.ConnectorDeletedEvent;
+import org.xowl.platform.services.connection.events.ConnectorSpawnedEvent;
 import org.xowl.platform.services.connection.jobs.PullArtifactJob;
 import org.xowl.platform.services.connection.jobs.PushArtifactJob;
 
@@ -191,6 +194,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             registration.refAsDomainConnector = context.registerService(ConnectorService.class, service, properties);
             registration.refAsServedService = context.registerService(HttpAPIService.class, service, null);
             connectorsById.put(identifier, registration);
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new ConnectorSpawnedEvent(this, registration.service));
             return new XSPReplyResult<>(registration.service);
         }
     }
@@ -203,6 +209,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                 return XSPReplyNotFound.instance();
             registration.refAsDomainConnector.unregister();
             registration.refAsServedService.unregister();
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new ConnectorDeletedEvent(this, registration.service));
             return XSPReplySuccess.instance();
         }
     }

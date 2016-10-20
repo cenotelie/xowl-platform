@@ -30,11 +30,14 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
+import org.xowl.platform.services.connection.events.ConnectorReceivedDataEvent;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -177,6 +180,9 @@ class GenericConnector extends ConnectorServiceBase {
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
         Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
         queueInput(artifact);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConnectorReceivedDataEvent(this, artifact));
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, artifact.serializedJSON());
     }
 }

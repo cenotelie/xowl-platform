@@ -24,6 +24,9 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.services.connection.events.ArtifactPulledFromConnectorEvent;
+import org.xowl.platform.services.connection.events.ArtifactPushedToConnectorEvent;
 
 /**
  * Utility APIs for the management of domains and related artifacts
@@ -61,6 +64,9 @@ public class ConnectorUtils {
         XSPReply reply = storageService.store(artifact);
         if (!reply.isSuccess())
             return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ArtifactPulledFromConnectorEvent(connector, artifact));
         // reply with the artifact
         return new XSPReplyResult<>(artifact.getIdentifier());
     }
@@ -82,6 +88,13 @@ public class ConnectorUtils {
         XSPReply reply = storage.retrieve(artifactId);
         if (!reply.isSuccess())
             return reply;
-        return connector.pushToClient(((XSPReplyResult<Artifact>) reply).getData());
+        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        reply = connector.pushToClient(artifact);
+        if (!reply.isSuccess())
+            return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ArtifactPushedToConnectorEvent(connector, artifact));
+        return reply;
     }
 }

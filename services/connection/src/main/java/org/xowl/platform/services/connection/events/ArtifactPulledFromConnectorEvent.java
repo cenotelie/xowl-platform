@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection.events;
 
+import org.xowl.platform.kernel.RichString;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.services.connection.ConnectorService;
@@ -44,7 +45,7 @@ public class ArtifactPulledFromConnectorEvent extends EventBase {
      * @param artifact  The pulled artifact
      */
     public ArtifactPulledFromConnectorEvent(ConnectorService connector, Artifact artifact) {
-        super("Pulled artifact " + artifact.getIdentifier() + " from connector " + connector.getIdentifier(), TYPE, connector);
+        super(new RichString("Pulled artifact ", artifact, " from connector ", connector), TYPE, connector);
         this.artifact = artifact;
     }
 

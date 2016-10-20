@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.events;
 
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.RichString;
 
 import java.util.Date;
 
@@ -28,6 +29,13 @@ import java.util.Date;
  * @author Laurent Wouters
  */
 public interface Event extends Identifiable, Serializable {
+    /**
+     * Gets a description of this event
+     *
+     * @return The description of this event
+     */
+    RichString getDescription();
+
     /**
      * Gets the event type
      *

@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.events;
 
 import org.xowl.infra.store.IOUtils;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.RichString;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -35,9 +36,9 @@ public class EventBase implements Event {
      */
     private final String identifier;
     /**
-     * The human-readable name of this event
+     * The human-readable description of this event
      */
-    private final String name;
+    private final RichString description;
     /**
      * The event type
      */
@@ -54,13 +55,28 @@ public class EventBase implements Event {
     /**
      * Initializes this event
      *
-     * @param name       The human-readable name of this event
-     * @param type       The event type
-     * @param originator The originator of this event
+     * @param description The human-readable description of this event
+     * @param type        The event type
+     * @param originator  The originator of this event
      */
-    public EventBase(String name, String type, Identifiable originator) {
+    public EventBase(RichString description, String type, Identifiable originator) {
         this.identifier = Event.class.getCanonicalName() + "." + UUID.randomUUID().toString();
-        this.name = name;
+        this.description = description;
+        this.type = type;
+        this.timestamp = new Date();
+        this.originator = originator;
+    }
+
+    /**
+     * Initializes this event
+     *
+     * @param description The human-readable description of this event
+     * @param type        The event type
+     * @param originator  The originator of this event
+     */
+    public EventBase(String description, String type, Identifiable originator) {
+        this.identifier = Event.class.getCanonicalName() + "." + UUID.randomUUID().toString();
+        this.description = new RichString(description);
         this.type = type;
         this.timestamp = new Date();
         this.originator = originator;
@@ -73,9 +89,13 @@ public class EventBase implements Event {
 
     @Override
     public String getName() {
-        return name;
+        return description.serializedString();
     }
 
+    @Override
+    public RichString getDescription() {
+        return description;
+    }
 
     @Override
     public String getType() {
@@ -94,7 +114,7 @@ public class EventBase implements Event {
 
     @Override
     public String serializedString() {
-        return identifier + ": " + name;
+        return identifier + ": " + description;
     }
 
     @Override
@@ -104,8 +124,10 @@ public class EventBase implements Event {
                 + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(name)
-                + "\", \"eventType\": \""
+                + IOUtils.escapeStringJSON(description.serializedString())
+                + "\", \"description\":"
+                + IOUtils.escapeStringJSON(description.serializedJSON())
+                + ", \"eventType\": \""
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"timestamp\": \""
                 + IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(timestamp))

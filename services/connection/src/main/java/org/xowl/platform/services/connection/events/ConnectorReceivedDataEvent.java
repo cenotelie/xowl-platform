@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection.events;
 
+import org.xowl.platform.kernel.RichString;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.services.connection.ConnectorService;
@@ -44,7 +45,7 @@ public class ConnectorReceivedDataEvent extends EventBase {
      * @param artifact  The received artifact
      */
     public ConnectorReceivedDataEvent(ConnectorService connector, Artifact artifact) {
-        super("Received artifact " + artifact.getIdentifier(), TYPE, connector);
+        super(new RichString("Received artifact ", artifact), TYPE, connector);
         this.artifact = artifact;
     }
 

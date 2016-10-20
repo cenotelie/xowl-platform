@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection.events;
 
+import org.xowl.platform.kernel.RichString;
 import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.services.connection.ConnectorDirectoryService;
 import org.xowl.platform.services.connection.ConnectorService;
@@ -44,7 +45,7 @@ public class ConnectorDeletedEvent extends EventBase {
      * @param connector        The deleted connector
      */
     public ConnectorDeletedEvent(ConnectorDirectoryService directoryService, ConnectorService connector) {
-        super("Deleted connector " + connector.getIdentifier(), TYPE, directoryService);
+        super(new RichString("Deleted connector ", connector), TYPE, directoryService);
         this.connectorService = connector;
     }
 

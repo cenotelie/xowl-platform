@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection.events;
 
+import org.xowl.platform.kernel.RichString;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.services.connection.ConnectorService;
@@ -44,7 +45,7 @@ public class ArtifactPushedToConnectorEvent extends EventBase {
      * @param artifact  The pushed artifact
      */
     public ArtifactPushedToConnectorEvent(ConnectorService connector, Artifact artifact) {
-        super("Pushed artifact " + artifact.getIdentifier() + " to connector " + connector.getIdentifier(), TYPE, connector);
+        super(new RichString("Pushed artifact ", artifact, " to connector ", connector), TYPE, connector);
         this.artifact = artifact;
     }
 

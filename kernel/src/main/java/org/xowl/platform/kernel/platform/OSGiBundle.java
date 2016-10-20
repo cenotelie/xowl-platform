@@ -124,7 +124,9 @@ public class OSGiBundle implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"id\": \"" +
+        return "{\"type\": \"" +
+                IOUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(getName()) +

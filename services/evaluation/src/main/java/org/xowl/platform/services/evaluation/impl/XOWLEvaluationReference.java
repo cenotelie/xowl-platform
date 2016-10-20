@@ -64,7 +64,7 @@ class XOWLEvaluationReference implements EvaluationReference {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" + IOUtils.escapeStringJSON(EvaluationReference.class.getCanonicalName()) +
-                "\", \"id\": \"" +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +

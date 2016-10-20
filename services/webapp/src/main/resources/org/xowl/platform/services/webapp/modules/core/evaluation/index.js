@@ -32,7 +32,7 @@ function renderEvaluation(index, evaluation) {
 	icon.height = 40;
 	icon.style.marginRight = "20px";
 	var link = document.createElement("a");
-	link.href = "eval.html?id=" + encodeURIComponent(evaluation.id);
+	link.href = "eval.html?id=" + encodeURIComponent(evaluation.identifier);
 	link.appendChild(document.createTextNode(evaluation.name));
 	var cell2 = document.createElement("td");
 	cell2.appendChild(icon);

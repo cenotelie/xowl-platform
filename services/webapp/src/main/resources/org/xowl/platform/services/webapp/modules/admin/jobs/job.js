@@ -26,7 +26,7 @@ function init() {
 function render(job) {
 	document.getElementById("job-identifier").value = job.identifier;
 	document.getElementById("job-name").value = job.name;
-	document.getElementById("job-type").value = job.type;
+	document.getElementById("job-type").value = job.jobType;
 	document.getElementById("job-status").value = job.status;
 	document.getElementById("job-time-scheduled").value = job.timeScheduled;
 	document.getElementById("job-time-run").value = job.timeRun;

@@ -111,7 +111,8 @@ public class Document implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \"" + IOUtils.escapeStringJSON(identifier) +
+        return "{\"type\": \"" + IOUtils.escapeStringJSON(Document.class.getCanonicalName()) +
+                "\", \"identifier\": \"" + IOUtils.escapeStringJSON(identifier) +
                 "\", \"name\":\"" + IOUtils.escapeStringJSON(name) +
                 "\", \"fileName\":\"" + IOUtils.escapeStringJSON(fileName) +
                 "\"}";

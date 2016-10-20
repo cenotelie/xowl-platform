@@ -77,7 +77,9 @@ public class WebModuleItem implements Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"name\": \"" +
+        return "{\"type\": \"" +
+                IOUtils.escapeStringJSON(WebModuleItem.class.getCanonicalName()) +
+                "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +
                 "\", \"uri\": \"" +
                 IOUtils.escapeStringJSON(uri) +

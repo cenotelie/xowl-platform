@@ -83,7 +83,9 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         @Override
         public String serializedJSON() {
             if (content instanceof Throwable) {
-                return "{\"level\": \"" +
+                return "{\"type\": \"" +
+                        IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                        "\", \"level\": \"" +
                         IOUtils.escapeStringJSON(level) +
                         "\", \"date\": \"" +
                         IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
@@ -91,7 +93,9 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
                         IOUtils.escapeStringJSON(((Throwable) content).getMessage()) +
                         "\"}";
             } else if (content instanceof Serializable) {
-                return "{\"level\": \"" +
+                return "{\"type\": \"" +
+                        IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                        "\", \"level\": \"" +
                         IOUtils.escapeStringJSON(level) +
                         "\", \"date\": \"" +
                         IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
@@ -99,7 +103,9 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
                         ((Serializable) content).serializedJSON() +
                         "}";
             }
-            return "{\"level\": \"" +
+            return "{\"type\": \"" +
+                    IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                    "\", \"level\": \"" +
                     IOUtils.escapeStringJSON(level) +
                     "\", \"date\": \"" +
                     IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +

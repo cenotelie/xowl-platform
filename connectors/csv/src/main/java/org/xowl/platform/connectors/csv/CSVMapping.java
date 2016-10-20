@@ -133,13 +133,15 @@ public class CSVMapping implements Serializable {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder("{\"columns\": [");
+        StringBuilder builder = new StringBuilder("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(CSVMapping.class.getCanonicalName()));
+        builder.append("\", \"columns\": [");
         for (int i = 0; i != columns.size(); i++) {
             if (i != 0)
                 builder.append(", ");
             builder.append(columns.get(i).serializedJSON());
         }
-        builder.append("]");
+        builder.append("]}");
         return builder.toString();
     }
 }

@@ -62,7 +62,9 @@ public class MetricBase implements Metric {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \""
+        return "{\"type\": \""
+                + IOUtils.escapeStringJSON(Metric.class.getCanonicalName())
+                + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)

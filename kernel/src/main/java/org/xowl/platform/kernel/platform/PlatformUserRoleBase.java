@@ -62,7 +62,9 @@ public class PlatformUserRoleBase implements PlatformUserRole {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \""
+        return "{\"type\": \""
+                + IOUtils.escapeStringJSON(PlatformUserRole.class.getCanonicalName())
+                + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)

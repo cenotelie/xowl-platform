@@ -68,7 +68,9 @@ public abstract class Importer implements Service, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \"" +
+        return "{\"type\": \"" +
+                IOUtils.escapeStringJSON(Importer.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(getName()) +

@@ -81,7 +81,7 @@ class XOWLConsistencyRule implements ConsistencyRule {
     public String serializedJSON() {
         return "{\"type\": \"" +
                 IOUtils.escapeStringJSON(XOWLConsistencyRule.class.getCanonicalName()) +
-                "\", \"id\": \"" +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(original.getName()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(name) +

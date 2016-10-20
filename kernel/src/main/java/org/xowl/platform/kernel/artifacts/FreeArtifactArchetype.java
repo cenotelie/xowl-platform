@@ -74,7 +74,7 @@ public class FreeArtifactArchetype implements ArtifactArchetype {
     public String serializedJSON() {
         return "{\"type\": \"" +
                 IOUtils.escapeStringJSON(ArtifactArchetype.class.getCanonicalName()) +
-                "\", \"id\": \"" +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(getName()) +

@@ -217,7 +217,7 @@ class XOWLEvaluation implements Evaluation {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
         builder.append(IOUtils.escapeStringJSON(XOWLEvaluation.class.getCanonicalName()));
-        builder.append("\", \"id\": \"");
+        builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(name));

@@ -17,7 +17,7 @@ function init() {
 
 function renderBundles(bundles) {
 	bundles.sort(function (x, y) {
-		return x.id.localeCompare(y.id);
+		return x.identifier.localeCompare(y.identifier);
 	});
 	var table = document.getElementById("bundles");
 	for (var i = 0; i != bundles.length; i++) {
@@ -28,7 +28,7 @@ function renderBundles(bundles) {
 			document.createElement("td"),
 			document.createElement("td")
 		];
-		cells[0].appendChild(document.createTextNode(bundles[i].id));
+		cells[0].appendChild(document.createTextNode(bundles[i].identifier));
 		cells[1].appendChild(document.createTextNode(bundles[i].vendor));
 		cells[2].appendChild(document.createTextNode(bundles[i].name));
 		cells[3].appendChild(document.createTextNode(bundles[i].version));

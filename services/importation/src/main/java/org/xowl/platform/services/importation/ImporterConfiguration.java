@@ -142,7 +142,9 @@ public class ImporterConfiguration implements Serializable {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{");
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(ImporterConfiguration.class.getCanonicalName()));
+        builder.append("\", ");
         serializeJSON(builder);
         builder.append("}");
         return builder.toString();

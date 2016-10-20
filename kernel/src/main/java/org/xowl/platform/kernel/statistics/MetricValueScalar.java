@@ -48,7 +48,9 @@ public class MetricValueScalar<T> implements Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"value\": \"" +
+        return "{\"type\": \"" +
+                IOUtils.escapeStringJSON(MetricValueScalar.class.getCanonicalName()) +
+                "\", \"value\": \"" +
                 IOUtils.escapeStringJSON(value.toString()) +
                 "\"}";
     }

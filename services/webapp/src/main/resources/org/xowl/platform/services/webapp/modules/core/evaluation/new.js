@@ -25,12 +25,12 @@ function renderEvaluableTypes(types) {
     var select = document.getElementById("input-evaluable-type");
     for (var i = 0; i != types.length; i++) {
         var option = document.createElement("option");
-        option.value = types[i].id;
+        option.value = types[i].identifier;
         option.appendChild(document.createTextNode(types[i].name));
         select.appendChild(option);
     }
     if (types.length > 0) {
-        select.value = types[0].id;
+        select.value = types[0].identifier;
         onEvaluableTypeChanged();
     } else {
         displayMessage(null);
@@ -113,12 +113,12 @@ function renderCriteriaTypes(criteria) {
         select.removeChild(select.lastChild);
     for (var i = 0; i != criteria.length; i++) {
         var option = document.createElement("option");
-        option.value = criteria[i].id;
+        option.value = criteria[i].identifier;
         option.appendChild(document.createTextNode(criteria[i].name));
         select.appendChild(option);
     }
     if (criteria.length > 0) {
-        select.value = criteria[0].id;
+        select.value = criteria[0].identifier;
         onCriterionChanged();
     }
 }
@@ -131,7 +131,7 @@ function onCriterionAdd() {
     var criterionTypeId = document.getElementById("input-criterion").value;
     var criterionType = null;
     for (var i = 0; i != CRITERIA_TYPES.length; i++) {
-        if (CRITERIA_TYPES[i].id === criterionTypeId) {
+        if (CRITERIA_TYPES[i].identifier === criterionTypeId) {
             criterionType = CRITERIA_TYPES[i];
             break;
         }
@@ -196,7 +196,7 @@ function onEvaluationGo() {
     BUSY = true;
     xowl.newEvaluation(function (status, ct, content) {
         if (status == 200) {
-            window.location.href = "eval.html?id=" + encodeURIComponent(content.id);
+            window.location.href = "eval.html?id=" + encodeURIComponent(content.identifier);
         } else {
             displayMessage(getErrorFor(status, content));
         }

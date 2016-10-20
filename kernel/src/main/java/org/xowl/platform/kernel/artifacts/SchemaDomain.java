@@ -81,7 +81,7 @@ public class SchemaDomain implements BusinessDomain {
     public String serializedJSON() {
         return "{\"type\": \"" +
                 IOUtils.escapeStringJSON(BusinessDomain.class.getCanonicalName()) +
-                "\", \"id\": \"" +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(getName()) +

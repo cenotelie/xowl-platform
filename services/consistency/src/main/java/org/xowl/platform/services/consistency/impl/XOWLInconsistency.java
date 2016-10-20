@@ -97,7 +97,9 @@ class XOWLInconsistency implements Inconsistency {
     @Override
     public String serializedJSON() {
         StringWriter builder = new StringWriter();
-        builder.append("{\"id\": \"");
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(Inconsistency.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(iri));
         builder.append("\", \"message\": \"");
         builder.append(IOUtils.escapeStringJSON(message));

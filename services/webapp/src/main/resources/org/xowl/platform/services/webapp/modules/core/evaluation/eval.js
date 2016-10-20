@@ -59,7 +59,7 @@ function renderEval(evaluation) {
 
 function getResult(evaluation, criterion, evaluable) {
 	for (var i = 0; i != evaluation.results.length; i++) {
-		if (evaluation.results[i].evaluable === evaluable.id && evaluation.results[i].criterion === criterion.id)
+		if (evaluation.results[i].evaluable === evaluable.identifier && evaluation.results[i].criterion === criterion.identifier)
 			return evaluation.results[i].data;
 	}
 	return null;

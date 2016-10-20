@@ -62,8 +62,8 @@ class XOWLInternalUser implements PlatformUser {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(XOWLInternalUser.class.getCanonicalName()) +
-                "\", \"id\": \"" +
+                IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
                 IOUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
                 IOUtils.escapeStringJSON(getName()) +

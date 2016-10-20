@@ -228,7 +228,9 @@ public class CSVConfiguration extends ImporterConfiguration {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{");
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(CSVConfiguration.class.getName()));
+        builder.append("\", ");
         serializeJSON(builder);
         builder.append(", \"separator\": ");
         builder.append(IOUtils.escapeStringJSON(Character.toString(separator)));

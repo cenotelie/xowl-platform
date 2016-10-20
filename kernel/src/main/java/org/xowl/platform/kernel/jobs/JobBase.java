@@ -150,11 +150,13 @@ public abstract class JobBase extends SafeRunnable implements Job {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \""
+        return "{\"type\": \""
+                + IOUtils.escapeStringJSON(Job.class.getCanonicalName())
+                + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)
-                + "\", \"type\": \""
+                + "\", \"jobType\": \""
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"status\": \""
                 + IOUtils.escapeStringJSON(status.toString())

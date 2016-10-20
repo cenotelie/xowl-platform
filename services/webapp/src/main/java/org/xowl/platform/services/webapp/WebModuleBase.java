@@ -100,7 +100,9 @@ public abstract class WebModuleBase implements WebModule {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
-        builder.append("{\"identifier\": \"");
+        builder.append("{\"type\": \"");
+        builder.append(IOUtils.escapeStringJSON(WebModule.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
         builder.append(IOUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(IOUtils.escapeStringJSON(getName()));

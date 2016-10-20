@@ -21,7 +21,7 @@ function init() {
 }
 
 function render(rule) {
-	document.getElementById("rule-id").value = rule.id;
+	document.getElementById("rule-id").value = rule.identifier;
 	document.getElementById("rule-name").value = rule.name;
 	document.getElementById("rule-active").value = rule.isActive ? "YES" : "NO";
 	document.getElementById("rule-def").value = rule.definition;

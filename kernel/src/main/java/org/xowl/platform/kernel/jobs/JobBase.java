@@ -108,7 +108,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
             } else if ("name".equals(head)) {
                 String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
-            } else if ("type".equals(head)) {
+            } else if ("jobType".equals(head)) {
                 String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 type = value.substring(1, value.length() - 1);
             } else if ("status".equals(head)) {

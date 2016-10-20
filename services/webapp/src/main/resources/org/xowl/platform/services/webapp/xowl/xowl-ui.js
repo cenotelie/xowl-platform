@@ -52,7 +52,7 @@ function getShortURI(value) {
 }
 
 function renderJobPayload(payload) {
-	if (payload instanceof String)
+	if (payload instanceof String || typeof payload === 'string')
 		return payload;
 	return JSON.stringify(payload);
 }
@@ -71,6 +71,51 @@ function renderXSPReply(xsp) {
 	} else {
 		return "SUCCESS: " + xsp.message;
 	}
+}
+
+function renderMessage(message) {
+	if (message instanceof String || typeof message === 'string')
+		return document.createTextNode(message);
+	if (message.type === "org.xowl.platform.kernel.RichString") {
+		var span = document.createElement("span");
+		for (var i = 0; i != message.parts.length; i++) {
+			span.appendChild(renderMessagePart(message.parts[i]));
+		}
+		return span;
+	}
+	return document.createTextNode(JSON.stringify(message));
+}
+
+function renderMessagePart(part) {
+	if (part instanceof String || typeof part === 'string')
+		return document.createTextNode(part);
+	if (part.type === "org.xowl.platform.kernel.jobs.Job") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/jobs/job.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.kernel.artifacts.Artifact") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.consistency.ConsistencyRule") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.importation.Document") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/core/importation/document.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	}
+	return document.createTextNode(JSON.stringify(part));
 }
 
 function rdfToDom(value) {

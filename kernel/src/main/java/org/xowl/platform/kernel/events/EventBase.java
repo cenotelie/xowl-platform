@@ -123,10 +123,10 @@ public class EventBase implements Event {
                 + IOUtils.escapeStringJSON(Event.class.getCanonicalName())
                 + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
-                + "\", \"name\":\""
+                + "\", \"name\": \""
                 + IOUtils.escapeStringJSON(description.serializedString())
-                + "\", \"description\":"
-                + IOUtils.escapeStringJSON(description.serializedJSON())
+                + "\", \"description\": "
+                + description.serializedJSON()
                 + ", \"eventType\": \""
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"timestamp\": \""

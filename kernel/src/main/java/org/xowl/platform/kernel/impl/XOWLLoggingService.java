@@ -30,6 +30,7 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.Metric;
@@ -197,24 +198,32 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
 
     @Override
     public void debug(Object message) {
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
         onLogMessage("DEBUG", message, false);
         super.debug(message);
     }
 
     @Override
     public void info(Object message) {
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
         onLogMessage("INFO", message, false);
         super.info(message);
     }
 
     @Override
     public void warning(Object message) {
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
         onLogMessage("WARNING", message, false);
         super.warning(message);
     }
 
     @Override
     public void error(Object message) {
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
         onLogMessage("ERROR", message, true);
         super.error(message);
     }

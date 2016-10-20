@@ -177,12 +177,12 @@ public abstract class ArtifactBase implements Artifact {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder("{\"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
-        builder.append("\", \"name\":\"");
-        builder.append(IOUtils.escapeStringJSON(name));
-        builder.append("\", \"type\": \"");
+        StringBuilder builder = new StringBuilder("{\"type\": \"");
         builder.append(IOUtils.escapeStringJSON(Artifact.class.getCanonicalName()));
+        builder.append("\", \"identifier\":\"");
+        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\": \"");
+        builder.append(IOUtils.escapeStringJSON(name));
         builder.append("\", \"base\": \"");
         builder.append(IOUtils.escapeStringJSON(baseID));
         builder.append("\", \"version\": \"");

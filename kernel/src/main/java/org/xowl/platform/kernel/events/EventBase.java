@@ -99,11 +99,13 @@ public class EventBase implements Event {
 
     @Override
     public String serializedJSON() {
-        return "{\"identifier\": \""
+        return "{\"type\": \""
+                + IOUtils.escapeStringJSON(Event.class.getCanonicalName())
+                + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
                 + IOUtils.escapeStringJSON(name)
-                + "\", \"type\": \""
+                + "\", \"eventType\": \""
                 + IOUtils.escapeStringJSON(type)
                 + "\", \"timestamp\": \""
                 + IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(timestamp))

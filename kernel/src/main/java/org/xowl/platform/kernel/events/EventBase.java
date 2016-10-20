@@ -94,7 +94,7 @@ public class EventBase implements Event {
 
     @Override
     public String serializedString() {
-        return identifier;
+        return identifier + ": " + name;
     }
 
     @Override
@@ -110,5 +110,10 @@ public class EventBase implements Event {
                 + "\", \"originator\": \""
                 + IOUtils.escapeStringJSON(originator.getIdentifier())
                 + "\"}";
+    }
+
+    @Override
+    public String toString() {
+        return serializedString();
     }
 }

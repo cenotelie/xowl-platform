@@ -10,13 +10,6 @@ function init() {
 			renderModules(content);
 		}
 	});
-	xowl.getBasicStatistics(function (code, type, content) {
-		if (code === 200) {
-			document.getElementById("stat-inconsistencies").innerHTML = content.nbInconsistencies;
-			document.getElementById("stat-artifacts-all").innerHTML = content.nbArtifactsTotal;
-			document.getElementById("stat-artifacts-live").innerHTML = content.nbArtifactsLive;
-		}
-	});
 }
 
 function renderModules(modules) {

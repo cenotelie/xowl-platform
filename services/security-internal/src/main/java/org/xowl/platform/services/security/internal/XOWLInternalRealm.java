@@ -20,16 +20,14 @@ package org.xowl.platform.services.security.internal;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.XOWLStoredProcedure;
-import org.xowl.infra.server.api.XOWLUser;
 import org.xowl.infra.server.api.base.BaseStoredProcedureContext;
 import org.xowl.infra.server.base.ServerConfiguration;
 import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.store.AbstractRepository;
-import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultYesNo;
@@ -41,16 +39,16 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserGroup;
+import org.xowl.platform.kernel.platform.PlatformUserRole;
 import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An authentication realm that uses a xOWL server as a user base
@@ -65,7 +63,7 @@ class XOWLInternalRealm implements Realm {
     /**
      * The graph for security entities
      */
-    private static final String GRAPH = "http://xowl.org/server/users#";
+    private static final String USERS = "http://xowl.org/server/users#";
 
     /**
      * A node manager for constant URIs
@@ -209,11 +207,11 @@ class XOWLInternalRealm implements Realm {
     }
 
     @Override
-    public XSPReply authenticate(String userId, char[] key) {
+    public PlatformUser authenticate(String userId, char[] key) {
         XSPReply reply = server.login(userId, new String(key));
         if (!reply.isSuccess())
-            return XSPReplyFailure.instance();
-        return new XSPReplyResult<>(new XOWLInternalUser(((XSPReplyResult<XOWLUser>) reply).getData().getName()));
+            return null;
+        return new XOWLInternalUser(userId);
     }
 
     @Override
@@ -224,7 +222,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public boolean checkHasRole(String userId, String roleId) {
         Map<String, Node> parameters = new HashMap<>();
-        parameters.put("user", nodes.getIRINode(GRAPH + userId));
+        parameters.put("user", nodes.getIRINode(USERS + userId));
         parameters.put("role", nodes.getIRINode(roleId));
         XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-check-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
@@ -232,6 +230,141 @@ class XOWLInternalRealm implements Realm {
             return false;
         Result result = ((XSPReplyResult<Result>) reply).getData();
         return reply.isSuccess() && ((ResultYesNo) result).getValue();
+    }
+
+    @Override
+    public Collection<PlatformUser> getUsers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<PlatformUserGroup> getGroups() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<PlatformUserRole> getRoles() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public PlatformUser getUser(String identifier) {
+        return null;
+    }
+
+    @Override
+    public PlatformUserGroup getGroup(String identifier) {
+        return null;
+    }
+
+    @Override
+    public PlatformUserRole getRole(String identifier) {
+        return null;
+    }
+
+    @Override
+    public XSPReply createUser(String identifier, String name, String key) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply createGroup(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply createRole(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameUser(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameGroup(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameRole(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteUser(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteGroup(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteRole(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply resetUserKey(String identifier, String newKey) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addUserToGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addAdminToGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeUserFromGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeAdminFromGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply assignRoleToUser(String user, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply assignRoleToGroup(String group, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply unassignRoleToUser(String user, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply unassignRoleToGroup(String group, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addRoleImplication(String sourceRole, String targetRole) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeRoleImplication(String sourceRole, String targetRole) {
+        return XSPReplyUnsupported.instance();
     }
 
     /**
@@ -243,7 +376,7 @@ class XOWLInternalRealm implements Realm {
      */
     public XSPReply assignRole(String entity, String role) {
         Map<String, Node> parameters = new HashMap<>();
-        parameters.put("entity", nodes.getIRINode(GRAPH + entity));
+        parameters.put("entity", nodes.getIRINode(USERS + entity));
         parameters.put("role", nodes.getIRINode(role));
         return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));

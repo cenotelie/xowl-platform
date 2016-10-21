@@ -18,8 +18,15 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.store.IOUtils;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserGroup;
+import org.xowl.platform.kernel.platform.PlatformUserRole;
 import org.xowl.platform.kernel.security.Realm;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A realm with no security
@@ -27,6 +34,61 @@ import org.xowl.platform.kernel.security.Realm;
  * @author Laurent Wouters
  */
 public class XOWLSecurityNosecRealm implements Realm {
+    /**
+     * The internal representation of a user for this realm
+     */
+    private static class User implements PlatformUser {
+        /**
+         * The identifier of the user
+         */
+        private final String identifier;
+
+        /**
+         * Initializes this user
+         *
+         * @param identifier The identifier of the user
+         */
+        public User(String identifier) {
+            this.identifier = identifier;
+        }
+
+        @Override
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        @Override
+        public String getName() {
+            return identifier;
+        }
+
+        @Override
+        public Collection<PlatformUserRole> getRoles() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public String serializedString() {
+            return identifier;
+        }
+
+        @Override
+        public String serializedJSON() {
+            return "{\"type\": \"" +
+                    IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()) +
+                    "\", \"identifier\": \"" +
+                    IOUtils.escapeStringJSON(identifier) +
+                    "\",  \"name\": \"" +
+                    IOUtils.escapeStringJSON(identifier) +
+                    "\"}";
+        }
+
+        @Override
+        public String toString() {
+            return identifier;
+        }
+    }
+
     /**
      * Initializes this realm provider
      */
@@ -44,8 +106,8 @@ public class XOWLSecurityNosecRealm implements Realm {
     }
 
     @Override
-    public XSPReply authenticate(String userId, char[] key) {
-        return new XSPReplyResult<>(userId);
+    public PlatformUser authenticate(String userId, char[] key) {
+        return new User(userId);
     }
 
     @Override
@@ -56,5 +118,140 @@ public class XOWLSecurityNosecRealm implements Realm {
     @Override
     public boolean checkHasRole(String userId, String roleId) {
         return true;
+    }
+
+    @Override
+    public Collection<PlatformUser> getUsers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<PlatformUserGroup> getGroups() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<PlatformUserRole> getRoles() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public PlatformUser getUser(String identifier) {
+        return null;
+    }
+
+    @Override
+    public PlatformUserGroup getGroup(String identifier) {
+        return null;
+    }
+
+    @Override
+    public PlatformUserRole getRole(String identifier) {
+        return null;
+    }
+
+    @Override
+    public XSPReply createUser(String identifier, String name, String key) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply createGroup(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply createRole(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameUser(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameGroup(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply renameRole(String identifier, String name) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteUser(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteGroup(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply deleteRole(String identifier) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply resetUserKey(String identifier, String newKey) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addUserToGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addAdminToGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeUserFromGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeAdminFromGroup(String user, String group) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply assignRoleToUser(String user, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply assignRoleToGroup(String group, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply unassignRoleToUser(String user, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply unassignRoleToGroup(String group, String role) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply addRoleImplication(String sourceRole, String targetRole) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply removeRoleImplication(String sourceRole, String targetRole) {
+        return XSPReplyUnsupported.instance();
     }
 }

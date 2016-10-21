@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
  * Manages the security on the platform
@@ -42,6 +43,13 @@ public interface SecurityService extends Service {
      * @return Whether the operation succeed
      */
     XSPReply authenticate(String client, String userId, char[] key);
+
+    /**
+     * The currently authenticated user on the current thread, if any
+     *
+     * @return The currently authenticated user, or null if there is none
+     */
+    PlatformUser getCurrentUser();
 
     /**
      * Event when the request terminated

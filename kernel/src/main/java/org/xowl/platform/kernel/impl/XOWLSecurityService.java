@@ -26,6 +26,8 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserGroup;
+import org.xowl.platform.kernel.platform.PlatformUserRole;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -43,7 +45,10 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
      * The URIs for this service
      */
     private static final String[] URIS = new String[]{
-            "services/core/security"
+            "services/core/security",
+            "services/core/security/users",
+            "services/core/security/groups",
+            "services/core/security/roles"
     };
 
     /**
@@ -115,10 +120,17 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        PlatformUser principal = CONTEXT.get();
-        if (principal == null)
-            return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, principal.serializedJSON(), HttpConstants.MIME_JSON);
+        switch (uri) {
+            case "services/core/security":
+                return onMessageCore(method);
+            case "services/core/security/users":
+                return onMessageUsers(method, parameters);
+            case "services/core/security/groups":
+                return onMessageGroups(method, parameters);
+            case "services/core/security/roles":
+                return onMessageRoles(method, parameters);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override
@@ -140,14 +152,19 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             Logging.getDefault().info("Login failure for " + userId + " from " + client);
             return banned ? null : XSPReplyFailure.instance();
         }
-        XSPReply reply = getRealm().authenticate(userId, key);
-        if (reply.isSuccess()) {
-            CONTEXT.set(((XSPReplyResult<PlatformUser>) reply).getData());
-            return reply;
+        PlatformUser user = getRealm().authenticate(userId, key);
+        if (user != null) {
+            CONTEXT.set(user);
+            return new XSPReplyResult<>(user);
         }
         boolean banned = onLoginFailure(client);
         Logging.getDefault().info("Login failure for " + userId + " from " + client);
         return banned ? null : XSPReplyFailure.instance();
+    }
+
+    @Override
+    public PlatformUser getCurrentUser() {
+        return CONTEXT.get();
     }
 
     @Override
@@ -219,5 +236,237 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             }
             return false;
         }
+    }
+
+    /**
+     * Responds to a request on the core URI
+     *
+     * @param method The HTTP method
+     * @return The HTTP response
+     */
+    private HttpResponse onMessageCore(String method) {
+        if ("GET".equals(method))
+            return new HttpResponse(HttpURLConnection.HTTP_OK, getCurrentUser().serializedJSON(), HttpConstants.MIME_JSON);
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    /**
+     * Responds to a request on the URI for users
+     *
+     * @param method     The HTTP method
+     * @param parameters The parameters
+     * @return The HTTP response
+     */
+    private HttpResponse onMessageUsers(String method, Map<String, String[]> parameters) {
+        if ("GET".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids != null && ids.length > 0) {
+                PlatformUser user = realm.getUser(ids[0]);
+                if (user == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, user.serializedJSON());
+            }
+            Collection<PlatformUser> users = realm.getUsers();
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (PlatformUser user : users) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(user.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if ("PUT".equals(method)) {
+            String[] ids = parameters.get("id");
+            String[] names = parameters.get("name");
+            String[] keys = parameters.get("key");
+            if (ids == null || ids.length == 0 || names == null || names.length == 0 || keys == null || keys.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.createUser(ids[0], names[0], keys[0]), null);
+        } else if ("DELETE".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.deleteUser(ids[0]), null);
+        } else if ("POST".equals(method)) {
+            String[] actions = parameters.get("action");
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            if ("rename".equals(actions[0])) {
+                String[] names = parameters.get("name");
+                if (names == null || names.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.renameUser(ids[0], names[0]), null);
+            } else if ("changeKey".equals(actions[0])) {
+                String[] oldKeys = parameters.get("oldKey");
+                String[] newKeys = parameters.get("newKey");
+                if (oldKeys == null || oldKeys.length == 0 || newKeys == null || newKeys.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.changeUserKey(ids[0], oldKeys[0], newKeys[0]), null);
+            } else if ("resetKey".equals(actions[0])) {
+                String[] newKeys = parameters.get("newKey");
+                if (newKeys == null || newKeys.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.resetUserKey(ids[0], newKeys[0]), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+    }
+
+    /**
+     * Responds to a request on the URI for groups
+     *
+     * @param method     The HTTP method
+     * @param parameters The parameters
+     * @return The HTTP response
+     */
+    private HttpResponse onMessageGroups(String method, Map<String, String[]> parameters) {
+        if ("GET".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids != null && ids.length > 0) {
+                PlatformUserGroup group = realm.getGroup(ids[0]);
+                if (group == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, group.serializedJSON());
+            }
+            Collection<PlatformUserGroup> groups = realm.getGroups();
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (PlatformUserGroup group : groups) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(group.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if ("PUT".equals(method)) {
+            String[] ids = parameters.get("id");
+            String[] names = parameters.get("name");
+            if (ids == null || ids.length == 0 || names == null || names.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.createGroup(ids[0], names[0]), null);
+        } else if ("DELETE".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.deleteGroup(ids[0]), null);
+        } else if ("POST".equals(method)) {
+            String[] actions = parameters.get("action");
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            if ("rename".equals(actions[0])) {
+                String[] names = parameters.get("name");
+                if (names == null || names.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.renameGroup(ids[0], names[0]), null);
+            } else if ("addMember".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users == null || users.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.addUserToGroup(users[0], ids[0]), null);
+            } else if ("removeMember".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users == null || users.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.removeUserFromGroup(users[0], ids[0]), null);
+            } else if ("addAdmin".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users == null || users.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.addAdminToGroup(users[0], ids[0]), null);
+            } else if ("removeAdmin".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users == null || users.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.removeAdminFromGroup(users[0], ids[0]), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+    }
+
+    /**
+     * Responds to a request on the URI for roles
+     *
+     * @param method     The HTTP method
+     * @param parameters The parameters
+     * @return The HTTP response
+     */
+    private HttpResponse onMessageRoles(String method, Map<String, String[]> parameters) {
+        if ("GET".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids != null && ids.length > 0) {
+                PlatformUserRole role = realm.getRole(ids[0]);
+                if (role == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, role.serializedJSON());
+            }
+            Collection<PlatformUserRole> roles = realm.getRoles();
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (PlatformUserRole role : roles) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(role.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if ("PUT".equals(method)) {
+            String[] ids = parameters.get("id");
+            String[] names = parameters.get("name");
+            if (ids == null || ids.length == 0 || names == null || names.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.createRole(ids[0], names[0]), null);
+        } else if ("DELETE".equals(method)) {
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            return XSPReplyUtils.toHttpResponse(realm.deleteRole(ids[0]), null);
+        } else if ("POST".equals(method)) {
+            String[] actions = parameters.get("action");
+            String[] ids = parameters.get("id");
+            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            if ("rename".equals(actions[0])) {
+                String[] names = parameters.get("name");
+                if (names == null || names.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.renameRole(ids[0], names[0]), null);
+            } else if ("assign".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users != null && users.length > 0)
+                    return XSPReplyUtils.toHttpResponse(realm.assignRoleToUser(users[0], ids[0]), null);
+                String[] groups = parameters.get("group");
+                if (groups != null && groups.length > 0)
+                    return XSPReplyUtils.toHttpResponse(realm.assignRoleToGroup(groups[0], ids[0]), null);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            } else if ("unassign".equals(actions[0])) {
+                String[] users = parameters.get("user");
+                if (users != null && users.length > 0)
+                    return XSPReplyUtils.toHttpResponse(realm.unassignRoleToUser(users[0], ids[0]), null);
+                String[] groups = parameters.get("group");
+                if (groups != null && groups.length > 0)
+                    return XSPReplyUtils.toHttpResponse(realm.unassignRoleToGroup(groups[0], ids[0]), null);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+            } else if ("addImplication".equals(actions[0])) {
+                String[] targets = parameters.get("target");
+                if (targets == null || targets.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.addRoleImplication(ids[0], targets[0]), null);
+            } else if ("removeImplication".equals(actions[0])) {
+                String[] targets = parameters.get("target");
+                if (targets == null || targets.length == 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return XSPReplyUtils.toHttpResponse(realm.removeRoleImplication(ids[0], targets[0]), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
     }
 }

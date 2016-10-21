@@ -53,10 +53,40 @@ public interface KernelSchema {
      */
     String ARTIFACT = URI_KERNEL + "#Artifact";
     /**
-     * The Artifact concept
+     * The PlatformUser concept
      */
-    String USER = URI_KERNEL + "#User";
+    String PLATFORM_USER = URI_KERNEL + "#PlatformUser";
+    /**
+     * The PlatformUserGroup concept
+     */
+    String PLATFORM_USER_GROUP = URI_KERNEL + "#PlatformUserGroup";
+    /**
+     * The PlatformUserRole concept
+     */
+    String PLATFORM_USER_ROLE = URI_KERNEL + "#PlatformUserRole";
 
+
+    /**
+     * The name property
+     */
+    String NAME = URI_KERNEL + "#name";
+    /**
+     * The creator property
+     */
+    String CREATOR = URI_KERNEL + "#creator";
+    /**
+     * The created property
+     */
+    String CREATED = URI_KERNEL + "#created";
+    /**
+     * The modified property
+     */
+    String MODIFIED = URI_KERNEL + "#modified";
+
+    /**
+     * The from property
+     */
+    String FROM = URI_KERNEL + "#from";
     /**
      * The base property
      */
@@ -73,26 +103,19 @@ public interface KernelSchema {
      * The archetype property
      */
     String ARCHETYPE = URI_KERNEL + "#archetype";
+
     /**
-     * The name property
+     * The hasMember property
      */
-    String NAME = URI_KERNEL + "#name";
+    String HAS_MEMBER = URI_KERNEL + "#hasMember";
     /**
-     * The from property
+     * The hasAdmin property
      */
-    String FROM = URI_KERNEL + "#from";
+    String HAS_ADMIN = URI_KERNEL + "#hasAdmin";
     /**
-     * The creator property
+     * The hasRole property
      */
-    String CREATOR = URI_KERNEL + "#creator";
-    /**
-     * The created property
-     */
-    String CREATED = URI_KERNEL + "#created";
-    /**
-     * The modified property
-     */
-    String MODIFIED = URI_KERNEL + "#modified";
+    String HAS_ROLE = URI_KERNEL + "#hasRole";
 
 
     /**

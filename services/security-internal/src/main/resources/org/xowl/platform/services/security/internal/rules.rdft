@@ -1,0 +1,52 @@
+######################################################################
+# Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation, either version 3
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General
+# Public License along with this program.
+# If not, see <http://www.gnu.org/licenses/>.
+######################################################################
+
+BASE <http://xowl.org/platform/services/security>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
+PREFIX security: <http://xowl.org/platform/services/security#>
+
+
+rule security:admin-is-member {
+    ?g kernel:hasAdmin ?u .
+} => {
+    ?g kernel:hasMember ?u .
+}
+
+rule security:member-has-group-roles {
+    ?g kernel:hasRole ?r .
+    ?g kernel:hasMember ?u .
+} => {
+    ?u kernel:hasRole ?r .
+}
+
+rule security:derived-roles {
+    ?u  kernel:hasRole ?r1 .
+    ?r1 kernel:impliesRole ?r2 .
+} => {
+    ?u  kernel:hasRole ?r2 .
+}
+
+rule security:admin-has-all-roles {
+    ?u kernel:hasRole security:RoleAdmin .
+    ?r rdf:type kernel:PlatformUserRole .
+} => {
+    ?u kernel:hasRole ?r .
+}

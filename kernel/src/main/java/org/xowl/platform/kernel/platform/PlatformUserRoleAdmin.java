@@ -32,6 +32,6 @@ public class PlatformUserRoleAdmin extends PlatformUserRoleBase {
      * Initializes this role
      */
     private PlatformUserRoleAdmin() {
-        super(PlatformUserRoleAdmin.class.getCanonicalName(), "Platform Administrator");
+        super("http://xowl.org/platform/services/security#RoleAdmin", "Platform Administrator");
     }
 }

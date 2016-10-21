@@ -41,6 +41,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.io.File;
@@ -64,7 +65,7 @@ class XOWLInternalRealm implements Realm {
     /**
      * The graph for security entities
      */
-    private static final String GRAPH = "http://xowl.org/platform/services/security#";
+    private static final String GRAPH = "http://xowl.org/server/users#";
 
     /**
      * A node manager for constant URIs
@@ -111,7 +112,7 @@ class XOWLInternalRealm implements Realm {
      */
     private void initializeDatabase() {
         // (re-)upload the rules
-        XSPReply reply = database.upload(readResource("rules.rdft"), AbstractRepository.SYNTAX_RDFT);
+        XSPReply reply = database.upload(AbstractRepository.SYNTAX_RDFT, readResource("rules.rdft"));
         if (!reply.isSuccess()) {
             Logging.getDefault().error("Failed to initialize the security database");
             return;
@@ -150,6 +151,7 @@ class XOWLInternalRealm implements Realm {
             deployProcedure("procedure-get-roles");
             deployProcedure("procedure-get-users");
             deployProcedure("procedure-imply-role", "source", "target");
+            assignRole("admin", PlatformUserRoleAdmin.INSTANCE.getIdentifier());
         }
     }
 
@@ -187,7 +189,7 @@ class XOWLInternalRealm implements Realm {
      * @return The content of the resource
      */
     private static String readResource(String resource) {
-        InputStream stream = Repository.class.getResourceAsStream(RESOURCES + resource);
+        InputStream stream = XOWLInternalRealm.class.getResourceAsStream(RESOURCES + resource);
         try {
             return Files.read(stream, Files.CHARSET);
         } catch (IOException exception) {
@@ -230,6 +232,21 @@ class XOWLInternalRealm implements Realm {
             return false;
         Result result = ((XSPReplyResult<Result>) reply).getData();
         return reply.isSuccess() && ((ResultYesNo) result).getValue();
+    }
+
+    /**
+     * Assigns a role to an entity
+     *
+     * @param entity The entity identifier
+     * @param role   The role to assign
+     * @return The reply
+     */
+    public XSPReply assignRole(String entity, String role) {
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(GRAPH + entity));
+        parameters.put("role", nodes.getIRINode(role));
+        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
     }
 
     /**

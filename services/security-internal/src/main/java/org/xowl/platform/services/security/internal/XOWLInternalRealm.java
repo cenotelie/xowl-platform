@@ -28,8 +28,12 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.store.AbstractRepository;
+import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.Node;
+import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
+import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.sparql.ResultYesNo;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
@@ -39,10 +43,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
-import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformGroup;
-import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.io.File;
@@ -61,9 +62,17 @@ class XOWLInternalRealm implements Realm {
      */
     private static final String RESOURCES = "/org/xowl/platform/services/security/internal/";
     /**
-     * The graph for security entities
+     * The IRI prefix for users
      */
-    private static final String USERS = "http://xowl.org/server/users#";
+    public static final String USERS = "http://xowl.org/server/users#";
+    /**
+     * The IRI prefix for groups
+     */
+    public static final String GROUPS = "http://xowl.org/platform/security/groups#";
+    /**
+     * The IRI prefix for roles
+     */
+    public static final String ROLES = "http://xowl.org/platform/security/roles#";
 
     /**
      * A node manager for constant URIs
@@ -81,6 +90,18 @@ class XOWLInternalRealm implements Realm {
      * The stored procedures
      */
     private final Map<String, XOWLStoredProcedure> procedures;
+    /**
+     * The cache of users
+     */
+    private final Map<String, XOWLInternalUser> cacheUsers;
+    /**
+     * The cache of groups
+     */
+    private final Map<String, XOWLInternalGroup> cacheGroups;
+    /**
+     * The cache of roles
+     */
+    private final Map<String, PlatformRoleBase> cacheRoles;
 
     /**
      * Initialize this realm
@@ -102,6 +123,9 @@ class XOWLInternalRealm implements Realm {
         this.server = server;
         this.database = database;
         this.procedures = new HashMap<>();
+        this.cacheUsers = new HashMap<>();
+        this.cacheGroups = new HashMap<>();
+        this.cacheRoles = new HashMap<>();
         initializeDatabase();
     }
 
@@ -135,6 +159,8 @@ class XOWLInternalRealm implements Realm {
             getProcedure("procedure-get-groups");
             getProcedure("procedure-get-roles");
             getProcedure("procedure-get-users");
+            getProcedure("procedure-get-entity-name");
+            getProcedure("procedure-get-entity-roles");
             getProcedure("procedure-imply-role");
         } else {
             // deploy the procedures
@@ -148,8 +174,13 @@ class XOWLInternalRealm implements Realm {
             deployProcedure("procedure-get-groups");
             deployProcedure("procedure-get-roles");
             deployProcedure("procedure-get-users");
+            deployProcedure("procedure-get-entity-name", "entity");
+            deployProcedure("procedure-get-entity-roles", "entity");
             deployProcedure("procedure-imply-role", "source", "target");
-            assignRole("admin", PlatformRoleAdmin.INSTANCE.getIdentifier());
+            // deploy admin user and role
+            assignRoleToUser("admin", PlatformRoleAdmin.INSTANCE.getIdentifier());
+            // deploy root user and role
+            assignRoleToUser("root", PlatformRoleAdmin.INSTANCE.getIdentifier());
         }
     }
 
@@ -211,7 +242,7 @@ class XOWLInternalRealm implements Realm {
         XSPReply reply = server.login(userId, new String(key));
         if (!reply.isSuccess())
             return null;
-        return new XOWLInternalUser(userId);
+        return getUser(userId);
     }
 
     @Override
@@ -223,7 +254,7 @@ class XOWLInternalRealm implements Realm {
     public boolean checkHasRole(String userId, String roleId) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("user", nodes.getIRINode(USERS + userId));
-        parameters.put("role", nodes.getIRINode(roleId));
+        parameters.put("role", nodes.getIRINode(ROLES + roleId));
         XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-check-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
@@ -234,32 +265,80 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public Collection<PlatformUser> getUsers() {
-        return Collections.emptyList();
+        Map<String, Node> parameters = new HashMap<>();
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-users"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return Collections.emptyList();
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String id = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());
+            String name = ((LiteralNode) solution.get("name")).getLexicalValue();
+            users.add(getUser(id, name));
+        }
+        return users;
     }
 
     @Override
     public Collection<PlatformGroup> getGroups() {
-        return Collections.emptyList();
+        Map<String, Node> parameters = new HashMap<>();
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-groups"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return Collections.emptyList();
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformGroup> groups = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String id = ((IRINode) solution.get("group")).getIRIValue().substring(USERS.length());
+            String name = ((LiteralNode) solution.get("name")).getLexicalValue();
+            groups.add(getGroup(id, name));
+        }
+        return groups;
     }
 
     @Override
     public Collection<PlatformRole> getRoles() {
-        return Collections.emptyList();
+        Map<String, Node> parameters = new HashMap<>();
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-groups"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return Collections.emptyList();
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformRole> roles = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String id = ((IRINode) solution.get("role")).getIRIValue().substring(USERS.length());
+            String name = ((LiteralNode) solution.get("name")).getLexicalValue();
+            roles.add(getRole(id, name));
+        }
+        return roles;
     }
 
     @Override
     public PlatformUser getUser(String identifier) {
-        return null;
+        PlatformUser user = cacheUsers.get(identifier);
+        if (user != null)
+            return user;
+        String name = getEntityName(USERS + identifier);
+        return getUser(identifier, name);
     }
 
     @Override
     public PlatformGroup getGroup(String identifier) {
-        return null;
+        PlatformGroup group = cacheGroups.get(identifier);
+        if (group != null)
+            return group;
+        String name = getEntityName(USERS + identifier);
+        return getGroup(identifier, name);
     }
 
     @Override
     public PlatformRole getRole(String identifier) {
-        return null;
+        PlatformRole role = cacheRoles.get(identifier);
+        if (role != null)
+            return role;
+        String name = getEntityName(ROLES + identifier);
+        return getRole(identifier, name);
     }
 
     @Override
@@ -339,12 +418,20 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply assignRoleToUser(String user, String role) {
-        return XSPReplyUnsupported.instance();
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(USERS + user));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
     }
 
     @Override
     public XSPReply assignRoleToGroup(String group, String role) {
-        return XSPReplyUnsupported.instance();
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(GROUPS + group));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
     }
 
     @Override
@@ -368,24 +455,107 @@ class XOWLInternalRealm implements Realm {
     }
 
     /**
-     * Assigns a role to an entity
-     *
-     * @param entity The entity identifier
-     * @param role   The role to assign
-     * @return The reply
-     */
-    public XSPReply assignRole(String entity, String role) {
-        Map<String, Node> parameters = new HashMap<>();
-        parameters.put("entity", nodes.getIRINode(USERS + entity));
-        parameters.put("role", nodes.getIRINode(role));
-        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
-                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
-    }
-
-    /**
      * When the platform is stopping
      */
     public void onStop() {
         server.onShutdown();
+    }
+
+
+    /**
+     * Gets the name of an entity
+     *
+     * @param entity The IRI of an entity
+     * @return The entity's name
+     */
+    private String getEntityName(String entity) {
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(entity));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-name"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return null;
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        if (result.getSolutions().size() == 0)
+            return null;
+        RDFPatternSolution solution = result.getSolutions().iterator().next();
+        return ((LiteralNode) solution.get("name")).getLexicalValue();
+    }
+
+    /**
+     * Gets the roles for an entity
+     *
+     * @param entity The IRI of an entity
+     * @return The roles
+     */
+    protected Collection<PlatformRole> getEntityRoles(String entity) {
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(entity));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-roles"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return null;
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformRole> roles = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String roleId = ((IRINode) solution.get("role")).getIRIValue().substring(ROLES.length());
+            String roleName = ((LiteralNode) solution.get("roleName")).getLexicalValue();
+            roles.add(getRole(roleId, roleName));
+        }
+        return roles;
+    }
+
+    /**
+     * Resolves a user from the cache
+     *
+     * @param identifier The identifier of the user
+     * @param name       The expected user's name
+     * @return The user
+     */
+    protected PlatformUser getUser(String identifier, String name) {
+        synchronized (cacheUsers) {
+            XOWLInternalUser user = cacheUsers.get(identifier);
+            if (user != null)
+                return user;
+            user = new XOWLInternalUser(this, identifier, name);
+            cacheUsers.put(identifier, user);
+            return user;
+        }
+    }
+
+    /**
+     * Resolves a group from the cache
+     *
+     * @param identifier The identifier of the group
+     * @param name       The expected group's name
+     * @return The group
+     */
+    protected PlatformGroup getGroup(String identifier, String name) {
+        synchronized (cacheGroups) {
+            XOWLInternalGroup group = cacheGroups.get(identifier);
+            if (group != null)
+                return group;
+            group = new XOWLInternalGroup(this, identifier, name);
+            cacheGroups.put(identifier, group);
+            return group;
+        }
+    }
+
+    /**
+     * Resolves a role from the cache
+     *
+     * @param identifier The identifier of the role
+     * @param name       The expected role's name
+     * @return The role
+     */
+    protected PlatformRole getRole(String identifier, String name) {
+        synchronized (cacheRoles) {
+            PlatformRoleBase role = cacheRoles.get(identifier);
+            if (role != null)
+                return role;
+            role = new PlatformRoleBase(identifier, name);
+            cacheRoles.put(identifier, role);
+            return role;
+        }
     }
 }

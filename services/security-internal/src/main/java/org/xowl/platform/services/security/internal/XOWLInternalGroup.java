@@ -17,17 +17,18 @@
 
 package org.xowl.platform.services.security.internal;
 
+import org.xowl.platform.kernel.platform.PlatformGroupBase;
 import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.platform.PlatformUserBase;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.Collection;
 
 /**
- * Represents a user on this platform
+ * Represents a group of users on this platform
  *
  * @author Laurent Wouters
  */
-class XOWLInternalUser extends PlatformUserBase {
+public class XOWLInternalGroup extends PlatformGroupBase {
     /**
      * The parent realm
      */
@@ -37,16 +38,26 @@ class XOWLInternalUser extends PlatformUserBase {
      * Initializes this user
      *
      * @param realm      The parent realm
-     * @param identifier The identifier of this user
-     * @param name       The name of this user
+     * @param identifier The identifier of this group
+     * @param name       The name of this group
      */
-    public XOWLInternalUser(XOWLInternalRealm realm, String identifier, String name) {
+    public XOWLInternalGroup(XOWLInternalRealm realm, String identifier, String name) {
         super(identifier, name);
         this.realm = realm;
     }
 
     @Override
+    public Collection<PlatformUser> getUsers() {
+        return null;
+    }
+
+    @Override
+    public Collection<PlatformUser> getAdmins() {
+        return null;
+    }
+
+    @Override
     public Collection<PlatformRole> getRoles() {
-        return realm.getEntityRoles(XOWLInternalRealm.USERS + getIdentifier());
+        return realm.getEntityRoles(XOWLInternalRealm.GROUPS + getIdentifier());
     }
 }

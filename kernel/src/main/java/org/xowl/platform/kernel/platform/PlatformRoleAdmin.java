@@ -32,6 +32,6 @@ public class PlatformRoleAdmin extends PlatformRoleBase {
      * Initializes this role
      */
     private PlatformRoleAdmin() {
-        super("http://xowl.org/platform/services/security#RoleAdmin", "Platform Administrator");
+        super("admin", "Platform Administrator");
     }
 }

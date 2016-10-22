@@ -460,13 +460,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
-        if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
 
         if (method.equals("GET")) {
             String[] ids = parameters.get("id");
@@ -474,16 +470,20 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
                 Job job = getJob(ids[0], JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+                if (securityService.getCurrentUser().equals(job.getOwner()))
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
             }
-            return onRequestJobs();
+            return onRequestJobs(securityService);
         } else if (method.equals("POST")) {
             String[] ids = parameters.get("cancel");
             if (ids != null && ids.length > 0) {
                 Job job = getJob(ids[0], JobStatus.Scheduled);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return XSPReplyUtils.toHttpResponse(cancel(job), null);
+                if (securityService.getCurrentUser().equals(job.getOwner()))
+                    return XSPReplyUtils.toHttpResponse(cancel(job), null);
+                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
@@ -493,9 +493,15 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
     /**
      * Responds to a request for the queue
      *
+     * @param securityService The current security service
      * @return The response
      */
-    private HttpResponse onRequestJobs() {
+    private HttpResponse onRequestJobs(SecurityService securityService) {
+        // check for platform admin role
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+
         List<Job> scheduled = getQueue();
         List<Job> running = getRunning();
         List<Job> completed = getCompleted();

@@ -20,6 +20,7 @@ package org.xowl.platform.kernel.jobs;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.store.Serializable;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
  * Represents a job to be executed on the platform
@@ -27,6 +28,13 @@ import org.xowl.platform.kernel.Identifiable;
  * @author Laurent Wouters
  */
 public interface Job extends Identifiable, Serializable, Runnable {
+    /**
+     * Gets the owner of this job
+     *
+     * @return The owner of this job
+     */
+    PlatformUser getOwner();
+
     /**
      * Gets the job's current status
      *

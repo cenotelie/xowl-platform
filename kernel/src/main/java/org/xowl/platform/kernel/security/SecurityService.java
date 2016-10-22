@@ -45,7 +45,14 @@ public interface SecurityService extends Service {
     XSPReply authenticate(String client, String userId, char[] key);
 
     /**
-     * The currently authenticated user on the current thread, if any
+     * Forces the authentication of the specified user on the current thread
+     *
+     * @param user The user to authenticate
+     */
+    void authenticate(PlatformUser user);
+
+    /**
+     * Gets the currently authenticated user on the current thread, if any
      *
      * @return The currently authenticated user, or null if there is none
      */

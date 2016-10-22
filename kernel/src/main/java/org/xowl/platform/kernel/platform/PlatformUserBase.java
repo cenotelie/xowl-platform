@@ -90,4 +90,9 @@ public abstract class PlatformUserBase implements PlatformUser {
     public String toString() {
         return identifier;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof PlatformUser && this.identifier.equals(((PlatformUser) o).getIdentifier()));
+    }
 }

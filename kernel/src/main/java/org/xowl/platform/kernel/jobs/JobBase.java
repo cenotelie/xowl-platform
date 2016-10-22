@@ -23,6 +23,9 @@ import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -46,6 +49,10 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * The job's type
      */
     protected final String type;
+    /**
+     * The job's owner
+     */
+    protected final PlatformUser owner;
     /**
      * The time this job has been scheduled
      */
@@ -73,11 +80,12 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param name The job's name
      * @param type The job's type
      */
-    public JobBase(String name, String type) {
+    public JobBase(String name, String type, PlatformUser owner) {
         super(Logging.getDefault());
         this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
+        this.owner = owner;
         this.status = JobStatus.Unscheduled;
         this.timeScheduled = "";
         this.timeRun = "";
@@ -95,6 +103,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         String id = null;
         String name = null;
         String type = null;
+        String ownerId = null;
         this.status = JobStatus.Scheduled;
         this.timeScheduled = "";
         this.timeRun = "";
@@ -111,6 +120,16 @@ public abstract class JobBase extends SafeRunnable implements Job {
             } else if ("jobType".equals(head)) {
                 String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 type = value.substring(1, value.length() - 1);
+            } else if ("owner".equals(head)) {
+                for (ASTNode subMember : member.getChildren().get(1).getChildren()) {
+                    String subHead = IOUtils.unescape(member.getChildren().get(0).getValue());
+                    subHead = subHead.substring(1, head.length() - 1);
+                    if ("identifier".equals(subHead)) {
+                        String value = IOUtils.unescape(subMember.getChildren().get(1).getValue());
+                        ownerId = value.substring(1, value.length() - 1);
+                        break;
+                    }
+                }
             } else if ("status".equals(head)) {
                 String value = IOUtils.unescape(member.getChildren().get(1).getValue());
                 this.status = JobStatus.valueOf(value.substring(1, value.length() - 1));
@@ -128,9 +147,11 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 this.completionRate = Float.parseFloat(value.substring(1, value.length() - 1));
             }
         }
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         this.identifier = id;
         this.name = name;
         this.type = type;
+        this.owner = (securityService != null) ? securityService.getRealm().getUser(ownerId) : null;
     }
 
     @Override
@@ -158,7 +179,13 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + IOUtils.escapeStringJSON(name)
                 + "\", \"jobType\": \""
                 + IOUtils.escapeStringJSON(type)
-                + "\", \"status\": \""
+                + "\", \"owner\": {\"type\": \""
+                + IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName())
+                + "\", \"identifier\": \""
+                + IOUtils.escapeStringJSON(owner.getIdentifier())
+                + "\", \"name\":\""
+                + IOUtils.escapeStringJSON(owner.getName())
+                + "\"}, \"status\": \""
                 + IOUtils.escapeStringJSON(status.toString())
                 + "\", \"timeScheduled\": \""
                 + IOUtils.escapeStringJSON(timeScheduled)
@@ -173,6 +200,11 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 + ", \"result\": "
                 + (getResult() == null ? "{}" : getResult().serializedJSON())
                 + "}";
+    }
+
+    @Override
+    public PlatformUser getOwner() {
+        return owner;
     }
 
     @Override
@@ -206,6 +238,9 @@ public abstract class JobBase extends SafeRunnable implements Job {
         status = JobStatus.Running;
         timeRun = DateFormat.getDateTimeInstance().format(new Date());
         completionRate = 0.0f;
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService != null)
+            securityService.authenticate(owner);
     }
 
     @Override
@@ -213,6 +248,9 @@ public abstract class JobBase extends SafeRunnable implements Job {
         status = cancelled ? JobStatus.Cancelled : JobStatus.Completed;
         timeCompleted = DateFormat.getDateTimeInstance().format(new Date());
         completionRate = 1.0f;
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService != null)
+            securityService.onRequestEnd(null);
     }
 
     /**

@@ -19,10 +19,10 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformGroup;
+import org.xowl.platform.kernel.platform.PlatformUserBase;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.util.Collection;
@@ -37,55 +37,19 @@ public class XOWLSecurityNosecRealm implements Realm {
     /**
      * The internal representation of a user for this realm
      */
-    private static class User implements PlatformUser {
-        /**
-         * The identifier of the user
-         */
-        private final String identifier;
-
+    private static class User extends PlatformUserBase {
         /**
          * Initializes this user
          *
          * @param identifier The identifier of the user
          */
         public User(String identifier) {
-            this.identifier = identifier;
-        }
-
-        @Override
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        @Override
-        public String getName() {
-            return identifier;
+            super(identifier, identifier);
         }
 
         @Override
         public Collection<PlatformRole> getRoles() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public String serializedString() {
-            return identifier;
-        }
-
-        @Override
-        public String serializedJSON() {
-            return "{\"type\": \"" +
-                    IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()) +
-                    "\", \"identifier\": \"" +
-                    IOUtils.escapeStringJSON(identifier) +
-                    "\",  \"name\": \"" +
-                    IOUtils.escapeStringJSON(identifier) +
-                    "\"}";
-        }
-
-        @Override
-        public String toString() {
-            return identifier;
         }
     }
 

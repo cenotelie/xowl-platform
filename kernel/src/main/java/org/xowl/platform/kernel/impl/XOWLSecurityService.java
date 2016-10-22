@@ -163,6 +163,11 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     }
 
     @Override
+    public void authenticate(PlatformUser user) {
+        CONTEXT.set(user);
+    }
+
+    @Override
     public PlatformUser getCurrentUser() {
         return CONTEXT.get();
     }

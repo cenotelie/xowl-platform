@@ -25,9 +25,9 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformGroup;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserGroup;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -327,15 +327,15 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0) {
-                PlatformUserGroup group = realm.getGroup(ids[0]);
+                PlatformGroup group = realm.getGroup(ids[0]);
                 if (group == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, group.serializedJSON());
             }
-            Collection<PlatformUserGroup> groups = realm.getGroups();
+            Collection<PlatformGroup> groups = realm.getGroups();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (PlatformUserGroup group : groups) {
+            for (PlatformGroup group : groups) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -401,15 +401,15 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0) {
-                PlatformUserRole role = realm.getRole(ids[0]);
+                PlatformRole role = realm.getRole(ids[0]);
                 if (role == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, role.serializedJSON());
             }
-            Collection<PlatformUserRole> roles = realm.getRoles();
+            Collection<PlatformRole> roles = realm.getRoles();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (PlatformUserRole role : roles) {
+            for (PlatformRole role : roles) {
                 if (!first)
                     builder.append(", ");
                 first = false;

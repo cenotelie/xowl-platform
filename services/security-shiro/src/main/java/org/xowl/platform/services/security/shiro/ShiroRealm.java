@@ -35,9 +35,9 @@ import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserGroup;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.util.Collection;
@@ -78,7 +78,7 @@ public class ShiroRealm implements Realm {
         }
 
         @Override
-        public Collection<PlatformUserRole> getRoles() {
+        public Collection<PlatformRole> getRoles() {
             return Collections.emptyList();
         }
 
@@ -186,12 +186,12 @@ public class ShiroRealm implements Realm {
     }
 
     @Override
-    public Collection<PlatformUserGroup> getGroups() {
+    public Collection<PlatformGroup> getGroups() {
         return Collections.emptyList();
     }
 
     @Override
-    public Collection<PlatformUserRole> getRoles() {
+    public Collection<PlatformRole> getRoles() {
         return Collections.emptyList();
     }
 
@@ -201,12 +201,12 @@ public class ShiroRealm implements Realm {
     }
 
     @Override
-    public PlatformUserGroup getGroup(String identifier) {
+    public PlatformGroup getGroup(String identifier) {
         return null;
     }
 
     @Override
-    public PlatformUserRole getRole(String identifier) {
+    public PlatformRole getRole(String identifier) {
         return null;
     }
 

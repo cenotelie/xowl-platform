@@ -33,5 +33,5 @@ public interface PlatformUser extends Identifiable, Serializable {
      *
      * @return The roles associated specifically to this user
      */
-    Collection<PlatformUserRole> getRoles();
+    Collection<PlatformRole> getRoles();
 }

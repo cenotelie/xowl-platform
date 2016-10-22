@@ -31,7 +31,7 @@ import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
-import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricValueScalar;
@@ -190,7 +190,7 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getMessages()), null);

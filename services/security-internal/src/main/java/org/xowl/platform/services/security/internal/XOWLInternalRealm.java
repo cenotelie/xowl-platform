@@ -39,10 +39,10 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserGroup;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
-import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformGroup;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.io.File;
@@ -149,7 +149,7 @@ class XOWLInternalRealm implements Realm {
             deployProcedure("procedure-get-roles");
             deployProcedure("procedure-get-users");
             deployProcedure("procedure-imply-role", "source", "target");
-            assignRole("admin", PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+            assignRole("admin", PlatformRoleAdmin.INSTANCE.getIdentifier());
         }
     }
 
@@ -238,12 +238,12 @@ class XOWLInternalRealm implements Realm {
     }
 
     @Override
-    public Collection<PlatformUserGroup> getGroups() {
+    public Collection<PlatformGroup> getGroups() {
         return Collections.emptyList();
     }
 
     @Override
-    public Collection<PlatformUserRole> getRoles() {
+    public Collection<PlatformRole> getRoles() {
         return Collections.emptyList();
     }
 
@@ -253,12 +253,12 @@ class XOWLInternalRealm implements Realm {
     }
 
     @Override
-    public PlatformUserGroup getGroup(String identifier) {
+    public PlatformGroup getGroup(String identifier) {
         return null;
     }
 
     @Override
-    public PlatformUserRole getRole(String identifier) {
+    public PlatformRole getRole(String identifier) {
         return null;
     }
 

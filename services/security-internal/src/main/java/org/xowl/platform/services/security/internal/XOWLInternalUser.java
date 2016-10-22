@@ -18,8 +18,8 @@
 package org.xowl.platform.services.security.internal;
 
 import org.xowl.infra.store.IOUtils;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +71,7 @@ class XOWLInternalUser implements PlatformUser {
     }
 
     @Override
-    public Collection<PlatformUserRole> getRoles() {
+    public Collection<PlatformRole> getRoles() {
         return Collections.emptyList();
     }
 }

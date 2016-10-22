@@ -25,5 +25,5 @@ import org.xowl.platform.kernel.Identifiable;
  *
  * @author Laurent Wouters
  */
-public interface PlatformUserRole extends Identifiable, Serializable {
+public interface PlatformRole extends Identifiable, Serializable {
 }

@@ -27,7 +27,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface PlatformUserGroup extends Identifiable, Serializable {
+public interface PlatformGroup extends Identifiable, Serializable {
     /**
      * Gets the users in this group
      *
@@ -47,5 +47,5 @@ public interface PlatformUserGroup extends Identifiable, Serializable {
      *
      * @return The user roles associated to this group
      */
-    Collection<PlatformUserRole> getRoles();
+    Collection<PlatformRole> getRoles();
 }

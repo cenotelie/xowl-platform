@@ -26,7 +26,7 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.OSGiBundle;
 import org.xowl.platform.kernel.platform.PlatformDescriptor;
 import org.xowl.platform.kernel.platform.PlatformDescriptorService;
-import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.Arrays;
@@ -74,7 +74,7 @@ public class XOWLPlatformDescriptorService implements PlatformDescriptorService 
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);

@@ -24,7 +24,7 @@ import org.xowl.infra.store.IOUtils;
  *
  * @author Laurent Wouters
  */
-public class PlatformUserRoleBase implements PlatformUserRole {
+public class PlatformRoleBase implements PlatformRole {
     /**
      * The unique identifier of this role
      */
@@ -40,7 +40,7 @@ public class PlatformUserRoleBase implements PlatformUserRole {
      * @param identifier The unique identifier of this role
      * @param name       The human-readable name of this role
      */
-    public PlatformUserRoleBase(String identifier, String name) {
+    public PlatformRoleBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
     }
@@ -63,7 +63,7 @@ public class PlatformUserRoleBase implements PlatformUserRole {
     @Override
     public String serializedJSON() {
         return "{\"type\": \""
-                + IOUtils.escapeStringJSON(PlatformUserRole.class.getCanonicalName())
+                + IOUtils.escapeStringJSON(PlatformRole.class.getCanonicalName())
                 + "\", \"identifier\": \""
                 + IOUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""

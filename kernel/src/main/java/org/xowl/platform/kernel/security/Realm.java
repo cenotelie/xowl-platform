@@ -19,9 +19,9 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.platform.PlatformGroup;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.platform.PlatformUserGroup;
-import org.xowl.platform.kernel.platform.PlatformUserRole;
 
 import java.util.Collection;
 
@@ -73,14 +73,14 @@ public interface Realm extends Service {
      *
      * @return The groups in this realm
      */
-    Collection<PlatformUserGroup> getGroups();
+    Collection<PlatformGroup> getGroups();
 
     /**
      * Gets all the roles in this realm
      *
      * @return The roles in this realm
      */
-    Collection<PlatformUserRole> getRoles();
+    Collection<PlatformRole> getRoles();
 
     /**
      * Gets a user for the specified identifier
@@ -96,7 +96,7 @@ public interface Realm extends Service {
      * @param identifier The identifier of a group
      * @return The associated group
      */
-    PlatformUserGroup getGroup(String identifier);
+    PlatformGroup getGroup(String identifier);
 
     /**
      * Gets a role for the specified identifier
@@ -104,7 +104,7 @@ public interface Realm extends Service {
      * @param identifier The identifier of a role
      * @return The associated role
      */
-    PlatformUserRole getRole(String identifier);
+    PlatformRole getRole(String identifier);
 
     /**
      * Creates a new user

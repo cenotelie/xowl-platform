@@ -22,16 +22,16 @@ package org.xowl.platform.kernel.platform;
  *
  * @author Laurent Wouters
  */
-public class PlatformUserRoleAdmin extends PlatformUserRoleBase {
+public class PlatformRoleAdmin extends PlatformRoleBase {
     /**
      * The singleton instance
      */
-    public static final PlatformUserRole INSTANCE = new PlatformUserRoleAdmin();
+    public static final PlatformRole INSTANCE = new PlatformRoleAdmin();
 
     /**
      * Initializes this role
      */
-    private PlatformUserRoleAdmin() {
+    private PlatformRoleAdmin() {
         super("http://xowl.org/platform/services/security#RoleAdmin", "Platform Administrator");
     }
 }

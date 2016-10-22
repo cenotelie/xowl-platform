@@ -37,7 +37,7 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
-import org.xowl.platform.kernel.platform.PlatformUserRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricValueScalar;
@@ -464,7 +464,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformUserRoleAdmin.INSTANCE.getIdentifier());
+        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 

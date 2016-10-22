@@ -121,9 +121,10 @@ public interface Realm extends Service {
      *
      * @param identifier The identifier for the new group
      * @param name       The human-readable name for the group
+     * @param adminId    The identifier of the initial administrator for the group
      * @return The protocol reply
      */
-    XSPReply createGroup(String identifier, String name);
+    XSPReply createGroup(String identifier, String name, String adminId);
 
     /**
      * Creates a new role

@@ -18,6 +18,10 @@ XOWL.prototype.isLoggedIn = function () {
 	return (this.authToken !== null && this.userId !== null);
 }
 
+XOWL.prototype.getUserId = function () {
+	return this.userId;
+}
+
 XOWL.prototype.getUserName = function () {
 	return this.userName;
 }
@@ -147,14 +151,14 @@ XOWL.prototype.getPlatformGroup = function (callback, groupId) {
 	}, "services/core/security/groups", {id: groupId});
 }
 
-XOWL.prototype.createPlatformGroup = function (callback, groupId, name) {
+XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
 	this.doHttpPut(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {id: groupId, name: name});
+	}, "services/core/security/groups", {id: groupId, name: name, admin: admin});
 }
 
 XOWL.prototype.deletePlatformGroup = function (callback, groupId) {

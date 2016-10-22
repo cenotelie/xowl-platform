@@ -351,9 +351,10 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         } else if ("PUT".equals(method)) {
             String[] ids = parameters.get("id");
             String[] names = parameters.get("name");
-            if (ids == null || ids.length == 0 || names == null || names.length == 0)
+            String[] admins = parameters.get("admin");
+            if (ids == null || ids.length == 0 || names == null || names.length == 0 || admins == null || admins.length == 0)
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.createGroup(ids[0], names[0]), null);
+            return XSPReplyUtils.toHttpResponse(realm.createGroup(ids[0], names[0], admins[0]), null);
         } else if ("DELETE".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids == null || ids.length == 0)

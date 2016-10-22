@@ -216,7 +216,7 @@ public class ShiroRealm implements Realm {
     }
 
     @Override
-    public XSPReply createGroup(String identifier, String name) {
+    public XSPReply createGroup(String identifier, String name, String adminId) {
         return XSPReplyUnsupported.instance();
     }
 

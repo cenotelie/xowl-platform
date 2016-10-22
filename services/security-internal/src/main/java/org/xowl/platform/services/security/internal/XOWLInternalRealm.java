@@ -185,39 +185,51 @@ class XOWLInternalRealm implements Realm {
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("user", nodes.getIRINode(USERS + "admin"));
             parameters.put("name", nodes.getLiteralNode("Administrator", Vocabulary.xsdString, null));
-            database.executeStoredProcedure(procedures.get("procedure-create-user"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // deploy root user
             parameters = new HashMap<>();
             parameters.put("user", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             parameters.put("name", nodes.getLiteralNode(PlatformUserRoot.INSTANCE.getName(), Vocabulary.xsdString, null));
-            database.executeStoredProcedure(procedures.get("procedure-create-user"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // deploy admin group
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
             parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
             parameters.put("admin", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
-            database.executeStoredProcedure(procedures.get("procedure-create-group"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // deploy admin role
             parameters = new HashMap<>();
             parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
             parameters.put("name", nodes.getLiteralNode(PlatformRoleAdmin.INSTANCE.getName(), Vocabulary.xsdString, null));
-            database.executeStoredProcedure(procedures.get("procedure-create-role"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // assign platform admin role to admin group
             parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(GROUPS + "admin"));
             parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
-            database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // add user admin as administrator of group admin
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
             parameters.put("admin", nodes.getIRINode(USERS + "admin"));
-            database.executeStoredProcedure(procedures.get("procedure-add-admin"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
         }
     }
 
@@ -357,6 +369,8 @@ class XOWLInternalRealm implements Realm {
         if (user != null)
             return user;
         String name = getEntityName(USERS + identifier);
+        if (name == null)
+            return null;
         return getUser(identifier, name);
     }
 
@@ -366,6 +380,8 @@ class XOWLInternalRealm implements Realm {
         if (group != null)
             return group;
         String name = getEntityName(GROUPS + identifier);
+        if (name == null)
+            return null;
         return getGroup(identifier, name);
     }
 
@@ -375,6 +391,8 @@ class XOWLInternalRealm implements Realm {
         if (role != null)
             return role;
         String name = getEntityName(ROLES + identifier);
+        if (name == null)
+            return null;
         return getRole(identifier, name);
     }
 
@@ -408,7 +426,7 @@ class XOWLInternalRealm implements Realm {
     }
 
     @Override
-    public XSPReply createGroup(String identifier, String name) {
+    public XSPReply createGroup(String identifier, String name, String adminId) {
         // check for current user with admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -421,10 +439,13 @@ class XOWLInternalRealm implements Realm {
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
             return new XSPReplyFailure("Identifier does not meet requirements ([_a-zA-Z0-9]+)");
+        if (getUser(adminId) == null)
+            return new XSPReplyFailure("Specified administrator is not a user");
         // create the group data
         Map<String, Node> parameters = new HashMap<>();
-        parameters.put("group", nodes.getIRINode(USERS + identifier));
+        parameters.put("group", nodes.getIRINode(GROUPS + identifier));
         parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+        parameters.put("admin", nodes.getIRINode(USERS + adminId));
         XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
@@ -448,7 +469,7 @@ class XOWLInternalRealm implements Realm {
             return new XSPReplyFailure("Identifier does not meet requirements ([_a-zA-Z0-9]+)");
         // create the group data
         Map<String, Node> parameters = new HashMap<>();
-        parameters.put("role", nodes.getIRINode(USERS + identifier));
+        parameters.put("role", nodes.getIRINode(ROLES + identifier));
         parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
         XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));

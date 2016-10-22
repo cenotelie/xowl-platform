@@ -28,6 +28,7 @@ function create() {
 	if (BUSY)
 		return;
 	BUSY = true;
+	displayMessage("Creating user ...");
 	xowl.createPlatformUser(function (status, ct, content) {
 		if (status == 200) {
 			window.location.href = "user.html?id=" + encodeURIComponent(identifier);

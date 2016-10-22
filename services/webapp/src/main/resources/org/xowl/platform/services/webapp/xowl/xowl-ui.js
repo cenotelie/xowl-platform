@@ -99,6 +99,21 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = "/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
+	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformUser") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformGroup") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/security/group.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformRole") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/security/role.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
 	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));

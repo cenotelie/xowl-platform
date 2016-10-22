@@ -17,47 +17,40 @@
 
 package org.xowl.platform.services.security.internal;
 
-import org.xowl.platform.kernel.platform.PlatformGroupBase;
+import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.RichString;
+import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.platform.PlatformUser;
-
-import java.util.Collection;
+import org.xowl.platform.kernel.platform.PlatformRoleBase;
 
 /**
- * Represents a group of users on this platform
+ * Event when a new role is created
  *
  * @author Laurent Wouters
  */
-class XOWLInternalGroup extends PlatformGroupBase {
+public class RoleCreatedEvent extends EventBase {
     /**
-     * The parent realm
+     * The created role
      */
-    private final XOWLInternalRealm realm;
+    private final PlatformRoleBase role;
 
     /**
-     * Initializes this user
+     * Gets the created role
      *
-     * @param realm      The parent realm
-     * @param identifier The identifier of this group
-     * @param name       The name of this group
+     * @return The created role
      */
-    public XOWLInternalGroup(XOWLInternalRealm realm, String identifier, String name) {
-        super(identifier, name);
-        this.realm = realm;
+    public PlatformRole getCreatedRole() {
+        return role;
     }
 
-    @Override
-    public Collection<PlatformUser> getUsers() {
-        return realm.getGroupMembers(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformUser> getAdmins() {
-        return realm.getGroupAdmins(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformRole> getRoles() {
-        return realm.getEntityRoles(XOWLInternalRealm.GROUPS + getIdentifier());
+    /**
+     * Initializes this event
+     *
+     * @param role       The created role
+     * @param originator The originator for this event
+     */
+    public RoleCreatedEvent(PlatformRoleBase role, Identifiable originator) {
+        super(new RichString("Created role ", role), RoleCreatedEvent.class.getCanonicalName(), originator);
+        this.role = role;
     }
 }

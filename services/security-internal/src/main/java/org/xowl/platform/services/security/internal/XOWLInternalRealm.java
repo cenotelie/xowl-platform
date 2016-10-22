@@ -42,6 +42,7 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -422,7 +423,11 @@ class XOWLInternalRealm implements Realm {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(getUser(identifier, name));
+        XOWLInternalUser user = getUser(identifier, name);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new UserCreatedEvent(user, this));
+        return new XSPReplyResult<>(user);
     }
 
     @Override
@@ -450,7 +455,11 @@ class XOWLInternalRealm implements Realm {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(getGroup(identifier, name));
+        XOWLInternalGroup group = getGroup(identifier, name);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new GroupCreatedEvent(group, this));
+        return new XSPReplyResult<>(group);
     }
 
     @Override
@@ -475,7 +484,11 @@ class XOWLInternalRealm implements Realm {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(getRole(identifier, name));
+        PlatformRoleBase role = getRole(identifier, name);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new RoleCreatedEvent(role, this));
+        return new XSPReplyResult<>(role);
     }
 
     @Override
@@ -672,7 +685,7 @@ class XOWLInternalRealm implements Realm {
      * @param name       The expected user's name
      * @return The user
      */
-    protected PlatformUser getUser(String identifier, String name) {
+    protected XOWLInternalUser getUser(String identifier, String name) {
         synchronized (cacheUsers) {
             XOWLInternalUser user = cacheUsers.get(identifier);
             if (user != null)
@@ -690,7 +703,7 @@ class XOWLInternalRealm implements Realm {
      * @param name       The expected group's name
      * @return The group
      */
-    protected PlatformGroup getGroup(String identifier, String name) {
+    protected XOWLInternalGroup getGroup(String identifier, String name) {
         synchronized (cacheGroups) {
             XOWLInternalGroup group = cacheGroups.get(identifier);
             if (group != null)
@@ -708,7 +721,7 @@ class XOWLInternalRealm implements Realm {
      * @param name       The expected role's name
      * @return The role
      */
-    protected PlatformRole getRole(String identifier, String name) {
+    protected PlatformRoleBase getRole(String identifier, String name) {
         synchronized (cacheRoles) {
             PlatformRoleBase role = cacheRoles.get(identifier);
             if (role != null)

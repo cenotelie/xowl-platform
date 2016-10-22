@@ -17,47 +17,39 @@
 
 package org.xowl.platform.services.security.internal;
 
-import org.xowl.platform.kernel.platform.PlatformGroupBase;
-import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.RichString;
+import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
-import java.util.Collection;
-
 /**
- * Represents a group of users on this platform
+ * Event when a new user is created
  *
  * @author Laurent Wouters
  */
-class XOWLInternalGroup extends PlatformGroupBase {
+public class UserCreatedEvent extends EventBase {
     /**
-     * The parent realm
+     * The created user
      */
-    private final XOWLInternalRealm realm;
+    private final XOWLInternalUser user;
 
     /**
-     * Initializes this user
+     * Gets the created user
      *
-     * @param realm      The parent realm
-     * @param identifier The identifier of this group
-     * @param name       The name of this group
+     * @return The created user
      */
-    public XOWLInternalGroup(XOWLInternalRealm realm, String identifier, String name) {
-        super(identifier, name);
-        this.realm = realm;
+    public PlatformUser getCreatedUser() {
+        return user;
     }
 
-    @Override
-    public Collection<PlatformUser> getUsers() {
-        return realm.getGroupMembers(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformUser> getAdmins() {
-        return realm.getGroupAdmins(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformRole> getRoles() {
-        return realm.getEntityRoles(XOWLInternalRealm.GROUPS + getIdentifier());
+    /**
+     * Initializes this event
+     *
+     * @param user       The created user
+     * @param originator The originator for this event
+     */
+    public UserCreatedEvent(XOWLInternalUser user, Identifiable originator) {
+        super(new RichString("Created user ", user), UserCreatedEvent.class.getCanonicalName(), originator);
+        this.user = user;
     }
 }

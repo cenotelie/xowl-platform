@@ -17,47 +17,39 @@
 
 package org.xowl.platform.services.security.internal;
 
-import org.xowl.platform.kernel.platform.PlatformGroupBase;
-import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.RichString;
+import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
-import java.util.Collection;
-
 /**
- * Represents a group of users on this platform
+ * Event when a user is deleted
  *
  * @author Laurent Wouters
  */
-class XOWLInternalGroup extends PlatformGroupBase {
+public class UserDeletedEvent extends EventBase {
     /**
-     * The parent realm
+     * The deleted user
      */
-    private final XOWLInternalRealm realm;
+    private final XOWLInternalUser user;
 
     /**
-     * Initializes this user
+     * Gets the deleted user
      *
-     * @param realm      The parent realm
-     * @param identifier The identifier of this group
-     * @param name       The name of this group
+     * @return The deleted user
      */
-    public XOWLInternalGroup(XOWLInternalRealm realm, String identifier, String name) {
-        super(identifier, name);
-        this.realm = realm;
+    public PlatformUser getDeletedUser() {
+        return user;
     }
 
-    @Override
-    public Collection<PlatformUser> getUsers() {
-        return realm.getGroupMembers(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformUser> getAdmins() {
-        return realm.getGroupAdmins(XOWLInternalRealm.GROUPS + getIdentifier());
-    }
-
-    @Override
-    public Collection<PlatformRole> getRoles() {
-        return realm.getEntityRoles(XOWLInternalRealm.GROUPS + getIdentifier());
+    /**
+     * Initializes this event
+     *
+     * @param user       The deleted user
+     * @param originator The originator for this event
+     */
+    public UserDeletedEvent(XOWLInternalUser user, Identifiable originator) {
+        super(new RichString("Deleted user ", user), UserDeletedEvent.class.getCanonicalName(), originator);
+        this.user = user;
     }
 }

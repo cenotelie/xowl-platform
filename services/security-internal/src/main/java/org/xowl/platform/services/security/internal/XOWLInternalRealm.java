@@ -370,7 +370,7 @@ class XOWLInternalRealm implements Realm {
         PlatformGroup group = cacheGroups.get(identifier);
         if (group != null)
             return group;
-        String name = getEntityName(USERS + identifier);
+        String name = getEntityName(GROUPS + identifier);
         return getGroup(identifier, name);
     }
 

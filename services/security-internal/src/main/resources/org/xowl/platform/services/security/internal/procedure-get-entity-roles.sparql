@@ -9,6 +9,6 @@ PREFIX security: <http://xowl.org/platform/services/security#>
 SELECT ?role ?roleName WHERE {
     GRAPH <http://xowl.org/platform/services/security> {
         ?entity kernel:hasRole ?role .
-        ?role kernel:hasName ?roleName .
+        ?role kernel:name ?roleName .
     }
 }

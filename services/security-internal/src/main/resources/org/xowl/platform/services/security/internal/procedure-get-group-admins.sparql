@@ -6,11 +6,9 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
 PREFIX security: <http://xowl.org/platform/services/security#>
 
-SELECT ?user ?name WHERE {
-    GRAPH ?g {
-        ?group kernel:hasAdmin ?user .
-    }
+SELECT DISTINCT ?user ?name WHERE {
     GRAPH <http://xowl.org/platform/services/security> {
+        ?group kernel:hasAdmin ?user .
         ?user kernel:name ?name .
     }
 }

@@ -6,7 +6,7 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
 PREFIX security: <http://xowl.org/platform/services/security#>
 
-SELECT ?role ?name WHERE {
+SELECT DISTINCT ?role ?name WHERE {
     GRAPH <http://xowl.org/platform/services/security> {
         ?role rdf:type kernel:PlatformRole .
         ?role kernel:name ?name .

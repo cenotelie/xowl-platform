@@ -387,7 +387,7 @@ class XOWLInternalRealm implements Realm {
         PlatformUser currentUser = securityService.getCurrentUser();
         if (currentUser == null)
             return XSPReplyUnauthenticated.instance();
-        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
             return XSPReplyUnauthorized.instance();
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
@@ -416,7 +416,7 @@ class XOWLInternalRealm implements Realm {
         PlatformUser currentUser = securityService.getCurrentUser();
         if (currentUser == null)
             return XSPReplyUnauthenticated.instance();
-        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
             return XSPReplyUnauthorized.instance();
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
@@ -441,7 +441,7 @@ class XOWLInternalRealm implements Realm {
         PlatformUser currentUser = securityService.getCurrentUser();
         if (currentUser == null)
             return XSPReplyUnauthenticated.instance();
-        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
             return XSPReplyUnauthorized.instance();
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))

@@ -41,12 +41,17 @@ function renderJob(job) {
 		document.createElement("td"),
 		document.createElement("td"),
 		document.createElement("td"),
+		document.createElement("td"),
 		document.createElement("td")];
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(job.name));
 	link.href="job.html?id=" + encodeURIComponent(job.identifier);
 	cells[0].appendChild(link);
-	cells[1].appendChild(document.createTextNode(job.status));
+	link = document.createElement("a");
+	link.appendChild(document.createTextNode(job.owner.name));
+	link.href="/web/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.id);
+	cells[1].appendChild(link);
+	cells[2].appendChild(document.createTextNode(job.status));
 	var progress = document.createElement("div");
 	progress.className = "progress";
 	var progressBar = document.createElement("div");
@@ -57,8 +62,8 @@ function renderJob(job) {
 	progressBar['aria-valuemax'] = 100;
 	progressBar.style.width = (job.completionRate * 100).toString() + "%";
 	progress.appendChild(progressBar);
-	cells[2].appendChild(progress);
-	cells[3].appendChild(document.createTextNode(renderXSPReply(job.result)));
+	cells[3].appendChild(progress);
+	cells[4].appendChild(document.createTextNode(renderXSPReply(job.result)));
 	if (job.status != "Completed" && job.status != "Cancelled") {
 		var button = document.createElement("button");
 		button.className = "btn btn-danger";
@@ -72,12 +77,13 @@ function renderJob(job) {
 			}, job.identifier);
 		};
 		button.appendChild(document.createTextNode("Cancel"));
-		cells[4].appendChild(button);
+		cells[5].appendChild(button);
 	}
 	row.appendChild(cells[0]);
 	row.appendChild(cells[1]);
 	row.appendChild(cells[2]);
 	row.appendChild(cells[3]);
 	row.appendChild(cells[4]);
+	row.appendChild(cells[5]);
 	return row;
 }

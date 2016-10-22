@@ -91,7 +91,7 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
                         "\", \"date\": \"" +
                         IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
                         "\", \"content\": \"" +
-                        IOUtils.escapeStringJSON(((Throwable) content).getMessage()) +
+                        IOUtils.escapeStringJSON(((Throwable) content).getClass().getCanonicalName()) +
                         "\"}";
             } else if (content instanceof Serializable) {
                 return "{\"type\": \"" +

@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var userId = getParameterByName("id");
+var oldName = null;
 
 function init() {
 	setupPage(xowl);
@@ -47,4 +48,43 @@ function renderPlatformRole(role) {
 	cell.appendChild(link);
 	row.appendChild(cell);
 	return row;
+}
+
+function onClickEdit() {
+	if (oldName !== null)
+		return;
+	document.getElementById("user-name-edit").style.display = "none";
+	document.getElementById("user-name-validate").style.display = "inline-block";
+	document.getElementById("user-name-cancel").style.display = "inline-block";
+	document.getElementById("user-name").readOnly = false;
+	document.getElementById("user-name").focus();
+	document.getElementById("user-name").select();
+	oldName = document.getElementById("user-name").value;
+}
+
+function onClickValidate() {
+	document.getElementById("user-name-edit").style.display = "inline-block";
+	document.getElementById("user-name-validate").style.display = "none";
+	document.getElementById("user-name-cancel").style.display = "none";
+	document.getElementById("user-name").readOnly = true;
+	displayMessage("Renaming ...");
+	xowl.renamePlatformUser(function (status, ct, content) {
+		if (status == 200) {
+			displayMessage(null);
+			oldName = null;
+		} else {
+			document.getElementById("user-name").value = oldName;
+			displayMessage(getErrorFor(status, content));
+			oldName = null;
+		}
+	}, userId, document.getElementById("user-name").value);
+}
+
+function onClickCancel() {
+	document.getElementById("user-name-edit").style.display = "inline-block";
+	document.getElementById("user-name-validate").style.display = "none";
+	document.getElementById("user-name-cancel").style.display = "none";
+	document.getElementById("user-name").value = oldName;
+	document.getElementById("user-name").readOnly = true;
+	oldName = null;
 }

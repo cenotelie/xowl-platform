@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var groupId = getParameterByName("id");
+var oldName = null;
 
 function init() {
 	setupPage(xowl);
@@ -78,4 +79,43 @@ function renderPlatformRole(role) {
 	cell.appendChild(link);
 	row.appendChild(cell);
 	return row;
+}
+
+function onClickEdit() {
+	if (oldName !== null)
+		return;
+	document.getElementById("group-name-edit").style.display = "none";
+	document.getElementById("group-name-validate").style.display = "inline-block";
+	document.getElementById("group-name-cancel").style.display = "inline-block";
+	document.getElementById("group-name").readOnly = false;
+	document.getElementById("group-name").focus();
+	document.getElementById("group-name").select();
+	oldName = document.getElementById("group-name").value;
+}
+
+function onClickValidate() {
+	document.getElementById("group-name-edit").style.display = "inline-block";
+	document.getElementById("group-name-validate").style.display = "none";
+	document.getElementById("group-name-cancel").style.display = "none";
+	document.getElementById("group-name").readOnly = true;
+	displayMessage("Renaming ...");
+	xowl.renamePlatformGroup(function (status, ct, content) {
+		if (status == 200) {
+			displayMessage(null);
+			oldName = null;
+		} else {
+			document.getElementById("group-name").value = oldName;
+			displayMessage(getErrorFor(status, content));
+			oldName = null;
+		}
+	}, groupId, document.getElementById("group-name").value);
+}
+
+function onClickCancel() {
+	document.getElementById("group-name-edit").style.display = "inline-block";
+	document.getElementById("group-name-validate").style.display = "none";
+	document.getElementById("group-name-cancel").style.display = "none";
+	document.getElementById("group-name").value = oldName;
+	document.getElementById("group-name").readOnly = true;
+	oldName = null;
 }

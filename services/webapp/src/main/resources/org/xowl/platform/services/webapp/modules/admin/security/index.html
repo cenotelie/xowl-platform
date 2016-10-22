@@ -2,19 +2,20 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Security</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/app.css">
+    <meta charset="utf-8">
+    <title>Security</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/branding/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-  <div class="header">
-    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
+<div class="header">
+    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px"
+            style="margin-left: 5px; display: inline-block;"></object>
     <div style="display: inline-block; margin-left: 50px;">
       <span style="display: inline-block;">
         <ol class="breadcrumb">
@@ -25,76 +26,76 @@
       </span>
     </div>
     <div style="float: right; margin-right: 20px;">
-      <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
+        <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
     </div>
-    <hr style="margin-top: 5px; margin-bottom: 5px;" />
-  </div>
-  <div class="body">
+    <hr style="margin-top: 5px; margin-bottom: 5px;"/>
+</div>
+<div class="body">
     <div class="panel panel-default" id="loader">
-      <div class="panel-body">
-        <img src="/web/branding/spinner.gif" width="32" height="32" />
-        <span id="loader-text">Loading ...</span>
-      </div>
+        <div class="panel-body">
+            <img src="/web/branding/spinner.gif" width="32" height="32"/>
+            <span id="loader-text">Loading ...</span>
+        </div>
     </div>
     <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-4">
-          <div>
-            <a href="user-new.html">Create new user</a>
-          </div>
-          <div>
-            <table class="table table-bordered table-hover">
-              <thead>
-              <tr>
-                <th>User</th>
-              </tr>
-              </thead>
-              <tbody id="users">
-              </tbody>
-            </table>
-          </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    <a href="user-new.html">Create new user</a>
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody id="users">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <a href="group-new.html">Create new group</a>
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Group</th>
+                        </tr>
+                        </thead>
+                        <tbody id="groups">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <a href="role-new.html">Create new role</a>
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Role</th>
+                        </tr>
+                        </thead>
+                        <tbody id="roles">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-          <div>
-            <a href="group-new.html">Create new group</a>
-          </div>
-          <div>
-            <table class="table table-bordered table-hover">
-              <thead>
-              <tr>
-                <th>Group</th>
-              </tr>
-              </thead>
-              <tbody id="groups">
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div>
-            <a href="role-new.html">Create new role</a>
-          </div>
-          <div>
-            <table class="table table-bordered table-hover">
-              <thead>
-              <tr>
-                <th>Role</th>
-              </tr>
-              </thead>
-              <tbody id="roles">
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-  <script src="/web/xowl/xowl-api-platform.js"></script>
-  <script src="/web/xowl/xowl-ui.js"></script>
-  <script src="index.js"></script>
-  <script>
+</div>
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="index.js"></script>
+<script>
     init();
-  </script>
+</script>
 </body>
 
 </html>

@@ -24,8 +24,10 @@ var MSG_ERROR_BAD_REQUEST = "Oops, wrong request.";
 var MSG_ERROR_UNAUTHORIZED = "You must be logged in to perform this operation.";
 var MSG_ERROR_FORBIDDEN = "You are not authorized to perform this operation.";
 var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
-var MSG_ERROR_INTERNAL_ERROR = "Something wrong happened ...";
-var MSG_ERROR_CONNECTION = "Error while accessing the server!";
+var MSG_ERROR_INTERNAL_ERROR = "Something very wrong happened on the server ...";
+var MSG_ERROR_NOT_IMPLEMENTED = "This operation is not supported.";
+var MSG_ERROR_UNKNOWN_ERROR = "The operation failed on the server.";
+var MSG_ERROR_OTHER = "The connection failed.";
 
 function setupPage(xowl) {
 	if (xowl !== null && !xowl.isLoggedIn()) {
@@ -236,10 +238,13 @@ function getErrorFor(code, content) {
 		case 404:
 			return (MSG_ERROR_NOT_FOUND + (content !== null ? "\n" + content : ""));
 		case 500:
-		case 502:
 			return (MSG_ERROR_INTERNAL_ERROR + (content !== null ? "\n" + content : ""));
+		case 501:
+			return (MSG_ERROR_NOT_IMPLEMENTED + (content !== null ? "\n" + content : ""));
+		case 520:
+			return (MSG_ERROR_UNKNOWN_ERROR + (content !== null ? "\n" + content : ""));
 		default:
-			return (MSG_ERROR_CONNECTION + (content !== null ? "\n" + content : ""));
+			return (MSG_ERROR_OTHER + "(" + code + ")" + (content !== null ? "\n" + content : ""));
 	}
 }
 

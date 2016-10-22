@@ -25,6 +25,7 @@ import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserRoot;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
@@ -80,12 +81,16 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param name The job's name
      * @param type The job's type
      */
-    public JobBase(String name, String type, PlatformUser owner) {
+    public JobBase(String name, String type) {
         super(Logging.getDefault());
+        PlatformUser owner = null;
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService != null)
+            owner = securityService.getCurrentUser();
         this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
         this.name = name;
         this.type = type;
-        this.owner = owner;
+        this.owner = owner != null ? owner : PlatformUserRoot.INSTANCE;
         this.status = JobStatus.Unscheduled;
         this.timeScheduled = "";
         this.timeRun = "";
@@ -147,11 +152,14 @@ public abstract class JobBase extends SafeRunnable implements Job {
                 this.completionRate = Float.parseFloat(value.substring(1, value.length() - 1));
             }
         }
+        PlatformUser owner = null;
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService != null)
+            owner = securityService.getRealm().getUser(ownerId);
         this.identifier = id;
         this.name = name;
         this.type = type;
-        this.owner = (securityService != null) ? securityService.getRealm().getUser(ownerId) : null;
+        this.owner = owner != null ? owner : PlatformUserRoot.INSTANCE;
     }
 
     @Override

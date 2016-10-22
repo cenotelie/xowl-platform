@@ -35,7 +35,7 @@ function setupPage(xowl) {
 	document.getElementById("branding-title").onload = function () {
 		document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title;
 	};
-	document.getElementById("btn-logout").innerHTML = "Logout (" + xowl.getUser() + ")";
+	document.getElementById("btn-logout").innerHTML = "Logout (" + xowl.getUserName() + ")";
 	document.getElementById("btn-logout").onclick = function() {
 		xowl.logout();
 		document.location.href = "/web/login.html";

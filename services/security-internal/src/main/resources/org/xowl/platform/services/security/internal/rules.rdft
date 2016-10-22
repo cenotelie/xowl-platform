@@ -22,6 +22,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
 PREFIX security: <http://xowl.org/platform/services/security#>
+PREFIX roles: <http://xowl.org/platform/security/roles#>
 
 
 rule security:admin-is-member {
@@ -45,8 +46,8 @@ rule security:derived-roles {
 }
 
 rule security:admin-has-all-roles {
-    ?u kernel:hasRole security:RoleAdmin .
-    ?r rdf:type kernel:PlatformUserRole .
+    ?u kernel:hasRole roles:admin .
+    ?r rdf:type kernel:PlatformRole .
 } => {
     ?u kernel:hasRole ?r .
 }

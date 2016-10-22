@@ -251,7 +251,7 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
      */
     private HttpResponse onMessageCore(String method) {
         if ("GET".equals(method))
-            return new HttpResponse(HttpURLConnection.HTTP_OK, getCurrentUser().serializedJSON(), HttpConstants.MIME_JSON);
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 

@@ -4,6 +4,7 @@
 function XOWL() {
 	this.endpoint = '/api/';
 	this.authToken = localStorage.getItem('xowl.authToken');
+	this.userId = localStorage.getItem('xowl.userId');
 	this.userName = localStorage.getItem('xowl.userName');
 }
 
@@ -14,10 +15,10 @@ function XOWL() {
 ////
 
 XOWL.prototype.isLoggedIn = function () {
-	return (this.authToken !== null && this.userName !== null);
+	return (this.authToken !== null && this.userId !== null);
 }
 
-XOWL.prototype.getUser = function () {
+XOWL.prototype.getUserName = function () {
 	return this.userName;
 }
 
@@ -27,15 +28,20 @@ XOWL.prototype.login = function (callback, login, password) {
 	this.authToken = token;
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
+			var user = JSON.parse(content);
 			_self.authToken = token;
-			_self.userName = login;
+			_self.userId = user.identifier;
+			_self.userName = user.name;
 			localStorage.setItem('xowl.authToken', token);
-			localStorage.setItem('xowl.userName', login);
+			localStorage.setItem('xowl.userId', user.identifier);
+			localStorage.setItem('xowl.userName', user.name);
 			callback(code, type, content);
 		} else {
 			_self.authToken = null;
+			_self.userId = null;
 			_self.userName = null;
 			localStorage.removeItem('xowl.authToken');
+			localStorage.removeItem('xowl.userId');
 			localStorage.removeItem('xowl.userName');
 			callback(code, type, content);
 		}
@@ -44,8 +50,10 @@ XOWL.prototype.login = function (callback, login, password) {
 
 XOWL.prototype.logout = function () {
 	this.authToken = null;
+	this.userId = null;
 	this.userName = null;
 	localStorage.removeItem('xowl.authToken');
+	localStorage.removeItem('xowl.userId');
 	localStorage.removeItem('xowl.userName');
 }
 

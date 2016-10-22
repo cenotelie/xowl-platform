@@ -190,19 +190,20 @@ class XOWLInternalRealm implements Realm {
             // deploy root user
             parameters = new HashMap<>();
             parameters.put("user", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
-            parameters.put("name", nodes.getLiteralNode("root", Vocabulary.xsdString, null));
+            parameters.put("name", nodes.getLiteralNode(PlatformUserRoot.INSTANCE.getName(), Vocabulary.xsdString, null));
             database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             // deploy admin group
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
             parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
+            parameters.put("admin", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             database.executeStoredProcedure(procedures.get("procedure-create-group"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             // deploy admin role
             parameters = new HashMap<>();
             parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
-            parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
+            parameters.put("name", nodes.getLiteralNode(PlatformRoleAdmin.INSTANCE.getName(), Vocabulary.xsdString, null));
             database.executeStoredProcedure(procedures.get("procedure-create-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             // assign platform admin role to admin group
@@ -215,12 +216,6 @@ class XOWLInternalRealm implements Realm {
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
             parameters.put("admin", nodes.getIRINode(USERS + "admin"));
-            database.executeStoredProcedure(procedures.get("procedure-add-admin"),
-                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
-            // add user root as administrator of group admin
-            parameters = new HashMap<>();
-            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
-            parameters.put("admin", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         }
@@ -332,7 +327,7 @@ class XOWLInternalRealm implements Realm {
         ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformGroup> groups = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
-            String id = ((IRINode) solution.get("group")).getIRIValue().substring(USERS.length());
+            String id = ((IRINode) solution.get("group")).getIRIValue().substring(GROUPS.length());
             String name = ((LiteralNode) solution.get("name")).getLexicalValue();
             groups.add(getGroup(id, name));
         }
@@ -342,14 +337,14 @@ class XOWLInternalRealm implements Realm {
     @Override
     public Collection<PlatformRole> getRoles() {
         Map<String, Node> parameters = new HashMap<>();
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-groups"),
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-roles"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return Collections.emptyList();
         ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformRole> roles = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
-            String id = ((IRINode) solution.get("role")).getIRIValue().substring(USERS.length());
+            String id = ((IRINode) solution.get("role")).getIRIValue().substring(ROLES.length());
             String name = ((LiteralNode) solution.get("name")).getLexicalValue();
             roles.add(getRole(id, name));
         }
@@ -619,7 +614,7 @@ class XOWLInternalRealm implements Realm {
         ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
-            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(ROLES.length());
+            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());
             String userName = ((LiteralNode) solution.get("name")).getLexicalValue();
             users.add(getUser(userId, userName));
         }
@@ -642,7 +637,7 @@ class XOWLInternalRealm implements Realm {
         ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
-            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(ROLES.length());
+            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());
             String userName = ((LiteralNode) solution.get("name")).getLexicalValue();
             users.add(getUser(userId, userName));
         }

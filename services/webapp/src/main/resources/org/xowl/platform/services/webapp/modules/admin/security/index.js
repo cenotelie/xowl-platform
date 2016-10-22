@@ -29,46 +29,46 @@ function init() {
 	});
 }
 
-function getPlatformUsers(users) {
+function renderPlatformUsers(users) {
 	users.sort(function (x, y) {
 		return x.name.localeCompare(y.name);
 	});
 	var table = document.getElementById("users");
 	for (var  i = 0; i != users.length; i++) {
-		table.appendChild(getPlatformUser(users[i]));
+		table.appendChild(renderPlatformUser(users[i]));
 	}
 	DONE++;
 	if (DONE === 3)
 		document.getElementById("loader").style.display = "none";
 }
 
-function getPlatformGroups(groups) {
+function renderPlatformGroups(groups) {
 	groups.sort(function (x, y) {
 		return x.name.localeCompare(y.name);
 	});
 	var table = document.getElementById("groups");
 	for (var  i = 0; i != groups.length; i++) {
-		table.appendChild(getPlatformGroup(groups[i]));
+		table.appendChild(renderPlatformGroup(groups[i]));
 	}
 	DONE++;
 	if (DONE === 3)
 		document.getElementById("loader").style.display = "none";
 }
 
-function getPlatformRoles(roles) {
+function renderPlatformRoles(roles) {
 	roles.sort(function (x, y) {
 		return x.name.localeCompare(y.name);
 	});
 	var table = document.getElementById("roles");
 	for (var  i = 0; i != roles.length; i++) {
-		table.appendChild(getPlatformRole(roles[i]));
+		table.appendChild(renderPlatformRole(roles[i]));
 	}
 	DONE++;
 	if (DONE === 3)
 		document.getElementById("loader").style.display = "none";
 }
 
-function getPlatformUser(user) {
+function renderPlatformUser(user) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var link = document.createElement("a");
@@ -79,7 +79,7 @@ function getPlatformUser(user) {
 	return row;
 }
 
-function getPlatformGroup(group) {
+function renderPlatformGroup(group) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var link = document.createElement("a");
@@ -90,7 +90,7 @@ function getPlatformGroup(group) {
 	return row;
 }
 
-function getPlatformRole(role) {
+function renderPlatformRole(role) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var link = document.createElement("a");

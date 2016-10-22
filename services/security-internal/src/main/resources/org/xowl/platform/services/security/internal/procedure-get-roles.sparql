@@ -8,7 +8,7 @@ PREFIX security: <http://xowl.org/platform/services/security#>
 
 SELECT ?role ?name WHERE {
     GRAPH <http://xowl.org/platform/services/security> {
-        ?role rdf:type kernel:PlatformUserRole .
+        ?role rdf:type kernel:PlatformRole .
         ?role kernel:name ?name .
     }
 }

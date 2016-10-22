@@ -46,7 +46,6 @@ function onClickValidate() {
 	displayMessage("Renaming ...");
 	xowl.renamePlatformRole(function (status, ct, content) {
 		if (status == 200) {
-			render(content);
 			displayMessage(null);
 			oldName = null;
 		} else {

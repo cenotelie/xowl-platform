@@ -23,11 +23,9 @@ import org.xowl.infra.server.api.XOWLStoredProcedure;
 import org.xowl.infra.server.api.base.BaseStoredProcedureContext;
 import org.xowl.infra.server.base.ServerConfiguration;
 import org.xowl.infra.server.embedded.EmbeddedServer;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.AbstractRepository;
+import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.Node;
@@ -43,8 +41,10 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.io.File;
 import java.io.IOException;
@@ -161,6 +161,8 @@ class XOWLInternalRealm implements Realm {
             getProcedure("procedure-get-users");
             getProcedure("procedure-get-entity-name");
             getProcedure("procedure-get-entity-roles");
+            getProcedure("procedure-get-group-admins");
+            getProcedure("procedure-get-group-members");
             getProcedure("procedure-imply-role");
         } else {
             // deploy the procedures
@@ -176,11 +178,45 @@ class XOWLInternalRealm implements Realm {
             deployProcedure("procedure-get-users");
             deployProcedure("procedure-get-entity-name", "entity");
             deployProcedure("procedure-get-entity-roles", "entity");
+            deployProcedure("procedure-get-group-admins", "group");
+            deployProcedure("procedure-get-group-members", "group");
             deployProcedure("procedure-imply-role", "source", "target");
-            // deploy admin user and role
-            assignRoleToUser("admin", PlatformRoleAdmin.INSTANCE.getIdentifier());
-            // deploy root user and role
-            assignRoleToUser("root", PlatformRoleAdmin.INSTANCE.getIdentifier());
+            // deploy admin user
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("user", nodes.getIRINode(USERS + "admin"));
+            parameters.put("name", nodes.getLiteralNode("Administrator", Vocabulary.xsdString, null));
+            database.executeStoredProcedure(procedures.get("procedure-create-user"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // deploy admin group
+            parameters = new HashMap<>();
+            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
+            database.executeStoredProcedure(procedures.get("procedure-create-group"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // deploy admin role
+            parameters = new HashMap<>();
+            parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
+            parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
+            database.executeStoredProcedure(procedures.get("procedure-create-role"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // assign platform admin role to admin group
+            parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
+            database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // add user admin as administrator of group admin
+            parameters = new HashMap<>();
+            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("admin", nodes.getIRINode(USERS + "admin"));
+            database.executeStoredProcedure(procedures.get("procedure-add-admin"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // add user root as administrator of group admin
+            parameters = new HashMap<>();
+            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("admin", nodes.getIRINode(USERS + "root"));
+            database.executeStoredProcedure(procedures.get("procedure-add-admin"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         }
     }
 
@@ -343,17 +379,81 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply createUser(String identifier, String name, String key) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // check identifier format
+        if (!identifier.matches("[_a-zA-Z0-9]+"))
+            return new XSPReplyFailure("Identifier does not meet requirements ([_a-zA-Z0-9]+)");
+        // create the user as an embedded server user
+        XSPReply reply = server.createUser(identifier, key);
+        if (!reply.isSuccess())
+            return reply;
+        // create the user data
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("user", nodes.getIRINode(USERS + identifier));
+        parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+        reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(getUser(identifier, name));
     }
 
     @Override
     public XSPReply createGroup(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // check identifier format
+        if (!identifier.matches("[_a-zA-Z0-9]+"))
+            return new XSPReplyFailure("Identifier does not meet requirements ([_a-zA-Z0-9]+)");
+        // create the group data
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(USERS + identifier));
+        parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(getGroup(identifier, name));
     }
 
     @Override
     public XSPReply createRole(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // check identifier format
+        if (!identifier.matches("[_a-zA-Z0-9]+"))
+            return new XSPReplyFailure("Identifier does not meet requirements ([_a-zA-Z0-9]+)");
+        // create the group data
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("role", nodes.getIRINode(USERS + identifier));
+        parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(getRole(identifier, name));
     }
 
     @Override
@@ -503,6 +603,52 @@ class XOWLInternalRealm implements Realm {
             roles.add(getRole(roleId, roleName));
         }
         return roles;
+    }
+
+    /**
+     * Gets the administrators of a group
+     *
+     * @param groupIRI The IRI of a group
+     * @return The administrators
+     */
+    protected Collection<PlatformUser> getGroupAdmins(String groupIRI) {
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(groupIRI));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-admins"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return null;
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(ROLES.length());
+            String userName = ((LiteralNode) solution.get("name")).getLexicalValue();
+            users.add(getUser(userId, userName));
+        }
+        return users;
+    }
+
+    /**
+     * Gets the members of a group
+     *
+     * @param groupIRI The IRI of a group
+     * @return The members
+     */
+    protected Collection<PlatformUser> getGroupMembers(String groupIRI) {
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(groupIRI));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-members"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return null;
+        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
+        for (RDFPatternSolution solution : result.getSolutions()) {
+            String userId = ((IRINode) solution.get("user")).getIRIValue().substring(ROLES.length());
+            String userName = ((LiteralNode) solution.get("name")).getLexicalValue();
+            users.add(getUser(userId, userName));
+        }
+        return users;
     }
 
     /**

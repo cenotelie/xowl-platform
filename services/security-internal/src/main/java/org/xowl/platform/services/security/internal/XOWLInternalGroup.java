@@ -48,12 +48,12 @@ public class XOWLInternalGroup extends PlatformGroupBase {
 
     @Override
     public Collection<PlatformUser> getUsers() {
-        return null;
+        return realm.getGroupMembers(XOWLInternalRealm.GROUPS + getIdentifier());
     }
 
     @Override
     public Collection<PlatformUser> getAdmins() {
-        return null;
+        return realm.getGroupAdmins(XOWLInternalRealm.GROUPS + getIdentifier());
     }
 
     @Override

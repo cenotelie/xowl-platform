@@ -29,7 +29,7 @@ public class PlatformUserRoot extends PlatformUserBase {
     /**
      * The singleton instance
      */
-    private static final PlatformUser INSTANCE = new PlatformUserRoot();
+    public static final PlatformUser INSTANCE = new PlatformUserRoot();
 
     /**
      * Initializes this user

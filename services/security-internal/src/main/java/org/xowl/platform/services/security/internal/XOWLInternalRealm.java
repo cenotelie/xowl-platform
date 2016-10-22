@@ -187,6 +187,12 @@ class XOWLInternalRealm implements Realm {
             parameters.put("name", nodes.getLiteralNode("Administrator", Vocabulary.xsdString, null));
             database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            // deploy root user
+            parameters = new HashMap<>();
+            parameters.put("user", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
+            parameters.put("name", nodes.getLiteralNode("root", Vocabulary.xsdString, null));
+            database.executeStoredProcedure(procedures.get("procedure-create-user"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             // deploy admin group
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
@@ -214,7 +220,7 @@ class XOWLInternalRealm implements Realm {
             // add user root as administrator of group admin
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
-            parameters.put("admin", nodes.getIRINode(USERS + "root"));
+            parameters.put("admin", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         }
@@ -518,20 +524,12 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply assignRoleToUser(String user, String role) {
-        Map<String, Node> parameters = new HashMap<>();
-        parameters.put("entity", nodes.getIRINode(USERS + user));
-        parameters.put("role", nodes.getIRINode(ROLES + role));
-        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
-                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply assignRoleToGroup(String group, String role) {
-        Map<String, Node> parameters = new HashMap<>();
-        parameters.put("entity", nodes.getIRINode(GROUPS + group));
-        parameters.put("role", nodes.getIRINode(ROLES + role));
-        return database.executeStoredProcedure(procedures.get("procedure-assign-role"),
-                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

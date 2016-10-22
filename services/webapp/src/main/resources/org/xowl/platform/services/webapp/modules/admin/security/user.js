@@ -88,3 +88,16 @@ function onClickCancel() {
 	document.getElementById("user-name").readOnly = true;
 	oldName = null;
 }
+
+function onClickDelete() {
+	if (oldName !== null)
+		return;
+	displayMessage("Deleting this user ...");
+	xowl.deletePlatformUser(function (status, ct, content) {
+		if (status == 200) {
+			window.location.href = "index.html";
+		} else {
+			displayMessage(getErrorFor(status, content));
+		}
+	}, userId);
+}

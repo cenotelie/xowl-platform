@@ -20,6 +20,7 @@ package org.xowl.platform.services.security.internal;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.XOWLStoredProcedure;
+import org.xowl.infra.server.api.XOWLUser;
 import org.xowl.infra.server.api.base.BaseStoredProcedureContext;
 import org.xowl.infra.server.base.ServerConfiguration;
 import org.xowl.infra.server.embedded.EmbeddedServer;
@@ -152,11 +153,15 @@ class XOWLInternalRealm implements Realm {
             // we already have the stored procedures, retrieve them
             getProcedure("procedure-add-admin");
             getProcedure("procedure-add-member");
+            getProcedure("procedure-remove-admin");
+            getProcedure("procedure-remove-member");
             getProcedure("procedure-assign-role");
             getProcedure("procedure-check-role");
             getProcedure("procedure-create-group");
             getProcedure("procedure-create-role");
             getProcedure("procedure-create-user");
+            getProcedure("procedure-delete-entity");
+            getProcedure("procedure-rename-entity");
             getProcedure("procedure-get-groups");
             getProcedure("procedure-get-roles");
             getProcedure("procedure-get-users");
@@ -169,11 +174,15 @@ class XOWLInternalRealm implements Realm {
             // deploy the procedures
             deployProcedure("procedure-add-admin", "group", "admin");
             deployProcedure("procedure-add-member", "group", "user");
+            deployProcedure("procedure-remove-admin", "group", "admin");
+            deployProcedure("procedure-remove-member", "group", "user");
             deployProcedure("procedure-assign-role", "entity", "role");
             deployProcedure("procedure-check-role", "user", "role");
             deployProcedure("procedure-create-group", "group", "name", "admin");
             deployProcedure("procedure-create-role", "role", "name");
             deployProcedure("procedure-create-user", "user", "name");
+            deployProcedure("procedure-delete-entity", "entity");
+            deployProcedure("procedure-rename-entity", "entity", "newName");
             deployProcedure("procedure-get-groups");
             deployProcedure("procedure-get-roles");
             deployProcedure("procedure-get-users");
@@ -493,32 +502,167 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply renameUser(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role (or rename itself)
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !currentUser.getIdentifier().equals(identifier))
+            return XSPReplyUnauthorized.instance();
+        // rename
+        synchronized (cacheUsers) {
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(USERS + identifier));
+            parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheUsers.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
     public XSPReply renameGroup(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+        PlatformGroup groupObject = getGroup(identifier);
+        if (groupObject == null)
+            return new XSPReplyFailure("The group does not exist");
+        // check for current user with admin role on group
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !groupObject.getAdmins().contains(currentUser))
+            return XSPReplyUnauthorized.instance();
+        synchronized (cacheGroups) {
+            // rename the entity
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(GROUPS + identifier));
+            parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheGroups.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
     public XSPReply renameRole(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        synchronized (cacheRoles) {
+            // rename the entity
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(ROLES + identifier));
+            parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
+            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheRoles.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
     public XSPReply deleteUser(String identifier) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // check for entity that cannot be deleted
+        if (PlatformUserRoot.INSTANCE.getIdentifier().equals(identifier))
+            return new XSPReplyFailure("The root user cannot be deleted.");
+        // delete the server user
+        synchronized (cacheUsers) {
+            XSPReply reply = server.getUser(identifier);
+            if (!reply.isSuccess())
+                return reply;
+            reply = server.deleteUser(((XSPReplyResult<XOWLUser>) reply).getData());
+            if (!reply.isSuccess())
+                return reply;
+            // delete the entity
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(USERS + identifier));
+            reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheUsers.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
     public XSPReply deleteGroup(String identifier) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // delete the entity
+        synchronized (cacheGroups) {
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(GROUPS + identifier));
+            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheGroups.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
     public XSPReply deleteRole(String identifier) {
-        return XSPReplyUnsupported.instance();
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // check for entity that cannot be deleted
+        if (PlatformRoleAdmin.INSTANCE.getIdentifier().equals(identifier))
+            return new XSPReplyFailure("The admin role cannot be deleted.");
+        // delete the entity
+        synchronized (cacheRoles) {
+            Map<String, Node> parameters = new HashMap<>();
+            parameters.put("entity", nodes.getIRINode(ROLES + identifier));
+            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                return reply;
+            cacheRoles.remove(identifier);
+            return XSPReplySuccess.instance();
+        }
     }
 
     @Override
@@ -533,32 +677,180 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply addUserToGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObject = getGroup(group);
+        if (groupObject == null)
+            return new XSPReplyFailure("The group does not exist");
+        PlatformUser newUser = getUser(user);
+        if (newUser == null)
+            return new XSPReplyFailure("The user does not exist");
+        // check the current user is either the platform admin or the group admin
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !groupObject.getAdmins().contains(currentUser))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(GROUPS + group));
+        parameters.put("user", nodes.getIRINode(USERS + user));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-add-member"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply addAdminToGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObject = getGroup(group);
+        if (groupObject == null)
+            return new XSPReplyFailure("The group does not exist");
+        PlatformUser newUser = getUser(user);
+        if (newUser == null)
+            return new XSPReplyFailure("The user does not exist");
+        // check the current user is either the platform admin or the group admin
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !groupObject.getAdmins().contains(currentUser))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(GROUPS + group));
+        parameters.put("admin", nodes.getIRINode(USERS + user));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply removeUserFromGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObject = getGroup(group);
+        if (groupObject == null)
+            return new XSPReplyFailure("The group does not exist");
+        PlatformUser newUser = getUser(user);
+        if (newUser == null)
+            return new XSPReplyFailure("The user does not exist");
+        // check the current user is either the platform admin or the group admin
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !groupObject.getAdmins().contains(currentUser))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(GROUPS + group));
+        parameters.put("user", nodes.getIRINode(USERS + user));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-remove-member"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply removeAdminFromGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObject = getGroup(group);
+        if (groupObject == null)
+            return new XSPReplyFailure("The group does not exist");
+        PlatformUser newUser = getUser(user);
+        if (newUser == null)
+            return new XSPReplyFailure("The user does not exist");
+        // check the current user is either the platform admin or the group admin
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !groupObject.getAdmins().contains(currentUser))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("group", nodes.getIRINode(GROUPS + group));
+        parameters.put("admin", nodes.getIRINode(USERS + user));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-remove-admin"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply assignRoleToUser(String user, String role) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformUser userObj = getUser(user);
+        if (userObj == null)
+            return new XSPReplyFailure("The user does not exist");
+        PlatformRole roleObj = getRole(role);
+        if (roleObj == null)
+            return new XSPReplyFailure("The role does not exist");
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(USERS + user));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply assignRoleToGroup(String group, String role) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObj = getGroup(group);
+        if (groupObj == null)
+            return new XSPReplyFailure("The group does not exist");
+        PlatformRole roleObj = getRole(role);
+        if (roleObj == null)
+            return new XSPReplyFailure("The role does not exist");
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(GROUPS + group));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override

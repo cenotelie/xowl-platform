@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="role" version="1.1">
+  <path
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#034091;stroke-width:8;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 10,20 C 31.719246,7.4603879 68.324167,7.4854517 90,20 90,45.030793 72.524152,90 50,90 27.475848,90 10,45.042691 10,20 Z"/>
+  <ellipse
+     style="fill:#00914d;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     cx="35" cy="35" rx="10" ry="5" />
+  <ellipse
+     style="fill:#00914d;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     cx="65" cy="35" rx="10" ry="5" />
+  <path
+     style="fill:#00914d;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 70,60 C 70,62.761424 55.522847,75 50,75 44.477153,75 30,62.761424 30,60 c 0,-2.761424 14.477153,5 20,5 5.522847,0 20,-7.761423 20,-5 z"/>
+</svg>

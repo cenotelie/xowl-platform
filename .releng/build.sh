@@ -14,11 +14,13 @@ mvn dependency:copy-dependencies -f "$ROOT/pom.xml"
 sh "$RELENG/build-distrib.sh"
 
 # Package distribution
+rm -f "$RELENG/xowl-platform-$VERSION.tar.gz"
 tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG" "felix/" -C "$RELENG/runtime" "run.sh" "config/"
 
 # Build the docker image
 mv "$RELENG/felix" "$RELENG/docker/felix"
 cp -r "$RELENG/runtime/config" "$RELENG/docker/config"
+docker rmi "xowl/xowl-platform:$VERSION" || true
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup

@@ -17,13 +17,13 @@
 
 package org.xowl.platform.services.security.internal;
 
+import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.XOWLStoredProcedure;
 import org.xowl.infra.server.api.XOWLUser;
 import org.xowl.infra.server.base.BaseStoredProcedureContext;
 import org.xowl.infra.server.embedded.EmbeddedServer;
-import org.xowl.infra.server.impl.ServerConfiguration;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.Vocabulary;

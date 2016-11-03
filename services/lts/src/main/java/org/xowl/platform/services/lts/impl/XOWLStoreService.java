@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.lts.impl;
 
+import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.embedded.EmbeddedServer;
-import org.xowl.infra.server.impl.ServerConfiguration;
 import org.xowl.infra.server.remote.RemoteServer;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.RDFUtils;

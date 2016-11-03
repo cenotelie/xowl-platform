@@ -78,10 +78,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
 
         @Override
         public XSPReply setupTSL(File keyStore, String password) {
-            File confDir = new File(System.getProperty(Env.CONF_DIR));
+            File root = new File(System.getProperty(Env.ROOT));
+            File confDir = new File(root, "conf");
+            File confFile = new File(confDir, "config.properties");
             Configuration platformConfig = new Configuration();
             try {
-                platformConfig.load(confDir.getAbsolutePath(), Files.CHARSET);
+                platformConfig.load(confFile.getAbsolutePath(), Files.CHARSET);
                 String value = platformConfig.get("org.osgi.service.http.port.secure");
                 if (value == null)
                     platformConfig.set("org.osgi.service.http.port.secure", "8443");
@@ -91,7 +93,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
                 platformConfig.set("org.apache.felix.https.keystore", keyStore.getAbsolutePath());
                 platformConfig.set("org.apache.felix.https.keystore.password", password);
                 platformConfig.set("org.apache.felix.https.keystore.key.password", password);
-                platformConfig.save(confDir.getAbsolutePath(), Files.CHARSET);
+                platformConfig.save(confFile.getAbsolutePath(), Files.CHARSET);
                 return XSPReplySuccess.instance();
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
@@ -170,8 +172,8 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
 
     @Override
     public XSPReply regenerateTLSConfig(String alias) {
-        File confDir = new File(System.getProperty(Env.CONF_DIR));
-        File targetKeyStore = new File(confDir, "keystore.jks");
+        File root = new File(System.getProperty(Env.ROOT));
+        File targetKeyStore = new File(root, "keystore.jks");
         String password = SSLGenerator.generateKeyStore(targetKeyStore, alias);
         if (password == null)
             return new XSPReplyFailure("Failed to generate TLS certificate");

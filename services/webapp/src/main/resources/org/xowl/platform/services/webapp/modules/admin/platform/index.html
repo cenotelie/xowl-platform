@@ -38,6 +38,34 @@
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">
+        Platform Actions
+      </div>
+      <div class="panel-body">
+        <div style="margin-top: 20px;">
+          <button class="btn btn-danger" id="button-shutdown" onclick="onClickShutdown()">Shutdown the platform</button>
+        </div>
+        <div style="margin-top: 20px;">
+          <button class="btn btn-danger" id="button-restart" onclick="onClickRestart()">Restart the platform</button>
+        </div>
+        <div style="margin-top: 20px;">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label for="certificate-cn" class="col-sm-2 control-label">Common Name</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="certificate-cn" placeholder="localhost">
+              </div>
+              <span class="col-sm-2">
+                <span class="btn btn-danger" id="button-regenerateTLS" onclick="onClickRegenerateTLS()">
+                  Regenerate TLS certificate
+                </span>
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
         Bundles
       </div>
       <div class="panel-body">

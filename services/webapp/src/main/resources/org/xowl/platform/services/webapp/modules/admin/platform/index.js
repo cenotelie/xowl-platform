@@ -5,6 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	setupPage(xowl);
+	document.getElementById("certificate-cn").value = window.location.hostname;
 	xowl.getPlatformBundles(function (status, ct, content) {
 		if (status == 200) {
 			renderBundles(content);
@@ -40,5 +41,50 @@ function renderBundles(bundles) {
 		row.appendChild(cells[3]);
 		row.appendChild(cells[4]);
 		table.appendChild(row);
+	}
+}
+
+function onClickShutdown() {
+	var result = confirm("Shutdown the platform?");
+	if (result == true) {
+		displayMessage("Shutting down the platform ...");
+		xowl.platformShutdown(function (status, ct, content) {
+			if (status == 200) {
+				document.location.href = "/web/";
+			} else {
+				displayMessage(getErrorFor(status, content));
+			}
+		});
+	}
+}
+
+function onClickRestart() {
+	var result = confirm("Restart the platform?");
+	if (result == true) {
+		displayMessage("Restarting the platform ...");
+		xowl.platformRestart(function (status, ct, content) {
+			if (status == 200) {
+				document.location.href = "/web/";
+			} else {
+				displayMessage(getErrorFor(status, content));
+			}
+		});
+	}
+}
+
+function onClickRegenerateTLS() {
+	var alias = document.getElementById("certificate-cn").value;
+	if (alias === null || alias === "")
+		return;
+	var result = confirm("Regenerate the TLS certificate?");
+	if (result == true) {
+		displayMessage("Regenerating TLS certificate ...");
+		xowl.platformRegenerateTLS(function (status, ct, content) {
+			if (status == 200) {
+				displayMessage("TLS certificate has been regenerated, restart to update.");
+			} else {
+				displayMessage(getErrorFor(status, content));
+			}
+		}, alias);
 	}
 }

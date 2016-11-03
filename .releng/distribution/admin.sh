@@ -39,7 +39,7 @@ start () {
 
 doStart () {
   echo "==== xOWL Platform Startup ====" >> log.txt
-  sh do-run.sh "$DISTRIB"  &
+  sh do-run.sh "$DISTRIB/config"  &
   PID="$!"
   echo $PID > xowl-platform.pid
   sleep $STARTUP_WAIT

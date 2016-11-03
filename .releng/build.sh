@@ -15,14 +15,16 @@ sh "$RELENG/build-distrib.sh"
 
 # Package distribution
 rm -f "$RELENG/xowl-platform-$VERSION.tar.gz"
-tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG" "felix/" -C "$RELENG/runtime" "run.sh" "config/"
+tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG/distribution" "felix/" "config/" "do-run.sh" "install-daemon.sh" "uninstall-daemon.sh"
 
 # Build the docker image
-mv "$RELENG/felix" "$RELENG/docker/felix"
-cp -r "$RELENG/runtime/config" "$RELENG/docker/config"
+mv "$RELENG/distribution/felix" "$RELENG/docker/felix"
+cp "$RELENG/distribution/do-run.sh" "$RELENG/docker/do-run.sh"
+cp -r "$RELENG/distribution/config" "$RELENG/docker/config"
 docker rmi "xowl/xowl-platform:$VERSION" || true
 docker build -t "xowl/xowl-platform:$VERSION" "$RELENG/docker"
 
 # Cleanup
 rm -rf "$RELENG/docker/felix"
 rm -rf "$RELENG/docker/config"
+rm -f "$RELENG/docker/do-run.sh"

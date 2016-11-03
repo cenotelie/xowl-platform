@@ -17,8 +17,9 @@
 
 package org.xowl.platform.services.consistency.impl;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Node;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 import org.xowl.platform.services.consistency.Inconsistency;
 
@@ -98,15 +99,15 @@ class XOWLInconsistency implements Inconsistency {
     public String serializedJSON() {
         StringWriter builder = new StringWriter();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(Inconsistency.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(Inconsistency.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(iri));
+        builder.append(TextUtils.escapeStringJSON(iri));
         builder.append("\", \"message\": \"");
-        builder.append(IOUtils.escapeStringJSON(message));
+        builder.append(TextUtils.escapeStringJSON(message));
         builder.append("\", \"ruleId\": \"");
-        builder.append(IOUtils.escapeStringJSON(rule.getIdentifier()));
+        builder.append(TextUtils.escapeStringJSON(rule.getIdentifier()));
         builder.append("\", \"ruleName\": \"");
-        builder.append(IOUtils.escapeStringJSON(rule.getUserName()));
+        builder.append(TextUtils.escapeStringJSON(rule.getUserName()));
         builder.append("\", \"antecedents\": {");
         boolean first = true;
         for (Map.Entry<String, Node> antecedent : antecedents.entrySet()) {
@@ -114,10 +115,10 @@ class XOWLInconsistency implements Inconsistency {
                 builder.append(", ");
             first = false;
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(antecedent.getKey()));
+            builder.append(TextUtils.escapeStringJSON(antecedent.getKey()));
             builder.append("\": ");
             try {
-                IOUtils.serializeJSON(builder, antecedent.getValue());
+                RDFUtils.serializeJSON(builder, antecedent.getValue());
             } catch (IOException exception) {
                 // cannot happen
             }

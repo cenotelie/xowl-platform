@@ -17,11 +17,11 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 
 import java.util.ArrayList;
@@ -178,27 +178,27 @@ public abstract class ArtifactBase implements Artifact {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(Artifact.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(Artifact.class.getCanonicalName()));
         builder.append("\", \"identifier\":\"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"base\": \"");
-        builder.append(IOUtils.escapeStringJSON(baseID));
+        builder.append(TextUtils.escapeStringJSON(baseID));
         builder.append("\", \"version\": \"");
-        builder.append(IOUtils.escapeStringJSON(version));
+        builder.append(TextUtils.escapeStringJSON(version));
         builder.append("\", \"from\": \"");
-        builder.append(IOUtils.escapeStringJSON(from));
+        builder.append(TextUtils.escapeStringJSON(from));
         builder.append("\", \"creation\": \"");
-        builder.append(IOUtils.escapeStringJSON(creation));
+        builder.append(TextUtils.escapeStringJSON(creation));
         builder.append("\", \"archetype\": \"");
-        builder.append(IOUtils.escapeStringJSON(archetype));
+        builder.append(TextUtils.escapeStringJSON(archetype));
         builder.append("\", \"supersede\": [");
         for (int i = 0; i != superseded.length; i++) {
             if (i != 0)
                 builder.append(", ");
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(superseded[i]));
+            builder.append(TextUtils.escapeStringJSON(superseded[i]));
             builder.append("\"");
         }
         builder.append("]}");

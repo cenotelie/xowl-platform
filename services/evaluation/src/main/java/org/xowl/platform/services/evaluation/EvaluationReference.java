@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
 /**

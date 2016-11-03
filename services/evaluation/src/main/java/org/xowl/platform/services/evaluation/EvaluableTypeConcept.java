@@ -20,12 +20,12 @@ package org.xowl.platform.services.evaluation;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultSolutions;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -71,15 +71,15 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
         if (service == null)
             return XSPReplyServiceUnavailable.instance();
         String query = "SELECT DISTINCT ?a ?e WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT) +
                 "> . ?a <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE) +
                 "> \"" +
-                IOUtils.escapeStringW3C(archetype.getIdentifier()) +
+                TextUtils.escapeStringW3C(archetype.getIdentifier()) +
                 "\" } . GRAPH ?a { ?e a <" +
-                IOUtils.escapeAbsoluteURIW3C(conceptyURI) +
+                TextUtils.escapeAbsoluteURIW3C(conceptyURI) +
                 "> } }";
         Result sparqlResult = service.getLongTermStore().sparql(query);
         if (sparqlResult.isFailure())

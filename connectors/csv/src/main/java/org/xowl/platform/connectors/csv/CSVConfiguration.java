@@ -18,7 +18,7 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.importation.ImporterConfiguration;
 
 /**
@@ -179,23 +179,23 @@ public class CSVConfiguration extends ImporterConfiguration {
         CSVMapping tMapping = null;
         boolean tSkipFirstRow = false;
         for (ASTNode pair : definition.getChildren()) {
-            String key = IOUtils.unescape(pair.getChildren().get(0).getValue());
+            String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             switch (key) {
                 case "separator": {
-                    String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
                     value = value.substring(1, value.length() - 1);
                     tSeparator = value.charAt(0);
                     break;
                 }
                 case "textMarker": {
-                    String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
                     value = value.substring(1, value.length() - 1);
                     tTextMarker = value.charAt(0);
                     break;
                 }
                 case "rowCount": {
-                    String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
                     value = value.substring(1, value.length() - 1);
                     tRowCount = Integer.parseInt(value);
                     break;
@@ -205,7 +205,7 @@ public class CSVConfiguration extends ImporterConfiguration {
                     break;
                 }
                 case "skipFirstRow": {
-                    String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
                     value = value.substring(1, value.length() - 1);
                     tSkipFirstRow = value.equalsIgnoreCase("true");
                     break;
@@ -229,13 +229,13 @@ public class CSVConfiguration extends ImporterConfiguration {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(CSVConfiguration.class.getName()));
+        builder.append(TextUtils.escapeStringJSON(CSVConfiguration.class.getName()));
         builder.append("\", ");
         serializeJSON(builder);
         builder.append(", \"separator\": ");
-        builder.append(IOUtils.escapeStringJSON(Character.toString(separator)));
+        builder.append(TextUtils.escapeStringJSON(Character.toString(separator)));
         builder.append("\", \"textMarker\": \"");
-        builder.append(IOUtils.escapeStringJSON(Character.toString(textMarker)));
+        builder.append(TextUtils.escapeStringJSON(Character.toString(textMarker)));
         builder.append("\", \"rowCount\": \"");
         builder.append(Integer.toString(rowCount));
         builder.append("\"");

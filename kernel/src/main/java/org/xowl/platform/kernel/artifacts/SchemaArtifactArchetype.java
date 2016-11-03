@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 
 import java.util.Collection;
@@ -73,13 +73,13 @@ public class SchemaArtifactArchetype implements ArtifactArchetype {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(ArtifactArchetype.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ArtifactArchetype.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(getIdentifier()) +
+                TextUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(getName()) +
+                TextUtils.escapeStringJSON(getName()) +
                 "\", \"description\": \"" +
-                IOUtils.escapeStringJSON(getDescription()) +
+                TextUtils.escapeStringJSON(getDescription()) +
                 "\"}";
     }
 }

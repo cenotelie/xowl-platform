@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Represents a rich string for a message with possible links to objects
@@ -57,7 +57,7 @@ public class RichString implements Serializable {
     public String serializedJSON() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("{\"type\": \"");
-        buffer.append(IOUtils.escapeStringJSON(RichString.class.getCanonicalName()));
+        buffer.append(TextUtils.escapeStringJSON(RichString.class.getCanonicalName()));
         buffer.append("\", \"parts\": [");
         for (int i = 0; i != parts.length; i++) {
             if (i != 0)
@@ -66,7 +66,7 @@ public class RichString implements Serializable {
                 buffer.append(((Serializable) parts[i]).serializedJSON());
             else {
                 buffer.append("\"");
-                buffer.append(IOUtils.escapeStringJSON(parts[i].toString()));
+                buffer.append(TextUtils.escapeStringJSON(parts[i].toString()));
                 buffer.append("\"");
             }
         }

@@ -19,7 +19,7 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 

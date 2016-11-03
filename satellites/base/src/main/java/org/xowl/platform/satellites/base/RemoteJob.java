@@ -21,7 +21,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Represents a job on a remote xOWL platform
@@ -126,28 +126,28 @@ public class RemoteJob {
         this.timeRun = "";
         this.timeCompleted = "";
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("identifier".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 id = value.substring(1, value.length() - 1);
             } else if ("name".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
             } else if ("type".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 type = value.substring(1, value.length() - 1);
             } else if ("status".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.status = value.substring(1, value.length() - 1);
             } else if ("timeScheduled".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeScheduled = value.substring(1, value.length() - 1);
             } else if ("timeRun".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeRun = value.substring(1, value.length() - 1);
             } else if ("timeCompleted".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeCompleted = value.substring(1, value.length() - 1);
             } else if ("result".equals(head)) {
                 ASTNode value = member.getChildren().get(1);
@@ -168,19 +168,19 @@ public class RemoteJob {
      */
     void update(ASTNode definition, XOWLFactory factory) {
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("status".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.status = value.substring(1, value.length() - 1);
             } else if ("timeScheduled".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeScheduled = value.substring(1, value.length() - 1);
             } else if ("timeRun".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeRun = value.substring(1, value.length() - 1);
             } else if ("timeCompleted".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeCompleted = value.substring(1, value.length() - 1);
             } else if ("result".equals(head)) {
                 ASTNode value = member.getChildren().get(1);

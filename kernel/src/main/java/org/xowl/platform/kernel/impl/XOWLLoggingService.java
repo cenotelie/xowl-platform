@@ -20,9 +20,9 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.ConsoleLogger;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.FileLogger;
@@ -85,33 +85,33 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         public String serializedJSON() {
             if (content instanceof Throwable) {
                 return "{\"type\": \"" +
-                        IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                        TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
                         "\", \"level\": \"" +
-                        IOUtils.escapeStringJSON(level) +
+                        TextUtils.escapeStringJSON(level) +
                         "\", \"date\": \"" +
-                        IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
+                        TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
                         "\", \"content\": \"" +
-                        IOUtils.escapeStringJSON(((Throwable) content).getClass().getCanonicalName()) +
+                        TextUtils.escapeStringJSON(((Throwable) content).getClass().getCanonicalName()) +
                         "\"}";
             } else if (content instanceof Serializable) {
                 return "{\"type\": \"" +
-                        IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                        TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
                         "\", \"level\": \"" +
-                        IOUtils.escapeStringJSON(level) +
+                        TextUtils.escapeStringJSON(level) +
                         "\", \"date\": \"" +
-                        IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
+                        TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
                         "\", \"content\": " +
                         ((Serializable) content).serializedJSON() +
                         "}";
             }
             return "{\"type\": \"" +
-                    IOUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
+                    TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
                     "\", \"level\": \"" +
-                    IOUtils.escapeStringJSON(level) +
+                    TextUtils.escapeStringJSON(level) +
                     "\", \"date\": \"" +
-                    IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
+                    TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
                     "\", \"content\": \"" +
-                    IOUtils.escapeStringJSON(content.toString()) +
+                    TextUtils.escapeStringJSON(content.toString()) +
                     "\"}";
         }
     }

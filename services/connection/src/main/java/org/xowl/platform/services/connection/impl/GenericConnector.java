@@ -19,14 +19,14 @@ package org.xowl.platform.services.connection.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.store.AbstractRepository;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.loaders.*;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.KernelSchema;
@@ -143,22 +143,22 @@ class GenericConnector extends ConnectorServiceBase {
         contentType = contentType.trim();
         Loader loader = null;
         switch (contentType) {
-            case AbstractRepository.SYNTAX_NTRIPLES:
+            case Repository.SYNTAX_NTRIPLES:
                 loader = new NTriplesLoader(nodeManager);
                 break;
-            case AbstractRepository.SYNTAX_NQUADS:
+            case Repository.SYNTAX_NQUADS:
                 loader = new NQuadsLoader(nodeManager);
                 break;
-            case AbstractRepository.SYNTAX_TURTLE:
+            case Repository.SYNTAX_TURTLE:
                 loader = new TurtleLoader(nodeManager);
                 break;
-            case AbstractRepository.SYNTAX_TRIG:
+            case Repository.SYNTAX_TRIG:
                 loader = new TriGLoader(nodeManager);
                 break;
-            case AbstractRepository.SYNTAX_RDFXML:
+            case Repository.SYNTAX_RDFXML:
                 loader = new RDFXMLLoader(nodeManager);
                 break;
-            case AbstractRepository.SYNTAX_JSON_LD:
+            case Repository.SYNTAX_JSON_LD:
                 loader = new JSONLDLoader(nodeManager) {
                     @Override
                     protected Reader getReaderFor(Logger logger, String iri) {

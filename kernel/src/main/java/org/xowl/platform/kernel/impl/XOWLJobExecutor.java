@@ -22,12 +22,14 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.SHA1;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
@@ -243,19 +245,19 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
      * @param content The job's content
      */
     private void reloadJob(String file, String content) {
-        ASTNode definition = IOUtils.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
             Logging.getDefault().error("Failed to parse the job " + file);
             return;
         }
         String type = null;
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             ASTNode nodeValue = member.getChildren().get(1);
             String value = null;
             if (nodeValue.getValue() != null) {
-                value = IOUtils.unescape(nodeValue.getValue());
+                value = TextUtils.unescape(nodeValue.getValue());
                 value = value.substring(1, value.length() - 1);
             }
             if ("type".equals(head)) {
@@ -535,7 +537,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
      * @return The file name
      */
     private static String getFileName(Job job) {
-        return "job-" + IOUtils.hashSHA1(job.getIdentifier()) + ".json";
+        return "job-" + SHA1.hashSHA1(job.getIdentifier()) + ".json";
     }
 
     /**

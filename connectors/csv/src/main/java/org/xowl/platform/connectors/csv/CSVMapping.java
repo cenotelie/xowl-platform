@@ -18,9 +18,9 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,7 +53,7 @@ public class CSVMapping implements Serializable {
     public CSVMapping(ASTNode node) {
         this.columns = new ArrayList<>();
         for (ASTNode child : node.getChildren()) {
-            String key = IOUtils.unescape(child.getChildren().get(0).getValue());
+            String key = TextUtils.unescape(child.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             if (key.equals("columns")) {
                 for (ASTNode columnNode : child.getChildren().get(1).getChildren()) {
@@ -134,7 +134,7 @@ public class CSVMapping implements Serializable {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(CSVMapping.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(CSVMapping.class.getCanonicalName()));
         builder.append("\", \"columns\": [");
         for (int i = 0; i != columns.size(); i++) {
             if (i != 0)

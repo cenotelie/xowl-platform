@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation of a user role for the platform
@@ -63,11 +63,11 @@ public class PlatformRoleBase implements PlatformRole {
     @Override
     public String serializedJSON() {
         return "{\"type\": \""
-                + IOUtils.escapeStringJSON(PlatformRole.class.getCanonicalName())
+                + TextUtils.escapeStringJSON(PlatformRole.class.getCanonicalName())
                 + "\", \"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
+                + TextUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(name)
+                + TextUtils.escapeStringJSON(name)
                 + "\"}";
     }
 }

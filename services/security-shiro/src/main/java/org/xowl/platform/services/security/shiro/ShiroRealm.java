@@ -31,13 +31,13 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
-import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
 
 import java.util.Collection;
@@ -90,11 +90,11 @@ public class ShiroRealm implements Realm {
         @Override
         public String serializedJSON() {
             return "{\"type\": \"" +
-                    IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()) +
+                    TextUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()) +
                     "\", \"identifier\": \"" +
-                    IOUtils.escapeStringJSON(identifier) +
+                    TextUtils.escapeStringJSON(identifier) +
                     "\",  \"name\": \"" +
-                    IOUtils.escapeStringJSON(identifier) +
+                    TextUtils.escapeStringJSON(identifier) +
                     "\"}";
         }
 

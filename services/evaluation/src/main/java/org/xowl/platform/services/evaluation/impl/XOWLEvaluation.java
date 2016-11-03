@@ -19,7 +19,6 @@ package org.xowl.platform.services.evaluation.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
@@ -27,6 +26,7 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -105,19 +105,19 @@ class XOWLEvaluation implements Evaluation {
         this.evaluables = new ArrayList<>();
         this.criteria = new ArrayList<>();
         for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String memberName = TextUtils.unescape(member.getChildren().get(0).getValue());
             memberName = memberName.substring(1, memberName.length() - 1);
             switch (memberName) {
                 case "identifier":
-                    identifier = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    identifier = TextUtils.unescape(member.getChildren().get(1).getValue());
                     identifier = identifier.substring(1, identifier.length() - 1);
                     break;
                 case "name":
-                    name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    name = TextUtils.unescape(member.getChildren().get(1).getValue());
                     name = name.substring(1, name.length() - 1);
                     break;
                 case "evaluableType":
-                    String id = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    String id = TextUtils.unescape(member.getChildren().get(1).getValue());
                     id = id.substring(1, id.length() - 1);
                     evaluableType = service.getEvaluableType(id);
                     break;
@@ -150,9 +150,9 @@ class XOWLEvaluation implements Evaluation {
     private Map<String, String> loadParameters(ASTNode node) {
         Map<String, String> parameters = new HashMap<>();
         for (ASTNode member : node.getChildren()) {
-            String paramName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String paramName = TextUtils.unescape(member.getChildren().get(0).getValue());
             paramName = paramName.substring(1, paramName.length() - 1);
-            String paramValue = IOUtils.unescape(member.getChildren().get(1).getValue());
+            String paramValue = TextUtils.unescape(member.getChildren().get(1).getValue());
             paramValue = paramValue.substring(1, paramValue.length() - 1);
             parameters.put(paramName, paramValue);
         }
@@ -170,11 +170,11 @@ class XOWLEvaluation implements Evaluation {
         String typeId = null;
         Map<String, String> parameters = new HashMap<>();
         for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String memberName = TextUtils.unescape(member.getChildren().get(0).getValue());
             memberName = memberName.substring(1, memberName.length() - 1);
             switch (memberName) {
                 case "typeId":
-                    typeId = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    typeId = TextUtils.unescape(member.getChildren().get(1).getValue());
                     typeId = typeId.substring(1, typeId.length() - 1);
                     break;
                 case "parameters":
@@ -216,13 +216,13 @@ class XOWLEvaluation implements Evaluation {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(XOWLEvaluation.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(XOWLEvaluation.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"evaluableType\": \"");
-        builder.append(IOUtils.escapeStringJSON(evaluableType.getIdentifier()));
+        builder.append(TextUtils.escapeStringJSON(evaluableType.getIdentifier()));
         builder.append("\", \"evaluables\": [");
         boolean first = true;
         for (Evaluable evaluable : evaluables) {
@@ -250,9 +250,9 @@ class XOWLEvaluation implements Evaluation {
                     builder.append(", ");
                 first = false;
                 builder.append("{\"evaluable\": \"");
-                builder.append(IOUtils.escapeStringJSON(evaluable.getIdentifier()));
+                builder.append(TextUtils.escapeStringJSON(evaluable.getIdentifier()));
                 builder.append("\", \"criterion\": \"");
-                builder.append(IOUtils.escapeStringJSON(criterion.getIdentifier()));
+                builder.append(TextUtils.escapeStringJSON(criterion.getIdentifier()));
                 builder.append("\", \"data\": ");
                 builder.append(result.serializedJSON());
                 builder.append("}");
@@ -316,11 +316,11 @@ class XOWLEvaluation implements Evaluation {
         if (lts == null)
             return XSPReplyServiceUnavailable.instance();
         Result sparqlResult = lts.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
-                IOUtils.escapeAbsoluteURIW3C(EVALUATION) +
+                TextUtils.escapeAbsoluteURIW3C(EVALUATION) +
                 "> . ?a <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n } }");
         if (!sparqlResult.isSuccess())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());

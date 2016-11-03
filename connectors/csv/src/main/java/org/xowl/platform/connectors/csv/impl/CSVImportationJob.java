@@ -19,7 +19,7 @@ package org.xowl.platform.connectors.csv.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.connectors.csv.CSVConfiguration;
 import org.xowl.platform.connectors.csv.CSVImporter;
 import org.xowl.platform.kernel.jobs.JobBase;
@@ -67,10 +67,10 @@ public class CSVImportationJob extends JobBase {
         ASTNode payload = getPayloadNode(definition);
         if (payload != null) {
             for (ASTNode member : payload.getChildren()) {
-                String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+                String head = TextUtils.unescape(member.getChildren().get(0).getValue());
                 head = head.substring(1, head.length() - 1);
                 if ("document".equals(head)) {
-                    String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                     tDocument = value.substring(1, value.length() - 1);
                 } else if ("configuration".equals(head)) {
                     tConfiguration = new CSVConfiguration(member.getChildren().get(1));
@@ -84,7 +84,7 @@ public class CSVImportationJob extends JobBase {
     @Override
     protected String getJSONSerializedPayload() {
         return "{\"document\": \"" +
-                IOUtils.escapeStringJSON(documentId) +
+                TextUtils.escapeStringJSON(documentId) +
                 "\", \"configuration\": " +
                 configuration.serializedJSON() +
                 "}";

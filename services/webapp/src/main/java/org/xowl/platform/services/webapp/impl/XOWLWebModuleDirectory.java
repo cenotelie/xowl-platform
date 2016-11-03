@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.services.webapp.WebModule;
 

@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.store.ProxyObject;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
 import java.util.Collection;

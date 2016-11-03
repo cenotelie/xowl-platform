@@ -18,7 +18,7 @@
 package org.xowl.platform.services.consistency.impl;
 
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 
 /**
@@ -80,13 +80,13 @@ class XOWLConsistencyRule implements ConsistencyRule {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(ConsistencyRule.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ConsistencyRule.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(original.getName()) +
+                TextUtils.escapeStringJSON(original.getName()) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\", \"definition\": \"" +
-                IOUtils.escapeStringJSON(original.getDefinition()) +
+                TextUtils.escapeStringJSON(original.getDefinition()) +
                 "\", \"isActive\": " +
                 Boolean.toString(original.isActive()) +
                 "}";

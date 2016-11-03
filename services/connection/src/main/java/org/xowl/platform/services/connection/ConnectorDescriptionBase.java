@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -83,13 +83,13 @@ public class ConnectorDescriptionBase implements ConnectorDescription {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ConnectorDescription.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ConnectorDescription.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"description\": \"");
-        builder.append(IOUtils.escapeStringJSON(description));
+        builder.append(TextUtils.escapeStringJSON(description));
         builder.append("\", \"parameters\": [");
         boolean first = true;
         for (ConnectorDescriptionParam param : getParameters()) {

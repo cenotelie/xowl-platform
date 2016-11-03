@@ -18,8 +18,8 @@
 package org.xowl.platform.services.importation;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
@@ -64,9 +64,9 @@ public class Document implements Identifiable, Serializable {
         String tName = "";
         String tFileName = "";
         for (ASTNode pair : node.getChildren()) {
-            String key = IOUtils.unescape(pair.getChildren().get(0).getValue());
+            String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
-            String value = IOUtils.unescape(pair.getChildren().get(1).getValue());
+            String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
             value = value.substring(1, value.length() - 1);
             switch (key) {
                 case "identifier":
@@ -111,10 +111,10 @@ public class Document implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + IOUtils.escapeStringJSON(Document.class.getCanonicalName()) +
-                "\", \"identifier\": \"" + IOUtils.escapeStringJSON(identifier) +
-                "\", \"name\":\"" + IOUtils.escapeStringJSON(name) +
-                "\", \"fileName\":\"" + IOUtils.escapeStringJSON(fileName) +
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(Document.class.getCanonicalName()) +
+                "\", \"identifier\": \"" + TextUtils.escapeStringJSON(identifier) +
+                "\", \"name\":\"" + TextUtils.escapeStringJSON(name) +
+                "\", \"fileName\":\"" + TextUtils.escapeStringJSON(fileName) +
                 "\"}";
     }
 }

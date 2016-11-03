@@ -21,11 +21,11 @@ import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.api.XOWLStoredProcedure;
 import org.xowl.infra.server.api.XOWLUser;
-import org.xowl.infra.server.api.base.BaseStoredProcedureContext;
-import org.xowl.infra.server.base.ServerConfiguration;
+import org.xowl.infra.server.base.BaseStoredProcedureContext;
 import org.xowl.infra.server.embedded.EmbeddedServer;
+import org.xowl.infra.server.impl.ServerConfiguration;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.AbstractRepository;
+import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
@@ -116,9 +116,9 @@ class XOWLInternalRealm implements Realm {
             Configuration configuration = configurationService.getConfigFor(this);
             String location = (new File(System.getenv(Env.ROOT), configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
-            server = new EmbeddedServer(serverConfiguration);
+            server = new EmbeddedServer(Logging.getDefault(), serverConfiguration);
             database = ((XSPReplyResult<XOWLDatabase>) server.getDatabase(serverConfiguration.getAdminDBName())).getData();
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             Logging.getDefault().error(exception);
         }
         this.nodes = new CachedNodes();
@@ -136,7 +136,7 @@ class XOWLInternalRealm implements Realm {
      */
     private void initializeDatabase() {
         // (re-)upload the rules
-        XSPReply reply = database.upload(AbstractRepository.SYNTAX_RDFT, readResource("rules.rdft"));
+        XSPReply reply = database.upload(Repository.SYNTAX_RDFT, readResource("rules.rdft"));
         if (!reply.isSuccess()) {
             Logging.getDefault().error("Failed to initialize the security database");
             return;

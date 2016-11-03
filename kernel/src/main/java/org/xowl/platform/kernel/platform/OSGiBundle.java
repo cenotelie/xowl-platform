@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.platform;
 
 import org.osgi.framework.Bundle;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Identifiable;
 
 /**
@@ -125,21 +125,21 @@ public class OSGiBundle implements Identifiable, Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(getIdentifier()) +
+                TextUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(getName()) +
+                TextUtils.escapeStringJSON(getName()) +
                 "\", \"description\": \"" +
-                IOUtils.escapeStringJSON(getDescription()) +
+                TextUtils.escapeStringJSON(getDescription()) +
                 "\", \"vendor\": \"" +
-                IOUtils.escapeStringJSON(getVendor()) +
+                TextUtils.escapeStringJSON(getVendor()) +
                 "\", \"type\": \"" +
-                IOUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
                 "\", \"version\": \"" +
-                IOUtils.escapeStringJSON(getVersion()) +
+                TextUtils.escapeStringJSON(getVersion()) +
                 "\", \"state\": \"" +
-                IOUtils.escapeStringJSON(getState().toString()) +
+                TextUtils.escapeStringJSON(getState().toString()) +
                 "\"}";
     }
 }

@@ -20,13 +20,13 @@ package org.xowl.platform.services.impact.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -179,7 +179,7 @@ class XOWLImpactAnalysisJob extends JobBase {
         StringBuilder builder = new StringBuilder("DESCRIBE");
         for (int i = start; i != parts.size(); i++) {
             builder.append(" <");
-            builder.append(IOUtils.escapeAbsoluteURIW3C(parts.get(i).getNode().getIRIValue()));
+            builder.append(TextUtils.escapeAbsoluteURIW3C(parts.get(i).getNode().getIRIValue()));
             builder.append(">");
         }
         Result result = live.sparql(builder.toString());

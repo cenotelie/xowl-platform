@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.impact.impl;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisResult;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 
@@ -58,7 +58,7 @@ class XOWLImpactAnalysisResult implements ImpactAnalysisResult {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ImpactAnalysisResult.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ImpactAnalysisResult.class.getCanonicalName()));
         builder.append("\", \"parts\": [");
         for (int i = 0; i != parts.size(); i++) {
             if (i > 0)

@@ -18,8 +18,8 @@
 package org.xowl.platform.services.importation;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Represents the basic configuration for an importer
@@ -71,22 +71,22 @@ public class ImporterConfiguration implements Serializable {
         String tArchetype = "";
 
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("family".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 tFamily = value.substring(1, value.length() - 1);
             } else if ("version".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 tVersion = value.substring(1, value.length() - 1);
             } else if ("archetype".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 tArchetype = value.substring(1, value.length() - 1);
             } else if ("superseded".equals(head)) {
                 ASTNode nodeSuperseded = member.getChildren().get(1);
                 tSuperseded = new String[nodeSuperseded.getChildren().size()];
                 for (int i = 0; i != tSuperseded.length; i++) {
-                    String value = IOUtils.unescape(nodeSuperseded.getChildren().get(i).getValue());
+                    String value = TextUtils.unescape(nodeSuperseded.getChildren().get(i).getValue());
                     tSuperseded[i] = value.substring(1, value.length() - 1);
                 }
             }
@@ -143,7 +143,7 @@ public class ImporterConfiguration implements Serializable {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ImporterConfiguration.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ImporterConfiguration.class.getCanonicalName()));
         builder.append("\", ");
         serializeJSON(builder);
         builder.append("}");
@@ -157,7 +157,7 @@ public class ImporterConfiguration implements Serializable {
      */
     protected void serializeJSON(StringBuilder builder) {
         builder.append("\"family\": \"");
-        builder.append(IOUtils.escapeStringJSON(family));
+        builder.append(TextUtils.escapeStringJSON(family));
         builder.append("\", \"superseded\": [");
         for (int i = 0; i != superseded.length; i++) {
             if (i != 0)
@@ -167,9 +167,9 @@ public class ImporterConfiguration implements Serializable {
             builder.append("\"");
         }
         builder.append("], \"version\": \"");
-        builder.append(IOUtils.escapeStringJSON(version));
+        builder.append(TextUtils.escapeStringJSON(version));
         builder.append("\", \"archetype\": \"");
-        builder.append(IOUtils.escapeStringJSON(archetype));
+        builder.append(TextUtils.escapeStringJSON(archetype));
         builder.append("\"");
     }
 }

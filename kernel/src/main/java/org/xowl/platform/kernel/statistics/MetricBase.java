@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation of a metric
@@ -63,11 +63,11 @@ public class MetricBase implements Metric {
     @Override
     public String serializedJSON() {
         return "{\"type\": \""
-                + IOUtils.escapeStringJSON(Metric.class.getCanonicalName())
+                + TextUtils.escapeStringJSON(Metric.class.getCanonicalName())
                 + "\", \"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
+                + TextUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(name)
+                + TextUtils.escapeStringJSON(name)
                 + "\"}";
     }
 }

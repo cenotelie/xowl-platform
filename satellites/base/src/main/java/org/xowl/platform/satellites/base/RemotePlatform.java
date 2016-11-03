@@ -20,11 +20,11 @@ package org.xowl.platform.satellites.base;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.hime.redist.ParseError;
 import org.xowl.hime.redist.ParseResult;
-import org.xowl.infra.store.URIUtils;
-import org.xowl.infra.store.http.HttpConnection;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.http.HttpConnection;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.infra.utils.logging.Logging;
 

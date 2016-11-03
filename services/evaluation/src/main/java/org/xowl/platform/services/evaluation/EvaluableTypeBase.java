@@ -17,8 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.store.IOUtils;
-import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation for representation of evaluable element types
@@ -64,11 +63,11 @@ public abstract class EvaluableTypeBase implements EvaluableType {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(getClass().getCanonicalName()) +
+                TextUtils.escapeStringJSON(getClass().getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(identifier) +
+                TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\"}";
     }
 }

@@ -19,7 +19,7 @@ package org.xowl.platform.services.lts.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -67,7 +67,7 @@ public class DeleteArtifactJob extends JobBase {
      */
     public DeleteArtifactJob(ASTNode definition) {
         super(definition);
-        String connector = IOUtils.unescape(getPayloadNode(definition).getValue());
+        String connector = TextUtils.unescape(getPayloadNode(definition).getValue());
         this.artifactId = connector.substring(1, connector.length() - 1);
     }
 

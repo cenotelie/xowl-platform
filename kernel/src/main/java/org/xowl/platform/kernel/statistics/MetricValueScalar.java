@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Implements a scalar value for a metric
@@ -49,9 +49,9 @@ public class MetricValueScalar<T> implements Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(MetricValueScalar.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(MetricValueScalar.class.getCanonicalName()) +
                 "\", \"value\": \"" +
-                IOUtils.escapeStringJSON(value.toString()) +
+                TextUtils.escapeStringJSON(value.toString()) +
                 "\"}";
     }
 }

@@ -19,13 +19,13 @@ package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultSolutions;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -77,9 +77,9 @@ public class EvaluableEntity implements Evaluable {
         } else {
             String name = null;
             Result sparqlResult = ltsService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
-                    IOUtils.escapeAbsoluteURIW3C(artifactId) +
+                    TextUtils.escapeAbsoluteURIW3C(artifactId) +
                     "> { <" +
-                    IOUtils.escapeAbsoluteURIW3C(elementURI) +
+                    TextUtils.escapeAbsoluteURIW3C(elementURI) +
                     "> ?p ?o } }");
             if (!sparqlResult.isSuccess()) {
                 name = elementURI;
@@ -131,15 +131,15 @@ public class EvaluableEntity implements Evaluable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(getClass().getCanonicalName()) +
+                TextUtils.escapeStringJSON(getClass().getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(identifier) +
+                TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\", \"artifact\": \"" +
-                IOUtils.escapeStringJSON(artifactId) +
+                TextUtils.escapeStringJSON(artifactId) +
                 "\", \"element\": \"" +
-                IOUtils.escapeStringJSON(elementURI) +
+                TextUtils.escapeStringJSON(elementURI) +
                 "\"}";
     }
 }

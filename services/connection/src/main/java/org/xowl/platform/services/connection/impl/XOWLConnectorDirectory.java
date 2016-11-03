@@ -22,12 +22,13 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;
@@ -413,7 +414,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = IOUtils.parseJSON(logger, new String(content, Files.CHARSET));
+        ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
 
@@ -432,26 +433,26 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         List<String> uris = new ArrayList<>(2);
         Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
         for (ASTNode member : root.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             switch (head) {
                 case "identifier":
-                    id = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    id = TextUtils.unescape(member.getChildren().get(1).getValue());
                     id = id.substring(1, id.length() - 1);
                     break;
                 case "name":
-                    name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    name = TextUtils.unescape(member.getChildren().get(1).getValue());
                     name = name.substring(1, name.length() - 1);
                     break;
                 case "uris": {
                     ASTNode valueNode = member.getChildren().get(1);
                     if (valueNode.getValue() != null) {
-                        String value = IOUtils.unescape(valueNode.getValue());
+                        String value = TextUtils.unescape(valueNode.getValue());
                         value = value.substring(1, value.length() - 1);
                         uris.add(value);
                     } else if (valueNode.getChildren().size() > 0) {
                         for (ASTNode childNode : valueNode.getChildren()) {
-                            String value = IOUtils.unescape(childNode.getValue());
+                            String value = TextUtils.unescape(childNode.getValue());
                             value = value.substring(1, value.length() - 1);
                             uris.add(value);
                         }
@@ -469,14 +470,14 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                     if (parameter != null) {
                         ASTNode valueNode = member.getChildren().get(1);
                         if (valueNode.getValue() != null) {
-                            String value = IOUtils.unescape(valueNode.getValue());
+                            String value = TextUtils.unescape(valueNode.getValue());
                             if (value.startsWith("\"") && value.endsWith("\""))
                                 value = value.substring(1, value.length() - 1);
                             customParams.put(parameter, value);
                         } else if (valueNode.getChildren().size() > 0) {
                             String[] values = new String[valueNode.getChildren().size()];
                             for (int i = 0; i != valueNode.getChildren().size(); i++) {
-                                String value = IOUtils.unescape(valueNode.getChildren().get(i).getValue());
+                                String value = TextUtils.unescape(valueNode.getChildren().get(i).getValue());
                                 if (value.startsWith("\"") && value.endsWith("\""))
                                     value = value.substring(1, value.length() - 1);
                                 values[i] = value;

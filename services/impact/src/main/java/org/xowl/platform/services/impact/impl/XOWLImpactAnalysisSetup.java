@@ -18,10 +18,10 @@
 package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
@@ -100,15 +100,15 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
         this.filterLinks = new ArrayList<>();
         this.filterResults = new ArrayList<>();
         for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String memberName = TextUtils.unescape(member.getChildren().get(0).getValue());
             memberName = memberName.substring(1, memberName.length() - 1);
             switch (memberName) {
                 case "root":
-                    root = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    root = TextUtils.unescape(member.getChildren().get(1).getValue());
                     root = root.substring(1, root.length() - 1);
                     break;
                 case "degree":
-                    value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    value = TextUtils.unescape(member.getChildren().get(1).getValue());
                     if (value.startsWith("\""))
                         value = value.substring(1, value.length() - 1);
                     degree = Integer.parseInt(value);
@@ -119,7 +119,7 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
                     }
                     break;
                 case "isFilterLinksInclusive":
-                    value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    value = TextUtils.unescape(member.getChildren().get(1).getValue());
                     if (value.startsWith("\""))
                         value = value.substring(1, value.length() - 1);
                     isFilterLinksInclusive = "true".equalsIgnoreCase(value);
@@ -130,7 +130,7 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
                     }
                     break;
                 case "isFilterResultsInclusive":
-                    value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    value = TextUtils.unescape(member.getChildren().get(1).getValue());
                     if (value.startsWith("\""))
                         value = value.substring(1, value.length() - 1);
                     isFilterResultsInclusive = "true".equalsIgnoreCase(value);
@@ -181,9 +181,9 @@ class XOWLImpactAnalysisSetup implements ImpactAnalysisSetup {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ImpactAnalysisSetup.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ImpactAnalysisSetup.class.getCanonicalName()));
         builder.append("\", \"root\": \"");
-        builder.append(IOUtils.escapeStringJSON(root.getIRIValue()));
+        builder.append(TextUtils.escapeStringJSON(root.getIRIValue()));
         builder.append("\", \"degree\": ");
         builder.append(Integer.toString(degree));
         builder.append(", \"filterLinks\": [");

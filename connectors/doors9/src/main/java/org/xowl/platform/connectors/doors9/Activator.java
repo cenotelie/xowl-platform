@@ -21,8 +21,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.connectors.doors9.impl.DOORS9ImportationJobFactory;
 import org.xowl.platform.connectors.doors9.impl.DOORS9UIContribution;
-import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.jobs.JobFactory;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.importation.Importer;
 
 /**

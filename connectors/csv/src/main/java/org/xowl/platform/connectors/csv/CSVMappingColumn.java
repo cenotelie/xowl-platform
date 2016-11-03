@@ -18,10 +18,10 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -126,9 +126,9 @@ public class CSVMappingColumn implements Serializable {
         String tDatatype = "";
         String tRegexp = "";
         for (ASTNode child : node.getChildren()) {
-            String key = IOUtils.unescape(child.getChildren().get(0).getValue());
+            String key = TextUtils.unescape(child.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
-            String value = IOUtils.unescape(child.getChildren().get(1).getValue());
+            String value = TextUtils.unescape(child.getChildren().get(1).getValue());
             value = value.substring(1, value.length() - 1);
             switch (key) {
                 case "type":
@@ -229,13 +229,13 @@ public class CSVMappingColumn implements Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(type) +
+                TextUtils.escapeStringJSON(type) +
                 "\", \"property\": \"" +
-                IOUtils.escapeStringJSON(property != null ? property : "") +
+                TextUtils.escapeStringJSON(property != null ? property : "") +
                 "\", \"datatype\": \"" +
-                IOUtils.escapeStringJSON(datatype != null ? datatype : "") +
+                TextUtils.escapeStringJSON(datatype != null ? datatype : "") +
                 "\", \"regexp\": \"" +
-                IOUtils.escapeStringJSON(regexp != null ? regexp.pattern() : "") +
+                TextUtils.escapeStringJSON(regexp != null ? regexp.pattern() : "") +
                 "\"}";
     }
 }

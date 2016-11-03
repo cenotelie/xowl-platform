@@ -19,10 +19,10 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
@@ -134,7 +134,7 @@ public class XOWLStatisticsService implements StatisticsService {
                 builder.append(", ");
             first = false;
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(ids[i]));
+            builder.append(TextUtils.escapeStringJSON(ids[i]));
             builder.append("\": ");
             builder.append(value.serializedJSON());
         }

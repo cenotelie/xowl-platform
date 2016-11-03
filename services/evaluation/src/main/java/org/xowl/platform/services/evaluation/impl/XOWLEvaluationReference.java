@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation.impl;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.evaluation.EvaluationReference;
 
 /**
@@ -63,11 +63,11 @@ class XOWLEvaluationReference implements EvaluationReference {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + IOUtils.escapeStringJSON(EvaluationReference.class.getCanonicalName()) +
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(EvaluationReference.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(identifier) +
+                TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\"}";
     }
 }

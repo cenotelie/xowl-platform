@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.webapp;
 
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Represents an item in a web module
@@ -78,13 +78,13 @@ public class WebModuleItem implements Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(WebModuleItem.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(WebModuleItem.class.getCanonicalName()) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\", \"uri\": \"" +
-                IOUtils.escapeStringJSON(uri) +
+                TextUtils.escapeStringJSON(uri) +
                 "\", \"icon\": \"" +
-                (icon == null ? "" : IOUtils.escapeStringJSON(icon)) +
+                (icon == null ? "" : TextUtils.escapeStringJSON(icon)) +
                 "\"}";
     }
 }

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation for a platform user
@@ -63,11 +63,11 @@ public abstract class PlatformUserBase implements PlatformUser {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"roles\": [");
         boolean first = true;
         for (PlatformRole role : getRoles()) {
@@ -75,11 +75,11 @@ public abstract class PlatformUserBase implements PlatformUser {
                 builder.append(", ");
             first = false;
             builder.append("{\"type\": \"");
-            builder.append(IOUtils.escapeStringJSON(PlatformRole.class.getCanonicalName()));
+            builder.append(TextUtils.escapeStringJSON(PlatformRole.class.getCanonicalName()));
             builder.append("\", \"identifier\": \"");
-            builder.append(IOUtils.escapeStringJSON(role.getIdentifier()));
+            builder.append(TextUtils.escapeStringJSON(role.getIdentifier()));
             builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(role.getName()));
+            builder.append(TextUtils.escapeStringJSON(role.getName()));
             builder.append("\"}");
         }
         builder.append("]}");

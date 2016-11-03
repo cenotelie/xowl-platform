@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.impact.impl;
 
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 
@@ -164,13 +164,13 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ImpactAnalysisResultPart.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ImpactAnalysisResultPart.class.getCanonicalName()));
         builder.append("\", \"node\": \"");
-        builder.append(IOUtils.escapeStringJSON(node.getIRIValue()));
+        builder.append(TextUtils.escapeStringJSON(node.getIRIValue()));
         builder.append("\", \"degree\": ");
         builder.append(Integer.toString(degree));
         builder.append(", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"types\": [");
         boolean first = true;
         for (IRINode type : types) {
@@ -178,7 +178,7 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
                 builder.append(", ");
             first = false;
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(type.getIRIValue()));
+            builder.append(TextUtils.escapeStringJSON(type.getIRIValue()));
             builder.append("\"");
         }
         builder.append("], \"paths\": [");
@@ -193,9 +193,9 @@ class XOWLImpactAnalysisResultPart implements ImpactAnalysisResultPart {
                     builder.append(", ");
                 Couple<ImpactAnalysisResultPart, IRINode> part = path.get(i);
                 builder.append("{\"target\": \"");
-                builder.append(IOUtils.escapeStringJSON(part.x.getName()));
+                builder.append(TextUtils.escapeStringJSON(part.x.getName()));
                 builder.append("\", \"property\": \"");
-                builder.append(IOUtils.escapeStringJSON(part.y.getIRIValue()));
+                builder.append(TextUtils.escapeStringJSON(part.y.getIRIValue()));
                 builder.append("\"}");
             }
             builder.append("]}");

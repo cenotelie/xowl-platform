@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.jobs;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -114,41 +114,41 @@ public abstract class JobBase extends SafeRunnable implements Job {
         this.timeRun = "";
         this.timeCompleted = "";
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("identifier".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 id = value.substring(1, value.length() - 1);
             } else if ("name".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
             } else if ("jobType".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 type = value.substring(1, value.length() - 1);
             } else if ("owner".equals(head)) {
                 for (ASTNode subMember : member.getChildren().get(1).getChildren()) {
-                    String subHead = IOUtils.unescape(member.getChildren().get(0).getValue());
+                    String subHead = TextUtils.unescape(member.getChildren().get(0).getValue());
                     subHead = subHead.substring(1, head.length() - 1);
                     if ("identifier".equals(subHead)) {
-                        String value = IOUtils.unescape(subMember.getChildren().get(1).getValue());
+                        String value = TextUtils.unescape(subMember.getChildren().get(1).getValue());
                         ownerId = value.substring(1, value.length() - 1);
                         break;
                     }
                 }
             } else if ("status".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.status = JobStatus.valueOf(value.substring(1, value.length() - 1));
             } else if ("timeScheduled".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeScheduled = value.substring(1, value.length() - 1);
             } else if ("timeRun".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeRun = value.substring(1, value.length() - 1);
             } else if ("timeCompleted".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.timeCompleted = value.substring(1, value.length() - 1);
             } else if ("completionRate".equals(head)) {
-                String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 this.completionRate = Float.parseFloat(value.substring(1, value.length() - 1));
             }
         }
@@ -180,27 +180,27 @@ public abstract class JobBase extends SafeRunnable implements Job {
     @Override
     public String serializedJSON() {
         return "{\"type\": \""
-                + IOUtils.escapeStringJSON(Job.class.getCanonicalName())
+                + TextUtils.escapeStringJSON(Job.class.getCanonicalName())
                 + "\", \"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
+                + TextUtils.escapeStringJSON(identifier)
                 + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(name)
+                + TextUtils.escapeStringJSON(name)
                 + "\", \"jobType\": \""
-                + IOUtils.escapeStringJSON(type)
+                + TextUtils.escapeStringJSON(type)
                 + "\", \"owner\": {\"type\": \""
-                + IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName())
+                + TextUtils.escapeStringJSON(PlatformUser.class.getCanonicalName())
                 + "\", \"identifier\": \""
-                + IOUtils.escapeStringJSON(owner.getIdentifier())
+                + TextUtils.escapeStringJSON(owner.getIdentifier())
                 + "\", \"name\":\""
-                + IOUtils.escapeStringJSON(owner.getName())
+                + TextUtils.escapeStringJSON(owner.getName())
                 + "\"}, \"status\": \""
-                + IOUtils.escapeStringJSON(status.toString())
+                + TextUtils.escapeStringJSON(status.toString())
                 + "\", \"timeScheduled\": \""
-                + IOUtils.escapeStringJSON(timeScheduled)
+                + TextUtils.escapeStringJSON(timeScheduled)
                 + "\", \"timeRun\": \""
-                + IOUtils.escapeStringJSON(timeRun)
+                + TextUtils.escapeStringJSON(timeRun)
                 + "\", \"timeCompleted\": \""
-                + IOUtils.escapeStringJSON(timeCompleted)
+                + TextUtils.escapeStringJSON(timeCompleted)
                 + "\", \"completionRate\": \""
                 + Float.toString(completionRate)
                 + "\", \"payload\": "
@@ -276,7 +276,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      */
     public static ASTNode getPayloadNode(ASTNode definition) {
         for (ASTNode member : definition.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("payload".equals(head)) {
                 return member.getChildren().get(1);

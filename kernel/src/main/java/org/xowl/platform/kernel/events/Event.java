@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.RichString;
 

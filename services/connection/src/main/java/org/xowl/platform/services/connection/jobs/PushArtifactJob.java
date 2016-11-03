@@ -19,7 +19,7 @@ package org.xowl.platform.services.connection.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.connection.ConnectorUtils;
 
@@ -76,8 +76,8 @@ public class PushArtifactJob extends JobBase {
         String connector = null;
         String artifact = null;
         for (ASTNode member : payloadNode.getChildren()) {
-            String head = IOUtils.unescape(member.getChildren().get(0).getValue());
-            String value = IOUtils.unescape(member.getChildren().get(1).getValue());
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            String value = TextUtils.unescape(member.getChildren().get(1).getValue());
             head = head.substring(1, head.length() - 1);
             if ("connectorId".equals(head)) {
                 connector = value.substring(1, value.length() - 1);
@@ -92,9 +92,9 @@ public class PushArtifactJob extends JobBase {
     @Override
     protected String getJSONSerializedPayload() {
         return "{\"connectorId\": \"" +
-                IOUtils.escapeStringJSON(connectorId) +
+                TextUtils.escapeStringJSON(connectorId) +
                 "\", \"artifactId\": \"" +
-                IOUtils.escapeStringJSON(artifactId) +
+                TextUtils.escapeStringJSON(artifactId) +
                 "\"}";
     }
 

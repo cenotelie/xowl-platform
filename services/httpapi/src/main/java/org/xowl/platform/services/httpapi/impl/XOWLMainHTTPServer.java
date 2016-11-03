@@ -17,11 +17,11 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.httpapi.HTTPServerService;
 
 import javax.servlet.ServletException;

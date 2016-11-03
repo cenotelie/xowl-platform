@@ -19,29 +19,29 @@ package org.xowl.platform.services.lts.impl;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
-import org.xowl.infra.server.api.remote.RemoteServer;
-import org.xowl.infra.server.base.ServerConfiguration;
 import org.xowl.infra.server.embedded.EmbeddedServer;
+import org.xowl.infra.server.impl.ServerConfiguration;
+import org.xowl.infra.server.remote.RemoteServer;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.AbstractRepository;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.RDFUtils;
-import org.xowl.infra.store.Serializable;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultUtils;
-import org.xowl.infra.store.storage.StoreStatistics;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -153,7 +153,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         } else {
             try {
                 String location = (new File(System.getenv(Env.ROOT), configuration.get("embedded", "location"))).getAbsolutePath();
-                XOWLServer server = new EmbeddedServer(new ServerConfiguration(location));
+                XOWLServer server = new EmbeddedServer(Logging.getDefault(), new ServerConfiguration(location));
                 XSPReply reply = server.getDatabase(configuration.get("databases", "live"));
                 if (!reply.isSuccess()) {
                     // initialize
@@ -165,7 +165,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
                         return null;
                 }
                 return server;
-            } catch (IOException exception) {
+            } catch (Exception exception) {
                 Logging.getDefault().error(exception);
                 return null;
             }
@@ -226,17 +226,17 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     public XSPReply retrieve(String base, String version) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write(">. ?a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
         writer.write("> <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(base));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(base));
         writer.write(">. ?a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.VERSION));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.VERSION));
         writer.write("> \"");
-        writer.write(IOUtils.escapeStringW3C(version));
+        writer.write(TextUtils.escapeStringW3C(version));
         writer.write("\" } }");
         Result result = storeLongTerm.sparql(writer.toString());
         if (result.isFailure())
@@ -269,13 +269,13 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     public XSPReply getArtifactsForBase(String base) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write(">. ?a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.BASE));
         writer.write("> <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(base));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(base));
         writer.write("> } }");
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
@@ -288,13 +288,13 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     public XSPReply getArtifactsForArchetype(String archetype) {
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write(">. ?a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARCHETYPE));
         writer.write("> \"");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(archetype));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(archetype));
         writer.write("\" } }");
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
@@ -361,17 +361,17 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             XSPReply reply = storeService.getStatistics();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<StoreStatistics>) reply).getData();
+            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
         } else if (metric == storeLongTerm.getMetricStatistics()) {
             XSPReply reply = storeLongTerm.getStatistics();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<StoreStatistics>) reply).getData();
+            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
         } else if (metric == storeLive.getMetricStatistics()) {
             XSPReply reply = storeLive.getStatistics();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<StoreStatistics>) reply).getData();
+            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
         }
         return null;
     }
@@ -442,7 +442,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         String request = new String(content, Files.CHARSET);
         Result result = storeLive.sparql(request);
-        String resultType = ResultUtils.coerceContentType(result, accept != null ? IOUtils.httpNegotiateContentType(Collections.singletonList(accept)) : AbstractRepository.SYNTAX_NQUADS);
+        String resultType = ResultUtils.coerceContentType(result, accept != null ? XSPReplyUtils.httpNegotiateContentType(Collections.singletonList(accept)) : Repository.SYNTAX_NQUADS);
         StringWriter writer = new StringWriter();
         try {
             result.print(writer, resultType);
@@ -471,7 +471,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         serializer.serialize(logger, artifact.getMetadata().iterator());
         if (!logger.getErrorMessages().isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**
@@ -496,7 +496,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         serializer.serialize(logger, content.iterator());
         if (!logger.getErrorMessages().isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**
@@ -555,7 +555,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         serializer.serialize(logger, changeset.getRemoved().iterator());
         if (!logger.getErrorMessages().isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, AbstractRepository.SYNTAX_NQUADS, writer.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
     }
 
     /**

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.Job;
 
@@ -69,13 +69,13 @@ public abstract class Importer implements Service, Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(Importer.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(Importer.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(getIdentifier()) +
+                TextUtils.escapeStringJSON(getIdentifier()) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(getName()) +
+                TextUtils.escapeStringJSON(getName()) +
                 "\", \"wizardUri\": \"" +
-                IOUtils.escapeStringJSON(getWebWizardURI()) +
+                TextUtils.escapeStringJSON(getWebWizardURI()) +
                 "\"}";
     }
 }

@@ -18,8 +18,12 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.lang.owl2.Ontology;
-import org.xowl.infra.store.*;
+import org.xowl.infra.store.ProxyObject;
+import org.xowl.infra.store.Repository;
+import org.xowl.infra.store.RepositoryRDF;
+import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.storage.StoreFactory;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 
 import java.io.InputStream;
@@ -51,11 +55,7 @@ public class BusinessSchemaResource implements BusinessSchema {
     /**
      * The backing repository
      */
-    private final Repository repository;
-    /**
-     * The loaded ontology
-     */
-    private final Ontology ontology;
+    private final RepositoryRDF repository;
     /**
      * The classes in the schema
      */
@@ -86,15 +86,18 @@ public class BusinessSchemaResource implements BusinessSchema {
      */
     public BusinessSchemaResource(Class<?> type, String resource, String iri) {
         this.iri = iri;
-        this.repository = new Repository(StoreFactory.create().inMemory().make());
+        this.repository = new RepositoryRDF(StoreFactory.create().inMemory().make());
         InputStream stream = type.getResourceAsStream(resource);
+        Ontology ontology = null;
         if (stream != null) {
-            this.ontology = this.repository.loadResource(Logging.getDefault(),
-                    new InputStreamReader(stream),
-                    AbstractRepository.SCHEME_RESOURCE + resource,
-                    iri, AbstractRepository.getSyntax(resource));
-        } else {
-            this.ontology = null;
+            try {
+                ontology = this.repository.load(Logging.getDefault(),
+                        new InputStreamReader(stream),
+                        Repository.SCHEME_RESOURCE + resource,
+                        iri, Repository.getSyntax(resource));
+            } catch (Exception exception) {
+                Logging.getDefault().error(exception);
+            }
         }
         ProxyObject proxy = repository.getProxy(iri);
         if (proxy != null) {
@@ -185,11 +188,11 @@ public class BusinessSchemaResource implements BusinessSchema {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(BusinessSchema.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(BusinessSchema.class.getCanonicalName()));
         builder.append("\", \"id\": \"");
-        builder.append(IOUtils.escapeStringJSON(iri));
+        builder.append(TextUtils.escapeStringJSON(iri));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"classes\": [");
         serialize(builder, proxyClasses);
         builder.append("], \"datatypes\": [");
@@ -217,10 +220,10 @@ public class BusinessSchemaResource implements BusinessSchema {
                 builder.append(", ");
             first = false;
             builder.append("{\"id\": \"");
-            builder.append(IOUtils.escapeStringJSON(proxy.getIRIString()));
+            builder.append(TextUtils.escapeStringJSON(proxy.getIRIString()));
             builder.append("\", \"name\": \"");
             String label = (String) proxy.getDataValue(RDFS_LABEL);
-            builder.append(IOUtils.escapeStringJSON(label != null ? label : proxy.getIRIString()));
+            builder.append(TextUtils.escapeStringJSON(label != null ? label : proxy.getIRIString()));
             builder.append("\"}");
         }
     }

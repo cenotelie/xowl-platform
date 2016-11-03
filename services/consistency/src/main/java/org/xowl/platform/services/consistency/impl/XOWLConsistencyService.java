@@ -18,13 +18,10 @@
 package org.xowl.platform.services.consistency.impl;
 
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.server.api.base.BaseRule;
+import org.xowl.infra.server.base.BaseRule;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.IRIs;
-import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
 import org.xowl.infra.store.loaders.RDFTLoader;
 import org.xowl.infra.store.rdf.*;
@@ -33,6 +30,10 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.SHA1;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -182,13 +183,13 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
             return reply;
         Collection<XOWLRule> rules = new ArrayList<>(((XSPReplyResultCollection<XOWLRule>) reply).getData());
         Result sparqlResult = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { ?r a <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_RULE) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE) +
                 "> . ?r <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n . ?r <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
                 "> ?d } }");
         if (!sparqlResult.isSuccess())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
@@ -220,9 +221,9 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
         Result result = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
+                TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
                 "> } }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
@@ -267,9 +268,9 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
             return -1;
         TripleStore live = lts.getLiveStore();
         Result result = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
+                TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
                 "> } }");
         if (!result.isSuccess())
             return -1;
@@ -288,15 +289,15 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
             return reply;
         XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
         Result sparqlResult = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { <" +
-                IOUtils.escapeAbsoluteURIW3C(identifier) +
+                TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> a <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_RULE) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE) +
                 "> . <" +
-                IOUtils.escapeAbsoluteURIW3C(identifier) +
+                TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> <" +
-                IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
+                TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n . } }");
         if (!sparqlResult.isSuccess())
             return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
@@ -310,8 +311,8 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
 
     @Override
     public XSPReply createRule(String name, String message, String prefixes, String conditions) {
-        String id = IRI_RULE_BASE + "#" + IOUtils.hashSHA1(name);
-        String definition = prefixes + " rule distinct <" + IOUtils.escapeAbsoluteURIW3C(id) + "> {\n" + conditions + "\n} => {}";
+        String id = IRI_RULE_BASE + "#" + SHA1.hashSHA1(name);
+        String definition = prefixes + " rule distinct <" + TextUtils.escapeAbsoluteURIW3C(id) + "> {\n" + conditions + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
         RDFTLoader loader = new RDFTLoader(new CachedNodes());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
@@ -322,28 +323,28 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
         StringBuilder builder = new StringBuilder(prefixes);
         builder.append(" rule distinct <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(id));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(id));
         builder.append("> {\n");
         builder.append(conditions);
         builder.append("\n} => {\n");
         builder.append("?e <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType));
         builder.append("> <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY));
         builder.append(">.\n");
         builder.append("?e <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_MESSAGE));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(IRI_MESSAGE));
         builder.append("> \"");
-        builder.append(IOUtils.escapeStringW3C(message));
+        builder.append(TextUtils.escapeStringW3C(message));
         builder.append("\".\n");
         builder.append("?e <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_PRODUCED_BY));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(IRI_PRODUCED_BY));
         builder.append("> <");
-        builder.append(IOUtils.escapeAbsoluteURIW3C(id));
+        builder.append(TextUtils.escapeAbsoluteURIW3C(id));
         builder.append(">.\n");
         for (VariableNode variable : variables) {
             builder.append("?e <");
-            builder.append(IOUtils.escapeAbsoluteURIW3C(IRI_ANTECEDENT + variable.getName()));
+            builder.append(TextUtils.escapeAbsoluteURIW3C(IRI_ANTECEDENT + variable.getName()));
             builder.append("> ?");
             builder.append(variable.getName());
             builder.append(".\n");
@@ -359,10 +360,10 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (!reply.isSuccess())
             return reply;
         XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
-        Result result = live.sparql("INSERT DATA { GRAPH <" + IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
-                "<" + IOUtils.escapeAbsoluteURIW3C(id) + "> <" + IOUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + IOUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
-                "<" + IOUtils.escapeAbsoluteURIW3C(id) + "> <" + IOUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + IOUtils.escapeStringW3C(name) + "\" ." +
-                "<" + IOUtils.escapeAbsoluteURIW3C(id) + "> <" + IOUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + IOUtils.escapeStringW3C(definition) + "\" ." +
+        Result result = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
+                "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
+                "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(name) + "\" ." +
+                "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(definition) + "\" ." +
                 "} }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
@@ -408,9 +409,9 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (!reply.isSuccess())
             return reply;
         Result result = live.sparql("DELETE WHERE { GRAPH <" +
-                IOUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { <" +
-                IOUtils.escapeAbsoluteURIW3C(identifier) +
+                TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> ?p ?o } }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());

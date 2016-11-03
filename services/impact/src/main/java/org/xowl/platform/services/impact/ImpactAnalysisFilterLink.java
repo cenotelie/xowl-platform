@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.impact;
 
-import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.utils.Serializable;
 
 /**
  * Represents a filter in the impact analysis on a link between nodes
@@ -29,7 +29,7 @@ public interface ImpactAnalysisFilterLink extends Serializable {
     /**
      * Apply this filter
      *
-     * @param link    The link to the target
+     * @param link The link to the target
      * @return Whether to keep the neighbour (target)
      */
     boolean apply(IRINode link);

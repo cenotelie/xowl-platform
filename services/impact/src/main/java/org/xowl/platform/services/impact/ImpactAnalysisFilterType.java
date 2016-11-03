@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.impact;
 
-import org.xowl.infra.store.Serializable;
 import org.xowl.infra.store.rdf.IRINode;
+import org.xowl.infra.utils.Serializable;
 
 /**
  * Represents a filter on types in the results of an impact analysis

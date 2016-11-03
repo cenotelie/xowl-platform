@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,11 +77,11 @@ public abstract class CriterionTypeBase implements CriterionType {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(getClass().getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(getClass().getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"parameters\": [");
         boolean first = true;
         for (String param : parameters) {
@@ -89,7 +89,7 @@ public abstract class CriterionTypeBase implements CriterionType {
                 builder.append(", ");
             first = false;
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(param));
+            builder.append(TextUtils.escapeStringJSON(param));
             builder.append("\"");
         }
         builder.append("]}");

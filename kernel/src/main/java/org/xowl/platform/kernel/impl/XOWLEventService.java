@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Identifiable;

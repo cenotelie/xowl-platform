@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.RichString;
 
@@ -120,19 +120,19 @@ public class EventBase implements Event {
     @Override
     public String serializedJSON() {
         return "{\"type\": \""
-                + IOUtils.escapeStringJSON(Event.class.getCanonicalName())
+                + TextUtils.escapeStringJSON(Event.class.getCanonicalName())
                 + "\", \"identifier\": \""
-                + IOUtils.escapeStringJSON(identifier)
+                + TextUtils.escapeStringJSON(identifier)
                 + "\", \"name\": \""
-                + IOUtils.escapeStringJSON(description.serializedString())
+                + TextUtils.escapeStringJSON(description.serializedString())
                 + "\", \"description\": "
                 + description.serializedJSON()
                 + ", \"eventType\": \""
-                + IOUtils.escapeStringJSON(type)
+                + TextUtils.escapeStringJSON(type)
                 + "\", \"timestamp\": \""
-                + IOUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(timestamp))
+                + TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(timestamp))
                 + "\", \"originator\": \""
-                + IOUtils.escapeStringJSON(originator.getIdentifier())
+                + TextUtils.escapeStringJSON(originator.getIdentifier())
                 + "\"}";
     }
 

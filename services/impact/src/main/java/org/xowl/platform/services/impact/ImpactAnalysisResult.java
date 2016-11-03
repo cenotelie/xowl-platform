@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.impact;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 
 import java.util.Collection;
 

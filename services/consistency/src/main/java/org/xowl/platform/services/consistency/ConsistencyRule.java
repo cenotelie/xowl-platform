@@ -18,7 +18,7 @@
 package org.xowl.platform.services.consistency;
 
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
 /**

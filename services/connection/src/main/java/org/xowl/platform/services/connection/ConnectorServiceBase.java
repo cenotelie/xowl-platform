@@ -20,15 +20,15 @@ package org.xowl.platform.services.connection;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.URIUtils;
 import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 
@@ -131,11 +131,11 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(ConnectorService.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ConnectorService.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
+        builder.append(TextUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(getName()));
+        builder.append(TextUtils.escapeStringJSON(getName()));
         builder.append("\", \"uris\": [");
         Collection<String> uris = getURIs();
         boolean first = true;
@@ -144,7 +144,7 @@ public abstract class ConnectorServiceBase implements ConnectorService {
                 builder.append(", ");
             first = false;
             builder.append("\"");
-            builder.append(IOUtils.escapeStringJSON(uri));
+            builder.append(TextUtils.escapeStringJSON(uri));
             builder.append("\"");
         }
         builder.append("], \"canPullInput\": ");

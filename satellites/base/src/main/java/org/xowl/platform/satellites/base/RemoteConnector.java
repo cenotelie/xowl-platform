@@ -18,7 +18,7 @@
 package org.xowl.platform.satellites.base;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Represents a connector on the remote platform
@@ -55,16 +55,16 @@ public class RemoteConnector {
         String name = null;
         String uri = null;
         for (ASTNode member : node.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String memberName = TextUtils.unescape(member.getChildren().get(0).getValue());
             memberName = memberName.substring(1, memberName.length() - 1);
             if (memberName.equals("name")) {
-                name = IOUtils.unescape(member.getChildren().get(1).getValue());
+                name = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = name.substring(1, name.length() - 1);
             } else if (memberName.equals("uris")) {
                 if (member.getChildren().get(1).getChildren().isEmpty())
                     continue;
                 ASTNode firstURI = member.getChildren().get(1).getChildren().get(0);
-                uri = IOUtils.unescape(firstURI.getValue());
+                uri = TextUtils.unescape(firstURI.getValue());
                 uri = uri.substring(1, uri.length() - 1);
             }
         }

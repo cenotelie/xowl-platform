@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.infra.store.URIUtils;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.webapp.ContributionDirectory;
 

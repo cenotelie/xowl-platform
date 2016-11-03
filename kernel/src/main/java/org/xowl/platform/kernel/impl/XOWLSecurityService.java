@@ -18,9 +18,9 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.HttpAPIService;

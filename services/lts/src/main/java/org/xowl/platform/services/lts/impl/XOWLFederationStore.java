@@ -19,12 +19,12 @@ package org.xowl.platform.services.lts.impl;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.server.api.base.BaseDatabase;
+import org.xowl.infra.server.base.BaseDatabase;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.EntailmentRegime;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.*;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
@@ -223,9 +223,9 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return XSPReplyNetworkError.instance();
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write("> } }");
         XSPReply reply = connection.sparql(writer.toString(), null, null);
         if (!reply.isSuccess())
@@ -245,9 +245,9 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return -1;
         StringWriter writer = new StringWriter();
         writer.write("SELECT (COUNT(?a) AS ?c) WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { ?a a <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write("> } }");
         XSPReply reply = connection.sparql(writer.toString(), null, null);
         if (!reply.isSuccess())
@@ -273,7 +273,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply retrieve(String identifier) {
-        Result result = sparql("DESCRIBE <" + IOUtils.escapeAbsoluteURIW3C(identifier) + ">");
+        Result result = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">");
         if (result.isFailure())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
@@ -286,11 +286,11 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     public XSPReply delete(String identifier) {
         StringWriter writer = new StringWriter();
         writer.write("DELETE WHERE { GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
         writer.write("> { <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(identifier));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(identifier));
         writer.write("> ?p ?o } }; DROP SILENT GRAPH <");
-        writer.write(IOUtils.escapeAbsoluteURIW3C(identifier));
+        writer.write(TextUtils.escapeAbsoluteURIW3C(identifier));
         writer.write(">");
         Result result = sparql(writer.toString());
         if (result.isSuccess())
@@ -334,7 +334,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         return new ArtifactDeferred(metadata) {
             @Override
             protected Collection<Quad> load() {
-                Result result = sparql("CONSTRUCT FROM NAMED <" + IOUtils.escapeAbsoluteURIW3C(identifier) + "> WHERE { ?s ?p ?o }");
+                Result result = sparql("CONSTRUCT FROM NAMED <" + TextUtils.escapeAbsoluteURIW3C(identifier) + "> WHERE { ?s ?p ?o }");
                 if (result.isFailure())
                     return null;
                 return ((ResultQuads) result).getQuads();

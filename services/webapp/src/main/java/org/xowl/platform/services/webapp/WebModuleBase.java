@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.webapp;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,15 +101,15 @@ public abstract class WebModuleBase implements WebModule {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(WebModule.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(WebModule.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(getIdentifier()));
+        builder.append(TextUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(getName()));
+        builder.append(TextUtils.escapeStringJSON(getName()));
         builder.append("\", \"uri\": \"");
-        builder.append(IOUtils.escapeStringJSON(getURI()));
+        builder.append(TextUtils.escapeStringJSON(getURI()));
         builder.append("\", \"icon\": \"");
-        builder.append(getIcon() == null ? "" : IOUtils.escapeStringJSON(getIcon()));
+        builder.append(getIcon() == null ? "" : TextUtils.escapeStringJSON(getIcon()));
         builder.append("\", \"items\": [");
         for (int i = 0; i != items.size(); i++) {
             if (i != 0)

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.store.Serializable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;

@@ -18,9 +18,9 @@
 package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.storage.NodeManager;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 
 /**
@@ -50,11 +50,11 @@ class XOWLImpactAnalysisFilterType implements ImpactAnalysisFilterType {
     public XOWLImpactAnalysisFilterType(NodeManager nodes, ASTNode definition) {
         String filtered = null;
         for (ASTNode member : definition.getChildren()) {
-            String memberName = IOUtils.unescape(member.getChildren().get(0).getValue());
+            String memberName = TextUtils.unescape(member.getChildren().get(0).getValue());
             memberName = memberName.substring(1, memberName.length() - 1);
             switch (memberName) {
                 case "filtered":
-                    filtered = IOUtils.unescape(member.getChildren().get(1).getValue());
+                    filtered = TextUtils.unescape(member.getChildren().get(1).getValue());
                     filtered = filtered.substring(1, filtered.length() - 1);
                     break;
             }
@@ -75,9 +75,9 @@ class XOWLImpactAnalysisFilterType implements ImpactAnalysisFilterType {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(ImpactAnalysisFilterType.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ImpactAnalysisFilterType.class.getCanonicalName()) +
                 "\", \"filtered\": \"" +
-                IOUtils.escapeStringJSON(filtered.getIRIValue()) +
+                TextUtils.escapeStringJSON(filtered.getIRIValue()) +
                 "\"}";
     }
 }

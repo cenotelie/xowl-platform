@@ -18,11 +18,11 @@
 package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.IOUtils;
-import org.xowl.infra.store.http.HttpConstants;
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -112,7 +112,7 @@ public class XOWLImportationService implements ImportationService {
      * @param content The descriptor content
      */
     private void reloadDocument(String file, String content) {
-        ASTNode definition = IOUtils.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
             Logging.getDefault().error("Failed to parse the job " + file);
             return;

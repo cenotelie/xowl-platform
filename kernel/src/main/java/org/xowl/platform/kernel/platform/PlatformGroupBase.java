@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation of a group of users on the platform
@@ -63,11 +63,11 @@ public abstract class PlatformGroupBase implements PlatformGroup {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(IOUtils.escapeStringJSON(PlatformGroup.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(PlatformGroup.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(IOUtils.escapeStringJSON(identifier));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(IOUtils.escapeStringJSON(name));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"members\": [");
         boolean first = true;
         for (PlatformUser member : getUsers()) {
@@ -75,11 +75,11 @@ public abstract class PlatformGroupBase implements PlatformGroup {
                 builder.append(", ");
             first = false;
             builder.append("{\"type\": \"");
-            builder.append(IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
+            builder.append(TextUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
             builder.append("\", \"identifier\": \"");
-            builder.append(IOUtils.escapeStringJSON(member.getIdentifier()));
+            builder.append(TextUtils.escapeStringJSON(member.getIdentifier()));
             builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(member.getName()));
+            builder.append(TextUtils.escapeStringJSON(member.getName()));
             builder.append("\"}");
         }
         builder.append("], \"admins\": [");
@@ -89,11 +89,11 @@ public abstract class PlatformGroupBase implements PlatformGroup {
                 builder.append(", ");
             first = false;
             builder.append("{\"type\": \"");
-            builder.append(IOUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
+            builder.append(TextUtils.escapeStringJSON(PlatformUser.class.getCanonicalName()));
             builder.append("\", \"identifier\": \"");
-            builder.append(IOUtils.escapeStringJSON(member.getIdentifier()));
+            builder.append(TextUtils.escapeStringJSON(member.getIdentifier()));
             builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(member.getName()));
+            builder.append(TextUtils.escapeStringJSON(member.getName()));
             builder.append("\"}");
         }
         builder.append("], \"roles\": [");
@@ -103,11 +103,11 @@ public abstract class PlatformGroupBase implements PlatformGroup {
                 builder.append(", ");
             first = false;
             builder.append("{\"type\": \"");
-            builder.append(IOUtils.escapeStringJSON(PlatformRole.class.getCanonicalName()));
+            builder.append(TextUtils.escapeStringJSON(PlatformRole.class.getCanonicalName()));
             builder.append("\", \"identifier\": \"");
-            builder.append(IOUtils.escapeStringJSON(role.getIdentifier()));
+            builder.append(TextUtils.escapeStringJSON(role.getIdentifier()));
             builder.append("\", \"name\": \"");
-            builder.append(IOUtils.escapeStringJSON(role.getName()));
+            builder.append(TextUtils.escapeStringJSON(role.getName()));
             builder.append("\"}");
         }
         builder.append("]}");

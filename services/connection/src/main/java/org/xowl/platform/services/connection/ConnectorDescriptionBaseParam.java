@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.store.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation of a domain parameter
@@ -85,15 +85,15 @@ public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                IOUtils.escapeStringJSON(ConnectorDescriptionParam.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ConnectorDescriptionParam.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                IOUtils.escapeStringJSON(identifier) +
+                TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
-                IOUtils.escapeStringJSON(name) +
+                TextUtils.escapeStringJSON(name) +
                 "\", \"isRequired\": " +
                 isRequired +
                 ", \"typeHint\": \"" +
-                IOUtils.escapeStringJSON(typeHint) +
+                TextUtils.escapeStringJSON(typeHint) +
                 "\"}";
     }
 }

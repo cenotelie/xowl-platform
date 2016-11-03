@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.store.http.HttpResponse;
+import org.xowl.infra.utils.http.HttpResponse;
 
 import java.util.Collection;
 import java.util.Map;

@@ -17,20 +17,48 @@
 
 package org.xowl.platform.kernel.platform;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.HttpAPIService;
 
 import java.util.Collection;
 
 /**
- * Represents a service for describing the platform
+ * Represents a service for the management of this platform
  *
  * @author Laurent Wouters
  */
-public interface PlatformDescriptorService extends HttpAPIService {
+public interface PlatformManagementService extends HttpAPIService {
+    /**
+     * Exit code when the platform is shutting down as requested
+     */
+    int PLATFORM_EXIT_NORMAL = 0;
+    /**
+     * Exit code when the platform is shutting down to be restarted
+     */
+    int PLATFORM_EXIT_RESTART = 5;
+
     /**
      * Gets the description of the bundles on this platform
      *
      * @return The bundle on this platform
      */
     Collection<OSGiBundle> getPlatformBundles();
+
+    /**
+     * Regenerates a self-signed TLS certificate and setup its use in the OSGi platform configuration
+     *
+     * @param alias The alias to use in the TLS certificate
+     * @return Whether the operation was successful
+     */
+    XSPReply regenerateTLSConfig(String alias);
+
+    /**
+     * Shutdowns the platform
+     */
+    XSPReply shutdown();
+
+    /**
+     * Restarts the platform
+     */
+    XSPReply restart();
 }

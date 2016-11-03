@@ -27,7 +27,7 @@ import org.xowl.platform.kernel.artifacts.SchemaDomain;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.platform.PlatformDescriptorService;
+import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -38,6 +38,10 @@ import org.xowl.platform.kernel.statistics.StatisticsService;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The platform management service
+     */
+    private XOWLPlatformManagementService managementService;
     /**
      * The job executor service
      */
@@ -65,9 +69,9 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(HttpAPIService.class, securityService, null);
 
         // register the platform descriptor service
-        PlatformDescriptorService platformDescriptorService = new XOWLPlatformDescriptorService();
-        bundleContext.registerService(PlatformDescriptorService.class, platformDescriptorService, null);
-        bundleContext.registerService(HttpAPIService.class, platformDescriptorService, null);
+        managementService = new XOWLPlatformManagementService();
+        bundleContext.registerService(PlatformManagementService.class, managementService, null);
+        bundleContext.registerService(HttpAPIService.class, managementService, null);
 
         // register the statistics service
         StatisticsService statisticsService = new XOWLStatisticsService();

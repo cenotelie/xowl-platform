@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Deploy the xOWL Platform bundles and their dependencies into a Felix distribution
+
 SCRIPT="$(readlink -f "$0")"
 RELENG="$(dirname "$SCRIPT")"
 ROOT="$(dirname "$RELENG")"

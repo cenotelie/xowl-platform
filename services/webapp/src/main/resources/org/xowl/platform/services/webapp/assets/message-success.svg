@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="message-success" version="1.1">
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#034091;stroke-width:8;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="m 15,70 0,-45 70,0 0,45 -35,0 -20,20 0,-20 z"/>
+  <path
+     style="fill:#00914d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 28.037288,44.105974 44.213201,64.570577 74.081361,31.192134 43.262929,50.055817 Z"/>
+</svg>

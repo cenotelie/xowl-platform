@@ -147,10 +147,10 @@ function displayLoader(message) {
 	content.appendChild(document.createTextNode(message));
 	content.classList.add("message-content");
 	var row = document.createElement("div");
-	row.classList.add("header-row");
+	row.classList.add("header-message");
 	row.appendChild(image);
 	row.appendChild(content);
-	var rows = document.getElementById("placeholder-header-rows");
+	var rows = document.getElementById("placeholder-messages");
 	rows.appendChild(row);
 	return function () {
 		rows.removeChild(row);
@@ -177,11 +177,11 @@ function displayMessage(type, message) {
 	button.classList.add("close");
 	button.classList.add("message-button");
 	var row = document.createElement("div");
-	row.classList.add("header-row");
+	row.classList.add("header-message");
 	row.appendChild(image);
 	row.appendChild(content);
 	row.appendChild(button);
-	var rows = document.getElementById("placeholder-header-rows");
+	var rows = document.getElementById("placeholder-messages");
 	rows.appendChild(row);
 	button.onclick = function () {
 		rows.removeChild(row);

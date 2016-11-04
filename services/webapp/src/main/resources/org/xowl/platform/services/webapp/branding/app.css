@@ -30,6 +30,25 @@
   margin-right: 10px;
 }
 
+.header-messages {
+  position: fixed;
+  top: 30px;
+  z-index:100;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+  left: 25%;
+  width: 50%;
+  background: white;
+}
+
+.header-message {
+  margin-bottom: 5px;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
 .header-separator {
   margin-top: 5px;
   margin-bottom: 5px;

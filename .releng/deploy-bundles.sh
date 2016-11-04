@@ -10,7 +10,7 @@ VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -f "$ROO
 
 
 doDeployDependency () {
-    FILE=$(ls $1/$2-*.jar)
+    FILE=$(ls $1/$2-*.jar | grep "$2-[0-9].*\(-SNAPSHOT\)\{0,1\}\.jar")
     FILE=$(basename "$FILE")
     cp "$1/$FILE" "$4/$3.$FILE"
 }

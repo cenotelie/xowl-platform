@@ -4,11 +4,14 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getWebModules(function (status, ct, content) {
-		if (status == 200) {
-			renderModules(content);
-		}
+	doSetupPage(xowl, true, [], function() {
+		var remover = displayLoader("Loading ...");
+			xowl.getWebModules(function (status, ct, content) {
+			if (status == 200) {
+				renderModules(content);
+			}
+			remover();
+		});
 	});
 }
 

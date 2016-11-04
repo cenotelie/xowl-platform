@@ -1,11 +1,204 @@
 // Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
-var DEFAULT_URI_MAPPINGS = [
-    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
-    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
-    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
-    ["owl", "http://www.w3.org/2002/07/owl#"]];
+
+/*****************************************************
+ * Page management and setup
+ ****************************************************/
+
+/**
+ * DOM node for the Title component
+ */
+var PAGE_COMPONENT_TITLE = null;
+/**
+ * DOM node for the Header component
+ */
+var PAGE_COMPONENT_HEADER = null;
+/**
+ * DOM node for the Footer component
+ */
+var PAGE_COMPONENT_FOOTER = null;
+/**
+ * The current breadcrumbs for the page
+ */
+var PAGE_BREADCRUMBS = [{name: "Home", uri: "/web/"}];
+/**
+ * The current xOWL platform object (access to the platform API)
+ */
+var PLATFORM = null;
+/**
+ * The index to know whether the page is ready (ready on 100)
+ */
+var PAGE_READY_INDEX = 0;
+/**
+ * The hook to call when the page is ready
+ */
+var PAGE_READY_HOOK = null;
+
+/**
+ * Performs the initial setup of the current page
+ *
+ * @param platform       The current xOWL platform object (access to the platform API)
+ * @param mustBeLoggedIn Whether a user must be logged-in to see the page
+ * @param breadcrumbs    The current breadcrumbs for the page
+ * @param onReady        The hook to call when the page is ready
+ */
+function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
+	if (mustBeLoggedIn && (platform === null || !platform.isLoggedIn())) {
+		document.location.href = "/web/login.html";
+		return;
+	}
+	PLATFORM = platform;
+	PAGE_BREADCRUMBS = PAGE_BREADCRUMBS.concat(breadcrumbs);
+	PAGE_READY_HOOK = onReady;
+}
+
+function doSetupHeader() {
+	if (PAGE_COMPONENT_TITLE === null || PAGE_COMPONENT_HEADER === null)
+		return;
+	document.getElementById("placeholder-header").appendChild(PAGE_COMPONENT_HEADER);
+	document.getElementById("placeholder-title").appendChild(PAGE_COMPONENT_TITLE);
+	var breadcrumbs = document.getElementById("placeholder-breadcrumbs");
+	for (var i = 0; i != PAGE_BREADCRUMBS.length; i++) {
+		var name = PAGE_BREADCRUMBS[i].name;
+		var uri = PAGE_BREADCRUMBS[i].uri;
+		if (uri instanceof String || typeof uri === 'string') {
+			var a = document.createElement("a");
+			a.appendChild(document.createTextNode(name));
+			a.href = uri;
+			var li = document.createElement("li");
+			li.appendChild(a);
+			breadcrumbs.appendChild(li);
+		} else {
+			var li = document.createElement("li");
+			li.appendChild(document.createTextNode(name));
+			li.classList.add("active");
+			breadcrumbs.appendChild(li);
+		}
+	}
+	if (PLATFORM !== null && PLATFORM.isLoggedIn()) {
+		var userLink = document.getElementById("placeholder-user");
+		var image = document.createElement("img");
+		image.src = "/web/assets/user.svg";
+		image.width = 25;
+		image.height = 25;
+		image.style.marginRight = "20px";
+		userLink.appendChild(image);
+		userLink.appendChild(document.createTextNode(PLATFORM.getUserName()));
+		userLink.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(PLATFORM.getUserId());
+	}
+	PAGE_READY_INDEX += 50;
+	if (PAGE_READY_INDEX >= 100)
+		PAGE_READY_HOOK();
+}
+
+function doSetupFooter() {
+	if (PAGE_COMPONENT_FOOTER === null)
+		return;
+	document.getElementById("placeholder-footer").appendChild(PAGE_COMPONENT_FOOTER);
+	PAGE_READY_INDEX += 50;
+	if (PAGE_READY_INDEX >= 100)
+		PAGE_READY_HOOK();
+}
+
+function onComponentLoadedTitle() {
+	PAGE_COMPONENT_TITLE = onComponentLoadedGetNode("component-title");
+	doSetupHeader();
+}
+
+function onComponentLoadedHeader() {
+	PAGE_COMPONENT_HEADER = onComponentLoadedGetNode("component-header");
+	doSetupHeader();
+}
+
+function onComponentLoadedFooter() {
+	PAGE_COMPONENT_FOOTER = onComponentLoadedGetNode("component-footer");
+	doSetupFooter();
+}
+
+function onComponentLoadedGetNode(identifier) {
+	var object = document.getElementById(identifier);
+	var doc = object.contentDocument.documentElement;
+	object.style.display = "none";
+	return doc.children[1].children[0].cloneNode(true);
+}
+
+/**
+ * Reacts to the user clicking on the logout buttun
+ */
+function onClickLogout() {
+	PLATFORM.logout();
+	document.location.href = "/web/login.html";
+}
+
+/**
+ * Displays a message for loading
+ *
+ * @param message The message to display
+ * @return A function that can be called to remove the loading message
+ */
+function displayLoader(message) {
+	var image = document.createElement("img");
+	image.src = "/web/branding/spinner.gif";
+	image.width = 32;
+	image.height = 32;
+	image.classList.add("message-icon");
+	var content = document.createElement("span");
+	content.appendChild(document.createTextNode(message));
+	content.classList.add("message-content");
+	var row = document.createElement("div");
+	row.classList.add("header-row");
+	row.appendChild(image);
+	row.appendChild(content);
+	var rows = document.getElementById("placeholder-header-rows");
+	rows.appendChild(row);
+	return function () {
+		rows.removeChild(row);
+	}
+}
+
+/**
+ * Displays an information message
+ *
+ * @param type    The type of message (info, success, warning, danger)
+ * @param message The message to display
+ */
+function displayMessage(type, message) {
+	var image = document.createElement("img");
+	image.src = "/web/branding/spinner.gif";
+	image.width = 32;
+	image.height = 32;
+	image.classList.add("message-icon");
+	var content = document.createElement("span");
+	content.appendChild(document.createTextNode(message));
+	content.classList.add("message-content");
+	var button = document.createElement("span");
+	button.innerHtml = "&times;";
+	button.classList.add("close");
+	button.classList.add("message-button");
+	var row = document.createElement("div");
+	row.classList.add("header-row");
+	row.appendChild(image);
+	row.appendChild(content);
+	row.appendChild(button);
+	var rows = document.getElementById("placeholder-header-rows");
+	rows.appendChild(row);
+	button.onclick = function () {
+		rows.removeChild(row);
+	}
+}
+
+
+
+
+
+
+
+
+
+/*
+ * Page management
+ */
 
 var MIME_TYPES = [
 	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
@@ -20,29 +213,13 @@ var MIME_TYPES = [
 	{ name: 'xOWL Ontology', value: 'application/x-xowl', extensions: ['.xowl'] }
 ];
 
-var MSG_ERROR_BAD_REQUEST = "Oops, wrong request.";
-var MSG_ERROR_UNAUTHORIZED = "You must be logged in to perform this operation.";
-var MSG_ERROR_FORBIDDEN = "You are not authorized to perform this operation.";
-var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
-var MSG_ERROR_INTERNAL_ERROR = "Something very wrong happened on the server ...";
-var MSG_ERROR_NOT_IMPLEMENTED = "This operation is not supported.";
-var MSG_ERROR_UNKNOWN_ERROR = "The operation failed on the server.";
-var MSG_ERROR_OTHER = "The connection failed.";
 
-function setupPage(xowl) {
-	if (xowl !== null && !xowl.isLoggedIn()) {
-		document.location.href = "/web/login.html";
-		return;
-	}
-	document.getElementById("branding-title").onload = function () {
-		document.title = document.getElementById("branding-title").contentDocument.getElementById("title-value").innerHTML + document.title;
-	};
-	document.getElementById("btn-logout").innerHTML = "Logout (" + xowl.getUserName() + ")";
-	document.getElementById("btn-logout").onclick = function() {
-		xowl.logout();
-		document.location.href = "/web/login.html";
-	};
-}
+
+var DEFAULT_URI_MAPPINGS = [
+    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["owl", "http://www.w3.org/2002/07/owl#"]];
 
 function getShortURI(value) {
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
@@ -204,7 +381,7 @@ function rdfToDom(value) {
     }
 }
 
-function displayMessage(text) {
+/*function displayMessage(text) {
 	if (text === null) {
 		document.getElementById("loader").style.display = "none";
 		return;
@@ -221,7 +398,16 @@ function displayMessage(text) {
 		}
 	}
 	document.getElementById("loader").style.display = "";
-}
+}*/
+
+var MSG_ERROR_BAD_REQUEST = "Oops, wrong request.";
+var MSG_ERROR_UNAUTHORIZED = "You must be logged in to perform this operation.";
+var MSG_ERROR_FORBIDDEN = "You are not authorized to perform this operation.";
+var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
+var MSG_ERROR_INTERNAL_ERROR = "Something very wrong happened on the server ...";
+var MSG_ERROR_NOT_IMPLEMENTED = "This operation is not supported.";
+var MSG_ERROR_UNKNOWN_ERROR = "The operation failed on the server.";
+var MSG_ERROR_OTHER = "The connection failed.";
 
 function getErrorFor(code, content) {
 	if (content != null) {

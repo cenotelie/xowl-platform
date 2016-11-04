@@ -13,21 +13,14 @@
 </head>
 
 <body>
-<div class="header">
-    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-    <div style="display: inline-block; margin-left: 50px;">
-      <span style="display: inline-block;">
-        <ol class="breadcrumb">
-            <li><a href="/web/">Home</a></li>
-            <li class="active">404: Not found</li>
-        </ol>
-      </span>
-    </div>
-    <div style="float: right; margin-right: 20px;">
-        <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-    </div>
-    <hr style="margin-top: 5px; margin-bottom: 5px;" />
-</div>
+<object type="text/html" data="/web/branding/title.html" id="component-title"
+        onload="onComponentLoadedTitle()"></object>
+<object type="text/html" data="/web/components/header.html" id="component-header"
+        onload="onComponentLoadedHeader()"></object>
+<object type="text/html" data="/web/components/footer.html" id="component-footer"
+        onload="onComponentLoadedFooter()"></object>
+
+<div id="placeholder-header"></div>
 <div class="body">
     <div class="panel panel-default">
         <div class="panel-body">
@@ -43,11 +36,11 @@
         </div>
     </div>
 </div>
+<div id="placeholder-footer"></div>
+
 <script src="/web/xowl/xowl-api-platform.js"></script>
 <script src="/web/xowl/xowl-ui.js"></script>
-<script>
-    setupPage(new XOWL());
-</script>
+<script>doSetupPage(null, false, [{name: "404"}], function() {});</script>
 </body>
 
 </html>

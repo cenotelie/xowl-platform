@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
@@ -47,8 +48,7 @@ class OSGiImplFelix extends OSGiImpl {
     @Override
     public void enforceHttpConfig(Configuration platformConfiguration, JobExecutionService executionService) {
         File root = new File(System.getProperty(Env.ROOT));
-        File confDir = new File(root, "conf");
-        File confFile = new File(confDir, "config.properties");
+        File confFile = new File(new File(new File(root, "felix"), "conf"), "config.properties");
         Configuration felixConfiguration = new Configuration();
         try {
             felixConfiguration.load(confFile.getAbsolutePath(), Files.CHARSET);
@@ -59,9 +59,11 @@ class OSGiImplFelix extends OSGiImpl {
         boolean mustReboot = false;
 
         // Felix default for org.apache.felix.http.enable is true
+        boolean httpEnabled = false;
         String valueTarget = platformConfiguration.get("httpEnabled");
         String valueReal = felixConfiguration.get("org.apache.felix.http.enable");
         if ("true".equalsIgnoreCase(valueTarget)) {
+            httpEnabled = true;
             if (valueReal != null && "false".equalsIgnoreCase(valueReal)) {
                 // must enable HTTP
                 felixConfiguration.set("org.apache.felix.http.enable", "true");
@@ -76,9 +78,11 @@ class OSGiImplFelix extends OSGiImpl {
         }
 
         // Felix default for org.apache.felix.https.enable is false
+        boolean httpsEnabled = false;
         valueTarget = platformConfiguration.get("httpsEnabled");
         valueReal = felixConfiguration.get("org.apache.felix.https.enable");
         if ("true".equalsIgnoreCase(valueTarget)) {
+            httpsEnabled = true;
             if (valueReal == null || "false".equalsIgnoreCase(valueReal)) {
                 // must enable HTTPS
                 felixConfiguration.set("org.apache.felix.https.enable", "true");
@@ -92,39 +96,60 @@ class OSGiImplFelix extends OSGiImpl {
             }
         }
 
-        // Felix default for org.osgi.service.http.port is 8080
-        valueTarget = platformConfiguration.get("httpPort");
-        valueReal = felixConfiguration.get("org.osgi.service.http.port");
-        if ((valueReal == null && !"8080".equals(valueTarget))
-                || (!Objects.equals(valueReal, valueTarget))) {
-            // must update port
-            felixConfiguration.set("org.osgi.service.http.port", valueTarget);
-            mustReboot = true;
+        if (httpEnabled) {
+            // Felix default for org.osgi.service.http.port is 8080
+            valueTarget = platformConfiguration.get("httpPort");
+            valueReal = felixConfiguration.get("org.osgi.service.http.port");
+            if ((valueReal == null && !"8080".equals(valueTarget))
+                    || (!Objects.equals(valueReal, valueTarget))) {
+                // must update port
+                felixConfiguration.set("org.osgi.service.http.port", valueTarget);
+                mustReboot = true;
+            }
         }
 
-        // Felix default for org.osgi.service.http.port.secure is 8443
-        valueTarget = platformConfiguration.get("httpsPort");
-        valueReal = felixConfiguration.get("org.osgi.service.http.port.secure");
-        if ((valueReal == null && !"8443".equals(valueTarget))
-                || (!Objects.equals(valueReal, valueTarget))) {
-            // must update port
-            felixConfiguration.set("org.osgi.service.http.port.secure", valueTarget);
-            mustReboot = true;
-        }
+        if (httpsEnabled) {
+            // Felix default for org.osgi.service.http.port.secure is 8443
+            valueTarget = platformConfiguration.get("httpsPort");
+            valueReal = felixConfiguration.get("org.osgi.service.http.port.secure");
+            if ((valueReal == null && !"8443".equals(valueTarget))
+                    || (!Objects.equals(valueReal, valueTarget))) {
+                // must update port
+                felixConfiguration.set("org.osgi.service.http.port.secure", valueTarget);
+                mustReboot = true;
+            }
 
-        valueTarget = platformConfiguration.get("tlsKeyStore");
-        valueReal = felixConfiguration.get("org.apache.felix.https.keystore");
-        if (!Objects.equals(valueReal, valueTarget)) {
-            felixConfiguration.set("org.apache.felix.https.keystore", valueTarget);
-            mustReboot = true;
-        }
-
-        valueTarget = platformConfiguration.get("tlsKeyPassword");
-        valueReal = felixConfiguration.get("org.apache.felix.https.keystore.password");
-        if (!Objects.equals(valueReal, valueTarget)) {
-            felixConfiguration.set("org.apache.felix.https.keystore.password", valueTarget);
-            felixConfiguration.set("org.apache.felix.https.keystore.key.password", valueTarget);
-            mustReboot = true;
+            valueTarget = platformConfiguration.get("tlsKeyStore");
+            valueReal = felixConfiguration.get("org.apache.felix.https.keystore");
+            if (valueTarget == null || valueTarget.isEmpty()) {
+                // key store is auto-generated
+                if (valueReal == null || valueReal.isEmpty()) {
+                    // not generated yet
+                    File keyStoreFile = new File(new File(new File(root, "felix"), "conf"), "keystore.jks");
+                    String password = SSLGenerator.generateKeyStore(keyStoreFile, "platform.xowl.org");
+                    if (password == null) {
+                        Logging.getDefault().error("Failed to generate the keystore");
+                    } else {
+                        felixConfiguration.set("org.apache.felix.https.keystore", keyStoreFile.getAbsolutePath());
+                        felixConfiguration.set("org.apache.felix.https.keystore.password", password);
+                        felixConfiguration.set("org.apache.felix.https.keystore.key.password", password);
+                        mustReboot = true;
+                    }
+                }
+            } else {
+                // key store is forced
+                if (!Objects.equals(valueReal, valueTarget)) {
+                    felixConfiguration.set("org.apache.felix.https.keystore", valueTarget);
+                    mustReboot = true;
+                }
+                valueTarget = platformConfiguration.get("tlsKeyPassword");
+                valueReal = felixConfiguration.get("org.apache.felix.https.keystore.password");
+                if (!Objects.equals(valueReal, valueTarget)) {
+                    felixConfiguration.set("org.apache.felix.https.keystore.password", valueTarget);
+                    felixConfiguration.set("org.apache.felix.https.keystore.key.password", valueTarget);
+                    mustReboot = true;
+                }
+            }
         }
 
         if (mustReboot) {

@@ -337,7 +337,7 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 // Admin Module - Platform Descriptor Service
 ////
 
-XOWL.prototype.getPlatformBundles = function (callback) {
+XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content).payload);
@@ -345,6 +345,16 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 			callback(code, type, content);
 		}
 	}, "services/admin/platform", null);
+}
+
+XOWL.prototype.getPlatformBundles = function (callback) {
+	this.doHttpGet(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content).payload);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/platform/bundles", null);
 }
 
 XOWL.prototype.platformShutdown = function (callback) {

@@ -41,26 +41,15 @@
         Platform Actions
       </div>
       <div class="panel-body">
-        <div style="margin-top: 20px;">
-          <button class="btn btn-danger" id="button-shutdown" onclick="onClickShutdown()">Shutdown the platform</button>
-        </div>
-        <div style="margin-top: 20px;">
-          <button class="btn btn-danger" id="button-restart" onclick="onClickRestart()">Restart the platform</button>
-        </div>
-        <div style="margin-top: 20px;">
-          <form class="form-horizontal">
-            <div class="form-group">
-              <label for="certificate-cn" class="col-sm-2 control-label">Common Name</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="certificate-cn" placeholder="localhost">
-              </div>
-              <span class="col-sm-2">
-                <span class="btn btn-danger" id="button-regenerateTLS" onclick="onClickRegenerateTLS()">
-                  Regenerate TLS certificate
-                </span>
-              </span>
-            </div>
-          </form>
+        <div>
+          <span class="btn btn-default" id="button-shutdown" onclick="onClickShutdown()">
+            <img src="/web/assets/shutdown.svg" width="30" height="30"/>
+            <span style="margin-left: 20px;">Shutdown the platform</span>
+          </span>
+          <span class="btn btn-default" id="button-restart" onclick="onClickRestart()">
+            <img src="/web/assets/restart.svg" width="30" height="30"/>
+            <span style="margin-left: 20px;">Restart the platform</span>
+          </span>
         </div>
       </div>
     </div>

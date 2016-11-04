@@ -5,7 +5,6 @@ var xowl = new XOWL();
 
 function init() {
 	setupPage(xowl);
-	document.getElementById("certificate-cn").value = window.location.hostname;
 	xowl.getPlatformBundles(function (status, ct, content) {
 		if (status == 200) {
 			renderBundles(content);
@@ -69,22 +68,5 @@ function onClickRestart() {
 				displayMessage(getErrorFor(status, content));
 			}
 		});
-	}
-}
-
-function onClickRegenerateTLS() {
-	var alias = document.getElementById("certificate-cn").value;
-	if (alias === null || alias === "")
-		return;
-	var result = confirm("Regenerate the TLS certificate?");
-	if (result == true) {
-		displayMessage("Regenerating TLS certificate ...");
-		xowl.platformRegenerateTLS(function (status, ct, content) {
-			if (status == 200) {
-				displayMessage("TLS certificate has been regenerated, restart to update.");
-			} else {
-				displayMessage(getErrorFor(status, content));
-			}
-		}, alias);
 	}
 }

@@ -27,6 +27,8 @@ import org.xowl.platform.kernel.artifacts.SchemaDomain;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.jobs.JobFactory;
+import org.xowl.platform.kernel.platform.PlatformJobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -38,10 +40,6 @@ import org.xowl.platform.kernel.statistics.StatisticsService;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The platform management service
-     */
-    private XOWLPlatformManagementService managementService;
     /**
      * The job executor service
      */
@@ -68,11 +66,6 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpAPIService.class, securityService, null);
 
-        // register the platform descriptor service
-        managementService = new XOWLPlatformManagementService();
-        bundleContext.registerService(PlatformManagementService.class, managementService, null);
-        bundleContext.registerService(HttpAPIService.class, managementService, null);
-
         // register the statistics service
         StatisticsService statisticsService = new XOWLStatisticsService();
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
@@ -82,6 +75,7 @@ public class Activator implements BundleActivator {
         serviceJobExecutor = new XOWLJobExecutor();
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
+        bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
         statisticsService.registerProvider(serviceJobExecutor);
 
         // register the event service
@@ -98,7 +92,12 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
         bundleContext.registerService(HttpAPIService.class, directoryService, null);
 
-        eventService.onEvent(PlatformStartupEvent.INSTANCE);
+        // register the platform management service
+        XOWLPlatformManagementService managementService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
+        bundleContext.registerService(PlatformManagementService.class, managementService, null);
+        bundleContext.registerService(HttpAPIService.class, managementService, null);
+
+        eventService.onEvent(new PlatformStartupEvent(managementService));
     }
 
     @Override

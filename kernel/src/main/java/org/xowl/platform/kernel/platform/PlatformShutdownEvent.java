@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -30,15 +29,13 @@ public class PlatformShutdownEvent extends EventBase {
      * The type for this event
      */
     public static final String TYPE = PlatformStartupEvent.class.getCanonicalName();
-    /**
-     * The singleton instance
-     */
-    public static final Event INSTANCE = new PlatformShutdownEvent();
 
     /**
      * Initializes this event
+     *
+     * @param managementService The platform management service
      */
-    private PlatformShutdownEvent() {
-        super("Platform is shutting down", TYPE, PlatformDescriptor.INSTANCE);
+    public PlatformShutdownEvent(PlatformManagementService managementService) {
+        super("Platform is shutting down", TYPE, managementService.getOSGiImplementation());
     }
 }

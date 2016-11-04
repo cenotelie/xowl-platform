@@ -21,9 +21,11 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricValueScalar;
@@ -86,7 +88,9 @@ public class XOWLEventService implements EventService {
      */
     public void close() {
         mustStop.set(true);
-        onEvent(PlatformShutdownEvent.INSTANCE);
+        PlatformManagementService managementService = ServiceUtils.getService(PlatformManagementService.class);
+        if (managementService != null)
+            onEvent(new PlatformShutdownEvent(managementService));
         try {
             dispatchThread.join();
         } catch (InterruptedException exception) {
@@ -190,7 +194,7 @@ public class XOWLEventService implements EventService {
                 totalProcessed++;
 
                 // stop on platform shutdown
-                if (event == PlatformShutdownEvent.INSTANCE)
+                if (PlatformShutdownEvent.TYPE.equals(event.getType()))
                     return;
             } catch (InterruptedException exception) {
                 Logging.getDefault().error(exception);

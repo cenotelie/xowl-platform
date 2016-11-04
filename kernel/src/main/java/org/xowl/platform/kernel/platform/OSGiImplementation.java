@@ -15,16 +15,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.platform;
+
+import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Identifiable;
 
 /**
- * List of the platform environment variables
+ * Represents a specific OSGi implementation the platform is running on
  *
  * @author Laurent Wouters
  */
-public interface Env {
-    /**
-     * Root directory for the distribution
-     */
-    String ROOT = "xowl.root";
+public interface OSGiImplementation extends Identifiable, Serializable {
 }

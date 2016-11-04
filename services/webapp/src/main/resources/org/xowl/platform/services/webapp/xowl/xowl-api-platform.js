@@ -367,16 +367,6 @@ XOWL.prototype.platformRestart = function (callback) {
 	}, "services/admin/platform", {"action": "restart"}, null);
 }
 
-XOWL.prototype.platformRegenerateTLS = function (callback, alias) {
-	this.doHttpPost(function (code, type, content) {
-		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/admin/platform", {"action": "regenerateTLS", "alias": alias}, null);
-}
-
 
 
 ////

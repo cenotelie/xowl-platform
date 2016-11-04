@@ -17,29 +17,22 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.SSLGenerator;
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.Identifiable;
+import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.OSGiBundle;
-import org.xowl.platform.kernel.platform.PlatformDescriptor;
+import org.xowl.platform.kernel.platform.OSGiImplementation;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements the platform management service
@@ -48,77 +41,41 @@ import java.util.Map;
  */
 public class XOWLPlatformManagementService implements PlatformManagementService {
     /**
-     * Represents the details of a specific OSGi implementation
-     */
-    private interface PlatformImpl extends Identifiable {
-        /**
-         * Setups the configuration for using a TLS certificate
-         *
-         * @param keyStore The key store with the private key to use
-         * @param password The password to the key store
-         * @return Whether the operation succeeded
-         */
-        XSPReply setupTSL(File keyStore, String password);
-    }
-
-    /**
-     * The Felix implementation of OSGi
-     */
-    private static final class PlatformImplFelix implements PlatformImpl {
-
-        @Override
-        public String getIdentifier() {
-            return PlatformImplFelix.class.getCanonicalName();
-        }
-
-        @Override
-        public String getName() {
-            return "Apache Felix";
-        }
-
-        @Override
-        public XSPReply setupTSL(File keyStore, String password) {
-            File root = new File(System.getProperty(Env.ROOT));
-            File confDir = new File(root, "conf");
-            File confFile = new File(confDir, "config.properties");
-            Configuration platformConfig = new Configuration();
-            try {
-                platformConfig.load(confFile.getAbsolutePath(), Files.CHARSET);
-                String value = platformConfig.get("org.osgi.service.http.port.secure");
-                if (value == null)
-                    platformConfig.set("org.osgi.service.http.port.secure", "8443");
-                value = platformConfig.get("org.apache.felix.https.enable");
-                if (value == null || "false".equalsIgnoreCase(value))
-                    platformConfig.set("org.apache.felix.https.enable", "true");
-                platformConfig.set("org.apache.felix.https.keystore", keyStore.getAbsolutePath());
-                platformConfig.set("org.apache.felix.https.keystore.password", password);
-                platformConfig.set("org.apache.felix.https.keystore.key.password", password);
-                platformConfig.save(confFile.getAbsolutePath(), Files.CHARSET);
-                return XSPReplySuccess.instance();
-            } catch (IOException exception) {
-                Logging.getDefault().error(exception);
-                return new XSPReplyFailure(exception.getMessage());
-            }
-        }
-    }
-
-    /**
      * The URIs for this service
      */
     private static final String[] URIS = new String[]{
-            "services/admin/platform"
+            "services/admin/platform",
+            "services/admin/platform/bundles"
     };
 
     /**
      * The details of the OSGi implementation we are running on
      */
-    private final PlatformImpl osgiImpl;
+    private final OSGiImpl osgiImpl;
+    /**
+     * The cache of bundles
+     */
+    private final List<OSGiBundle> bundles;
 
     /**
      * Initializes this service
+     *
+     * @param configurationService The current configuration service
+     * @param executionService     The current execution service
      */
-    public XOWLPlatformManagementService() {
-        osgiImpl = new PlatformImplFelix();
+    public XOWLPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
+        bundles = new ArrayList<>();
+        osgiImpl = getCurrentOSGIImpl();
+        osgiImpl.enforceHttpConfig(configurationService.getConfigFor(this), executionService);
+    }
+
+    /**
+     * Gets the current OSGi implementation we are running on
+     *
+     * @return The current OSGi implementation
+     */
+    private static OSGiImpl getCurrentOSGIImpl() {
+        return new OSGiImplFelix();
     }
 
     @Override
@@ -146,38 +103,37 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
+        if (uri.equals("services/admin/platform/bundles")) {
+            return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);
+        }
+
         String[] actions = parameters.get("action");
         if (actions == null || actions.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(getOSGiImplementation()), null);
 
         switch (actions[0]) {
             case "shutdown":
                 return XSPReplyUtils.toHttpResponse(shutdown(), null);
             case "restart":
                 return XSPReplyUtils.toHttpResponse(restart(), null);
-            case "regenerateTLS": {
-                String[] aliases = parameters.get("alias");
-                if (aliases == null || aliases.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected alias parameter");
-                return XSPReplyUtils.toHttpResponse(regenerateTLSConfig(aliases[0]), null);
-            }
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Override
-    public Collection<OSGiBundle> getPlatformBundles() {
-        return PlatformDescriptor.INSTANCE.getPlatformBundles();
+    public OSGiImplementation getOSGiImplementation() {
+        return osgiImpl;
     }
 
     @Override
-    public XSPReply regenerateTLSConfig(String alias) {
-        File root = new File(System.getProperty(Env.ROOT));
-        File targetKeyStore = new File(root, "keystore.jks");
-        String password = SSLGenerator.generateKeyStore(targetKeyStore, alias);
-        if (password == null)
-            return new XSPReplyFailure("Failed to generate TLS certificate");
-        return osgiImpl.setupTSL(targetKeyStore, password);
+    public Collection<OSGiBundle> getPlatformBundles() {
+        if (bundles.isEmpty()) {
+            Bundle[] bundles = FrameworkUtil.getBundle(OSGiBundle.class).getBundleContext().getBundles();
+            for (int i = 0; i != bundles.length; i++) {
+                this.bundles.add(new OSGiBundle(bundles[i]));
+            }
+        }
+        return Collections.unmodifiableCollection(bundles);
     }
 
     @Override

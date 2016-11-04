@@ -38,19 +38,18 @@ public interface PlatformManagementService extends HttpAPIService {
     int PLATFORM_EXIT_RESTART = 5;
 
     /**
+     * Gets the details of the OSGi implementation the platform is running on
+     *
+     * @return The details of the OSGi implementation the platform is running on
+     */
+    OSGiImplementation getOSGiImplementation();
+
+    /**
      * Gets the description of the bundles on this platform
      *
      * @return The bundle on this platform
      */
     Collection<OSGiBundle> getPlatformBundles();
-
-    /**
-     * Regenerates a self-signed TLS certificate and setup its use in the OSGi platform configuration
-     *
-     * @param alias The alias to use in the TLS certificate
-     * @return Whether the operation was successful
-     */
-    XSPReply regenerateTLSConfig(String alias);
 
     /**
      * Shutdowns the platform

@@ -35,20 +35,25 @@ import java.io.IOException;
  */
 public class FSConfigurationService implements ConfigurationService {
     /**
+     * From the distribution's root, the path to the configuration
+     */
+    private static final String CONFIG_DIR = "config";
+    /**
      * The supported extension for configuration files
      */
     private static final String CONFIG_EXT = ".ini";
 
     /**
-     * The root folder for the configuration
+     * The directory for the configuration
      */
-    private final File root;
+    private final File directory;
 
     /**
      * Initializes this service
      */
     public FSConfigurationService() {
-        root = new File(System.getProperty(Env.CONF_DIR));
+        File root = new File(System.getProperty(Env.ROOT));
+        directory = new File(root, CONFIG_DIR);
     }
 
     @Override
@@ -64,7 +69,7 @@ public class FSConfigurationService implements ConfigurationService {
     @Override
     public Configuration getConfigFor(Identifiable entity) {
         Configuration configuration = new Configuration();
-        File file = new File(root, entity.getIdentifier() + CONFIG_EXT);
+        File file = new File(directory, entity.getIdentifier() + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
             try (FileInputStream stream = new FileInputStream(file)) {
                 configuration.load(stream, Files.CHARSET);

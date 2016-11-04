@@ -15,16 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.platform;
+
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobFactory;
 
 /**
- * List of the platform environment variables
+ * The factory for platform related jobs
  *
  * @author Laurent Wouters
  */
-public interface Env {
-    /**
-     * Root directory for the distribution
-     */
-    String ROOT = "xowl.root";
+public class PlatformJobFactory implements JobFactory {
+    @Override
+    public String getIdentifier() {
+        return PlatformJobFactory.class.getCanonicalName();
+    }
+
+    @Override
+    public String getName() {
+        return "xOWL Federation Platform - Platform Job Factory";
+    }
+
+    @Override
+    public boolean canDeserialize(String type) {
+        return (type.equals(PlatformRebootJob.class.getCanonicalName()));
+    }
+
+    @Override
+    public Job newJob(String type, ASTNode definition) {
+        if (type.equals(PlatformRebootJob.class.getCanonicalName()))
+            return new PlatformRebootJob(definition);
+        return null;
+    }
 }

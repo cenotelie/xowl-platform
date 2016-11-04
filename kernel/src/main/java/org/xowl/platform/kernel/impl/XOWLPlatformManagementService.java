@@ -80,12 +80,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
 
     @Override
     public String getIdentifier() {
-        return XOWLSecurityService.class.getCanonicalName();
+        return XOWLPlatformManagementService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Platform Descriptor Service";
+        return "xOWL Federation Platform - Platform Management Service";
     }
 
     @Override

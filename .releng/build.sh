@@ -15,7 +15,7 @@ sh "$RELENG/build-distrib.sh"
 
 # Package distribution
 rm -f "$RELENG/xowl-platform-$VERSION.tar.gz"
-tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG/distribution" "felix/" "config/" "do-run.sh" "install-daemon.sh" "uninstall-daemon.sh"
+tar -czf "$RELENG/xowl-platform-$VERSION.tar.gz" -C "$ROOT" LICENSE.txt -C "$RELENG/distribution" "felix/" "config/" "do-run.sh" "admin.sh" "install-daemon.sh" "uninstall-daemon.sh"
 
 # Build the docker image
 mv "$RELENG/distribution/felix" "$RELENG/docker/felix"

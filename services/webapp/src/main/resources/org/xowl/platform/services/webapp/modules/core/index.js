@@ -4,5 +4,5 @@
 var xowl = new XOWL();
 
 function init() {
-	doSetupPage(xowl, true, [{name: "Core Module"}], function() {});
+	doSetupPage(xowl, true, [{name: "Core Services"}], function() {});
 }

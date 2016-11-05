@@ -165,7 +165,7 @@ function displayLoader(message) {
  */
 function displayMessage(type, message) {
 	var image = document.createElement("img");
-	image.src = "/web/branding/spinner.gif";
+	image.src = "/web/assets/message-" + type + ".svg";
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("message-icon");
@@ -178,6 +178,7 @@ function displayMessage(type, message) {
 	button.classList.add("message-button");
 	var row = document.createElement("div");
 	row.classList.add("header-message");
+	row.classList.add("header-message-" + type);
 	row.appendChild(image);
 	row.appendChild(content);
 	row.appendChild(button);

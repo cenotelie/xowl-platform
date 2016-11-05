@@ -52,7 +52,9 @@ function onClickShutdown() {
 	if (!onOperationRequest("Shutting down the platform ..."))
 		return;
 	xowl.platformShutdown(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
+		if (status == 0) {
+			displayMessage("success", "The platform shut down.");
+		} else if (onOperationEnded(status, content)) {
 			displayMessage("success", "The platform shut down.");
 		}
 	});
@@ -65,7 +67,9 @@ function onClickRestart() {
 	if (!onOperationRequest("Restarting down the platform ..."))
 		return;
 	xowl.platformRestart(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
+		if (status == 0) {
+			displayMessage("success", "The platform shut down.");
+		} else if (onOperationEnded(status, content)) {
 			displayMessage("success", "The platform is restarting.");
 		}
 	});

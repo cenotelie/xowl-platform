@@ -11,7 +11,6 @@ function init() {
 			{name: "Connector " + connectorId}], function() {
 		if (!connectorId || connectorId === null || connectorId === "")
 			return;
-		document.getElementById("placeholder-connector").innerHTML = connectorId;
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getConnector(function (status, ct, content) {

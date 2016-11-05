@@ -31,10 +31,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
@@ -178,7 +175,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         // event before running
         job.onRun();
-        Logging.getDefault().info("Begin running job " + job.getIdentifier());
+        Logging.getDefault().info(new RichString("Begin running job ", job));
     }
 
     /**
@@ -214,7 +211,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         // callback on completion
         job.onTerminated(job.getStatus() == JobStatus.Cancelled);
-        Logging.getDefault().info("Ended job " + job.getIdentifier());
+        Logging.getDefault().info(new RichString("Ended job ", job));
     }
 
     /**
@@ -331,7 +328,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
         }
         job.onScheduled();
         pool.execute(job);
-        Logging.getDefault().info("Scheduled job " + job.getIdentifier());
+        Logging.getDefault().info(new RichString("Scheduled job ", job));
     }
 
     @Override

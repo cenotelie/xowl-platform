@@ -340,7 +340,7 @@ function renderMessage(message) {
  */
 function renderMessagePart(part) {
 	if (part instanceof String || typeof part === 'string') {
-		var parts = message.split("\n");
+		var parts = part.split("\n");
     	if (parts.length > 0) {
     		var dom = document.createElement("span");
     		dom.appendChild(document.createTextNode(parts[0]));
@@ -417,7 +417,7 @@ function waitForJob(jobId, jobName, callback) {
 			" is running ..."]}))
 		return;
 
-	var trackOnce() = function() {
+	var trackOnce = function() {
 		xowl.getJob(function (status, ct, content) {
 			if (status == 200) {
 				if (content.status === "Completed") {

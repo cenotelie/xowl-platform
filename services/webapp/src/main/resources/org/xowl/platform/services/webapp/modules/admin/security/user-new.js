@@ -5,13 +5,15 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Administration Module", uri: "/web/modules/admin/"},
-			{name: "Security"}], function() {
-		doGetUsers();
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "New User"}], function() {
 	});
 }
 
 function create() {
+	if (!onOperationRequest("Creating new user ..."))
+		return false;
 	var identifier = document.getElementById("user-identifier").value;
 	var name = document.getElementById("user-name").value;
 	var password1 = document.getElementById("user-password1").value;
@@ -20,24 +22,17 @@ function create() {
 		|| name == null || name == ""
 		|| password1 == null || password1 == ""
 		|| password2 == null || password2 == "") {
-		alert("All fields are mandatory.");
-		return;
+		onOperationAbort("All fields are mandatory.");
+		return false;
 	}
 	if (password1 !== password2) {
-		alert("The two passwords are different.");
-		return;
+		onOperationAbort("The two passwords are different.");
+		return false;
 	}
-	if (BUSY)
-		return;
-	BUSY = true;
-	displayMessage("Creating user ...");
 	xowl.createPlatformUser(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "user.html?id=" + encodeURIComponent(identifier);
-			BUSY = false;
-		} else {
-			displayMessage(getErrorFor(status, content));
-			BUSY = false;
 		}
 	}, identifier, name, password1);
+	return false;
 }

@@ -2,32 +2,29 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var BUSY = false;
 
 function init() {
-	setupPage(xowl);
-	displayMessage(null);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "New Role"}], function() {
+	});
 }
 
 function create() {
+	if (!onOperationRequest("Creating new role ..."))
+		return false;
 	var identifier = document.getElementById("role-identifier").value;
 	var name = document.getElementById("role-name").value;
 	if (identifier == null || identifier == ""
 		|| name == null || name == "") {
-		alert("All fields are mandatory.");
-		return;
+		onOperationAbort("All fields are mandatory.");
+		return false;
 	}
-	if (BUSY)
-		return;
-	BUSY = true;
-	displayMessage("Creating role ...");
 	xowl.createPlatformRole(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "role.html?id=" + encodeURIComponent(identifier);
-			BUSY = false;
-		} else {
-			displayMessage(getErrorFor(status, content));
-			BUSY = false;
 		}
 	}, identifier, name);
+	return false;
 }

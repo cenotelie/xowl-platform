@@ -2,17 +2,24 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var BUSY = false;
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "New Group"}], function() {
+			doGetUsers();
+	});
+}
+
+function doGetUsers() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getPlatformUsers(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderPlatformUsers(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
+		doGetGroups();
 	});
 }
 
@@ -41,25 +48,20 @@ function renderPlatformUser(user) {
 }
 
 function create() {
+	if (!onOperationRequest("Creating new group ..."))
+		return false;
 	var identifier = document.getElementById("group-identifier").value;
 	var name = document.getElementById("group-name").value;
 	var admin = document.getElementById("group-admin").value;
 	if (identifier == null || identifier == ""
 		|| name == null || name == "") {
-		alert("All fields are mandatory.");
-		return;
+		onOperationAbort("All fields are mandatory.");
+		return false;
 	}
-	if (BUSY)
-		return;
-	BUSY = true;
-	displayMessage("Creating group ...");
 	xowl.createPlatformGroup(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "group.html?id=" + encodeURIComponent(identifier);
-			BUSY = false;
-		} else {
-			displayMessage(getErrorFor(status, content));
-			BUSY = false;
 		}
 	}, identifier, name, admin);
+	return false;
 }

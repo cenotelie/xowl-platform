@@ -47,6 +47,18 @@
   border: 1px solid gray;
   border-radius: 5px;
   background: white;
+  -webkit-animation: header-message-fadein 0.25s linear forwards;
+  animation: header-message-fadein 0.25s linear forwards;
+}
+
+@-webkit-keyframes header-message-fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes header-message-fadein {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 .header-message-success {

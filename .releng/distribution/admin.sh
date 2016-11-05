@@ -67,7 +67,7 @@ stop () {
 
 doStop () {
   echo "xOWL Platform stopping ..."
-  sudo kill $PID
+  kill $PID
   rm -f xowl-platform.pid
   echo "xOWL Platform stopped ..."
 }

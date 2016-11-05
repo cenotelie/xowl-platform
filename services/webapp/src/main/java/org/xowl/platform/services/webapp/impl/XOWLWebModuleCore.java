@@ -30,7 +30,7 @@ public class XOWLWebModuleCore extends WebModuleBase {
      * Initializes this service
      */
     public XOWLWebModuleCore() {
-        super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/web/assets/xowl.svg");
+        super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/web/assets/module-core.svg");
         this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/web/assets/artifact.svg"));
         this.items.add(new WebModuleItem("Data Import", "importation", "/web/assets/import.svg"));
         this.items.add(new WebModuleItem("Consistency Management", "consistency", "/web/assets/consistency.svg"));

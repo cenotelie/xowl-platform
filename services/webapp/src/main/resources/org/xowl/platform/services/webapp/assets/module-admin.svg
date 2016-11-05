@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="module-admin" version="1.1">
+  <path
+     style="fill:#034091;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 42.5 7.5 L 42.5 20.974609 A 30 30 0 0 0 34.791016 24.183594 L 25.251953 14.644531 L 14.644531 25.251953 L 24.179688 34.787109 A 30 30 0 0 0 20.990234 42.5 L 7.5 42.5 L 7.5 57.5 L 20.974609 57.5 A 30 30 0 0 0 24.183594 65.208984 L 14.644531 74.748047 L 25.251953 85.355469 L 34.787109 75.820312 A 30 30 0 0 0 42.5 79.009766 L 42.5 92.5 L 57.5 92.5 L 57.5 79.025391 A 30 30 0 0 0 65.208984 75.816406 L 74.748047 85.355469 L 85.355469 74.748047 L 75.820312 65.212891 A 30 30 0 0 0 79.009766 57.5 L 92.5 57.5 L 92.5 42.5 L 79.025391 42.5 A 30 30 0 0 0 75.816406 34.791016 L 85.355469 25.251953 L 74.748047 14.644531 L 65.212891 24.179688 A 30 30 0 0 0 57.5 20.990234 L 57.5 7.5 L 42.5 7.5 z M 50 35 A 15 15 0 0 1 65 50 A 15 15 0 0 1 50 65 A 15 15 0 0 1 35 50 A 15 15 0 0 1 50 35 z "/>
+  <path
+     style="fill:#00914d;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 44.887673,30.676632 57.119791,42.90875 53.584258,53.515351 42.977656,57.050885 30.74968,44.82291 a 20,20 0 0 0 5.156907,19.299043 20,20 0 0 0 19.299043,5.156909 L 78.332994,92.406225 92.47513,78.26409 69.351909,55.140869 A 20,20 0 0 0 64.190858,35.837682 20,20 0 0 0 44.887672,30.676632 Z"/>
+</svg>

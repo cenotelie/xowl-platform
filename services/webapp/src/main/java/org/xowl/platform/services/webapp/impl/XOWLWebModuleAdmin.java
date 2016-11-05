@@ -30,7 +30,7 @@ public class XOWLWebModuleAdmin extends WebModuleBase {
      * Initializes this service
      */
     public XOWLWebModuleAdmin() {
-        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Administration", "admin", "/web/assets/xowl.svg");
+        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Administration", "admin", "/web/assets/module-admin.svg");
         this.items.add(new WebModuleItem("Platform Security", "security", "/web/assets/security.svg"));
         this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
         this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/web/assets/jobs.svg"));

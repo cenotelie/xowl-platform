@@ -36,6 +36,7 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
+import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.Metric;
@@ -226,7 +227,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
                 if (isJobFile(files[i].getName())) {
                     try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
                         String content = Files.read(reader);
-                        reloadJob(files[i].getAbsolutePath(), content);
+                        reloadJob(files[i], content);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
@@ -238,13 +239,13 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
     /**
      * Tries to reload a job
      *
-     * @param file    The name of the file
+     * @param file    The job's file
      * @param content The job's content
      */
-    private void reloadJob(String file, String content) {
+    private void reloadJob(File file, String content) {
         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse the job " + file);
+            Logging.getDefault().error("Failed to parse the job " + file.getAbsolutePath());
             return;
         }
         String type = null;
@@ -265,6 +266,12 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
             Logging.getDefault().error("Unknown job type " + file);
             return;
         }
+        if (type.equals(PlatformRebootJob.class.getCanonicalName())) {
+            // do not reload reboot job
+            if (!file.delete()) {
+                Logging.getDefault().error("Failed to delete " + file.getAbsolutePath());
+            }
+        }
         Collection<JobFactory> factories = ServiceUtils.getServices(JobFactory.class);
         for (JobFactory factory : factories) {
             if (factory.canDeserialize(type)) {
@@ -274,7 +281,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
                 return;
             }
         }
-        Logging.getDefault().error("Could not find a factory for job " + file);
+        Logging.getDefault().error("Could not find a factory for job " + file.getAbsolutePath());
     }
 
     @Override

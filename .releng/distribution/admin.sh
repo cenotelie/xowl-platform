@@ -48,6 +48,7 @@ doStart () {
   if test "${PROCESS#*$TARGET}" != "$PROCESS"
   then
     ISRUNNING=true
+    disown -h "$PID"
     echo "xOWL Platform started ..."
   else
     ISRUNNING=false

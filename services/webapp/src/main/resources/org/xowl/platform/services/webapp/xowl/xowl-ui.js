@@ -214,7 +214,7 @@ function onOperationEnded(code, content, customMessage) {
  */
 function displayLoader(message) {
 	var image = document.createElement("img");
-	image.src = "/web/branding/spinner.gif";
+	image.src = "/web/assets/spinner.gif";
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("message-icon");

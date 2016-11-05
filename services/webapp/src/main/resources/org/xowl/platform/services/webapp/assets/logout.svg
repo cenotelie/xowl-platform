@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="logout" version="1.1">
+  <path
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#034091;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 40,15 -20,0 0,70 20,0"/>
+  <path
+     style="fill:#034091;fill-rule:evenodd;stroke:#034091;stroke-width:5;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+     d="M 80,15 50,5 50,95 80,85 Z"/>
+  <ellipse
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     cx="58.5" cy="50" rx="3.5" ry="5" />
+  <path
+     style="fill:#00914d;fill-rule:evenodd;stroke:#00914d;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="M 5,45 30,45 30,35 40,52.5 30,70 30,60 5,60 Z"/>
+</svg>

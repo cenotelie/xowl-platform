@@ -6,19 +6,20 @@ var roleId = getParameterByName("id");
 var oldName = null;
 
 function init() {
-	setupPage(xowl);
-	if (!roleId || roleId === null || roleId === "")
-		return;
-	document.getElementById("placeholder-role").innerHTML = "Role " + roleId;
-	displayMessage("Loading ...");
-	xowl.getPlatformRole(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, roleId);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Role " + roleId}], function() {
+		if (!roleId || roleId === null || roleId === "")
+			return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getPlatformRole(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				render(content);
+			}
+		}, roleId);
+	});
 }
 
 function render(role) {
@@ -43,16 +44,13 @@ function onClickValidate() {
 	document.getElementById("role-name-validate").style.display = "none";
 	document.getElementById("role-name-cancel").style.display = "none";
 	document.getElementById("role-name").readOnly = true;
-	displayMessage("Renaming ...");
+	if (!onOperationRequest("Renaming ..."))
+		return;
 	xowl.renamePlatformRole(function (status, ct, content) {
-		if (status == 200) {
-			displayMessage(null);
-			oldName = null;
-		} else {
+		if (!onOperationEnded(status, content)) {
 			document.getElementById("role-name").value = oldName;
-			displayMessage(getErrorFor(status, content));
-			oldName = null;
 		}
+		oldName = null;
 	}, roleId, document.getElementById("role-name").value);
 }
 
@@ -66,14 +64,14 @@ function onClickCancel() {
 }
 
 function onClickDelete() {
-	if (oldName !== null)
+	var result = confirm("Delete the role " + roleId + "?");
+	if (!result)
 		return;
-	displayMessage("Deleting this role ...");
+	if (!onOperationRequest("Deleting this role ..."))
+		return;
 	xowl.deletePlatformRole(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "index.html";
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, roleId);
 }

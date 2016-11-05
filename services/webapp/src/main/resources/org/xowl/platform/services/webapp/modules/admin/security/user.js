@@ -6,19 +6,20 @@ var userId = getParameterByName("id");
 var oldName = null;
 
 function init() {
-	setupPage(xowl);
-	if (!userId || userId === null || userId === "")
-		return;
-	document.getElementById("placeholder-user").innerHTML = "User " + userId;
-	displayMessage("Loading ...");
-	xowl.getPlatformUser(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, userId);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "User " + userId}], function() {
+		if (!userId || userId === null || userId === "")
+			return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getPlatformUser(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				render(content);
+			}
+		}, userId);
+	});
 }
 
 function render(user) {
@@ -67,16 +68,13 @@ function onClickValidate() {
 	document.getElementById("user-name-validate").style.display = "none";
 	document.getElementById("user-name-cancel").style.display = "none";
 	document.getElementById("user-name").readOnly = true;
-	displayMessage("Renaming ...");
+	if (!onOperationRequest("Renaming ..."))
+		return;
 	xowl.renamePlatformUser(function (status, ct, content) {
-		if (status == 200) {
-			displayMessage(null);
-			oldName = null;
-		} else {
+		if (!onOperationEnded(status, content)) {
 			document.getElementById("user-name").value = oldName;
-			displayMessage(getErrorFor(status, content));
-			oldName = null;
 		}
+		oldName = null;
 	}, userId, document.getElementById("user-name").value);
 }
 
@@ -90,14 +88,14 @@ function onClickCancel() {
 }
 
 function onClickDelete() {
-	if (oldName !== null)
+	var result = confirm("Delete the user " + userId + "?");
+	if (!result)
 		return;
-	displayMessage("Deleting this user ...");
+	if (!onOperationRequest("Deleting this user ..."))
+		return;
 	xowl.deletePlatformUser(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "index.html";
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, userId);
 }

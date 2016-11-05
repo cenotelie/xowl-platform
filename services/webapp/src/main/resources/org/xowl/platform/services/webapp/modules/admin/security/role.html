@@ -3,41 +3,25 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Role</title>
+    <title>Security: Role</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/web/assets/favicon.png"/>
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
     <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-<div class="header">
-    <object id="branding-title" type="text/html" data="/web/components/title.html" height="25px"
-            style="margin-left: 5px; display: inline-block;"></object>
-    <div style="display: inline-block; margin-left: 50px;">
-      <span style="display: inline-block;">
-        <ol class="breadcrumb">
-          <li><a href="/web/">Home</a></li>
-          <li><a href="/web/modules/admin/">Administration</a></li>
-          <li><a href="/web/modules/admin/security/">Platform Security</a></li>
-          <li class="active" id="placeholder-role">Role</li>
-        </ol>
-      </span>
-    </div>
-    <div style="float: right; margin-right: 20px;">
-        <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-    </div>
-    <hr style="margin-top: 5px; margin-bottom: 5px;"/>
-</div>
+<object type="text/html" data="/web/components/title.html" id="component-title"
+        onload="onComponentLoadedTitle()"></object>
+<object type="text/html" data="/web/components/header.html" id="component-header"
+        onload="onComponentLoadedHeader()"></object>
+<object type="text/html" data="/web/components/footer.html" id="component-footer"
+        onload="onComponentLoadedFooter()"></object>
+
+<div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default" id="loader">
-        <div class="panel-body">
-            <img src="/web/assets/spinner.gif" width="32" height="32"/>
-            <span id="loader-text">Loading ...</span>
-        </div>
-    </div>
     <div class="panel panel-default">
         <div class="panel-body">
             <form class="form-horizontal">
@@ -75,13 +59,12 @@
         </div>
     </div>
 </div>
+<div id="placeholder-footer"></div>
+
 <script src="/web/xowl/xowl-api-platform.js"></script>
 <script src="/web/xowl/xowl-ui.js"></script>
-<script src="/web/xowl/xowl-utils.js"></script>
 <script src="role.js"></script>
-<script>
-    init();
-</script>
+<script>init();</script>
 </body>
 
 </html>

@@ -6,19 +6,20 @@ var groupId = getParameterByName("id");
 var oldName = null;
 
 function init() {
-	setupPage(xowl);
-	if (!groupId || groupId === null || groupId === "")
-		return;
-	document.getElementById("placeholder-group").innerHTML = "Group " + groupId;
-	displayMessage("Loading ...");
-	xowl.getPlatformGroup(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, groupId);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Group " + groupId}], function() {
+		if (!groupId || groupId === null || groupId === "")
+			return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getPlatformGroup(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				render(content);
+			}
+		}, groupId);
+	});
 }
 
 function render(group) {
@@ -98,16 +99,13 @@ function onClickValidate() {
 	document.getElementById("group-name-validate").style.display = "none";
 	document.getElementById("group-name-cancel").style.display = "none";
 	document.getElementById("group-name").readOnly = true;
-	displayMessage("Renaming ...");
+	if (!onOperationRequest("Renaming ..."))
+		return;
 	xowl.renamePlatformGroup(function (status, ct, content) {
-		if (status == 200) {
-			displayMessage(null);
-			oldName = null;
-		} else {
+		if (!onOperationEnded(status, content)) {
 			document.getElementById("group-name").value = oldName;
-			displayMessage(getErrorFor(status, content));
-			oldName = null;
 		}
+		oldName = null;
 	}, groupId, document.getElementById("group-name").value);
 }
 
@@ -121,14 +119,14 @@ function onClickCancel() {
 }
 
 function onClickDelete() {
-	if (oldName !== null)
+	var result = confirm("Delete the group " + groupId + "?");
+	if (!result)
 		return;
-	displayMessage("Deleting this group ...");
+	if (!onOperationRequest("Deleting this group ..."))
+		return;
 	xowl.deletePlatformGroup(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			window.location.href = "index.html";
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, groupId);
 }

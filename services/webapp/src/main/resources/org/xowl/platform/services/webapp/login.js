@@ -2,30 +2,23 @@
 // Provided under LGPL v3
 
 var xowl = new XOWL();
-var BUSY = false;
 
 function init() {
 	doSetupPage(xowl, false, [{name: "Login"}], function() {});
 }
 
 function onLoginButton() {
-	if (BUSY) {
-		displayMessage("error", "Another operation is going on ...");
+	if (!onOperationRequest("Trying to login ..."))
 		return;
-	}
 	var login = document.getElementById("field-login").value;
 	var password = document.getElementById("field-password").value;
-	if (login === null || login === "" || password === null || password === "")
+	if (login === null || login === "" || password === null || password === "") {
+		onOperationAbort("Login / Password is empty!");
 		return;
-	BUSY = true;
-	var remover = displayLoader("Trying to login ...");
+	}
 	xowl.login(function (code, type, content) {
-		SENT = false;
-		if (code === 200) {
+		if (onOperationEnded(status, content, "Failed to login, verify your login and password.")) {
 			window.location.href = "index.html";
-		} else {
-			remover();
-			displayMessage("error", "Failed to login, verify your login and password.");
 		}
 	}, login, password);
 	return false;

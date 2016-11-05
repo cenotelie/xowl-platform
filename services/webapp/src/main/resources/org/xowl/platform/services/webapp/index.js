@@ -5,12 +5,12 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [], function() {
-		var remover = displayLoader("Loading ...");
-			xowl.getWebModules(function (status, ct, content) {
-			if (status == 200) {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getWebModules(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
 				renderModules(content);
 			}
-			remover();
 		});
 	});
 }

@@ -17,7 +17,8 @@ function init() {
 			{name: "Administration Module", uri: "/web/modules/admin/"},
 			{name: "Statistics", uri: "/web/admin/statistics/"},
 			{name: "DB File " + fileName}], function() {
-		var remover = displayLoader("Loading ...");
+		if (!onOperationRequest("Loading ..."))
+			return;
 	});
 	document.getElementById("file-name").value = fileName;
 }

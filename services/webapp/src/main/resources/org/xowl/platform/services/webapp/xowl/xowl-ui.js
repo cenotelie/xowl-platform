@@ -34,6 +34,12 @@ var PAGE_READY_INDEX = 0;
  * The hook to call when the page is ready
  */
 var PAGE_READY_HOOK = null;
+/**
+ * Whether the current page is busy with a running operation
+ * Null indicate that no operation is underway.
+ * A non-null value is the function to be called to remove the on-going message.
+ */
+var PAGE_BUSY = null;
 
 /**
  * Get the value of an HTTP parameter
@@ -142,6 +148,62 @@ function onComponentLoadedGetNode(identifier) {
 function onClickLogout() {
 	PLATFORM.logout();
 	document.location.href = "/web/login.html";
+}
+
+/**
+ * When an operation has been requested by the user
+ *
+ * @param message The message to display for the operation
+ * @return Whether the operation can be performed
+ */
+function onOperationRequest(message) {
+	if (PAGE_BUSY != null) {
+		displayMessage("error", "Another operation is going on ...");
+		return false;
+	}
+	PAGE_BUSY = displayLoader(message);
+	return true;
+}
+
+/**
+ * When the current operation was aborted
+ *
+ * @param message The message to display
+ * @return Whether the operation was successful
+ */
+function onOperationAbort(message) {
+	if (PAGE_BUSY != null) {
+		displayMessage("error", "No on-going operation ...");
+		return false;
+	}
+	PAGE_BUSY();
+	PAGE_BUSY = null;
+	displayMessage("error", message);
+	return true;
+}
+
+/**
+ * When an operation ended
+ *
+ * @param code          The HTTP code (other that 200 - OK)
+ * @param content       The content of the HTTP response
+ * @param customMessage A custom message to override the default one (may be undefined)
+ * @return Whether the operation was successful
+ */
+function onOperationEnded(code, content, customMessage) {
+	if (PAGE_BUSY != null) {
+		displayMessage("error", "No on-going operation ...");
+		return false;
+	}
+	PAGE_BUSY();
+	PAGE_BUSY = null;
+	if (code != 200) {
+		if ((typeof customMessage) === "undefined")
+			displayMessageHttpError(code, content);
+		else
+			displayMessage("error", customMessage);
+	}
+	return (code === 200);
 }
 
 /**

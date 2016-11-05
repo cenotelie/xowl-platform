@@ -7,14 +7,11 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
 			{name: "Statistics"}], function() {
-		var remover = displayLoader("Loading ...");
+		if (!onOperationRequest("Loading ..."))
+			return;
 		xowl.getStatisticsList(function (status, ct, content) {
-			if (status == 200) {
+			if (onOperationEnded(status, content)) {
 				renderMetrics(content);
-				remover();
-			} else {
-				remover();
-				displayMessageHttpError(status, content);
 			}
 		});
 	});

@@ -2,20 +2,16 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var BUSY = false;
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
 			{name: "Platform Management"}], function() {
-		var remover = displayLoader("Loading ...");
+		if (!onOperationRequest("Loading ..."))
+			return;
 		xowl.getPlatformBundles(function (status, ct, content) {
-			if (status == 200) {
+			if (onOperationEnded(status, content)) {
 				renderBundles(content);
-				remover();
-			} else {
-				remover();
-				displayMessageHttpError(status, content);
 			}
 		});
 	});
@@ -50,45 +46,27 @@ function renderBundles(bundles) {
 }
 
 function onClickShutdown() {
-	if (BUSY) {
-		displayMessage("error", "Another operation is going on ...");
-		return;
-	}
 	var result = confirm("Shutdown the platform?");
-	if (result == true) {
-		BUSY = true;
-		var remover = displayLoader("Shutting down the platform ...");
-		xowl.platformShutdown(function (status, ct, content) {
-			BUSY = false;
-			if (status == 200) {
-				remover();
-				displayMessage("success", "Platform shut down.");
-			} else {
-				remover();
-				displayMessageHttpError(status, content);
-			}
-		});
-	}
+	if (!result)
+		return;
+	if (!onOperationRequest("Shutting down the platform ..."))
+		return;
+	xowl.platformShutdown(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "The platform shut down.");
+		}
+	});
 }
 
 function onClickRestart() {
-	if (BUSY) {
-		displayMessage("error", "Another operation is going on ...");
-		return;
-	}
 	var result = confirm("Restart the platform?");
-	if (result == true) {
-		BUSY = true;
-		var remover = displayLoader("Restarting the platform ...");
-		xowl.platformRestart(function (status, ct, content) {
-			BUSY = false;
-			if (status == 200) {
-				remover();
-				displayMessage("success", "Platform si restarting.");
-			} else {
-				remover();
-				displayMessageHttpError(status, content);
-			}
-		});
-	}
+	if (!result)
+		return;
+	if (!onOperationRequest("Restarting down the platform ..."))
+		return;
+	xowl.platformRestart(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "The platform is restarting.");
+		}
+	});
 }

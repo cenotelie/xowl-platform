@@ -172,7 +172,7 @@ function onOperationRequest(message) {
  * @return Whether the operation was successful
  */
 function onOperationAbort(message) {
-	if (PAGE_BUSY != null) {
+	if (PAGE_BUSY == null) {
 		displayMessage("error", "No on-going operation ...");
 		return false;
 	}
@@ -191,7 +191,7 @@ function onOperationAbort(message) {
  * @return Whether the operation was successful
  */
 function onOperationEnded(code, content, customMessage) {
-	if (PAGE_BUSY != null) {
+	if (PAGE_BUSY == null) {
 		displayMessage("error", "No on-going operation ...");
 		return false;
 	}
@@ -376,27 +376,7 @@ function getShortURI(value) {
 	return value;
 }
 
-function renderJobPayload(payload) {
-	if (payload instanceof String || typeof payload === 'string')
-		return payload;
-	return JSON.stringify(payload);
-}
 
-function renderXSPReply(xsp) {
-	if (!xsp.hasOwnProperty("isSuccess"))
-		return "No result ...";
-	if (!xsp.isSuccess) {
-		return "FAILURE: " + xsp.message;
-	} else if (xsp.hasOwnProperty("payload")) {
-		if (xsp.payload == null)
-			return "SUCCESS: " + xsp.message;
-		if (xsp.payload instanceof String)
-			return xsp.payload;
-		return JSON.stringify(xsp.payload);
-	} else {
-		return "SUCCESS: " + xsp.message;
-	}
-}
 
 function renderMessage(message) {
 	if (message instanceof String || typeof message === 'string')

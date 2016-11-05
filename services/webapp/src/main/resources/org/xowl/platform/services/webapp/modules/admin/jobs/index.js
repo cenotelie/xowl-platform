@@ -4,18 +4,19 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	refresh();
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Jobs"}], function() {
+		refresh();
+	});
 }
 
 function refresh() {
-	displayMessage("Loading ...");
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getJobs(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderData(content);
-			document.getElementById("loader").style.display = "none";
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	});
 }
@@ -67,15 +68,7 @@ function renderJob(job) {
 	if (job.status != "Completed" && job.status != "Cancelled") {
 		var button = document.createElement("button");
 		button.className = "btn btn-danger";
-		button.onclick = function () {
-			xowl.cancelJob(function (status, ct, content) {
-				if (status == 200) {
-					refresh();
-				} else {
-					displayMessage(getErrorFor(status, content));
-				}
-			}, job.identifier);
-		};
+		button.onclick = function () { onCancelJob(job); };
 		button.appendChild(document.createTextNode("Cancel"));
 		cells[5].appendChild(button);
 	}
@@ -86,4 +79,14 @@ function renderJob(job) {
 	row.appendChild(cells[4]);
 	row.appendChild(cells[5]);
 	return row;
+}
+
+function onCancelJob(job) {
+	if (!onOperationRequest("Cancelling job " + job.name + "..."))
+		return;
+	xowl.cancelJob(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			refresh();
+		}
+	}, job.identifier);
 }

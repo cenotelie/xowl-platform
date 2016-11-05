@@ -9,14 +9,14 @@ function init() {
 
 function onLoginButton() {
 	if (!onOperationRequest("Trying to login ..."))
-		return;
+		return false;
 	var login = document.getElementById("field-login").value;
 	var password = document.getElementById("field-password").value;
 	if (login === null || login === "" || password === null || password === "") {
 		onOperationAbort("Login / Password is empty!");
-		return;
+		return false;
 	}
-	xowl.login(function (code, type, content) {
+	xowl.login(function (status, type, content) {
 		if (onOperationEnded(status, content, "Failed to login, verify your login and password.")) {
 			window.location.href = "index.html";
 		}

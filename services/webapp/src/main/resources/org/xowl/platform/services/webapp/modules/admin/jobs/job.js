@@ -5,22 +5,23 @@ var xowl = new XOWL();
 var jobId = getParameterByName("id");
 
 function init() {
-	setupPage(xowl);
-	if (!jobId || jobId === null || jobId === "")
-		return;
-	document.getElementById("placeholder-job").innerHTML = jobId;
-	displayMessage("Loading ...");
-	xowl.getJob(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			if (content.status !== "Completed") {
-				window.setTimeout(init, 2000);
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Jobs", uri: "/web/modules/admin/jobs/"},
+			{name: "Job " + jobId}], function() {
+		if (!jobId || jobId === null || jobId === "")
+			return;
+		document.getElementById("placeholder-job").innerHTML = jobId;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getJob(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderData(content);
+				if (content.status !== "Completed")
+					window.setTimeout(init, 2000);
 			}
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, jobId);
+		}, jobId);
+	});
 }
 
 function render(job) {
@@ -31,6 +32,28 @@ function render(job) {
 	document.getElementById("job-time-scheduled").value = job.timeScheduled;
 	document.getElementById("job-time-run").value = job.timeRun;
 	document.getElementById("job-time-completed").value = job.timeCompleted;
-	document.getElementById("job-payload").innerHTML = renderJobPayload(job.payload);
-	document.getElementById("job-result").innerHTML = renderXSPReply(job.result);
+	document.getElementById("job-payload").appendChild(renderJobPayload(job.payload));
+	document.getElementById("job-result").appendChild(renderJobResult(job.result));
+}
+
+function renderJobPayload(payload) {
+	if (payload instanceof String || typeof payload === 'string')
+		return document.createTextNode(payload);
+	return document.createTextNode(JSON.stringify(payload));
+}
+
+function renderJobResult(xsp) {
+	if (!xsp.hasOwnProperty("isSuccess"))
+		return document.createTextNode("No result ...");
+	if (!xsp.isSuccess) {
+		return document.createTextNode("FAILURE: " + xsp.message);
+	} else if (xsp.hasOwnProperty("payload")) {
+		if (xsp.payload == null)
+			return document.createTextNode("SUCCESS: " + xsp.message);
+		if (xsp.payload instanceof String)
+			return document.createTextNode(xsp.payload);
+		return document.createTextNode(JSON.stringify(xsp.payload));
+	} else {
+		return document.createTextNode("SUCCESS: " + xsp.message);
+	}
 }

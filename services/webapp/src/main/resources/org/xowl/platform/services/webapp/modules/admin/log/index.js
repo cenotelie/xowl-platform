@@ -4,14 +4,16 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getLogMessages(function (status, ct, content) {
-		if (status == 200) {
-			renderLogLines(content);
-			document.getElementById("loader").style.display = "none";
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Log"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getLogMessages(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderLogLines(content);
+			}
+		});
 	});
 }
 

@@ -19,19 +19,34 @@ var GRAPH_DB_X = 20;
 var GRAPH_CONNECTOR_X = 400;
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Connectors Management"}], function() {
+			doGetConnectors();
+	});
 	var url = document.URL;
 	var index = url.indexOf("/web/");
 	if (index > 0)
 		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
+}
+
+function doGetConnectors() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getConnectors(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			CONNECTORS = content;
 			render();
 		}
+		doGetDescriptors();
 	});
+}
+
+function doGetDescriptors() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getDescriptors(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			DOMAINS = content;
 			var select = document.getElementById("input-domain");
 			while (select.length > 0)
@@ -102,26 +117,26 @@ function onClickLink(connector) {
 }
 
 function onClickNewConnector() {
-	var onerror = false;
+	var onError = false;
 	var id = document.getElementById("input-id").value;
 	var name = document.getElementById("input-name").value;
 	var uri = document.getElementById("input-uri").value;
 	if (SELECTED_DOMAIN == null) {
 		document.getElementById("input-domain").parentElement.className = "form-group has-error"
 		document.getElementById("input-domain-help").innerHTML = "A domain must be selected.";
-		onerror = true;
+		onError = true;
 	}
 	if (typeof id == "undefined" || id == null || id == "") {
 		document.getElementById("input-id").parentElement.className = "form-group has-error"
 		document.getElementById("input-id-help").innerHTML = "The identifier must not be empty.";
-		onerror = true;
+		onError = true;
 	}
 	if (typeof name == "undefined" || name == null || name == "") {
 		document.getElementById("input-name").parentElement.className = "form-group has-error"
 		document.getElementById("input-name-help").innerHTML = "The name must not be empty.";
-		onerror = true;
+		onError = true;
 	}
-	if (onerror)
+	if (onError)
 		return;
 	document.getElementById("input-domain").parentElement.className = "form-group"
 	document.getElementById("input-domain-help").innerHTML = "";
@@ -146,8 +161,11 @@ function onClickNewConnector() {
 			data[SELECTED_DOMAIN.parameters[i].identifier] = value;
 		}
 	}
+
+	if (!onOperationRequest("Creating new connector ..."))
+		return;
 	xowl.createConnector(function (status, ct, content) {
-		if (status === 200) {
+		if (onOperationEnded(status, content)) {
 			var connector = content;
 			document.getElementById("input-id").value = "";
 			document.getElementById("input-name").value = "";
@@ -160,9 +178,6 @@ function onClickNewConnector() {
 				document.getElementById("input-param-" + i).value = "";
 			}
 			render();
-		} else {
-			document.getElementById("input-id").parentElement.className = "form-group has-error"
-			document.getElementById("input-id-help").innerHTML = content;
 		}
 	}, SELECTED_DOMAIN, data);
 }
@@ -170,8 +185,13 @@ function onClickNewConnector() {
 function onClickDeleteConnector() {
 	if (SELECTED_CONNECTOR === null)
 		return;
+	var result = confirm("Delete connector " + SELECTED_CONNECTOR.identifier + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Deleting connector ..."))
+		return;
 	xowl.deleteConnector(function (status, ct, content) {
-		if (status === 200) {
+		if (onOperationEnded(status, content)) {
 			document.getElementById("connector-properties").style.display = "none";
 			CONNECTORS.splice(CONNECTORS.indexOf(SELECTED_CONNECTOR), 1);
 			render();

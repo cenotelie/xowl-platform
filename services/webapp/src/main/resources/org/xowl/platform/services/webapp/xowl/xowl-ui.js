@@ -150,6 +150,12 @@ function onClickLogout() {
 	document.location.href = "/web/login.html";
 }
 
+
+
+/*****************************************************
+ * HTTP operations management
+ ****************************************************/
+
 /**
  * When an operation has been requested by the user
  *
@@ -206,6 +212,12 @@ function onOperationEnded(code, content, customMessage) {
 	return (code === 200);
 }
 
+
+
+/*****************************************************
+ * Message display
+ ****************************************************/
+
 /**
  * Displays a message for loading
  *
@@ -218,16 +230,7 @@ function displayLoader(message) {
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("header-message-icon");
-	var content = document.createElement("span");
-	var parts = message.split("\n");
-	if (parts.length > 0) {
-		content.appendChild(document.createTextNode(parts[0]));
-		for (var i = 1; i != parts.length; i++) {
-			content.appendChild(document.createElement("br"));
-			content.appendChild(document.createTextNode(parts[i]));
-		}
-	}
-	content.classList.add("header-message-content");
+	var content = renderMessage(message);
 	var row = document.createElement("div");
 	row.classList.add("header-message");
 	row.appendChild(image);
@@ -251,16 +254,7 @@ function displayMessage(type, message) {
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("header-message-icon");
-	var content = document.createElement("span");
-	var parts = message.split("\n");
-	if (parts.length > 0) {
-		content.appendChild(document.createTextNode(parts[0]));
-		for (var i = 1; i != parts.length; i++) {
-			content.appendChild(document.createElement("br"));
-			content.appendChild(document.createTextNode(parts[i]));
-		}
-	}
-	content.classList.add("header-message-content");
+	var content = renderMessage(message);
 	var button = document.createElement("span");
 	button.appendChild(document.createTextNode("×"));
 	button.classList.add("header-message-button");
@@ -317,84 +311,48 @@ function displayMessageHttpError(code, content) {
 	displayMessage("error", message);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
- * Page management
+/**
+ * Renders in HTML the specified message
+ *
+ * @param message The message to render, may be a complex RichText message
+ * @return The HTML DOM element corresponding to the rendered message
  */
-
-var MIME_TYPES = [
-	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
-	{ name: 'N-Quads', value: 'application/n-quads', extensions: ['.nq'] },
-	{ name: 'Turtle', value: 'text/turtle', extensions: ['.ttl'] },
-	{ name: 'TriG', value: 'application/trig', extensions: ['.trig'] },
-	{ name: 'JSON-LD', value: 'application/ld+json', extensions: ['.jsonld'] },
-	{ name: 'RDF/XML', value: 'application/rdf+xml', extensions: ['.rdf'] },
-	{ name: 'Functional OWL2', value: 'text/owl-functional', extensions: ['.ofn', '.fs'] },
-	{ name: 'OWL/XML', value: 'application/owl+xml', extensions: ['.owx', '.owl'] },
-	{ name: 'xOWL RDF Rules', value: 'application/x-xowl-rdft', extensions: ['.rdft'] },
-	{ name: 'xOWL Ontology', value: 'application/x-xowl', extensions: ['.xowl'] }
-];
-
-
-
-var DEFAULT_URI_MAPPINGS = [
-    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
-    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
-    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
-    ["owl", "http://www.w3.org/2002/07/owl#"]];
-
-function getShortURI(value) {
-	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
-		if (value.indexOf(DEFAULT_URI_MAPPINGS[i][1]) === 0) {
-			return DEFAULT_URI_MAPPINGS[i][0] + ":" + value.substring(DEFAULT_URI_MAPPINGS[i][1].length);
-		}
-	}
-	return value;
-}
-
-
-
 function renderMessage(message) {
-	if (message instanceof String || typeof message === 'string')
-		return document.createTextNode(message);
-	if (message.type === "org.xowl.platform.kernel.RichString") {
-		var span = document.createElement("span");
+	var result = document.createElement("p");
+	result.classList.add("header-message-content");
+	if (message instanceof String || typeof message === 'string') {
+		result.appendChild(renderMessagePart(message));
+	} else if (message.type === "org.xowl.platform.kernel.RichString") {
 		for (var i = 0; i != message.parts.length; i++) {
-			span.appendChild(renderMessagePart(message.parts[i]));
+			result.appendChild(renderMessagePart(message.parts[i]));
 		}
-		return span;
+	} else {
+		result.appendChild(document.createTextNode(JSON.stringify(message)));
 	}
-	return document.createTextNode(JSON.stringify(message));
+	return result;
 }
 
+/**
+ * Renders in HTML the specified message part
+ *
+ * @param message The message to part render
+ * @return The HTML DOM element corresponding to the rendered message part
+ */
 function renderMessagePart(part) {
-	if (part instanceof String || typeof part === 'string')
-		return document.createTextNode(part);
-	if (part.type === "org.xowl.platform.kernel.jobs.Job") {
+	if (part instanceof String || typeof part === 'string') {
+		var parts = message.split("\n");
+    	if (parts.length > 0) {
+    		var dom = document.createElement("span");
+    		dom.appendChild(document.createTextNode(parts[0]));
+    		for (var i = 1; i != parts.length; i++) {
+    			dom.appendChild(document.createElement("br"));
+    			dom.appendChild(document.createTextNode(parts[i]));
+    		}
+    		return dom;
+    	} else {
+    		return document.createTextNode(part);
+    	}
+	} else if (part.type === "org.xowl.platform.kernel.jobs.Job") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = "/web/modules/admin/jobs/job.html?id=" + encodeURIComponent(part.identifier);
@@ -436,6 +394,83 @@ function renderMessagePart(part) {
 		return dom;
 	}
 	return document.createTextNode(JSON.stringify(part));
+}
+
+
+
+/*****************************************************
+ * Job tracking
+ ****************************************************/
+
+/**
+ * Wait for a job to complete
+ *
+ * @param jobId    The identifier of the job to wait for
+ * @param jobName  The name of the job
+ * @param callback The callback when the job has been completed
+ *                 The callback is expected to have 1 parameter for the job object
+ */
+function waitForJob(jobId, jobName, callback) {
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: [
+			"Job ",
+			{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName},
+			" is running ..."]}))
+		return;
+
+	var trackOnce() = function() {
+		xowl.getJob(function (status, ct, content) {
+			if (status == 200) {
+				if (content.status === "Completed") {
+					onOperationEnded(status, content);
+					callback(content);
+				} else {
+					window.setTimeout(trackOnce, 2000);
+				}
+			} else {
+				onOperationEnded(status, content, { type: "org.xowl.platform.kernel.RichString", parts: [
+					"Failed to retrieve data for job ",
+					{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName}
+					]});
+			}
+		}, jobId);
+	};
+	trackOnce();
+}
+
+
+
+/*****************************************************
+ * RDF rendering
+ ****************************************************/
+
+var MIME_TYPES = [
+	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
+	{ name: 'N-Quads', value: 'application/n-quads', extensions: ['.nq'] },
+	{ name: 'Turtle', value: 'text/turtle', extensions: ['.ttl'] },
+	{ name: 'TriG', value: 'application/trig', extensions: ['.trig'] },
+	{ name: 'JSON-LD', value: 'application/ld+json', extensions: ['.jsonld'] },
+	{ name: 'RDF/XML', value: 'application/rdf+xml', extensions: ['.rdf'] },
+	{ name: 'Functional OWL2', value: 'text/owl-functional', extensions: ['.ofn', '.fs'] },
+	{ name: 'OWL/XML', value: 'application/owl+xml', extensions: ['.owx', '.owl'] },
+	{ name: 'xOWL RDF Rules', value: 'application/x-xowl-rdft', extensions: ['.rdft'] },
+	{ name: 'xOWL Ontology', value: 'application/x-xowl', extensions: ['.xowl'] }
+];
+
+
+
+var DEFAULT_URI_MAPPINGS = [
+    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["owl", "http://www.w3.org/2002/07/owl#"]];
+
+function getShortURI(value) {
+	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
+		if (value.indexOf(DEFAULT_URI_MAPPINGS[i][1]) === 0) {
+			return DEFAULT_URI_MAPPINGS[i][0] + ":" + value.substring(DEFAULT_URI_MAPPINGS[i][1].length);
+		}
+	}
+	return value;
 }
 
 function rdfToDom(value) {
@@ -507,36 +542,7 @@ function rdfToDom(value) {
     }
 }
 
-function trackJob(jobId, text, callback) {
-	var link = document.createElement("a");
-	link.href = "/web/modules/admin/jobs/job.html?id=" + encodeURIComponent(jobId);
-	link.appendChild(document.createTextNode(text));
-	var span = document.getElementById("loader-text");
-	while (span.hasChildNodes())
-		span.removeChild(span.lastChild);
-	span.appendChild(link);
-	document.getElementById("loader").style.display = "";
-	var doTrack = function () {
-		xowl.getJob(function (status, ct, content) {
-			if (status == 200) {
-				JOB = content;
-				if (content.status === "Completed") {
-					JOB = null;
-					if (content.result.isSuccess) {
-						document.getElementById("loader").style.display = "none";
-					} else {
-						span.removeChild(link);
-						span.appendChild(document.createTextNode("FAILURE: " + content.result.message));
-					}
-					callback(content.result.isSuccess)
-				} else {
-					window.setTimeout(doTrack, 2000);
-				}
-			}
-		}, jobId);
-	};
-	doTrack();
-}
+
 
 function compareArtifacts(a1, a2) {
 	var d1 = new Date(a1.creation);

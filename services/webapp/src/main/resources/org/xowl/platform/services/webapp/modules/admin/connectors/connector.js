@@ -3,22 +3,23 @@
 
 var xowl = new XOWL();
 var connectorId = getParameterByName("id");
-var JOB = null;
 
 function init() {
-	setupPage(xowl);
-	if (!connectorId || connectorId === null || connectorId === "")
-		return;
-	document.getElementById("placeholder-connector").innerHTML = connectorId;
-	displayMessage("Loading ...");
-	xowl.getConnector(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, connectorId);
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Connectors Management", uri: "/web/modules/admin/connectors/"},
+			{name: "Connector " + connectorId}], function() {
+		if (!connectorId || connectorId === null || connectorId === "")
+			return;
+		document.getElementById("placeholder-connector").innerHTML = connectorId;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getConnector(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				render(content);
+			}
+		}, connectorId);
+	});
 }
 
 function render(connector) {
@@ -47,20 +48,31 @@ function render(connector) {
 }
 
 function onClickPull() {
-	if (JOB !== null) {
-		alert("Please wait for the previous action to terminate.");
+	var result = confirm("Pull from connector " + document.getElementById("connector-name").value + "?");
+	if (!result)
 		return;
-	}
-	JOB = "reserved";
+	if (!onOperationRequest("Launching a pull artifact operation from " + document.getElementById("connector-name").value + " ..."))
+		return;
 	xowl.pullFromConnector(function (status, ct, content) {
-		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function (isSuccess) {
-				if (isSuccess)
-					window.location.reload(true);
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+				"Launched job ",
+				{type: "org.xowl.platform.kernel.jobs.Job", identifier: content.identifier, name: content.name}]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onPullJobComplete(job.result);
 			});
-		} else {
-			displayMessage(getErrorFor(status, content));
-			JOB = null;
 		}
 	}, connectorId);
+}
+
+function onPullJobComplete(xsp) {
+	if (!xsp.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!xsp.isSuccess) {
+		displayMessage("error", "FAILURE: " + xsp.message);
+	} else {
+		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+			"Pulled artifact ",
+			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
+	}
 }

@@ -13,6 +13,7 @@ function init() {
 			if (onOperationEnded(status, content)) {
 				renderLogLines(content);
 			}
+			displayMessage("warning", "This page only shows the latest messages.\nRefer to the platform's log file for the full content.");
 		});
 	});
 }

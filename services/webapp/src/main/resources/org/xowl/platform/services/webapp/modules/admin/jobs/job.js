@@ -7,7 +7,7 @@ var jobId = getParameterByName("id");
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
-			{name: "Jobs", uri: "/web/modules/admin/jobs/"},
+			{name: "Platform Job Management", uri: "/web/modules/admin/jobs/"},
 			{name: "Job " + jobId}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;

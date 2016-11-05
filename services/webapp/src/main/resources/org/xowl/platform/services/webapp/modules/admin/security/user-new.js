@@ -2,11 +2,13 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var BUSY = false;
 
 function init() {
-	setupPage(xowl);
-	displayMessage(null);
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Security"}], function() {
+		doGetUsers();
+	});
 }
 
 function create() {

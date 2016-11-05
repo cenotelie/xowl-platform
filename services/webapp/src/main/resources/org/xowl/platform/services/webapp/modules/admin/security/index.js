@@ -2,32 +2,47 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var DONE = 0;
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Platform Security"}], function() {
+		doGetUsers();
+	});
+}
+
+function doGetUsers() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getPlatformUsers(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderPlatformUsers(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
+		doGetGroups();
 	});
+}
+
+function doGetGroups() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getPlatformGroups(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderPlatformGroups(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
+		doGetRoles();
 	});
+}
+
+function doGetRoles() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getPlatformRoles(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderPlatformRoles(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	});
 }
+
 
 function renderPlatformUsers(users) {
 	users.sort(function (x, y) {
@@ -37,9 +52,6 @@ function renderPlatformUsers(users) {
 	for (var  i = 0; i != users.length; i++) {
 		table.appendChild(renderPlatformUser(users[i]));
 	}
-	DONE++;
-	if (DONE === 3)
-		document.getElementById("loader").style.display = "none";
 }
 
 function renderPlatformGroups(groups) {
@@ -50,9 +62,6 @@ function renderPlatformGroups(groups) {
 	for (var  i = 0; i != groups.length; i++) {
 		table.appendChild(renderPlatformGroup(groups[i]));
 	}
-	DONE++;
-	if (DONE === 3)
-		document.getElementById("loader").style.display = "none";
 }
 
 function renderPlatformRoles(roles) {
@@ -63,9 +72,6 @@ function renderPlatformRoles(roles) {
 	for (var  i = 0; i != roles.length; i++) {
 		table.appendChild(renderPlatformRole(roles[i]));
 	}
-	DONE++;
-	if (DONE === 3)
-		document.getElementById("loader").style.display = "none";
 }
 
 function renderPlatformUser(user) {

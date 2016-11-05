@@ -27,21 +27,40 @@
             Platform Actions
         </div>
         <div class="panel-body">
-            <div>
           <span class="btn btn-default" id="button-shutdown" onclick="onClickShutdown()">
             <img src="/web/assets/shutdown.svg" width="30" height="30"/>
             <span style="margin-left: 20px;">Shutdown the platform</span>
           </span>
-                <span class="btn btn-default" id="button-restart" onclick="onClickRestart()">
+            <span class="btn btn-default" id="button-restart" onclick="onClickRestart()">
             <img src="/web/assets/restart.svg" width="30" height="30"/>
             <span style="margin-left: 20px;">Restart the platform</span>
           </span>
-            </div>
         </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            Bundles
+            Platform OSGi Implementation
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="osgi-identifier" class="col-sm-2 control-label">Identifier</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="osgi-identifier" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="osgi-name" class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="osgi-name" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Platform Bundles
         </div>
         <div class="panel-body">
             <table class="table table-bordered table-hover">

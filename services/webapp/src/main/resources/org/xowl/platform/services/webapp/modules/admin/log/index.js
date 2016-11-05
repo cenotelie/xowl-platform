@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
-			{name: "Log"}], function() {
+			{name: "Platform Log"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getLogMessages(function (status, ct, content) {

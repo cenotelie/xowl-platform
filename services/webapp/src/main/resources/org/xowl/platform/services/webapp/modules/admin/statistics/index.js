@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
-			{name: "Statistics"}], function() {
+			{name: "Platform Statistics"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getStatisticsList(function (status, ct, content) {

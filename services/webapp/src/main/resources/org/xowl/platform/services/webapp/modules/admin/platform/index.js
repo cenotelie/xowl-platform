@@ -7,13 +7,29 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
 			{name: "Platform Management"}], function() {
-		if (!onOperationRequest("Loading ..."))
-			return;
-		xowl.getPlatformBundles(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				renderBundles(content);
-			}
-		});
+		doGetImpl();
+	});
+}
+
+function doGetImpl() {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getPlatformOSGiImpl(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			document.getElementById("osgi-identifier").value = content.identifier;
+			document.getElementById("osgi-name").value = content.name;
+			doGetBundles();
+		}
+	});
+}
+
+function doGetBundles() {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getPlatformBundles(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderBundles(content);
+		}
 	});
 }
 

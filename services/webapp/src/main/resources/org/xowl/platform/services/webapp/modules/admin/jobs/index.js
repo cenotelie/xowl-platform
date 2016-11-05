@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Administration Module", uri: "/web/modules/admin/"},
-			{name: "Jobs"}], function() {
+			{name: "Platform Job Management"}], function() {
 		refresh();
 	});
 }

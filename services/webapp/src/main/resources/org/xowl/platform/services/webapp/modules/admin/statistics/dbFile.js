@@ -13,9 +13,13 @@ var RATE = 1000; // refresh rate in ms
 var MAX_SAMPLES_COUNT = 60; // maximum number of samples
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Statistics", uri: "/web/admin/statistics/"},
+			{name: "DB File " + fileName}], function() {
+		var remover = displayLoader("Loading ...");
+	});
 	document.getElementById("file-name").value = fileName;
-	retrieveSample();
 }
 
 function retrieveSample() {

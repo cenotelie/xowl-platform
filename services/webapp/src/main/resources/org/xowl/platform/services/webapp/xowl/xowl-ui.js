@@ -36,6 +36,19 @@ var PAGE_READY_INDEX = 0;
 var PAGE_READY_HOOK = null;
 
 /**
+ * Get the value of an HTTP parameter
+ *
+ * @param name The name of the parameter to retrieve
+ * @return The value associated to the parameter
+ */
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+/**
  * Performs the initial setup of the current page
  *
  * @param platform       The current xOWL platform object (access to the platform API)
@@ -144,7 +157,14 @@ function displayLoader(message) {
 	image.height = 32;
 	image.classList.add("message-icon");
 	var content = document.createElement("span");
-	content.appendChild(document.createTextNode(message));
+	var parts = message.split("\n");
+	if (parts.length > 0) {
+		content.appendChild(document.createTextNode(parts[0]));
+		for (var i = 1; i != parts.length; i++) {
+			content.appendChild(document.createElement("br"));
+			content.appendChild(document.createTextNode(parts[i]));
+		}
+	}
 	content.classList.add("message-content");
 	var row = document.createElement("div");
 	row.classList.add("header-message");
@@ -160,7 +180,7 @@ function displayLoader(message) {
 /**
  * Displays an information message
  *
- * @param type    The type of message (info, success, warning, danger)
+ * @param type    The type of message (info, success, warning, error)
  * @param message The message to display
  */
 function displayMessage(type, message) {
@@ -170,11 +190,17 @@ function displayMessage(type, message) {
 	image.height = 32;
 	image.classList.add("message-icon");
 	var content = document.createElement("span");
-	content.appendChild(document.createTextNode(message));
+	var parts = message.split("\n");
+	if (parts.length > 0) {
+		content.appendChild(document.createTextNode(parts[0]));
+		for (var i = 1; i != parts.length; i++) {
+			content.appendChild(document.createElement("br"));
+			content.appendChild(document.createTextNode(parts[i]));
+		}
+	}
 	content.classList.add("message-content");
 	var button = document.createElement("span");
-	button.innerHtml = "&times;";
-	button.classList.add("close");
+	button.appendChild(document.createTextNode("×"));
 	button.classList.add("message-button");
 	var row = document.createElement("div");
 	row.classList.add("header-message");
@@ -188,6 +214,63 @@ function displayMessage(type, message) {
 		rows.removeChild(row);
 	}
 }
+
+/**
+ * Displays an error message for a failed HTTP request
+ *
+ * @param code    The HTTP code (other that 200 - OK)
+ * @param content The content of the HTTP response
+ */
+function displayMessageHttpError(code, content) {
+	var message = null;
+	switch (code) {
+		case 400:
+			message = "Oops, wrong request.";
+			break;
+		case 401:
+			message =  "You must be logged in to perform this operation.";
+			break;
+		case 403:
+			message =  "You are not authorized to perform this operation.";
+			break;
+		case 404:
+			message =  "Can't find the requested data.";
+			break;
+		case 500:
+			message =  "Something very wrong happened on the server ...";
+			break;
+		case 501:
+			message =  "This operation is not supported.";
+			break;
+		case 520:
+			message =  "The operation failed on the server.";
+			break;
+		default:
+			message =  "The connection failed." + "(" + code + ")";
+			break;
+	}
+	if (content != null && (content instanceof String || typeof content === 'string')) {
+		message += "\n" + content;
+	}
+	displayMessage("error", message);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -380,59 +463,6 @@ function rdfToDom(value) {
 		}
 		return dom;
     }
-}
-
-/*function displayMessage(text) {
-	if (text === null) {
-		document.getElementById("loader").style.display = "none";
-		return;
-	}
-	var parts = text.split("\n");
-	var span = document.getElementById("loader-text");
-	while (span.hasChildNodes())
-		span.removeChild(span.lastChild);
-	if (parts.length > 0) {
-		span.appendChild(document.createTextNode(parts[0]));
-		for (var i = 1; i != parts.length; i++) {
-			span.appendChild(document.createElement("br"));
-			span.appendChild(document.createTextNode(parts[i]));
-		}
-	}
-	document.getElementById("loader").style.display = "";
-}*/
-
-var MSG_ERROR_BAD_REQUEST = "Oops, wrong request.";
-var MSG_ERROR_UNAUTHORIZED = "You must be logged in to perform this operation.";
-var MSG_ERROR_FORBIDDEN = "You are not authorized to perform this operation.";
-var MSG_ERROR_NOT_FOUND = "Can't find the requested data.";
-var MSG_ERROR_INTERNAL_ERROR = "Something very wrong happened on the server ...";
-var MSG_ERROR_NOT_IMPLEMENTED = "This operation is not supported.";
-var MSG_ERROR_UNKNOWN_ERROR = "The operation failed on the server.";
-var MSG_ERROR_OTHER = "The connection failed.";
-
-function getErrorFor(code, content) {
-	if (content != null) {
-		if (content == '' || (typeof content) == 'undefined')
-			content = null;
-	}
-	switch (code) {
-		case 400:
-			return (MSG_ERROR_BAD_REQUEST + (content !== null ? "\n" + content : ""));
-		case 401:
-			return (MSG_ERROR_UNAUTHORIZED + (content !== null ? "\n" + content : ""));
-		case 403:
-			return (MSG_ERROR_FORBIDDEN + (content !== null ? "\n" + content : ""));
-		case 404:
-			return (MSG_ERROR_NOT_FOUND + (content !== null ? "\n" + content : ""));
-		case 500:
-			return (MSG_ERROR_INTERNAL_ERROR + (content !== null ? "\n" + content : ""));
-		case 501:
-			return (MSG_ERROR_NOT_IMPLEMENTED + (content !== null ? "\n" + content : ""));
-		case 520:
-			return (MSG_ERROR_UNKNOWN_ERROR + (content !== null ? "\n" + content : ""));
-		default:
-			return (MSG_ERROR_OTHER + "(" + code + ")" + (content !== null ? "\n" + content : ""));
-	}
 }
 
 function trackJob(jobId, text, callback) {

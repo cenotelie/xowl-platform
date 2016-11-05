@@ -2,16 +2,22 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
+var BUSY = false;
 
 function init() {
-	setupPage(xowl);
-	xowl.getPlatformBundles(function (status, ct, content) {
-		if (status == 200) {
-			renderBundles(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Platform Management"}], function() {
+		var remover = displayLoader("Loading ...");
+		xowl.getPlatformBundles(function (status, ct, content) {
+			if (status == 200) {
+				renderBundles(content);
+				remover();
+			} else {
+				remover();
+				displayMessageHttpError(status, content);
+			}
+		});
 	});
 }
 
@@ -44,28 +50,44 @@ function renderBundles(bundles) {
 }
 
 function onClickShutdown() {
+	if (BUSY) {
+		displayMessage("error", "Another operation is going on ...");
+		return;
+	}
 	var result = confirm("Shutdown the platform?");
 	if (result == true) {
-		displayMessage("Shutting down the platform ...");
+		BUSY = true;
+		var remover = displayLoader("Shutting down the platform ...");
 		xowl.platformShutdown(function (status, ct, content) {
+			BUSY = false;
 			if (status == 200) {
-				document.location.href = "/web/";
+				remover();
+				displayMessage("success", "Platform shut down.");
 			} else {
-				displayMessage(getErrorFor(status, content));
+				remover();
+				displayMessageHttpError(status, content);
 			}
 		});
 	}
 }
 
 function onClickRestart() {
+	if (BUSY) {
+		displayMessage("error", "Another operation is going on ...");
+		return;
+	}
 	var result = confirm("Restart the platform?");
 	if (result == true) {
-		displayMessage("Restarting the platform ...");
+		BUSY = true;
+		var remover = displayLoader("Restarting the platform ...");
 		xowl.platformRestart(function (status, ct, content) {
+			BUSY = false;
 			if (status == 200) {
-				document.location.href = "/web/";
+				remover();
+				displayMessage("success", "Platform si restarting.");
 			} else {
-				displayMessage(getErrorFor(status, content));
+				remover();
+				displayMessageHttpError(status, content);
 			}
 		});
 	}

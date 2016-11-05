@@ -2,68 +2,61 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Core</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="/web/branding/favicon.png" />
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/branding/app.css">
+    <meta charset="utf-8">
+    <title>Core Module</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/branding/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/branding/app.css">
 </head>
 
 <body>
-  <div class="header">
-    <object id="branding-title" type="text/html" data="/web/branding/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-    <div style="display: inline-block; margin-left: 50px;">
-      <span style="display: inline-block;">
-        <ol class="breadcrumb">
-          <li><a href="/web/">Home</a></li>
-          <li class="active">Core</li>
-        </ol>
-      </span>
-    </div>
-    <div style="float: right; margin-right: 20px;">
-      <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-    </div>
-    <hr style="margin-top: 5px; margin-bottom: 5px;" />
-  </div>
-  <div class="body">
+<object type="text/html" data="/web/branding/title.html" id="component-title"
+        onload="onComponentLoadedTitle()"></object>
+<object type="text/html" data="/web/components/header.html" id="component-header"
+        onload="onComponentLoadedHeader()"></object>
+<object type="text/html" data="/web/components/footer.html" id="component-footer"
+        onload="onComponentLoadedFooter()"></object>
+
+<div id="placeholder-header"></div>
+<div class="body">
     <div class="panel panel-default">
-      <div class="panel-body">
-        <div>
-          <img src="/web/assets/artifact.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/artifacts/">Artifacts Management</a>
+        <div class="panel-body">
+            <div>
+                <img src="/web/assets/artifact.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/artifacts/">Artifacts Management</a>
+            </div>
+            <div>
+                <img src="/web/assets/import.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/importation/">Data Import</a>
+            </div>
+            <div>
+                <img src="/web/assets/consistency.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/consistency/">Consistency Management</a>
+            </div>
+            <div>
+                <img src="/web/assets/exploration.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/discovery/">Traceability Exploration</a>
+            </div>
+            <div>
+                <img src="/web/assets/impact.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/impact/">Impact Analysis</a>
+            </div>
+            <div>
+                <img src="/web/assets/evaluation.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="/web/modules/core/evaluation/">Evaluation Analysis</a>
+            </div>
         </div>
-        <div>
-          <img src="/web/assets/import.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/importation/">Data Import</a>
-        </div>
-        <div>
-          <img src="/web/assets/consistency.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/consistency/">Consistency Management</a>
-        </div>
-        <div>
-          <img src="/web/assets/exploration.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/discovery/">Traceability Exploration</a>
-        </div>
-        <div>
-          <img src="/web/assets/impact.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/impact/">Impact Analysis</a>
-        </div>
-        <div>
-          <img src="/web/assets/evaluation.svg" width="30" height="30" style="margin-left: 20px;"/>
-          <a class="btn" href="/web/modules/core/evaluation/">Evaluation Analysis</a>
-        </div>
-      </div>
     </div>
-  </div>
-  <script src="/web/xowl/xowl-api-platform.js"></script>
-  <script src="/web/xowl/xowl-ui.js"></script>
-  <script src="index.js"></script>
-  <script>
-    init();
-  </script>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="index.js"></script>
+<script>init();</script>
 </body>
 
 </html>

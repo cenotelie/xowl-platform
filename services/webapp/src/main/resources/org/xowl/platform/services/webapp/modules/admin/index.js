@@ -4,5 +4,5 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [{name: "Administration Module"}], function() {});
 }

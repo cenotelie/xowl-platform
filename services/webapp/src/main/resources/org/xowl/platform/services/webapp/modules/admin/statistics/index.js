@@ -4,14 +4,19 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getStatisticsList(function (status, ct, content) {
-		if (status == 200) {
-			renderMetrics(content);
-			document.getElementById("loader").style.display = "none";
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Administration Module", uri: "/web/modules/admin/"},
+			{name: "Statistics"}], function() {
+		var remover = displayLoader("Loading ...");
+		xowl.getStatisticsList(function (status, ct, content) {
+			if (status == 200) {
+				renderMetrics(content);
+				remover();
+			} else {
+				remover();
+				displayMessageHttpError(status, content);
+			}
+		});
 	});
 }
 

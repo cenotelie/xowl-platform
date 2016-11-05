@@ -70,6 +70,35 @@ function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
 	PLATFORM = platform;
 	PAGE_BREADCRUMBS = PAGE_BREADCRUMBS.concat(breadcrumbs);
 	PAGE_READY_HOOK = onReady;
+	loadComponent("/web/components/title.html", function (node) {
+		PAGE_COMPONENT_TITLE = node;
+		doSetupHeader();
+	});
+	loadComponent("/web/components/header.html", function (node) {
+		PAGE_COMPONENT_HEADER = node;
+		doSetupHeader();
+	});
+	loadComponent("/web/components/footer.html", function (node) {
+		PAGE_COMPONENT_FOOTER = node;
+		doSetupFooter();
+	});
+}
+
+function loadComponent(component, callback) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function () {
+		if (xmlHttp.readyState == 4) {
+			if (xmlHttp.status == 200) {
+				var doc = document.implementation.createHTMLDocument("example");
+				doc.documentElement.innerHTML = xmlHttp.responseText;
+				var node = doc.documentElement.children[1].children[0].cloneNode(true);
+				callback(node);
+        	}
+		}
+	}
+	xmlHttp.open("GET", component, true);
+	xmlHttp.setRequestHeader("Accept", "text/html");
+	xmlHttp.send();
 }
 
 function doSetupHeader() {
@@ -120,30 +149,8 @@ function doSetupFooter() {
 		PAGE_READY_HOOK();
 }
 
-function onComponentLoadedTitle() {
-	PAGE_COMPONENT_TITLE = onComponentLoadedGetNode("component-title");
-	doSetupHeader();
-}
-
-function onComponentLoadedHeader() {
-	PAGE_COMPONENT_HEADER = onComponentLoadedGetNode("component-header");
-	doSetupHeader();
-}
-
-function onComponentLoadedFooter() {
-	PAGE_COMPONENT_FOOTER = onComponentLoadedGetNode("component-footer");
-	doSetupFooter();
-}
-
-function onComponentLoadedGetNode(identifier) {
-	var object = document.getElementById(identifier);
-	var doc = object.contentDocument.documentElement;
-	object.style.display = "none";
-	return doc.children[1].children[0].cloneNode(true);
-}
-
 /**
- * Reacts to the user clicking on the logout buttun
+ * Reacts to the user clicking on the logout button
  */
 function onClickLogout() {
 	PLATFORM.logout();

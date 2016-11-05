@@ -50,7 +50,7 @@ function renderJob(job) {
 	cells[0].appendChild(link);
 	link = document.createElement("a");
 	link.appendChild(document.createTextNode(job.owner.name));
-	link.href="/web/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.id);
+	link.href="/web/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.identifier);
 	cells[1].appendChild(link);
 	cells[2].appendChild(document.createTextNode(job.status));
 	var progress = document.createElement("div");
@@ -64,7 +64,7 @@ function renderJob(job) {
 	progressBar.style.width = (job.completionRate * 100).toString() + "%";
 	progress.appendChild(progressBar);
 	cells[3].appendChild(progress);
-	cells[4].appendChild(document.createTextNode(renderXSPReply(job.result)));
+	cells[4].appendChild(renderJobResult(job.result));
 	if (job.status != "Completed" && job.status != "Cancelled") {
 		var button = document.createElement("button");
 		button.className = "btn btn-danger";
@@ -79,6 +79,16 @@ function renderJob(job) {
 	row.appendChild(cells[4]);
 	row.appendChild(cells[5]);
 	return row;
+}
+
+function renderJobResult(xsp) {
+	if (!xsp.hasOwnProperty("isSuccess"))
+		return document.createTextNode("");
+	if (!xsp.isSuccess) {
+		return document.createTextNode("FAILURE");
+	} else {
+		return document.createTextNode("SUCCESS");
+	}
 }
 
 function onCancelJob(job) {

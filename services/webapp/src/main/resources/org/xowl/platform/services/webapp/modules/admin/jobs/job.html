@@ -13,13 +13,6 @@
 </head>
 
 <body>
-<object type="text/html" data="/web/components/title.html" id="component-title"
-        onload="onComponentLoadedTitle()"></object>
-<object type="text/html" data="/web/components/header.html" id="component-header"
-        onload="onComponentLoadedHeader()"></object>
-<object type="text/html" data="/web/components/footer.html" id="component-footer"
-        onload="onComponentLoadedFooter()"></object>
-
 <div id="placeholder-header"></div>
 <div class="body">
     <div class="panel panel-default" id="loader">
@@ -47,6 +40,18 @@
                     <label for="job-type" class="col-sm-2 control-label">Type</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="job-type" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="job-owner" class="col-sm-2 control-label">Type</label>
+                    <div class="col-sm-10">
+                        <div class="panel panel-default" style="margin-bottom: 0px;">
+                            <div class="panel-body">
+                                <div style="width: 100%">
+                                    <a id="job-owner"></a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -95,7 +100,7 @@
 
 <script src="/web/xowl/xowl-api-platform.js"></script>
 <script src="/web/xowl/xowl-ui.js"></script>
-<script src="index.js"></script>
+<script src="job.js"></script>
 <script>init();</script>
 </body>
 

@@ -11,12 +11,11 @@ function init() {
 			{name: "Job " + jobId}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;
-		document.getElementById("placeholder-job").innerHTML = jobId;
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getJob(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				renderData(content);
+				render(content);
 				if (content.status !== "Completed")
 					window.setTimeout(init, 2000);
 			}
@@ -28,6 +27,8 @@ function render(job) {
 	document.getElementById("job-identifier").value = job.identifier;
 	document.getElementById("job-name").value = job.name;
 	document.getElementById("job-type").value = job.jobType;
+	document.getElementById("job-owner").href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent();
+	document.getElementById("job-owner").appendChild(document.createTextNode(job.owner.name));
 	document.getElementById("job-status").value = job.status;
 	document.getElementById("job-time-scheduled").value = job.timeScheduled;
 	document.getElementById("job-time-run").value = job.timeRun;

@@ -9,6 +9,7 @@
 
 .header-row {
   margin-top: 5px;
+  padding-bottom: 10px;
 }
 
 .header-title-placeholder {
@@ -85,6 +86,24 @@
   border-color: #ebccd1
 }
 
+.header-message-icon {
+ display: inline-block;
+ margin-left: 20px;
+ margin-right: 20px;
+}
+
+.header-message-content {
+ display: inline-block;
+}
+
+.header-message-button {
+  float: right;
+  margin-right: 20px;
+  cursor: pointer;
+  font-weight:700;
+  font-size: 20px;
+}
+
 .header-separator {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -100,24 +119,6 @@
 
 .footer {
   margin-bottom: 2px;
-}
-
-.message-icon {
- display: inline-block;
- margin-left: 20px;
- margin-right: 20px;
-}
-
-.message-content {
- display: inline-block;
-}
-
-.message-button {
-  float: right;
-  margin-right: 20px;
-  cursor: pointer;
-  font-weight:700;
-  font-size: 20px;
 }
 
 .toggle-button {

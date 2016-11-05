@@ -217,7 +217,7 @@ function displayLoader(message) {
 	image.src = "/web/assets/spinner.gif";
 	image.width = 32;
 	image.height = 32;
-	image.classList.add("message-icon");
+	image.classList.add("header-message-icon");
 	var content = document.createElement("span");
 	var parts = message.split("\n");
 	if (parts.length > 0) {
@@ -227,7 +227,7 @@ function displayLoader(message) {
 			content.appendChild(document.createTextNode(parts[i]));
 		}
 	}
-	content.classList.add("message-content");
+	content.classList.add("header-message-content");
 	var row = document.createElement("div");
 	row.classList.add("header-message");
 	row.appendChild(image);
@@ -250,7 +250,7 @@ function displayMessage(type, message) {
 	image.src = "/web/assets/message-" + type + ".svg";
 	image.width = 32;
 	image.height = 32;
-	image.classList.add("message-icon");
+	image.classList.add("header-message-icon");
 	var content = document.createElement("span");
 	var parts = message.split("\n");
 	if (parts.length > 0) {
@@ -260,10 +260,10 @@ function displayMessage(type, message) {
 			content.appendChild(document.createTextNode(parts[i]));
 		}
 	}
-	content.classList.add("message-content");
+	content.classList.add("header-message-content");
 	var button = document.createElement("span");
 	button.appendChild(document.createTextNode("×"));
-	button.classList.add("message-button");
+	button.classList.add("header-message-button");
 	var row = document.createElement("div");
 	row.classList.add("header-message");
 	row.classList.add("header-message-" + type);

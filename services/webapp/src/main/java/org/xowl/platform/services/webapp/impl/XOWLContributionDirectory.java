@@ -22,7 +22,10 @@ import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements the UI contribution directory
@@ -53,16 +56,6 @@ public class XOWLContributionDirectory implements ContributionDirectory {
     }
 
     /**
-     * The priority comparator for the contributions
-     */
-    private static final Comparator<WebUIContribution> COMPARATOR = new Comparator<WebUIContribution>() {
-        @Override
-        public int compare(WebUIContribution c1, WebUIContribution c2) {
-            return Integer.compare(c2.getPriority(), c1.getPriority());
-        }
-    };
-
-    /**
      * The root of the tree of contributions
      */
     private final Folder root;
@@ -91,7 +84,6 @@ public class XOWLContributionDirectory implements ContributionDirectory {
             current = child;
         }
         current.contributions.add(contribution);
-        Collections.sort(current.contributions, COMPARATOR);
     }
 
     @Override
@@ -124,8 +116,12 @@ public class XOWLContributionDirectory implements ContributionDirectory {
                     return result;
             }
         }
-        if (folder.contributions.isEmpty())
-            return null;
-        return folder.contributions.get(0).getResource(uri);
+        WebUIContribution top = null;
+        for (int i = 0; i != folder.contributions.size(); i++) {
+            WebUIContribution contribution = folder.contributions.get(i);
+            if (top == null || contribution.getPriority() > top.getPriority())
+                top = contribution;
+        }
+        return top == null ? null : top.getResource(uri);
     }
 }

@@ -260,7 +260,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
                 value = TextUtils.unescape(nodeValue.getValue());
                 value = value.substring(1, value.length() - 1);
             }
-            if ("type".equals(head)) {
+            if ("jobType".equals(head)) {
                 type = value;
             }
         }

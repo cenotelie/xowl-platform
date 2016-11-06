@@ -2,129 +2,107 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<title>Explorer</title>
-	<meta name="description" content="">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="/web/assets/favicon.png" />
-	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-	<link rel="stylesheet" type="text/css" href="/web/app.css">
-	<link rel="stylesheet" type="text/css" href="/web/xowl/xowl-graph.css">
-	<link rel="stylesheet" type="text/css" href="explorer.css">
+    <meta charset="utf-8">
+    <title>Explorer</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
+    <link rel="stylesheet" type="text/css" href="/web/xowl/xowl-graph.css">
+    <link rel="stylesheet" type="text/css" href="explorer.css">
 </head>
 
 <body>
-	<div class="header">
-		<object id="branding-title" type="text/html" data="/web/components/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-		<div style="display: inline-block; margin-left: 50px;">
-			<span style="display: inline-block;">
-				<ol class="breadcrumb">
-					<li><a href="/web/">Home</a></li>
-					<li><a href="/web/modules/core/">Core</a></li>
-					<li><a href="/web/modules/core/discovery/">Discovery</a></li>
-					<li class="active">Explorer</li>
-				</ol>
-			</span>
-		</div>
-		<div style="float: right; margin-right: 20px;">
-			<div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-		</div>
-		<hr style="margin-top: 5px; margin-bottom: 5px;" />
-	</div>
-	<div class="body">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="panel panel-warning">
-						<div class="panel-body">
-							<span class="text-warning">The data presented here come from</span>
-							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
-							<strong class="text-warning">live</strong>
-							<span class="text-warning">. Data in artifacts not pushed to</span>
-							<img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
-							<strong class="text-warning">live</strong>
-							<span class="text-warning">won't appear here.</span>
-							<a href="/web/modules/core/artifacts/">Manage artifacts</a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-9">
-					<svg id="display" style="border: 1px solid gray;">
-					</svg>
-				</div>
-				<div class="col-md-3">
-					<div>
-						<table>
-							<tr>
-								<td style="text-align: center; padding-right: 20px;">Physics:</td>
-								<td>
-									<div id="button-physics" class="toggle-button toggle-button-selected" onclick="onClickPhysics()">
-										<button></button>
-									</div>
-								</td>
-							</tr>
-						</table>
-					</div>
-					<div>
-						<span>Zoom:</span>
-						<a class="btn btn-default" onclick="GRAPH.zoomUpdate(0.1)">+</a>
-						<a class="btn btn-default" onclick="GRAPH.zoomUpdate(-0.1)">-</a>
-						<a class="btn btn-default" onclick="GRAPH.zoomReset()">0</a>
-					</div>
-					<div style="overflow:scroll; height:400px; margin-bottom: 10px;">
-						<table id="options" class="options">
-						</table>
-					</div>
-					<div class="panel panel-default" id="loader">
-						<div class="panel-body">
-							<img src="/web/assets/spinner.gif" width="32" height="32" />
-							<span id="loader-text">Loading ...</span>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<form class="form-horizontal">
-								<div class="form-group">
-									<label for="entity-identifier" class="col-sm-2 control-label">Identifier</label>
-									<div class="col-sm-10">
-										<input type="text" class="form-control" id="entity-identifier" readonly>
-									</div>
-								</div>
-							</form>
-							<div>
-								<table class="table table-bordered table-hover">
-									<thead>
-										<tr>
-											<th>Property</th>
-											<th>Value</th>
-										</tr>
-									</thead>
-									<tbody id="properties">
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script src="/web/xowl/xowl-api-platform.js"></script>
-	<script src="/web/xowl/xowl-api-nquads.js"></script>
-	<script src="/web/xowl/xowl-graph.js"></script>
-	<script src="/web/xowl/xowl-ui.js"></script>
-	<script src="/web/xowl/xowl-utils.js"></script>
-	<script src="explorer.js"></script>
-	<script>
-		init();
-	</script>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-body">
+                        <span class="text-warning">The data presented here come from</span>
+                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <strong class="text-warning">live</strong>
+                        <span class="text-warning">. Data in artifacts not pushed to</span>
+                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <strong class="text-warning">live</strong>
+                        <span class="text-warning">won't appear here.</span>
+                        <a href="/web/modules/core/artifacts/">Manage artifacts</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-9">
+                <svg id="display" style="border: 1px solid gray;">
+                </svg>
+            </div>
+            <div class="col-md-3">
+                <div>
+                    <table>
+                        <tr>
+                            <td style="text-align: center; padding-right: 20px;">Physics:</td>
+                            <td>
+                                <div id="button-physics" class="toggle-button toggle-button-selected"
+                                     onclick="onClickPhysics()">
+                                    <button></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <span>Zoom:</span>
+                    <a class="btn btn-default" onclick="GRAPH.zoomUpdate(0.1)">+</a>
+                    <a class="btn btn-default" onclick="GRAPH.zoomUpdate(-0.1)">-</a>
+                    <a class="btn btn-default" onclick="GRAPH.zoomReset()">0</a>
+                </div>
+                <div style="overflow:scroll; height:400px; margin-bottom: 10px;">
+                    <table id="options" class="options">
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="entity-identifier" class="col-sm-2 control-label">Identifier</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="entity-identifier" readonly>
+                                </div>
+                            </div>
+                        </form>
+                        <div>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Value</th>
+                                </tr>
+                                </thead>
+                                <tbody id="properties">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-api-nquads.js"></script>
+<script src="/web/xowl/xowl-graph.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="explorer.js"></script>
+<script>init();</script>
 </body>
 
 </html>

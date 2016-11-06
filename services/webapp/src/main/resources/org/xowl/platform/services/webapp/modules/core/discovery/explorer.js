@@ -13,13 +13,17 @@ var GRAPH_SPREAD = 150;
 var GRAPH = new GraphCanvas(GRAPH_WIDTH, GRAPH_HEIGHT, document.getElementById("display"));
 
 function init() {
-	setupPage(xowl);
-	var rootId = getParameterByName("id")
-	if (typeof (rootId) === "undefined" || rootId === null || rootId === "") {
-		displayMessage("Undefined root entity!");
-		return;
-	}
-	ensureExpanded(rootId);
+	var rootId = getParameterByName("id");
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Traceability Exploration", uri: "/web/modules/core/discovery"},
+			{name: "Entity " + rootId}], function() {
+		if (typeof (rootId) === "undefined" || rootId === null || rootId === "") {
+			displayMessage("error", "Undefined root entity!");
+			return;
+		}
+		ensureExpanded(rootId);
+	});
 }
 
 function ensureExpanded(identifier) {
@@ -35,10 +39,11 @@ function ensureData(identifier, continuation) {
 	}
 	if (REQUESTED.indexOf(identifier) >= 0)
 		return;
+	if (!onOperationRequest("Working ..."))
+		return;
 	REQUESTED.push(identifier);
-	displayMessage("Loading ...");
 	xowl.sparql(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			var data = parseNQuads(content);
 			var names = Object.getOwnPropertyNames(data);
 			var target = null;
@@ -54,10 +59,8 @@ function ensureData(identifier, continuation) {
 				ENTITIES[identifier] = target;
 			}
 			continuation(target);
-			document.getElementById("loader").style.display = "none";
 		} else {
 			REQUESTED.splice(REQUESTED.indexOf(entity.id), 1);
-			displayMessage(getErrorFor(status, content));
 		}
 	}, "DESCRIBE <" + identifier + ">");
 }
@@ -87,9 +90,10 @@ function doExpand(entity) {
 			instrumentConnector(GRAPH.addConnector(new GraphConnector(nodeOrigin, nodeTarget, pair.id)), pair.id);
 		}
 	}
-	displayMessage("Loading ...");
+	if (!onOperationRequest("Working ..."))
+		return;
 	xowl.sparql(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			var solutions = JSON.parse(content).results.bindings;
 			for (var i = 0; i != solutions.length; i++) {
 				var s = solutions[i].s.value;
@@ -105,12 +109,9 @@ function doExpand(entity) {
 				}
 				instrumentConnector(GRAPH.addConnector(new GraphConnector(nodeTarget, nodeOrigin, p)), p);
 			}
-			document.getElementById("loader").style.display = "none";
-		} else {
-			displayMessage(getErrorFor(status, content));
+			doLayout(nodeOrigin, newNodes);
+			EXPANDED.push(entity.id);
 		}
-		doLayout(nodeOrigin, newNodes);
-		EXPANDED.push(entity.id);
 	}, "SELECT DISTINCT ?s ?p WHERE { GRAPH ?g { ?s ?p <" + entity.id + "> } }");
 }
 

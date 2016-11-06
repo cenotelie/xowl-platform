@@ -6,15 +6,17 @@ var SCHEMAS = null;
 var HISTORY = [];
 
 function init() {
-	setupPage(xowl);
-	displayMessage("Loading ...");
-	xowl.getBusinessSchemas(function (status, ct, content) {
-		if (status == 200) {
-			SCHEMAS = content;
-			renderQuery();
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Traceability Exploration"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getBusinessSchemas(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				SCHEMAS = content;
+				renderQuery();
+			}
+		});
 	});
 }
 
@@ -33,22 +35,19 @@ function renderQuery() {
 			prefix = iri.substring(index + 1);
 		query += "PREFIX " + prefix + ": <" + iri + "#>\n";
 	}
-	query += "\nSELECT DISTINCT ?x ?y WHERE { GRAPH ?g { ?x a ?y } }";
+	query += "\nSELECT DISTINCT ?x ?y WHERE {\n    GRAPH ?g {\n        ?x a ?y\n    }\n}";
 	document.getElementById("sparql").value = query;
-	displayMessage(null);
 }
 
 function onExecute() {
 	var query = document.getElementById("sparql").value;
 	HISTORY.push(query);
 	renderHistory(HISTORY.length - 1);
-	displayMessage("Working ...");
+	if (!onOperationRequest("Working ..."))
+		return;
 	xowl.sparql(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderSparqlResults(ct, content);
-			document.getElementById("loader").style.display = "none";
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, query);
 }

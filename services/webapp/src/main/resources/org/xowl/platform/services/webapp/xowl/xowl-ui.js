@@ -470,6 +470,9 @@ function waitForJob(jobId, jobName, callback) {
  * RDF rendering
  ****************************************************/
 
+/*
+ * The known MIME types for the RDF and OWL datasets
+ */
 var MIME_TYPES = [
 	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
 	{ name: 'N-Quads', value: 'application/n-quads', extensions: ['.nq'] },
@@ -483,14 +486,21 @@ var MIME_TYPES = [
 	{ name: 'xOWL Ontology', value: 'application/x-xowl', extensions: ['.xowl'] }
 ];
 
-
-
+/*
+ * The defaults known URI mappings
+ */
 var DEFAULT_URI_MAPPINGS = [
     ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
     ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
     ["xsd", "http://www.w3.org/2001/XMLSchema#"],
     ["owl", "http://www.w3.org/2002/07/owl#"]];
 
+/*
+ * Gets the short URI (prefix:suffix) for the specified full URI
+ *
+ * @param value The full URI
+ * @return The associated short URI (or the full URI if it cannot be shortened)
+ */
 function getShortURI(value) {
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
 		if (value.indexOf(DEFAULT_URI_MAPPINGS[i][1]) === 0) {
@@ -500,6 +510,12 @@ function getShortURI(value) {
 	return value;
 }
 
+/*
+ * Gets the HTML DOM object rendering the specified RDF node
+ *
+ * @param value An RDF node (represented as a Javascript object)
+ * @return The HTML DOM rendering of the node
+ */
 function rdfToDom(value) {
 	if (value.type === "uri" || value.type === "iri") {
 		var dom = document.createElement("a");

@@ -67,7 +67,7 @@ stop () {
 
 doStop () {
   echo "xOWL Platform stopping ..."
-  PGID=`ps -o pgid= -p 6162 | tr -d ' '`
+  PGID=`ps -o pgid= -p $PID | tr -d ' '`
   kill -TERM -$PGID
   rm "$DISTRIB/xowl-platform.pid"
   echo "xOWL Platform stopped ..."

@@ -466,8 +466,7 @@ function waitForJob(jobId, jobName, callback) {
 			} else {
 				onOperationEnded(status, content, { type: "org.xowl.platform.kernel.RichString", parts: [
 					"Failed to retrieve data for job ",
-					{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName}
-					]});
+					{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName}]});
 			}
 		}, jobId);
 	};

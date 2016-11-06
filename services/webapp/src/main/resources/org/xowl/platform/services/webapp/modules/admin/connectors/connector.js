@@ -54,9 +54,7 @@ function onClickPull() {
 		return;
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
-				"Launched job ",
-				{type: "org.xowl.platform.kernel.jobs.Job", identifier: content.identifier, name: content.name}]});
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onPullJobComplete(job.result);
 			});

@@ -6,191 +6,168 @@
     <title>Impact Analysis</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/web/assets/favicon.png" />
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
     <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-    <div class="header">
-        <object id="branding-title" type="text/html" data="/web/components/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-        <div style="display: inline-block; margin-left: 50px;">
-            <span style="display: inline-block;">
-				<ol class="breadcrumb">
-                    <li><a href="/web/">Home</a></li>
-                    <li><a href="/web/modules/core/">Core</a></li>
-                    <li class="active">Impact Analysis</li>
-                </ol>
-			</span>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-body">
+                        <span class="text-warning">The data presented here come from</span>
+                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <strong class="text-warning">live</strong>
+                        <span class="text-warning">. Data in artifacts not pushed to</span>
+                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <strong class="text-warning">live</strong>
+                        <span class="text-warning">won't appear here.</span>
+                        <a href="/web/modules/core/artifacts/">Manage artifacts</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="float: right; margin-right: 20px;">
-            <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-        </div>
-        <hr style="margin-top: 5px; margin-bottom: 5px;" />
-    </div>
-    <div class="body">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel panel-warning">
-                        <div class="panel-body">
-                            <span class="text-warning">The data presented here come from</span>
-                            <img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
-                            <strong class="text-warning">live</strong>
-                            <span class="text-warning">. Data in artifacts not pushed to</span>
-                            <img src="/web/assets/db.svg" width="25px" style="display: inline-block;" />
-                            <strong class="text-warning">live</strong>
-                            <span class="text-warning">won't appear here.</span>
-                            <a href="/web/modules/core/artifacts/">Manage artifacts</a>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Analysis Root:</label>
+                        <p>This is the element the analysis will begin with.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <img src="/web/assets/schema.svg" width="40" height="40"/>
+                            <label for="root-schema">Schema for root's type:</label>
+                            <select class="form-control" id="root-schema" onchange="onSchemaChange()"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <img src="/web/assets/concept.svg" width="40" height="40"/>
+                            <label for="root-type">Root's type:</label>
+                            <select class="form-control" id="root-type" onchange="onTypeChange()"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <img src="/web/assets/element.svg" width="40" height="40"/>
+                            <label for="root-element">Root element:</label>
+                            <select class="form-control" id="root-element"></select>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="panel panel-default" id="loader">
-                    <div class="panel-body">
-                        <img src="/web/assets/spinner.gif" width="32" height="32" />
-                        <span id="loader-text">Loading ...</span>
-                    </div>
-                </div>
-            </div>
+        </div>
+        <div class="row">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label>Analysis Root:</label>
-                            <p>This is the element the analysis will begin with.</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <img src="/web/assets/schema.svg" width="40" height="40"></img>
-                                <label for="root-schema">Schema for root's type:</label>
-                                <select class="form-control" id="root-schema" onchange="onSchemaChange()"></select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <img src="/web/assets/concept.svg" width="40" height="40"></img>
-                                <label for="root-type">Root's type:</label>
-                                <select class="form-control" id="root-type" onchange="onTypeChange()"></select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <img src="/web/assets/element.svg" width="40" height="40"></img>
-                                <label for="root-element">Root element:</label>
-                                <select class="form-control" id="root-element"></select>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="degree">Max Distance:</label>
+                        <input type="number" class="form-control" id="degree" min="1" step="1" value="5">
+                        <p>The maximum number of hops between an element and the root.</p>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <label for="degree">Max Distance:</label>
-                            <input type="number" class="form-control" id="degree" min="1" step="1" value="5">
-                            <p>The maximum number of hops between an element and the root.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div>
-                                <img src="/web/assets/relation.svg" width="40" height="40"></img>
-                                <label>Links to use during the analysis:</label>
-                                <select id="filters-links-inclusive">
-                                    <option value="inclusive">Inclusive (Only use the selected links)</option>
-                                    <option value="exclusive">Exclusive (Use all except the selected links)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <div class="form-group">
-                                    <label for="filters-links-schema">Link:</label>
-                                    <select class="form-control" id="filters-links-schema">
-                                    </select>
-                                </div>
-                                <a class="btn btn-primary" onclick="onClickNewFilterLink()">Add filter</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div>
-                                <img src="/web/assets/concept.svg" width="40" height="40"></img>
-                                <label>Types to look for during the analysis:</label>
-                                <select id="filters-types-inclusive">
-                                    <option value="inclusive">Inclusive (Only report the selected types)</option>
-                                    <option value="exclusive">Exclusive (Report all except the selected types)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <div class="form-group">
-                                    <label for="filters-types-schema">Type:</label>
-                                    <select class="form-control" id="filters-types-schema">
-                                    </select>
-                                </div>
-                                <a class="btn btn-primary" onclick="onClickNewFilterType()">Add filter</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Filter</th>
-                                        <th>Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="filters-links">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Filter</th>
-                                        <th>Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="filters-types">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <a class="btn btn-primary" onclick="onClickRun()">Run Analysis</a>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <img src="/web/assets/relation.svg" width="40" height="40"/>
+                            <label>Links to use during the analysis:</label>
+                            <select id="filters-links-inclusive">
+                                <option value="inclusive">Inclusive (Only use the selected links)</option>
+                                <option value="exclusive">Exclusive (Use all except the selected links)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label for="filters-links-schema">Link:</label>
+                                <select class="form-control" id="filters-links-schema">
+                                </select>
+                            </div>
+                            <a class="btn btn-primary" onclick="onClickNewFilterLink()">Add filter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <img src="/web/assets/concept.svg" width="40" height="40"/>
+                            <label>Types to look for during the analysis:</label>
+                            <select id="filters-types-inclusive">
+                                <option value="inclusive">Inclusive (Only report the selected types)</option>
+                                <option value="exclusive">Exclusive (Report all except the selected types)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label for="filters-types-schema">Type:</label>
+                                <select class="form-control" id="filters-types-schema">
+                                </select>
+                            </div>
+                            <a class="btn btn-primary" onclick="onClickNewFilterType()">Add filter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Filter</th>
+                                <th>Remove</th>
+                            </tr>
+                            </thead>
+                            <tbody id="filters-links">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Filter</th>
+                                <th>Remove</th>
+                            </tr>
+                            </thead>
+                            <tbody id="filters-types">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <a class="btn btn-primary" onclick="onClickRun()">Run Analysis</a>
+        </div>
     </div>
-    <script src="/web/xowl/xowl-api-platform.js"></script>
-    <script src="/web/xowl/xowl-api-nquads.js"></script>
-    <script src="/web/xowl/xowl-ui.js"></script>
-    <script src="index.js"></script>
-    <script>
-        init();
-    </script>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-api-nquads.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="index.js"></script>
+<script>init();</script>
 </body>
 
-<html>
+</html>

@@ -18,7 +18,6 @@
 package org.xowl.platform.services.consistency.impl;
 
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.server.base.BaseRule;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IRIs;
 import org.xowl.infra.store.Vocabulary;
@@ -39,12 +38,12 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricBase;
 import org.xowl.platform.kernel.statistics.MetricProvider;
 import org.xowl.platform.kernel.statistics.StatisticsService;
-import org.xowl.platform.services.consistency.ConsistencyRule;
-import org.xowl.platform.services.consistency.ConsistencyService;
+import org.xowl.platform.services.consistency.*;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 
@@ -368,6 +367,9 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
         XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
         return new XSPReplyResult<>(rule);
     }
 
@@ -377,12 +379,32 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (lts == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        return live.activateRule(new BaseRule(identifier, null, false));
+        XSPReply reply = getRule(identifier);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        reply = live.activateRule(rule);
+        if (!reply.isSuccess())
+            return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
+        return reply;
     }
 
     @Override
     public XSPReply activateRule(ConsistencyRule rule) {
-        return activateRule(rule.getIdentifier());
+        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
+        if (lts == null)
+            return XSPReplyServiceUnavailable.instance();
+        TripleStore live = lts.getLiveStore();
+        XSPReply reply = live.activateRule(rule);
+        if (!reply.isSuccess())
+            return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
+        return reply;
     }
 
     @Override
@@ -391,12 +413,32 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (lts == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        return live.deactivateRule(new BaseRule(identifier, null, false));
+        XSPReply reply = getRule(identifier);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        reply = live.deactivateRule(rule);
+        if (!reply.isSuccess())
+            return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
+        return reply;
     }
 
     @Override
     public XSPReply deactivateRule(ConsistencyRule rule) {
-        return deactivateRule(rule.getIdentifier());
+        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
+        if (lts == null)
+            return XSPReplyServiceUnavailable.instance();
+        TripleStore live = lts.getLiveStore();
+        XSPReply reply = live.deactivateRule(rule);
+        if (!reply.isSuccess())
+            return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
+        return reply;
     }
 
     @Override
@@ -405,7 +447,11 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
         if (lts == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = lts.getLiveStore();
-        XSPReply reply = live.removeRule(new BaseRule(identifier, null, false));
+        XSPReply reply = getRule(identifier);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        reply = live.removeRule(rule);
         if (!reply.isSuccess())
             return reply;
         Result result = live.sparql("DELETE WHERE { GRAPH <" +
@@ -415,12 +461,32 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
                 "> ?p ?o } }");
         if (!result.isSuccess())
             return new XSPReplyFailure(((ResultFailure) result).getMessage());
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
         return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply deleteRule(ConsistencyRule rule) {
-        return deleteRule(rule.getIdentifier());
+        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
+        if (lts == null)
+            return XSPReplyServiceUnavailable.instance();
+        TripleStore live = lts.getLiveStore();
+        XSPReply reply = live.removeRule(rule);
+        if (!reply.isSuccess())
+            return reply;
+        Result result = live.sparql("DELETE WHERE { GRAPH <" +
+                TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
+                "> { <" +
+                TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) +
+                "> ?p ?o } }");
+        if (!result.isSuccess())
+            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
+        return XSPReplySuccess.instance();
     }
 
     @Override

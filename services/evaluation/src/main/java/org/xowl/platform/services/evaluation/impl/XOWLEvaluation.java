@@ -137,7 +137,7 @@ class XOWLEvaluation implements Evaluation {
             }
         }
         this.identifier = identifier != null ? identifier : (EVAL_URI + "/Evaluation#" + UUID.randomUUID());
-        this.name = name;
+        this.name = name != null ? name : "Anonymous Evaluation";
         this.evaluableType = evaluableType;
     }
 
@@ -268,6 +268,8 @@ class XOWLEvaluation implements Evaluation {
      * @return The operation's result
      */
     public XSPReply store() {
+        if (evaluableType == null)
+            return new XSPReplyFailure("Invalid evaluation: evaluable type not specified");
         NodeManager nodes = new CachedNodes();
         IRINode graphEval = nodes.getIRINode(identifier);
         IRINode registry = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);

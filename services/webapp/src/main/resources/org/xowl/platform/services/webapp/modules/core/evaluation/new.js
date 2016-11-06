@@ -2,7 +2,7 @@
 // Provided under LGPL v3
 
 var xowl = new XOWL();
-var EVALUABLES = null;
+var EVALUABLES = [];
 var CRITERIA_TYPES = [];
 var CRITERIA_SELECTED = [];
 
@@ -184,13 +184,18 @@ function onEvaluationGo() {
 	if (!onOperationRequest("Creating evaluation ..."))
 		return;
 	var name = document.getElementById("input-eval-name").value;
+	var evaluableType = document.getElementById("input-evaluable-type").value;
 	if (name === null || name === "") {
 		onOperationAbort("Expected a name for the evaluation!");
 		return;
 	}
+	if (evaluableType === null || evaluableType === "") {
+		onOperationAbort("Expected a type of element to evaluate!");
+		return;
+	}
 	var definition = {
 		name: name,
-		evaluableType: document.getElementById("input-evaluable-type").value,
+		evaluableType: evaluableType,
 		evaluables: [],
 		criteria: CRITERIA_SELECTED
 	};

@@ -24,6 +24,7 @@ fi
 CODE=5
 while [ "$CODE" -eq 5 ]
   do
+    rm -rf "$DISTRIB/felix-cache"
     $JAVA "-Dgosh.args=--noi" "-Dxowl.root=$DISTRIB" -jar "$DISTRIB/felix/bin/felix.jar" -b "$DISTRIB/felix/bundle"
     CODE=$?
     echo "Exit code is $CODE"

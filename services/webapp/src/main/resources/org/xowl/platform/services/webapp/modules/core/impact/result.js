@@ -30,7 +30,7 @@ function onJobCompleted(job) {
 	if (!job.result.hasOwnProperty("isSuccess")) {
 		displayMessage("error", "No result ...");
 	} else if (!job.result.isSuccess) {
-		displayMessage("error", "FAILURE: " + xsp.message);
+		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
 		renderResult(job);
 	}

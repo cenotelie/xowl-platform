@@ -11,19 +11,29 @@ function init() {
 			{name: "Job " + jobId}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;
-		if (!onOperationRequest("Loading ..."))
-			return;
-		xowl.getJob(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				render(content);
-				if (content.status !== "Completed")
-					window.setTimeout(init, 2000);
-			}
-		}, jobId);
+		doGetJob();
 	});
 }
 
+function doGetJob() {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getJob(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			render(content);
+			if (content.status !== "Completed")
+				window.setTimeout(doGetJob, 2000);
+		}
+	}, jobId);
+}
+
 function render(job) {
+	while (document.getElementById("job-owner").hasChildNodes())
+		document.getElementById("job-owner").removeChild(document.getElementById("job-owner").lastChild);
+	while (document.getElementById("job-payload").hasChildNodes())
+		document.getElementById("job-payload").removeChild(document.getElementById("job-payload").lastChild);
+	while (document.getElementById("job-result").hasChildNodes())
+		document.getElementById("job-result").removeChild(document.getElementById("job-result").lastChild);
 	document.getElementById("job-identifier").value = job.identifier;
 	document.getElementById("job-name").value = job.name;
 	document.getElementById("job-type").value = job.jobType;

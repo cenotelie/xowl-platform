@@ -31,7 +31,8 @@ function create() {
 	}
 	xowl.createPlatformUser(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			window.location.href = "user.html?id=" + encodeURIComponent(identifier);
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created user ", content, "."]});
+			waitAndGo("user.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, identifier, name, password1);
 	return false;

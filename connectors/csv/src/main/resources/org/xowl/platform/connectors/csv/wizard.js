@@ -219,7 +219,7 @@ function onImport() {
 		superseded: [],
 		separator: separator,
 		textMarker: textMarker,
-		skipFirstRow: document.getElementById("document-has-title-row").checked,
+		skipFirstRow: "\"" + document.getElementById("document-has-title-row").checked + "\"",
 		mapping: {
 			columns: MAPPING
 		}

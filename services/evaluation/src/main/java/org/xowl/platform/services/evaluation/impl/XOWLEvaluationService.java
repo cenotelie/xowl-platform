@@ -26,6 +26,8 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.services.evaluation.*;
 
 import java.net.HttpURLConnection;
@@ -161,6 +163,9 @@ public class XOWLEvaluationService implements EvaluationService {
         XSPReply reply = evaluation.store();
         if (!reply.isSuccess())
             return reply;
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));
         return new XSPReplyResult<>(evaluation);
     }
 
@@ -262,6 +267,9 @@ public class XOWLEvaluationService implements EvaluationService {
         XSPReply reply = evaluation.store();
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));
         XOWLEvaluationReference reference = new XOWLEvaluationReference(evaluation.getIdentifier(), evaluation.getName());
         return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(reference), null);
     }

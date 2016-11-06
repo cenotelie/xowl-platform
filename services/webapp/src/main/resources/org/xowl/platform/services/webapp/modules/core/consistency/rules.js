@@ -44,7 +44,7 @@ function renderRule(rule, index) {
 	toggle.classList.add("toggle-button");
 	if (rule.isActive)
 		toggle.classList.add("toggle-button-selected");
-	toggle.onclick = function (evt) { onToggleRule(rule); };
+	toggle.onclick = function (evt) { onToggleRule(toggle, rule); };
 	var cell3 = document.createElement("td");
 	cell3.appendChild(toggle);
 	var span = document.createElement("span");
@@ -68,15 +68,15 @@ function renderRule(rule, index) {
 	return row;
 }
 
-function onToggleRule(rule) {
+function onToggleRule(toggle, rule) {
 	if (rule.isActive) {
-		doDeactivateRule(rule);
+		doDeactivateRule(toggle, rule);
 	} else {
-		doActivateRule(rule);
+		doActivateRule(toggle, rule);
 	}
 }
 
-function doActivateRule(rule) {
+function doActivateRule(toggle, rule) {
 	var result = confirm("Activate consistency rule " + rule.name + "?");
 	if (!result)
 		return;
@@ -85,13 +85,13 @@ function doActivateRule(rule) {
 	xowl.activateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Activated rule ", rule, "."]});
-			// TODO: do not do a full reload
-			waitAndRefresh();
+			rule.isActive = true;
+			toggle.classList.add("toggle-button-selected");
 		}
 	}, rule.identifier);
 }
 
-function doDeactivateRule(rule) {
+function doDeactivateRule(toggle, rule) {
 	var result = confirm("De-activate consistency rule " + rule.name + "?");
 	if (!result)
 		return;
@@ -100,8 +100,8 @@ function doDeactivateRule(rule) {
 	xowl.deactivateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["De-activated rule ", rule, "."]});
-			// TODO: do not do a full reload
-			waitAndRefresh();
+			rule.isActive = false;
+			toggle.classList.remove("toggle-button-selected");
 		}
 	}, rule.identifier);
 }

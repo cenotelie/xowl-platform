@@ -26,6 +26,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.services.importation.*;
@@ -354,6 +355,9 @@ public class XOWLImportationService implements ImportationService {
             return null;
         }
         documents.put(document.getIdentifier(), document);
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new DocumentUploadedEvent(document, this));
         return document;
     }
 
@@ -371,6 +375,9 @@ public class XOWLImportationService implements ImportationService {
             Logging.getDefault().error("Failed to delete " + fileDescriptor.getAbsolutePath());
         if (!fileContent.delete())
             Logging.getDefault().error("Failed to delete " + fileContent.getAbsolutePath());
+        EventService eventService = ServiceUtils.getService(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new DocumentUploadedEvent(document2, this));
     }
 
     @Override

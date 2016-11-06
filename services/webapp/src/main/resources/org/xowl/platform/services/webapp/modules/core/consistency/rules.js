@@ -5,14 +5,17 @@ var xowl = new XOWL();
 var FLAG = false;
 
 function init() {
-	setupPage(xowl);
-	xowl.getConsistencyRules(function (status, ct, content) {
-		if (status == 200) {
-			renderRules(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Consistency Management", uri: "/web/modules/core/consistency/"},
+			{name: "Consistency Rules"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getConsistencyRules(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderRules(content);
+			}
+		});
 	});
 }
 
@@ -67,40 +70,54 @@ function renderRule(rule, index) {
 }
 
 function onToggleRule(rule) {
-	if (FLAG)
-		return;
-	FLAG = true;
 	if (rule.isActive) {
-		displayMessage("Deactivating the rule ...");
-		xowl.deactivateConsistencyRule(function (status, ct, content) {
-			if (status == 200) {
-				window.location.reload();
-			} else {
-				displayMessage(getErrorFor(status, content));
-			}
-		}, rule.id);
+		doDeactivateRule(rule);
 	} else {
-		displayMessage("Activating the rule ...");
-		xowl.activateConsistencyRule(function (status, ct, content) {
-			if (status == 200) {
-				window.location.reload();
-			} else {
-				displayMessage(getErrorFor(status, content));
-			}
-		}, rule.id);
+		doActivateRule(rule);
 	}
 }
 
-function onDeleteRule(rule) {
-	if (FLAG)
+function doActivateRule(rule) {
+	var result = confirm("Activate consistency rule " + rule.name + "?");
+	if (!result)
 		return;
-	FLAG = true;
-	displayMessage("Deleting the rule ...");
-	xowl.deleteConsistencyRule(function (status, ct, content) {
-		if (status == 200) {
-			window.location.reload();
-		} else {
-			displayMessage(getErrorFor(status, content));
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Activating rule ", rule, " ..."]}))
+		return;
+	xowl.activateConsistencyRule(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Activated rule ", rule, "."]});
+			// TODO: do not do a full reload
+			waitAndRefresh();
 		}
-	}, rule.id);
+	}, rule.identifier);
+}
+
+function doDeactivateRule(rule) {
+	var result = confirm("De-activate consistency rule " + rule.name + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["De-activating rule ", rule, " ..."]})))
+		return;
+	xowl.deactivateConsistencyRule(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["De-activated rule ", rule, "."]});
+			// TODO: do not do a full reload
+			waitAndRefresh();
+		}
+	}, rule.identifier);
+}
+
+function onDeleteRule(rule) {
+	var result = confirm("Delete rule " + rule.name + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Deleting rule ", rule, " ..."]}))
+		return;
+	xowl.deleteConsistencyRule(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Deleted rule ", rule, "."]});
+			// TODO: do not do a full reload
+			waitAndRefresh();
+		}
+	}, rule.identifier);
 }

@@ -403,6 +403,26 @@ function renderMessagePart(part) {
 	return document.createTextNode(JSON.stringify(part));
 }
 
+/**
+ * Waits for a small time (1.5s) and then refreshes the current page
+ */
+function waitAndRefresh() {
+	window.setTimeout(function () {
+		window.location.reload(true);
+	}, 1500);
+}
+
+/**
+ * Waits for a small time (1.5s) and then go to the specified reference
+ *
+ * @param target The target reference to go to after the wait
+ */
+function waitAndGo(target) {
+	window.setTimeout(function () {
+		window.location.href = target;
+	}, 1500);
+}
+
 
 
 /*****************************************************

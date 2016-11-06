@@ -4,14 +4,16 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getInconsistencies(function (status, ct, content) {
-		if (status == 200) {
-			renderInconsistencies(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Consistency Management"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getInconsistencies(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderInconsistencies(content);
+			}
+		});
 	});
 }
 

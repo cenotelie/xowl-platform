@@ -5,19 +5,20 @@ var xowl = new XOWL();
 var ruleId = getParameterByName("id");
 
 function init() {
-	setupPage(xowl);
-	if (!ruleId || ruleId === null || ruleId === "")
-		return;
-	document.getElementById("placeholder-rule").innerHTML = ruleId;
-	displayMessage("Loading ...");
-	xowl.getConsistencyRule(function (status, ct, content) {
-		if (status == 200) {
-			render(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, ruleId);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Consistency Management", uri: "/web/modules/core/consistency/"},
+			{name: "Consistency Rule " + ruleId}], function() {
+		if (!ruleId || ruleId === null || ruleId === "")
+			return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getConsistencyRule(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				render(content);
+			}
+		}, ruleId);
+	});
 }
 
 function render(rule) {

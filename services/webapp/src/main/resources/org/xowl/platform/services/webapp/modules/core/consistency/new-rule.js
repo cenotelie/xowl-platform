@@ -4,8 +4,10 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	displayMessage(null);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Consistency Management", uri: "/web/modules/core/consistency/"},
+			{name: "New Consistency Rule"}], function() {});
 	var prefixes = "";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
 		prefixes += "PREFIX " + DEFAULT_URI_MAPPINGS[i][0] + ": <" + DEFAULT_URI_MAPPINGS[i][1] + ">\n";
@@ -16,18 +18,20 @@ function init() {
 }
 
 function onClickNewRule() {
+	if (!onOperationRequest("Creating new rule ..."))
+		return false;
 	var name = document.getElementById("input-name").value;
 	var message = document.getElementById("input-message").value;
 	var prefixes = document.getElementById("input-prefixes").value;
 	var conditions = document.getElementById("input-conditions").value;
-	if (name === null || name === "" || message === null || message === "" || conditions === null || conditions === "")
+	if (name === null || name === "" || message === null || message === "" || conditions === null || conditions === "") {
+		onOperationAbort("All fields are mandatory.");
 		return;
-	displayMessage("Creating new rule ...")
+	}
 	xowl.newConsistencyRule(function (status, ct, content) {
-		if (status == 200) {
-			window.location.href = "rules.html";
-		} else {
-			displayMessage(getErrorFor(status, content));
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created rule ", content, "."]});
+			waitAndGo("rules.html");
 		}
 	}, name, message, prefixes, conditions);
 }

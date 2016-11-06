@@ -6,34 +6,47 @@ var ARTIFACTS_ALL = null;
 var ARTIFACTS_LIVE = null;
 var ARTIFACTS = null;
 var CONNECTORS = null;
-var JOB = null;
 var DIFF_LEFT = null;
 var DIFF_RIGHT = null;
 
 function init() {
-	setupPage(xowl);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Artifacts Management"}], function() {
+		doGetConnectors();
+	});
+}
+
+function doGetConnectors() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getConnectors(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			CONNECTORS = content;
 			renderConnectors();
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
+		doGetAllArtifacts();
 	});
+}
+
+function doGetAllArtifacts() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getAllArtifacts(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			ARTIFACTS_ALL = content;
-			prepareArtifacts();
-		} else {
-			displayMessage(getErrorFor(status, content));
+			doGetLiveArtifacts();
 		}
 	});
+}
+
+function doGetLiveArtifacts() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getLiveArtifacts(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			ARTIFACTS_LIVE = content;
 			prepareArtifacts();
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	});
 }
@@ -257,45 +270,109 @@ function onClickShowMore(button, childRows) {
 }
 
 function onClickPull(connector) {
-	if (JOB !== null) {
-		alert("Please wait for the previous action to terminate.");
+	var result = confirm("Pull from connector " + connector.name + "?");
+	if (!result)
 		return;
-	}
-	JOB = "reserved";
+	if (!onOperationRequest("Launching a pull artifact operation from " + connector.name + " ..."))
+		return;
 	xowl.pullFromConnector(function (status, ct, content) {
-		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function (isSuccess) {
-				if (isSuccess)
-					window.location.reload(true);
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+				"Launched job ",
+				{type: "org.xowl.platform.kernel.jobs.Job", identifier: content.identifier, name: content.name}]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onPullJobComplete(job.result);
 			});
-		} else {
-			displayMessage(getErrorFor(status, content));
-			JOB = null;
 		}
 	}, connector.identifier);
 }
 
-function onClickToggleLive(artifact) {
-	if (JOB !== null) {
-		alert("Please wait for the previous action to terminate.");
-		return;
+function onPullJobComplete(xsp) {
+	if (!xsp.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!xsp.isSuccess) {
+		displayMessage("error", "FAILURE: " + xsp.message);
+	} else {
+		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+			"Pulled artifact ",
+			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
+		// TODO: do not do a full reload
+		waitAndRefresh();
 	}
-	JOB = "reserved";
-	var callback = function (status, ct, content) {
-		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function (isSuccess) {
-				if (isSuccess)
-					window.location.reload(true);
+}
+
+function onClickToggleLive(artifact) {
+	if (artifact.isLive) {
+		doPullFromLive(artifact);
+	} else {
+		doPushToLive(artifact);
+	}
+}
+
+function doPushToLive(artifact) {
+	var result = confirm("Activate " + artifact.name + " for live reasoning?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Launching an activation job for artifact " + artifact.name + " ..."))
+		return;
+	xowl.pushArtifactToLive(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+				"Launched job ",
+				{type: "org.xowl.platform.kernel.jobs.Job", identifier: content.identifier, name: content.name}]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onPushToLiveCompleted(job.result, artifact);
 			});
-		} else {
-			displayMessage(getErrorFor(status, content));
-			JOB = null;
 		}
-	};
-	if (artifact.isLive)
-		xowl.pullArtifactFromLive(callback, artifact.identifier);
-	else
-		xowl.pushArtifactToLive(callback, artifact.identifier);
+	}, artifact.identifier);
+}
+
+function onPushToLiveCompleted(xsp, artifact) {
+	if (!xsp.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!xsp.isSuccess) {
+		displayMessage("error", "FAILURE: " + xsp.message);
+	} else {
+		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+			"Activated artifact ",
+			artifact,
+			" for live reasoning."]});
+		// TODO: do not do a full reload
+		waitAndRefresh();
+	}
+}
+
+function doPullFromLive(artifact) {
+	var result = confirm("De-activate " + artifact.name + " for live reasoning?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Launching an de-activation job for artifact " + artifact.name + " ..."))
+		return;
+	xowl.pullArtifactFromLive(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+				"Launched job ",
+				{type: "org.xowl.platform.kernel.jobs.Job", identifier: content.identifier, name: content.name}]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onPullFromLiveCompleted(job.result, artifact);
+			});
+		}
+	}, artifact.identifier);
+}
+
+function onPullFromLiveCompleted(xsp, artifact) {
+	if (!xsp.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!xsp.isSuccess) {
+		displayMessage("error", "FAILURE: " + xsp.message);
+	} else {
+		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+			"De-activated artifact ",
+			artifact,
+			" for live reasoning."]});
+		// TODO: do not do a full reload
+		waitAndRefresh();
+	}
 }
 
 function onClickSelectDiff(artifact) {

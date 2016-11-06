@@ -163,7 +163,7 @@ public class ImporterConfiguration implements Serializable {
             if (i != 0)
                 builder.append(", ");
             builder.append("\"");
-            builder.append(superseded[i]);
+            builder.append(TextUtils.escapeStringJSON(superseded[i]));
             builder.append("\"");
         }
         builder.append("], \"version\": \"");

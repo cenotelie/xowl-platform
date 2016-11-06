@@ -6,7 +6,7 @@ var docId = getParameterByName("id");
 var base = getParameterByName("base");
 var version = getParameterByName("version");
 var archetype = getParameterByName("archetype");
-var importerId = "org.xowl.platform.connectors.doors9.DOORS9Importer"
+var importerId = "org.xowl.platform.connectors.doors9.DOORS9Importer";
 var DOCUMENT = null;
 
 function init() {

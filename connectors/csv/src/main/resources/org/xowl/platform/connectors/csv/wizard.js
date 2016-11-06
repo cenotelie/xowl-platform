@@ -3,22 +3,33 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
-var importerId = "org.xowl.platform.connectors.csv.CSVImporter"
-var lastPreview = null;
-var mapping = [];
+var base = getParameterByName("base");
+var version = getParameterByName("version");
+var archetype = getParameterByName("archetype");
+var importerId = "org.xowl.platform.connectors.csv.CSVImporter";
+var DOCUMENT = null;
+var PREVIEW = null;
+var MAPPING = [];
 
 function init() {
-	setupPage(xowl);
-	if (!docId || docId === null || docId === "")
-    	return;
-	document.getElementById("placeholder-doc").innerHTML = docId;
-	displayMessage("Loading ...");
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Document ", uri: "document.html?id=" + encodeURIComponent(docId)},
+			{name: "CSV Importer"}], function() {
+		if (!docId || docId === null || docId === "")
+			return;
+		doGetDocument();
+	});
+}
+
+function doGetDocument() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getUploadedDocument(function (status, ct, content) {
-		if (status == 200) {
-			document.getElementById("document-name").value = content.name;
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
+		if (onOperationEnded(status, content)) {
+			DOCUMENT = content;
+			document.getElementById("document-name").value = DOCUMENT.name;
 		}
 	}, docId);
 }
@@ -27,15 +38,13 @@ function onPreview() {
 	var separator = document.getElementById("document-separator").value;
 	var textMarker = document.getElementById("document-text-marker").value;
 	var rowCount = document.getElementById("document-row-count").value;
-    if (separator === null || textMarker === null || rowCount <= 0 || separator == "" || textMarker == "")
+	if (separator === null || textMarker === null || rowCount <= 0 || separator == "" || textMarker == "")
 		return;
-    displayMessage("Loading ...");
-    xowl.getUploadedDocumentPreview(function (status, ct, content) {
-		if (status == 200) {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getUploadedDocumentPreview(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
 			renderPreview(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, docId, importerId, {
 		separator: separator,
@@ -45,7 +54,7 @@ function onPreview() {
 }
 
 function renderPreview(data) {
-	lastPreview = data;
+	PREVIEW = data;
 	var tableHead = document.getElementById("document-heads");
 	while (tableHead.hasChildNodes())
 		tableHead.removeChild(tableHead.lastChild);
@@ -81,23 +90,23 @@ function renderPreviewCell(cell) {
 }
 
 function onInitMapping() {
-	mapping = [];
+	MAPPING = [];
 	var table = document.getElementById("mapping");
 	while (table.hasChildNodes())
 		table.removeChild(table.lastChild);
-	if (lastPreview == null || lastPreview.rows.length <= 0)
+	if (PREVIEW == null || PREVIEW.rows.length <= 0)
 		return;
-	for (var i = 0; i != lastPreview.rows[0].cells.length; i++) {
-		table.appendChild(mappingNewColumn(i, lastPreview.rows[0].cells[i]));
+	for (var i = 0; i != PREVIEW.rows[0].cells.length; i++) {
+		table.appendChild(mappingNewColumn(i, PREVIEW.rows[0].cells[i]));
 	}
 }
 
 function mappingNewColumn(index, name) {
-	mapping[index] = {
-	    type: "none",
-	    property: "",
-	    datatype: "",
-	    regexp: ""
+	MAPPING[index] = {
+		type: "none",
+		property: "",
+		datatype: "",
+		regexp: ""
 	};
 	var result = document.createElement("tr");
 	var cell1 = document.createElement("td");
@@ -141,7 +150,7 @@ function createNewSelectMappingType(index) {
 	selectType.appendChild(option3);
 	selectType.appendChild(option4);
 	selectType.onchange = function() {
-		mapping[index].type = selectType.value;
+		MAPPING[index].type = selectType.value;
 	};
 	return selectType;
 }
@@ -151,7 +160,7 @@ function createNewPropertyInput(index) {
 	input.type = "text";
 	input.placeholder = "http://xowl.org/property";
 	input.onchange = function() {
-		mapping[index].property = input.value;
+		MAPPING[index].property = input.value;
 	};
 	return input;
 }
@@ -175,7 +184,7 @@ function createNewSelectDatatype(index) {
 	selectType.appendChild(option3);
 	selectType.appendChild(option4);
 	selectType.onchange = function() {
-		mapping[index].datatype = selectType.value;
+		MAPPING[index].datatype = selectType.value;
 	};
 	return selectType;
 }
@@ -184,11 +193,47 @@ function createNewSelectRegexp(index) {
 	var input = document.createElement("input");
 	input.type = "text";
 	input.onchange = function() {
-		mapping[index].regexp = input.value;
+		MAPPING[index].regexp = input.value;
 	};
 	return input;
 }
 
 function onImport() {
+	var separator = document.getElementById("document-separator").value;
+	var textMarker = document.getElementById("document-text-marker").value;
+	if (separator === null || textMarker === null || separator == "" || textMarker == "")
+		return;
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Importing document ", DOCUMENT, " ..."]}))
+		return;
+	xowl.importUploadedDocument(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched importation job for ", DOCUMENT, "."]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onJobCompleted(job);
+			});
+		}
+	}, docId, importerId, {
+		family: base,
+		version: version,
+		archetype: archetype,
+		superseded: [],
+		separator: separator,
+		textMarker: textMarker,
+		skipFirstRow: document.getElementById("document-has-title-row").checked,
+		mapping: {
+			columns: MAPPING
+		}
+	});
+}
 
+function onJobCompleted(job) {
+	if (!job.result.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!job.result.isSuccess) {
+		displayMessage("error", "FAILURE: " + job.result.message);
+	} else {
+		var artifactId = job.result.payload;
+		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
+		waitAndGo("/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
+	}
 }

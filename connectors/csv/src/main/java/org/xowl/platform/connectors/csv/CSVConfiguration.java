@@ -232,7 +232,7 @@ public class CSVConfiguration extends ImporterConfiguration {
         builder.append(TextUtils.escapeStringJSON(CSVConfiguration.class.getName()));
         builder.append("\", ");
         serializeJSON(builder);
-        builder.append(", \"separator\": ");
+        builder.append(", \"separator\": \"");
         builder.append(TextUtils.escapeStringJSON(Character.toString(separator)));
         builder.append("\", \"textMarker\": \"");
         builder.append(TextUtils.escapeStringJSON(Character.toString(textMarker)));

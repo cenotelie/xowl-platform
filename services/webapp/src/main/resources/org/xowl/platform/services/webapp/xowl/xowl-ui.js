@@ -394,6 +394,16 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = "/web/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
+	} else if (part.type === "org.xowl.platform.services.evaluation.Evaluation") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.evaluation.EvaluationReference") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
 	} else if (part.type === "org.xowl.platform.services.importation.Document") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));

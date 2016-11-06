@@ -131,7 +131,7 @@ public class EvaluableEntity implements Evaluable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(getClass().getCanonicalName()) +
+                TextUtils.escapeStringJSON(Evaluable.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

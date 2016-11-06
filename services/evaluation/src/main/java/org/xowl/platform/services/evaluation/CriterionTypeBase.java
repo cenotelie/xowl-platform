@@ -77,7 +77,7 @@ public abstract class CriterionTypeBase implements CriterionType {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(getClass().getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(CriterionType.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
         builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");

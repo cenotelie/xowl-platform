@@ -2,121 +2,99 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<title>New Evaluation</title>
-	<meta name="description" content="">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="/web/assets/favicon.png" />
-	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-	<link rel="stylesheet" type="text/css" href="/web/app.css">
+    <meta charset="utf-8">
+    <title>New Evaluation</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-	<div class="header">
-		<object id="branding-title" type="text/html" data="/web/components/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-		<div style="display: inline-block; margin-left: 50px;">
-			<span style="display: inline-block;">
-				<ol class="breadcrumb">
-					<li><a href="/web/">Home</a></li>
-					<li><a href="/web/modules/core/">Core</a></li>
-					<li><a href="/web/modules/core/evaluation/">Evaluation Analysis</a></li>
-					<li class="active">New Evaluation</li>
-				</ol>
-			</span>
-		</div>
-		<div style="float: right; margin-right: 20px;">
-			<div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-		</div>
-		<hr style="margin-top: 5px; margin-bottom: 5px;" />
-	</div>
-	<div class="body">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="panel panel-default" id="loader">
-					<div class="panel-body">
-						<img src="/web/assets/spinner.gif" width="32" height="32" />
-						<span id="loader-text">Loading ...</span>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<div class="form-group">
-							<label for="input-eval-name">Evaluation Name:</label>
-							<input type="text" class="form-control" id="input-eval-name" placeholder="Evaluation of XX (v1) and XX (v2)">
-						</div>
-						<div class="form-group">
-							<img src="/web/assets/concept.svg" width="40" height="40"/>
-							<label for="input-evaluable-type">Evaluable Type:</label>
-							<select class="form-control" id="input-evaluable-type" onchange="onEvaluableTypeChanged()"></select>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<div>Evaluable Elements:</div>
-						<table class="table table-bordered table-hover">
-							<thead>
-								<tr>
-									<th>Element</th>
-									<th>Selection</th>
-								</tr>
-							</thead>
-							<tbody id="evaluables">
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<div>Available criteria:</div>
-							<div class="form-group">
-								<img src="/web/assets/criterion.svg" width="40" height="40"/>
-								<label for="input-criterion">Criterion:</label>
-								<select class="form-control" id="input-criterion" onchange="onCriterionChanged()"></select>
-							</div>
-							<div id="input-criterion-params">
-							</div>
-							<div><a id="btn-criterion-new" class="btn btn-default" onclick="onCriterionAdd()">Add</a></div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<div>Selected Criteria:</div>
-							<table class="table table-bordered table-hover">
-								<thead>
-									<tr>
-										<th>Action</th>
-										<th>Name</th>
-									</tr>
-								</thead>
-								<tbody id="criteria">
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div><a id="btn-go" class="btn btn-primary" onclick="onEvaluationGo()">GO</a></div>
-			</div>
-		</div>
-	</div>
-	<script src="/web/xowl/xowl-api-platform.js"></script>
-	<script src="/web/xowl/xowl-ui.js"></script>
-	<script src="new.js"></script>
-	<script>
-		init();
-	</script>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="input-eval-name">Evaluation Name:</label>
+                        <input type="text" class="form-control" id="input-eval-name"
+                               placeholder="Evaluation of XX (v1) and XX (v2)">
+                    </div>
+                    <div class="form-group">
+                        <img src="/web/assets/concept.svg" width="40" height="40"/>
+                        <label for="input-evaluable-type">Evaluable Type:</label>
+                        <select class="form-control" id="input-evaluable-type"
+                                onchange="onEvaluableTypeChanged()"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>Evaluable Elements:</div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Element</th>
+                            <th>Selection</th>
+                        </tr>
+                        </thead>
+                        <tbody id="evaluables">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>Available criteria:</div>
+                        <div class="form-group">
+                            <img src="/web/assets/criterion.svg" width="40" height="40"/>
+                            <label for="input-criterion">Criterion:</label>
+                            <select class="form-control" id="input-criterion" onchange="onCriterionChanged()"></select>
+                        </div>
+                        <div id="input-criterion-params">
+                        </div>
+                        <div><a id="btn-criterion-new" class="btn btn-default" onclick="onCriterionAdd()">Add</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>Selected Criteria:</div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Name</th>
+                            </tr>
+                            </thead>
+                            <tbody id="criteria">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div><a id="btn-go" class="btn btn-primary" onclick="onEvaluationGo()">GO</a></div>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="new.js"></script>
+<script>init();</script>
 </body>
 
 </html>

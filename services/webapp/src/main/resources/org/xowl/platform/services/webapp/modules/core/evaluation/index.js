@@ -4,14 +4,16 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getEvaluations(function (status, ct, content) {
-		if (status == 200) {
-			renderEvaluations(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Evaluation Analysis"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getEvaluations(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderEvaluations(content);
+			}
+		});
 	});
 }
 

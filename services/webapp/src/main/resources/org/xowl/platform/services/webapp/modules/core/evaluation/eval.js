@@ -5,18 +5,20 @@ var xowl = new XOWL();
 var evalId = getParameterByName("id");
 
 function init() {
-	setupPage(xowl);
-	if (!evalId || evalId === null || evalId === "")
-		return;
-	document.getElementById("placeholder-eval").innerHTML = evalId;
-	displayMessage("Loading ...");
-	xowl.getEvaluation(function (status, ct, content) {
-		if (status == 200) {
-			renderEval(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, evalId);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Evaluation Analysis", uri: "/web/modules/core/evaluation/"},
+			{name: "Evaluation " + evalId}], function() {
+		if (!evalId || evalId === null || evalId === "")
+			return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getEvaluation(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderEval(content);
+			}
+		}, evalId);
+	});
 }
 
 function renderEval(evaluation) {

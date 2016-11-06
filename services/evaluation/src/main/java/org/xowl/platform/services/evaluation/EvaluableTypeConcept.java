@@ -54,15 +54,15 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
     /**
      * Initializes this element
      *
-     * @param identifier  The type's unique identifier
-     * @param name        The type's name
-     * @param archetype   The archetype of artifacts to look into
-     * @param conceptyURI The URI of the concept that can be evaluated
+     * @param identifier The type's unique identifier
+     * @param name       The type's name
+     * @param archetype  The archetype of artifacts to look into
+     * @param conceptURI The URI of the concept that can be evaluated
      */
-    public EvaluableTypeConcept(String identifier, String name, ArtifactArchetype archetype, String conceptyURI) {
+    public EvaluableTypeConcept(String identifier, String name, ArtifactArchetype archetype, String conceptURI) {
         super(identifier, name);
         this.archetype = archetype;
-        this.conceptyURI = conceptyURI;
+        this.conceptyURI = conceptURI;
     }
 
     @Override

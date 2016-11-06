@@ -377,7 +377,7 @@ public class XOWLImportationService implements ImportationService {
             Logging.getDefault().error("Failed to delete " + fileContent.getAbsolutePath());
         EventService eventService = ServiceUtils.getService(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new DocumentUploadedEvent(document2, this));
+            eventService.onEvent(new DocumentDroppedEvent(document2, this));
     }
 
     @Override

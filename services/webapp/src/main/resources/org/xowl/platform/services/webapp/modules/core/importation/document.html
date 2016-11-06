@@ -2,71 +2,49 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>Uploaded Document</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="/web/assets/favicon.png" />
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-  <link rel="stylesheet" type="text/css" href="/web/app.css">
+    <meta charset="utf-8">
+    <title>Data Import: Document</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
 </head>
 
 <body>
-  <div class="header">
-    <object id="branding-title" type="text/html" data="/web/components/title.html" height="25px" style="margin-left: 5px; display: inline-block;"></object>
-    <div style="display: inline-block; margin-left: 50px;">
-      <span style="display: inline-block;">
-        <ol class="breadcrumb">
-          <li><a href="/web/">Home</a></li>
-          <li><a href="/web/modules/core/">Core</a></li>
-          <li><a href="/web/modules/core/importation/">Data Import</a></li>
-          <li class="active" id="placeholder-doc">Document</li>
-        </ol>
-      </span>
-    </div>
-    <div style="float: right; margin-right: 20px;">
-      <div><a style="cursor: pointer;" id="btn-logout">Logout</a></div>
-    </div>
-    <hr style="margin-top: 5px; margin-bottom: 5px;" />
-  </div>
-  <div class="body">
-    <div class="panel panel-default" id="loader">
-      <div class="panel-body">
-        <img src="/web/assets/spinner.gif" width="32" height="32" />
-        <span id="loader-text">Loading ...</span>
-      </div>
-    </div>
+<div id="placeholder-header"></div>
+<div class="body">
     <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="form-group">
-          <label for="document-name">Name:</label>
-          <input type="text" class="form-control" id="document-name" readonly>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="document-name">Name:</label>
+                <input type="text" class="form-control" id="document-name" readonly>
+            </div>
+            <div class="form-group">
+                <label for="document-name">Importer:</label>
+                <select class="form-control" id="importers">
+                </select>
+            </div>
+            <div style="margin-top: 10px">
+                <button class="btn btn-primary" onclick="onImportNew()">Import as new artifact</button>
+            </div>
+            <div style="margin-top: 10px">
+                <button class="btn btn-primary" onclick="onImportUpdate()">Import as new version of existing artifact
+                </button>
+            </div>
+            <div style="margin-top: 10px">
+                <button class="btn btn-danger" onclick="onDrop()">Drop document</button>
+            </div>
         </div>
-        <div class="form-group">
-          <label for="document-name">Importer:</label>
-          <select class="form-control" id="importers">
-          </select>
-        </div>
-        <div style="margin-top: 10px">
-          <button class="btn btn-primary" onclick="onImportNew()">Import as new artifact</button>
-        </div>
-        <div style="margin-top: 10px">
-          <button class="btn btn-primary" onclick="onImportUpdate()">Import as new version of existing artifact</button>
-        </div>
-        <div style="margin-top: 10px">
-          <button class="btn btn-danger" onclick="onDrop()">Drop document</button>
-        </div>
-      </div>
     </div>
-  </div>
-  <script src="/web/xowl/xowl-api-platform.js"></script>
-  <script src="/web/xowl/xowl-ui.js"></script>
-  <script src="/web/xowl/xowl-utils.js"></script>
-  <script src="document.js"></script>
-  <script>
-    init();
-  </script>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="document.js"></script>
+<script>init();</script>
 </body>
 
 </html>

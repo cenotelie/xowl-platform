@@ -4,8 +4,11 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	displayMessage(null);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Upload New Document"}], function() {
+	});
 }
 
 function onFileSelected() {
@@ -34,29 +37,31 @@ function onUpload() {
 		var ratio = 100 * event.loaded / event.total;
 		progressBar['aria-valuenow'] = ratio;
 		progressBar.style.width = ratio.toString() + "%";
-		displayMessage("Reading ...");
 	}
 	reader.onloadend = function (event) {
 		if (reader.error !== null) {
-			displayMessage("Error: " + reader.error.toString());
+			onOperationEnded(500, "", reader.error.toString());
 			progressBar['aria-valuenow'] = 100;
 			progressBar.style.width = "100%";
 			progressBar.classList.add("progress-bar-error");
 			return;
 		}
-		displayMessage("Sending ...");
-		xowl.uploadDocument(function (code, type, content) {
-			if (code === 200) {
+		onOperationEnded(200, "");
+		if (!onOperationRequest("Sending ..."))
+			return;
+		xowl.uploadDocument(function (status, type, content) {
+			if (onOperationEnded(status, content)) {
 				progressBar.classList.add("progress-bar-success");
-				displayMessage(null);
-				window.location.href = "document.html?id=" + encodeURIComponent(content.identifier);
+				displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Uploaded document ", content, "."]});
+				waitAndGo("document.html?id=" + encodeURIComponent(content.identifier));
 			} else {
-				displayMessage(getErrorFor(code, content));
 				progressBar.classList.add("progress-bar-error");
 			}
 			progressBar['aria-valuenow'] = 100;
 			progressBar.style.width = "100%";
 		}, name, reader.result);
 	}
+	if (!onOperationRequest("Reading ..."))
+		return;
 	reader.readAsBinaryString(file);
 }

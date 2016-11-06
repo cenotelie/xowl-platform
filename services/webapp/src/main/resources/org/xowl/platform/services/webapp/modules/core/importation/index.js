@@ -4,14 +4,16 @@
 var xowl = new XOWL();
 
 function init() {
-	setupPage(xowl);
-	xowl.getUploadedDocuments(function (status, ct, content) {
-		if (status == 200) {
-			renderDocuments(content);
-			displayMessage(null);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Data Import"}], function() {
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getUploadedDocuments(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				renderDocuments(content);
+			}
+		});
 	});
 }
 

@@ -6,45 +6,61 @@ var docId = getParameterByName("id");
 var importerId = getParameterByName("importer");
 var importerWizard = null;
 var ARTIFACTS = {};
+var DOCUMENT = null;
 
 function init() {
-	setupPage(xowl);
-	if (!docId || docId === null || docId === "")
-    	return;
-	document.getElementById("placeholder-doc").innerHTML = docId;
-	displayMessage("Loading ...");
-	var loader = new Loader(4);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Document ", uri: "document.html?id=" + encodeURIComponent(docId)},
+			{name: "Import as Update"}], function() {
+		if (!docId || docId === null || docId === "")
+    		return;
+		doGetDocument();
+	});
+}
+
+function doGetDocument() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getUploadedDocument(function (status, ct, content) {
-		if (status == 200) {
-			document.getElementById("document-name").value = content.name;
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
+		if (onOperationEnded(status, content)) {
+			DOCUMENT = content;
+			document.getElementById("document-name").value = DOCUMENT.name;
 		}
+		doGetImporter();
 	}, docId);
+}
+
+function doGetImporter() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getDocumentImporter(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			document.getElementById("importer").value = content.name;
 			importerWizard = content.wizardUri;
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
 		}
+		doGetArchetypes();
 	}, importerId);
+}
+
+function doGetArchetypes() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getArtifactArchetypes(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderArchetypes(content);
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
 		}
+		doGetArtifacts();
 	});
+}
+
+function doGetArtifacts() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getAllArtifacts(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderFamilies(content);
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
 		}
 	});
 }
@@ -86,7 +102,6 @@ function renderFamilies(data) {
 		select.value = ARTIFACTS[names[0]][0].base;
 		renderArtifacts(ARTIFACTS[names[0]]);
 	}
-	displayMessage(null);
 }
 
 function renderArtifacts(artifacts) {

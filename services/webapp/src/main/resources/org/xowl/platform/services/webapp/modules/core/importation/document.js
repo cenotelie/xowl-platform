@@ -3,30 +3,33 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
-var lastPreview = null;
-var mapping = [];
+var DOCUMENT = null;
 
 function init() {
-	setupPage(xowl);
-	if (!docId || docId === null || docId === "")
-    	return;
-	document.getElementById("placeholder-doc").innerHTML = docId;
-	displayMessage("Loading ...");
-	var loader = new Loader(2);
-	xowl.getUploadedDocument(function (status, ct, content) {
-		if (status == 200) {
-			document.getElementById("document-name").value = content.name;
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
-		}
-	}, docId);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Document " + docId}], function() {
+		if (!docId || docId === null || docId === "")
+    		return;
+		if (!onOperationRequest("Loading ..."))
+			return;
+		xowl.getUploadedDocument(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				DOCUMENT = content;
+				document.getElementById("document-name").value = DOCUMENT.name;
+			}
+			doGetImporters();
+		}, docId);
+	});
+}
+
+function doGetImporters() {
+	if (!onOperationRequest("Loading ..."))
+		return;
 	xowl.getDocumentImporters(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderImporters(content);
-			loader.onLoaded();
-		} else {
-			loader.onError(status, content);
 		}
 	});
 }
@@ -52,12 +55,15 @@ function onImportUpdate() {
 }
 
 function onDrop() {
-	displayMessage("Dropping the document ...");
+	var result = confirm("Drop document " + DOCUMENT.name + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Dropping document ", DOCUMENT, " ..."]}))
+		return;
 	xowl.dropUploadedDocument(function (status, ct, content) {
-		if (status == 200) {
-			window.location.href = "index.html";
-		} else {
-			displayMessage(getErrorFor(status, content));
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Dropped document ", DOCUMENT, "."]});
+			waitAndGo("index.html");
 		}
 	}, docId);
 }

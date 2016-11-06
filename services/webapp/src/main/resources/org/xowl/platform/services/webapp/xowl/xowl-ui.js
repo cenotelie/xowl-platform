@@ -409,6 +409,11 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = "/web/modules/core/importation/document.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
+	} else if (part.type === "org.xowl.platform.services.importation.Importer") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = part.wizardUri;
+		return dom;
 	}
 	return document.createTextNode(JSON.stringify(part));
 }
@@ -596,24 +601,19 @@ function rdfToDom(value) {
 
 
 
+/*****************************************************
+ * Misc
+ ****************************************************/
+
+/*
+ * Compares two artifacts by their creation time
+ *
+ * @param a1 An artifact
+ * @param a2 Another artifact
+ * @return Whether the creation of a1 is before the creation of a2
+ */
 function compareArtifacts(a1, a2) {
 	var d1 = new Date(a1.creation);
 	var d2 = new Date(a2.creation);
 	return d1.getTime() < d2.getTime();
-}
-
-
-function Loader(count) {
-	this.count = count;
-	this.message = null;
-}
-Loader.prototype.onLoaded = function () {
-	this.count--;
-	if (this.count <= 0 && this.message == null)
-		displayMessage(null);
-}
-Loader.prototype.onError = function (code, content) {
-	this.count--;
-	this.message = getErrorFor(code, content);
-	displayMessage(message);
 }

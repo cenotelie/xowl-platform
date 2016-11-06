@@ -2,7 +2,6 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var FLAG = false;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -96,7 +95,7 @@ function doDeactivateRule(rule) {
 	var result = confirm("De-activate consistency rule " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["De-activating rule ", rule, " ..."]})))
+	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["De-activating rule ", rule, " ..."]}))
 		return;
 	xowl.deactivateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {

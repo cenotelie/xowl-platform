@@ -84,7 +84,7 @@ XOWL.prototype.getPlatformUser = function (callback, userId) {
 XOWL.prototype.createPlatformUser = function (callback, userId, name, password) {
 	this.doHttpPut(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -154,7 +154,7 @@ XOWL.prototype.getPlatformGroup = function (callback, groupId) {
 XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
 	this.doHttpPut(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -244,7 +244,7 @@ XOWL.prototype.getPlatformRole = function (callback, roleId) {
 XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
 	this.doHttpPut(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -861,7 +861,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
 	this.doHttpPost(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, "application/json", JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}

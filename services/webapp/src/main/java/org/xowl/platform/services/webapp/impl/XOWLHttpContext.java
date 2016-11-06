@@ -53,6 +53,9 @@ public class XOWLHttpContext implements HttpContext {
 
     @Override
     public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        //use this to insert the cache-control header
+        addCORSHeader(httpServletRequest, httpServletResponse);
+        httpServletResponse.addHeader("Cache-Control", "public, max-age=31536000, immutable");
         return defaultContext.handleSecurity(httpServletRequest, httpServletResponse);
     }
 
@@ -74,6 +77,24 @@ public class XOWLHttpContext implements HttpContext {
         if (name.endsWith("/"))
             name += "index.html";
         return directory.resolveResource(name);
+    }
+
+    /**
+     * Adds the headers required in a response for the support of Cross-Origin Resource Sharing
+     *
+     * @param request  The request
+     * @param response The response to add headers to
+     */
+    private void addCORSHeader(HttpServletRequest request, HttpServletResponse response) {
+        String origin = request.getHeader("Origin");
+        if (origin == null) {
+            // the request is from the same host
+            origin = request.getHeader("Host");
+        }
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, Cache-Control");
+        response.setHeader("Access-Control-Allow-Origin", origin);
+        response.setHeader("Access-Control-Allow-Credentials", "true");
     }
 
     @Override

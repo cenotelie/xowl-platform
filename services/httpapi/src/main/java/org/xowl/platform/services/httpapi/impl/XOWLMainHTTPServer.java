@@ -54,6 +54,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         addCORSHeader(request, response);
+        addCacheControlHeader(response);
         response.setStatus(HttpURLConnection.HTTP_OK);
     }
 
@@ -86,6 +87,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      */
     private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
         addCORSHeader(request, response);
+        addCacheControlHeader(response);
         try {
             String uri = request.getRequestURI();
             uri = uri.substring(HttpAPIService.URI_API.length() + 1);
@@ -157,6 +159,15 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     }
 
     /**
+     * Adds the cache control headers a response
+     *
+     * @param response The response to add headers to
+     */
+    private void addCacheControlHeader(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "private, no-cache, no-store, no-transform, must-revalidate");
+    }
+
+    /**
      * Adds the headers required in a response for the support of Cross-Origin Resource Sharing
      *
      * @param request  The request
@@ -172,6 +183,5 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         response.setHeader("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, Cache-Control");
         response.setHeader("Access-Control-Allow-Origin", origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Cache-Control", "no-cache");
     }
 }

@@ -40,7 +40,6 @@ function doGetData() {
 				prepareArtifacts();
 		}
 	});
-	prepareArtifacts();
 }
 
 function prepareArtifacts() {

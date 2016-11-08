@@ -10,30 +10,34 @@ var BASE = null;
 var MARKER = 0;
 
 function init() {
-	setupPage(xowl);
-	if (ARTIFACTID_LEFT === null || ARTIFACTID_LEFT == "")
-		return;
-	if (ARTIFACTID_RIGHT === null || ARTIFACTID_RIGHT == "")
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Artifacts Management", uri: "/web/modules/core/artifacts/"},
+			{name: "Diff"}], function() {
+		if (ARTIFACTID_LEFT === null || ARTIFACTID_LEFT == "")
+			return;
+		if (ARTIFACTID_RIGHT === null || ARTIFACTID_RIGHT == "")
+			return;
+		doGetData();
+	});
+}
+
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 3))
 		return;
 	xowl.getArtifactMetadata(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderMetadataLeft(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_LEFT);
 	xowl.getArtifactMetadata(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderMetadataRight(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_RIGHT);
 	xowl.diffArtifacts(function (status, ct, content) {
-		if (status == 200) {
+		if (onOperationEnded(status, content)) {
 			renderDiff(content.left, content.right);
-		} else {
-			displayMessage(getErrorFor(status, content));
 		}
 	}, ARTIFACTID_LEFT, ARTIFACTID_RIGHT);
 }
@@ -49,7 +53,6 @@ function renderMetadataLeft(metadata) {
 		else if (name === "http://xowl.org/platform/schemas/kernel#version")
 			document.getElementById("artifact-left-version").value = properties[i].value.lexical;
 	}
-	onRendered();
 }
 
 function renderMetadataRight(metadata) {
@@ -63,7 +66,6 @@ function renderMetadataRight(metadata) {
 		else if (name === "http://xowl.org/platform/schemas/kernel#version")
 			document.getElementById("artifact-right-version").value = properties[i].value.lexical;
 	}
-	onRendered();
 }
 
 function renderDiff(left, right) {
@@ -139,7 +141,6 @@ function renderDiff(left, right) {
 			done.push(property.id);
 		}
 	}
-	onRendered();
 }
 
 function renderGetRowPad() {
@@ -191,10 +192,4 @@ function renderGetRowDiff(type, property, value) {
 	row.appendChild(cell3);
 	row.appendChild(cell4);
 	return row;
-}
-
-function onRendered() {
-	MARKER++;
-	if (MARKER === 3)
-		displayMessage(null);
 }

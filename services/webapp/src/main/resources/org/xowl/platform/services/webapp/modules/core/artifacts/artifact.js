@@ -2,78 +2,84 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var ARTIFACTID = getParameterByName("id");
+var artifactId = getParameterByName("id");
+var artifactName = null;
 var METADATA = null;
 var CONTENT = null;
-var JOB = null;
 
 function init() {
-	setupPage(xowl);
-	if (ARTIFACTID === null || ARTIFACTID == "")
-		return;
-	document.getElementById("placeholder-artifact").innerHTML = ARTIFACTID;
-	displayMessage("Loading ...");
-	xowl.getArtifactMetadata(function (status, ct, content) {
-		if (status == 200) {
-			renderMetadata(content);
-		} else {
-			displayMessage(getErrorFor(status, content));
-		}
-	}, ARTIFACTID);
+	doSetupPage(xowl, true, [
+			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Artifacts Management", uri: "/web/modules/core/artifacts/"},
+			{name: "Artifact " + artifactId}], function() {
+		if (artifactId === null || artifactId == "")
+			return;
+		doGetData();
+	});
 }
 
-function onClickRetrieveContent() {
-	if (ARTIFACTID === null || ARTIFACTID == "")
+function doGetData() {
+	if (!onOperationRequest("Loading ..."))
 		return;
-	if (JOB !== null) {
-		alert("Please wait for the previous action to terminate.");
-		return;
-	}
-	JOB = "reserved";
-	displayMessage("Loading ...");
-	xowl.getArtifactContent(function (status, ct, content) {
-		if (status == 200) {
-			renderContent(content);
-			JOB = null;
-		} else {
-			displayMessage(getErrorFor(status, content));
-			JOB = null;
+	xowl.getArtifactMetadata(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderMetadata(content);
 		}
-	}, ARTIFACTID);
+	}, artifactId);
+}
+
+
+function onClickRetrieveContent() {
+	if (artifactId === null || artifactId == "")
+		return;
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getArtifactContent(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderContent(content);
+		}
+	}, artifactId);
 }
 
 function onClickDelete() {
-	if (ARTIFACTID === null || ARTIFACTID == "")
+	if (artifactId === null || artifactId == "")
 		return;
-	if (JOB !== null) {
-		alert("Please wait for the previous action to terminate.");
+	var result = confirm("Delete artifact " + artifactName + " ?");
+	if (!result)
 		return;
-	}
-	JOB = "reserved";
-	displayMessage("Working ...");
+	if (!onOperationRequest("Launching job for deletion of artifact " + artifactName + " ..."))
+		return;
 	xowl.deleteArtifact(function (status, ct, content) {
-		if (status == 200) {
-			trackJob(content.identifier, "Working ...", function (isSuccess) {
-				if (isSuccess)
-					window.location.href = "/web/modules/core/artifacts/";
-				JOB = null;
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched deletion as job ", content, "."]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onJobCompleted(job);
 			});
-		} else {
-			displayMessage(getErrorFor(status, content));
-			JOB = null;
 		}
-	}, ARTIFACTID);
+	}, artifactId);
+}
+
+function onJobCompleted(job) {
+	if (!job.result.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!job.result.isSuccess) {
+		displayMessage("error", "FAILURE: " + job.result.message);
+	} else {
+		displayMessage("success", "Deleted artifact " + artifactName + ".");
+		waitAndGo("index.html");
+	}
 }
 
 function renderMetadata(metadata) {
 	METADATA = parseNQuads(metadata);
-	var properties = METADATA[ARTIFACTID].properties;
-	document.getElementById("artifact-identifier").value = ARTIFACTID;
+	var properties = METADATA[artifactId].properties;
+	document.getElementById("artifact-identifier").value = artifactId;
 	for (var i = 0; i != properties.length; i++) {
 		var name = properties[i].id;
-		if (name === "http://xowl.org/platform/schemas/kernel#name")
-			document.getElementById("artifact-name").value = properties[i].value.lexical;
-		else if (name === "http://xowl.org/platform/schemas/kernel#archetype")
+		if (name === "http://xowl.org/platform/schemas/kernel#name") {
+			artifactName = properties[i].value.lexical;
+			document.getElementById("artifact-name").value = artifactName;
+		} else if (name === "http://xowl.org/platform/schemas/kernel#archetype")
 			document.getElementById("artifact-archetype").value = properties[i].value.lexical;
 		else if (name === "http://xowl.org/platform/schemas/kernel#from") {
 			document.getElementById("artifact-origin").appendChild(document.createTextNode(properties[i].value.lexical));
@@ -94,7 +100,6 @@ function renderMetadata(metadata) {
 			document.getElementById("artifact-supersede").appendChild(container);
 		}
 	}
-	displayMessage(null);
 }
 
 function renderContent(content) {
@@ -125,6 +130,5 @@ function renderContent(content) {
 			table.appendChild(row);
 		}
 	}
-	displayMessage(null);
 	document.getElementById("button-retrieve").style.display = "none";
 }

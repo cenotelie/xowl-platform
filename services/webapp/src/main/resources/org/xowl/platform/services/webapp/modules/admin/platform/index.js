@@ -84,7 +84,7 @@ function onClickRestart() {
 		return;
 	xowl.platformRestart(function (status, ct, content) {
 		if (status == 0) {
-			displayMessage("success", "The platform shut down.");
+			displayMessage("success", "The platform is restarting.");
 		} else if (onOperationEnded(status, content)) {
 			displayMessage("success", "The platform is restarting.");
 		}

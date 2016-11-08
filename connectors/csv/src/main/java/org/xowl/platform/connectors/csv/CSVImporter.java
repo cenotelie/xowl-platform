@@ -36,6 +36,7 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.importation.*;
@@ -171,6 +172,9 @@ public class CSVImporter extends Importer {
             XSPReply reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new DocumentImportedEvent(document, artifact, importationService));
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);

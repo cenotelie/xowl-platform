@@ -42,7 +42,6 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricBase;
 import org.xowl.platform.kernel.statistics.MetricProvider;
-import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.services.consistency.*;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
@@ -110,9 +109,6 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
      * Initializes this service
      */
     public XOWLConsistencyService() {
-        StatisticsService statisticsService = ServiceUtils.getService(StatisticsService.class);
-        if (statisticsService != null)
-            statisticsService.registerProvider(this);
     }
 
     @Override

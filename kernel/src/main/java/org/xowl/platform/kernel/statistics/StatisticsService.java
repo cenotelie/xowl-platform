@@ -30,20 +30,6 @@ import java.util.Collection;
  */
 public interface StatisticsService extends Service, HttpAPIService {
     /**
-     * Registers a metric provider
-     *
-     * @param provider A metric provider
-     */
-    void registerProvider(MetricProvider provider);
-
-    /**
-     * Unregisters a metric provider
-     *
-     * @param provider A metric provider
-     */
-    void unregisterProvider(MetricProvider provider);
-
-    /**
      * Gets the known metrics
      *
      * @return The known metrics

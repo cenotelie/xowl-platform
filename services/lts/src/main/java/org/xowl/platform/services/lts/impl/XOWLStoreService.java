@@ -50,7 +50,6 @@ import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.statistics.Metric;
 import org.xowl.platform.kernel.statistics.MetricBase;
 import org.xowl.platform.kernel.statistics.MetricProvider;
-import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
@@ -129,9 +128,6 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
                 return XOWLStoreService.this.resolveRemote(this.getName());
             }
         };
-        StatisticsService statisticsService = ServiceUtils.getService(StatisticsService.class);
-        if (statisticsService != null)
-            statisticsService.registerProvider(this);
     }
 
     /**

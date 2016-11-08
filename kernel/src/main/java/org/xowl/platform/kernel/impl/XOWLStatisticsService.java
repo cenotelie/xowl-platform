@@ -32,9 +32,9 @@ import org.xowl.platform.kernel.statistics.MetricProvider;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,20 +51,9 @@ public class XOWLStatisticsService implements StatisticsService {
     };
 
     /**
-     * The known metrics
-     */
-    private final Map<String, Metric> metrics;
-    /**
-     * The metric providers
-     */
-    private final Map<String, MetricProvider> providers;
-
-    /**
      * Initializes this provider
      */
     public XOWLStatisticsService() {
-        this.metrics = new HashMap<>();
-        this.providers = new HashMap<>();
     }
 
     @Override
@@ -99,7 +88,7 @@ public class XOWLStatisticsService implements StatisticsService {
         // get all the metrics
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
-        for (Metric metric : metrics.values()) {
+        for (Metric metric : getMetrics()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -143,37 +132,32 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     @Override
-    public void registerProvider(MetricProvider provider) {
-        for (Metric metric : provider.getMetrics()) {
-            metrics.put(metric.getIdentifier(), metric);
-            providers.put(metric.getIdentifier(), provider);
-        }
-    }
-
-    @Override
-    public void unregisterProvider(MetricProvider provider) {
-        for (Metric metric : provider.getMetrics()) {
-            metrics.remove(metric.getIdentifier());
-            providers.remove(metric.getIdentifier());
-        }
-    }
-
-    @Override
     public Collection<Metric> getMetrics() {
-        return metrics.values();
+        Collection<Metric> result = new ArrayList<>();
+        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
+            result.addAll(provider.getMetrics());
+        }
+        return result;
     }
 
     @Override
     public Serializable update(Metric metric) {
-        MetricProvider provider = providers.get(metric.getIdentifier());
-        if (provider == null)
-            return null;
-        return provider.update(metric);
+        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
+            Serializable result = provider.update(metric);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 
     @Override
     public Serializable update(String metricId) {
-        Metric metric = metrics.get(metricId);
-        return metric == null ? null : update(metric);
+        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
+            for (Metric metric : provider.getMetrics()) {
+                if (metric.getIdentifier().equals(metricId))
+                    return provider.update(metric);
+            }
+        }
+        return null;
     }
 }

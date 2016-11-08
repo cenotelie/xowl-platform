@@ -28,10 +28,27 @@ import org.xowl.platform.services.importation.ImporterConfiguration;
  */
 public class SemanticWebImporterConfiguration extends ImporterConfiguration {
     /**
-     * Initializes this configuration for a preview
+     * The expected syntax od the document to import
      */
-    public SemanticWebImporterConfiguration() {
+    private final String syntax;
+
+    /**
+     * Gets the expected syntax od the document to import
+     *
+     * @return The expected syntax od the document to import
+     */
+    public String getSyntax() {
+        return syntax;
+    }
+
+    /**
+     * Initializes this configuration for a preview
+     *
+     * @param syntax The expected syntax od the document to import
+     */
+    public SemanticWebImporterConfiguration(String syntax) {
         super("", new String[0], null, null);
+        this.syntax = syntax;
     }
 
     /**
@@ -41,9 +58,11 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
      * @param superseded The URI of the superseded artifacts
      * @param version    The version number of the artifact
      * @param archetype  The artifact archetype
+     * @param syntax     The expected syntax od the document to import
      */
-    public SemanticWebImporterConfiguration(String family, String[] superseded, String version, String archetype) {
+    public SemanticWebImporterConfiguration(String family, String[] superseded, String version, String archetype, String syntax) {
         super(family, superseded, version, archetype);
+        this.syntax = syntax;
     }
 
     /**
@@ -53,6 +72,20 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
      */
     public SemanticWebImporterConfiguration(ASTNode definition) {
         super(definition);
+        String syntax = "";
+        for (ASTNode pair : definition.getChildren()) {
+            String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
+            key = key.substring(1, key.length() - 1);
+            switch (key) {
+                case "syntax": {
+                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
+                    value = value.substring(1, value.length() - 1);
+                    syntax = value;
+                    break;
+                }
+            }
+        }
+        this.syntax = syntax;
     }
 
     @Override
@@ -67,7 +100,9 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
         builder.append(TextUtils.escapeStringJSON(SemanticWebImporterConfiguration.class.getName()));
         builder.append("\", ");
         serializeJSON(builder);
-        builder.append("}");
+        builder.append(", \"syntax\": \"");
+        builder.append(TextUtils.escapeStringJSON(syntax));
+        builder.append("\"}");
         return builder.toString();
     }
 }

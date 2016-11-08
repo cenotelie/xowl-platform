@@ -18,13 +18,14 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.writers.NQuadsSerializer;
+import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -38,7 +39,7 @@ import org.xowl.platform.services.importation.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.StringWriter;
 import java.util.Collection;
 
 /**
@@ -80,8 +81,26 @@ public class SemanticWebImporter extends Importer {
         SemanticWebImporterConfiguration swConfig = (SemanticWebImporterConfiguration) configuration;
         try (InputStream stream = service.getStreamFor(document)) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
-            // TODO: complete this
-            return null;
+            SemanticWebLoader loader = new SemanticWebLoader();
+            XSPReply reply = loader.load(reader, document.getIdentifier(), swConfig.getSyntax());
+            if (!reply.isSuccess())
+                return null;
+            Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
+            StringWriter writer = new StringWriter();
+            RDFSerializer serializer = new NQuadsSerializer(writer);
+            serializer.serialize(new BufferedLogger(), quads.iterator());
+            final String result = writer.toString();
+            return new DocumentPreview() {
+                @Override
+                public String serializedString() {
+                    return result;
+                }
+
+                @Override
+                public String serializedJSON() {
+                    return "{\"quads\": \"" + TextUtils.escapeStringJSON(result) + "\"}";
+                }
+            };
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return null;
@@ -109,15 +128,16 @@ public class SemanticWebImporter extends Importer {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-
         Document document = importationService.getDocument(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
-
         try (InputStream stream = importationService.getStreamFor(document)) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
-            // TODO: complete this
-            Collection<Quad> quads = new ArrayList<>();
+            SemanticWebLoader loader = new SemanticWebLoader();
+            XSPReply reply = loader.load(reader, documentId, configuration.getSyntax());
+            if (!reply.isSuccess())
+                return reply;
+            Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
             Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(
                     documentId,
                     configuration.getFamily(),
@@ -127,7 +147,7 @@ public class SemanticWebImporter extends Importer {
                     configuration.getArchetype(),
                     SemanticWebImporter.class.getCanonicalName());
             Artifact artifact = new ArtifactSimple(metadata, quads);
-            XSPReply reply = storageService.store(artifact);
+            reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;
             return new XSPReplyResult<>(artifact.getIdentifier());

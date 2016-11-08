@@ -18,17 +18,14 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.store.Repository;
-import org.xowl.infra.store.loaders.*;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -39,8 +36,8 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.connection.events.ConnectorReceivedDataEvent;
 
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
@@ -140,44 +137,15 @@ public class SemanticWebConnector extends ConnectorServiceBase {
         if (index != -1)
             contentType = contentType.substring(0, index);
         contentType = contentType.trim();
-        Loader loader = null;
-        switch (contentType) {
-            case Repository.SYNTAX_NTRIPLES:
-                loader = new NTriplesLoader(nodeManager);
-                break;
-            case Repository.SYNTAX_NQUADS:
-                loader = new NQuadsLoader(nodeManager);
-                break;
-            case Repository.SYNTAX_TURTLE:
-                loader = new TurtleLoader(nodeManager);
-                break;
-            case Repository.SYNTAX_TRIG:
-                loader = new TriGLoader(nodeManager);
-                break;
-            case Repository.SYNTAX_RDFXML:
-                loader = new RDFXMLLoader(nodeManager);
-                break;
-            case Repository.SYNTAX_JSON_LD:
-                loader = new JSONLDLoader(nodeManager) {
-                    @Override
-                    protected Reader getReaderFor(Logger logger, String iri) {
-                        return null;
-                    }
-                };
-                break;
-        }
-        if (loader == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Unsupported content type: " + contentType);
-        BufferedLogger logger = new BufferedLogger();
-        String contentString = new String(content, Files.CHARSET);
+
         String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
-        RDFLoaderResult result = loader.loadRDF(logger, new StringReader(contentString), resource, resource);
-        if (!logger.getErrorMessages().isEmpty()) {
-            logger.error("Failed to parse the content");
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        }
+        SemanticWebLoader loader = new SemanticWebLoader();
+        XSPReply reply = loader.load(new InputStreamReader(new ByteArrayInputStream(content)), resource, contentType);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
-        Artifact artifact = new ArtifactSimple(metadata, result.getQuads());
+        Artifact artifact = new ArtifactSimple(metadata, quads);
         queueInput(artifact);
         EventService eventService = ServiceUtils.getService(EventService.class);
         if (eventService != null)

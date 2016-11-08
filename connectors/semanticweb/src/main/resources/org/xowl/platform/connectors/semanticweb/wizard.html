@@ -15,6 +15,19 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="document-name">Name:</label>
+                <input type="text" class="form-control" id="document-name" readonly>
+            </div>
+            <div class="form-group">
+                <label for="input-syntax">Content syntax:</label>
+                <select id="input-syntax" class="form-control"></select>
+            </div>
+            <button class="btn btn-primary" onclick="onImport()">Import</button>
+        </div>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

@@ -37,7 +37,9 @@ var PAGE_READY_HOOK = null;
 /**
  * Whether the current page is busy with a running operation
  * Null indicate that no operation is underway.
- * A non-null value is the function to be called to remove the on-going message.
+ * A non-null value is an object:
+ * - count:   The number of concurrent ongoing operations.
+ * - remover: The function to be called to remove the on-going message.
  */
 var PAGE_BUSY = null;
 
@@ -167,14 +169,20 @@ function onClickLogout() {
  * When an operation has been requested by the user
  *
  * @param message The message to display for the operation
+ * @param count   The number of concurrent ongoing operations
  * @return Whether the operation can be performed
  */
-function onOperationRequest(message) {
+function onOperationRequest(message, count) {
 	if (PAGE_BUSY != null) {
 		displayMessage("error", "Another operation is going on ...");
 		return false;
 	}
-	PAGE_BUSY = displayLoader(message);
+	var c = 1;
+	if ((typeof count) !== "undefined") {
+		c = count;
+	}
+	var remover = displayLoader(message);
+	PAGE_BUSY = { count: c, remover: remover };
 	return true;
 }
 
@@ -189,9 +197,12 @@ function onOperationAbort(message) {
 		displayMessage("error", "No on-going operation ...");
 		return false;
 	}
-	PAGE_BUSY();
-	PAGE_BUSY = null;
-	displayMessage("error", message);
+	PAGE_BUSY.count--;
+	if (PAGE_BUSY.count === 0) {
+		PAGE_BUSY.remover();
+		PAGE_BUSY = null;
+		displayMessage("error", message);
+	}
 	return true;
 }
 
@@ -208,8 +219,11 @@ function onOperationEnded(code, content, customMessage) {
 		displayMessage("error", "No on-going operation ...");
 		return false;
 	}
-	PAGE_BUSY();
-	PAGE_BUSY = null;
+	PAGE_BUSY.count--;
+	if (PAGE_BUSY.count === 0) {
+		PAGE_BUSY.remover();
+		PAGE_BUSY = null;
+	}
 	if (code != 200) {
 		if ((typeof customMessage) === "undefined")
 			displayMessageHttpError(code, content);

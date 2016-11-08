@@ -19,7 +19,6 @@ function doGetUsers() {
 		if (onOperationEnded(status, content)) {
 			renderPlatformUsers(content);
 		}
-		doGetGroups();
 	});
 }
 

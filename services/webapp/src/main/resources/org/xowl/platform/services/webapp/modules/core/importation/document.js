@@ -12,21 +12,19 @@ function init() {
 			{name: "Document " + docId}], function() {
 		if (!docId || docId === null || docId === "")
     		return;
-		if (!onOperationRequest("Loading ..."))
-			return;
-		xowl.getUploadedDocument(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				DOCUMENT = content;
-				document.getElementById("document-name").value = DOCUMENT.name;
-			}
-			doGetImporters();
-		}, docId);
+    	doGetData();
 	});
 }
 
-function doGetImporters() {
-	if (!onOperationRequest("Loading ..."))
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 2))
 		return;
+	xowl.getUploadedDocument(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			DOCUMENT = content;
+			document.getElementById("document-name").value = DOCUMENT.name;
+		}
+	}, docId);
 	xowl.getDocumentImporters(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderImporters(content);

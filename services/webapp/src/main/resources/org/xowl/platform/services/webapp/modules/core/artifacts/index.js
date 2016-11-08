@@ -13,42 +13,34 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: "/web/modules/core/"},
 			{name: "Artifacts Management"}], function() {
-		doGetConnectors();
+		doGetData();
 	});
 }
 
-function doGetConnectors() {
-	if (!onOperationRequest("Loading ..."))
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 3))
 		return;
 	xowl.getConnectors(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			CONNECTORS = content;
 			renderConnectors();
 		}
-		doGetAllArtifacts();
 	});
-}
-
-function doGetAllArtifacts() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getAllArtifacts(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			ARTIFACTS_ALL = content;
-			doGetLiveArtifacts();
+			if (ARTIFACTS_LIVE !== null)
+				prepareArtifacts();
 		}
 	});
-}
-
-function doGetLiveArtifacts() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getLiveArtifacts(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			ARTIFACTS_LIVE = content;
-			prepareArtifacts();
+			if (ARTIFACTS_ALL !== null)
+				prepareArtifacts();
 		}
 	});
+	prepareArtifacts();
 }
 
 function prepareArtifacts() {

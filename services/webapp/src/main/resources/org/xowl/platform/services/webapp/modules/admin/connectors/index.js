@@ -22,7 +22,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Platform Administration", uri: "/web/modules/admin/"},
 			{name: "Platform Connectors Management"}], function() {
-			doGetConnectors();
+			doGetData();
 	});
 	var url = document.URL;
 	var index = url.indexOf("/web/");
@@ -30,21 +30,15 @@ function init() {
 		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
 }
 
-function doGetConnectors() {
-	if (!onOperationRequest("Loading ..."))
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 2))
 		return;
 	xowl.getConnectors(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			CONNECTORS = content;
 			render();
 		}
-		doGetDescriptors();
 	});
-}
-
-function doGetDescriptors() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getDescriptors(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			DOMAINS = content;

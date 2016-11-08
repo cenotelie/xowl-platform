@@ -16,48 +16,30 @@ function init() {
 			{name: "Import as Update"}], function() {
 		if (!docId || docId === null || docId === "")
     		return;
-		doGetDocument();
+		doGetData();
 	});
 }
 
-function doGetDocument() {
-	if (!onOperationRequest("Loading ..."))
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 4))
 		return;
 	xowl.getUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			DOCUMENT = content;
 			document.getElementById("document-name").value = DOCUMENT.name;
 		}
-		doGetImporter();
 	}, docId);
-}
-
-function doGetImporter() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getDocumentImporter(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			document.getElementById("importer").value = content.name;
 			importerWizard = content.wizardUri;
 		}
-		doGetArchetypes();
 	}, importerId);
-}
-
-function doGetArchetypes() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getArtifactArchetypes(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderArchetypes(content);
 		}
-		doGetArtifacts();
 	});
-}
-
-function doGetArtifacts() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getAllArtifacts(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderFamilies(content);

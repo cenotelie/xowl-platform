@@ -7,42 +7,29 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Platform Administration", uri: "/web/modules/admin/"},
 			{name: "Platform Security"}], function() {
-		doGetUsers();
+		doGetData();
 	});
 }
 
-function doGetUsers() {
-	if (!onOperationRequest("Loading ..."))
+function doGetData() {
+	if (!onOperationRequest("Loading ...", 3))
 		return;
 	xowl.getPlatformUsers(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderPlatformUsers(content);
 		}
-		doGetGroups();
 	});
-}
-
-function doGetGroups() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getPlatformGroups(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderPlatformGroups(content);
 		}
-		doGetRoles();
 	});
-}
-
-function doGetRoles() {
-	if (!onOperationRequest("Loading ..."))
-		return;
 	xowl.getPlatformRoles(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderPlatformRoles(content);
 		}
 	});
 }
-
 
 function renderPlatformUsers(users) {
 	users.sort(function (x, y) {

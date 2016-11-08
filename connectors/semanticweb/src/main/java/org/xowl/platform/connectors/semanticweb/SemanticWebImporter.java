@@ -130,7 +130,6 @@ public class SemanticWebImporter extends Importer {
             XSPReply reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;
-            importationService.drop(document);
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);

@@ -59,7 +59,7 @@ function onUpload() {
 			}
 			progressBar['aria-valuenow'] = 100;
 			progressBar.style.width = "100%";
-		}, name, reader.result);
+		}, name, reader.result, file.name);
 	}
 	if (!onOperationRequest("Reading ..."))
 		return;

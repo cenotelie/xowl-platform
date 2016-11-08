@@ -115,7 +115,7 @@ public class XOWLImportationService implements ImportationService {
     private void reloadDocument(String file, String content) {
         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse the job " + file);
+            Logging.getDefault().error("Failed to parse the document descriptor " + file);
             return;
         }
         Document document = new Document(definition);
@@ -159,8 +159,9 @@ public class XOWLImportationService implements ImportationService {
             }
             case "PUT": {
                 String[] names = parameters.get("name");
-                if (names != null && names.length > 0)
-                    return onPutDocument(names[0], content);
+                String[] fileNames = parameters.get("fileName");
+                if (names != null && names.length > 0 && fileNames != null && fileNames.length > 0)
+                    return onPutDocument(names[0], content, fileNames[0]);
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
             }
             case "POST": {
@@ -215,12 +216,13 @@ public class XOWLImportationService implements ImportationService {
     /**
      * When a new document is uploaded
      *
-     * @param name    The document 's name
-     * @param content The document's content
+     * @param name     The document 's name
+     * @param content  The document's content
+     * @param fileName The original client's file name
      * @return The document
      */
-    private HttpResponse onPutDocument(String name, byte[] content) {
-        Document document = upload(name, content);
+    private HttpResponse onPutDocument(String name, byte[] content, String fileName) {
+        Document document = upload(name, content, fileName);
         if (document == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
@@ -331,13 +333,13 @@ public class XOWLImportationService implements ImportationService {
     }
 
     @Override
-    public Document upload(String name, byte[] content) {
+    public Document upload(String name, byte[] content, String fileName) {
         onActivated();
         if (storage == null)
             return null;
         if (!storage.exists() && !storage.mkdirs())
             return null;
-        Document document = new Document(name);
+        Document document = new Document(name, fileName);
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         try (FileOutputStream stream = new FileOutputStream(fileDescriptor)) {
@@ -433,7 +435,7 @@ public class XOWLImportationService implements ImportationService {
      * @return The file name
      */
     private static String getDocDescriptorFile(Document document) {
-        return "document-" + document.getFileName() + "-descriptor.json";
+        return "document-" + document.getStorageId() + "-descriptor.json";
     }
 
     /**
@@ -443,7 +445,7 @@ public class XOWLImportationService implements ImportationService {
      * @return The file name
      */
     private static String getDocContentFile(Document document) {
-        return "document-" + document.getFileName() + "-content";
+        return "document-" + document.getStorageId() + "-content";
     }
 
     /**

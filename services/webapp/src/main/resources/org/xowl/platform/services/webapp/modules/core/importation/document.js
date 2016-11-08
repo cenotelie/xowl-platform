@@ -23,6 +23,9 @@ function doGetData() {
 		if (onOperationEnded(status, content)) {
 			DOCUMENT = content;
 			document.getElementById("document-name").value = DOCUMENT.name;
+			document.getElementById("document-upload-date").value = DOCUMENT.uploadDate;
+			document.getElementById("document-uploader").value = DOCUMENT.uploader;
+			document.getElementById("document-file-name").value = DOCUMENT.fileName;
 		}
 	}, docId);
 	xowl.getDocumentImporters(function (status, ct, content) {

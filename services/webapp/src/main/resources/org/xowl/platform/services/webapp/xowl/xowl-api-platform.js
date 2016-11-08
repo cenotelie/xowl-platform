@@ -812,14 +812,14 @@ XOWL.prototype.importUploadedDocument = function (callback, docId, importer, con
 	}, "services/core/importation", {import: docId, importer: importer}, configuration);
 }
 
-XOWL.prototype.uploadDocument = function (callback, name, content) {
+XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 	this.doHttpRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "PUT", "services/core/importation", {name: name}, content, "application/octet-stream", "application/json");
+	}, "PUT", "services/core/importation", {name: name, fileName: fileName}, content, "application/octet-stream", "application/json");
 }
 
 

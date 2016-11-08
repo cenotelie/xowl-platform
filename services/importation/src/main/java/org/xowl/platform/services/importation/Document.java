@@ -22,7 +22,13 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.security.SecurityService;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * Represents a document to be imported
@@ -39,19 +45,32 @@ public class Document implements Identifiable, Serializable {
      */
     private final String name;
     /**
-     * The file that stores this document
+     * The date and time at which this document was initially uploaded
+     */
+    private final String uploadDate;
+    /**
+     * The identifier of the platform user that performed the upload (may be null)
+     */
+    private final String uploader;
+    /**
+     * The original client's file name
      */
     private final String fileName;
 
     /**
      * Initializes this document
      *
-     * @param name The document's name
+     * @param name     The document's name
+     * @param fileName The original client's file name
      */
-    public Document(String name) {
+    public Document(String name, String fileName) {
         this.identifier = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         this.name = name;
-        this.fileName = identifier.substring(KernelSchema.GRAPH_ARTIFACTS.length() + 1);
+        this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
+        this.fileName = fileName;
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
+        this.uploader = currentUser == null ? null : currentUser.getIdentifier();
     }
 
     /**
@@ -62,7 +81,9 @@ public class Document implements Identifiable, Serializable {
     public Document(ASTNode node) {
         String tIdentifier = "";
         String tName = "";
-        String tFileName = "";
+        String tUploadDate = "";
+        String tUploader = null;
+        String tOriginalFileName = "";
         for (ASTNode pair : node.getChildren()) {
             String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -75,22 +96,58 @@ public class Document implements Identifiable, Serializable {
                 case "name":
                     tName = value;
                     break;
+                case "uploadDate":
+                    tUploadDate = value;
+                    break;
+                case "uploader":
+                    if (!value.isEmpty())
+                        tUploader = value;
+                    break;
                 case "fileName":
-                    tFileName = value;
+                    tOriginalFileName = value;
                     break;
             }
         }
         this.identifier = tIdentifier;
         this.name = tName;
-        this.fileName = tFileName;
+        this.uploadDate = tUploadDate;
+        this.uploader = tUploader;
+        this.fileName = tOriginalFileName;
     }
 
     /**
-     * Gets the file that stores this document
+     * Gets the storage identifier of this document
      *
-     * @return The file that stores this document
+     * @return The storage identifier of this document
      */
-    public String getFileName() {
+    public String getStorageId() {
+        return identifier.substring(KernelSchema.GRAPH_ARTIFACTS.length() + 1);
+    }
+
+    /**
+     * Gets the date and time at which this document was initially uploaded
+     *
+     * @return The date and time at which this document was initially uploaded
+     */
+    public String getUploadDate() {
+        return uploadDate;
+    }
+
+    /**
+     * Gets the identifier of the platform user that performed the upload (may be null)
+     *
+     * @return The identifier of the platform user that performed the upload (may be null)
+     */
+    public String getUploader() {
+        return uploader;
+    }
+
+    /**
+     * Gets the original client's file name
+     *
+     * @return The original client's file name
+     */
+    public String getOriginalFileName() {
         return fileName;
     }
 
@@ -114,6 +171,8 @@ public class Document implements Identifiable, Serializable {
         return "{\"type\": \"" + TextUtils.escapeStringJSON(Document.class.getCanonicalName()) +
                 "\", \"identifier\": \"" + TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\":\"" + TextUtils.escapeStringJSON(name) +
+                "\", \"uploadDate\":\"" + TextUtils.escapeStringJSON(uploadDate) +
+                "\", \"uploader\":\"" + TextUtils.escapeStringJSON(uploader != null ? uploader : "") +
                 "\", \"fileName\":\"" + TextUtils.escapeStringJSON(fileName) +
                 "\"}";
     }

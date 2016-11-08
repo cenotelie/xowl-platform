@@ -15,49 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.connectors.csv.impl;
+package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.platform.kernel.ui.WebUIContribution;
-
-import java.net.URL;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobFactory;
 
 /**
- * Implementation of the UI contributions for the CSV importer
+ * The factory for Semantic Web dataset importation jobs
  *
  * @author Laurent Wouters
  */
-public class CSVUIContribution implements WebUIContribution {
-    /**
-     * The root resource for the web app files
-     */
-    private static final String RESOURCES = "/org/xowl/platform/connectors/csv";
-    /**
-     * The URI prefix for this contribution
-     */
-    public static final String PREFIX = URI_WEB + "/contributions/connectors/csv";
-
+public class SemanticWebImportJobFactory implements JobFactory {
     @Override
     public String getIdentifier() {
-        return CSVUIContribution.class.getCanonicalName();
+        return SemanticWebImportJobFactory.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - CSV Importer Contribution";
+        return "xOWL Federation Platform - Semantic Web Importation Job Factory";
     }
 
     @Override
-    public String getPrefix() {
-        return PREFIX;
+    public boolean canDeserialize(String type) {
+        return (type.equals(SemanticWebImportJob.class.getCanonicalName()));
     }
 
     @Override
-    public int getPriority() {
-        return 1;
-    }
-
-    @Override
-    public URL getResource(String resource) {
-        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(PREFIX.length()));
+    public Job newJob(String type, ASTNode definition) {
+        if (type.equals(SemanticWebImportJob.class.getCanonicalName()))
+            return new SemanticWebImportJob(definition);
+        return null;
     }
 }

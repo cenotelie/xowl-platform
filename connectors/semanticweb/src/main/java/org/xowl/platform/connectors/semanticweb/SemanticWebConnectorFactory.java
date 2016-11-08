@@ -15,48 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.connection.impl;
+package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.services.connection.ConnectorDescription;
-import org.xowl.platform.services.connection.ConnectorDescriptionBase;
 import org.xowl.platform.services.connection.ConnectorDescriptionParam;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
 /**
- * Implements a factory of generic connectors
+ * The factory for Semantic Web connectors
  *
  * @author Laurent Wouters
  */
-public class GenericConnectorFactory implements ConnectorServiceFactory {
-    /**
-     * The description of the generic connector
-     */
-    private static final ConnectorDescription DESCRIPTION = new ConnectorDescriptionBase(
-            "org.xowl.platform.services.connection.GenericDomain",
-            "Generic Domain - RDF and OWL Syntaxes",
-            "This is a generic domain that accepts as input any form of semantic data (triples, quads, ontologies)."
-    );
-
+public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
     /**
      * The descriptions of the supported domains
      */
-    private static final Collection<ConnectorDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Arrays.asList(DESCRIPTION));
+    private static final Collection<ConnectorDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Collections.singletonList((ConnectorDescription) SemanticWebConnectorDescriptor.INSTANCE));
 
     @Override
     public String getIdentifier() {
-        return GenericConnectorFactory.class.getCanonicalName();
+        return SemanticWebConnectorFactory.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Generic Connector Factory";
+        return "xOWL Federation Platform - Semantic Web Connector Factory";
     }
 
     @Override
@@ -66,6 +55,6 @@ public class GenericConnectorFactory implements ConnectorServiceFactory {
 
     @Override
     public XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
-        return new XSPReplyResult<>(new GenericConnector(identifier, name, uris));
+        return new XSPReplyResult<>(new SemanticWebConnector(identifier, name, uris));
     }
 }

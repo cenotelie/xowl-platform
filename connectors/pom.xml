@@ -13,5 +13,6 @@
 	<modules>
 		<module>csv</module>
 		<module>doors9</module>
+		<module>semanticweb</module>
 	</modules>
 </project>

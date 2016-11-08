@@ -15,10 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.connection.impl;
+package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.loaders.*;
 import org.xowl.infra.store.rdf.Quad;
@@ -47,21 +47,21 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Implementation of a domain connector that can be configured and deployed at runtime
+ * Represents a connector for Semantic Web datasets
  *
  * @author Laurent Wouters
  */
-class GenericConnector extends ConnectorServiceBase {
+public class SemanticWebConnector extends ConnectorServiceBase {
     /**
      * The identifier for this connector
      */
     private final String identifier;
     /**
-     * The name of this connector
+     * The name for this connector
      */
     private final String name;
     /**
-     * The URI to access this connector
+     * The API URIs for this connector
      */
     private final String[] uris;
     /**
@@ -73,10 +73,10 @@ class GenericConnector extends ConnectorServiceBase {
      * Initializes this connector
      *
      * @param identifier The identifier for this connector
-     * @param name       The name of this connector
-     * @param uris       The URIs to access this connector
+     * @param name       The name for this connector
+     * @param uris       The API URIs for this connector
      */
-    public GenericConnector(String identifier, String name, String[] uris) {
+    public SemanticWebConnector(String identifier, String name, String[] uris) {
         this.identifier = identifier;
         this.name = name;
         this.uris = uris;
@@ -95,8 +95,7 @@ class GenericConnector extends ConnectorServiceBase {
 
     @Override
     public XSPReply pushToClient(Artifact data) {
-        // cannot push to clients
-        return XSPReplyFailure.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

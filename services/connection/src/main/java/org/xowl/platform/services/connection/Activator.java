@@ -23,7 +23,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.jobs.JobFactory;
-import org.xowl.platform.services.connection.impl.GenericConnectorFactory;
 import org.xowl.platform.services.connection.impl.XOWLConnectorDirectory;
 import org.xowl.platform.services.connection.jobs.ConnectorJobFactory;
 
@@ -63,7 +62,6 @@ public class Activator implements BundleActivator {
         };
         factoryTracker.open();
 
-        bundleContext.registerService(ConnectorServiceFactory.class, new GenericConnectorFactory(), null);
         bundleContext.registerService(JobFactory.class, new ConnectorJobFactory(), null);
     }
 

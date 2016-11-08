@@ -15,49 +15,31 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.connectors.csv.impl;
+package org.xowl.platform.connectors.semanticweb;
 
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.ui.WebUIContribution;
-
-import java.net.URL;
+import org.xowl.platform.services.connection.ConnectorServiceFactory;
+import org.xowl.platform.services.importation.Importer;
 
 /**
- * Implementation of the UI contributions for the CSV importer
+ * The activator for this bundle
  *
  * @author Laurent Wouters
  */
-public class CSVUIContribution implements WebUIContribution {
-    /**
-     * The root resource for the web app files
-     */
-    private static final String RESOURCES = "/org/xowl/platform/connectors/csv";
-    /**
-     * The URI prefix for this contribution
-     */
-    public static final String PREFIX = URI_WEB + "/contributions/connectors/csv";
-
+public class Activator implements BundleActivator {
     @Override
-    public String getIdentifier() {
-        return CSVUIContribution.class.getCanonicalName();
+    public void start(BundleContext bundleContext) throws Exception {
+        bundleContext.registerService(ConnectorServiceFactory.class, new SemanticWebConnectorFactory(), null);
+        bundleContext.registerService(Importer.class, new SemanticWebImporter(), null);
+        bundleContext.registerService(JobFactory.class, new SemanticWebImportJobFactory(), null);
+        bundleContext.registerService(WebUIContribution.class, new SemanticWebUIContribution(), null);
     }
 
     @Override
-    public String getName() {
-        return "xOWL Federation Platform - CSV Importer Contribution";
-    }
+    public void stop(BundleContext bundleContext) throws Exception {
 
-    @Override
-    public String getPrefix() {
-        return PREFIX;
-    }
-
-    @Override
-    public int getPriority() {
-        return 1;
-    }
-
-    @Override
-    public URL getResource(String resource) {
-        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(PREFIX.length()));
     }
 }

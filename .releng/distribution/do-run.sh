@@ -4,17 +4,17 @@
 # This scripts looks for a special return value to indicate that the server requested a restart
 
 SCRIPT="$(readlink -f "$0")"
-DISTRIB="$(dirname "$SCRIPT")"
+DISTRIBUTION="$(dirname "$SCRIPT")"
 
 # custom path to java, if any
 # if left empty, the script will use 'which' to locate java
 JAVA=
 
-if [ -z $JAVA ]
+if [ -z "$JAVA" ]
   then
     JAVA=`which java`
 fi
-if [ -z $JAVA ]
+if [ -z "$JAVA" ]
   then
     echo "Cannot find java"
     exit 1
@@ -24,8 +24,8 @@ fi
 CODE=5
 while [ "$CODE" -eq 5 ]
   do
-    rm -rf "$DISTRIB/felix-cache"
-    $JAVA "-Duser.dir=$DISTRIB" "-Dgosh.args=--noi" "-Dxowl.root=$DISTRIB" -jar "$DISTRIB/felix/bin/felix.jar" -b "$DISTRIB/felix/bundle"
+    rm -rf "$DISTRIBUTION/felix-cache"
+    "$JAVA" "-Duser.dir=$DISTRIBUTION" "-Dgosh.args=--noi" "-Dxowl.root=$DISTRIBUTION" -jar "$DISTRIBUTION/felix/bin/felix.jar" -b "$DISTRIBUTION/felix/bundle"
     CODE=$?
     echo "Exit code is $CODE"
 done

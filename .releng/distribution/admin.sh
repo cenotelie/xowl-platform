@@ -1,35 +1,35 @@
 #!/bin/sh
 
 # number of seconds to wait after launching the daemon before checking it has started correctly
-STARTUP_WAIT=4
+WAIT=4
 
 SCRIPT="$(readlink -f "$0")"
-DISTRIB="$(dirname $SCRIPT)"
+DISTRIBUTION="$(dirname "$SCRIPT")"
 
 init () {
-  PID=
-  ISRUNNING=false
+  PROCESS_ID=
+  IS_RUNNING=false
 
   if [ -f "xowl-platform.pid" ];
   then
     # pid file exists, is the server still running?
-    PID=`cat "$DISTRIB/xowl-platform.pid"`
-    PROCESS=`ps -p $PID`
+    PROCESS_ID=`cat "$DISTRIBUTION/xowl-platform.pid"`
+    PROCESS=`ps -p "$PROCESS_ID"`
     TARGET=sh
     if test "${PROCESS#*$TARGET}" != "$PROCESS"
     then
-      ISRUNNING=true
+      IS_RUNNING=true
     fi
   fi
 }
 
 start () {
-  if [ "$ISRUNNING" = "true" ]; then
-    echo "xOWL Platform is already running ..."
+  if [ "$IS_RUNNING" = "true" ]; then
+    echo "xOWL Platform is already running!"
     exit 1
   else
     doStart
-    if [ "$ISRUNNING" = "true" ]; then
+    if [ "$IS_RUNNING" = "true" ]; then
       exit 0
     else
       exit 1
@@ -38,47 +38,53 @@ start () {
 }
 
 doStart () {
-  echo "==== xOWL Platform Startup ====" >> log.txt
-  sh "$DISTRIB/do-run.sh" &
-  PID="$!"
-  echo $PID > "$DISTRIB/xowl-platform.pid"
-  sleep $STARTUP_WAIT
-  PROCESS=`ps -p $PID`
+  echo "==== xOWL Platform Startup ====" >> "$DISTRIBUTION/platform.log"
+  echo "xOWL Server starting ..."
+  sh "$DISTRIBUTION/do-run.sh" "$DISTRIBUTION" &
+  PROCESS_ID="$!"
+  echo "$PROCESS_ID" > "$DISTRIBUTION/xowl-platform.pid"
+  sleep "$WAIT"
+  PROCESS=`ps -p "$PROCESS_ID"`
   TARGET=sh
   if test "${PROCESS#*$TARGET}" != "$PROCESS"
   then
-    ISRUNNING=true
-    echo "xOWL Platform started ..."
+    IS_RUNNING=true
+    echo "xOWL Platform started."
   else
-    ISRUNNING=false
-    echo "xOWL Platform failed to start"
+    IS_RUNNING=false
+    echo "xOWL Platform failed to start!"
   fi
 }
 
 stop () {
-  if [ "$ISRUNNING" = "true" ]; then
+  if [ "$IS_RUNNING" = "true" ]; then
     doStop
     exit 0
   else
-    echo "xOWL Platform is not running ..."
+    echo "xOWL Platform is not running!"
     exit 0
   fi
 }
 
 doStop () {
   echo "xOWL Platform stopping ..."
-  PGID=`ps -o pgid= -p $PID | tr -d ' '`
-  kill -TERM -$PGID
-  rm "$DISTRIB/xowl-platform.pid"
-  echo "xOWL Platform stopped ..."
+  GROUP_ID=`ps -o pgid= -p "$PROCESS_ID" | tr -d ' '`
+  CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
+  while [ -n "$CHILDREN" ]; do
+    kill -TERM "-$GROUP_ID"
+    sleep "$WAIT"
+    CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
+  done
+  rm "$DISTRIBUTION/xowl-platform.pid"
+  echo "xOWL Platform stopped."
 }
 
 restart () {
-  if [ "$ISRUNNING" = "true" ]; then
+  if [ "$IS_RUNNING" = "true" ]; then
     doStop
   fi
   doStart
-  if [ "$ISRUNNING" = "true" ]; then
+  if [ "$IS_RUNNING" = "true" ]; then
     exit 0
   else
     exit 1
@@ -86,10 +92,10 @@ restart () {
 }
 
 status () {
-  if [ "$ISRUNNING" = "true" ]; then
-    echo "xOWL Platform is running on PID $PID"
+  if [ "$IS_RUNNING" = "true" ]; then
+    echo "xOWL Platform is running on PID $PROCESS_ID."
   else
-    echo "xOWL Platform is not running"
+    echo "xOWL Platform is not running."
   fi
   exit 0
 }

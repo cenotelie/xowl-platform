@@ -70,8 +70,8 @@ doStop () {
   echo "xOWL Platform stopping ..."
   GROUP_ID=`ps -o pgid= -p "$PROCESS_ID" | tr -d ' '`
   CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
+  kill -TERM "-$GROUP_ID"
   while [ -n "$CHILDREN" ]; do
-    kill -TERM "-$GROUP_ID"
     sleep "$WAIT"
     CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
   done

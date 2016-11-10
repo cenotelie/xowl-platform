@@ -50,19 +50,19 @@ var PAGE_BUSY = null;
  * @return The value associated to the parameter
  */
 function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+		results = regex.exec(location.search);
+	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 /**
  * Performs the initial setup of the current page
  *
- * @param platform       The current xOWL platform object (access to the platform API)
+ * @param platform	   The current xOWL platform object (access to the platform API)
  * @param mustBeLoggedIn Whether a user must be logged-in to see the page
- * @param breadcrumbs    The current breadcrumbs for the page
- * @param onReady        The hook to call when the page is ready
+ * @param breadcrumbs	The current breadcrumbs for the page
+ * @param onReady		The hook to call when the page is ready
  */
 function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
 	if (mustBeLoggedIn && (platform === null || !platform.isLoggedIn())) {
@@ -95,7 +95,7 @@ function loadComponent(component, callback) {
 				doc.documentElement.innerHTML = xmlHttp.responseText;
 				var node = doc.documentElement.children[1].children[0].cloneNode(true);
 				callback(node);
-        	}
+			}
 		}
 	}
 	xmlHttp.open("GET", component, true);
@@ -209,8 +209,8 @@ function onOperationAbort(message) {
 /**
  * When an operation ended
  *
- * @param code          The HTTP code (other that 200 - OK)
- * @param content       The content of the HTTP response
+ * @param code		  The HTTP code (other that 200 - OK)
+ * @param content	   The content of the HTTP response
  * @param customMessage A custom message to override the default one (may be undefined)
  * @return Whether the operation was successful
  */
@@ -266,7 +266,7 @@ function displayLoader(message) {
 /**
  * Displays an information message
  *
- * @param type    The type of message (info, success, warning, error)
+ * @param type	The type of message (info, success, warning, error)
  * @param message The message to display
  */
 function displayMessage(type, message) {
@@ -295,7 +295,7 @@ function displayMessage(type, message) {
 /**
  * Displays an error message for a failed HTTP request
  *
- * @param code    The HTTP code (other that 200 - OK)
+ * @param code	The HTTP code (other that 200 - OK)
  * @param content The content of the HTTP response
  */
 function displayMessageHttpError(code, content) {
@@ -362,17 +362,17 @@ function renderMessage(message) {
 function renderMessagePart(part) {
 	if (part instanceof String || typeof part === 'string') {
 		var parts = part.split("\n");
-    	if (parts.length > 0) {
-    		var dom = document.createElement("span");
-    		dom.appendChild(document.createTextNode(parts[0]));
-    		for (var i = 1; i != parts.length; i++) {
-    			dom.appendChild(document.createElement("br"));
-    			dom.appendChild(document.createTextNode(parts[i]));
-    		}
-    		return dom;
-    	} else {
-    		return document.createTextNode(part);
-    	}
+		if (parts.length > 0) {
+			var dom = document.createElement("span");
+			dom.appendChild(document.createTextNode(parts[0]));
+			for (var i = 1; i != parts.length; i++) {
+				dom.appendChild(document.createElement("br"));
+				dom.appendChild(document.createTextNode(parts[i]));
+			}
+			return dom;
+		} else {
+			return document.createTextNode(part);
+		}
 	} else if (part.type === "org.xowl.platform.kernel.jobs.Job") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
@@ -461,10 +461,10 @@ function waitAndGo(target) {
 /**
  * Wait for a job to complete
  *
- * @param jobId    The identifier of the job to wait for
+ * @param jobId	The identifier of the job to wait for
  * @param jobName  The name of the job
  * @param callback The callback when the job has been completed
- *                 The callback is expected to have 1 parameter for the job object
+ *				 The callback is expected to have 1 parameter for the job object
  */
 function waitForJob(jobId, jobName, callback) {
 	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: [
@@ -518,10 +518,10 @@ var MIME_TYPES = [
  * The defaults known URI mappings
  */
 var DEFAULT_URI_MAPPINGS = [
-    ["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
-    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
-    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
-    ["owl", "http://www.w3.org/2002/07/owl#"]];
+	["rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"],
+	["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+	["xsd", "http://www.w3.org/2001/XMLSchema#"],
+	["owl", "http://www.w3.org/2002/07/owl#"]];
 
 /*
  * Gets the short URI (prefix:suffix) for the specified full URI
@@ -551,22 +551,22 @@ function rdfToDom(value) {
 		dom.href = "/web/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.value);
 		dom.classList.add("rdfIRI");
 		return dom;
-    } else if (value.type === "bnode") {
+	} else if (value.type === "bnode") {
 		var dom = document.createElement("span");
 		dom.appendChild(document.createTextNode('_:' + value.value));
 		dom.classList.add("rdfBlank");
 		return dom;
-    } else if (value.type === "blank") {
+	} else if (value.type === "blank") {
 		var dom = document.createElement("span");
 		dom.appendChild(document.createTextNode('_:' + value.id));
 		dom.classList.add("rdfBlank");
 		return dom;
-    } else if (value.type === "variable") {
+	} else if (value.type === "variable") {
 		var dom = document.createElement("span");
 		dom.appendChild(document.createTextNode('?' + value.value));
 		dom.classList.add("rdfVariable");
 		return dom;
-    } else if (value.hasOwnProperty("lexical")) {
+	} else if (value.hasOwnProperty("lexical")) {
 		var span1 = document.createElement("span");
 		span1.appendChild(document.createTextNode('"' + value.lexical + '"'));
 		var dom = document.createElement("span");
@@ -588,7 +588,7 @@ function rdfToDom(value) {
 			dom.appendChild(span2);
 		}
 		return dom;
-    } else {
+	} else {
 		var span1 = document.createElement("span");
 		span1.appendChild(document.createTextNode('"' + value.value + '"'));
 		var dom = document.createElement("span");
@@ -610,7 +610,7 @@ function rdfToDom(value) {
 			dom.appendChild(span2);
 		}
 		return dom;
-    }
+	}
 }
 
 

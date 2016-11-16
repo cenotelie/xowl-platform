@@ -32,7 +32,7 @@ import org.xowl.platform.kernel.platform.PlatformJobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 
 /**
@@ -76,13 +76,13 @@ public class Activator implements BundleActivator {
         serviceJobExecutor = new XOWLJobExecutor();
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
-        bundleContext.registerService(MetricProvider.class, serviceJobExecutor, null);
+        bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
         bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
 
         // register the event service
         eventService = new XOWLEventService();
         bundleContext.registerService(EventService.class, eventService, null);
-        bundleContext.registerService(MetricProvider.class, eventService, null);
+        bundleContext.registerService(MeasurableService.class, eventService, null);
 
         // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();

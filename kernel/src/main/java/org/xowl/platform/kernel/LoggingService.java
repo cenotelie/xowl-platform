@@ -17,23 +17,34 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.logging.Logger;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 
 /**
  * Represents the logging service for the platform
  *
  * @author Laurent Wouters
  */
-public interface LoggingService extends Service, HttpAPIService, MetricProvider, Logger {
+public interface LoggingService extends Service, HttpAPIService, MeasurableService, Logger {
     /**
      * The metric for the number of errors
      */
-    Metric METRIC_ERRORS_COUNT = new MetricBase(LoggingService.class.getCanonicalName() + ".ErrorsCount", "Logging Service - Errors count");
+    Metric METRIC_ERRORS_COUNT = new MetricBase(LoggingService.class.getCanonicalName() + ".ErrorsCount",
+            "Logging Service - Errors count",
+            "errors",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the total number of messages
      */
-    Metric METRIC_TOTAL_MESSAGES = new MetricBase(LoggingService.class.getCanonicalName() + ".TotalMessages", "Logging Service - Total messages");
+    Metric METRIC_TOTAL_MESSAGES = new MetricBase(LoggingService.class.getCanonicalName() + ".TotalMessages",
+            "Logging Service - Total messages",
+            "messages",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 }

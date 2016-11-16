@@ -23,12 +23,14 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricProvider;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 
 import java.net.HttpURLConnection;
@@ -75,16 +77,16 @@ public class XOWLStatisticsService implements StatisticsService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
-            return onMessageGetStatList();
-        return onMessageGetStatValues(ids);
+            return onMessageGetMetricList();
+        return onMessageGetMetricValues(ids);
     }
 
     /**
-     * Responds to a request for the list of available statistics
+     * Responds to a request for the list of available metrics
      *
-     * @return The statistics
+     * @return The metrics
      */
-    private HttpResponse onMessageGetStatList() {
+    private HttpResponse onMessageGetMetricList() {
         // get all the metrics
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -99,12 +101,12 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     /**
-     * Responds to a request for the values of statistics
+     * Responds to a request for the values of metrics
      *
-     * @param ids The requested statistics
-     * @return The statistics' values
+     * @param ids The requested metrics
+     * @return The metrics' values
      */
-    private HttpResponse onMessageGetStatValues(String[] ids) {
+    private HttpResponse onMessageGetMetricValues(String[] ids) {
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -113,15 +115,14 @@ public class XOWLStatisticsService implements StatisticsService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("{");
+        StringBuilder builder = new StringBuilder("{\"timestamp\": \"");
+        builder.append(TextUtils.escapeStringJSON(Long.toString(System.nanoTime())));
+        builder.append("\"");
         for (int i = 0; i != ids.length; i++) {
-            Serializable value = update(ids[i]);
+            Serializable value = pollMetric(ids[i]);
             if (value == null)
                 continue;
-            if (!first)
-                builder.append(", ");
-            first = false;
+            builder.append(", ");
             builder.append("\"");
             builder.append(TextUtils.escapeStringJSON(ids[i]));
             builder.append("\": ");
@@ -134,16 +135,16 @@ public class XOWLStatisticsService implements StatisticsService {
     @Override
     public Collection<Metric> getMetrics() {
         Collection<Metric> result = new ArrayList<>();
-        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
+        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
             result.addAll(provider.getMetrics());
         }
         return result;
     }
 
     @Override
-    public Serializable update(Metric metric) {
-        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
-            Serializable result = provider.update(metric);
+    public MetricSnapshot pollMetric(Metric metric) {
+        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+            MetricSnapshot result = provider.pollMetric(metric);
             if (result != null)
                 return result;
         }
@@ -151,11 +152,11 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     @Override
-    public Serializable update(String metricId) {
-        for (MetricProvider provider : ServiceUtils.getServices(MetricProvider.class)) {
+    public MetricSnapshot pollMetric(String metricId) {
+        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
                 if (metric.getIdentifier().equals(metricId))
-                    return provider.update(metric);
+                    return provider.pollMetric(metric);
             }
         }
         return null;

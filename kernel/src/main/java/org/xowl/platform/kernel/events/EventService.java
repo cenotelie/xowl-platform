@@ -17,26 +17,37 @@
 
 package org.xowl.platform.kernel.events;
 
+import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 
 /**
  * Represents a service on the platform for managing events
  *
  * @author Laurent Wouters
  */
-public interface EventService extends Service, MetricProvider {
+public interface EventService extends Service, MeasurableService {
     /**
      * The metric for the total number of processed events
      */
-    Metric METRIC_TOTAL_PROCESSED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".TotalProcessedEvents", "Event Service - Total processed events");
+    Metric METRIC_TOTAL_PROCESSED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".TotalProcessedEvents",
+            "Event Service - Total processed events",
+            "events",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the number of queued events
      */
-    Metric METRIC_QUEUED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".QueuedEvents", "Event Service - Queued events");
+    Metric METRIC_QUEUED_EVENTS = new MetricBase(EventService.class.getCanonicalName() + ".QueuedEvents",
+            "Event Service - Queued events",
+            "events",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
      * When an event happened

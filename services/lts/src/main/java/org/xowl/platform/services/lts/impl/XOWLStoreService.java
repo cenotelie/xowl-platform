@@ -36,6 +36,7 @@ import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -79,11 +80,21 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * The total artifacts count metric
      */
-    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount", "Storage Service - Total artifacts count");
+    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount",
+            "Storage Service - Total artifacts count",
+            "artifacts",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The total artifacts count metric
      */
-    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount", "Storage Service - Live artifacts count");
+    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount",
+            "Storage Service - Live artifacts count",
+            "artifacts",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
 
     /**
@@ -326,7 +337,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_LIVE_ARTIFACTS_COUNT) {
             final int count = storeLive.getArtifactsCount();
             return new Serializable() {

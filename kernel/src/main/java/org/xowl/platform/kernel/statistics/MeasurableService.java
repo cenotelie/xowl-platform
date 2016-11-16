@@ -17,13 +17,13 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Identifiable;
+import org.xowl.infra.utils.metrics.MetricProvider;
+import org.xowl.platform.kernel.Service;
 
 /**
- * Represents a metric for statistics on the platform
+ * Represents a service that can be measured by metrics
  *
  * @author Laurent Wouters
  */
-public interface Metric extends Identifiable, Serializable {
+public interface MeasurableService extends Service, MetricProvider {
 }

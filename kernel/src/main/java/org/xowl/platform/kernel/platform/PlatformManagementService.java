@@ -18,11 +18,12 @@
 package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 
 import java.util.Collection;
 
@@ -31,7 +32,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface PlatformManagementService extends Service, HttpAPIService, MetricProvider {
+public interface PlatformManagementService extends Service, HttpAPIService, MeasurableService {
     /**
      * Exit code when the platform is shutting down as requested
      */
@@ -44,19 +45,39 @@ public interface PlatformManagementService extends Service, HttpAPIService, Metr
     /**
      * The metric for the used memory
      */
-    Metric METRIC_USED_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".UsedMemory", "Platform Management Service - Used Memory");
+    Metric METRIC_USED_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".UsedMemory",
+            "Platform Management Service - Used Memory",
+            "bytes",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the free memory
      */
-    Metric METRIC_FREE_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".FreeMemory", "Platform Management Service - Free Memory");
+    Metric METRIC_FREE_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".FreeMemory",
+            "Platform Management Service - Free Memory",
+            "bytes",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the total reserved memory
      */
-    Metric METRIC_TOTAL_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".TotalMemory", "Platform Management Service - Total Memory");
+    Metric METRIC_TOTAL_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".TotalMemory",
+            "Platform Management Service - Total Memory",
+            "bytes",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the max memory that can be reserved
      */
-    Metric METRIC_MAX_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".MaxMemory", "Platform Management Service - Max Memory");
+    Metric METRIC_MAX_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".MaxMemory",
+            "Platform Management Service - Max Memory",
+            "bytes",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
      * Gets the details of the OSGi implementation the platform is running on

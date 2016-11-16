@@ -491,7 +491,7 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public Serializable pollMetric(Metric metric) {
         if (metric != METRIC_INCONSISTENCY_COUNT)
             return null;
         final int count = getInconsistenciesCount();

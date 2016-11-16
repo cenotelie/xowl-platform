@@ -20,8 +20,10 @@ package org.xowl.platform.kernel.impl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -31,8 +33,6 @@ import org.xowl.platform.kernel.platform.OSGiImplementation;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
 import java.net.HttpURLConnection;
 import java.util.*;
@@ -97,15 +97,15 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_USED_MEMORY)
-            return new MetricValueScalar<>(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+            return new MetricSnapshotLong(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
         if (metric == METRIC_FREE_MEMORY)
-            return new MetricValueScalar<>(Runtime.getRuntime().freeMemory());
+            return new MetricSnapshotLong(Runtime.getRuntime().freeMemory());
         if (metric == METRIC_TOTAL_MEMORY)
-            return new MetricValueScalar<>(Runtime.getRuntime().totalMemory());
+            return new MetricSnapshotLong(Runtime.getRuntime().totalMemory());
         if (metric == METRIC_MAX_MEMORY)
-            return new MetricValueScalar<>(Runtime.getRuntime().maxMemory());
+            return new MetricSnapshotLong(Runtime.getRuntime().maxMemory());
         return null;
     }
 

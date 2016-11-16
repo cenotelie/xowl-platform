@@ -26,6 +26,9 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.ConsoleLogger;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.FileLogger;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -33,8 +36,6 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -171,11 +172,11 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_TOTAL_MESSAGES)
-            return new MetricValueScalar<>(totalMessages.get());
+            return new MetricSnapshotInt(totalMessages.get());
         if (metric == METRIC_ERRORS_COUNT)
-            return new MetricValueScalar<>(errorsCount.get());
+            return new MetricSnapshotInt(errorsCount.get());
         return null;
     }
 

@@ -18,10 +18,11 @@
 package org.xowl.platform.kernel.jobs;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 
 import java.util.List;
 
@@ -30,19 +31,34 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface JobExecutionService extends Service, MetricProvider {
+public interface JobExecutionService extends Service, MeasurableService {
     /**
      * The metric for the total number of processed jobs
      */
-    Metric METRIC_TOTAL_PROCESSED_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".TotalProcessedJobs", "Job Execution Service - Total processed jobs");
+    Metric METRIC_TOTAL_PROCESSED_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".TotalProcessedJobs",
+            "Job Execution Service - Total processed jobs",
+            "jobs",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the number of scheduled jobs
      */
-    Metric METRIC_SCHEDULED_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".ScheduledJobs", "Job Execution Service - Scheduled jobs");
+    Metric METRIC_SCHEDULED_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".ScheduledJobs",
+            "Job Execution Service - Scheduled jobs",
+            "jobs",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
     /**
      * The metric for the number of executing jobs
      */
-    Metric METRIC_EXECUTING_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".ExecutingJobs", "Job Execution Service - Executing jobs");
+    Metric METRIC_EXECUTING_JOBS = new MetricBase(JobExecutionService.class.getCanonicalName() + ".ExecutingJobs",
+            "Job Execution Service - Executing jobs",
+            "jobs",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
      * Schedules a job for execution

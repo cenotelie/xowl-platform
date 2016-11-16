@@ -17,7 +17,8 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.HttpAPIService;
 import org.xowl.platform.kernel.Service;
 
@@ -42,13 +43,13 @@ public interface StatisticsService extends Service, HttpAPIService {
      * @param metric The requested metric
      * @return The last value (or null if the metric is not provided)
      */
-    Serializable update(Metric metric);
+    MetricSnapshot pollMetric(Metric metric);
 
     /**
      * Gets the last value for the specified metric
      *
-     * @param metric The identifier of the requested metric
+     * @param metric The requested metric
      * @return The last value (or null if the metric is not provided)
      */
-    Serializable update(String metric);
+    MetricSnapshot pollMetric(String metric);
 }

@@ -24,14 +24,21 @@ import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.SHA1;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.*;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotInt;
+import org.xowl.infra.utils.metrics.MetricSnapshotLong;
+import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
@@ -39,8 +46,6 @@ import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -307,13 +312,13 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_TOTAL_PROCESSED_JOBS)
-            return new MetricValueScalar<>(executorPool.getCompletedTaskCount());
+            return new MetricSnapshotLong(executorPool.getCompletedTaskCount());
         if (metric == METRIC_SCHEDULED_JOBS)
-            return new MetricValueScalar<>(executorPool.getQueue().size());
+            return new MetricSnapshotInt(executorPool.getQueue().size());
         if (metric == METRIC_EXECUTING_JOBS)
-            return new MetricValueScalar<>(executorPool.getActiveCount());
+            return new MetricSnapshotInt(executorPool.getActiveCount());
         return null;
     }
 

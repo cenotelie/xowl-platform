@@ -17,9 +17,11 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.events.Event;
@@ -27,8 +29,6 @@ import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricValueScalar;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -114,11 +114,11 @@ public class XOWLEventService implements EventService {
     }
 
     @Override
-    public Serializable update(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_TOTAL_PROCESSED_EVENTS)
-            return new MetricValueScalar<>(totalProcessed);
+            return new MetricSnapshotInt(totalProcessed);
         if (metric == METRIC_QUEUED_EVENTS)
-            return new MetricValueScalar<>(queue.size());
+            return new MetricSnapshotInt(queue.size());
         return null;
     }
 

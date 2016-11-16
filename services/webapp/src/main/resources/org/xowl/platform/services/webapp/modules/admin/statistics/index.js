@@ -9,7 +9,7 @@ function init() {
 			{name: "Platform Statistics"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getStatisticsList(function (status, ct, content) {
+		xowl.getAllMetrics(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				renderMetrics(content);
 			}

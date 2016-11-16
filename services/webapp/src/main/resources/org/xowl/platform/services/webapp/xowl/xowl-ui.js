@@ -343,7 +343,7 @@ function renderMessage(message) {
 	result.classList.add("header-message-content");
 	if (message instanceof String || typeof message === 'string') {
 		result.appendChild(renderMessagePart(message));
-	} else if (message.type === "org.xowl.platform.kernel.RichString") {
+	} else if (message.type === "org.xowl.infra.utils.RichString") {
 		for (var i = 0; i != message.parts.length; i++) {
 			result.appendChild(renderMessagePart(message.parts[i]));
 		}
@@ -467,7 +467,7 @@ function waitAndGo(target) {
  *				 The callback is expected to have 1 parameter for the job object
  */
 function waitForJob(jobId, jobName, callback) {
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: [
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: [
 			"Job ",
 			{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName},
 			" is running ..."]}))
@@ -483,7 +483,7 @@ function waitForJob(jobId, jobName, callback) {
 					window.setTimeout(trackOnce, 2000);
 				}
 			} else {
-				onOperationEnded(status, content, { type: "org.xowl.platform.kernel.RichString", parts: [
+				onOperationEnded(status, content, { type: "org.xowl.infra.utils.RichString", parts: [
 					"Failed to retrieve data for job ",
 					{type: "org.xowl.platform.kernel.jobs.Job", identifier: jobId, name: jobName}]});
 			}

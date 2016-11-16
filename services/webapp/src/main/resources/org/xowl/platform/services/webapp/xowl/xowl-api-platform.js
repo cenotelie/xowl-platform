@@ -435,7 +435,7 @@ XOWL.prototype.cancelJob = function (callback, jobId) {
 // Admin Module - Statistics Service
 ////
 
-XOWL.prototype.getStatisticsList = function (callback) {
+XOWL.prototype.getAllMetrics = function (callback) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
@@ -445,14 +445,24 @@ XOWL.prototype.getStatisticsList = function (callback) {
 	}, "services/admin/statistics", null);
 }
 
-XOWL.prototype.getStatisticsValues = function (callback) {
+XOWL.prototype.getMetric = function (callback, metricId) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/statistics", null);
+	}, "services/admin/statistics", {id: metricId});
+}
+
+XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
+	this.doHttpGet(function (code, type, content) {
+		if (code === 200) {
+			callback(code, "application/json", JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/admin/statistics", {poll: metricId});
 }
 
 

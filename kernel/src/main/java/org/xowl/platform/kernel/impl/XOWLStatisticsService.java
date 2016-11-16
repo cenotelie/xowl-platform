@@ -20,7 +20,6 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.metrics.Metric;
@@ -75,10 +74,13 @@ public class XOWLStatisticsService implements StatisticsService {
 
     @Override
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+        String[] polls = parameters.get("poll");
+        if (polls != null && polls.length > 0)
+            onMessageGetMetricValues(polls);
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
             return onMessageGetMetricList();
-        return onMessageGetMetricValues(ids);
+        return onMessageGetMetric(ids[0]);
     }
 
     /**
@@ -101,6 +103,22 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     /**
+     * Responds to a request for the definition of a metric
+     *
+     * @param identifier The identifier of the requested metric
+     * @return The metrics
+     */
+    private HttpResponse onMessageGetMetric(String identifier) {
+        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+            for (Metric metric : provider.getMetrics()) {
+                if (metric.getIdentifier().equals(identifier))
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, metric.serializedJSON());
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
      * Responds to a request for the values of metrics
      *
      * @param ids The requested metrics
@@ -115,20 +133,29 @@ public class XOWLStatisticsService implements StatisticsService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        StringBuilder builder = new StringBuilder("{\"timestamp\": \"");
-        builder.append(TextUtils.escapeStringJSON(Long.toString(System.nanoTime())));
-        builder.append("\"");
-        for (int i = 0; i != ids.length; i++) {
-            Serializable value = pollMetric(ids[i]);
-            if (value == null)
-                continue;
-            builder.append(", ");
-            builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(ids[i]));
-            builder.append("\": ");
-            builder.append(value.serializedJSON());
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+            for (Metric metric : provider.getMetrics()) {
+                for (int i = 0; i != ids.length; i++) {
+                    if (metric.getIdentifier().equals(ids[i])) {
+                        Serializable value = provider.pollMetric(metric);
+                        if (value == null)
+                            continue;
+                        if (!first)
+                            builder.append(", ");
+                        first = false;
+                        builder.append("{\"metric\": ");
+                        builder.append(metric.serializedJSON());
+                        builder.append(", \"value\": ");
+                        builder.append(value.serializedJSON());
+                        builder.append("}");
+                        break;
+                    }
+                }
+            }
         }
-        builder.append("}");
+        builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 

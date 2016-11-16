@@ -19,6 +19,10 @@ package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.statistics.Metric;
+import org.xowl.platform.kernel.statistics.MetricBase;
+import org.xowl.platform.kernel.statistics.MetricProvider;
 
 import java.util.Collection;
 
@@ -27,7 +31,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface PlatformManagementService extends HttpAPIService {
+public interface PlatformManagementService extends Service, HttpAPIService, MetricProvider {
     /**
      * Exit code when the platform is shutting down as requested
      */
@@ -36,6 +40,23 @@ public interface PlatformManagementService extends HttpAPIService {
      * Exit code when the platform is shutting down to be restarted
      */
     int PLATFORM_EXIT_RESTART = 5;
+
+    /**
+     * The metric for the used memory
+     */
+    Metric METRIC_USED_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".UsedMemory", "Platform Management Service - Used Memory");
+    /**
+     * The metric for the free memory
+     */
+    Metric METRIC_FREE_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".FreeMemory", "Platform Management Service - Free Memory");
+    /**
+     * The metric for the total reserved memory
+     */
+    Metric METRIC_TOTAL_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".TotalMemory", "Platform Management Service - Total Memory");
+    /**
+     * The metric for the max memory that can be reserved
+     */
+    Metric METRIC_MAX_MEMORY = new MetricBase(PlatformManagementService.class.getCanonicalName() + ".MaxMemory", "Platform Management Service - Max Memory");
 
     /**
      * Gets the details of the OSGi implementation the platform is running on

@@ -7,4 +7,4 @@ VOLUME ["/config"]
 COPY felix felix
 COPY config /config
 COPY do-run.sh do-run.sh
-COPY xowl-platform.version xowl-platform.version
+COPY xowl-platform.manifest xowl-platform.manifest

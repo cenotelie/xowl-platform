@@ -314,11 +314,11 @@ public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Clo
     @Override
     public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_TOTAL_PROCESSED_JOBS)
-            return new MetricSnapshotLong(executorPool.getCompletedTaskCount());
+            return new MetricSnapshotLong(getExecutorPool().getCompletedTaskCount());
         if (metric == METRIC_SCHEDULED_JOBS)
-            return new MetricSnapshotInt(executorPool.getQueue().size());
+            return new MetricSnapshotInt(getExecutorPool().getQueue().size());
         if (metric == METRIC_EXECUTING_JOBS)
-            return new MetricSnapshotInt(executorPool.getActiveCount());
+            return new MetricSnapshotInt(getExecutorPool().getActiveCount());
         return null;
     }
 

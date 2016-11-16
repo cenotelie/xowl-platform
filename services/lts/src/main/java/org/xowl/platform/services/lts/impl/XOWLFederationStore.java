@@ -49,7 +49,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     /**
      * The metric for the statistics of this database
      */
-    protected final Metric metricStatistics;
+    protected Metric metricStatistics;
     /**
      * The remote backend
      */
@@ -62,9 +62,6 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
      */
     public XOWLFederationStore(String name) {
         super(name);
-        this.metricStatistics = new MetricComposite(METRIC_DB_STATS + "." + name,
-                "Storage Service - Database statistics for " + name,
-                1000000000);
     }
 
     /**
@@ -191,6 +188,14 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getMetric() {
+        if (metricStatistics != null)
+            return new XSPReplyResult<>(metricStatistics);
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        metricStatistics = new MetricComposite(
+                ((XSPReplyResult<MetricComposite>) connection.getMetric()).getData(),
+                "Storage Service - Database statistics for " + name);
         return new XSPReplyResult<>(metricStatistics);
     }
 

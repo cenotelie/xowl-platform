@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.metrics.Metric;
@@ -76,7 +75,7 @@ public class XOWLStatisticsService implements StatisticsService {
     public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
         String[] polls = parameters.get("poll");
         if (polls != null && polls.length > 0)
-            onMessageGetMetricValues(polls);
+            return onMessageGetMetricValues(polls);
         String[] ids = parameters.get("id");
         if (ids == null || ids.length == 0)
             return onMessageGetMetricList();
@@ -139,7 +138,7 @@ public class XOWLStatisticsService implements StatisticsService {
             for (Metric metric : provider.getMetrics()) {
                 for (int i = 0; i != ids.length; i++) {
                     if (metric.getIdentifier().equals(ids[i])) {
-                        Serializable value = provider.pollMetric(metric);
+                        MetricSnapshot value = provider.pollMetric(metric);
                         if (value == null)
                             continue;
                         if (!first)

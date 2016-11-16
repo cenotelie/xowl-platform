@@ -57,6 +57,7 @@ public class Activator implements BundleActivator {
         Logging.setDefault(loggingService);
         bundleContext.registerService(LoggingService.class, loggingService, null);
         bundleContext.registerService(HttpAPIService.class, loggingService, null);
+        bundleContext.registerService(MeasurableService.class, loggingService, null);
 
         // register the configuration service
         ConfigurationService configurationService = new FSConfigurationService();
@@ -97,6 +98,7 @@ public class Activator implements BundleActivator {
         XOWLPlatformManagementService managementService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
         bundleContext.registerService(PlatformManagementService.class, managementService, null);
         bundleContext.registerService(HttpAPIService.class, managementService, null);
+        bundleContext.registerService(MeasurableService.class, managementService, null);
 
         eventService.onEvent(new PlatformStartupEvent(managementService));
     }

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.connection.events;
 
-import org.xowl.platform.kernel.RichString;
+import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;
 import org.xowl.platform.services.connection.ConnectorService;

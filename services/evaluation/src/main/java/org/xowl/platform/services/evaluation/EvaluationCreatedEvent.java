@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.evaluation;
 
+import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.RichString;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**

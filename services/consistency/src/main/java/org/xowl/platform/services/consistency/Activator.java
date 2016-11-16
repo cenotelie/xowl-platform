@@ -20,7 +20,7 @@ package org.xowl.platform.services.consistency;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.HttpAPIService;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
 
 /**
@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
         XOWLConsistencyService service = new XOWLConsistencyService();
         bundleContext.registerService(ConsistencyService.class, service, null);
         bundleContext.registerService(HttpAPIService.class, service, null);
-        bundleContext.registerService(MetricProvider.class, service, null);
+        bundleContext.registerService(MeasurableService.class, service, null);
     }
 
     @Override

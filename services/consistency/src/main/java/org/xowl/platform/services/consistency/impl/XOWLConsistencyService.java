@@ -30,18 +30,20 @@ import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.SHA1;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
+import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.consistency.*;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
@@ -55,7 +57,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConsistencyService implements ConsistencyService, MetricProvider {
+public class XOWLConsistencyService implements ConsistencyService, MeasurableService {
     /**
      * The URIs for this service
      */
@@ -66,7 +68,12 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
     /**
      * The inconsistency count metric
      */
-    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount", "Consistency Service - Inconsistency count");
+    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount",
+            "Consistency Service - Inconsistency count",
+            "inconsistencies",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
      * The URI of the graph for metadata on the consistency rules
@@ -491,20 +498,10 @@ public class XOWLConsistencyService implements ConsistencyService, MetricProvide
     }
 
     @Override
-    public Serializable pollMetric(Metric metric) {
+    public MetricSnapshot pollMetric(Metric metric) {
         if (metric != METRIC_INCONSISTENCY_COUNT)
             return null;
-        final int count = getInconsistenciesCount();
-        return new Serializable() {
-            @Override
-            public String serializedString() {
-                return Integer.toString(count);
-            }
-
-            @Override
-            public String serializedJSON() {
-                return "{\"count\": " + Integer.toString(count) + "}";
-            }
-        };
+        int count = getInconsistenciesCount();
+        return new MetricSnapshotInt(count);
     }
 }

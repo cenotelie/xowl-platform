@@ -25,11 +25,11 @@ import org.xowl.infra.store.EntailmentRegime;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.*;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricComposite;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
 import org.xowl.platform.services.lts.TripleStore;
 
 import java.io.StringWriter;
@@ -49,7 +49,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     /**
      * The metric for the statistics of this database
      */
-    private final Metric metricStatistics;
+    protected final Metric metricStatistics;
     /**
      * The remote backend
      */
@@ -62,8 +62,9 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
      */
     public XOWLFederationStore(String name) {
         super(name);
-        this.metricStatistics = new MetricBase(METRIC_DB_STATS + "." + name,
-                "Storage Service - Database statistics for store" + name);
+        this.metricStatistics = new MetricComposite(METRIC_DB_STATS + "." + name,
+                "Storage Service - Database statistics for " + name,
+                1000000000);
     }
 
     /**
@@ -75,15 +76,6 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         if (backend == null)
             backend = resolveBackend();
         return backend;
-    }
-
-    /**
-     * Gets the metric for the statistics of this database
-     *
-     * @return The metric for the statistics of this database
-     */
-    public Metric getMetricStatistics() {
-        return metricStatistics;
     }
 
     /**
@@ -198,11 +190,16 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
-    public XSPReply getStatistics() {
+    public XSPReply getMetric() {
+        return new XSPReplyResult<>(metricStatistics);
+    }
+
+    @Override
+    public XSPReply getMetricSnapshot() {
         XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
-        return connection.getStatistics();
+        return connection.getMetricSnapshot();
     }
 
     @Override

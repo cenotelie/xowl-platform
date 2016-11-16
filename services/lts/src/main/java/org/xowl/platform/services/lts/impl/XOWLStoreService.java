@@ -34,7 +34,6 @@ import org.xowl.infra.store.sparql.ResultUtils;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.config.Configuration;
@@ -42,15 +41,16 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.statistics.Metric;
-import org.xowl.platform.kernel.statistics.MetricBase;
-import org.xowl.platform.kernel.statistics.MetricProvider;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
@@ -69,7 +69,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, MetricProvider, Closeable {
+public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, MeasurableService, Closeable {
     /**
      * The URIs for this service
      */
@@ -330,52 +330,30 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         List<Metric> metrics = new ArrayList<>();
         metrics.add(METRIC_TOTAL_ARTIFACTS_COUNT);
         metrics.add(METRIC_LIVE_ARTIFACTS_COUNT);
-        metrics.add(storeService.getMetricStatistics());
-        metrics.add(storeLongTerm.getMetricStatistics());
-        metrics.add(storeLive.getMetricStatistics());
+        metrics.add(((XSPReplyResult<Metric>) storeService.getMetric()).getData());
+        metrics.add(((XSPReplyResult<Metric>) storeLongTerm.getMetric()).getData());
+        metrics.add(((XSPReplyResult<Metric>) storeLive.getMetric()).getData());
         return metrics;
     }
 
     @Override
     public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_LIVE_ARTIFACTS_COUNT) {
-            final int count = storeLive.getArtifactsCount();
-            return new Serializable() {
-                @Override
-                public String serializedString() {
-                    return Integer.toString(count);
-                }
-
-                @Override
-                public String serializedJSON() {
-                    return "{\"count\": " + Integer.toString(count) + "}";
-                }
-            };
+            return new MetricSnapshotInt(storeLive.getArtifactsCount());
         } else if (metric == METRIC_TOTAL_ARTIFACTS_COUNT) {
-            final int count = storeLongTerm.getArtifactsCount();
-            return new Serializable() {
-                @Override
-                public String serializedString() {
-                    return Integer.toString(count);
-                }
-
-                @Override
-                public String serializedJSON() {
-                    return "{\"count\": " + Integer.toString(count) + "}";
-                }
-            };
-        } else if (metric == storeService.getMetricStatistics()) {
-            XSPReply reply = storeService.getStatistics();
+            return new MetricSnapshotInt(storeLongTerm.getArtifactsCount());
+        } else if (metric == storeService.metricStatistics) {
+            XSPReply reply = storeService.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
             return ((XSPReplyResult<MetricSnapshot>) reply).getData();
-        } else if (metric == storeLongTerm.getMetricStatistics()) {
-            XSPReply reply = storeLongTerm.getStatistics();
+        } else if (metric == storeLongTerm.metricStatistics) {
+            XSPReply reply = storeLongTerm.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
             return ((XSPReplyResult<MetricSnapshot>) reply).getData();
-        } else if (metric == storeLive.getMetricStatistics()) {
-            XSPReply reply = storeLive.getStatistics();
+        } else if (metric == storeLive.metricStatistics) {
+            XSPReply reply = storeLive.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
             return ((XSPReplyResult<MetricSnapshot>) reply).getData();

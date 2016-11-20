@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# This is the script used to start and stop a xOWL Federation Platform.
+# This script is supported by the do-run.sh script that is used to launch the server and monitor its execution.
+# In turn, the do-run.sh script launches the Java process for the application.
+# It also keeps running to monitor the exit code of the Java process.
+# In the case of a user-requested application restart, the do-run.sh script simply launches another Java process.
+
 # number of seconds to wait after launching the daemon before checking it has started correctly
 WAIT=4
 
@@ -68,13 +74,15 @@ stop () {
 
 doStop () {
   echo "xOWL Platform stopping ..."
-  GROUP_ID=`ps -o pgid= -p "$PROCESS_ID" | tr -d ' '`
-  CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
-  kill -TERM "-$GROUP_ID"
-  while [ -n "$CHILDREN" ]; do
+  # get the PID of the child Java process and kill it
+  CHILD=`ps -o pid= --ppid "$PROCESS_ID" | tr -d ' '`
+  kill -TERM "$CHILD"
+  while [ -n "$CHILD" ]; do
+    # wait a bit and check whether the child Java process is still there
     sleep "$WAIT"
-    CHILDREN=`ps -o pid= "-$GROUP_ID" | tr -d ' '`
+    CHILD=`ps -o pid= --ppid "$PROCESS_ID" | tr -d ' '`
   done
+  # the child Java process is dead, the original shell process running do-run.sh ought to be dead to
   rm "$DISTRIBUTION/xowl-platform.pid"
   echo "xOWL Platform stopped."
 }

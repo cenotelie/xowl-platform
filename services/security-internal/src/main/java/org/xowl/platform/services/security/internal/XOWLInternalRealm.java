@@ -297,11 +297,11 @@ class XOWLInternalRealm implements Realm {
     }
 
     @Override
-    public PlatformUser authenticate(String userId, char[] key) {
-        XSPReply reply = server.login(userId, new String(key));
+    public PlatformUser authenticate(String login, String password) {
+        XSPReply reply = server.login(login, password);
         if (!reply.isSuccess())
             return null;
-        return getUser(userId);
+        return getUser(login);
     }
 
     @Override
@@ -877,7 +877,7 @@ class XOWLInternalRealm implements Realm {
      * When the platform is stopping
      */
     public void onStop() {
-        server.onShutdown();
+        server.serverShutdown();
     }
 
 

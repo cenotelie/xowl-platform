@@ -70,8 +70,8 @@ public class XOWLSecurityNosecRealm implements Realm {
     }
 
     @Override
-    public PlatformUser authenticate(String userId, char[] key) {
-        return new User(userId);
+    public PlatformUser authenticate(String login, String password) {
+        return new User(login);
     }
 
     @Override

@@ -35,14 +35,32 @@ public interface SecurityService extends Service {
     Realm getRealm();
 
     /**
-     * On a new request, performs the authentication of a user
+     * Performs the initial authentication of a client
+     *
+     * @param client   The requesting client
+     * @param userId   The identifier of a user
+     * @param password The key used to identified the user (e.g. a password)
+     * @return If the operation succeed, the authentication token
+     */
+    XSPReply login(String client, String userId, String password);
+
+    /**
+     * Performs the logout of a client
      *
      * @param client The requesting client
-     * @param userId The identifier of a user
-     * @param key    The key used to identified the user (e.g. a password)
+     * @param token  The authentication token
      * @return Whether the operation succeed
      */
-    XSPReply authenticate(String client, String userId, char[] key);
+    XSPReply logout(String client, String token);
+
+    /**
+     * Performs the authentication of a user on the current thread
+     *
+     * @param client The requesting client
+     * @param token  The authentication token
+     * @return Whether the operation succeed
+     */
+    XSPReply authenticate(String client, String token);
 
     /**
      * Forces the authentication of the specified user on the current thread

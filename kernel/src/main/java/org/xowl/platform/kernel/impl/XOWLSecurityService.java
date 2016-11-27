@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -31,8 +32,13 @@ import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -82,6 +88,18 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
      */
     private final String realmId;
     /**
+     * The Message Authentication Code algorithm to use for securing user tokens
+     */
+    private final Mac securityMAC;
+    /**
+     * The private security key for the Message Authentication Code
+     */
+    private final Key securityKey;
+    /**
+     * The time to live in seconds of an authentication token
+     */
+    private final long securityTokenTTL;
+    /**
      * The map of clients with failed login attempts
      */
     private final Map<String, ClientLogin> clients;
@@ -100,6 +118,19 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
         this.realmId = configuration.get("realm");
+        Mac mac = null;
+        KeyGenerator keyGenerator = null;
+        try {
+            mac = Mac.getInstance("HmacSHA256");
+            keyGenerator = KeyGenerator.getInstance("HmacSHA256");
+            keyGenerator.init(256);
+        } catch (NoSuchAlgorithmException exception) {
+            // should not happen
+            Logging.getDefault().error(exception);
+        }
+        this.securityMAC = mac;
+        this.securityKey = keyGenerator.generateKey();
+        this.securityTokenTTL = Integer.parseInt(configuration.get("tokenTTL"));
         this.clients = new HashMap<>();
     }
 
@@ -144,22 +175,47 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
     }
 
     @Override
-    public XSPReply authenticate(String client, String userId, char[] key) {
+    public XSPReply login(String client, String login, String password) {
         if (isBanned(client))
-            return null;
-        if (userId == null || userId.isEmpty() || key == null || key.length == 0) {
-            boolean banned = onLoginFailure(client);
-            Logging.getDefault().info("Login failure for " + userId + " from " + client);
-            return banned ? null : XSPReplyFailure.instance();
+            return XSPReplyUnauthenticated.instance();
+        if (login == null || login.isEmpty() || password == null || password.length() == 0) {
+            onLoginFailure(client);
+            Logging.getDefault().info("Authentication failure from " + client + " on initial login with " + login);
+            return XSPReplyUnauthenticated.instance();
         }
-        PlatformUser user = getRealm().authenticate(userId, key);
+        PlatformUser user = getRealm().authenticate(login, password);
         if (user != null) {
             CONTEXT.set(user);
-            return new XSPReplyResult<>(user);
+            return new XSPReplyResult<>(buildTokenFor(login));
         }
-        boolean banned = onLoginFailure(client);
-        Logging.getDefault().info("Login failure for " + userId + " from " + client);
-        return banned ? null : XSPReplyFailure.instance();
+        onLoginFailure(client);
+        Logging.getDefault().info("Authentication failure from " + client + " on initial login with " + login);
+        return XSPReplyUnauthenticated.instance();
+    }
+
+    @Override
+    public XSPReply logout(String client, String token) {
+        return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public XSPReply authenticate(String client, String token) {
+        if (isBanned(client))
+            return XSPReplyUnauthenticated.instance();
+        XSPReply reply = checkToken(token);
+        if (reply == XSPReplyUnauthenticated.instance()) {
+            // the token is invalid
+            onLoginFailure(client);
+            Logging.getDefault().info("Authentication failure from " + client + " with invalid token");
+            return reply;
+        }
+        if (!reply.isSuccess()) {
+            Logging.getDefault().info("Authentication failure from " + client + " with invalid token");
+            return reply;
+        }
+        PlatformUser user = realm.getUser(((XSPReplyResult<String>) reply).getData());
+        CONTEXT.set(user);
+        return new XSPReplyResult<>(user);
     }
 
     @Override
@@ -474,5 +530,90 @@ public class XOWLSecurityService implements SecurityService, HttpAPIService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+    }
+
+
+    /**
+     * Builds an authentication token for the specified login
+     *
+     * @param login The user login
+     * @return The new authentication token
+     */
+    private String buildTokenFor(String login) {
+        long timestamp = System.currentTimeMillis();
+        long validUntil = timestamp + securityTokenTTL * 1000;
+        byte[] text = login.getBytes(Files.CHARSET);
+        byte[] tokenData = Arrays.copyOf(text, text.length + 8);
+        tokenData[text.length] = (byte) ((validUntil & 0xFF00000000000000L) >>> 56);
+        tokenData[text.length + 1] = (byte) ((validUntil & 0x00FF000000000000L) >>> 48);
+        tokenData[text.length + 2] = (byte) ((validUntil & 0x0000FF0000000000L) >>> 40);
+        tokenData[text.length + 3] = (byte) ((validUntil & 0x000000FF00000000L) >>> 32);
+        tokenData[text.length + 4] = (byte) ((validUntil & 0x00000000FF000000L) >>> 24);
+        tokenData[text.length + 5] = (byte) ((validUntil & 0x0000000000FF0000L) >>> 16);
+        tokenData[text.length + 6] = (byte) ((validUntil & 0x000000000000FF00L) >>> 8);
+        tokenData[text.length + 7] = (byte) ((validUntil & 0x00000000000000FFL));
+
+        synchronized (securityMAC) {
+            try {
+                securityMAC.init(securityKey);
+                byte[] tokenHash = securityMAC.doFinal(tokenData);
+                byte[] token = Arrays.copyOf(tokenData, tokenData.length + tokenHash.length);
+                System.arraycopy(tokenHash, 0, token, tokenData.length, tokenHash.length);
+                return org.xowl.infra.utils.Base64.encodeBase64(token);
+            } catch (InvalidKeyException exception) {
+                Logging.getDefault().error(exception);
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Checks whether the token is valid
+     *
+     * @param token The authentication token to check
+     * @return The protocol reply, or null if the token is invalid
+     */
+    private XSPReply checkToken(String token) {
+        byte[] tokenBytes = org.xowl.infra.utils.Base64.decodeBase64(token);
+        if (tokenBytes.length <= 32 + 8)
+            return XSPReplyUnauthenticated.instance();
+        byte[] tokenData = Arrays.copyOf(tokenBytes, tokenBytes.length - 32);
+        byte[] hashProvided = new byte[32];
+        System.arraycopy(tokenBytes, tokenBytes.length - 32, hashProvided, 0, 32);
+
+        // checks the hash
+        synchronized (securityMAC) {
+            try {
+                securityMAC.init(securityKey);
+                byte[] computedHash = securityMAC.doFinal(tokenData);
+                if (!Arrays.equals(hashProvided, computedHash))
+                    // the token does not checks out ...
+                    return XSPReplyUnauthenticated.instance();
+            } catch (InvalidKeyException exception) {
+                Logging.getDefault().error(exception);
+                return new XSPReplyException(exception);
+            }
+        }
+
+        byte b0 = tokenBytes[tokenBytes.length - 32 - 8];
+        byte b1 = tokenBytes[tokenBytes.length - 32 - 7];
+        byte b2 = tokenBytes[tokenBytes.length - 32 - 6];
+        byte b3 = tokenBytes[tokenBytes.length - 32 - 5];
+        byte b4 = tokenBytes[tokenBytes.length - 32 - 4];
+        byte b5 = tokenBytes[tokenBytes.length - 32 - 3];
+        byte b6 = tokenBytes[tokenBytes.length - 32 - 2];
+        byte b7 = tokenBytes[tokenBytes.length - 32 - 1];
+        long validUntil = ((long) b0 & 0xFFL) << 56
+                | ((long) b1 & 0xFFL) << 48
+                | ((long) b2 & 0xFFL) << 40
+                | ((long) b3 & 0xFFL) << 32
+                | ((long) b4 & 0xFFL) << 24
+                | ((long) b5 & 0xFFL) << 16
+                | ((long) b6 & 0xFFL) << 8
+                | ((long) b7 & 0xFFL);
+        if (System.currentTimeMillis() > validUntil)
+            // the token expired
+            return XSPReplyExpiredSession.instance();
+        return new XSPReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - 32 - 8, Files.CHARSET));
     }
 }

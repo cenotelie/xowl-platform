@@ -583,6 +583,6 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
     @Override
     public void close() {
-        server.onShutdown();
+        server.serverShutdown();
     }
 }

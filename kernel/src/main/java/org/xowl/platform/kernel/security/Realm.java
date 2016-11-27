@@ -39,11 +39,11 @@ public interface Realm extends Service {
     /**
      * On a new request, performs the authentication of a user
      *
-     * @param userId The identifier of a user
-     * @param key    The key used to identified the user (e.g. a password)
+     * @param login    The identifier of a user
+     * @param password The key used to identified the user (e.g. a password)
      * @return The authenticated user, if the authentication is successful, null otherwise
      */
-    PlatformUser authenticate(String userId, char[] key);
+    PlatformUser authenticate(String login, String password);
 
     /**
      * Event when the request terminated

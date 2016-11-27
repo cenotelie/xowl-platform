@@ -19,8 +19,10 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.xowl.infra.server.api.ApiV1;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.Base64;
+import org.xowl.infra.server.xsp.XSPReplyExpiredSession;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Enumeration;
 
 /**
  * The main HTTP context
@@ -62,30 +65,27 @@ public class XOWLMainHTTPContext implements HttpContext {
             return false;
         }
 
-        String headerAuth = httpServletRequest.getHeader("Authorization");
-        if (headerAuth != null) {
-            int index = headerAuth.indexOf(32);
-            if (index != -1 && headerAuth.substring(0, index).equals("Basic")) {
-                String authToken = Base64.decodeBase64(headerAuth.substring(index + 1));
-                int indexColon = authToken.indexOf(58);
-                if (indexColon != -1) {
-                    String login = authToken.substring(0, indexColon);
-                    String password = authToken.substring(indexColon + 1);
-                    XSPReply reply = securityService.authenticate(httpServletRequest.getRemoteAddr(), login, password.toCharArray());
-                    if (reply == null) {
-                        // client is banned
-                        httpServletResponse.setStatus(HttpURLConnection.HTTP_FORBIDDEN);
+        Enumeration<String> values = httpServletRequest.getHeaders(HttpConstants.HEADER_COOKIE);
+        if (values != null) {
+            while (values.hasMoreElements()) {
+                String content = values.nextElement();
+                String[] parts = content.split(";");
+                for (String cookie : parts) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(ApiV1.AUTH_TOKEN + "=")) {
+                        String token = cookie.substring(ApiV1.AUTH_TOKEN.length() + 1);
+                        XSPReply reply = securityService.authenticate(httpServletRequest.getRemoteAddr(), token);
+                        if (reply.isSuccess())
+                            return true;
+                        if (reply == XSPReplyExpiredSession.instance())
+                            httpServletResponse.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
+                        else
+                            httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
                         return false;
-                    } else if (reply.isSuccess()) {
-                        httpServletRequest.setAttribute(AUTHENTICATION_TYPE, "Basic");
-                        httpServletRequest.setAttribute(REMOTE_USER, login);
-                        return true;
                     }
                 }
             }
         }
-        httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"" + securityService.getRealm().getIdentifier() + "\"");
-        httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
         return false;
     }
 

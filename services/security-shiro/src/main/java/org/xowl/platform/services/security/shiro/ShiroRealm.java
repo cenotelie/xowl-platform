@@ -155,11 +155,11 @@ public class ShiroRealm implements Realm {
     }
 
     @Override
-    public PlatformUser authenticate(String userId, char[] key) {
+    public PlatformUser authenticate(String login, String password) {
         ThreadContext.bind(manager);
         Subject subject = SecurityUtils.getSubject();
         try {
-            subject.login(new UsernamePasswordToken(userId, key));
+            subject.login(new UsernamePasswordToken(login, password));
             String principal = subject.getPrincipal().toString();
             return new User(principal);
         } catch (AuthenticationException exception) {

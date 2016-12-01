@@ -22,6 +22,7 @@ import org.xowl.infra.utils.logging.Logger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
  * Represents the logging service for the platform

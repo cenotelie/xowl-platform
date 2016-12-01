@@ -19,8 +19,8 @@ package org.xowl.platform.services.consistency;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
 
 /**

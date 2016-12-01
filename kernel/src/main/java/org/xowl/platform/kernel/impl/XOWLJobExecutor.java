@@ -36,7 +36,6 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
@@ -46,6 +45,7 @@ import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.*;
 import java.net.HttpURLConnection;

@@ -23,8 +23,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ui.WebUIContribution;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.impl.*;
 
 /**

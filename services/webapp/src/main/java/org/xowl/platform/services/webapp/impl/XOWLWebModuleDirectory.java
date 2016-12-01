@@ -19,7 +19,7 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.platform.kernel.HttpApiService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.WebModule;
 
 import java.net.HttpURLConnection;

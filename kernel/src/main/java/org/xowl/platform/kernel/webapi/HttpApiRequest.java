@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.webapi;
 
 import java.util.Collection;
 

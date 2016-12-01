@@ -19,8 +19,8 @@ package org.xowl.platform.kernel.statistics;
 
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 

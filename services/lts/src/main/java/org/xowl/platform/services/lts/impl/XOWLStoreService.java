@@ -51,6 +51,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
 import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;

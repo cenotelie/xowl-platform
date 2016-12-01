@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.InputStream;
 import java.util.Collection;

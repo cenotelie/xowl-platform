@@ -19,7 +19,7 @@ package org.xowl.platform.services.evaluation;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpApiService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.evaluation.impl.XOWLEvaluationService;
 
 /**

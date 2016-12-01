@@ -19,8 +19,8 @@ package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.List;
 

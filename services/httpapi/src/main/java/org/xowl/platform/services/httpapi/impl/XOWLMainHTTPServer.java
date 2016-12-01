@@ -21,10 +21,10 @@ import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.HttpApiRequest;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.httpapi.HTTPServerService;
 
 import javax.servlet.ServletException;

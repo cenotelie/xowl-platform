@@ -24,13 +24,14 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
@@ -48,14 +49,9 @@ import java.util.*;
  */
 public class XOWLSecurityService implements SecurityService, HttpApiService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIS = new String[]{
-            "services/core/security",
-            "services/core/security/users",
-            "services/core/security/groups",
-            "services/core/security/roles"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/core/security";
 
     /**
      * The data about a client
@@ -145,12 +141,14 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIS);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse handle(HttpApiRequest request) {
         switch (uri) {
             case "services/core/security":
                 return onMessageCore(method);

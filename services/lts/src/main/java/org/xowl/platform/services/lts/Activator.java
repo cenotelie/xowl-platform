@@ -19,10 +19,10 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.lts.impl.XOWLStoreService;
 import org.xowl.platform.services.lts.jobs.StorageJobFactory;
 

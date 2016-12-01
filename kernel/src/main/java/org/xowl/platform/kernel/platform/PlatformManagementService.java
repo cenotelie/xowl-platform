@@ -21,9 +21,9 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
-import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 

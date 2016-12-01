@@ -15,9 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.webapi;
 
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.Service;
 
 /**
  * Interface for services that offer an HTTP API interface
@@ -34,6 +35,27 @@ public interface HttpApiService extends Service {
      * The response when this service cannot handle a request
      */
     int CANNOT_HANDLE = -1;
+
+    /**
+     * The lowest priority for HTTP services
+     */
+    int PRIORITY_LOWEST = 0;
+    /**
+     * A priority lower than normal for HTTP services
+     */
+    int PRIORITY_LOWER = 25;
+    /**
+     * The default priority for services
+     */
+    int PRIORITY_NORMAL = 50;
+    /**
+     * A priority higher than normal for HTTP services
+     */
+    int PRIORITY_HIGH = 75;
+    /**
+     * The highest priority for HTTP services
+     */
+    int PRIORITY_HIGHEST = 100;
 
     /**
      * Gets whether this server can handle the specified request, and if so with which priority

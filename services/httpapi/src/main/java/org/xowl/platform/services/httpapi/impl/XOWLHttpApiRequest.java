@@ -18,7 +18,7 @@
 package org.xowl.platform.services.httpapi.impl;
 
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;

@@ -34,6 +34,7 @@ import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
  * Activator for this bundle

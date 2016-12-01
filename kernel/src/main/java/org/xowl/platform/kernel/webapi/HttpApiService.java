@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.webapi;
 
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Service;
 
@@ -56,6 +57,35 @@ public interface HttpApiService extends Service {
      * The highest priority for HTTP services
      */
     int PRIORITY_HIGHEST = 100;
+
+    /**
+     * The prefix for the help links
+     */
+    String ERROR_HELP_PREFIX = "http://xowl.org/support/platform/errors/";
+    /**
+     * API error - Expected query parameters.
+     */
+    ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x0101,
+            "Expected query parameters.",
+            ERROR_HELP_PREFIX + "0x0101.html");
+    /**
+     * API error - Failed to read the content of the request
+     */
+    ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x0102,
+            "Failed to read the content of the request.",
+            ERROR_HELP_PREFIX + "0x0102.html");
+    /**
+     * API error - A query parameter is not in the expected range
+     */
+    ApiError ERROR_PARAMETER_RANGE = new ApiError(0x0103,
+            "A query parameter is not in the expected range.",
+            ERROR_HELP_PREFIX + "0x0103.html");
+    /**
+     * API error - Expected a Content-Type header
+     */
+    ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x0104,
+            "Expected a Content-Type header.",
+            ERROR_HELP_PREFIX + "0x0104.html");
 
     /**
      * Gets whether this server can handle the specified request, and if so with which priority

@@ -53,10 +53,9 @@ public interface SecurityService extends Service {
      * Performs the logout of a client
      *
      * @param client The requesting client
-     * @param token  The authentication token
      * @return Whether the operation succeed
      */
-    XSPReply logout(String client, String token);
+    XSPReply logout(String client);
 
     /**
      * Performs the authentication of a user on the current thread

@@ -149,17 +149,19 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        switch (uri) {
-            case "services/core/security":
-                return onMessageCore(method);
-            case "services/core/security/users":
-                return onMessageUsers(method, parameters);
-            case "services/core/security/groups":
-                return onMessageGroups(method, parameters);
-            case "services/core/security/roles":
-                return onMessageRoles(method, parameters);
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        if (request.getUri().equals(URI_API + "/login"))
+            return handleRequestLogin(request);
+        if (request.getUri().equals(URI_API + "/logout"))
+            return handleRequestLogout(request);
+        if (request.getUri().equals(URI_API + "/me"))
+            return handleRequestMe(request);
+        if (request.getUri().startsWith(URI_API + "/users"))
+            return handleRequestUsers(request);
+        if (request.getUri().startsWith(URI_API + "/groups"))
+            return handleRequestGroups(request);
+        if (request.getUri().startsWith(URI_API + "/roles"))
+            return handleRequestRoles(request);
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override
@@ -192,7 +194,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public XSPReply logout(String client, String token) {
+    public XSPReply logout(String client) {
         return XSPReplySuccess.instance();
     }
 
@@ -298,25 +300,72 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     /**
-     * Responds to a request on the core URI
+     * Responds to a request for the login resource
      *
-     * @param method The HTTP method
+     * @param request The web API request to handle
      * @return The HTTP response
      */
-    private HttpResponse onMessageCore(String method) {
-        if ("GET".equals(method))
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    private HttpResponse handleRequestLogin(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+
+        String[] logins = request.getParameter("login");
+        if (logins == null || logins.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'login'"), null);
+        String password = new String(request.getContent(), Files.UTF8);
+        XSPReply reply = login(request.getClient(), logins[0], password);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        String token = ((XSPReplyResult<String>) reply).getData();
+        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
+        response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "=" + token +
+                "; Max-Age=" + Long.toString(securityTokenTTL) +
+                "; Path=" + HttpApiService.URI_API +
+                "; Secure" +
+                "; HttpOnly");
+        return response;
     }
 
     /**
-     * Responds to a request on the URI for users
+     * Responds to a request for the logout resource
      *
-     * @param method     The HTTP method
-     * @param parameters The parameters
+     * @param request The web API request to handle
      * @return The HTTP response
      */
-    private HttpResponse onMessageUsers(String method, Map<String, String[]> parameters) {
+    private HttpResponse handleRequestLogout(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+        XSPReply reply = logout(request.getClient());
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
+        response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "= " +
+                "; Max-Age=0" +
+                "; Path=" + HttpApiService.URI_API +
+                "; Secure" +
+                "; HttpOnly");
+        return response;
+    }
+
+    /**
+     * Responds to a request for the me resource
+     *
+     * @param request The web API request to handle
+     * @return The HTTP response
+     */
+    private HttpResponse handleRequestMe(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
+    }
+
+    /**
+     * Responds to a request for the usets resource
+     *
+     * @param request The web API request to handle
+     * @return The HTTP response
+     */
+    private HttpResponse handleRequestUsers(HttpApiRequest request) {
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0) {
@@ -376,13 +425,12 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     /**
-     * Responds to a request on the URI for groups
+     * Responds to a request for the groups resource
      *
-     * @param method     The HTTP method
-     * @param parameters The parameters
+     * @param request The web API request to handle
      * @return The HTTP response
      */
-    private HttpResponse onMessageGroups(String method, Map<String, String[]> parameters) {
+    private HttpResponse handleRequestGroups(HttpApiRequest request) {
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0) {
@@ -451,13 +499,12 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     /**
-     * Responds to a request on the URI for roles
+     * Responds to a request for the roles resource
      *
-     * @param method     The HTTP method
-     * @param parameters The parameters
+     * @param request The web API request to handle
      * @return The HTTP response
      */
-    private HttpResponse onMessageRoles(String method, Map<String, String[]> parameters) {
+    private HttpResponse handleRequestRoles(HttpApiRequest request) {
         if ("GET".equals(method)) {
             String[] ids = parameters.get("id");
             if (ids != null && ids.length > 0) {

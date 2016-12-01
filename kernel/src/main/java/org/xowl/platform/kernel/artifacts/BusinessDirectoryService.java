@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface BusinessDirectoryService extends Service, HttpAPIService {
+public interface BusinessDirectoryService extends Service, HttpApiService {
     /**
      * Gets the registered domains
      *

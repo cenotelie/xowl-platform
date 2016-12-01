@@ -56,7 +56,7 @@ public class Activator implements BundleActivator {
         LoggingService loggingService = new XOWLLoggingService();
         Logging.setDefault(loggingService);
         bundleContext.registerService(LoggingService.class, loggingService, null);
-        bundleContext.registerService(HttpAPIService.class, loggingService, null);
+        bundleContext.registerService(HttpApiService.class, loggingService, null);
         bundleContext.registerService(MeasurableService.class, loggingService, null);
 
         // register the configuration service
@@ -66,17 +66,17 @@ public class Activator implements BundleActivator {
         // register the security service
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
         bundleContext.registerService(SecurityService.class, securityService, null);
-        bundleContext.registerService(HttpAPIService.class, securityService, null);
+        bundleContext.registerService(HttpApiService.class, securityService, null);
 
         // register the statistics service
         StatisticsService statisticsService = new XOWLStatisticsService();
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
-        bundleContext.registerService(HttpAPIService.class, statisticsService, null);
+        bundleContext.registerService(HttpApiService.class, statisticsService, null);
 
         // register the job executor service
         serviceJobExecutor = new XOWLJobExecutor();
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
-        bundleContext.registerService(HttpAPIService.class, serviceJobExecutor, null);
+        bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
         bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
         bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
 
@@ -92,12 +92,12 @@ public class Activator implements BundleActivator {
         directoryService.register(FreeArtifactArchetype.INSTANCE);
         directoryService.register(SchemaDomain.INSTANCE);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
-        bundleContext.registerService(HttpAPIService.class, directoryService, null);
+        bundleContext.registerService(HttpApiService.class, directoryService, null);
 
         // register the platform management service
         XOWLPlatformManagementService managementService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
         bundleContext.registerService(PlatformManagementService.class, managementService, null);
-        bundleContext.registerService(HttpAPIService.class, managementService, null);
+        bundleContext.registerService(HttpApiService.class, managementService, null);
         bundleContext.registerService(MeasurableService.class, managementService, null);
 
         eventService.onEvent(new PlatformStartupEvent(managementService));

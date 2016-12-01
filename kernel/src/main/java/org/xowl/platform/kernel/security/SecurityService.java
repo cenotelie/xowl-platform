@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public interface SecurityService extends Service {
     /**
+     * The name of the cookie for the authentication token
+     */
+    String AUTH_TOKEN = "__Secure-xOWL-Platform";
+
+    /**
      * Gets the realm of this platform
      *
      * @return The realm of this platform

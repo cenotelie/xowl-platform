@@ -24,7 +24,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -46,7 +46,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityService implements SecurityService, HttpAPIService {
+public class XOWLSecurityService implements SecurityService, HttpApiService {
     /**
      * The URIs for this service
      */

@@ -19,7 +19,6 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.infra.server.api.ApiV1;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyExpiredSession;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -54,33 +53,37 @@ public class XOWLMainHTTPContext implements HttpContext {
     }
 
     @Override
-    public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // do not perform authentication for pre-flight requests
-        if (httpServletRequest.getMethod().equals("OPTIONS"))
+        if (request.getMethod().equals("OPTIONS"))
+            return true;
+
+        // do not perform authentication for the login service
+        if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
             return true;
 
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null) {
-            httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
             return false;
         }
 
-        Enumeration<String> values = httpServletRequest.getHeaders(HttpConstants.HEADER_COOKIE);
+        Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);
         if (values != null) {
             while (values.hasMoreElements()) {
                 String content = values.nextElement();
                 String[] parts = content.split(";");
                 for (String cookie : parts) {
                     cookie = cookie.trim();
-                    if (cookie.startsWith(ApiV1.AUTH_TOKEN + "=")) {
-                        String token = cookie.substring(ApiV1.AUTH_TOKEN.length() + 1);
-                        XSPReply reply = securityService.authenticate(httpServletRequest.getRemoteAddr(), token);
+                    if (cookie.startsWith(SecurityService.AUTH_TOKEN + "=")) {
+                        String token = cookie.substring(SecurityService.AUTH_TOKEN.length() + 1);
+                        XSPReply reply = securityService.authenticate(request.getRemoteAddr(), token);
                         if (reply.isSuccess())
                             return true;
                         if (reply == XSPReplyExpiredSession.instance())
-                            httpServletResponse.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
+                            response.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
                         else
-                            httpServletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+                            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
                         return false;
                     }
                 }

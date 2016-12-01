@@ -69,7 +69,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpAPIService, MeasurableService, Closeable {
+public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpApiService, MeasurableService, Closeable {
     /**
      * The URIs for this service
      */

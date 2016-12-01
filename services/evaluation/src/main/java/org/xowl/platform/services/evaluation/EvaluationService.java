@@ -18,7 +18,7 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface EvaluationService extends Service, HttpAPIService {
+public interface EvaluationService extends Service, HttpApiService {
     /**
      * Registers a type of evaluable element
      *

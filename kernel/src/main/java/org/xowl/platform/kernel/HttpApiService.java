@@ -19,37 +19,35 @@ package org.xowl.platform.kernel;
 
 import org.xowl.infra.utils.http.HttpResponse;
 
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * Interface for services that offer an HTTP API interface
  *
  * @author Laurent Wouters
  */
-public interface HttpAPIService extends Service {
+public interface HttpApiService extends Service {
     /**
      * The URI prefix for API connections
      */
     String URI_API = "/api";
 
     /**
-     * Gets the URIs for accessing the service
-     *
-     * @return The URIs for accessing the service
+     * The response when this service cannot handle a request
      */
-    Collection<String> getURIs();
+    int CANNOT_HANDLE = -1;
 
     /**
-     * Responds to a message
+     * Gets whether this server can handle the specified request, and if so with which priority
      *
-     * @param method      The HTTP method
-     * @param uri         The requested URI
-     * @param parameters  The request parameters
-     * @param contentType The content type, if any
-     * @param content     The content, if any
-     * @param accept      The Accept header, if any
-     * @return The response
+     * @param request The request to handle
+     * @return A negative number if this service cannot handle the request; otherwise a positive number indicating the priority of this service (greater number indicate greater priority)
      */
-    HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept);
+    int canHandle(HttpApiRequest request);
+
+    /**
+     * Handles an HTTP API request
+     *
+     * @param request The request to handle
+     * @return The HTTP response
+     */
+    HttpResponse handle(HttpApiRequest request);
 }

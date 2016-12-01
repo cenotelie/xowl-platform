@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.statistics;
 
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface StatisticsService extends Service, HttpAPIService {
+public interface StatisticsService extends Service, HttpApiService {
     /**
      * Gets the known metrics
      *

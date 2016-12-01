@@ -18,7 +18,7 @@
 package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorDirectoryService extends HttpAPIService {
+public interface ConnectorDirectoryService extends HttpApiService {
     /**
      * Gets the available connectors
      *

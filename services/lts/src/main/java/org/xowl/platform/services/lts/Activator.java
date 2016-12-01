@@ -19,7 +19,7 @@ package org.xowl.platform.services.lts;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.statistics.MeasurableService;
@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
         storeService = new XOWLStoreService();
         bundleContext.registerService(TripleStoreService.class, storeService, null);
         bundleContext.registerService(ArtifactStorageService.class, storeService, null);
-        bundleContext.registerService(HttpAPIService.class, storeService, null);
+        bundleContext.registerService(HttpApiService.class, storeService, null);
         bundleContext.registerService(MeasurableService.class, storeService, null);
 
         bundleContext.registerService(JobFactory.class, new StorageJobFactory(), null);

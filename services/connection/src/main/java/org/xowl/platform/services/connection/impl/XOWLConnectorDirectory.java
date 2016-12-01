@@ -31,7 +31,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
@@ -193,7 +193,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             properties.put("id", service.getIdentifier());
             BundleContext context = FrameworkUtil.getBundle(ConnectorService.class).getBundleContext();
             registration.refAsDomainConnector = context.registerService(ConnectorService.class, service, properties);
-            registration.refAsServedService = context.registerService(HttpAPIService.class, service, null);
+            registration.refAsServedService = context.registerService(HttpApiService.class, service, null);
             connectorsById.put(identifier, registration);
             EventService eventService = ServiceUtils.getService(EventService.class);
             if (eventService != null)

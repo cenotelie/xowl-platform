@@ -18,7 +18,7 @@
 package org.xowl.platform.services.consistency;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.Service;
 
 /**
@@ -26,7 +26,7 @@ import org.xowl.platform.kernel.Service;
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyService extends Service, HttpAPIService {
+public interface ConsistencyService extends Service, HttpApiService {
     /**
      * Gets all the consistency rules
      *

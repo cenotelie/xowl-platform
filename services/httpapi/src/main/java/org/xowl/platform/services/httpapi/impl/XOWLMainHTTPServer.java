@@ -17,9 +17,12 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.infra.server.xsp.XSPReplyException;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiRequest;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.httpapi.HTTPServerService;
@@ -28,9 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Collection;
@@ -60,97 +61,74 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        handleRequest("GET", request, response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        handleRequest("POST", request, response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        handleRequest("PUT", request, response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        handleRequest("DELETE", request, response);
+        handleRequest(request, response);
     }
 
     /**
      * Handles a request
      *
-     * @param method   The HTTP method
-     * @param request  The request
-     * @param response The response
+     * @param servletRequest  The request
+     * @param servletResponse The response
      */
-    private void handleRequest(String method, HttpServletRequest request, HttpServletResponse response) {
-        addCORSHeader(request, response);
-        addCacheControlHeader(response);
+    private void handleRequest(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        addCORSHeader(servletRequest, servletResponse);
+        addCacheControlHeader(servletResponse);
+
+        HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
         try {
-            String uri = request.getRequestURI();
-            uri = uri.substring(HttpAPIService.URI_API.length() + 1);
-            Collection<HttpAPIService> services = ServiceUtils.getServices(HttpAPIService.class);
-            for (HttpAPIService service : services) {
-                if (service.getURIs().contains(uri)) {
-                    doServedService(service, method, uri, request, response);
-                    return;
+            Collection<HttpApiService> services = ServiceUtils.getServices(HttpApiService.class);
+            HttpApiService service = null;
+            int priority = HttpApiService.CANNOT_HANDLE;
+            for (HttpApiService candidate : services) {
+                int result = candidate.canHandle(apiRequest);
+                if (result > priority) {
+                    service = candidate;
+                    priority = result;
                 }
             }
-            response.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+            if (service == null)
+                servletResponse.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
+            else
+                doResponse(servletResponse, service.handle(apiRequest));
         } catch (Throwable exception) {
             Logging.getDefault().error(exception);
-            response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
         } finally {
             SecurityService securityService = ServiceUtils.getService(SecurityService.class);
             if (securityService != null)
-                securityService.onRequestEnd(request.getRemoteAddr());
+                securityService.onRequestEnd(servletRequest.getRemoteAddr());
         }
     }
 
     /**
-     * Responds on a request for a served service
+     * Outputs an API response to the servlet response
      *
-     * @param service  The served service
-     * @param uri      The service-specific part of the requested URI
-     * @param method   The HTTP method
-     * @param request  The request
-     * @param response The response
+     * @param servletResponse The servlet response to fill
+     * @param apiResponse     The API response
      */
-    private void doServedService(HttpAPIService service, String method, String uri, HttpServletRequest request, HttpServletResponse response) {
-        byte[] content = null;
-        if (request.getContentLength() > 0) {
-            try (InputStream is = request.getInputStream()) {
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int read = is.read(buffer);
-                while (read > 0) {
-                    output.write(buffer, 0, read);
-                    read = is.read(buffer);
-                }
-                content = output.toByteArray();
-            } catch (IOException exception) {
-                Logging.getDefault().error(exception);
-            }
-        }
-        HttpResponse serviceResponse = service.onMessage(method,
-                uri,
-                request.getParameterMap(),
-                request.getContentType(),
-                content,
-                request.getHeader("Accept"));
-        if (serviceResponse == null) {
-            response.setStatus(HttpURLConnection.HTTP_INTERNAL_ERROR);
-            return;
-        }
-        response.setStatus(serviceResponse.getCode());
-        if (serviceResponse.getContentType() != null)
-            response.setContentType(serviceResponse.getContentType());
-        if (serviceResponse.getBodyAsBytes() != null) {
-            response.setContentLength(serviceResponse.getBodyAsBytes().length);
-            try (OutputStream os = response.getOutputStream()) {
-                os.write(serviceResponse.getBodyAsBytes());
+    private void doResponse(HttpServletResponse servletResponse, HttpResponse apiResponse) {
+        servletResponse.setStatus(apiResponse.getCode());
+        if (apiResponse.getContentType() != null)
+            servletResponse.setContentType(apiResponse.getContentType());
+        if (apiResponse.getBodyAsBytes() != null) {
+            servletResponse.setContentLength(apiResponse.getBodyAsBytes().length);
+            try (OutputStream os = servletResponse.getOutputStream()) {
+                os.write(apiResponse.getBodyAsBytes());
                 os.flush();
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);

@@ -36,7 +36,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, HttpAPIService, Closeable {
+public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Closeable {
     /**
      * The bound of the executor queue
      */

@@ -19,7 +19,7 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.services.webapp.WebModule;
 
 import java.net.HttpURLConnection;
@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLWebModuleDirectory implements HttpAPIService {
+public class XOWLWebModuleDirectory implements HttpApiService {
     /**
      * The URIs for this service
      */

@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.HttpAPIService;
+import org.xowl.platform.kernel.HttpApiService;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.webapp.impl.*;
 
@@ -61,7 +61,7 @@ public class Activator implements BundleActivator {
         moduleDirectory = new XOWLWebModuleDirectory();
         moduleDirectory.register(new XOWLWebModuleCore());
         moduleDirectory.register(new XOWLWebModuleAdmin());
-        bundleContext.registerService(HttpAPIService.class, moduleDirectory, null);
+        bundleContext.registerService(HttpApiService.class, moduleDirectory, null);
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {

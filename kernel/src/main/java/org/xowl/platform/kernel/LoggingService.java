@@ -28,7 +28,7 @@ import org.xowl.platform.kernel.statistics.MeasurableService;
  *
  * @author Laurent Wouters
  */
-public interface LoggingService extends Service, HttpAPIService, MeasurableService, Logger {
+public interface LoggingService extends Service, HttpApiService, MeasurableService, Logger {
     /**
      * The metric for the number of errors
      */

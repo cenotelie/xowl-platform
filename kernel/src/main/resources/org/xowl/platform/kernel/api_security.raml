@@ -1,0 +1,222 @@
+#%RAML 1.0
+---
+title: Security Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  PlatformUser: !include schema_platform_kernel.json#/definitions/PlatformUser
+  PlatformUsers: !include schema_platform_kernel.json#/definitions/PlatformUsers
+  PlatformGroup: !include schema_platform_kernel.json#/definitions/PlatformGroup
+  PlatformGroups: !include schema_platform_kernel.json#/definitions/PlatformGroups
+  PlatformRole: !include schema_platform_kernel.json#/definitions/PlatformRole
+  PlatformRoles: !include schema_platform_kernel.json#/definitions/PlatformRoles
+traits: !include api_traits.raml
+baseUri: https://localhost:3443/api
+/services/core/security:
+  /me:
+    description: Represents the current user in its interaction with the platform
+    get:
+      description: Gets the data representing the currently logged user
+      is: [secured]
+      responses:
+        200:
+          description: A description of the currently logged-in user
+          body:
+            application/json:
+              schema: PlatformUser
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                  "identifier": "jdoe",
+                  "name": "Jane Doe",
+                  "roles": [
+                    {
+                      "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                      "identifier": "role1",
+                      "name": "Role 1"
+                    }
+                  ]
+                }
+  /login:
+    description: Action for a user to log on the platform
+    post:
+      description: Tries to login on the platform
+      is: [mayFail]
+      queryParameters:
+        login:
+          displayName: Login
+          type: string
+          description: The login to use
+          example: admin
+          required: true
+      body:
+        text/plain:
+          type: string
+          description: The password to use
+          example: myPassword01
+          required: true
+      responses:
+        200:
+          description: The operation succeeded
+          headers:
+            Set-Cookie:
+              description: The authentication token that can be used later to authenticate for further operations
+              example: __Secure-xOWL-Platform=AAAAA
+              required: true
+        401:
+          description: The login operation failed
+  /logout:
+    description: Action for a user to log out of the platform
+    post:
+      description: Tries to logout from the platform
+      is: [secured]
+      responses:
+        200:
+          description: The operation succeeded
+          headers:
+            Set-Cookie:
+              description: Resets the authentication token
+              example: __Secure-xOWL-Token-v1=; Max-Age=0
+              required: true
+  /users:
+    description: The collection of users on the platform
+    get:
+     description: Gets the list of the users on the platform
+     is: [secured, mayFail]
+     responses:
+       200:
+         description: The list of users on the platform
+         body:
+           application/json:
+             schema: PlatformUsers
+             example: |
+               [
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                   "identifier": "jdoe",
+                   "name": "Jane Doe",
+                   "roles": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                       "identifier": "role1",
+                       "name": "Role 1"
+                     }
+                   ]
+                 }
+               ]
+    /{userId}:
+      description: A specific user on the platform
+      is: [secured, mayFail, resourceAccess]
+      get:
+        description: Gets the description of the user
+        responses:
+          200:
+            description: Returns the description of the user
+            body:
+              application/json:
+                schema: PlatformUser
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe",
+                    "roles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                        "identifier": "role1",
+                        "name": "Role 1"
+                      }
+                    ]
+                  }
+      put:
+        description: Creates the user on the platform
+        body:
+          text/plain:
+            displayName: Password
+            type: string
+        responses:
+          200:
+            description: Returns the created user
+            body:
+              application/json:
+                schema: PlatformUser
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe",
+                    "roles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                        "identifier": "role1",
+                        "name": "Role 1"
+                      }
+                    ]
+                  }
+      delete:
+        description: Deletes the user from the platform
+        responses:
+          200:
+            description: The operation succeeded
+      /rename:
+        description: Action to rename the user (updates the display name)
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Renames the user (updates the display name)
+          queryParameters:
+            name:
+              displayName: Display name
+              type: string
+              description: The new display name for the user
+              example: John Doe
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
+      /updateKey:
+        description: Action to update the key (password) for the user
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Updates the key (password) for the user
+          queryParameters:
+            oldKey:
+              displayName: Old key
+              type: string
+              description: The current key (password) for the user
+              example: Password01
+              required: true
+          body:
+            text/plain:
+              displayName: New key
+              type: string
+          responses:
+            200:
+              description: The operation succeeded
+      /resetKey:
+        description: Action to reset the key (password) for the user
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Resets the key (password) for the user
+          body:
+            text/plain:
+              displayName: New key
+              type: string
+          responses:
+            200:
+              description: The operation succeeded
+      /assign:
+      /unassign:
+  /groups:
+    /{groupId}:
+      /rename:
+      /addMember:
+      /removeMember:
+      /addAdmin:
+      /removeAdmin:
+      /assign:
+      /unassign:
+  /roles:
+    /{roleId}:
+      /rename:
+      /imply:
+      /unimply:

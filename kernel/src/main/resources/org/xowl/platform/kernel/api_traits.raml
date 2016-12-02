@@ -1,0 +1,52 @@
+secured:
+  usage: Apply this to any method that needs to be secured
+  description: Trait for requests that require authentication
+  headers:
+    Cookie:
+      description: Authentication token provided by the platform
+      example: __Secure-xOWL-Platform=AAAAA
+      required: true
+  responses:
+    401:
+      description: No user is logged-in, or the authentication token is invalid.
+    403:
+      description: The logged-in user is not authorized to perform this operation.
+    440:
+      description: The user session has expired.
+resourceAccess:
+  usage: Apply this to any method that refers to a particular resource
+  description: Trait for requests that refer to particular resources
+  responses:
+    404:
+      description: The requested resource cannot be found.
+mayFail:
+  usage: Apply this to any method that may fail
+  description: Trait for requests that may fail due to reasons other that security and resource access failure
+  responses:
+    400:
+      description: The request is malformed in some way
+      body:
+        application/json:
+          type: ApiError
+          example: |
+            {
+              "type": "org.xowl.infra.utils.ApiError",
+              "code": 1,
+              "message": "The main description of this error",
+              "helpLink": "http://xowl.org/supports/errors/001.html",
+              "content": "Supplementary information about the error"
+            }
+    500:
+      description: An unexpected error occurred on the platform
+      body:
+        text/plain:
+          type: string
+          description: The error message from the platform
+    501:
+      description: The requested operation is not supported
+    560:
+      description: An unknown error error occurred on the platform
+      body:
+        text/plain:
+          type: string
+          description: The error message from the platform

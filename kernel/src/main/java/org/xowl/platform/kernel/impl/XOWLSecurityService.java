@@ -22,6 +22,7 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -312,7 +313,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
         String[] logins = request.getParameter("login");
         if (logins == null || logins.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'login'"), null);
-        String password = new String(request.getContent(), Files.UTF8);
+        String password = new String(request.getContent(), Files.CHARSET);
         XSPReply reply = login(request.getClient(), logins[0], password);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -366,14 +367,9 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestUsers(HttpApiRequest request) {
-        if ("GET".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids != null && ids.length > 0) {
-                PlatformUser user = realm.getUser(ids[0]);
-                if (user == null)
-                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, user.serializedJSON());
-            }
+        if (request.getUri().equals(URI_API + "/users")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformUser> users = realm.getUsers();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
@@ -385,43 +381,78 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if ("PUT".equals(method)) {
-            String[] ids = parameters.get("id");
-            String[] names = parameters.get("name");
-            String[] keys = parameters.get("key");
-            if (ids == null || ids.length == 0 || names == null || names.length == 0 || keys == null || keys.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.createUser(ids[0], names[0], keys[0]), null);
-        } else if ("DELETE".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.deleteUser(ids[0]), null);
-        } else if ("POST".equals(method)) {
-            String[] actions = parameters.get("action");
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            if ("rename".equals(actions[0])) {
-                String[] names = parameters.get("name");
-                if (names == null || names.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.renameUser(ids[0], names[0]), null);
-            } else if ("changeKey".equals(actions[0])) {
-                String[] oldKeys = parameters.get("oldKey");
-                String[] newKeys = parameters.get("newKey");
-                if (oldKeys == null || oldKeys.length == 0 || newKeys == null || newKeys.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.changeUserKey(ids[0], oldKeys[0], newKeys[0]), null);
-            } else if ("resetKey".equals(actions[0])) {
-                String[] newKeys = parameters.get("newKey");
-                if (newKeys == null || newKeys.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.resetUserKey(ids[0], newKeys[0]), null);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+
+        String rest = request.getUri().substring(URI_API.length() + "/users".length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String userId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+
+        if (index < 0) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    PlatformUser user = realm.getUser(userId);
+                    if (user == null)
+                        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, user.serializedJSON());
+                }
+                case HttpConstants.METHOD_PUT: {
+                    String[] displayNames = request.getParameter("name");
+                    if (displayNames == null || displayNames.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                    String password = new String(request.getContent(), Files.CHARSET);
+                    return XSPReplyUtils.toHttpResponse(realm.createUser(userId, displayNames[0], password), null);
+                }
+                case HttpConstants.METHOD_DELETE: {
+                    return XSPReplyUtils.toHttpResponse(realm.deleteUser(userId), null);
+                }
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
+        }
+
+        switch (rest.substring(index)) {
+            case "/rename": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] displayNames = request.getParameter("name");
+                if (displayNames == null || displayNames.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.renameUser(userId, displayNames[0]), null);
+            }
+            case "/updateKey": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] oldKeys = request.getParameter("oldKey");
+                if (oldKeys == null || oldKeys.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'oldKey'"), null);
+                String password = new String(request.getContent(), Files.CHARSET);
+                return XSPReplyUtils.toHttpResponse(realm.changeUserKey(userId, oldKeys[0], password), null);
+            }
+            case "/resetKey": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String password = new String(request.getContent(), Files.CHARSET);
+                return XSPReplyUtils.toHttpResponse(realm.resetUserKey(userId, password), null);
+            }
+            case "/assign": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] roles = request.getParameter("role");
+                if (roles == null || roles.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.assignRoleToUser(userId, roles[0]), null);
+            }
+            case "/unassign": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] roles = request.getParameter("role");
+                if (roles == null || roles.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.unassignRoleToUser(userId, roles[0]), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**
@@ -431,14 +462,9 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestGroups(HttpApiRequest request) {
-        if ("GET".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids != null && ids.length > 0) {
-                PlatformGroup group = realm.getGroup(ids[0]);
-                if (group == null)
-                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, group.serializedJSON());
-            }
+        if (request.getUri().equals(URI_API + "/groups")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformGroup> groups = realm.getGroups();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
@@ -450,52 +476,97 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if ("PUT".equals(method)) {
-            String[] ids = parameters.get("id");
-            String[] names = parameters.get("name");
-            String[] admins = parameters.get("admin");
-            if (ids == null || ids.length == 0 || names == null || names.length == 0 || admins == null || admins.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.createGroup(ids[0], names[0], admins[0]), null);
-        } else if ("DELETE".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.deleteGroup(ids[0]), null);
-        } else if ("POST".equals(method)) {
-            String[] actions = parameters.get("action");
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            if ("rename".equals(actions[0])) {
-                String[] names = parameters.get("name");
-                if (names == null || names.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.renameGroup(ids[0], names[0]), null);
-            } else if ("addMember".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users == null || users.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.addUserToGroup(users[0], ids[0]), null);
-            } else if ("removeMember".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users == null || users.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.removeUserFromGroup(users[0], ids[0]), null);
-            } else if ("addAdmin".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users == null || users.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.addAdminToGroup(users[0], ids[0]), null);
-            } else if ("removeAdmin".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users == null || users.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.removeAdminFromGroup(users[0], ids[0]), null);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+
+        String rest = request.getUri().substring(URI_API.length() + "/groups".length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String groupId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+
+        if (index < 0) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    PlatformGroup group = realm.getGroup(groupId);
+                    if (group == null)
+                        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, group.serializedJSON());
+                }
+                case HttpConstants.METHOD_PUT: {
+                    String[] displayNames = request.getParameter("name");
+                    if (displayNames == null || displayNames.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                    String[] admins = request.getParameter("admin");
+                    if (admins == null || admins.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'admin'"), null);
+                    return XSPReplyUtils.toHttpResponse(realm.createGroup(groupId, displayNames[0], admins[0]), null);
+                }
+                case HttpConstants.METHOD_DELETE: {
+                    return XSPReplyUtils.toHttpResponse(realm.deleteGroup(groupId), null);
+                }
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
+        }
+
+        switch (rest.substring(index)) {
+            case "/rename": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] displayNames = request.getParameter("name");
+                if (displayNames == null || displayNames.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.renameGroup(groupId, displayNames[0]), null);
+            }
+            case "/addMember": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] users = request.getParameter("user");
+                if (users == null || users.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.addUserToGroup(users[0], groupId), null);
+            }
+            case "/removeMember": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] users = request.getParameter("user");
+                if (users == null || users.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.removeUserFromGroup(users[0], groupId), null);
+            }
+            case "/addAdmin": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] users = request.getParameter("user");
+                if (users == null || users.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.addAdminToGroup(users[0], groupId), null);
+            }
+            case "/removeAdmin": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] users = request.getParameter("user");
+                if (users == null || users.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.removeAdminFromGroup(users[0], groupId), null);
+            }
+            case "/assign": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] roles = request.getParameter("role");
+                if (roles == null || roles.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.assignRoleToGroup(groupId, roles[0]), null);
+            }
+            case "/unassign": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] roles = request.getParameter("role");
+                if (roles == null || roles.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.unassignRoleToGroup(groupId, roles[0]), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**
@@ -505,14 +576,9 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestRoles(HttpApiRequest request) {
-        if ("GET".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids != null && ids.length > 0) {
-                PlatformRole role = realm.getRole(ids[0]);
-                if (role == null)
-                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, role.serializedJSON());
-            }
+        if (request.getUri().equals(URI_API + "/roles")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformRole> roles = realm.getRoles();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
@@ -524,57 +590,62 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if ("PUT".equals(method)) {
-            String[] ids = parameters.get("id");
-            String[] names = parameters.get("name");
-            if (ids == null || ids.length == 0 || names == null || names.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.createRole(ids[0], names[0]), null);
-        } else if ("DELETE".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            return XSPReplyUtils.toHttpResponse(realm.deleteRole(ids[0]), null);
-        } else if ("POST".equals(method)) {
-            String[] actions = parameters.get("action");
-            String[] ids = parameters.get("id");
-            if (ids == null || ids.length == 0 || actions == null || actions.length == 0)
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            if ("rename".equals(actions[0])) {
-                String[] names = parameters.get("name");
-                if (names == null || names.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.renameRole(ids[0], names[0]), null);
-            } else if ("assign".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users != null && users.length > 0)
-                    return XSPReplyUtils.toHttpResponse(realm.assignRoleToUser(users[0], ids[0]), null);
-                String[] groups = parameters.get("group");
-                if (groups != null && groups.length > 0)
-                    return XSPReplyUtils.toHttpResponse(realm.assignRoleToGroup(groups[0], ids[0]), null);
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            } else if ("unassign".equals(actions[0])) {
-                String[] users = parameters.get("user");
-                if (users != null && users.length > 0)
-                    return XSPReplyUtils.toHttpResponse(realm.unassignRoleToUser(users[0], ids[0]), null);
-                String[] groups = parameters.get("group");
-                if (groups != null && groups.length > 0)
-                    return XSPReplyUtils.toHttpResponse(realm.unassignRoleToGroup(groups[0], ids[0]), null);
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            } else if ("addImplication".equals(actions[0])) {
-                String[] targets = parameters.get("target");
-                if (targets == null || targets.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.addRoleImplication(ids[0], targets[0]), null);
-            } else if ("removeImplication".equals(actions[0])) {
-                String[] targets = parameters.get("target");
-                if (targets == null || targets.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(realm.removeRoleImplication(ids[0], targets[0]), null);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+
+        String rest = request.getUri().substring(URI_API.length() + "/roles".length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String roleId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+
+        if (index < 0) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    PlatformRole role = realm.getRole(roleId);
+                    if (role == null)
+                        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, role.serializedJSON());
+                }
+                case HttpConstants.METHOD_PUT: {
+                    String[] displayNames = request.getParameter("name");
+                    if (displayNames == null || displayNames.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                    return XSPReplyUtils.toHttpResponse(realm.createRole(roleId, displayNames[0]), null);
+                }
+                case HttpConstants.METHOD_DELETE: {
+                    return XSPReplyUtils.toHttpResponse(realm.deleteRole(roleId), null);
+                }
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
+        }
+
+        switch (rest.substring(index)) {
+            case "/rename": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] displayNames = request.getParameter("name");
+                if (displayNames == null || displayNames.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.renameRole(roleId, displayNames[0]), null);
+            }
+            case "/imply": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] targets = request.getParameter("target");
+                if (targets == null || targets.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.addRoleImplication(roleId, targets[0]), null);
+            }
+            case "/unimply": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String[] targets = request.getParameter("target");
+                if (targets == null || targets.length == 0)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
+                return XSPReplyUtils.toHttpResponse(realm.removeRoleImplication(roleId, targets[0]), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
 

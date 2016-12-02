@@ -31,6 +31,10 @@ public interface SecurityService extends Service {
      * The name of the cookie for the authentication token
      */
     String AUTH_TOKEN = "__Secure-xOWL-Platform";
+    /**
+     * The URI of the API for the login service
+     */
+    String URI_LOGIN = "/api/services/core/security/login";
 
     /**
      * Gets the realm of this platform

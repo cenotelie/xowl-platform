@@ -55,7 +55,7 @@ public class XOWLMainHTTPContext implements HttpContext {
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // do not perform authentication for pre-flight requests
-        if (request.getMethod().equals("OPTIONS"))
+        if (request.getMethod().equals(HttpConstants.METHOD_OPTIONS))
             return true;
 
         // do not perform authentication for the login service

@@ -130,6 +130,14 @@ baseUri: https://localhost:3443/api
                   }
       put:
         description: Creates the user on the platform
+        queryParameters:
+          name:
+            displayName: Display name
+            type: string
+            description: The display name for the user
+            example: John Doe
+            required: true
+          admin:
         body:
           text/plain:
             displayName: Password
@@ -205,18 +213,374 @@ baseUri: https://localhost:3443/api
             200:
               description: The operation succeeded
       /assign:
+        description: Action to assign a role to the user
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Assigns a role to the user
+          queryParameters:
+            role:
+              displayName: Role
+              type: string
+              description: The identifier of the role to assign
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /unassign:
+        description: Action to un-assign a role from the user
+        post:
+          description: Un-assigns a role from the user
+          queryParameters:
+            role:
+              displayName: Role
+              type: string
+              description: The identifier of the role to un-assign
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
   /groups:
+    description: The collection of groups on the platform
+    get:
+     description: Gets the list of the groups on the platform
+     is: [secured, mayFail]
+     responses:
+       200:
+         description: The list of groups on the platform
+         body:
+           application/json:
+             schema: PlatformGroups
+             example: |
+               [
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                   "identifier": "group1",
+                   "name": "Group 1",
+                   "members": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "admins": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "roles": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                       "identifier": "role1",
+                       "name": "Role 1"
+                     }
+                   ]
+                 }
+               ]
     /{groupId}:
+      description: A specific group on the platform
+      is: [secured, mayFail, resourceAccess]
+      get:
+        description: Gets the description of the group
+        responses:
+          200:
+            description: Returns the description of the group
+            body:
+              application/json:
+                schema: PlatformGroup
+                example: |
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                   "identifier": "group1",
+                   "name": "Group 1",
+                   "members": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "admins": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "roles": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                       "identifier": "role1",
+                       "name": "Role 1"
+                     }
+                   ]
+                 }
+      put:
+        description: Creates the group on the platform
+        queryParameters:
+          name:
+            displayName: Display name
+            type: string
+            description: The display name for the group
+            example: Group 1
+            required: true
+          admin:
+            displayName: Administrator
+            type: string
+            description: The identifier of a user to add as an administrator to the group
+            example: jdoe
+            required: true
+        responses:
+          200:
+            description: Returns the created group
+            body:
+              application/json:
+                schema: PlatformGroup
+                example: |
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                   "identifier": "group1",
+                   "name": "Group 1",
+                   "members": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "admins": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                       "identifier": "jdoe",
+                       "name": "Jane doe"
+                     }
+                   ],
+                   "roles": [
+                     {
+                       "type": "org.xowl.platform.kernel.platform.PlatformGroup",
+                       "identifier": "role1",
+                       "name": "Role 1"
+                     }
+                   ]
+                 }
+      delete:
+        description: Deletes the group from the platform
+        responses:
+          200:
+            description: The operation succeeded
       /rename:
+        description: Action to rename the group (updates the display name)
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Renames the group (updates the display name)
+          queryParameters:
+            name:
+              displayName: Display name
+              type: string
+              description: The new display name for the group
+              example: Group X
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /addMember:
+        description: Action to add a new member to the group
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Adds a new member to the group
+          queryParameters:
+            member:
+              displayName: User identifier
+              type: string
+              description: The identifier of the user to add as a member
+              example: jsode
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /removeMember:
+        description: Action to remove a member from the group
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Removes a member from the group
+          queryParameters:
+            member:
+              displayName: User identifier
+              type: string
+              description: The identifier of the user to remove as a member
+              example: jsode
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /addAdmin:
+        description: Action to add a new admin to the group
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Adds a new admin to the group
+          queryParameters:
+            member:
+              displayName: User identifier
+              type: string
+              description: The identifier of the user to add as an admin
+              example: jsode
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /removeAdmin:
+        description: Action to remove an admin from the group
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Removes an admin from the group
+          queryParameters:
+            member:
+              displayName: User identifier
+              type: string
+              description: The identifier of the user to remove as an admin
+              example: jsode
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /assign:
+        description: Action to assign a role to the group
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Assigns a role to the group
+          queryParameters:
+            role:
+              displayName: Role
+              type: string
+              description: The identifier of the role to assign
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /unassign:
+        description: Action to un-assign a role from the group
+        post:
+          description: Un-assigns a role from the group
+          queryParameters:
+            role:
+              displayName: Role
+              type: string
+              description: The identifier of the role to un-assign
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
   /roles:
+    description: The collection of roles on the platform
+    get:
+     description: Gets the list of the roles on the platform
+     is: [secured, mayFail]
+     responses:
+       200:
+         description: The list of roles on the platform
+         body:
+           application/json:
+             schema: PlatformRoles
+             example: |
+               [
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                   "identifier": "admin",
+                   "name": "Administrator Role"
+                 }
+               ]
     /{roleId}:
+      description: A specific role on the platform
+      is: [secured, mayFail, resourceAccess]
+      get:
+        description: Gets the description of the role
+        responses:
+          200:
+            description: Returns the description of the role
+            body:
+              application/json:
+                schema: PlatformRole
+                example: |
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                   "identifier": "admin",
+                   "name": "Administrator Role"
+                 }
+      put:
+        description: Creates the role on the platform
+        queryParameters:
+          name:
+            displayName: Display name
+            type: string
+            description: The display name for the role
+            example: Role 1
+            required: true
+          admin:
+        responses:
+          200:
+            description: Returns the created role
+            body:
+              application/json:
+                schema: PlatformRole
+                example: |
+                 {
+                   "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                   "identifier": "admin",
+                   "name": "Administrator Role"
+                 }
+      delete:
+        description: Deletes the group from the platform
+        responses:
+          200:
+            description: The operation succeeded
       /rename:
+        description: Action to rename the group (updates the display name)
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Renames the group (updates the display name)
+          queryParameters:
+            name:
+              displayName: Display name
+              type: string
+              description: The new display name for the group
+              example: Group X
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /imply:
+        description: Action to add role implied by this one
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Adds a role implied by this one
+          queryParameters:
+            target:
+              displayName: Target role
+              type: string
+              description: The identifier of the role to imply
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
       /unimply:
+        description: Action to remove role implied by this one
+        is: [secured, mayFail, resourceAccess]
+        post:
+          description: Removes a role implied by this one
+          queryParameters:
+            target:
+              displayName: Target role
+              type: string
+              description: The identifier of the implied role
+              example: role1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded

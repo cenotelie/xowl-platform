@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/infra/utils/schema",
+  "definitions": {
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.ApiError"
+          ]
+        },
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        },
+        "helpLink": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "message",
+        "helpLink"
+      ]
+    },
+    "Metric": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.metrics.Metric"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "snapshotTTL": {
+          "type": "string"
+        },
+        "hints": {
+          "type": "object"
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Metric"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "unit",
+        "snapshotTTL",
+        "hints"
+      ]
+    },
+    "MetricSnapshot": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.metrics.MetricSnapshot"
+          ]
+        },
+        "value": {
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/MetricSnapshot"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type"
+      ]
+    }
+  }
+}

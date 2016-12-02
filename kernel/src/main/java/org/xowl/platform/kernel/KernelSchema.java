@@ -27,22 +27,14 @@ import org.xowl.platform.kernel.artifacts.BusinessSchemaResource;
  */
 public interface KernelSchema {
     /**
-     * The base uri for the platform
+     * URI of the artifact registry graphs
      */
-    String URI_BASE = "http://xowl.org/platform";
-    /**
-     * Base URI for all schemas
-     */
-    String URI_SCHEMAS = URI_BASE + "/schemas/";
+    String GRAPH_ARTIFACTS = "http://xowl.org/platform/artifacts";
+
     /**
      * The URI of the kernel schema
      */
-    String URI_KERNEL = URI_SCHEMAS + "kernel";
-
-    /**
-     * URI of the artifact registry graphs
-     */
-    String GRAPH_ARTIFACTS = URI_BASE + "/artifacts";
+    String URI_KERNEL = "http://xowl.org/platform/kernel";
 
     /**
      * The Resource concept
@@ -121,5 +113,5 @@ public interface KernelSchema {
     /**
      * The implementation of this schema
      */
-    BusinessSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/schemas/kernel.fs", URI_KERNEL);
+    BusinessSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", URI_KERNEL);
 }

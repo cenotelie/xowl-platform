@@ -134,8 +134,6 @@ public class OSGiBundle implements Identifiable, Serializable {
                 TextUtils.escapeStringJSON(getDescription()) +
                 "\", \"vendor\": \"" +
                 TextUtils.escapeStringJSON(getVendor()) +
-                "\", \"type\": \"" +
-                TextUtils.escapeStringJSON(OSGiBundle.class.getCanonicalName()) +
                 "\", \"version\": \"" +
                 TextUtils.escapeStringJSON(getVersion()) +
                 "\", \"state\": \"" +

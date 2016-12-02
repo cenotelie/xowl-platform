@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/platform/kernel/schema",
+  "definitions": {
+    "OSGiBundle": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.OSGiBundle"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "UNINSTALLED",
+            "INSTALLED",
+            "RESOLVED",
+            "STARTING",
+            "STOPPING",
+            "ACTIVE"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "description",
+        "vendor",
+        "version",
+        "state"
+      ]
+    },
+    "OSGiBundles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/OSGiBundle"
+          }
+        ]
+      }
+    },
+    "OSGiImplementation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.OSGiImplementation"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "PlatformRole": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.PlatformRole"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "PlatformRoles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/PlatformRole"
+          }
+        ]
+      }
+    },
+    "PlatformUser": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.PlatformUser"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/PlatformRole"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "PlatformUsers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/PlatformUser"
+          }
+        ]
+      }
+    },
+    "PlatformGroup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.PlatformGroup"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/PlatformUser"
+              }
+            ]
+          }
+        },
+        "admins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/PlatformUser"
+              }
+            ]
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/PlatformRole"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "PlatformGroups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/PlatformGroup"
+          }
+        ]
+      }
+    }
+  }
+}

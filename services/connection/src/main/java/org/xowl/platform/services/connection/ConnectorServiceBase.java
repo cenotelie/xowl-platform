@@ -52,19 +52,19 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     /**
      * The identifier for this connector
      */
-    private final String identifier;
+    protected final String identifier;
     /**
      * The name for this connector
      */
-    private final String name;
+    protected final String name;
     /**
      * The API URIs for this connector
      */
-    private final String[] uris;
+    protected final String[] uris;
     /**
      * The queue iof input data packages, i.e. packages toward the platform
      */
-    private final BlockingQueue<Artifact> input;
+    protected final BlockingQueue<Artifact> input;
 
     /**
      * Initializes this connector
@@ -93,6 +93,16 @@ public abstract class ConnectorServiceBase implements ConnectorService {
         } catch (InterruptedException exception) {
             return false;
         }
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

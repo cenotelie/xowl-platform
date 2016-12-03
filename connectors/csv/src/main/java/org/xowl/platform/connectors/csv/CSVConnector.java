@@ -19,14 +19,8 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
-
-import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Represents a CSV connector
@@ -35,19 +29,6 @@ import java.util.Map;
  */
 public class CSVConnector extends ConnectorServiceBase {
     /**
-     * The identifier for this connector
-     */
-    private final String identifier;
-    /**
-     * The name for this connector
-     */
-    private final String name;
-    /**
-     * The API URIs for this connector
-     */
-    private final String[] uris;
-
-    /**
      * Initializes this connector
      *
      * @param identifier The identifier for this connector
@@ -55,33 +36,11 @@ public class CSVConnector extends ConnectorServiceBase {
      * @param uris       The API URIs for this connector
      */
     public CSVConnector(String identifier, String name, String[] uris) {
-        this.identifier = identifier;
-        this.name = name;
-        this.uris = uris;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getName() {
-        return name;
+        super(identifier, name, uris);
     }
 
     @Override
     public XSPReply pushToClient(Artifact data) {
         return XSPReplyUnsupported.instance();
-    }
-
-    @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(uris);
-    }
-
-    @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
     }
 }

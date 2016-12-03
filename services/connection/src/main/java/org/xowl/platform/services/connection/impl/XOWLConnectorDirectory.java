@@ -23,12 +23,14 @@ import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -38,6 +40,7 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.connection.*;
 import org.xowl.platform.services.connection.events.ConnectorDeletedEvent;
@@ -73,12 +76,32 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     }
 
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/admin/connectors",
-            "services/core/descriptors"
+    private static final String URI_API = HttpApiService.URI_API + "/services/connection";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json",
+            "/org/xowl/platform/services/connection/schema_platform_connection.json"
     };
+
+    /**
+     * API error - A connector with the same identifier already exists
+     */
+    private static final ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00010001,
+            "A connector with the same identifier already exists.",
+            ERROR_HELP_PREFIX + "0x00010001.html");
+    /**
+     * API error - Could not find a factory for the specified connector descriptor
+     */
+    private static final ApiError ERROR_NO_FACTORY = new ApiError(0x00010002,
+            "Could not find a factory for the specified connector descriptor.",
+            ERROR_HELP_PREFIX + "0x00010002.html");
 
     /**
      * The spawned connectors by identifier
@@ -108,37 +131,65 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (method.equals("GET")) {
-            if (uri.equals("services/core/descriptors"))
-                return onMessageListDescriptors();
-            if (uri.equals("services/admin/connectors")) {
-                String[] ids = parameters.get("id");
-                if (ids != null && ids.length > 0)
-                    return onMessageGetConnector(ids[0]);
-                return onMessageListConnectors();
+    public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/descriptors")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onMessageListDescriptors();
+        } else if (request.getUri().equals(URI_API + "/connectors")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onMessageListConnectors();
+        } else if (request.getUri().startsWith(URI_API + "/connectors")) {
+            String rest = request.getUri().substring(URI_API.length() + "/connectors".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String connectorId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET:
+                        return onMessageGetConnector(connectorId);
+                    case HttpConstants.METHOD_PUT:
+                        return onMessageCreateConnector(request);
+                    case HttpConstants.METHOD_DELETE:
+                        onMessageDeleteConnector(connectorId);
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
             }
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            rest = rest.substring(index);
+            switch (rest) {
+                case "/pull":
+                    return onMessagePullFromConnector(connectorId);
+                case "/push":
+                    return onMessagePushToConnector(connectorId, request);
+            }
         }
-        if (!method.equals("POST"))
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
 
-        String[] actions = parameters.get("action");
-        String action = actions != null && actions.length >= 1 ? actions[0] : null;
-        if (action != null && action.equals("spawn"))
-            return onMessageCreateConnector(parameters, content);
-        if (action != null && action.equals("delete"))
-            return onMessageDeleteConnector(parameters);
-        if (action != null && action.equals("pull"))
-            return onMessagePullFromConnector(parameters);
-        if (action != null && action.equals("push"))
-            return onMessagePushToConnector(parameters);
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/services/connection/api_service_connection.raml";
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/services/connection/api_service_connection.html";
     }
 
     @Override
@@ -171,7 +222,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             ConnectorService service = get(identifier);
             if (service != null)
                 // already exists
-                return new XSPReplyFailure("A connector with this identifier already exists");
+                return new XSPReplyApiError(ERROR_CONNECTOR_SAME_ID);
 
             for (ConnectorServiceFactory factory : factories) {
                 if (factory.getDescriptors().contains(description)) {
@@ -185,7 +236,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             }
             if (service == null)
                 // failed to create the service (factory not fond?)
-                return new XSPReplyFailure("Could not find the factory to create this service");
+                return new XSPReplyApiError(ERROR_NO_FACTORY);
 
             Registration registration = new Registration();
             registration.service = service;
@@ -402,31 +453,31 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * Responds to the request to spawn a new parametric connector
      *
-     * @param parameters The request parameters
-     * @param content    The content
+     * @param request The request to handle
      * @return The response
      */
-    private HttpResponse onMessageCreateConnector(Map<String, String[]> parameters, byte[] content) {
-        String[] domainIds = parameters.get("descriptor");
-        if (domainIds == null || domainIds.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected descriptor parameter");
-        if (content == null || content.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected JSON content");
+    private HttpResponse onMessageCreateConnector(HttpApiRequest request) {
+        String[] descriptorId = request.getParameter("descriptor");
+        if (descriptorId == null || descriptorId.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
+        String content = new String(request.getContent(), Files.CHARSET);
+        if (content.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, Files.CHARSET));
+        ASTNode root = JSONLDLoader.parseJSON(logger, content);
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
 
         ConnectorDescription descriptor = null;
         for (ConnectorDescription description : getDescriptors()) {
-            if (description.getIdentifier().equals(domainIds[0])) {
+            if (description.getIdentifier().equals(descriptorId[0])) {
                 descriptor = description;
                 break;
             }
         }
         if (descriptor == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Failed to find descriptor " + domainIds[0]);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
 
         String id = null;
         String name = null;
@@ -490,9 +541,9 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         }
 
         if (id == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Identifier for connector not specified");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The identifier for the connector is not specified"), null);
         if (name == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Name for connector not specified");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The name for the connector is not specified"), null);
 
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
@@ -503,20 +554,18 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             return XSPReplyUtils.toHttpResponse(reply, null);
 
         reply = spawn(descriptor, id, name, uris.toArray(new String[uris.size()]), customParams);
-        return XSPReplyUtils.toHttpResponse(reply, null);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConnectorService>) reply).getData().serializedJSON());
     }
 
     /**
      * Responds to the request to delete a previously spawned parametric connector
      *
-     * @param parameters The request parameters
+     * @param connectorId The identifier of the connector to delete
      * @return The response
      */
-    private HttpResponse onMessageDeleteConnector(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
-
+    private HttpResponse onMessageDeleteConnector(String connectorId) {
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -525,7 +574,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        reply = delete(ids[0]);
+        reply = delete(connectorId);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
@@ -533,17 +582,14 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * Responds to the request to pull an artifact from a connector
      * When successful, this action creates the appropriate job and returns it.
      *
-     * @param parameters The request parameters
+     * @param connectorId The identifier of the connector to delete
      * @return The response
      */
-    private HttpResponse onMessagePullFromConnector(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
+    private HttpResponse onMessagePullFromConnector(String connectorId) {
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
-        Job job = new PullArtifactJob(ids[0]);
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        Job job = new PullArtifactJob(connectorId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
@@ -552,21 +598,19 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
      * Responds to the request to push an artifact to a connector
      * When successful, this action creates the appropriate job and returns it.
      *
-     * @param parameters The request parameters
+     * @param connectorId The identifier of the connector to delete
+     * @param request     The request to handle
      * @return The response
      */
-    private HttpResponse onMessagePushToConnector(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
-        String[] artifacts = parameters.get("artifact");
+    private HttpResponse onMessagePushToConnector(String connectorId, HttpApiRequest request) {
+        String[] artifacts = request.getParameter("artifact");
         if (artifacts == null || artifacts.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an artifact parameter");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
 
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Could not find the job execution service");
-        Job job = new PushArtifactJob(ids[0], artifacts[0]);
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        Job job = new PushArtifactJob(connectorId, artifacts[0]);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }

@@ -272,6 +272,9 @@
         "name": {
           "type": "string"
         },
+        "jobType": {
+          "type": "string"
+        },
         "owner": {
           "type": "object",
           "oneOf": [
@@ -310,6 +313,7 @@
         "type",
         "identifier",
         "name",
+        "jobType",
         "owner",
         "status",
         "timeScheduled",
@@ -505,6 +509,65 @@
         "oneOf": [
           {
             "$ref": "#/definitions/BusinessSchema"
+          }
+        ]
+      }
+    },
+    "Artifact": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.artifacts.Artifact"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "base": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "creation": {
+          "type": "string"
+        },
+        "archetype": {
+          "type": "string"
+        },
+        "supersede": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "base",
+        "version",
+        "from",
+        "creation",
+        "archetype",
+        "supersede"
+      ]
+    },
+    "Artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Artifact"
           }
         ]
       }

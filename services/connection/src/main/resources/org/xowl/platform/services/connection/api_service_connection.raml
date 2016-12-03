@@ -1,0 +1,245 @@
+#%RAML 1.0
+---
+title: Connection Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+  ConnectorDescriptions: !include schema_platform_connection.json#/definitions/ConnectorDescriptions
+  ConnectorServices: !include schema_platform_connection.json#/definitions/ConnectorServices
+  ConnectorService: !include schema_platform_connection.json#/definitions/ConnectorService
+  ConnectorServiceData: !include schema_platform_connection.json#/definitions/ConnectorServiceData
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/connection:
+  /descriptors:
+    description: The collection of the connector descriptors for this platform
+    get:
+      description: Gets the list of the connector descriptors for this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the connector descriptors for this platform
+          body:
+            application/json:
+              schema: ConnectorDescriptions
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.connection.ConnectorDescription",
+                    "identifier": "descriptor1",
+                    "name": "My First Descriptor",
+                    "description": "This is the descriptor for a connector. It acts as a blueprint for spawning new connectors.",
+                    "parameters": [
+                      {
+                        "type": "org.xowl.platform.services.connection.ConnectorDescriptionParam",
+                        "identifier": "param1",
+                        "name": "Parameter 1",
+                        "isRequired": true,
+                        "typeHint": "string"
+                      }
+                    ]
+                  }
+                ]
+  /connectors:
+    description: The collection of spawned connectors for this platform
+    get:
+      description: Gets the list of the spawned connectors
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the spawned connectors
+          body:
+            application/json:
+              schema: ConnectorServices
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.connection.ConnectorService",
+                    "identifier": "connector1",
+                    "name": "The connectors for XXX",
+                    "uris": [
+                      "/api/connectors/connector1"
+                    ],
+                    "queue": [
+                      {
+                        "type": "org.xowl.platform.kernel.artifacts.Artifact",
+                        "identifier": "http://xowl.org/artifact1/v1",
+                        "name": "Artifact 1",
+                        "base": "http://xowl.org/artifact1",
+                        "version": "v1",
+                        "from": "connector1",
+                        "creation": "01/01/2001 10:10",
+                        "archetype": "archetype1",
+                        "supersede": [
+                          "http://xowl.org/artifact1/v0"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+    /{connectorId}:
+      description: Represents a connector for this platform
+      is: [secured, mayFail, resourceAccess]
+      get:
+        description: Gets the description of the connector
+        responses:
+          200:
+            description: The description of the connector
+            body:
+              application/json:
+                schema: ConnectorService
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.connection.ConnectorService",
+                    "identifier": "connector1",
+                    "name": "The connectors for XXX",
+                    "uris": [
+                      "/api/connectors/connector1"
+                    ],
+                    "queue": [
+                      {
+                        "type": "org.xowl.platform.kernel.artifacts.Artifact",
+                        "identifier": "http://xowl.org/artifact1/v1",
+                        "name": "Artifact 1",
+                        "base": "http://xowl.org/artifact1",
+                        "version": "v1",
+                        "from": "connector1",
+                        "creation": "01/01/2001 10:10",
+                        "archetype": "archetype1",
+                        "supersede": [
+                          "http://xowl.org/artifact1/v0"
+                        ]
+                      }
+                    ]
+                  }
+      put:
+        description: Create this connector
+        queryParameters:
+          descriptor:
+            displayName: Descriptor
+            type: string
+            description: The identifier of the descriptor that will serve as blueprint for the new connector
+            example: descriptor1
+            required: true
+        body:
+          application/json:
+            schema: ConnectorServiceData
+            example: |
+              {
+                "identifier": "connector1",
+                "name": "The connectors for XXX",
+                "uris": [
+                  "/api/connectors/connector1"
+                ],
+                "param1": "value1",
+                "param2": [
+                  "value21",
+                  "value22"
+                ]
+              }
+        responses:
+          200:
+            description: The description of the created connector
+            body:
+              application/json:
+                schema: ConnectorService
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.connection.ConnectorService",
+                    "identifier": "connector1",
+                    "name": "The connectors for XXX",
+                    "uris": [
+                      "/api/connectors/connector1"
+                    ],
+                    "queue": [
+                      {
+                        "type": "org.xowl.platform.kernel.artifacts.Artifact",
+                        "identifier": "http://xowl.org/artifact1/v1",
+                        "name": "Artifact 1",
+                        "base": "http://xowl.org/artifact1",
+                        "version": "v1",
+                        "from": "connector1",
+                        "creation": "01/01/2001 10:10",
+                        "archetype": "archetype1",
+                        "supersede": [
+                          "http://xowl.org/artifact1/v0"
+                        ]
+                      }
+                    ]
+                  }
+      delete:
+        description: Deletes this connector from the platform
+        responses:
+          200:
+            description: The operation succeeded
+      /pull:
+        description: Action to pull a new artifact from the connector's queue
+        post:
+          description: Triggers a job to pull a new artifact from the connector's queue
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The description of the new job that will executes this action
+              body:
+                application/json:
+                  schema: Job
+                  example: |
+                    {
+                      "type": "org.xowl.platform.kernel.jobs.Job",
+                      "identifier": "job1",
+                      "name": "Pull from connector 1",
+                      "jobType": "org.xowl.platform.services.connection.jobs.PullArtifactJob",
+                      "owner": {
+                        "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                        "identifier": "jdoe",
+                        "name": "Jane Doe"
+                      },
+                      "status": "Running",
+                      "timeScheduled": "01/01/2001 10:10",
+                      "timeRun": "01/01/2001 10:10",
+                      "timeCompleted": "",
+                      "completionRate": "0.5",
+                      "payload": "connector1",
+                      "result": {}
+                    }
+      /push:
+        description: Action to push an existing artifact through this connector to a satellite of this platform
+        post:
+          description: Triggers a job to push an existing artifact through this connector to a satellite of this platform
+          is: [secured, mayFail, resourceAccess]
+          queryParameters:
+            artifact:
+              displayName: Artifact
+              type: string
+              description: The identifier of the artifact to push through
+              example: http://xowl.org/platform/artifacts/artifact1/v1
+              required: true
+          responses:
+            200:
+              description: The description of the new job that will executes this action
+              body:
+                application/json:
+                  schema: Job
+                  example: |
+                    {
+                      "type": "org.xowl.platform.kernel.jobs.Job",
+                      "identifier": "job1",
+                      "name": "Pull from connector 1",
+                      "jobType": "org.xowl.platform.services.connection.jobs.PushArtifactJob",
+                      "owner": {
+                        "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                        "identifier": "jdoe",
+                        "name": "Jane Doe"
+                      },
+                      "status": "Running",
+                      "timeScheduled": "01/01/2001 10:10",
+                      "timeRun": "01/01/2001 10:10",
+                      "timeCompleted": "",
+                      "completionRate": "0.5",
+                      "payload": {
+                        "connectorId": "connector1",
+                        "artifactId": "http://xowl.org/platform/artifacts/artifact1/v1"
+                      },
+                      "result": {}
+                    }

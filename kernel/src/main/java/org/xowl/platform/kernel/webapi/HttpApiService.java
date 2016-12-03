@@ -63,29 +63,35 @@ public interface HttpApiService extends Service {
      */
     String ERROR_HELP_PREFIX = "http://xowl.org/support/platform/errors/";
     /**
+     * API error - Failed to parse the content of the request.
+     */
+    ApiError ERROR_CONTENT_PARSING_FAILED = new ApiError(0x0001,
+            "Failed to parse the content of the request.",
+            ERROR_HELP_PREFIX + "0x0001.html");
+    /**
      * API error - Expected query parameters.
      */
-    ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x0101,
+    ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x0002,
             "Expected query parameters.",
-            ERROR_HELP_PREFIX + "0x0101.html");
+            ERROR_HELP_PREFIX + "0x0002.html");
     /**
      * API error - Failed to read the content of the request
      */
-    ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x0102,
+    ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x0003,
             "Failed to read the content of the request.",
-            ERROR_HELP_PREFIX + "0x0102.html");
+            ERROR_HELP_PREFIX + "0x0003.html");
     /**
      * API error - A query parameter is not in the expected range
      */
-    ApiError ERROR_PARAMETER_RANGE = new ApiError(0x0103,
+    ApiError ERROR_PARAMETER_RANGE = new ApiError(0x0004,
             "A query parameter is not in the expected range.",
-            ERROR_HELP_PREFIX + "0x0103.html");
+            ERROR_HELP_PREFIX + "0x0004.html");
     /**
      * API error - Expected a Content-Type header
      */
-    ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x0104,
+    ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x0005,
             "Expected a Content-Type header.",
-            ERROR_HELP_PREFIX + "0x0104.html");
+            ERROR_HELP_PREFIX + "0x0005.html");
 
     /**
      * Gets whether this server can handle the specified request, and if so with which priority

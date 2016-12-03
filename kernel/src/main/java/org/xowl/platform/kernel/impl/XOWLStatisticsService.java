@@ -50,15 +50,6 @@ public class XOWLStatisticsService implements StatisticsService {
     private static final String URI_API = HttpApiService.URI_API + "/kernel/statistics";
 
     /**
-     * The additional resources for the API definition
-     */
-    private static final String[] RESOURCES = new String[]{
-            "/org/xowl/platform/kernel/api_traits.raml",
-            "/org/xowl/platform/kernel/schema_infra_utils.json",
-            "/org/xowl/platform/kernel/schema_platform_kernel.json"
-    };
-
-    /**
      * Initializes this provider
      */
     public XOWLStatisticsService() {
@@ -101,21 +92,6 @@ public class XOWLStatisticsService implements StatisticsService {
                 return onMessageGetMetricValue(metricId);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Override
-    public String getDefinitionRAML() {
-        return "/org/xowl/platform/kernel/api_statistics.raml";
-    }
-
-    @Override
-    public String[] getDefinitionResources() {
-        return RESOURCES;
-    }
-
-    @Override
-    public String getDefinitionHTML() {
-        return "/org/xowl/platform/kernel/api_statistics.html";
     }
 
     /**

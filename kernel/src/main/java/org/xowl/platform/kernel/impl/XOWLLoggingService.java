@@ -57,15 +57,6 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     private static final String URI_API = HttpApiService.URI_API + "/kernel/log";
 
     /**
-     * The additional resources for the API definition
-     */
-    private static final String[] RESOURCES = new String[]{
-            "/org/xowl/platform/kernel/api_traits.raml",
-            "/org/xowl/platform/kernel/schema_infra_utils.json",
-            "/org/xowl/platform/kernel/schema_platform_kernel.json"
-    };
-
-    /**
      * The size of the buffer for the last messages
      */
     private static final int BUFFER_SIZE = 128;
@@ -221,21 +212,6 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    @Override
-    public String getDefinitionRAML() {
-        return "/org/xowl/platform/kernel/api_log.raml";
-    }
-
-    @Override
-    public String[] getDefinitionResources() {
-        return RESOURCES;
-    }
-
-    @Override
-    public String getDefinitionHTML() {
-        return "/org/xowl/platform/kernel/api_log.html";
     }
 
     @Override

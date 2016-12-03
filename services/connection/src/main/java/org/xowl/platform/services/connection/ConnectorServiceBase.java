@@ -161,21 +161,6 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     }
 
     @Override
-    public String getDefinitionRAML() {
-        return null;
-    }
-
-    @Override
-    public String[] getDefinitionResources() {
-        return null;
-    }
-
-    @Override
-    public String getDefinitionHTML() {
-        return null;
-    }
-
-    @Override
     public String serializedString() {
         return getIdentifier();
     }

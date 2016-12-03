@@ -19,14 +19,13 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.WebModule;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Implements a directory of registered web modules
@@ -35,11 +34,9 @@ import java.util.Map;
  */
 public class XOWLWebModuleDirectory implements HttpApiService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/webapp/modules"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/webapp";
 
     /**
      * The registered modules
@@ -82,21 +79,28 @@ public class XOWLWebModuleDirectory implements HttpApiService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        StringBuilder builder = new StringBuilder("[");
-        boolean first = true;
-        for (WebModule module : modules) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(module.serializedJSON());
+    public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/modules")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (WebModule module : modules) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(module.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 }

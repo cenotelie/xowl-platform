@@ -81,16 +81,6 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     private static final String URI_API = HttpApiService.URI_API + "/services/connection";
 
     /**
-     * The additional resources for the API definition
-     */
-    private static final String[] RESOURCES = new String[]{
-            "/org/xowl/platform/kernel/api_traits.raml",
-            "/org/xowl/platform/kernel/schema_infra_utils.json",
-            "/org/xowl/platform/kernel/schema_platform_kernel.json",
-            "/org/xowl/platform/services/connection/schema_platform_connection.json"
-    };
-
-    /**
      * API error - A connector with the same identifier already exists
      */
     private static final ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00010001,
@@ -172,24 +162,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                     return onMessagePushToConnector(connectorId, request);
             }
         }
-
-
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Override
-    public String getDefinitionRAML() {
-        return "/org/xowl/platform/services/connection/api_service_connection.raml";
-    }
-
-    @Override
-    public String[] getDefinitionResources() {
-        return RESOURCES;
-    }
-
-    @Override
-    public String getDefinitionHTML() {
-        return "/org/xowl/platform/services/connection/api_service_connection.html";
     }
 
     @Override

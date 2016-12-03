@@ -45,15 +45,6 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     private static final String URI_API = HttpApiService.URI_API + "/kernel/business";
 
     /**
-     * The additional resources for the API definition
-     */
-    private static final String[] RESOURCES = new String[]{
-            "/org/xowl/platform/kernel/api_traits.raml",
-            "/org/xowl/platform/kernel/schema_infra_utils.json",
-            "/org/xowl/platform/kernel/schema_platform_kernel.json"
-    };
-
-    /**
      * The registered domains
      */
     private final Map<String, BusinessDomain> domains;
@@ -164,21 +155,6 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
             return onGetSchema(rest);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Override
-    public String getDefinitionRAML() {
-        return "/org/xowl/platform/kernel/api_business.raml";
-    }
-
-    @Override
-    public String[] getDefinitionResources() {
-        return RESOURCES;
-    }
-
-    @Override
-    public String getDefinitionHTML() {
-        return "/org/xowl/platform/kernel/api_business.html";
     }
 
     /**

@@ -74,6 +74,17 @@
         "hints"
       ]
     },
+    "Metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Metric"
+          }
+        ]
+      }
+    },
     "MetricSnapshot": {
       "type": "object",
       "properties": {

@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -30,12 +31,12 @@ import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * The provider of statistics services
@@ -44,10 +45,17 @@ import java.util.Map;
  */
 public class XOWLStatisticsService implements StatisticsService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/admin/statistics"
+    private static final String URI_API = HttpApiService.URI_API + "/services/admin/statistics";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json"
     };
 
     /**
@@ -67,19 +75,47 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        String[] polls = parameters.get("poll");
-        if (polls != null && polls.length > 0)
-            return onMessageGetMetricValues(polls);
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
+    public HttpResponse handle(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+
+        if (request.getUri().equals(URI_API + "/metrics"))
             return onMessageGetMetricList();
-        return onMessageGetMetric(ids[0]);
+
+        if (request.getUri().startsWith(URI_API + "/metrics")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/metrics".length() + 1));
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String metricId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0)
+                return onMessageGetMetric(metricId);
+            else if (rest.substring(index).equals("/snapshot"))
+                return onMessageGetMetricValue(metricId);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/kernel/api_statistics.raml";
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/kernel/api_statistics.html";
     }
 
     /**
@@ -118,12 +154,12 @@ public class XOWLStatisticsService implements StatisticsService {
     }
 
     /**
-     * Responds to a request for the values of metrics
+     * Responds to a request for the values of a metric
      *
-     * @param ids The requested metrics
+     * @param identifier The requested metric
      * @return The metrics' values
      */
-    private HttpResponse onMessageGetMetricValues(String[] ids) {
+    private HttpResponse onMessageGetMetricValue(String identifier) {
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -132,30 +168,15 @@ public class XOWLStatisticsService implements StatisticsService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        boolean first = true;
-        StringBuilder builder = new StringBuilder("[");
         for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
-                for (int i = 0; i != ids.length; i++) {
-                    if (metric.getIdentifier().equals(ids[i])) {
-                        MetricSnapshot value = provider.pollMetric(metric);
-                        if (value == null)
-                            continue;
-                        if (!first)
-                            builder.append(", ");
-                        first = false;
-                        builder.append("{\"metric\": ");
-                        builder.append(metric.serializedJSON());
-                        builder.append(", \"value\": ");
-                        builder.append(value.serializedJSON());
-                        builder.append("}");
-                        break;
-                    }
+                if (metric.getIdentifier().equals(identifier)) {
+                    MetricSnapshot value = provider.pollMetric(metric);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, value.serializedJSON());
                 }
             }
         }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override

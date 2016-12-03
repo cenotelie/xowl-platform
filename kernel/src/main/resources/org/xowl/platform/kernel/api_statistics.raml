@@ -1,0 +1,77 @@
+#%RAML 1.0
+---
+title: Statistics Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Metric: !include schema_infra_utils.json#/definitions/Metric
+  Metrics: !include schema_infra_utils.json#/definitions/Metrics
+  MetricSnapshot: !include schema_infra_utils.json#/definitions/MetricSnapshot
+traits: !include api_traits.raml
+baseUri: https://localhost:3443/api
+/services/admin/statistics:
+  /metrics:
+    description: The collection of metrics on the platform
+    get:
+      description: Gets the list of metrics on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of metrics on the platform
+          body:
+            application/json:
+              schema: Metrics
+              example: |
+                [
+                  {
+                    "type": "org.xowl.infra.utils.metrics.Metric",
+                    "identifier": "metric1",
+                    "name": "My Metric",
+                    "unit": "second",
+                    "snapshotTTL": "60",
+                    "hints": {
+                      "composed": "false"
+                    },
+                    "parts": []
+                  }
+                ]
+    /{metricId}:
+      description: A metric on the platform
+      get:
+        description: Gets the description of a metric
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the metric
+            body:
+              application/json:
+                schema: Metric
+                example: |
+                  {
+                    "type": "org.xowl.infra.utils.metrics.Metric",
+                    "identifier": "metric1",
+                    "name": "My Metric",
+                    "unit": "second",
+                    "snapshotTTL": "60",
+                    "hints": {
+                      "composed": "false"
+                    },
+                    "parts": []
+                  }
+      /snapshot:
+        description: A snapshot of the metric
+        get:
+          description: Gets a snapshot of the metric
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The description of the metric
+              body:
+                application/json:
+                  schema: MetricSnapshot
+                  example: |
+                    {
+                      "type": "org.xowl.infra.utils.metrics.MetricSnapshot",
+                      "value": "50",
+                      "parts": []
+                    }

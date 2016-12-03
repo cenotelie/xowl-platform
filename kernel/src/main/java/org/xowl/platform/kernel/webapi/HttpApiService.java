@@ -102,4 +102,25 @@ public interface HttpApiService extends Service {
      * @return The HTTP response
      */
     HttpResponse handle(HttpApiRequest request);
+
+    /**
+     * Gets the name of the resource that contains the RAML definition of the API
+     *
+     * @return The name of the resource
+     */
+    String getDefinitionRAML();
+
+    /**
+     * Gets the name of the additional resources for the RAML definition of the API
+     *
+     * @return The name of the resources
+     */
+    String[] getDefinitionResources();
+
+    /**
+     * Gets the name of the resource that contains the documentation of the API
+     *
+     * @return The name of the resource that contains the documentation of the API
+     */
+    String getDefinitionHTML();
 }

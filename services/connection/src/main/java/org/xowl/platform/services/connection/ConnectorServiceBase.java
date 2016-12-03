@@ -17,24 +17,24 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 
-import java.net.HttpURLConnection;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -50,14 +50,33 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     protected static final int INPUT_QUEUE_MAX_CAPACITY = 16;
 
     /**
+     * The identifier for this connector
+     */
+    private final String identifier;
+    /**
+     * The name for this connector
+     */
+    private final String name;
+    /**
+     * The API URIs for this connector
+     */
+    private final String[] uris;
+    /**
      * The queue iof input data packages, i.e. packages toward the platform
      */
     private final BlockingQueue<Artifact> input;
 
     /**
      * Initializes this connector
+     *
+     * @param identifier The identifier for this connector
+     * @param name       The name for this connector
+     * @param uris       The API URIs for this connector
      */
-    protected ConnectorServiceBase() {
+    protected ConnectorServiceBase(String identifier, String name, String[] uris) {
+        this.identifier = identifier;
+        this.name = name;
+        this.uris = uris;
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
     }
 
@@ -118,8 +137,32 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, serializedJSON());
+    public int canHandle(HttpApiRequest request) {
+        for (int i = 0; i != uris.length; i++) {
+            if (uris[i].equals(request.getUri()))
+                return PRIORITY_NORMAL;
+        }
+        return CANNOT_HANDLE;
+    }
+
+    @Override
+    public HttpResponse handle(HttpApiRequest request) {
+        return XSPReplyUtils.toHttpResponse(XSPReplyUnsupported.instance(), null);
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return null;
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return null;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return null;
     }
 
     @Override
@@ -133,11 +176,10 @@ public abstract class ConnectorServiceBase implements ConnectorService {
         builder.append("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(ConnectorService.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
-        builder.append(TextUtils.escapeStringJSON(getIdentifier()));
+        builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
-        builder.append(TextUtils.escapeStringJSON(getName()));
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"uris\": [");
-        Collection<String> uris = getURIs();
         boolean first = true;
         for (String uri : uris) {
             if (!first)

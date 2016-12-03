@@ -257,6 +257,79 @@
           }
         ]
       }
+    },
+    "Job": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.jobs.Job"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PlatformUser"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "Unscheduled",
+            "Scheduled",
+            "Running",
+            "Completed",
+            "Cancelled"
+          ]
+        },
+        "timeScheduled": {
+          "type": "string"
+        },
+        "timeRun": {
+          "type": "string"
+        },
+        "timeCompleted": {
+          "type": "string"
+        },
+        "completionRate": {
+          "type": "string"
+        },
+        "payload": {
+        },
+        "result": {
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "owner",
+        "status",
+        "timeScheduled",
+        "timeRun",
+        "timeCompleted",
+        "completionRate",
+        "payload",
+        "result"
+      ]
+    },
+    "Jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Job"
+          }
+        ]
+      }
     }
   }
 }

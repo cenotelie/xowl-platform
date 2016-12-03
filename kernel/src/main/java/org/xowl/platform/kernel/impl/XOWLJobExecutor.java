@@ -30,6 +30,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -45,6 +46,7 @@ import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.*;
@@ -78,10 +80,17 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
     private static final int COMPLETED_QUEUED_BOUND = EXECUTOR_QUEUE_BOUND;
 
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/admin/jobs"
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/jobs";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json"
     };
 
 
@@ -465,40 +474,67 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse handle(HttpApiRequest request) {
+        // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
 
-        if (method.equals("GET")) {
-            String[] ids = parameters.get("id");
-            if (ids != null && ids.length > 0) {
-                Job job = getJob(ids[0], JobStatus.Completed);
+        if (request.getUri().equals(URI_API)) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onRequestJobs(securityService);
+        }
+
+        if (request.getUri().startsWith(URI_API)) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + 1));
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String jobId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 if (securityService.getCurrentUser().equals(job.getOwner()))
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
                 return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
-            }
-            return onRequestJobs(securityService);
-        } else if (method.equals("POST")) {
-            String[] ids = parameters.get("cancel");
-            if (ids != null && ids.length > 0) {
-                Job job = getJob(ids[0], JobStatus.Scheduled);
+            } else if (rest.substring(index).equals("/cancel")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 if (securityService.getCurrentUser().equals(job.getOwner()))
                     return XSPReplyUtils.toHttpResponse(cancel(job), null);
                 return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
             }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/kernel/api_jobs.raml";
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/kernel/api_jobs.html";
     }
 
     /**
@@ -516,26 +552,28 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
         List<Job> scheduled = getQueue();
         List<Job> running = getRunning();
         List<Job> completed = getCompleted();
+        boolean first = true;
         StringWriter builder = new StringWriter();
-        builder.append("{\"scheduled\": [");
-        for (int i = 0; i != scheduled.size(); i++) {
-            if (i != 0)
+        builder.append("[");
+        for (Job job : scheduled) {
+            if (!first)
                 builder.append(", ");
-            builder.append(scheduled.get(i).serializedJSON());
+            first = false;
+            builder.append(job.serializedJSON());
         }
-        builder.append("], \"running\": [");
-        for (int i = 0; i != running.size(); i++) {
-            if (i != 0)
+        for (Job job : running) {
+            if (!first)
                 builder.append(", ");
-            builder.append(running.get(i).serializedJSON());
+            first = false;
+            builder.append(job.serializedJSON());
         }
-        builder.append("], \"completed\": [");
-        for (int i = 0; i != completed.size(); i++) {
-            if (i != 0)
+        for (Job job : completed) {
+            if (!first)
                 builder.append(", ");
-            builder.append(completed.get(i).serializedJSON());
+            first = false;
+            builder.append(job.serializedJSON());
         }
-        builder.append("]}");
+        builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 

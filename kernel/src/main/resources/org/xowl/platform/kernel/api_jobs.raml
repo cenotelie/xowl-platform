@@ -1,0 +1,78 @@
+#%RAML 1.0
+---
+title: Jobs Management Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+  Jobs: !include schema_platform_kernel.json#/definitions/Jobs
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/kernel/jobs:
+  description: Collection of the jobs management by the platform
+  get:
+    description: Gets the list of the jobs managed by the platform
+    is: [secured, mayFail]
+    responses:
+      200:
+        description: The list of the jobs amanged by the platform
+        body:
+          application/json:
+            schema: Jobs
+            example: |
+              [
+                {
+                  "type": "org.xowl.platform.kernel.jobs.Job",
+                  "identifier": "job1",
+                  "name": "My Job",
+                  "owner": {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe"
+                  },
+                  "status": "Running",
+                  "timeScheduled": "01/01/2001 10:10",
+                  "timeRun": "01/01/2001 10:10",
+                  "timeCompleted": "",
+                  "completionRate": "0.5",
+                  "payload": "do this",
+                  "result": {}
+                }
+              ]
+  /{jobId}:
+    description: Represents a job managed by the platform
+    get:
+      description: Gets the description of a job
+      is: [secured, mayFail, resourceAccess]
+      responses:
+        200:
+          description: The description of the job
+          body:
+            application/json:
+              schema: Job
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.jobs.Job",
+                  "identifier": "job1",
+                  "name": "My Job",
+                  "owner": {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe"
+                  },
+                  "status": "Running",
+                  "timeScheduled": "01/01/2001 10:10",
+                  "timeRun": "01/01/2001 10:10",
+                  "timeCompleted": "",
+                  "completionRate": "0.5",
+                  "payload": "do this",
+                  "result": {}
+                }
+    /cancel:
+      description: Action to cancel a job that is scheduled to run or is running
+      post:
+        description: Cancels a job that is scheduled to run or is running
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded

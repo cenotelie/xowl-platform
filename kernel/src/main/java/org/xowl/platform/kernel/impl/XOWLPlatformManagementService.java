@@ -19,7 +19,10 @@ package org.xowl.platform.kernel.impl;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -33,6 +36,8 @@ import org.xowl.platform.kernel.platform.OSGiImplementation;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
 import java.util.*;
@@ -44,11 +49,17 @@ import java.util.*;
  */
 public class XOWLPlatformManagementService implements PlatformManagementService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIS = new String[]{
-            "services/admin/platform",
-            "services/admin/platform/bundles"
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/platform";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json"
     };
 
     /**
@@ -110,12 +121,14 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIS);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse handle(HttpApiRequest request) {
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -124,21 +137,48 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        if (uri.equals("services/admin/platform/bundles")) {
-            return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getPlatformBundles()), null);
+        if (request.getUri().equals(URI_API)) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getOSGiImplementation().serializedJSON());
+        } else if (request.getUri().equals(URI_API + "/shutdown")) {
+            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+            return XSPReplyUtils.toHttpResponse(shutdown(), null);
+        } else if (request.getUri().equals(URI_API + "/restart")) {
+            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+            return XSPReplyUtils.toHttpResponse(restart(), null);
+        } else if (request.getUri().equals(URI_API + "/bundles")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (OSGiBundle bundle : getPlatformBundles()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(bundle.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
 
-        String[] actions = parameters.get("action");
-        if (actions == null || actions.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(getOSGiImplementation()), null);
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/kernel/api_platform.raml";
+    }
 
-        switch (actions[0]) {
-            case "shutdown":
-                return XSPReplyUtils.toHttpResponse(shutdown(), null);
-            case "restart":
-                return XSPReplyUtils.toHttpResponse(restart(), null);
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/kernel/api_platform.html";
     }
 
     @Override

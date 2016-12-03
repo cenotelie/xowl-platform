@@ -19,7 +19,7 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.loaders.JSONLDLoader;
@@ -178,7 +178,7 @@ public class CSVImporter extends Importer {
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyFailure(exception.getMessage());
+            return new XSPReplyException(exception);
         }
     }
 }

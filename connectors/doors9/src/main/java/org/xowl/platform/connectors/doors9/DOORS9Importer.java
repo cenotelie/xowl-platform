@@ -18,10 +18,7 @@
 package org.xowl.platform.connectors.doors9;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.IRINode;
@@ -40,6 +37,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.importation.*;
 
@@ -111,7 +109,7 @@ public class DOORS9Importer extends Importer {
             BufferedLogger logger = new BufferedLogger();
             ASTNode root = JSONLDLoader.parseJSON(logger, json);
             if (root == null)
-                return new XSPReplyFailure(logger.getErrorsAsString());
+                return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
             DOORS9Context context = new DOORS9Context(new CachedNodes(), documentId, documentId);
             importProject(root.getChildren().get(0).getChildren().get(1), context);
             Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(documentId, configuration.getFamily(), configuration.getSuperseded(), document.getName(), configuration.getVersion(), configuration.getArchetype(), DOORS9Importer.class.getCanonicalName());
@@ -125,7 +123,7 @@ public class DOORS9Importer extends Importer {
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyFailure(exception.getMessage());
+            return new XSPReplyException(exception);
         }
     }
 

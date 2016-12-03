@@ -23,6 +23,7 @@ import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
@@ -48,6 +49,13 @@ public abstract class ConnectorServiceBase implements ConnectorService {
      * The maximum number of queued data packages for input toward the platform
      */
     protected static final int INPUT_QUEUE_MAX_CAPACITY = 16;
+
+    /**
+     * API error - The connector's queue is empty
+     */
+    public static final ApiError ERROR_EMPTY_QUEUE = new ApiError(0x00010003,
+            "The connector's queue is empty.",
+            ERROR_HELP_PREFIX + "0x00010003.html");
 
     /**
      * The identifier for this connector
@@ -142,7 +150,7 @@ public abstract class ConnectorServiceBase implements ConnectorService {
             artifact = input.poll();
         }
         if (artifact == null)
-            return new XSPReplyFailure("No queued artifact");
+            return new XSPReplyApiError(ERROR_EMPTY_QUEUE);
         return new XSPReplyResult<>(artifact);
     }
 

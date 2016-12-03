@@ -18,6 +18,7 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.Repository;
@@ -29,6 +30,7 @@ import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.Reader;
 import java.util.Collection;
@@ -62,11 +64,11 @@ class SemanticWebLoader {
         try {
             Collection<Quad> quads = load(bufferedLogger, reader, resourceIRI, syntax);
             if (quads == null || !bufferedLogger.getErrorMessages().isEmpty())
-                return new XSPReplyFailure(bufferedLogger.getErrorsAsString());
+                return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
             return new XSPReplyResultCollection<>(quads);
         } catch (TranslationException exception) {
             bufferedLogger.error(exception);
-            return new XSPReplyFailure(bufferedLogger.getErrorsAsString());
+            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
         }
     }
 

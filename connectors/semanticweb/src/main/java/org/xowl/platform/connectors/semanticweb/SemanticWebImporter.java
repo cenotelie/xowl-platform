@@ -157,7 +157,7 @@ public class SemanticWebImporter extends Importer {
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyFailure(exception.getMessage());
+            return new XSPReplyException(exception);
         }
     }
 }

@@ -18,15 +18,9 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.RichString;
-import org.xowl.infra.utils.SHA1;
-import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -84,6 +78,18 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/jobs";
 
+    /**
+     * API error - The job is already cancelled
+     */
+    public static final ApiError ERROR_ALREADY_CANCELLED = new ApiError(0x0011,
+            "The job is already cancelled.",
+            ERROR_HELP_PREFIX + "0x0011.html");
+    /**
+     * API error - The job is already completed
+     */
+    public static final ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x0012,
+            "The job is already completed.",
+            ERROR_HELP_PREFIX + "0x0012.html");
 
     /**
      * The pool of executor threads
@@ -359,9 +365,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
             case Running:
                 return job.cancel();
             case Completed:
-                return new XSPReplyFailure("Already completed");
+                return new XSPReplyApiError(ERROR_ALREADY_COMPLETED);
             case Cancelled:
-                return new XSPReplyFailure("Already cancelled");
+                return new XSPReplyApiError(ERROR_ALREADY_CANCELLED);
         }
         return XSPReplyFailure.instance();
     }

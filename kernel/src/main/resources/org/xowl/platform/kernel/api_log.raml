@@ -1,0 +1,29 @@
+#%RAML 1.0
+---
+title: Logging Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  LogMessages: !include schema_platform_kernel.json#/definitions/LogMessages
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/kernel/log:
+  description: The last log messages for the platform
+  get:
+    description: Gets the last log messages for the platform
+    is: [secured, mayFail]
+    responses:
+      200:
+        description: The last log messages for the platform
+        body:
+          application/json:
+            schema: LogMessages
+            example: |
+              [
+                {
+                  "type": "org.xowl.platform.kernel.impl.XOWLLoggingService.Msg",
+                  "level": "INFO",
+                  "date": "01/01/2001 10:10",
+                  "content": "This is a message"
+                }
+              ]

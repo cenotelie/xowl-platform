@@ -18,10 +18,10 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.ConsoleLogger;
 import org.xowl.infra.utils.logging.DispatchLogger;
@@ -36,8 +36,11 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +51,25 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Laurent Wouters
  */
 public class XOWLLoggingService extends DispatchLogger implements LoggingService {
+    /**
+     * The URI for the API services
+     */
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/log";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json"
+    };
+
+    /**
+     * The size of the buffer for the last messages
+     */
+    private static final int BUFFER_SIZE = 128;
+
     /**
      * Represents a message in a log
      */
@@ -118,17 +140,6 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     /**
-     * The URIs for this service
-     */
-    private static final String[] URIs = new String[]{
-            "services/admin/log"
-    };
-    /**
-     * The size of the buffer for the last messages
-     */
-    private static final int BUFFER_SIZE = 128;
-
-    /**
      * The buffer of the last messages
      */
     private final Msg[] messages;
@@ -181,12 +192,14 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
+    public HttpResponse handle(HttpApiRequest request) {
         // check for platform admin role
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
@@ -194,7 +207,35 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
-        return XSPReplyUtils.toHttpResponse(new XSPReplyResultCollection<>(getMessages()), null);
+
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (Msg message : getMessages()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(message.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/kernel/api_log.raml";
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/kernel/api_log.html";
     }
 
     @Override

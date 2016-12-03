@@ -217,6 +217,46 @@
           }
         ]
       }
+    },
+    "LogMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.impl.XOWLLoggingService.Msg"
+          ]
+        },
+        "level": {
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ]
+        },
+        "date": {
+          "type": "string"
+        },
+        "content": {
+        }
+      },
+      "required": [
+        "type",
+        "level",
+        "date",
+        "content"
+      ]
+    },
+    "LogMessages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/LogMessage"
+          }
+        ]
+      }
     }
   }
 }

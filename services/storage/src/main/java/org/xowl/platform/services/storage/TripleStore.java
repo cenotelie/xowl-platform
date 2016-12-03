@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts;
+package org.xowl.platform.services.storage;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.xsp.XSPReply;

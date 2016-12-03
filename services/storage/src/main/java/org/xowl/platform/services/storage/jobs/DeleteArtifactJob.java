@@ -15,24 +15,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts.jobs;
+package org.xowl.platform.services.storage.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobBase;
 
 /**
- * A job for pulling an artifact from the live store
+ * A job for deleting an artifact
  *
  * @author Laurent Wouters
  */
-public class PullArtifactFromLiveJob extends JobBase {
+public class DeleteArtifactJob extends JobBase {
     /**
      * The identifier of the target artifact
      */
@@ -47,7 +45,7 @@ public class PullArtifactFromLiveJob extends JobBase {
      *
      * @param artifactId The target connector
      */
-    public PullArtifactFromLiveJob(String artifactId) {
+    public DeleteArtifactJob(String artifactId) {
         this(PullArtifactFromLiveJob.class.getCanonicalName(), artifactId);
     }
 
@@ -57,8 +55,8 @@ public class PullArtifactFromLiveJob extends JobBase {
      * @param type       The custom type of this job
      * @param artifactId The target connector
      */
-    public PullArtifactFromLiveJob(String type, String artifactId) {
-        super("Pull live artifact " + artifactId, type);
+    public DeleteArtifactJob(String type, String artifactId) {
+        super("Delete artifact " + artifactId, type);
         this.artifactId = artifactId;
     }
 
@@ -67,7 +65,7 @@ public class PullArtifactFromLiveJob extends JobBase {
      *
      * @param definition The job's definition
      */
-    public PullArtifactFromLiveJob(ASTNode definition) {
+    public DeleteArtifactJob(ASTNode definition) {
         super(definition);
         String connector = TextUtils.unescape(getPayloadNode(definition).getValue());
         this.artifactId = connector.substring(1, connector.length() - 1);
@@ -90,11 +88,6 @@ public class PullArtifactFromLiveJob extends JobBase {
             result = XSPReplyServiceUnavailable.instance();
             return;
         }
-        XSPReply reply = storage.retrieve(artifactId);
-        if (!reply.isSuccess()) {
-            result = reply;
-            return;
-        }
-        result = storage.pullFromLive(((XSPReplyResult<Artifact>) reply).getData());
+        result = storage.delete(artifactId);
     }
 }

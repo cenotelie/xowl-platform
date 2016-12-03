@@ -5,10 +5,10 @@
 		<artifactId>xowl-services</artifactId>
 		<version>0.2.4-SNAPSHOT</version>
 	</parent>
-	<artifactId>xowl-service-lts</artifactId>
+	<artifactId>xowl-service-storage</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service LTS</name>
+	<name>xOWL Federation - Service Storage</name>
 	<description>The LTS service</description>
 	<dependencies>
 		<dependency>
@@ -33,7 +33,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator>org.xowl.platform.services.lts.Activator</Bundle-Activator>
+						<Bundle-Activator>org.xowl.platform.services.storage.Activator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

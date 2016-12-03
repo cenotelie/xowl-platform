@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts;
+package org.xowl.platform.services.storage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -23,8 +23,8 @@ import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.lts.impl.XOWLStoreService;
-import org.xowl.platform.services.lts.jobs.StorageJobFactory;
+import org.xowl.platform.services.storage.impl.XOWLStoreService;
+import org.xowl.platform.services.storage.jobs.StorageJobFactory;
 
 /**
  * Activator for the triple store service

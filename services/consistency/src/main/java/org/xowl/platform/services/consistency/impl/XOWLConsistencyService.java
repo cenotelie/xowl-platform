@@ -45,8 +45,8 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.consistency.*;
-import org.xowl.platform.services.lts.TripleStore;
-import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.storage.TripleStore;
+import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.io.StringReader;
 import java.net.HttpURLConnection;

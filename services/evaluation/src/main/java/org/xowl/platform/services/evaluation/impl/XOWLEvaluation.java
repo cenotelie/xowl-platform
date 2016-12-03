@@ -34,7 +34,7 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.services.evaluation.*;
-import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.text.DateFormat;
 import java.util.*;

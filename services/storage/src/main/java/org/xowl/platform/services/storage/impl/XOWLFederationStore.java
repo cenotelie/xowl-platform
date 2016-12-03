@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts.impl;
+package org.xowl.platform.services.storage.impl;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLRule;
@@ -32,7 +32,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.lts.TripleStore;
+import org.xowl.platform.services.storage.TripleStore;
 
 import java.io.StringWriter;
 import java.util.*;

@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts.impl;
+package org.xowl.platform.services.storage.impl;
 
 import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
@@ -53,11 +53,11 @@ import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.lts.TripleStore;
-import org.xowl.platform.services.lts.TripleStoreService;
-import org.xowl.platform.services.lts.jobs.DeleteArtifactJob;
-import org.xowl.platform.services.lts.jobs.PullArtifactFromLiveJob;
-import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
+import org.xowl.platform.services.storage.TripleStore;
+import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.jobs.DeleteArtifactJob;
+import org.xowl.platform.services.storage.jobs.PullArtifactFromLiveJob;
+import org.xowl.platform.services.storage.jobs.PushArtifactToLiveJob;
 
 import java.io.Closeable;
 import java.io.File;

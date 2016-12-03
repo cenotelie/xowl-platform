@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.lts.jobs;
+package org.xowl.platform.services.storage.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;

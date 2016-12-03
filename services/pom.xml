@@ -13,7 +13,7 @@
 	<modules>
 		<module>security-internal</module>
 		<module>security-shiro</module>
-		<module>lts</module>
+		<module>storage</module>
 		<module>consistency</module>
 		<module>impact</module>
 		<module>importation</module>

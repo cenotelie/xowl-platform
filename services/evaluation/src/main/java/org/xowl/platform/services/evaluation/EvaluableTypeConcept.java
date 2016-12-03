@@ -30,7 +30,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
-import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.util.ArrayList;
 import java.util.Collection;

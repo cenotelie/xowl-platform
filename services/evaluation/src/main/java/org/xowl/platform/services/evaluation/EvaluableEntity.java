@@ -30,7 +30,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
-import org.xowl.platform.services.lts.TripleStoreService;
+import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.util.HashMap;
 import java.util.Map;

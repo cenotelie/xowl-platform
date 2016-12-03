@@ -30,7 +30,6 @@ import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.store.sparql.ResultUtils;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
@@ -39,6 +38,7 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
@@ -51,6 +51,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.lts.TripleStore;
 import org.xowl.platform.services.lts.TripleStoreService;
@@ -60,10 +61,12 @@ import org.xowl.platform.services.lts.jobs.PushArtifactToLiveJob;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements a triple store service that is backed by a xOWL Server
@@ -72,12 +75,10 @@ import java.util.*;
  */
 public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpApiService, MeasurableService, Closeable {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/core/sparql",
-            "services/core/artifacts"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/storage";
+
     /**
      * The total artifacts count metric
      */
@@ -202,7 +203,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Triple Store Service";
+        return "xOWL Federation Platform - Storage Service";
     }
 
     @Override
@@ -248,7 +249,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         writer.write("\" } }");
         Result result = storeLongTerm.sparql(writer.toString());
         if (result.isFailure())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
             return XSPReplyNotFound.instance();
@@ -288,7 +289,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
         if (sparqlResult.isFailure())
-            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
     }
 
@@ -307,7 +308,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
         Result sparqlResult = storeLongTerm.sparql(writer.toString());
         if (sparqlResult.isFailure())
-            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
     }
 
@@ -363,55 +364,135 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (uri.equals("services/core/sparql"))
-            return onMessageSPARQL(content, accept);
-        if (uri.equals("services/core/artifacts")) {
-            // is it an action
-            String[] actions = parameters.get("action");
-            String action = actions != null && actions.length >= 1 ? actions[0] : null;
-            if (action != null && action.equals("delete"))
-                return onMessageDeleteArtifact(parameters);
-            if (action != null && action.equals("pull"))
-                return onMessagePullFromLive(parameters);
-            if (action != null && action.equals("push"))
-                return onMessagePushToLive(parameters);
-            // not an action, is it a specific artifact?
-            String[] ids = parameters.get("id");
-            String id = (ids != null && ids.length > 0) ? ids[0] : null;
-            if (id != null) {
-                // yes, request the content of the just the header?
-                String[] quads = parameters.get("quads");
-                if (quads == null || quads.length == 0)
-                    return XSPReplyUtils.toHttpResponse(retrieve(id), null);
-                if (quads[0].equals("metadata"))
-                    return onMessageGetArtifactMetadata(id);
-                else if (quads[0].equals("content"))
-                    return onMessageGetArtifactContent(id);
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/sparql")) {
+            return onMessageSPARQL(request);
+        } else if (request.getUri().equals(URI_API + "/artifacts")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            // get artifacts
+            String[] archetypes = request.getParameter("archetype");
+            if (archetypes != null && archetypes.length > 0) {
+                // get all artifacts for an archetype
+                XSPReply reply = getArtifactsForArchetype(archetypes[0]);
+                if (!reply.isSuccess())
+                    return XSPReplyUtils.toHttpResponse(reply, null);
+                boolean first = true;
+                StringBuilder builder = new StringBuilder("[");
+                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                    if (!first)
+                        builder.append(", ");
+                    first = false;
+                    builder.append(artifact.serializedJSON());
+                }
+                builder.append("]");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
             }
-            // no, is it a diff?
-            String[] diffLefts = parameters.get("diffLeft");
-            String[] diffRights = parameters.get("diffRight");
-            if (diffLefts != null && diffRights != null && diffLefts.length > 0 && diffRights.length > 0)
-                return onMessageDiffArtifacts(diffLefts[0], diffRights[0]);
-            // no, request a set of artifacts
-            String[] lives = parameters.get("live");
-            String[] bases = parameters.get("base");
-            String[] archetypes = parameters.get("archetype");
-            if (lives != null && lives.length > 0)
-                return XSPReplyUtils.toHttpResponse(getLiveArtifacts(), null);
-            else if (bases != null && bases.length > 0)
-                return XSPReplyUtils.toHttpResponse(getArtifactsForBase(bases[0]), null);
-            else if (archetypes != null && archetypes.length > 0)
-                return XSPReplyUtils.toHttpResponse(getArtifactsForArchetype(archetypes[0]), null);
-            else
-                return XSPReplyUtils.toHttpResponse(getAllArtifacts(), null);
+            String[] bases = request.getParameter("base");
+            if (bases != null && bases.length > 0) {
+                // get all artifacts for an base
+                XSPReply reply = getArtifactsForBase(bases[0]);
+                if (!reply.isSuccess())
+                    return XSPReplyUtils.toHttpResponse(reply, null);
+                boolean first = true;
+                StringBuilder builder = new StringBuilder("[");
+                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                    if (!first)
+                        builder.append(", ");
+                    first = false;
+                    builder.append(artifact.serializedJSON());
+                }
+                builder.append("]");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+            } else {
+                XSPReply reply = getAllArtifacts();
+                if (!reply.isSuccess())
+                    return XSPReplyUtils.toHttpResponse(reply, null);
+                boolean first = true;
+                StringBuilder builder = new StringBuilder("[");
+                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                    if (!first)
+                        builder.append(", ");
+                    first = false;
+                    builder.append(artifact.serializedJSON());
+                }
+                builder.append("]");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+            }
+        } else if (request.getUri().equals(URI_API + "/artifacts/diff")) {
+            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+            // diff artifacts left and right
+            String[] lefts = request.getParameter("left");
+            String[] rights = request.getParameter("right");
+            if (lefts == null || lefts.length == 0)
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
+            if (rights == null || rights.length == 0)
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
+            return onMessageDiffArtifacts(lefts[0], rights[0]);
+        } else if (request.getUri().equals(URI_API + "/artifacts/live")) {
+            XSPReply reply = getLiveArtifacts();
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(artifact.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().startsWith(URI_API + "/artifacts")) {
+            String rest = request.getUri().substring(URI_API.length() + "/artifacts".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String artifactId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        XSPReply reply = retrieve(artifactId);
+                        if (!reply.isSuccess())
+                            return XSPReplyUtils.toHttpResponse(reply, null);
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Artifact>) reply).getData().serializedJSON());
+                    }
+                    case HttpConstants.METHOD_DELETE:
+                        return onMessageDeleteArtifact(artifactId);
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+            } else {
+                switch (rest.substring(index)) {
+                    case "/metadata": {
+                        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                        return onMessageGetArtifactMetadata(artifactId);
+                    }
+                    case "/content": {
+                        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                        return onMessageGetArtifactContent(artifactId);
+                    }
+                    case "/activate": {
+                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                        return onMessagePushToLive(artifactId);
+                    }
+                    case "/deactivate": {
+                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                        return onMessagePullFromLive(artifactId);
+                    }
+                }
+            }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -419,23 +500,16 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * Responds to a SPARQL command
      *
-     * @param content The SPARQL content
-     * @param accept  The accept HTTP header
+     * @param request The request to handle
      * @return The response
      */
-    private HttpResponse onMessageSPARQL(byte[] content, String accept) {
-        if (content == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        String request = new String(content, Files.CHARSET);
-        Result result = storeLive.sparql(request);
-        String resultType = ResultUtils.coerceContentType(result, accept != null ? XSPReplyUtils.httpNegotiateContentType(Collections.singletonList(accept)) : Repository.SYNTAX_NQUADS);
-        StringWriter writer = new StringWriter();
-        try {
-            result.print(writer, resultType);
-        } catch (IOException exception) {
-            // cannot happen
-        }
-        return new HttpResponse(result.isSuccess() ? HttpURLConnection.HTTP_OK : HttpConstants.HTTP_UNKNOWN_ERROR, resultType, writer.toString());
+    private HttpResponse onMessageSPARQL(HttpApiRequest request) {
+        if (request.getContent() == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+        String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);
+        String sparql = new String(request.getContent(), Files.CHARSET);
+        Result result = storeLive.sparql(sparql);
+        return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(result), Arrays.asList(accept));
     }
 
     /**
@@ -450,7 +524,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
@@ -472,10 +546,10 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> content = artifact.getContent();
         if (content == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact's content"), null);
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
@@ -488,17 +562,14 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * Responds to a request to delete an artifact
      *
-     * @param parameters The request parameters
+     * @param artifactId The identifier of an artifact
      * @return The response
      */
-    private HttpResponse onMessageDeleteArtifact(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
+    private HttpResponse onMessageDeleteArtifact(String artifactId) {
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        Job job = new DeleteArtifactJob(ids[0]);
+        Job job = new DeleteArtifactJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
@@ -516,20 +587,20 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentLeft = artifact.getContent();
         if (contentLeft == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         reply = retrieve(artifactRight);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentRight = artifact.getContent();
         if (contentRight == null)
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to retrieve the content of the artifact");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
         BufferedLogger logger = new BufferedLogger();
@@ -539,8 +610,6 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
         serializer.serialize(logger, changeset.getAdded().iterator());
         writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getRemoved().iterator());
-        if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
         return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
     }
 
@@ -548,17 +617,14 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * Responds to the request to pull an artifact from the live store
      * When successful, this action creates the appropriate job and returns it.
      *
-     * @param parameters The request parameters
+     * @param artifactId The identifier of an artifact
      * @return The response
      */
-    private HttpResponse onMessagePullFromLive(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
+    private HttpResponse onMessagePullFromLive(String artifactId) {
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        Job job = new PullArtifactFromLiveJob(ids[0]);
+        Job job = new PullArtifactFromLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }
@@ -567,17 +633,14 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * Responds to the request to push an artifact to the live store
      * When successful, this action creates the appropriate job and returns it.
      *
-     * @param parameters The request parameters
+     * @param artifactId The identifier of an artifact
      * @return The response
      */
-    private HttpResponse onMessagePushToLive(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected an id parameter");
+    private HttpResponse onMessagePushToLive(String artifactId) {
         JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        Job job = new PushArtifactToLiveJob(ids[0]);
+        Job job = new PushArtifactToLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }

@@ -24,12 +24,14 @@ import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.EntailmentRegime;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.*;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricComposite;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.lts.TripleStore;
 
 import java.io.StringWriter;
@@ -42,9 +44,17 @@ import java.util.*;
  */
 abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     /**
-     * The metric type for database statistics
+     * API error - The requested operation failed in storage
      */
-    private static final String METRIC_DB_STATS = XOWLFederationStore.class.getCanonicalName() + ".DatabaseStatistics";
+    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00020001,
+            "The requested operation failed in storage.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00020001.html");
+    /**
+     * API error - The artifact is invalid
+     */
+    public static final ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00020002,
+            "The artifact is invalid.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00020002.html");
 
     /**
      * The metric for the statistics of this database
@@ -263,10 +273,10 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     public XSPReply store(Artifact artifact) {
         Collection<Quad> metadata = artifact.getMetadata();
         if (metadata == null || metadata.isEmpty())
-            return new XSPReplyFailure("Invalid artifact (empty metadata)");
+            return new XSPReplyApiError(ERROR_INVALID_ARTIFACT, "Empty metadata.");
         Collection<Quad> content = artifact.getContent();
         if (content == null)
-            return new XSPReplyFailure("Failed to fetch the artifact's content");
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to fetch the artifact's content.");
         XSPReply reply = upload(metadata);
         if (!reply.isSuccess())
             return reply;
@@ -277,7 +287,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     public XSPReply retrieve(String identifier) {
         Result result = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">");
         if (result.isFailure())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure)result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
             return XSPReplyNotFound.instance();
@@ -297,7 +307,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         Result result = sparql(writer.toString());
         if (result.isSuccess())
             return XSPReplySuccess.instance();
-        return new XSPReplyFailure(((ResultFailure) result).getMessage());
+        return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure)result).getMessage());
     }
 
     /**

@@ -52,7 +52,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     /**
      * The URI for the API services
      */
-    private static final String URI_API = HttpApiService.URI_API + "/services/core/security";
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/security";
 
     /**
      * The additional resources for the API definition

@@ -9,7 +9,7 @@ types:
   MetricSnapshot: !include schema_infra_utils.json#/definitions/MetricSnapshot
 traits: !include api_traits.raml
 baseUri: https://localhost:3443/api
-/services/admin/statistics:
+/kernel/statistics:
   /metrics:
     description: The collection of metrics on the platform
     get:

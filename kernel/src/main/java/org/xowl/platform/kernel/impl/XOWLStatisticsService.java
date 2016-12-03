@@ -47,7 +47,7 @@ public class XOWLStatisticsService implements StatisticsService {
     /**
      * The URI for the API services
      */
-    private static final String URI_API = HttpApiService.URI_API + "/services/admin/statistics";
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/statistics";
 
     /**
      * The additional resources for the API definition

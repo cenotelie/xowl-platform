@@ -330,6 +330,184 @@
           }
         ]
       }
+    },
+    "ArtifactArchetype": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.artifacts.ArtifactArchetype"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "description"
+      ]
+    },
+    "ArtifactArchetypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ArtifactArchetype"
+          }
+        ]
+      }
+    },
+    "BusinessDomain": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.artifacts.BusinessDomain"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "description"
+      ]
+    },
+    "BusinessDomains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/BusinessDomain"
+          }
+        ]
+      }
+    },
+    "BusinessSchema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.artifacts.BusinessSchema"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "datatypes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "objectProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "dataProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "individuals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "classes",
+        "datatypes",
+        "objectProperties",
+        "individuals"
+      ]
+    },
+    "BusinessSchemas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/BusinessSchema"
+          }
+        ]
+      }
     }
   }
 }

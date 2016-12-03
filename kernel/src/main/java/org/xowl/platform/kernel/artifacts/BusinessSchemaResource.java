@@ -189,7 +189,7 @@ public class BusinessSchemaResource implements BusinessSchema {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(BusinessSchema.class.getCanonicalName()));
-        builder.append("\", \"id\": \"");
+        builder.append("\", \"identifier\": \"");
         builder.append(TextUtils.escapeStringJSON(iri));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(name));
@@ -219,7 +219,7 @@ public class BusinessSchemaResource implements BusinessSchema {
             if (!first)
                 builder.append(", ");
             first = false;
-            builder.append("{\"id\": \"");
+            builder.append("{\"identifier\": \"");
             builder.append(TextUtils.escapeStringJSON(proxy.getIRIString()));
             builder.append("\", \"name\": \"");
             String label = (String) proxy.getDataValue(RDFS_LABEL);

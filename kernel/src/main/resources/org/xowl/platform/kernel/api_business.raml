@@ -1,0 +1,187 @@
+#%RAML 1.0
+---
+title: Business Directory Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  ArtifactArchetype: !include schema_platform_kernel.json#/definitions/ArtifactArchetype
+  ArtifactArchetypes: !include schema_platform_kernel.json#/definitions/ArtifactArchetypes
+  BusinessDomain: !include schema_platform_kernel.json#/definitions/BusinessDomain
+  BusinessDomains: !include schema_platform_kernel.json#/definitions/BusinessDomains
+  BusinessSchema: !include schema_platform_kernel.json#/definitions/BusinessSchema
+  BusinessSchemas: !include schema_platform_kernel.json#/definitions/BusinessSchemas
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/kernel/business:
+  /archetypes:
+    description: The artifact archetypes registered on this platform
+    get:
+      description: Gets the artifact archetypes registered on this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The artifacts archetypes
+          body:
+            application/json:
+              schema: ArtifactArchetypes
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.ArtifactArchetype",
+                    "identifier": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype",
+                    "name": "Free Artifact Archetype",
+                    "description": "An archetype for artifacts that follow no specific schema."
+                  }
+                ]
+    /{archetypeId}:
+      description: Represents a specific archetype on this platform
+      get:
+        description: Gets the description of an archetype
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the artifact
+            body:
+              application/json:
+                schema: ArtifactArchetype
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.ArtifactArchetype",
+                    "identifier": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype",
+                    "name": "Free Artifact Archetype",
+                    "description": "An archetype for artifacts that follow no specific schema."
+                  }
+  /domains:
+    description: The business domains registered on this platform
+    get:
+      description: Gets the business domains registered on this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The business domains
+          body:
+            application/json:
+              schema: BusinessDomains
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.BusinessDomain",
+                    "identifier": "org.xowl.platform.kernel.artifacts.SchemaDomain",
+                    "name": "Schema Domain",
+                    "description": "The domain of schemas for other artifacts and datasets."
+                  }
+                ]
+    /{domainId}:
+      description: Represents a specific business domain on this platform
+      get:
+        description: Gets the description of a business domain
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the business domain
+            body:
+              application/json:
+                schema: BusinessDomain
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.BusinessDomain",
+                    "identifier": "org.xowl.platform.kernel.artifacts.SchemaDomain",
+                    "name": "Schema Domain",
+                    "description": "The domain of schemas for other artifacts and datasets."
+                  }
+  /schemas:
+    description: The business schemas registered on this platform
+    get:
+      description: Gets the business schemas registered on this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The business schemas
+          body:
+            application/json:
+              schema: BusinessSchemas
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.BusinessSchema",
+                    "identifier": "http://xowl.org/platform/kernel",
+                    "name": "Kernel Schema",
+                    "classes": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#Class1",
+                        "name": "Class 1"
+                      }
+                    ],
+                    "datatypes": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#weirdString",
+                        "name": "Weird String"
+                      }
+                    ],
+                    "objectProperties": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#owner",
+                        "name": "Owner"
+                      }
+                    ],
+                    "dataProperties": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#name",
+                        "name": "Name"
+                      }
+                    ],
+                    "individuals": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#Subject1",
+                        "name": "Subject 1"
+                      }
+                    ]
+                  }
+                ]
+    /{schemaId}:
+      description: Represents a specific business schema on this platform
+      get:
+        description: Gets the description of a business schema
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the business schema
+            body:
+              application/json:
+                schema: BusinessSchema
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.artifacts.BusinessSchema",
+                    "identifier": "http://xowl.org/platform/kernel",
+                    "name": "Kernel Schema",
+                    "classes": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#Class1",
+                        "name": "Class 1"
+                      }
+                    ],
+                    "datatypes": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#weirdString",
+                        "name": "Weird String"
+                      }
+                    ],
+                    "objectProperties": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#owner",
+                        "name": "Owner"
+                      }
+                    ],
+                    "dataProperties": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#name",
+                        "name": "Name"
+                      }
+                    ],
+                    "individuals": [
+                      {
+                        "identifier": "http://xowl.org/platform/kernel#Subject1",
+                        "name": "Subject 1"
+                      }
+                    ]
+                  }

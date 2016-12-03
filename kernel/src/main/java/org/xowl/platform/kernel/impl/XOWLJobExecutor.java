@@ -494,7 +494,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
         }
 
         if (request.getUri().startsWith(URI_API)) {
-            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + 1));
+            String rest = request.getUri().substring(URI_API.length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

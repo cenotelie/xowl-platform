@@ -19,13 +19,19 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
 import org.xowl.platform.kernel.artifacts.BusinessSchema;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implements the business directory service
@@ -34,15 +40,17 @@ import java.util.*;
  */
 public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIS = new String[]{
-            "services/core/business/archetypes",
-            "services/core/business/archetype",
-            "services/core/business/domains",
-            "services/core/business/domain",
-            "services/core/business/schemas",
-            "services/core/business/schema"
+    private static final String URI_API = HttpApiService.URI_API + "/kernel/business";
+
+    /**
+     * The additional resources for the API definition
+     */
+    private static final String[] RESOURCES = new String[]{
+            "/org/xowl/platform/kernel/api_traits.raml",
+            "/org/xowl/platform/kernel/schema_infra_utils.json",
+            "/org/xowl/platform/kernel/schema_platform_kernel.json"
     };
 
     /**
@@ -123,36 +131,54 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIS);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (!method.equals("GET"))
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
-        String[] ids = parameters.get("id");
-        switch (uri) {
-            case "services/core/business/archetypes":
-                return onGetArchetypes();
-            case "services/core/business/domains":
-                return onGetDomains();
-            case "services/core/business/schemas":
-                return onGetSchemas();
-            case "services/core/business/archetype":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return onGetArchetype(ids[0]);
-            case "services/core/business/domain":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return onGetDomain(ids[0]);
-            case "services/core/business/schema":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return onGetSchema(ids[0]);
+    public HttpResponse handle(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+        if (request.getUri().equals(URI_API + "/archetypes")) {
+            return onGetArchetypes();
+        } else if (request.getUri().equals(URI_API + "/domains")) {
+            return onGetDomains();
+        } else if (request.getUri().equals(URI_API + "/schemas")) {
+            return onGetSchemas();
+        } else if (request.getUri().startsWith(URI_API + "/archetypes")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/archetypes".length() + 1));
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return onGetArchetype(rest);
+        } else if (request.getUri().startsWith(URI_API + "/domains")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/domains".length() + 1));
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return onGetDomain(rest);
+        } else if (request.getUri().startsWith(URI_API + "/schemas")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/schemas".length() + 1));
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return onGetSchema(rest);
         }
-        return null;
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public String getDefinitionRAML() {
+        return "/org/xowl/platform/kernel/api_business.raml";
+    }
+
+    @Override
+    public String[] getDefinitionResources() {
+        return RESOURCES;
+    }
+
+    @Override
+    public String getDefinitionHTML() {
+        return "/org/xowl/platform/kernel/api_business.html";
     }
 
     /**

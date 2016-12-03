@@ -18,7 +18,10 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.*;
 import org.xowl.infra.utils.config.Configuration;
@@ -90,6 +93,12 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
     public static final ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x0012,
             "The job is already completed.",
             ERROR_HELP_PREFIX + "0x0012.html");
+    /**
+     * API error - Invalid job state
+     */
+    public static final ApiError ERROR_INVALID_JOB_STATE = new ApiError(0x0013,
+            "The job is already completed.",
+            ERROR_HELP_PREFIX + "0x0013.html");
 
     /**
      * The pool of executor threads
@@ -368,8 +377,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
                 return new XSPReplyApiError(ERROR_ALREADY_COMPLETED);
             case Cancelled:
                 return new XSPReplyApiError(ERROR_ALREADY_CANCELLED);
+            default:
+                return new XSPReplyApiError(ERROR_INVALID_JOB_STATE, job.getStatus().toString());
         }
-        return XSPReplyFailure.instance();
     }
 
     @Override

@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
@@ -232,7 +232,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
 
     @Override
     public XSPReply cancel() {
-        return XSPReplyFailure.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

@@ -29,10 +29,14 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
+import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
@@ -64,6 +68,13 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/consistency";
+
+    /**
+     * API error - The requested operation failed in storage
+     */
+    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00060001,
+            "The requested operation failed in storage.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00060001.html");
 
     /**
      * The URI of the schema for the consistency concepts
@@ -141,43 +152,101 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        if (uri.equals("services/core/inconsistencies"))
-            return XSPReplyUtils.toHttpResponse(getInconsistencies(), Collections.singletonList(accept));
-        if (!uri.equals("services/core/consistency"))
+        if (request.getUri().equals(URI_API + "/inconsistencies")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            XSPReply reply = getInconsistencies();
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (Inconsistency inconsistency : ((XSPReplyResultCollection<Inconsistency>) reply).getData()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(inconsistency.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        }
+
+        if (request.getUri().equals(URI_API + "/rules")) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    XSPReply reply = getRules();
+                    if (!reply.isSuccess())
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    StringBuilder builder = new StringBuilder("[");
+                    boolean first = true;
+                    for (ConsistencyRule rule : ((XSPReplyResultCollection<ConsistencyRule>) reply).getData()) {
+                        if (!first)
+                            builder.append(", ");
+                        first = false;
+                        builder.append(rule.serializedJSON());
+                    }
+                    builder.append("]");
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+                }
+                case HttpConstants.METHOD_PUT: {
+                    String[] names = request.getParameter("name");
+                    if (names == null || names.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                    String[] messages = request.getParameter("message");
+                    if (messages == null || messages.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"), null);
+                    String[] prefixes = request.getParameter("prefixes");
+                    if (prefixes == null || prefixes.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
+                    String conditions = new String(request.getContent(), Files.CHARSET);
+                    if (conditions.isEmpty())
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    XSPReply reply = createRule(names[0], messages[0], prefixes[0], conditions);
+                    if (!reply.isSuccess())
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());
+                }
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+        }
+        if (request.getUri().startsWith(URI_API + "/rules")) {
+            String rest = request.getUri().substring(URI_API.length() + "/rules".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String ruleId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        XSPReply reply = getRule(ruleId);
+                        if (!reply.isSuccess())
+                            return XSPReplyUtils.toHttpResponse(reply, null);
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());
+                    }
+                    case HttpConstants.METHOD_DELETE: {
+                        XSPReply reply = deleteRule(ruleId);
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+            } else {
+                switch (rest.substring(index)) {
+                    case "/activate": {
+                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                        XSPReply reply = activateRule(ruleId);
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    }
+                    case "/deactivate": {
+                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                        XSPReply reply = deactivateRule(ruleId);
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    }
+                }
+            }
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        if ("GET".equals(method)) {
-            String[] ids = parameters.get("id");
-            if (ids != null && ids.length > 0)
-                return XSPReplyUtils.toHttpResponse(getRule(ids[0]), Collections.singletonList(accept));
-            return XSPReplyUtils.toHttpResponse(getRules(), Collections.singletonList(accept));
         }
-        String[] actions = parameters.get("action");
-        String[] ids = parameters.get("id");
-        if (actions == null || actions.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        switch (actions[0]) {
-            case "create":
-                String[] names = parameters.get("name");
-                String[] messages = parameters.get("message");
-                String[] prefixes = parameters.get("prefixes");
-                String[] conditions = parameters.get("conditions");
-                if (names == null || names.length == 0 || messages == null || messages.length == 0 || prefixes == null || prefixes.length == 0 || conditions == null || conditions.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(createRule(names[0], messages[0], prefixes[0], conditions[0]), Collections.singletonList(accept));
-            case "activate":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(activateRule(ids[0]), Collections.singletonList(accept));
-            case "deactivate":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(deactivateRule(ids[0]), Collections.singletonList(accept));
-            case "delete":
-                if (ids == null || ids.length == 0)
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-                return XSPReplyUtils.toHttpResponse(deleteRule(ids[0]), Collections.singletonList(accept));
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override
@@ -200,7 +269,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
                 "> ?d } }");
         if (!sparqlResult.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         Collection<XOWLConsistencyRule> result = new ArrayList<>();
         for (RDFPatternSolution solution : solutions.getSolutions()) {
@@ -234,7 +303,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
                 "> } }");
         if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> quads = ((ResultQuads) result).getQuads();
         Map<SubjectNode, Collection<Quad>> map = PlatformUtils.mapBySubject(quads);
         Collection<XOWLInconsistency> inconsistencies = new ArrayList<>();
@@ -308,7 +377,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n . } }");
         if (!sparqlResult.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
             return XSPReplyNotFound.instance();
@@ -325,9 +394,9 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
         RDFTLoader loader = new RDFTLoader(new CachedNodes());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
         if (!logger.getErrorMessages().isEmpty())
-            return new XSPReplyFailure(logger.getErrorsAsString());
+            return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
         if (rdfResult == null || rdfResult.getRules().isEmpty())
-            return new XSPReplyFailure("Failed to load the rule");
+            return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
         Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
         StringBuilder builder = new StringBuilder(prefixes);
         builder.append(" rule distinct <");
@@ -374,7 +443,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(definition) + "\" ." +
                 "} }");
         if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
         EventService eventService = ServiceUtils.getService(EventService.class);
         if (eventService != null)
@@ -469,7 +538,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> ?p ?o } }");
         if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         EventService eventService = ServiceUtils.getService(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
@@ -491,7 +560,7 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
                 TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) +
                 "> ?p ?o } }");
         if (!result.isSuccess())
-            return new XSPReplyFailure(((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         EventService eventService = ServiceUtils.getService(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));

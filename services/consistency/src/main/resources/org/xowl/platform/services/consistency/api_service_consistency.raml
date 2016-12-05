@@ -1,0 +1,152 @@
+#%RAML 1.0
+---
+title: Consistency Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Inconsistencies: !include schema_platform_consistency.json#/definitions/Inconsistencies
+  ConsistencyRule: !include schema_platform_consistency.json#/definitions/ConsistencyRule
+  ConsistencyRules: !include schema_platform_consistency.json#/definitions/ConsistencyRules
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/consistency:
+  /inconsistencies:
+    description: The collection of the current inconsistencies in the live data on the platform
+    get:
+      description: Gets the list of the current inconsistencies in the live data on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the current inconsistencies in the live data
+          body:
+            application/json:
+              type: Inconsistencies
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.consistency.Inconsistency",
+                    "identifier": "http://xowl.org/inconsistency/XXXX",
+                    "message": "The object ?x has property ?p but not ?q.",
+                    "ruleId": "http://xowl.org/rules/rule1",
+                    "ruleName": "Rule 1",
+                    "antecedents": {
+                      "x": {
+                        "type": "uri",
+                        "value": "http://xowl.org/data/entity1"
+                      },
+                      "p": {
+                        "type": "uri",
+                        "value": "http://xowl.org/schemas/property1"
+                      },
+                      "q": {
+                        "type": "uri",
+                        "value": "http://xowl.org/schemas/property2"
+                      }
+                    }
+                  }
+                ]
+  /rules:
+    description: The collection of consistency rules on the platform
+    get:
+      description: Gets the list of consistency rules on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the consistency rules on the platform
+          body:
+            application/json:
+              type: ConsistencyRules
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                    "identifier": "http://xowl.org/rules/rule1",
+                    "name": "Rule 1",
+                    "definition": "...",
+                    "isActive": true
+                  }
+                ]
+    put:
+      description: Creates a new consistency rule
+      is: [secured, mayFail]
+      queryParameters:
+        name:
+          displayName: Rule name
+          type: string
+          description: The human-readable name for the rule
+          example: Rule 1
+          required: true
+        message:
+          displayName: Message
+          type: string
+          description: The template message that will be displayed for inconsistencies produced by this rule
+          example: The object ?x has property ?p but not ?q.
+          required: true
+        prefixes:
+          displayName: Prefixes
+          type: string
+          description: The URI prefixes used for the rule definition
+          example: |
+            PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
+          required: true
+      body:
+        text/plain:
+          description: The conditions for the rule
+          example: |
+            ?x ?p ?y
+            NOT (?x ?q ?z)
+      responses:
+        200:
+          description: The description of the created rule
+          body:
+            application/json:
+              type: ConsistencyRule
+              example: |
+                {
+                  "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                  "identifier": "http://xowl.org/rules/rule1",
+                  "name": "Rule 1",
+                  "definition": "...",
+                  "isActive": true
+                }
+    /{ruleId}:
+      description: Represents a specific consistency rule on the platform
+      get:
+        description: Gets the description of the consistency rule
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the consistency rule
+            body:
+              application/json:
+                type: ConsistencyRule
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                    "identifier": "http://xowl.org/rules/rule1",
+                    "name": "Rule 1",
+                    "definition": "...",
+                    "isActive": true
+                  }
+      delete:
+        description: Deletes the consistency rule
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded
+      /activate:
+        description: Action to activate the consistency rule
+        post:
+          description: Activates the consistency rule
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The operation succeeded
+      /deactivate:
+        description: Action to de-activate the consistency rule
+        post:
+          description: De-activates the consistency rule
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The operation succeeded

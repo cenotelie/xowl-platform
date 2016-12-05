@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/platform/services/consistency/schema",
+  "definitions": {
+    "Inconsistency": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.consistency.Inconsistency"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "ruleId": {
+          "type": "string"
+        },
+        "ruleName": {
+          "type": "string"
+        },
+        "antecedents": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "message",
+        "ruleId",
+        "ruleName",
+        "antecedents"
+      ]
+    },
+    "Inconsistencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Inconsistency"
+          }
+        ]
+      }
+    },
+    "ConsistencyRule": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.consistency.ConsistencyRule"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "definition": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "definition",
+        "isActive"
+      ]
+    },
+    "ConsistencyRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ConsistencyRule"
+          }
+        ]
+      }
+    }
+  }
+}

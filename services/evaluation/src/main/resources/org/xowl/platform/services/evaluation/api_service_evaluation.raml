@@ -1,0 +1,200 @@
+#%RAML 1.0
+---
+title: Evaluation Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  EvaluableTypes: !include schema_platform_evaluation.json#/definitions/EvaluableTypes
+  Evaluables: !include schema_platform_evaluation.json#/definitions/Evaluables
+  CriterionTypes: !include schema_platform_evaluation.json#/definitions/CriterionTypes
+  EvaluationReferences: !include schema_platform_evaluation.json#/definitions/EvaluationReferences
+  EvaluationReference: !include schema_platform_evaluation.json#/definitions/EvaluationReference
+  Evaluation: !include schema_platform_evaluation.json#/definitions/Evaluation
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/evaluation:
+  /evaluableTypes:
+    description: The collection of the supported evaluable types on the platform
+    get:
+      description: Gets the list of the supported evaluable types on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the supported evaluable types on the platform
+          body:
+            application/json:
+              type: EvaluableTypes
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.evaluation.EvaluableType",
+                    "identifier": "myevaluable1",
+                    "name": "Evaluable Entity"
+                  }
+                ]
+  /evaluables:
+    description: The collection of the evaluables for a given type on the platform
+    get:
+      description: Gets the list of the possible evaluables for a given type
+      is: [secured, mayFail, resourceAccess]
+      queryParameters:
+        type:
+          displayName: Evaluable type
+          type: string
+          description: The identifier of the evaluable type
+          example: myevaluable1
+          required: true
+      responses:
+        200:
+          description: The list of the possible evaluables for the requested type
+          body:
+            application/json:
+              type: Evaluables
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.evaluation.Evaluable",
+                    "identifier": "http://xowl.org/data/entity1",
+                    "name": "Entity 1",
+                    "artifact": "http://xowl.org/artifacts/artifact0/v1",
+                    "element": "http://xowl.org/data/entity1"
+                  }
+                ]
+  /criterionTypes:
+    description: The collection of the possible critera for a given type on the platform
+    get:
+      description: Gets the list of the possible criteria for a given type on the platform
+      is: [secured, mayFail, resourceAccess]
+      queryParameters:
+        for:
+          displayName: Evaluable type
+          type: string
+          description: The identifier of the evaluable type
+          example: myevaluable1
+          required: true
+      responses:
+        200:
+          description: The list of the possible criteria for a given type on the platform
+          body:
+            application/json:
+              type: CriterionTypes
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.evaluation.CriterionType",
+                    "identifier": "http://xowl.org/data/criterion1",
+                    "name": "Criterion 1",
+                    "parameters": [
+                      "xxx"
+                    ]
+                  }
+                ]
+  /evaluations:
+    description: The collection of the on-going evaluations on the platform
+    get:
+      description: Gets the list of the on-going evaluations on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the on-going evaluations on the platform
+          body:
+            application/json:
+              type: EvaluationReferences
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.evaluation.EvaluationReference",
+                    "identifier": "http://xowl.org/evaluations/evaluation01",
+                    "name": "Evaluation 01"
+                  }
+                ]
+    put:
+      description: Creates a new evaluation
+      is: [secured, mayFail]
+      body:
+        application/json:
+          description: The definition of the evaluation
+          type: Evaluation
+          example: |
+            {
+              "type": "org.xowl.platform.services.evaluation.Evaluation",
+              "name": "Evaluation 01",
+              "evaluableType": "myevaluable1",
+              "evaluables": [
+                {
+                  "type": "org.xowl.platform.services.evaluation.Evaluable",
+                  "identifier": "http://xowl.org/data/entity1",
+                  "name": "Entity 1",
+                  "artifact": "http://xowl.org/artifacts/artifact0/v1",
+                  "element": "http://xowl.org/data/entity1"
+                }
+              ],
+              "criteria": [
+                {
+                  "type": "org.xowl.platform.services.evaluation.Criterion",
+                  "identifier": "http://xowl.org/data/criterion1",
+                  "name": "Criterion 1",
+                  "typeId": "http://xowl.org/data/criterion1",
+                  "parameters": {
+                    "xxx": "data"
+                  }
+                }
+              ]
+            }
+      responses:
+        200:
+          description: The reference to the created evaluation
+          body:
+            application/json:
+              type: EvaluationReference
+              example: |
+                {
+                  "type": "org.xowl.platform.services.evaluation.EvaluationReference",
+                  "identifier": "http://xowl.org/evaluations/evaluation01",
+                  "name": "Evaluation 01"
+                }
+    /{evalId}:
+      description: Represents a specific evaluation on the platform
+      get:
+        description: Gets the full description of the evaluation
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The full description of the evaluation
+            body:
+              application/json:
+                type: Evaluation
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.evaluation.Evaluation",
+                    "identifier": "http://xowl.org/evaluations/evaluation01",
+                    "name": "Evaluation 01",
+                    "evaluableType": "myevaluable1",
+                    "evaluables": [
+                      {
+                        "type": "org.xowl.platform.services.evaluation.Evaluable",
+                        "identifier": "http://xowl.org/data/entity1",
+                        "name": "Entity 1",
+                        "artifact": "http://xowl.org/artifacts/artifact0/v1",
+                        "element": "http://xowl.org/data/entity1"
+                      }
+                    ],
+                    "criteria": [
+                      {
+                        "type": "org.xowl.platform.services.evaluation.Criterion",
+                        "identifier": "http://xowl.org/data/criterion1",
+                        "name": "Criterion 1",
+                        "typeId": "http://xowl.org/data/criterion1",
+                        "parameters": {
+                          "xxx": "data"
+                        }
+                      }
+                    ],
+                    "results": [
+                      {
+                        "evaluable": "http://xowl.org/data/entity1",
+                        "criterion": "http://xowl.org/data/criterion1",
+                        "data": {}
+                      }
+                    ]
+                  }

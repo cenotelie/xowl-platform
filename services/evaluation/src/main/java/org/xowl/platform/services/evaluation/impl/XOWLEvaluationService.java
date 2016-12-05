@@ -18,16 +18,17 @@
 package org.xowl.platform.services.evaluation.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.evaluation.*;
 
 import java.net.HttpURLConnection;
@@ -40,16 +41,9 @@ import java.util.*;
  */
 public class XOWLEvaluationService implements EvaluationService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/core/evaluation/evaluations",
-            "services/core/evaluation/evaluation",
-            "services/core/evaluation/evaluableTypes",
-            "services/core/evaluation/evaluables",
-            "services/core/evaluation/criterionTypes",
-            "services/core/evaluation/service"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/evaluation";
 
     /**
      * The registered evaluable types
@@ -79,32 +73,52 @@ public class XOWLEvaluationService implements EvaluationService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (method.equals("GET")) {
-            switch (uri) {
-                case "services/core/evaluation/evaluableTypes":
-                    return onGetEvaluableTypes();
-                case "services/core/evaluation/evaluables":
-                    return onGetEvaluables(parameters);
-                case "services/core/evaluation/criterionTypes":
-                    return onGetCriterionTypes(parameters);
-                case "services/core/evaluation/evaluations":
-                    return onGetEvaluations();
-                case "services/core/evaluation/evaluation":
-                    return onGetEvaluation(parameters);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-        } else if (method.equals("POST")) {
-            if (uri.equals("services/core/evaluation/service"))
-                return onPostEvaluation(content);
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/evaluableTypes")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onGetEvaluableTypes();
         }
-        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
+        if (request.getUri().equals(URI_API + "/evaluables")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onGetEvaluables(request);
+        }
+        if (request.getUri().equals(URI_API + "/criterionTypes")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onGetCriterionTypes(request);
+        }
+        if (request.getUri().equals(URI_API + "/evaluations")) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET:
+                    return onGetEvaluations();
+                case HttpConstants.METHOD_PUT:
+                    return onPutEvaluation(request);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+        }
+        if (request.getUri().startsWith(URI_API + "/evaluations")) {
+            String rest = request.getUri().substring(URI_API.length() + "/evaluations".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String evalId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                return onGetEvaluation(evalId);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override
@@ -190,32 +204,44 @@ public class XOWLEvaluationService implements EvaluationService {
     /**
      * Responds to a request for the evaluables of a given type
      *
-     * @param parameters The request parameters
+     * @param request The request to handle
      * @return The response
      */
-    private HttpResponse onGetEvaluables(Map<String, String[]> parameters) {
-        String[] types = parameters.get("type");
+    private HttpResponse onGetEvaluables(HttpApiRequest request) {
+        String[] types = request.getParameter("type");
         if (types == null || types.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'type' parameter");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
         EvaluableType evaluableType = evaluableTypes.get(types[0]);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        return XSPReplyUtils.toHttpResponse(evaluableType.getElements(), null);
+        XSPReply reply = evaluableType.getElements();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (Evaluable evaluable : ((XSPReplyResultCollection<Evaluable>) reply).getData()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(evaluable.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
      * Responds to a request for the criterion types applicable to an evaluable type
      *
-     * @param parameters The request parameters
+     * @param request The request to handle
      * @return The response
      */
-    private HttpResponse onGetCriterionTypes(Map<String, String[]> parameters) {
-        String[] types = parameters.get("for");
+    private HttpResponse onGetCriterionTypes(HttpApiRequest request) {
+        String[] types = request.getParameter("for");
         if (types == null || types.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'for' parameter");
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
         EvaluableType evaluableType = evaluableTypes.get(types[0]);
         if (evaluableType == null)
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, "[]");
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (CriterionType criterionType : getCriterionTypes(evaluableType)) {
@@ -234,35 +260,49 @@ public class XOWLEvaluationService implements EvaluationService {
      * @return The response
      */
     private HttpResponse onGetEvaluations() {
-        return XSPReplyUtils.toHttpResponse(getEvaluations(), null);
+        XSPReply reply = getEvaluations();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        StringBuilder builder = new StringBuilder("[");
+        boolean first = true;
+        for (EvaluationReference evaluation : ((XSPReplyResultCollection<EvaluationReference>) reply).getData()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(evaluation.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
     }
 
     /**
      * Responds to a request for a particular evaluation
      *
-     * @param parameters The request parameters
+     * @param evaluationIdentifier The identifier of the requested evlauation
      * @return The response
      */
-    private HttpResponse onGetEvaluation(Map<String, String[]> parameters) {
-        String[] ids = parameters.get("id");
-        if (ids == null || ids.length == 0)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected 'id' parameter");
-        return XSPReplyUtils.toHttpResponse(getEvaluation(ids[0]), null);
+    private HttpResponse onGetEvaluation(String evaluationIdentifier) {
+        XSPReply reply = getEvaluation(evaluationIdentifier);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Evaluation>) reply).getData().serializedJSON());
     }
 
     /**
      * Responds to the request to launch a new evaluation
      *
-     * @param content The posted content
+     * @param request The request to handle
      * @return The response
      */
-    private HttpResponse onPostEvaluation(byte[] content) {
-        if (content == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, "Expected content");
+    private HttpResponse onPutEvaluation(HttpApiRequest request) {
+        byte[] content = request.getContent();
+        if (content == null || content.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
         XSPReply reply = evaluation.store();
         if (!reply.isSuccess())
@@ -271,6 +311,6 @@ public class XOWLEvaluationService implements EvaluationService {
         if (eventService != null)
             eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));
         XOWLEvaluationReference reference = new XOWLEvaluationReference(evaluation.getIdentifier(), evaluation.getName());
-        return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(reference), null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, reference.serializedJSON());
     }
 }

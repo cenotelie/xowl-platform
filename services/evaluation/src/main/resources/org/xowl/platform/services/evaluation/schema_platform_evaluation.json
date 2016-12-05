@@ -1,0 +1,258 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/platform/services/evaluation/schema",
+  "definitions": {
+    "EvaluableType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.EvaluableType"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "EvaluableTypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/EvaluableType"
+          }
+        ]
+      }
+    },
+    "Evaluable": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.Evaluable"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "artifact": {
+          "type": "string"
+        },
+        "element": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "artifact",
+        "element"
+      ]
+    },
+    "Evaluables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Evaluable"
+          }
+        ]
+      }
+    },
+    "CriterionType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.CriterionType"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "parameters"
+      ]
+    },
+    "CriterionTypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/CriterionType"
+          }
+        ]
+      }
+    },
+    "Criterion": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.Criterion"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "typeId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "typeId",
+        "parameters"
+      ]
+    },
+    "EvaluationReference": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.EvaluationReference"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "EvaluationReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/EvaluationReference"
+          }
+        ]
+      }
+    },
+    "EvaluationResultPart": {
+      "type": "object",
+      "properties": {
+        "evaluable": {
+          "type": "string"
+        },
+        "criterion": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "evaluable",
+        "criterion",
+        "data"
+      ]
+    },
+    "Evaluation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.evaluation.Evaluation"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "evaluableType": {
+          "type": "string"
+        },
+        "evaluables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Evaluable"
+              }
+            ]
+          }
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Criterion"
+              }
+            ]
+          }
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/EvaluationResultPart"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "evaluableType",
+        "evaluables",
+        "criteria",
+        "results"
+      ]
+    }
+  }
+}

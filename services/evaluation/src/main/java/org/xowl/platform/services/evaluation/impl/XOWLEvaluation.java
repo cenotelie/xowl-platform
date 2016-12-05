@@ -48,7 +48,7 @@ class XOWLEvaluation implements Evaluation {
     /**
      * The base URI for evaluation data
      */
-    private static final String EVAL_URI = KernelSchema.URI_BASE + "/evaluation";
+    private static final String EVAL_URI = "http://xowl.org/platform/services/evaluation";
     /**
      * The URI for the concept of evaluation
      */

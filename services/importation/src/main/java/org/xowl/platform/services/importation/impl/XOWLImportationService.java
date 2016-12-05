@@ -18,22 +18,28 @@
 package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.importation.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,11 +51,16 @@ import java.util.Map;
  */
 public class XOWLImportationService implements ImportationService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/core/importation"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/importation";
+
+    /**
+     * API error - The requested operation failed in storage
+     */
+    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00040001,
+            "The requested operation failed in storage.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00040001.html");
 
     /**
      * The current documents pending importation
@@ -134,52 +145,63 @@ public class XOWLImportationService implements ImportationService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        switch (method) {
-            case "GET": {
-                String[] docIds = parameters.get("document");
-                if (docIds != null && docIds.length > 0)
-                    return onGetDocument(docIds[0]);
-                String[] importerIds = parameters.get("importer");
-                if (importerIds != null && importerIds.length > 0)
-                    return onGetImporter(importerIds[0]);
-                String[] whats = parameters.get("what");
-                if (whats != null && whats.length > 0) {
-                    if (whats[0].equals("document"))
-                        return onGetDocuments();
-                    else if (whats[0].equals("importer"))
-                        return onGetImporters();
+    public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/importers")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return onGetImporters();
+        } else if (request.getUri().equals(URI_API + "/documents")) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET:
+                    return onGetDocuments();
+                case HttpConstants.METHOD_PUT:
+                    return onPutDocument(request);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+        } else if (request.getUri().startsWith(URI_API + "/importers")) {
+            String rest = request.getUri().substring(URI_API.length() + "/importers".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String importerId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                return onGetImporter(importerId);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        } else if (request.getUri().startsWith(URI_API + "/documents")) {
+            String rest = request.getUri().substring(URI_API.length() + "/documents".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String documentId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET:
+                        return onGetDocument(documentId);
+                    case HttpConstants.METHOD_DELETE:
+                        return onPostDropDocument(documentId);
                 }
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+            } else {
+                switch (rest.substring(index)) {
+                    case "/preview":
+                        return onGetPreview(documentId, request);
+                    case "/import": {
+                        return onBeginImport(documentId, request);
+                    }
+                }
             }
-            case "PUT": {
-                String[] names = parameters.get("name");
-                String[] fileNames = parameters.get("fileName");
-                if (names != null && names.length > 0 && fileNames != null && fileNames.length > 0)
-                    return onPutDocument(names[0], content, fileNames[0]);
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            }
-            case "POST": {
-                String[] drops = parameters.get("drop");
-                if (drops != null && drops.length > 0)
-                    return onPostDropDocument(drops[0]);
-                String[] previews = parameters.get("preview");
-                String[] importers = parameters.get("importer");
-                if (previews != null && previews.length > 0 && importers != null && importers.length > 0)
-                    return onGetPreview(previews[0], importers[0], new String(content, Files.CHARSET));
-                String[] imports = parameters.get("import");
-                if (imports != null && imports.length > 0 && importers != null && importers.length > 0)
-                    return onBeginImport(imports[0], importers[0], new String(content, Files.CHARSET));
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
-            }
-            default:
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
         }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**
@@ -216,15 +238,19 @@ public class XOWLImportationService implements ImportationService {
     /**
      * When a new document is uploaded
      *
-     * @param name     The document 's name
-     * @param content  The document's content
-     * @param fileName The original client's file name
+     * @param request The request to handle
      * @return The document
      */
-    private HttpResponse onPutDocument(String name, byte[] content, String fileName) {
-        Document document = upload(name, content, fileName);
+    private HttpResponse onPutDocument(HttpApiRequest request) {
+        String[] names = request.getParameter("name");
+        String[] fileNames = request.getParameter("fileName");
+        if (names == null || names.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+        if (fileNames == null || fileNames.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
+        Document document = upload(names[0], fileNames[0], request.getContent());
         if (document == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_OPERATION_FAILED), null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
     }
 
@@ -245,18 +271,24 @@ public class XOWLImportationService implements ImportationService {
     /**
      * When the preview of a document is requested
      *
-     * @param documentId    The identifier of the document
-     * @param importerId    The identifier of the importer to use
-     * @param configuration The importer's configuration
+     * @param documentId The identifier of the document
+     * @param request    The request to handle
      * @return The HTTP response
      */
-    private HttpResponse onGetPreview(String documentId, String importerId, String configuration) {
+    private HttpResponse onGetPreview(String documentId, HttpApiRequest request) {
+        String[] importerIds = request.getParameter("importer");
+        if (importerIds == null || importerIds.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
+        String configuration = new String(request.getContent(), Files.CHARSET);
+        if (configuration.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
+
         Document document = getDocument(documentId);
         if (document == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
         for (Importer importer : importers) {
-            if (importer.getIdentifier().equals(importerId)) {
+            if (importer.getIdentifier().equals(importerIds[0])) {
                 DocumentPreview preview = getPreview(document, importer, importer.getConfiguration(configuration));
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, preview.serializedJSON());
             }
@@ -299,21 +331,27 @@ public class XOWLImportationService implements ImportationService {
     /**
      * When the importation of a document is requested
      *
-     * @param documentId    The identifier of the document
-     * @param importerId    The identifier of the importer to use
-     * @param configuration The importer's configuration
+     * @param documentId The identifier of the document
+     * @param request    The request to handle
      * @return The HTTP response
      */
-    private HttpResponse onBeginImport(String documentId, String importerId, String configuration) {
+    private HttpResponse onBeginImport(String documentId, HttpApiRequest request) {
+        String[] importerIds = request.getParameter("importer");
+        if (importerIds == null || importerIds.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
+        String configuration = new String(request.getContent(), Files.CHARSET);
+        if (configuration.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
+
         Document document = getDocument(documentId);
         if (document == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
         for (Importer importer : importers) {
-            if (importer.getIdentifier().equals(importerId)) {
+            if (importer.getIdentifier().equals(importerIds[0])) {
                 Job job = beginImport(document, importer, importer.getConfiguration(configuration));
                 if (job == null)
-                    return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, "Failed to import");
+                    return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
             }
         }
@@ -333,7 +371,7 @@ public class XOWLImportationService implements ImportationService {
     }
 
     @Override
-    public Document upload(String name, byte[] content, String fileName) {
+    public Document upload(String name, String fileName, byte[] content) {
         onActivated();
         if (storage == null)
             return null;

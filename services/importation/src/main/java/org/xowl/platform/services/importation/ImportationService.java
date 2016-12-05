@@ -46,11 +46,11 @@ public interface ImportationService extends HttpApiService {
      * Uploads a new document
      *
      * @param name             The document 's name
-     * @param content          The document's content
      * @param originalFileName The original client's file name
+     * @param content          The document's content
      * @return The document
      */
-    Document upload(String name, byte[] content, String originalFileName);
+    Document upload(String name, String originalFileName, byte[] content);
 
     /**
      * Drops the specified document

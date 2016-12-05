@@ -19,6 +19,7 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -123,6 +124,9 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      */
     private void doResponse(HttpServletResponse servletResponse, HttpResponse apiResponse) {
         servletResponse.setStatus(apiResponse.getCode());
+        for (Couple<String, String> header : apiResponse.getHeaders()) {
+            servletResponse.addHeader(header.x, header.y);
+        }
         if (apiResponse.getContentType() != null)
             servletResponse.setContentType(apiResponse.getContentType());
         if (apiResponse.getBodyAsBytes() != null) {

@@ -63,6 +63,22 @@ baseUri: https://localhost:8443/api
               description: The authentication token that can be used later to authenticate for further operations
               example: __Secure-xOWL-Platform=AAAAA
               required: true
+          body:
+            application/json:
+              type: PlatformUser
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                  "identifier": "jdoe",
+                  "name": "Jane Doe",
+                  "roles": [
+                    {
+                      "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                      "identifier": "role1",
+                      "name": "Role 1"
+                    }
+                  ]
+                }
         401:
           description: The login operation failed
   /logout:
@@ -81,29 +97,29 @@ baseUri: https://localhost:8443/api
   /users:
     description: The collection of users on the platform
     get:
-     description: Gets the list of the users on the platform
-     is: [secured, mayFail]
-     responses:
-       200:
-         description: The list of users on the platform
-         body:
-           application/json:
-             type: PlatformUsers
-             example: |
-               [
-                 {
-                   "type": "org.xowl.platform.kernel.platform.PlatformUser",
-                   "identifier": "jdoe",
-                   "name": "Jane Doe",
-                   "roles": [
-                     {
-                       "type": "org.xowl.platform.kernel.platform.PlatformRole",
-                       "identifier": "role1",
-                       "name": "Role 1"
-                     }
-                   ]
-                 }
-               ]
+      description: Gets the list of the users on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of users on the platform
+          body:
+            application/json:
+              type: PlatformUsers
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe",
+                    "roles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.PlatformRole",
+                        "identifier": "role1",
+                        "name": "Role 1"
+                      }
+                    ]
+                  }
+                ]
     /{userId}:
       description: A specific user on the platform
       is: [secured, mayFail, resourceAccess]

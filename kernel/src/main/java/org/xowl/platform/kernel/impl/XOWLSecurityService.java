@@ -318,7 +318,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         String token = ((XSPReplyResult<String>) reply).getData();
-        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
+        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
         response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "=" + token +
                 "; Max-Age=" + Long.toString(securityTokenTTL) +
                 "; Path=" + HttpApiService.URI_API +

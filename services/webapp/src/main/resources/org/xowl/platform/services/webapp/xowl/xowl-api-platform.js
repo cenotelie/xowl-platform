@@ -3,7 +3,6 @@
 
 function XOWL() {
 	this.endpoint = '/api/';
-	this.authToken = localStorage.getItem('xowl.authToken');
 	this.userId = localStorage.getItem('xowl.userId');
 	this.userName = localStorage.getItem('xowl.userName');
 }
@@ -15,7 +14,7 @@ function XOWL() {
 ////
 
 XOWL.prototype.isLoggedIn = function () {
-	return (this.authToken !== null && this.userId !== null);
+	return (this.userId !== null);
 }
 
 XOWL.prototype.getUserId = function () {
@@ -28,37 +27,34 @@ XOWL.prototype.getUserName = function () {
 
 XOWL.prototype.login = function (callback, login, password) {
 	var _self = this;
-	var token = window.btoa(unescape(encodeURIComponent(login + ':' + password)));
-	this.authToken = token;
-	this.doHttpGet(function (code, type, content) {
+	this.doHttpPost(function (code, type, content) {
 		if (code === 200) {
 			var user = JSON.parse(content);
-			_self.authToken = token;
-			_self.userId = user.identifier;
+			_self.userId = login;
 			_self.userName = user.name;
-			localStorage.setItem('xowl.authToken', token);
-			localStorage.setItem('xowl.userId', user.identifier);
+			localStorage.setItem('xowl.userId', login);
 			localStorage.setItem('xowl.userName', user.name);
 			callback(code, type, content);
 		} else {
-			_self.authToken = null;
 			_self.userId = null;
 			_self.userName = null;
-			localStorage.removeItem('xowl.authToken');
 			localStorage.removeItem('xowl.userId');
 			localStorage.removeItem('xowl.userName');
 			callback(code, type, content);
 		}
-	}, "services/core/security", null);
+	}, "kernel/security/login", {login: login}, password);
 }
 
 XOWL.prototype.logout = function () {
-	this.authToken = null;
-	this.userId = null;
-	this.userName = null;
-	localStorage.removeItem('xowl.authToken');
-	localStorage.removeItem('xowl.userId');
-	localStorage.removeItem('xowl.userName');
+	this.doHttpPost(function (code, type, content) {
+		if (code === 200) {
+			_self.userId = null;
+			_self.userName = null;
+			localStorage.removeItem('xowl.userId');
+			localStorage.removeItem('xowl.userName');
+		}
+		callback(code, type, content);
+	}, "kernel/security/login", {}, null);
 }
 
 XOWL.prototype.getPlatformUsers = function (callback) {
@@ -68,7 +64,7 @@ XOWL.prototype.getPlatformUsers = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", null);
+	}, "kernel/security/users", null);
 }
 
 XOWL.prototype.getPlatformUser = function (callback, userId) {
@@ -78,7 +74,7 @@ XOWL.prototype.getPlatformUser = function (callback, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {id: userId});
+	}, "kernel/security/users/" + encodeURIComponent(userId), null);
 }
 
 XOWL.prototype.createPlatformUser = function (callback, userId, name, password) {
@@ -88,7 +84,7 @@ XOWL.prototype.createPlatformUser = function (callback, userId, name, password) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {id: userId, name: name, key: password});
+	}, "kernel/security/users/" + encodeURIComponent(userId), {name: name}, password);
 }
 
 XOWL.prototype.deletePlatformUser = function (callback, userId) {
@@ -98,7 +94,7 @@ XOWL.prototype.deletePlatformUser = function (callback, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {id: userId});
+	}, "kernel/security/users/" + encodeURIComponent(userId), null);
 }
 
 XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
@@ -340,41 +336,41 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/platform", null);
+	}, "kernel/platform", null);
 }
 
 XOWL.prototype.getPlatformBundles = function (callback) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/platform/bundles", null);
+	}, "kernel/platform/bundles", null);
 }
 
 XOWL.prototype.platformShutdown = function (callback) {
 	this.doHttpPost(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", content);
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/platform", {"action": "shutdown"}, null);
+	}, "kernel/platform/shutdown", null, null);
 }
 
 XOWL.prototype.platformRestart = function (callback) {
 	this.doHttpPost(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", content);
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/platform", {"action": "restart"}, null);
+	}, "kernel/platform/restart", null, null);
 }
 
 
@@ -386,11 +382,11 @@ XOWL.prototype.platformRestart = function (callback) {
 XOWL.prototype.getLogMessages = function (callback) {
 	this.doHttpGet(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, "application/json", JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/log", null);
+	}, "kernel/log", null);
 }
 
 
@@ -442,7 +438,7 @@ XOWL.prototype.getAllMetrics = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/statistics", null);
+	}, "kernel/statistics/metrics", null);
 }
 
 XOWL.prototype.getMetric = function (callback, metricId) {
@@ -452,7 +448,7 @@ XOWL.prototype.getMetric = function (callback, metricId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/statistics", {id: metricId});
+	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId), null);
 }
 
 XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
@@ -462,7 +458,7 @@ XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/statistics", {poll: metricId});
+	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId) + "/snapshot", null);
 }
 
 
@@ -1041,8 +1037,6 @@ XOWL.prototype.doHttpDelete = function (callback, target, parameters) {
 }
 
 XOWL.prototype.doHttpRequest = function (callback, verb, uriComplement, parameters, payload, contentType, accept) {
-	if (this.authToken === null || this.authToken == "")
-		callback(401, "text/plain", "");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState == 4) {
@@ -1066,7 +1060,6 @@ XOWL.prototype.doHttpRequest = function (callback, verb, uriComplement, paramete
 	if (contentType != null)
 		xmlHttp.setRequestHeader("Content-Type", contentType);
 	xmlHttp.withCredentials = true;
-	xmlHttp.setRequestHeader("Authorization", "Basic " + this.authToken);
 	if (payload === null)
 		xmlHttp.send();
 	else if (contentType === "application/json")

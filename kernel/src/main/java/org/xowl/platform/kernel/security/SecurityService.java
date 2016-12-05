@@ -34,7 +34,7 @@ public interface SecurityService extends Service {
     /**
      * The URI of the API for the login service
      */
-    String URI_LOGIN = "/api/services/core/security/login";
+    String URI_LOGIN = "/api/kernel/security/login";
 
     /**
      * Gets the realm of this platform

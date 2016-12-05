@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/platform/services/impact/schema",
+  "definitions": {
+    "ImpactAnalysisFilterLink": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.impact.ImpactAnalysisFilterLink"
+          ]
+        },
+        "filtered": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "filtered"
+      ]
+    },
+    "ImpactAnalysisFilterType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.impact.ImpactAnalysisFilterType"
+          ]
+        },
+        "filtered": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "filtered"
+      ]
+    },
+    "ImpactAnalysisSetup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.impact.ImpactAnalysisSetup"
+          ]
+        },
+        "root": {
+          "type": "string"
+        },
+        "degree": {
+          "type": "integer"
+        },
+        "filterLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ImpactAnalysisFilterLink"
+              }
+            ]
+          }
+        },
+        "isFilterLinksInclusive": {
+          "type": "boolean"
+        },
+        "filterResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ImpactAnalysisFilterType"
+              }
+            ]
+          }
+        },
+        "isFilterResultsInclusive": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "root",
+        "degree",
+        "filterLinks",
+        "isFilterLinksInclusive",
+        "filterResults",
+        "isFilterResultsInclusive"
+      ]
+    },
+    "ImpactAnalysisResultPathElement": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "property": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "target",
+        "property"
+      ]
+    },
+    "ImpactAnalysisResultPath": {
+      "type": "object",
+      "properties": {
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ImpactAnalysisResultPathElement"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "elements"
+      ]
+    },
+    "ImpactAnalysisResultPart": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.impact.ImpactAnalysisResultPart"
+          ]
+        },
+        "node": {
+          "type": "string"
+        },
+        "degree": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ImpactAnalysisResultPath"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "parts"
+      ]
+    },
+    "ImpactAnalysisResult": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.impact.ImpactAnalysisResult"
+          ]
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ImpactAnalysisResultPart"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "parts"
+      ]
+    }
+  }
+}

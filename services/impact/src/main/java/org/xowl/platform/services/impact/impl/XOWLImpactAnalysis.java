@@ -19,6 +19,7 @@ package org.xowl.platform.services.impact.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
@@ -29,13 +30,12 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.impact.ImpactAnalysisService;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Implements the impact analysis service
@@ -44,11 +44,9 @@ import java.util.Map;
  */
 public class XOWLImpactAnalysis implements ImpactAnalysisService {
     /**
-     * The URIs for this service
+     * The URI for the API services
      */
-    private static final String[] URIs = new String[]{
-            "services/core/impact"
-    };
+    private static final String URI_API = HttpApiService.URI_API + "/services/impact";
 
     @Override
     public String getIdentifier() {
@@ -61,20 +59,24 @@ public class XOWLImpactAnalysis implements ImpactAnalysisService {
     }
 
     @Override
-    public Collection<String> getURIs() {
-        return Arrays.asList(URIs);
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(URI_API)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
-    public HttpResponse onMessage(String method, String uri, Map<String, String[]> parameters, String contentType, byte[] content, String accept) {
-        if (!method.equals("POST"))
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD);
-        if (content == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST);
+    public HttpResponse handle(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+        byte[] content = request.getContent();
+        if (content == null || content.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         return XSPReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);
     }
 

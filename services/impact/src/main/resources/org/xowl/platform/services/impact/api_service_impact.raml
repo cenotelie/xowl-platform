@@ -1,0 +1,64 @@
+#%RAML 1.0
+---
+title: Impact Analysis Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+  ImpactAnalysisSetup: !include schema_platform_impact.json#/definitions/ImpactAnalysisSetup
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/impact:
+  description: Action to launch a new impact analysis
+  post:
+    description: Launches a new impact analysis
+    is: [secured, mayFail]
+    body:
+      application/json:
+        description: The configuration for the impact analysis
+        type: ImpactAnalysisSetup
+        example: |
+          {
+            "type": "org.xowl.platform.services.impact.ImpactAnalysisSetup",
+            "root": "http://xowl.org/data/mynode",
+            "degree": 10,
+            "filterLinks": [
+              {
+                "type": "org.xowl.platform.services.impact.ImpactAnalysisFilterLink",
+                "filtered": "http://xowl.org/schema/property"
+              }
+            ],
+            "isFilterLinksInclusive": true,
+            "filterResults": [
+              {
+                "type": "org.xowl.platform.services.impact.ImpactAnalysisFilterType",
+                "filtered": "http://xowl.org/schema/TypeX"
+              }
+            ],
+            "isFilterResultsInclusive": true
+          }
+    responses:
+      200:
+        description: The description of the launched job
+        body:
+          application/json:
+            type: Job
+            example: |
+              {
+                "type": "org.xowl.platform.kernel.jobs.Job",
+                "identifier": "job1",
+                "name": "Import Document XXX",
+                "jobType": "org.xowl.platform.services.impact.impl.XOWLImpactAnalysisJob",
+                "owner": {
+                  "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                  "identifier": "jdoe",
+                  "name": "Jane Doe"
+                },
+                "status": "Running",
+                "timeScheduled": "01/01/2001 10:10",
+                "timeRun": "01/01/2001 10:10",
+                "timeCompleted": "",
+                "completionRate": "0.5",
+                "payload": {},
+                "result": {}
+              }

@@ -20,6 +20,7 @@ package org.xowl.platform.services.evaluation.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -44,6 +45,19 @@ public class XOWLEvaluationService implements EvaluationService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/evaluation";
+
+    /**
+     * API error - The requested operation failed in storage
+     */
+    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00050001,
+            "The requested operation failed in storage.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00050001.html");
+    /**
+     * API error - The specified evaluable type is invalid (or unspecified)
+     */
+    public static final ApiError ERROR_INVALID_EVALUABLE_TYPE = new ApiError(0x00050002,
+            "The specified evaluable type is invalid (or unspecified).",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00050002.html");
 
     /**
      * The registered evaluable types

@@ -18,7 +18,7 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
@@ -30,6 +30,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
+import org.xowl.platform.services.evaluation.impl.XOWLEvaluationService;
 import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.util.ArrayList;
@@ -83,7 +84,7 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
                 "> } }";
         Result sparqlResult = service.getLongTermStore().sparql(query);
         if (sparqlResult.isFailure())
-            return new XSPReplyFailure(((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(XOWLEvaluationService.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<Evaluable> result = new ArrayList<>();
         for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             String artifactId = ((IRINode) solution.get("a")).getIRIValue();

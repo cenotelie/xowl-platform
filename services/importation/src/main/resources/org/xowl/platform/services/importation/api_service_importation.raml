@@ -1,0 +1,217 @@
+#%RAML 1.0
+---
+title: Importation Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+  Importer: !include schema_platform_importation.json#/definitions/Importer
+  Importers: !include schema_platform_importation.json#/definitions/Importers
+  ImporterConfiguration: !include schema_platform_importation.json#/definitions/ImporterConfiguration
+  Document: !include schema_platform_importation.json#/definitions/Document
+  Documents: !include schema_platform_importation.json#/definitions/Documents
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/importation:
+  /importers:
+    description: The collection of available data importers for the platform
+    get:
+      description: Gets the list of available data importers for the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the available data importers for the platform
+          body:
+            application/json:
+              type: Importers
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.importation.Importer",
+                    "identifier": "org.xowl.platform.importers.CSVImporter",
+                    "name": "CSV Importer",
+                    "wizardUri": "contributions/importers/csv"
+                  }
+                ]
+    /{importerId}:
+      description: A specific data importer for the platform
+      get:
+        description: Gets a description of the importer
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: A description of the importer
+            body:
+              application/json:
+                type: Importer
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.importation.Importer",
+                    "identifier": "org.xowl.platform.importers.CSVImporter",
+                    "name": "CSV Importer",
+                    "wizardUri": "contributions/importers/csv"
+                  }
+  /documents:
+    description: The collection of uploaded documents
+    get:
+      description: Gets the list of the uploaded documents
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the uploaded documents
+          body:
+            application/json:
+              type: Documents
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.importation.Document",
+                    "identifier": "mydocument1",
+                    "name": "Document XXX",
+                    "uploadDate": "01/01/2001 10:10",
+                    "uploader": "jdoe",
+                    "fileName": "mydocument.csv"
+                  }
+                ]
+    put:
+      description: Uploads a new document
+      is: [secured, mayFail]
+      queryParameters:
+        name:
+          displayName: Name
+          type: string
+          description: The name for the uploaded document
+          example: Document XXX
+          required: true
+        fileName:
+          displayName: Original file name
+          type: string
+          description: The original name of the file when uploaded
+          example: mydocument.csv
+          required: true
+      body:
+        binary/octet-stream:
+          description: The content of the file to upload
+      responses:
+        200:
+          description: The description of the uploaded document
+          body:
+            application/json:
+              type: Document
+              example: |
+                {
+                  "type": "org.xowl.platform.services.importation.Document",
+                  "identifier": "mydocument1",
+                  "name": "Document XXX",
+                  "uploadDate": "01/01/2001 10:10",
+                  "uploader": "jdoe",
+                  "fileName": "mydocument.csv"
+                }
+    /{documentId}:
+      description: A specific uploaded document
+      get:
+        description: Gets a description of the document
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the document
+            body:
+              application/json:
+                type: Document
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.importation.Document",
+                    "identifier": "mydocument1",
+                    "name": "Document XXX",
+                    "uploadDate": "01/01/2001 10:10",
+                    "uploader": "jdoe",
+                    "fileName": "mydocument.csv"
+                  }
+      delete:
+        description: Deletes the document
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded
+      /preview:
+        description: Action to request a preview of the data that would be imported from the document
+        post:
+          description: Requests a preview of the data that would be imported from the document
+          is: [secured, mayFail, resourceAccess]
+          queryParameters:
+            importer:
+              displayName: Importer
+              type: string
+              description: The identifier of the importer to use
+              example: org.xowl.platform.importers.CSVImporter
+              required: true
+          body:
+            application/json:
+              description: The configuration for the importer
+              type: ImporterConfiguration
+              example: |
+                {
+                  "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+                  "family": "http://xowl.org/platform/artifacts/artifact0",
+                  "superseded": [
+                    "http://xowl.org/platform/artifacts/artifact0/v0"
+                  ],
+                  "version": "v1",
+                  "archetype": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype"
+                }
+          responses:
+            200:
+              description: The preview of the data that would be imported from the document
+              body:
+               application/json:
+      /import:
+        description: Action to launch the importation of data from the document
+        post:
+          description: Requests to launch the importation of data from the document
+          is: [secured, mayFail, resourceAccess]
+          queryParameters:
+            importer:
+              displayName: Importer
+              type: string
+              description: The identifier of the importer to use
+              example: org.xowl.platform.importers.CSVImporter
+              required: true
+          body:
+            application/json:
+              description: The configuration for the importer
+              type: ImporterConfiguration
+              example: |
+                {
+                  "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+                  "family": "http://xowl.org/platform/artifacts/artifact0",
+                  "superseded": [
+                    "http://xowl.org/platform/artifacts/artifact0/v0"
+                  ],
+                  "version": "v1",
+                  "archetype": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype"
+                }
+          responses:
+            200:
+              description: The job that imports the document
+              body:
+                application/json:
+                  type: Job
+                  example: |
+                    {
+                      "type": "org.xowl.platform.kernel.jobs.Job",
+                      "identifier": "job1",
+                      "name": "Import Document XXX",
+                      "jobType": "org.xowl.platform.services.importation.ImportationJob",
+                      "owner": {
+                        "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                        "identifier": "jdoe",
+                        "name": "Jane Doe"
+                      },
+                      "status": "Running",
+                      "timeScheduled": "01/01/2001 10:10",
+                      "timeRun": "01/01/2001 10:10",
+                      "timeCompleted": "",
+                      "completionRate": "0.5",
+                      "payload": "document1",
+                      "result": {}
+                    }

@@ -22,7 +22,7 @@ baseUri: https://localhost:8443/api
           description: The list of the connector descriptors for this platform
           body:
             application/json:
-              schema: ConnectorDescriptions
+              type: ConnectorDescriptions
               example: |
                 [
                   {
@@ -51,7 +51,7 @@ baseUri: https://localhost:8443/api
           description: The list of the spawned connectors
           body:
             application/json:
-              schema: ConnectorServices
+              type: ConnectorServices
               example: |
                 [
                   {
@@ -88,7 +88,7 @@ baseUri: https://localhost:8443/api
             description: The description of the connector
             body:
               application/json:
-                schema: ConnectorService
+                type: ConnectorService
                 example: |
                   {
                     "type": "org.xowl.platform.services.connection.ConnectorService",
@@ -124,7 +124,7 @@ baseUri: https://localhost:8443/api
             required: true
         body:
           application/json:
-            schema: ConnectorServiceData
+            type: ConnectorServiceData
             example: |
               {
                 "identifier": "connector1",
@@ -143,7 +143,7 @@ baseUri: https://localhost:8443/api
             description: The description of the created connector
             body:
               application/json:
-                schema: ConnectorService
+                type: ConnectorService
                 example: |
                   {
                     "type": "org.xowl.platform.services.connection.ConnectorService",
@@ -183,7 +183,7 @@ baseUri: https://localhost:8443/api
               description: The description of the new job that will executes this action
               body:
                 application/json:
-                  schema: Job
+                  type: Job
                   example: |
                     {
                       "type": "org.xowl.platform.kernel.jobs.Job",
@@ -220,7 +220,7 @@ baseUri: https://localhost:8443/api
               description: The description of the new job that will executes this action
               body:
                 application/json:
-                  schema: Job
+                  type: Job
                   example: |
                     {
                       "type": "org.xowl.platform.kernel.jobs.Job",

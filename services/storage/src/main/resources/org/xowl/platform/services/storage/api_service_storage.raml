@@ -73,7 +73,7 @@ baseUri: https://localhost:8443/api
           description: The list of the requested artifacts
           body:
             application/json:
-              schema: Artifacts
+              type: Artifacts
               example: |
                 [
                   {
@@ -128,7 +128,7 @@ baseUri: https://localhost:8443/api
             description: The list of the live artifacts
             body:
               application/json:
-                schema: Artifacts
+                type: Artifacts
                 example: |
                   [
                     {
@@ -155,7 +155,7 @@ baseUri: https://localhost:8443/api
             description: The description of the artifact
             body:
               application/json:
-                schema: Artifact
+                type: Artifact
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.artifacts.Artifact",
@@ -177,7 +177,7 @@ baseUri: https://localhost:8443/api
             description: The description of the new job that will executes this action
             body:
               application/json:
-                schema: Job
+                type: Job
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.jobs.Job",
@@ -227,7 +227,7 @@ baseUri: https://localhost:8443/api
               description: The description of the new job that will executes this action
               body:
                 application/json:
-                  schema: Job
+                  type: Job
                   example: |
                     {
                       "type": "org.xowl.platform.kernel.jobs.Job",
@@ -257,7 +257,7 @@ baseUri: https://localhost:8443/api
               description: The description of the new job that will executes this action
               body:
                 application/json:
-                  schema: Job
+                  type: Job
                   example: |
                     {
                       "type": "org.xowl.platform.kernel.jobs.Job",

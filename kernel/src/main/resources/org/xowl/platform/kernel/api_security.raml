@@ -23,7 +23,7 @@ baseUri: https://localhost:8443/api
           description: A description of the currently logged-in user
           body:
             application/json:
-              schema: PlatformUser
+              type: PlatformUser
               example: |
                 {
                   "type": "org.xowl.platform.kernel.platform.PlatformUser",
@@ -88,7 +88,7 @@ baseUri: https://localhost:8443/api
          description: The list of users on the platform
          body:
            application/json:
-             schema: PlatformUsers
+             type: PlatformUsers
              example: |
                [
                  {
@@ -114,7 +114,7 @@ baseUri: https://localhost:8443/api
             description: Returns the description of the user
             body:
               application/json:
-                schema: PlatformUser
+                type: PlatformUser
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.platform.PlatformUser",
@@ -147,7 +147,7 @@ baseUri: https://localhost:8443/api
             description: Returns the created user
             body:
               application/json:
-                schema: PlatformUser
+                type: PlatformUser
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.platform.PlatformUser",
@@ -251,7 +251,7 @@ baseUri: https://localhost:8443/api
          description: The list of groups on the platform
          body:
            application/json:
-             schema: PlatformGroups
+             type: PlatformGroups
              example: |
                [
                  {
@@ -291,7 +291,7 @@ baseUri: https://localhost:8443/api
             description: Returns the description of the group
             body:
               application/json:
-                schema: PlatformGroup
+                type: PlatformGroup
                 example: |
                  {
                    "type": "org.xowl.platform.kernel.platform.PlatformGroup",
@@ -339,7 +339,7 @@ baseUri: https://localhost:8443/api
             description: Returns the created group
             body:
               application/json:
-                schema: PlatformGroup
+                type: PlatformGroup
                 example: |
                  {
                    "type": "org.xowl.platform.kernel.platform.PlatformGroup",
@@ -486,7 +486,7 @@ baseUri: https://localhost:8443/api
          description: The list of roles on the platform
          body:
            application/json:
-             schema: PlatformRoles
+             type: PlatformRoles
              example: |
                [
                  {
@@ -505,7 +505,7 @@ baseUri: https://localhost:8443/api
             description: Returns the description of the role
             body:
               application/json:
-                schema: PlatformRole
+                type: PlatformRole
                 example: |
                  {
                    "type": "org.xowl.platform.kernel.platform.PlatformRole",
@@ -527,7 +527,7 @@ baseUri: https://localhost:8443/api
             description: Returns the created role
             body:
               application/json:
-                schema: PlatformRole
+                type: PlatformRole
                 example: |
                  {
                    "type": "org.xowl.platform.kernel.platform.PlatformRole",

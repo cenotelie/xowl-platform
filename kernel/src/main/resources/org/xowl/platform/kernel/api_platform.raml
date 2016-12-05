@@ -19,7 +19,7 @@ baseUri: https://localhost:8443/api
         description: The description of the platform implementation
         body:
           application/json:
-            schema: OSGiImplementation
+            type: OSGiImplementation
             example: |
               {
                 "type": "org.xowl.platform.kernel.platform.OSGiImplementation",
@@ -36,7 +36,7 @@ baseUri: https://localhost:8443/api
           description: The list of the bundles deployed on this platform
           body:
             application/json:
-              schema: OSGiBundles
+              type: OSGiBundles
               example: |
                 [
                   {

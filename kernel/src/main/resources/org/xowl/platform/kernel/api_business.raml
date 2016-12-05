@@ -23,7 +23,7 @@ baseUri: https://localhost:8443/api
           description: The artifacts archetypes
           body:
             application/json:
-              schema: ArtifactArchetypes
+              type: ArtifactArchetypes
               example: |
                 [
                   {
@@ -43,7 +43,7 @@ baseUri: https://localhost:8443/api
             description: The description of the artifact
             body:
               application/json:
-                schema: ArtifactArchetype
+                type: ArtifactArchetype
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.artifacts.ArtifactArchetype",
@@ -61,7 +61,7 @@ baseUri: https://localhost:8443/api
           description: The business domains
           body:
             application/json:
-              schema: BusinessDomains
+              type: BusinessDomains
               example: |
                 [
                   {
@@ -81,7 +81,7 @@ baseUri: https://localhost:8443/api
             description: The description of the business domain
             body:
               application/json:
-                schema: BusinessDomain
+                type: BusinessDomain
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.artifacts.BusinessDomain",
@@ -99,7 +99,7 @@ baseUri: https://localhost:8443/api
           description: The business schemas
           body:
             application/json:
-              schema: BusinessSchemas
+              type: BusinessSchemas
               example: |
                 [
                   {
@@ -148,7 +148,7 @@ baseUri: https://localhost:8443/api
             description: The description of the business schema
             body:
               application/json:
-                schema: BusinessSchema
+                type: BusinessSchema
                 example: |
                   {
                     "type": "org.xowl.platform.kernel.artifacts.BusinessSchema",

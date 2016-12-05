@@ -20,7 +20,7 @@ baseUri: https://localhost:8443/api
           description: The list of metrics on the platform
           body:
             application/json:
-              schema: Metrics
+              type: Metrics
               example: |
                 [
                   {
@@ -45,7 +45,7 @@ baseUri: https://localhost:8443/api
             description: The description of the metric
             body:
               application/json:
-                schema: Metric
+                type: Metric
                 example: |
                   {
                     "type": "org.xowl.infra.utils.metrics.Metric",
@@ -68,7 +68,7 @@ baseUri: https://localhost:8443/api
               description: The description of the metric
               body:
                 application/json:
-                  schema: MetricSnapshot
+                  type: MetricSnapshot
                   example: |
                     {
                       "type": "org.xowl.infra.utils.metrics.MetricSnapshot",

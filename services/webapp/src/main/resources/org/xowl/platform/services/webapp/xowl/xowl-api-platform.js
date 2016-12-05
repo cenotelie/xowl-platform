@@ -47,14 +47,12 @@ XOWL.prototype.login = function (callback, login, password) {
 
 XOWL.prototype.logout = function () {
 	this.doHttpPost(function (code, type, content) {
-		if (code === 200) {
-			_self.userId = null;
-			_self.userName = null;
-			localStorage.removeItem('xowl.userId');
-			localStorage.removeItem('xowl.userName');
-		}
+		_self.userId = null;
+		_self.userName = null;
+		localStorage.removeItem('xowl.userId');
+		localStorage.removeItem('xowl.userName');
 		callback(code, type, content);
-	}, "kernel/security/login", {}, null);
+	}, "kernel/security/logout", {}, null);
 }
 
 XOWL.prototype.getPlatformUsers = function (callback) {

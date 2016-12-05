@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-service-lts</artifactId>
+			<artifactId>xowl-service-storage</artifactId>
 			<version>0.2.4-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

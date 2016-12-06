@@ -561,7 +561,7 @@ XOWL.prototype.getWebModules = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/webapp/modules", null);
+	}, "services/webapp/modules", null, "GET", null, null);
 }
 
 
@@ -1057,7 +1057,7 @@ XOWL.prototype.doRequest = function (callback, complement, parameters, method, c
 			callback(xmlHttp.status, ct, xmlHttp.responseText)
 		}
 	}
-	var uri = this.endpoint + uriComplement;
+	var uri = this.endpoint + complement;
 	if (parameters != null) {
 		var names = Object.getOwnPropertyNames(parameters);
 		for (var p = 0; p != names.length; p++) {

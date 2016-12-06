@@ -25,14 +25,8 @@ function renderData(data) {
 	var table = document.getElementById("jobs");
 	while (table.hasChildNodes())
 		table.removeChild(table.lastChild);
-	renderJobs(table, data.scheduled);
-	renderJobs(table, data.running);
-	renderJobs(table, data.completed);
-}
-
-function renderJobs(table, jobs) {
-	for (var i = 0; i != jobs.length; i++) {
-		table.appendChild(renderJob(jobs[i]));
+	for (var i = 0; i != data.length; i++) {
+		table.appendChild(renderJob(data[i]));
 	}
 }
 

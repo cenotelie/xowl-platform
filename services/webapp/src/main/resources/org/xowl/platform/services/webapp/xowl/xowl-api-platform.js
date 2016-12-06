@@ -27,7 +27,7 @@ var MIME_SPARQL = "application/sparql-query";
 
 
 /*****************************************************
- * Security Service
+ * Kernel - Security Service
  ****************************************************/
 
 XOWL.prototype.isLoggedIn = function () {
@@ -350,9 +350,9 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 
 
 
-////
-// Admin Module - Platform Descriptor Service
-////
+/*****************************************************
+ * Kernel - Platform Management Service
+ ****************************************************/
 
 XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -361,7 +361,7 @@ XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/platform", null);
+	}, "kernel/platform", null, "GET", null, null);
 }
 
 XOWL.prototype.getPlatformBundles = function (callback) {
@@ -371,7 +371,7 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/platform/bundles", null);
+	}, "kernel/platform/bundles", null, "GET", null, null);
 }
 
 XOWL.prototype.platformShutdown = function (callback) {
@@ -381,7 +381,7 @@ XOWL.prototype.platformShutdown = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/platform/shutdown", null, null);
+	}, "kernel/platform/shutdown", null, "POST", null, null);
 }
 
 XOWL.prototype.platformRestart = function (callback) {
@@ -391,14 +391,14 @@ XOWL.prototype.platformRestart = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/platform/restart", null, null);
+	}, "kernel/platform/restart", null, "POST", null, null);
 }
 
 
 
-////
-// Admin Module - Logging Service
-////
+/*****************************************************
+ * Kernel - Logging Service
+ ****************************************************/
 
 XOWL.prototype.getLogMessages = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -407,14 +407,14 @@ XOWL.prototype.getLogMessages = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/log", null);
+	}, "kernel/log", null, "GET", null, null);
 }
 
 
 
-////
-// Admin Module - Job Execution Service
-////
+/*****************************************************
+ * Kernel - Jobs Management Service
+ ****************************************************/
 
 XOWL.prototype.getJobs = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -423,7 +423,7 @@ XOWL.prototype.getJobs = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/jobs", null);
+	}, "kernel/jobs", null, "GET", null, null);
 }
 
 XOWL.prototype.getJob = function (callback, jobId) {
@@ -433,7 +433,7 @@ XOWL.prototype.getJob = function (callback, jobId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/jobs", {id: jobId});
+	}, "kernel/jobs/" + encodeURIComponent(jobId), null, "GET", null, null);
 }
 
 XOWL.prototype.cancelJob = function (callback, jobId) {
@@ -443,14 +443,14 @@ XOWL.prototype.cancelJob = function (callback, jobId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/admin/jobs", {cancel: jobId}, null);
+	}, "kernel/jobs/" + encodeURIComponent(jobId) + "/cancel", null, "POST", null, null);
 }
 
 
 
-////
-// Admin Module - Statistics Service
-////
+/*****************************************************
+ * Kernel - Statistics Service
+ ****************************************************/
 
 XOWL.prototype.getAllMetrics = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -459,7 +459,7 @@ XOWL.prototype.getAllMetrics = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/statistics/metrics", null);
+	}, "kernel/statistics/metrics", null, "GET", null, null);
 }
 
 XOWL.prototype.getMetric = function (callback, metricId) {
@@ -469,7 +469,7 @@ XOWL.prototype.getMetric = function (callback, metricId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId), null);
+	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId), null, "GET", null, null);
 }
 
 XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
@@ -479,7 +479,89 @@ XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId) + "/snapshot", null);
+	}, "kernel/statistics/metrics/" + encodeURIComponent(metricId) + "/snapshot", null, "GET", null, null);
+}
+
+
+
+/*****************************************************
+ * Kernel - Business Directory Service
+ ****************************************************/
+
+XOWL.prototype.getBusinessDomains = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/domains", null, "GET", null, null);
+}
+
+XOWL.prototype.getBusinessDomain = function (callback, domainId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/domains/" + encodeURIComponent(domainId), null, "GET", null, null);
+}
+
+XOWL.prototype.getArtifactArchetypes = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/archetypes", null, "GET", null, null);
+}
+
+XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/archetypes/" + encodeURIComponent(archetypeId), null, "GET", null, null);
+}
+
+XOWL.prototype.getBusinessSchemas = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/schemas", null, "GET", null, null);
+}
+
+XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/business/schemas/" + encodeURIComponent(schemaId), null, "GET", null, null);
+}
+
+
+
+/*****************************************************
+ * Webapp - Web Modules Directory Service
+ ****************************************************/
+
+XOWL.prototype.getWebModules = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/webapp/modules", null);
 }
 
 
@@ -560,85 +642,11 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 
 
 
-////
-// Core Module - Web Application Modules Service
-////
-
-XOWL.prototype.getWebModules = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/webapp/modules", null);
-}
 
 
 
-////
-// Core Module - Business Directory Service
-////
 
-XOWL.prototype.getBusinessDomains = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/domains", null);
-}
 
-XOWL.prototype.getBusinessDomain = function (callback, domainId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/domain", {id: domainId});
-}
-
-XOWL.prototype.getArtifactArchetypes = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/archetypes", null);
-}
-
-XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/archetype", {id: archetypeId});
-}
-
-XOWL.prototype.getBusinessSchemas = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/schemas", null);
-}
-
-XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/core/business/schema", {id: schemaId});
-}
 
 
 

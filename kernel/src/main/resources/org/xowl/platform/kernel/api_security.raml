@@ -409,7 +409,7 @@ baseUri: https://localhost:8443/api
         post:
           description: Adds a new member to the group
           queryParameters:
-            member:
+            user:
               displayName: User identifier
               type: string
               description: The identifier of the user to add as a member
@@ -424,7 +424,7 @@ baseUri: https://localhost:8443/api
         post:
           description: Removes a member from the group
           queryParameters:
-            member:
+            user:
               displayName: User identifier
               type: string
               description: The identifier of the user to remove as a member
@@ -439,7 +439,7 @@ baseUri: https://localhost:8443/api
         post:
           description: Adds a new admin to the group
           queryParameters:
-            member:
+            user:
               displayName: User identifier
               type: string
               description: The identifier of the user to add as an admin
@@ -454,7 +454,7 @@ baseUri: https://localhost:8443/api
         post:
           description: Removes an admin from the group
           queryParameters:
-            member:
+            user:
               displayName: User identifier
               type: string
               description: The identifier of the user to remove as an admin

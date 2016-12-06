@@ -30,7 +30,7 @@ function renderPlatformUsers(users) {
 	for (var i = 0; i != users.length; i++) {
 		select.appendChild(renderPlatformUser(users[i]));
 	}
-	select.value = xowl.getUserId();
+	select.value = xowl.getLoggedInUserId();
 }
 
 function renderPlatformUser(user) {

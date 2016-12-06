@@ -34,11 +34,11 @@ XOWL.prototype.isLoggedIn = function () {
 	return (this.userIdentifier !== null);
 }
 
-XOWL.prototype.getUserId = function () {
+XOWL.prototype.getLoggedInUserId = function () {
 	return this.userIdentifier;
 }
 
-XOWL.prototype.getUserName = function () {
+XOWL.prototype.getLoggedInUserName = function () {
 	return this.userName;
 }
 
@@ -85,7 +85,7 @@ XOWL.prototype.getPlatformUsers = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users", null);
+	}, "kernel/security/users", null, "GET", null, null);
 }
 
 XOWL.prototype.getPlatformUser = function (callback, userId) {
@@ -95,7 +95,7 @@ XOWL.prototype.getPlatformUser = function (callback, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users/" + encodeURIComponent(userId), null);
+	}, "kernel/security/users/" + encodeURIComponent(userId), null, "GET", null, null);
 }
 
 XOWL.prototype.createPlatformUser = function (callback, userId, name, password) {
@@ -105,7 +105,7 @@ XOWL.prototype.createPlatformUser = function (callback, userId, name, password) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users/" + encodeURIComponent(userId), {name: name}, password);
+	}, "kernel/security/users/" + encodeURIComponent(userId), {name: name}, "PUT", MIME_PLAIN_TEXT, password);
 }
 
 XOWL.prototype.deletePlatformUser = function (callback, userId) {
@@ -115,7 +115,7 @@ XOWL.prototype.deletePlatformUser = function (callback, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users/" + encodeURIComponent(userId), null);
+	}, "kernel/security/users/" + encodeURIComponent(userId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
@@ -125,7 +125,7 @@ XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {action: "rename", id: userId, name: name});
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/rename", {name: name}, "POST", null, null);
 }
 
 XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassword, newPassword) {
@@ -135,7 +135,7 @@ XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassw
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {action: "changeKey", id: userId, oldKey: oldPassword, newKey: newPassword});
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/updateKey", {oldKey: oldPassword}, "POST", MIME_PLAIN_TEXT, newPassword);
 }
 
 XOWL.prototype.resetPlatformUserPassword = function (callback, userId, newPassword) {
@@ -145,7 +145,7 @@ XOWL.prototype.resetPlatformUserPassword = function (callback, userId, newPasswo
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/users", {action: "resetKey", id: userId, newKey: newPassword});
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/resetKey", null, "POST", MIME_PLAIN_TEXT, newPassword);
 }
 
 XOWL.prototype.getPlatformGroups = function (callback) {
@@ -155,7 +155,7 @@ XOWL.prototype.getPlatformGroups = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", null);
+	}, "kernel/security/groups", null, "GET", null, null);
 }
 
 XOWL.prototype.getPlatformGroup = function (callback, groupId) {
@@ -165,7 +165,7 @@ XOWL.prototype.getPlatformGroup = function (callback, groupId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {id: groupId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId), null, "GET", null, null);
 }
 
 XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
@@ -175,7 +175,7 @@ XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {id: groupId, name: name, admin: admin});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId), {name: name, admin: admin}, "PUT", null, null);
 }
 
 XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
@@ -185,7 +185,7 @@ XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {id: groupId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
@@ -195,7 +195,7 @@ XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {action: "rename", id: groupId, name: name});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/rename", {name: name}, "POST", null, null);
 }
 
 XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
@@ -205,7 +205,7 @@ XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {action: "addMember", id: groupId, user: userId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/addMember", {user: userId}, "POST", null, null);
 }
 
 XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, userId) {
@@ -215,7 +215,7 @@ XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, user
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {action: "removeMember", id: groupId, user: userId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/removeMember", {user: userId}, "POST", null, null);
 }
 
 XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
@@ -225,7 +225,7 @@ XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {action: "addAdmin", id: groupId, user: userId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/addAdmin", {user: userId}, "POST", null, null);
 }
 
 XOWL.prototype.removeAdminFromPlatformGroup = function (callback, groupId, userId) {
@@ -235,7 +235,7 @@ XOWL.prototype.removeAdminFromPlatformGroup = function (callback, groupId, userI
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/groups", {action: "removeAdmin", id: groupId, user: userId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/removeAdmin", {user: userId}, "POST", null, null);
 }
 
 XOWL.prototype.getPlatformRoles = function (callback) {
@@ -245,7 +245,7 @@ XOWL.prototype.getPlatformRoles = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", null);
+	}, "kernel/security/roles", null, "GET", null, null);
 }
 
 XOWL.prototype.getPlatformRole = function (callback, roleId) {
@@ -255,7 +255,7 @@ XOWL.prototype.getPlatformRole = function (callback, roleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {id: roleId});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId), null, "GET", null, null);
 }
 
 XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
@@ -265,7 +265,7 @@ XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {id: roleId, name: name});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId), {name: name}, "PUT", null, null);
 }
 
 XOWL.prototype.deletePlatformRole = function (callback, roleId) {
@@ -275,7 +275,7 @@ XOWL.prototype.deletePlatformRole = function (callback, roleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {id: roleId});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
@@ -285,7 +285,7 @@ XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "rename", id: roleId, name: name});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId) + "/rename", {name: name}, "POST", null, null);
 }
 
 XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
@@ -295,7 +295,7 @@ XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "assign", id: roleId, user: userId});
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/assign", {role: userId}, "POST", null, null);
 }
 
 XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId) {
@@ -305,7 +305,7 @@ XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "unassign", id: roleId, user: userId});
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/unassign", {role: userId}, "POST", null, null);
 }
 
 XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) {
@@ -315,7 +315,7 @@ XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "assign", id: roleId, group: groupId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/assign", {role: userId}, "POST", null, null);
 }
 
 XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, groupId) {
@@ -325,7 +325,7 @@ XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, group
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "unassign", id: roleId, group: groupId});
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/unassign", {role: userId}, "POST", null, null);
 }
 
 XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedRoleId) {
@@ -335,7 +335,7 @@ XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedR
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "addImplication", id: roleId, target: impliedRoleId});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId) + "/imply", {target: impliedRoleId}, "POST", null, null);
 }
 
 XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impliedRoleId) {
@@ -345,7 +345,7 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/security/roles", {action: "removeImplication", id: roleId, target: impliedRoleId});
+	}, "kernel/security/roles/" + encodeURIComponent(roleId) + "/unimply", {target: impliedRoleId}, "POST", null, null);
 }
 
 

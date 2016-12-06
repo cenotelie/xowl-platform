@@ -1,24 +1,41 @@
 // Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
+/*****************************************************
+ * xOWL Federation Platform API - V1
+ ****************************************************/
+
 function XOWL() {
 	this.endpoint = '/api/';
-	this.userId = localStorage.getItem('xowl.userId');
-	this.userName = localStorage.getItem('xowl.userName');
+	this.userLogin = localStorage.getItem('xowl.user.login');
+	this.userIdentifier = localStorage.getItem('xowl.user.identifier');
+	this.userName = localStorage.getItem('xowl.user.name');
 }
 
+/**
+ * MIME type for plain text
+ */
+var MIME_PLAIN_TEXT = "text/plain";
+/**
+ * MIME type for JSON
+ */
+var MIME_JSON = "application/json";
+/**
+ * MIME type for SPARQL
+ */
+var MIME_SPARQL = "application/sparql-query";
 
 
-////
-// Security Service
-////
+/*****************************************************
+ * Security Service
+ ****************************************************/
 
 XOWL.prototype.isLoggedIn = function () {
-	return (this.userId !== null);
+	return (this.userIdentifier !== null);
 }
 
 XOWL.prototype.getUserId = function () {
-	return this.userId;
+	return this.userIdentifier;
 }
 
 XOWL.prototype.getUserName = function () {
@@ -27,38 +44,44 @@ XOWL.prototype.getUserName = function () {
 
 XOWL.prototype.login = function (callback, login, password) {
 	var _self = this;
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			var user = JSON.parse(content);
-			_self.userId = login;
+			_self.userLogin = login;
+			_self.userIdentifier = user.identifier;
 			_self.userName = user.name;
-			localStorage.setItem('xowl.userId', login);
-			localStorage.setItem('xowl.userName', user.name);
+			localStorage.setItem('xowl.user.login', login);
+			localStorage.setItem('xowl.user.identifier', user.identifier);
+			localStorage.setItem('xowl.user.name', user.name);
 			callback(code, type, content);
 		} else {
-			_self.userId = null;
+			_self.userLogin = null;
+			_self.userIdentifier = null;
 			_self.userName = null;
-			localStorage.removeItem('xowl.userId');
-			localStorage.removeItem('xowl.userName');
+			localStorage.removeItem('xowl.user.login');
+			localStorage.removeItem('xowl.user.identifier');
+			localStorage.removeItem('xowl.user.name');
 			callback(code, type, content);
 		}
-	}, "kernel/security/login", {login: login}, password);
+	}, "kernel/security/login", {login: login}, "POST", MIME_PLAIN_TEXT, password);
 }
 
 XOWL.prototype.logout = function () {
-	this.doHttpPost(function (code, type, content) {
-		_self.userId = null;
+	this.doRequest(function (code, type, content) {
+		_self.userLogin = null;
+		_self.userIdentifier = null;
 		_self.userName = null;
-		localStorage.removeItem('xowl.userId');
-		localStorage.removeItem('xowl.userName');
+		localStorage.removeItem('xowl.user.login');
+		localStorage.removeItem('xowl.user.identifier');
+		localStorage.removeItem('xowl.user.name');
 		callback(code, type, content);
-	}, "kernel/security/logout", {}, null);
+	}, "kernel/security/logout", null, "POST", null, null);
 }
 
 XOWL.prototype.getPlatformUsers = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -66,9 +89,9 @@ XOWL.prototype.getPlatformUsers = function (callback) {
 }
 
 XOWL.prototype.getPlatformUser = function (callback, userId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -76,9 +99,9 @@ XOWL.prototype.getPlatformUser = function (callback, userId) {
 }
 
 XOWL.prototype.createPlatformUser = function (callback, userId, name, password) {
-	this.doHttpPut(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -86,9 +109,9 @@ XOWL.prototype.createPlatformUser = function (callback, userId, name, password) 
 }
 
 XOWL.prototype.deletePlatformUser = function (callback, userId) {
-	this.doHttpDelete(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -96,9 +119,9 @@ XOWL.prototype.deletePlatformUser = function (callback, userId) {
 }
 
 XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -106,9 +129,9 @@ XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
 }
 
 XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassword, newPassword) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -116,9 +139,9 @@ XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassw
 }
 
 XOWL.prototype.resetPlatformUserPassword = function (callback, userId, newPassword) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -126,9 +149,9 @@ XOWL.prototype.resetPlatformUserPassword = function (callback, userId, newPasswo
 }
 
 XOWL.prototype.getPlatformGroups = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -136,9 +159,9 @@ XOWL.prototype.getPlatformGroups = function (callback) {
 }
 
 XOWL.prototype.getPlatformGroup = function (callback, groupId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -146,9 +169,9 @@ XOWL.prototype.getPlatformGroup = function (callback, groupId) {
 }
 
 XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
-	this.doHttpPut(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -156,9 +179,9 @@ XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
 }
 
 XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
-	this.doHttpDelete(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -166,9 +189,9 @@ XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
 }
 
 XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -176,9 +199,9 @@ XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
 }
 
 XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -186,9 +209,9 @@ XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
 }
 
 XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -196,9 +219,9 @@ XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, user
 }
 
 XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -206,9 +229,9 @@ XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
 }
 
 XOWL.prototype.removeAdminFromPlatformGroup = function (callback, groupId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -216,9 +239,9 @@ XOWL.prototype.removeAdminFromPlatformGroup = function (callback, groupId, userI
 }
 
 XOWL.prototype.getPlatformRoles = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -226,9 +249,9 @@ XOWL.prototype.getPlatformRoles = function (callback) {
 }
 
 XOWL.prototype.getPlatformRole = function (callback, roleId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -236,9 +259,9 @@ XOWL.prototype.getPlatformRole = function (callback, roleId) {
 }
 
 XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
-	this.doHttpPut(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -246,9 +269,9 @@ XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
 }
 
 XOWL.prototype.deletePlatformRole = function (callback, roleId) {
-	this.doHttpDelete(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -256,9 +279,9 @@ XOWL.prototype.deletePlatformRole = function (callback, roleId) {
 }
 
 XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -266,9 +289,9 @@ XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
 }
 
 XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -276,9 +299,9 @@ XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
 }
 
 XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -286,9 +309,9 @@ XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId
 }
 
 XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -296,9 +319,9 @@ XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) 
 }
 
 XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, groupId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -306,9 +329,9 @@ XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, group
 }
 
 XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedRoleId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -316,9 +339,9 @@ XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedR
 }
 
 XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impliedRoleId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -332,9 +355,9 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 ////
 
 XOWL.prototype.getPlatformOSGiImpl = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -342,9 +365,9 @@ XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 }
 
 XOWL.prototype.getPlatformBundles = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -352,9 +375,9 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 }
 
 XOWL.prototype.platformShutdown = function (callback) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", content);
+			callback(code, MIME_JSON, content);
 		} else {
 			callback(code, type, content);
 		}
@@ -362,9 +385,9 @@ XOWL.prototype.platformShutdown = function (callback) {
 }
 
 XOWL.prototype.platformRestart = function (callback) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", content);
+			callback(code, MIME_JSON, content);
 		} else {
 			callback(code, type, content);
 		}
@@ -378,9 +401,9 @@ XOWL.prototype.platformRestart = function (callback) {
 ////
 
 XOWL.prototype.getLogMessages = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -394,9 +417,9 @@ XOWL.prototype.getLogMessages = function (callback) {
 ////
 
 XOWL.prototype.getJobs = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -404,9 +427,9 @@ XOWL.prototype.getJobs = function (callback) {
 }
 
 XOWL.prototype.getJob = function (callback, jobId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -414,9 +437,9 @@ XOWL.prototype.getJob = function (callback, jobId) {
 }
 
 XOWL.prototype.cancelJob = function (callback, jobId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -430,9 +453,9 @@ XOWL.prototype.cancelJob = function (callback, jobId) {
 ////
 
 XOWL.prototype.getAllMetrics = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -440,9 +463,9 @@ XOWL.prototype.getAllMetrics = function (callback) {
 }
 
 XOWL.prototype.getMetric = function (callback, metricId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -450,9 +473,9 @@ XOWL.prototype.getMetric = function (callback, metricId) {
 }
 
 XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -466,9 +489,9 @@ XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
 ////
 
 XOWL.prototype.getDescriptors = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -476,9 +499,9 @@ XOWL.prototype.getDescriptors = function (callback) {
 }
 
 XOWL.prototype.getConnectors = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -486,9 +509,9 @@ XOWL.prototype.getConnectors = function (callback) {
 }
 
 XOWL.prototype.getConnector = function (callback, connectorId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -496,9 +519,9 @@ XOWL.prototype.getConnector = function (callback, connectorId) {
 }
 
 XOWL.prototype.createConnector = function (callback, domain, definition) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -506,7 +529,7 @@ XOWL.prototype.createConnector = function (callback, domain, definition) {
 }
 
 XOWL.prototype.deleteConnector = function (callback, connectorId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
 		} else {
@@ -516,9 +539,9 @@ XOWL.prototype.deleteConnector = function (callback, connectorId) {
 }
 
 XOWL.prototype.pullFromConnector = function (callback, connectorId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -526,9 +549,9 @@ XOWL.prototype.pullFromConnector = function (callback, connectorId) {
 }
 
 XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -542,9 +565,9 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 ////
 
 XOWL.prototype.getWebModules = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -558,9 +581,9 @@ XOWL.prototype.getWebModules = function (callback) {
 ////
 
 XOWL.prototype.getBusinessDomains = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -568,9 +591,9 @@ XOWL.prototype.getBusinessDomains = function (callback) {
 }
 
 XOWL.prototype.getBusinessDomain = function (callback, domainId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -578,9 +601,9 @@ XOWL.prototype.getBusinessDomain = function (callback, domainId) {
 }
 
 XOWL.prototype.getArtifactArchetypes = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -588,9 +611,9 @@ XOWL.prototype.getArtifactArchetypes = function (callback) {
 }
 
 XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -598,9 +621,9 @@ XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
 }
 
 XOWL.prototype.getBusinessSchemas = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -608,9 +631,9 @@ XOWL.prototype.getBusinessSchemas = function (callback) {
 }
 
 XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -624,9 +647,9 @@ XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
 ////
 
 XOWL.prototype.getAllArtifacts = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -634,9 +657,9 @@ XOWL.prototype.getAllArtifacts = function (callback) {
 }
 
 XOWL.prototype.getLiveArtifacts = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -644,9 +667,9 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 }
 
 XOWL.prototype.getArtifactsForBase = function (callback, base) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -654,9 +677,9 @@ XOWL.prototype.getArtifactsForBase = function (callback, base) {
 }
 
 XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -664,9 +687,9 @@ XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
 }
 
 XOWL.prototype.getArtifact = function (callback, artifactId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -674,7 +697,7 @@ XOWL.prototype.getArtifact = function (callback, artifactId) {
 }
 
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/n-quads", content);
 		} else {
@@ -684,7 +707,7 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 }
 
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, "application/n-quads", content);
 		} else {
@@ -694,9 +717,9 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 }
 
 XOWL.prototype.deleteArtifact = function (callback, artifactId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -704,13 +727,13 @@ XOWL.prototype.deleteArtifact = function (callback, artifactId) {
 }
 
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			var leftIndex = content.indexOf("--xowlQuads");
 			var rightIndex = content.lastIndexOf("--xowlQuads");
 			var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
 			var contentRight = content.substring(rightIndex + "--xowlQuads".length);
-			callback(code, "application/json", {
+			callback(code, MIME_JSON, {
 				left: contentLeft,
 				right: contentRight
 			});
@@ -721,9 +744,9 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 }
 
 XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -731,9 +754,9 @@ XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
 }
 
 XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -747,9 +770,9 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 ////
 
 XOWL.prototype.getUploadedDocuments = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -757,9 +780,9 @@ XOWL.prototype.getUploadedDocuments = function (callback) {
 }
 
 XOWL.prototype.getUploadedDocument = function (callback, docId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -767,9 +790,9 @@ XOWL.prototype.getUploadedDocument = function (callback, docId) {
 }
 
 XOWL.prototype.getDocumentImporters = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -777,9 +800,9 @@ XOWL.prototype.getDocumentImporters = function (callback) {
 }
 
 XOWL.prototype.getDocumentImporter = function (callback, importerId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -787,9 +810,9 @@ XOWL.prototype.getDocumentImporter = function (callback, importerId) {
 }
 
 XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -797,7 +820,7 @@ XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer,
 }
 
 XOWL.prototype.dropUploadedDocument = function (callback, docId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
 		} else {
@@ -807,9 +830,9 @@ XOWL.prototype.dropUploadedDocument = function (callback, docId) {
 }
 
 XOWL.prototype.importUploadedDocument = function (callback, docId, importer, configuration) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -819,11 +842,11 @@ XOWL.prototype.importUploadedDocument = function (callback, docId, importer, con
 XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 	this.doHttpRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "PUT", "services/core/importation", {name: name, fileName: fileName}, content, "application/octet-stream", "application/json");
+	}, "PUT", "services/core/importation", {name: name, fileName: fileName}, content, "application/octet-stream", MIME_JSON);
 }
 
 
@@ -833,9 +856,9 @@ XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 ////
 
 XOWL.prototype.getInconsistencies = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -843,9 +866,9 @@ XOWL.prototype.getInconsistencies = function (callback) {
 }
 
 XOWL.prototype.getConsistencyRules = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -853,9 +876,9 @@ XOWL.prototype.getConsistencyRules = function (callback) {
 }
 
 XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -863,9 +886,9 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 }
 
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -879,9 +902,9 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 }
 
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -889,9 +912,9 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 }
 
 XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -899,9 +922,9 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 }
 
 XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -915,9 +938,9 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 ////
 
 XOWL.prototype.newImpactAnalysis = function (callback, definition) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -931,9 +954,9 @@ XOWL.prototype.newImpactAnalysis = function (callback, definition) {
 ////
 
 XOWL.prototype.getEvaluations = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -941,9 +964,9 @@ XOWL.prototype.getEvaluations = function (callback) {
 }
 
 XOWL.prototype.getEvaluation = function (callback, evaluationId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -951,9 +974,9 @@ XOWL.prototype.getEvaluation = function (callback, evaluationId) {
 }
 
 XOWL.prototype.getEvaluableTypes = function (callback) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -961,9 +984,9 @@ XOWL.prototype.getEvaluableTypes = function (callback) {
 }
 
 XOWL.prototype.getEvaluables = function (callback, typeId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -971,9 +994,9 @@ XOWL.prototype.getEvaluables = function (callback, typeId) {
 }
 
 XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
-	this.doHttpGet(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content));
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -981,9 +1004,9 @@ XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
 }
 
 XOWL.prototype.newEvaluation = function (callback, definition) {
-	this.doHttpPost(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/json", JSON.parse(content).payload);
+			callback(code, MIME_JSON, JSON.parse(content).payload);
 		} else {
 			callback(code, type, content);
 		}
@@ -1009,32 +1032,16 @@ XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, 
 		parameters.supersede = supersede;
 	if (archetype !== null && archetype !== "")
 		parameters.archetype = archetype;
-	this.doHttpRequest(callback, "POST", connectorURI, parameters, payload, contentType, "application/json");
+	this.doHttpRequest(callback, "POST", connectorURI, parameters, payload, contentType, MIME_JSON);
 }
 
 
 
-////
-// Low-Level Core API
-////
+/*****************************************************
+ * Utility API
+ ****************************************************/
 
-XOWL.prototype.doHttpGet = function (callback, target, parameters) {
-	this.doHttpRequest(callback, "GET", target, parameters, null, null, "text/plain, application/json");
-}
-
-XOWL.prototype.doHttpPost = function (callback, target, parameters, payload) {
-	this.doHttpRequest(callback, "POST", target, parameters, payload, "application/json", "text/plain, application/json");
-}
-
-XOWL.prototype.doHttpPut = function (callback, target, parameters, payload) {
-	this.doHttpRequest(callback, "PUT", target, parameters, payload, "application/json", "text/plain, application/json");
-}
-
-XOWL.prototype.doHttpDelete = function (callback, target, parameters) {
-	this.doHttpRequest(callback, "DELETE", target, parameters, null, null, "text/plain, application/json");
-}
-
-XOWL.prototype.doHttpRequest = function (callback, verb, uriComplement, parameters, payload, contentType, accept) {
+XOWL.prototype.doRequest = function (callback, complement, parameters, method, contentType, content) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState == 4) {
@@ -1053,15 +1060,15 @@ XOWL.prototype.doHttpRequest = function (callback, verb, uriComplement, paramete
 			uri += encodeURIComponent(value);
 		}
 	}
-	xmlHttp.open(verb, uri, true);
-	xmlHttp.setRequestHeader("Accept", accept);
-	if (contentType != null)
+	xmlHttp.open(method, uri, true);
+	xmlHttp.setRequestHeader("Accept", "text/plain, application/json");
+	if (contentType !== null)
 		xmlHttp.setRequestHeader("Content-Type", contentType);
 	xmlHttp.withCredentials = true;
-	if (payload === null)
+	if (content === null)
 		xmlHttp.send();
-	else if (contentType === "application/json")
-		xmlHttp.send(JSON.stringify(payload));
+	else if (contentType === MIME_JSON)
+		xmlHttp.send(JSON.stringify(content));
 	else
-		xmlHttp.send(payload);
+		xmlHttp.send(content);
 }

@@ -229,6 +229,8 @@ function onOperationEnded(code, content, customMessage) {
 			displayMessageHttpError(code, content);
 		else
 			displayMessage("error", customMessage);
+		if (code === 401 || code === 440)
+			waitAndGo("/web/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search));
 	}
 	return (code === 200);
 }
@@ -302,7 +304,7 @@ function displayMessageHttpError(code, content) {
 	var message = null;
 	switch (code) {
 		case 400:
-			message = "Oops, wrong request.";
+			message = "There is a problem with the request, see details.";
 			break;
 		case 401:
 			message =  "You must be logged in to perform this operation.";
@@ -313,14 +315,20 @@ function displayMessageHttpError(code, content) {
 		case 404:
 			message =  "Can't find the requested data.";
 			break;
+		case 440:
+			message =  "The session has expired, login again to continue.";
+			break;
+		case 461:
+			message =  "The SPARQL query failed.";
+			break;
 		case 500:
-			message =  "Something very wrong happened on the server ...";
+			message =  "An unexpected error occurred on the server.";
 			break;
 		case 501:
 			message =  "This operation is not supported.";
 			break;
-		case 520:
-			message =  "The operation failed on the server.";
+		case 560:
+			message =  "An unknown error error occurred on the server.";
 			break;
 		default:
 			message =  "The connection failed." + "(" + code + ")";

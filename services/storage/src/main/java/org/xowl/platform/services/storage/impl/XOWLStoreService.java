@@ -52,6 +52,8 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.storage.TripleStore;
 import org.xowl.platform.services.storage.TripleStoreService;
@@ -78,6 +80,14 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/storage";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLStoreService.class, "/org/xowl/platform/services/storage/api_service_storage.raml", "Storage Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLStoreService.class, "/org/xowl/platform/services/storage/api_service_storage.html", "Storage Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * The total artifacts count metric
@@ -495,6 +505,41 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     /**

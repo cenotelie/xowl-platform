@@ -17,9 +17,12 @@
 
 package org.xowl.platform.services.webapp.impl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.WebModule;
 
@@ -37,6 +40,19 @@ public class XOWLWebModuleDirectory implements HttpApiService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/webapp";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/api_service_webappmodules.raml", "Web Modules Directory Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/api_service_webappmodules.html", "Web Modules Directory Service - Documentation", HttpApiResource.MIME_HTML);
+    /**
+     * The resource for the API's schema
+     */
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/schema_platform_webappmodules.json", "Web Modules Directory Service - Schema", HttpConstants.MIME_JSON);
+
 
     /**
      * The registered modules
@@ -75,7 +91,7 @@ public class XOWLWebModuleDirectory implements HttpApiService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Web Modules Directory";
+        return "xOWL Federation Platform - Web Modules Directory Service";
     }
 
     @Override
@@ -102,5 +118,40 @@ public class XOWLWebModuleDirectory implements HttpApiService {
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return new HttpApiResource[]{RESOURCE_SCHEMA};
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 }

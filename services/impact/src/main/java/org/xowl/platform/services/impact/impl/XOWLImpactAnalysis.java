@@ -24,6 +24,7 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
@@ -31,6 +32,8 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.impact.ImpactAnalysisService;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
@@ -47,6 +50,19 @@ public class XOWLImpactAnalysis implements ImpactAnalysisService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/impact";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/api_service_impact.raml", "Impact Analysis Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/api_service_impact.html", "Impact Analysis Service - Documentation", HttpApiResource.MIME_HTML);
+    /**
+     * The resource for the API's schema
+     */
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/schema_platform_impact.json", "Impact Analysis Service - Schema", HttpConstants.MIME_JSON);
+
 
     @Override
     public String getIdentifier() {
@@ -78,6 +94,41 @@ public class XOWLImpactAnalysis implements ImpactAnalysisService {
         if (root == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         return XSPReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return new HttpApiResource[]{RESOURCE_SCHEMA};
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     @Override

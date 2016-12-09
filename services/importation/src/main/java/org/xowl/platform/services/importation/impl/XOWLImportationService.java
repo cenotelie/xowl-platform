@@ -23,6 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -35,6 +36,8 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.importation.*;
 
@@ -54,6 +57,19 @@ public class XOWLImportationService implements ImportationService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/services/importation";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImportationService.class, "/org/xowl/platform/services/importation/api_service_importation.raml", "Importation Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLImportationService.class, "/org/xowl/platform/services/importation/api_service_importation.html", "Importation Service - Documentation", HttpApiResource.MIME_HTML);
+    /**
+     * The resource for the API's schema
+     */
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImportationService.class, "/org/xowl/platform/services/importation/schema_platform_importation.json", "Importation Service - Schema", HttpConstants.MIME_JSON);
+
 
     /**
      * API error - The requested operation failed in storage
@@ -202,6 +218,41 @@ public class XOWLImportationService implements ImportationService {
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return new HttpApiResource[]{RESOURCE_SCHEMA};
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     /**

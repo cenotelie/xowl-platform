@@ -32,6 +32,8 @@ import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
@@ -48,6 +50,15 @@ public class XOWLStatisticsService implements StatisticsService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/statistics";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
+
 
     /**
      * Initializes this provider
@@ -92,6 +103,21 @@ public class XOWLStatisticsService implements StatisticsService {
                 return onMessageGetMetricValue(metricId);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiResources() {
+        return null;
     }
 
     /**

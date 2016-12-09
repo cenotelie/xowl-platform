@@ -37,6 +37,8 @@ import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
@@ -55,6 +57,15 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/log";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_log.raml", "Logging Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_log.html", "Logging Service - Documentation", HttpApiResource.MIME_HTML);
+
 
     /**
      * The size of the buffer for the last messages
@@ -212,6 +223,21 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
         }
         builder.append("]");
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiResources() {
+        return null;
     }
 
     @Override

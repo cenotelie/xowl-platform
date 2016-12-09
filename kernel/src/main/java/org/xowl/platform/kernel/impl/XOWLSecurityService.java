@@ -32,6 +32,8 @@ import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import javax.crypto.KeyGenerator;
@@ -53,6 +55,15 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/security";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_security.raml", "Security Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_security.html", "Security Service - Documentation", HttpApiResource.MIME_HTML);
+
 
     /**
      * The data about a client
@@ -163,6 +174,21 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
         if (request.getUri().startsWith(URI_API + "/roles"))
             return handleRequestRoles(request);
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiResources() {
+        return null;
     }
 
     @Override

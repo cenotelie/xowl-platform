@@ -37,6 +37,8 @@ import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
@@ -52,6 +54,23 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/platform";
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
+    /**
+     * The default API resources for the platform
+     */
+    private static final HttpApiResource[] RESOURCE_DEFAULTS = new HttpApiResource[]{
+            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_traits.raml", "Standard Traits", HttpApiResource.MIME_RAML),
+            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/schema_infra_utils.json", "Schema - xOWL Infrastructure", HttpConstants.MIME_JSON),
+            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/schema_platform_kernel.json", "Schema - xOWL Platform - Kernel", HttpConstants.MIME_JSON)
+    };
+
 
     /**
      * The details of the OSGi implementation we are running on
@@ -155,6 +174,21 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiResources() {
+        return RESOURCE_DEFAULTS;
     }
 
     @Override

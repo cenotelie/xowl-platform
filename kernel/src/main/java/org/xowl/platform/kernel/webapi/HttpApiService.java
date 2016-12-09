@@ -108,4 +108,25 @@ public interface HttpApiService extends Service {
      * @return The HTTP response
      */
     HttpResponse handle(HttpApiRequest request);
+
+    /**
+     * Gets the resource that contains the specification for this service
+     *
+     * @return The resource that contains the specification for this service
+     */
+    HttpApiResource getApiSpecification();
+
+    /**
+     * Gets the resource that contains the documentation for this service
+     *
+     * @return The resource that contains the documentation for this service
+     */
+    HttpApiResource getApiDocumentation();
+
+    /**
+     * Gets all the resources provided by this service
+     *
+     * @return The resources provided by this service
+     */
+    HttpApiResource[] getApiResources();
 }

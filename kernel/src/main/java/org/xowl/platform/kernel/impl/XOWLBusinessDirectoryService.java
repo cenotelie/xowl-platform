@@ -199,9 +199,9 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
                 TextUtils.escapeStringJSON(getName()) +
                 "\", \"specification\": " +
                 RESOURCE_SPECIFICATION.serializedJSON() +
-                ", \"documentation\": \"" +
+                ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
-                "\"}";
+                "}";
     }
 
     /**

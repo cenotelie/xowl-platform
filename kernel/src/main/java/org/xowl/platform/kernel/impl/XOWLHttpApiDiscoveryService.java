@@ -158,9 +158,9 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
                 TextUtils.escapeStringJSON(getName()) +
                 "\", \"specification\": " +
                 RESOURCE_SPECIFICATION.serializedJSON() +
-                ", \"documentation\": \"" +
+                ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
-                "\"}";
+                "}";
     }
 
     /**

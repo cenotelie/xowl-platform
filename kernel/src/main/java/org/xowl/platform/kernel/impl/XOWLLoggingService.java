@@ -255,9 +255,9 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
                 TextUtils.escapeStringJSON(getName()) +
                 "\", \"specification\": " +
                 RESOURCE_SPECIFICATION.serializedJSON() +
-                ", \"documentation\": \"" +
+                ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
-                "\"}";
+                "}";
     }
 
     @Override

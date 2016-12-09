@@ -199,9 +199,9 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
                 TextUtils.escapeStringJSON(getName()) +
                 "\", \"specification\": " +
                 RESOURCE_SPECIFICATION.serializedJSON() +
-                ", \"documentation\": \"" +
+                ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
-                "\"}";
+                "}";
     }
 
     @Override

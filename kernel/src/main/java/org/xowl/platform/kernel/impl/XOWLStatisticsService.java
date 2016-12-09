@@ -136,9 +136,9 @@ public class XOWLStatisticsService implements StatisticsService {
                 TextUtils.escapeStringJSON(getName()) +
                 "\", \"specification\": " +
                 RESOURCE_SPECIFICATION.serializedJSON() +
-                ", \"documentation\": \"" +
+                ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
-                "\"}";
+                "}";
     }
 
     /**

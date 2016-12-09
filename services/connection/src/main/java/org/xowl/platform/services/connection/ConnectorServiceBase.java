@@ -30,6 +30,7 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -169,6 +170,21 @@ public abstract class ConnectorServiceBase implements ConnectorService {
     }
 
     @Override
+    public HttpApiResource getApiSpecification() {
+        return null;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return null;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return null;
+    }
+
+    @Override
     public String serializedString() {
         return getIdentifier();
     }
@@ -182,7 +198,17 @@ public abstract class ConnectorServiceBase implements ConnectorService {
         builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(name));
-        builder.append("\", \"uris\": [");
+        builder.append("\", \"specification\": ");
+        if (getApiSpecification() != null)
+            builder.append(getApiSpecification().serializedJSON());
+        else
+            builder.append("{}");
+        builder.append(", \"documentation\": ");
+        if (getApiDocumentation() != null)
+            builder.append(getApiDocumentation().serializedJSON());
+        else
+            builder.append("{}");
+        builder.append(", \"uris\": [");
         boolean first = true;
         for (String uri : uris) {
             if (!first)

@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -187,8 +188,28 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public HttpApiResource[] getApiResources() {
+    public HttpApiResource[] getApiOtherResources() {
         return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     @Override

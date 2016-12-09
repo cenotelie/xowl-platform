@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
@@ -179,8 +180,28 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
     }
 
     @Override
-    public HttpApiResource[] getApiResources() {
+    public HttpApiResource[] getApiOtherResources() {
         return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     /**

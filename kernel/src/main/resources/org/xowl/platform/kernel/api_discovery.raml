@@ -1,0 +1,67 @@
+#%RAML 1.0
+---
+title: API Discovery Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  HttpApiResources: !include schema_platform_kernel.json#/definitions/HttpApiResources
+  HttpApiServices: !include schema_platform_kernel.json#/definitions/HttpApiServices
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/kernel/discovery:
+  /resources:
+    description: The resources for the API documentations
+    get:
+      description: Gets the description of the resources for the API documentations
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The description of the resources
+          body:
+            application/json:
+              type: HttpApiResources
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.webapi.HttpApiResource",
+                    "identifier": "/org/xowl/platform/kernel/api_traits.raml",
+                    "name": "Standard Traits",
+                    "fileName": "api_traits.raml",
+                    "mimeType": "application/raml+yaml"
+                  }
+                ]
+  /services:
+    description: The available API services
+    get:
+      description: Gets the description of the available API services
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The description of the available API services
+          body:
+            application/json:
+              type: HttpApiServices
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.webapi.HttpApiService",
+                    "identifier": "org.xowl.platform.kernel.impl.XOWLHttpApiDiscoveryService",
+                    "name": "xOWL Federation Platform - API Discovery Service",
+                    "specification":
+                      {
+                        "type": "org.xowl.platform.kernel.webapi.HttpApiResource",
+                        "identifier": "/org/xowl/platform/kernel/api_discovery.raml",
+                        "name": "API Discovery Service - Specification",
+                        "fileName": "api_discovery.raml",
+                        "mimeType": "application/raml+yaml"
+                      },
+                    "documentation":
+                      {
+                        "type": "org.xowl.platform.kernel.webapi.HttpApiResource",
+                        "identifier": "/org/xowl/platform/kernel/api_discovery.html",
+                        "name": "API Discovery Service - Documentation",
+                        "fileName": "api_discovery.html",
+                        "mimeType": "text/html"
+                      }
+                  }
+                ]

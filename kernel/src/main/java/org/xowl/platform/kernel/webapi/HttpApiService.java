@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.webapi;
 
 import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Service;
 
@@ -26,7 +27,7 @@ import org.xowl.platform.kernel.Service;
  *
  * @author Laurent Wouters
  */
-public interface HttpApiService extends Service {
+public interface HttpApiService extends Service, Serializable {
     /**
      * The URI prefix for API connections
      */
@@ -124,9 +125,9 @@ public interface HttpApiService extends Service {
     HttpApiResource getApiDocumentation();
 
     /**
-     * Gets all the resources provided by this service
+     * Gets the other resources provided by this API service
      *
-     * @return The resources provided by this service
+     * @return The other resources provided by this API service
      */
-    HttpApiResource[] getApiResources();
+    HttpApiResource[] getApiOtherResources();
 }

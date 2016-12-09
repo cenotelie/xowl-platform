@@ -236,8 +236,28 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     @Override
-    public HttpApiResource[] getApiResources() {
+    public HttpApiResource[] getApiOtherResources() {
         return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     @Override

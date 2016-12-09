@@ -22,6 +22,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.metrics.Metric;
@@ -62,14 +63,6 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
      * The resource for the API's documentation
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
-    /**
-     * The default API resources for the platform
-     */
-    private static final HttpApiResource[] RESOURCE_DEFAULTS = new HttpApiResource[]{
-            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_traits.raml", "Standard Traits", HttpApiResource.MIME_RAML),
-            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/schema_infra_utils.json", "Schema - xOWL Infrastructure", HttpConstants.MIME_JSON),
-            new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/schema_platform_kernel.json", "Schema - xOWL Platform - Kernel", HttpConstants.MIME_JSON)
-    };
 
 
     /**
@@ -187,8 +180,28 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
     }
 
     @Override
-    public HttpApiResource[] getApiResources() {
-        return RESOURCE_DEFAULTS;
+    public HttpApiResource[] getApiOtherResources() {
+        return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": \"" +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "\"}";
     }
 
     @Override

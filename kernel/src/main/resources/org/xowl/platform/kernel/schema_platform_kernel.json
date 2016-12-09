@@ -78,6 +78,96 @@
         "name"
       ]
     },
+    "HttpApiResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.webapi.HttpApiResource"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "fileName",
+        "mimeType"
+      ]
+    },
+    "HttpApiResources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/HttpApiResource"
+          }
+        ]
+      }
+    },
+    "HttpApiService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.webapi.HttpApiService"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "specification": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HttpApiResource"
+            }
+          ]
+        },
+        "documentation": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HttpApiResource"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "specification",
+        "documentation"
+      ]
+    },
+    "HttpApiServices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/HttpApiService"
+          }
+        ]
+      }
+    },
     "PlatformRole": {
       "type": "object",
       "properties": {

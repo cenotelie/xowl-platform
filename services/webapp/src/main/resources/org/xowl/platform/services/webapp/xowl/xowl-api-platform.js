@@ -872,7 +872,7 @@ XOWL.prototype.importUploadedDocument = function (callback, docId, importer, con
 }
 
 XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
-	this.doHttpRequest(function (code, type, content) {
+	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {

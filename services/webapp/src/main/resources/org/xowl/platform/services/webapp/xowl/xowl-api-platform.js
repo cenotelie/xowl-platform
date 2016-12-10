@@ -351,6 +351,32 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 
 
 /*****************************************************
+ * Kernel - API Discovery Service
+ ****************************************************/
+
+XOWL.prototype.getApiResources = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/discovery/resources", null, "GET", null, null);
+}
+
+XOWL.prototype.getApiServices = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/discovery/services", null, "GET", null, null);
+}
+
+
+
+/*****************************************************
  * Kernel - Platform Management Service
  ****************************************************/
 

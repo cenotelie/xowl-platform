@@ -20,6 +20,8 @@ package org.xowl.platform.kernel.webapi;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Identifiable;
 
+import java.net.URL;
+
 /**
  * Represents a resource for the documentation of an HTTP API
  *
@@ -50,9 +52,9 @@ public interface HttpApiResource extends Identifiable, Serializable {
     String getFileName();
 
     /**
-     * Gets the resource's content
+     * Gets the URL to the resource's content
      *
-     * @return The resource's content
+     * @return The URL to the resource's content
      */
-    byte[] getContent();
+    URL getResourceURL();
 }

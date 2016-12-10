@@ -19,6 +19,8 @@ package org.xowl.platform.services.webapp.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +57,11 @@ public class XOWLHttpContext implements HttpContext {
     public boolean handleSecurity(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         //use this to insert the cache-control header
         addCORSHeader(httpServletRequest, httpServletResponse);
-        httpServletResponse.addHeader("Cache-Control", "public, max-age=31536000, immutable");
+        httpServletResponse.addHeader(HttpConstants.HEADER_CACHE_CONTROL, "public, max-age=31536000, immutable");
+        httpServletResponse.addHeader(HttpConstants.HEADER_STRICT_TRANSPORT_SECURITY, "max-age=31536000");
+        httpServletResponse.addHeader(HttpConstants.HEADER_X_FRAME_OPTIONS, "deny");
+        httpServletResponse.addHeader(HttpConstants.HEADER_X_XSS_PROTECTION, "1; mode=block");
+        httpServletResponse.addHeader(HttpConstants.HEADER_X_CONTENT_TYPE_OPTIONS, "nosniff");
         return defaultContext.handleSecurity(httpServletRequest, httpServletResponse);
     }
 
@@ -99,6 +105,10 @@ public class XOWLHttpContext implements HttpContext {
 
     @Override
     public String getMimeType(String name) {
+        if (name.endsWith(".raml"))
+            return HttpApiResource.MIME_RAML;
+        if (name.endsWith(".json"))
+            return HttpConstants.MIME_JSON;
         return defaultContext.getMimeType(name);
     }
 }

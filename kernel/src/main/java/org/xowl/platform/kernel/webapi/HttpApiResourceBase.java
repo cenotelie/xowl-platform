@@ -17,12 +17,9 @@
 
 package org.xowl.platform.kernel.webapi;
 
-import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.logging.Logging;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Base implementation of an HTTP API resource
@@ -50,10 +47,6 @@ public class HttpApiResourceBase implements HttpApiResource {
      * The MIME type for the resource
      */
     private final String mimeType;
-    /**
-     * The resource's content
-     */
-    private byte[] content;
 
     /**
      * Initializes this resource
@@ -113,20 +106,7 @@ public class HttpApiResourceBase implements HttpApiResource {
     }
 
     @Override
-    public synchronized byte[] getContent() {
-        if (content != null)
-            return content;
-        try (InputStream stream = serviceType.getResourceAsStream(resource)) {
-            if (stream == null) {
-                content = new byte[0];
-                return content;
-            }
-            content = Files.load(stream);
-            return content;
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-            content = new byte[0];
-            return content;
-        }
+    public URL getResourceURL() {
+        return serviceType.getResource(resource);
     }
 }

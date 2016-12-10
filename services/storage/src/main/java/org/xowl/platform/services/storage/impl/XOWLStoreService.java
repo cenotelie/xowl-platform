@@ -549,6 +549,8 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
      * @return The response
      */
     private HttpResponse onMessageSPARQL(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         if (request.getContent() == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);

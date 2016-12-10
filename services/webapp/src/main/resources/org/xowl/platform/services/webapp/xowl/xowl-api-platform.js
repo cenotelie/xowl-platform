@@ -668,17 +668,15 @@ XOWL.prototype.pushToConnector = function (callback, connectorId, artifactId) {
 
 
 
+/*****************************************************
+ * Storage - Storage Service
+ ****************************************************/
 
-
-
-
-
-
-
-
-////
-// Core Module - Artifact Storage Service
-////
+XOWL.prototype.sparql = function (callback, payload) {
+	this.doRequest(function (code, type, content) {
+		callback(code, type, content);
+	}, "services/storage/sparql", null, "POST", "application/sparql-query", payload);
+}
 
 XOWL.prototype.getAllArtifacts = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -687,7 +685,7 @@ XOWL.prototype.getAllArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", null);
+	}, "services/storage/artifacts", null, "GET", null, null);
 }
 
 XOWL.prototype.getLiveArtifacts = function (callback) {
@@ -697,7 +695,7 @@ XOWL.prototype.getLiveArtifacts = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {live: "true"});
+	}, "services/storage/artifacts/live", null, "GET", null, null);
 }
 
 XOWL.prototype.getArtifactsForBase = function (callback, base) {
@@ -707,7 +705,7 @@ XOWL.prototype.getArtifactsForBase = function (callback, base) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {base: base});
+	}, "services/storage/artifacts", {base: base}, "GET", null, null);
 }
 
 XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
@@ -717,7 +715,7 @@ XOWL.prototype.getArtifactsForArchetype = function (callback, archetype) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {archetype: archetype});
+	}, "services/storage/artifacts", {archetype: archetype}, "GET", null, null);
 }
 
 XOWL.prototype.getArtifact = function (callback, artifactId) {
@@ -727,7 +725,7 @@ XOWL.prototype.getArtifact = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {id: artifactId});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId), null, "GET", null, null);
 }
 
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
@@ -737,7 +735,7 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {quads: "metadata", id: artifactId});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/metadata", null, "GET", null, null);
 }
 
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
@@ -747,7 +745,7 @@ XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {quads: "content", id: artifactId});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/content", null, "GET", null, null);
 }
 
 XOWL.prototype.deleteArtifact = function (callback, artifactId) {
@@ -757,7 +755,7 @@ XOWL.prototype.deleteArtifact = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {action: "delete", id: artifactId}, {});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
@@ -774,7 +772,7 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {diffLeft: artifactLeft, diffRight: artifactRight});
+	}, "services/storage/artifacts/diff", {left: artifactLeft, right: artifactRight}, "POST", null, null);
 }
 
 XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
@@ -784,7 +782,7 @@ XOWL.prototype.pullArtifactFromLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {action: "pull", id: artifactId}, {});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/deactivate", null, "POST", null, null);
 }
 
 XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
@@ -794,7 +792,7 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/artifacts", {action: "push", id: artifactId}, {});
+	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/activate", null, "POST", null, null);
 }
 
 
@@ -1053,9 +1051,7 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 // Core Module - Other API
 ////
 
-XOWL.prototype.sparql = function (callback, payload) {
-	this.doHttpRequest(callback, "POST", "services/core/sparql", null, payload, "application/sparql-query", "application/sparql-results+json, application/n-quads");
-}
+
 
 XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
 	var parameters = {

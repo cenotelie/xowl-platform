@@ -36,7 +36,7 @@ import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 import org.xowl.platform.services.storage.TripleStore;
-import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.StorageService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,12 +90,12 @@ class XOWLImpactAnalysisJob extends JobBase {
 
     @Override
     public void doRun() {
-        TripleStoreService tripleStoreService = ServiceUtils.getService(TripleStoreService.class);
-        if (tripleStoreService == null) {
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null) {
             result = XSPReplyServiceUnavailable.instance();
             return;
         }
-        TripleStore live = tripleStoreService.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         List<XOWLImpactAnalysisResultPart> finalParts = new ArrayList<>();
         result = new XSPReplyResult<>(new XOWLImpactAnalysisResult(finalParts));
         browseGraph(live, finalParts);

@@ -23,7 +23,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.storage.impl.XOWLStoreService;
+import org.xowl.platform.services.storage.impl.XOWLStorageService;
 import org.xowl.platform.services.storage.jobs.StorageJobFactory;
 
 /**
@@ -35,12 +35,12 @@ public class Activator implements BundleActivator {
     /**
      * The store service registered by this bundle
      */
-    private XOWLStoreService storeService;
+    private XOWLStorageService storeService;
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        storeService = new XOWLStoreService();
-        bundleContext.registerService(TripleStoreService.class, storeService, null);
+        storeService = new XOWLStorageService();
+        bundleContext.registerService(StorageService.class, storeService, null);
         bundleContext.registerService(ArtifactStorageService.class, storeService, null);
         bundleContext.registerService(HttpApiService.class, storeService, null);
         bundleContext.registerService(MeasurableService.class, storeService, null);

@@ -34,7 +34,6 @@ import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -42,21 +41,18 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
-import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.storage.TripleStore;
-import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.StorageService;
 import org.xowl.platform.services.storage.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.storage.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.storage.jobs.PushArtifactToLiveJob;
@@ -75,7 +71,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class XOWLStoreService implements TripleStoreService, ArtifactStorageService, HttpApiService, MeasurableService, Closeable {
+public class XOWLStorageService implements StorageService, Closeable {
     /**
      * The URI for the API services
      */
@@ -83,30 +79,11 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLStoreService.class, "/org/xowl/platform/services/storage/api_service_storage.raml", "Storage Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLStorageService.class, "/org/xowl/platform/services/storage/api_service_storage.raml", "Storage Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLStoreService.class, "/org/xowl/platform/services/storage/api_service_storage.html", "Storage Service - Documentation", HttpApiResource.MIME_HTML);
-
-    /**
-     * The total artifacts count metric
-     */
-    private static final Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".TotalArtifactsCount",
-            "Storage Service - Total artifacts count",
-            "artifacts",
-            1000000000,
-            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
-            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
-    /**
-     * The total artifacts count metric
-     */
-    private static final Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStoreService.class.getCanonicalName() + ".LiveArtifactsCount",
-            "Storage Service - Live artifacts count",
-            "artifacts",
-            1000000000,
-            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
-            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLStorageService.class, "/org/xowl/platform/services/storage/api_service_storage.html", "Storage Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**
@@ -129,26 +106,26 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
     /**
      * Initializes this service
      */
-    public XOWLStoreService() {
+    public XOWLStorageService() {
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(this);
         this.server = resolveServer(configuration);
         this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
             @Override
             protected XOWLDatabase resolveBackend() {
-                return XOWLStoreService.this.resolveRemote(this.getName());
+                return XOWLStorageService.this.resolveRemote(this.getName());
             }
         };
         this.storeLongTerm = new XOWLFederationStore(configuration.get("databases", "longTerm")) {
             @Override
             protected XOWLDatabase resolveBackend() {
-                return XOWLStoreService.this.resolveRemote(this.getName());
+                return XOWLStorageService.this.resolveRemote(this.getName());
             }
         };
         this.storeService = new XOWLFederationStore(configuration.get("databases", "service")) {
             @Override
             protected XOWLDatabase resolveBackend() {
-                return XOWLStoreService.this.resolveRemote(this.getName());
+                return XOWLStorageService.this.resolveRemote(this.getName());
             }
         };
     }
@@ -208,7 +185,7 @@ public class XOWLStoreService implements TripleStoreService, ArtifactStorageServ
 
     @Override
     public String getIdentifier() {
-        return XOWLStoreService.class.getCanonicalName();
+        return XOWLStorageService.class.getCanonicalName();
     }
 
     @Override

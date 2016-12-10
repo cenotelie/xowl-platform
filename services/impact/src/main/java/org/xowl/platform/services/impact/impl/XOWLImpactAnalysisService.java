@@ -45,7 +45,7 @@ import java.net.HttpURLConnection;
  *
  * @author Laurent Wouters
  */
-public class XOWLImpactAnalysis implements ImpactAnalysisService {
+public class XOWLImpactAnalysisService implements ImpactAnalysisService {
     /**
      * The URI for the API services
      */
@@ -53,20 +53,20 @@ public class XOWLImpactAnalysis implements ImpactAnalysisService {
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/api_service_impact.raml", "Impact Analysis Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImpactAnalysisService.class, "/org/xowl/platform/services/impact/api_service_impact.raml", "Impact Analysis Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/api_service_impact.html", "Impact Analysis Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLImpactAnalysisService.class, "/org/xowl/platform/services/impact/api_service_impact.html", "Impact Analysis Service - Documentation", HttpApiResource.MIME_HTML);
     /**
      * The resource for the API's schema
      */
-    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImpactAnalysis.class, "/org/xowl/platform/services/impact/schema_platform_impact.json", "Impact Analysis Service - Schema", HttpConstants.MIME_JSON);
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImpactAnalysisService.class, "/org/xowl/platform/services/impact/schema_platform_impact.json", "Impact Analysis Service - Schema", HttpConstants.MIME_JSON);
 
 
     @Override
     public String getIdentifier() {
-        return XOWLImpactAnalysis.class.getCanonicalName();
+        return XOWLImpactAnalysisService.class.getCanonicalName();
     }
 
     @Override

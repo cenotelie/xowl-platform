@@ -31,7 +31,7 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.services.evaluation.impl.XOWLEvaluationService;
-import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.StorageService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,8 +68,8 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
 
     @Override
     public XSPReply getElements() {
-        TripleStoreService service = ServiceUtils.getService(TripleStoreService.class);
-        if (service == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         String query = "SELECT DISTINCT ?a ?e WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
@@ -82,7 +82,7 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
                 "\" } . GRAPH ?a { ?e a <" +
                 TextUtils.escapeAbsoluteURIW3C(conceptyURI) +
                 "> } }";
-        Result sparqlResult = service.getLongTermStore().sparql(query);
+        Result sparqlResult = storageService.getLongTermStore().sparql(query);
         if (sparqlResult.isFailure())
             return new XSPReplyApiError(XOWLEvaluationService.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<Evaluable> result = new ArrayList<>();

@@ -50,8 +50,8 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.consistency.*;
+import org.xowl.platform.services.storage.StorageService;
 import org.xowl.platform.services.storage.TripleStore;
-import org.xowl.platform.services.storage.TripleStoreService;
 
 import java.io.StringReader;
 import java.net.HttpURLConnection;
@@ -288,10 +288,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply getRules() {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.getRules();
         if (!reply.isSuccess())
             return reply;
@@ -330,10 +330,10 @@ public class XOWLConsistencyService implements ConsistencyService {
             return reply;
         Collection<XOWLConsistencyRule> rules = ((XSPReplyResultCollection<XOWLConsistencyRule>) reply).getData();
 
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         Result result = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
@@ -377,10 +377,10 @@ public class XOWLConsistencyService implements ConsistencyService {
      * @return The number of inconsistencies
      */
     private int getInconsistenciesCount() {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return -1;
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         Result result = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
@@ -394,10 +394,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply getRule(String identifier) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.getRule(identifier);
         if (!reply.isSuccess())
             return reply;
@@ -466,10 +466,10 @@ public class XOWLConsistencyService implements ConsistencyService {
         builder.append("}");
         definition = builder.toString();
 
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.addRule(definition, false);
         if (!reply.isSuccess())
             return reply;
@@ -490,10 +490,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply activateRule(String identifier) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
@@ -509,10 +509,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply activateRule(ConsistencyRule rule) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.activateRule(rule);
         if (!reply.isSuccess())
             return reply;
@@ -524,10 +524,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply deactivateRule(String identifier) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
@@ -543,10 +543,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply deactivateRule(ConsistencyRule rule) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.deactivateRule(rule);
         if (!reply.isSuccess())
             return reply;
@@ -558,10 +558,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply deleteRule(String identifier) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
@@ -584,10 +584,10 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public XSPReply deleteRule(ConsistencyRule rule) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        TripleStore live = lts.getLiveStore();
+        TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.removeRule(rule);
         if (!reply.isSuccess())
             return reply;

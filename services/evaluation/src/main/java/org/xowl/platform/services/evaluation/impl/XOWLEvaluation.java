@@ -34,7 +34,7 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.services.evaluation.*;
-import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.StorageService;
 
 import java.text.DateFormat;
 import java.util.*;
@@ -302,10 +302,10 @@ class XOWLEvaluation implements Evaluation {
             }
         }
         Artifact artifact = new ArtifactSimple(metadata, content);
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        return lts.getServiceStore().store(artifact);
+        return storageService.getServiceStore().store(artifact);
     }
 
     /**
@@ -314,10 +314,10 @@ class XOWLEvaluation implements Evaluation {
      * @return The response
      */
     public static XSPReply retrieveAll() {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        Result sparqlResult = lts.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
+        Result sparqlResult = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
                 TextUtils.escapeAbsoluteURIW3C(EVALUATION) +
@@ -339,15 +339,15 @@ class XOWLEvaluation implements Evaluation {
     /**
      * Retrieves the data of an evaluation
      *
-     * @param service    The parent service
-     * @param identifier The identifier of the evaluation to retrieve
+     * @param evaluationService The parent service
+     * @param identifier        The identifier of the evaluation to retrieve
      * @return The result
      */
-    public static XSPReply retrieve(XOWLEvaluationService service, String identifier) {
-        TripleStoreService lts = ServiceUtils.getService(TripleStoreService.class);
-        if (lts == null)
+    public static XSPReply retrieve(XOWLEvaluationService evaluationService, String identifier) {
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = lts.getServiceStore().retrieve(identifier);
+        XSPReply reply = storageService.getServiceStore().retrieve(identifier);
         if (!reply.isSuccess())
             return reply;
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
@@ -365,7 +365,7 @@ class XOWLEvaluation implements Evaluation {
         for (Quad quad : quads) {
             if (((IRINode) quad.getProperty()).getIRIValue().equals(EVAL_URI + "/evaluableType")) {
                 String id = ((LiteralNode) quad.getObject()).getLexicalValue();
-                evaluableType = service.getEvaluableType(id);
+                evaluableType = evaluationService.getEvaluableType(id);
                 break;
             }
         }
@@ -386,7 +386,7 @@ class XOWLEvaluation implements Evaluation {
                 for (Quad q : data.get(criterionNode)) {
                     if (((IRINode) q.getProperty()).getIRIValue().endsWith(Vocabulary.rdfType)) {
                         String criterionTypeId = ((LiteralNode) q.getObject()).getLexicalValue();
-                        criterionType = service.getCriterionType(criterionTypeId);
+                        criterionType = evaluationService.getCriterionType(criterionTypeId);
                         break;
                     }
                 }

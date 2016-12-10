@@ -30,7 +30,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
-import org.xowl.platform.services.storage.TripleStoreService;
+import org.xowl.platform.services.storage.StorageService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,12 +71,12 @@ public class EvaluableEntity implements Evaluable {
         this.artifactId = artifactId;
         this.elementURI = elementURI;
         ArtifactStorageService artifactStorageService = ServiceUtils.getService(ArtifactStorageService.class);
-        TripleStoreService ltsService = ServiceUtils.getService(TripleStoreService.class);
-        if (artifactStorageService == null || ltsService == null) {
+        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        if (artifactStorageService == null || storageService == null) {
             this.name = identifier;
         } else {
             String name = null;
-            Result sparqlResult = ltsService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
+            Result sparqlResult = storageService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
                     TextUtils.escapeAbsoluteURIW3C(artifactId) +
                     "> { <" +
                     TextUtils.escapeAbsoluteURIW3C(elementURI) +

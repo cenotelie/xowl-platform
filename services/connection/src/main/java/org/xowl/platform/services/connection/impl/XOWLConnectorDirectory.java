@@ -163,7 +163,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
                     case HttpConstants.METHOD_GET:
                         return onMessageGetConnector(connectorId);
                     case HttpConstants.METHOD_PUT:
-                        return onMessageCreateConnector(request);
+                        return onMessageCreateConnector(connectorId, request);
                     case HttpConstants.METHOD_DELETE:
                         onMessageDeleteConnector(connectorId);
                 }
@@ -171,10 +171,16 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             }
             rest = rest.substring(index);
             switch (rest) {
-                case "/pull":
+                case "/pull": {
+                    if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                     return onMessagePullFromConnector(connectorId);
-                case "/push":
+                }
+                case "/push": {
+                    if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                     return onMessagePushToConnector(connectorId, request);
+                }
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -476,10 +482,11 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * Responds to the request to spawn a new parametric connector
      *
-     * @param request The request to handle
+     * @param connectorId The identifier of a connector
+     * @param request     The request to handle
      * @return The response
      */
-    private HttpResponse onMessageCreateConnector(HttpApiRequest request) {
+    private HttpResponse onMessageCreateConnector(String connectorId, HttpApiRequest request) {
         String[] descriptorId = request.getParameter("descriptor");
         if (descriptorId == null || descriptorId.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
@@ -502,7 +509,6 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (descriptor == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
 
-        String id = null;
         String name = null;
         List<String> uris = new ArrayList<>(2);
         Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
@@ -510,10 +516,6 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             switch (head) {
-                case "identifier":
-                    id = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    id = id.substring(1, id.length() - 1);
-                    break;
                 case "name":
                     name = TextUtils.unescape(member.getChildren().get(1).getValue());
                     name = name.substring(1, name.length() - 1);
@@ -563,8 +565,6 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
             }
         }
 
-        if (id == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The identifier for the connector is not specified"), null);
         if (name == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The name for the connector is not specified"), null);
 
@@ -576,7 +576,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        reply = spawn(descriptor, id, name, uris.toArray(new String[uris.size()]), customParams);
+        reply = spawn(descriptor, connectorId, name, uris.toArray(new String[uris.size()]), customParams);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConnectorService>) reply).getData().serializedJSON());

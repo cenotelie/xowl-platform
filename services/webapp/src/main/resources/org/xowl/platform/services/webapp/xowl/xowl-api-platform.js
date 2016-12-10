@@ -883,9 +883,9 @@ XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 
 
 
-////
-// Core Module - Consistency Service
-////
+/*****************************************************
+ * Consistency - Consistency Service
+ ****************************************************/
 
 XOWL.prototype.getInconsistencies = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -894,7 +894,7 @@ XOWL.prototype.getInconsistencies = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/inconsistencies", null);
+	}, "services/consistency/inconsistencies", null, "GET", null, null);
 }
 
 XOWL.prototype.getConsistencyRules = function (callback) {
@@ -904,7 +904,7 @@ XOWL.prototype.getConsistencyRules = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", null);
+	}, "services/consistency/rules", null, "GET", null, null);
 }
 
 XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
@@ -914,7 +914,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", {id: ruleId});
+	}, "services/consistency/rules/" + encodeURIComponent(ruleId), null, "GET", null, null);
 }
 
 XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
@@ -924,13 +924,11 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", {
-		action: "create",
+	}, "services/consistency/rules", {
 		name: name,
 		message: message,
-		prefixes: prefixes,
-		conditions: conditions
-	}, {});
+		prefixes: prefixes
+	}, "PUT", "application/x-xowl-rdft", conditions);
 }
 
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
@@ -940,7 +938,7 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", {action: "activate", id: ruleId}, {});
+	}, "services/consistency/rules/" + encodeURIComponent(ruleId) + "/activate", null, "POST", null, null);
 }
 
 XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
@@ -950,7 +948,7 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", {action: "deactivate", id: ruleId}, {});
+	}, "services/consistency/rules/" + encodeURIComponent(ruleId) + "/deactivate", null, "POST", null, null);
 }
 
 XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
@@ -960,7 +958,7 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/consistency", {action: "delete", id: ruleId}, {});
+	}, "services/consistency/rules/" + encodeURIComponent(ruleId), null, "DELETE", null, null);
 }
 
 
@@ -1043,26 +1041,6 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 			callback(code, type, content);
 		}
 	}, "services/core/evaluation/service", null, definition);
-}
-
-
-
-////
-// Core Module - Other API
-////
-
-
-
-XOWL.prototype.upload = function (callback, connectorURI, payload, contentType, name, base, version, supersede, archetype) {
-	var parameters = {
-		name: name,
-		base: base,
-		version: version };
-	if (supersede !== null && supersede !== "" && supersede !== "none")
-		parameters.supersede = supersede;
-	if (archetype !== null && archetype !== "")
-		parameters.archetype = archetype;
-	this.doHttpRequest(callback, "POST", connectorURI, parameters, payload, contentType, MIME_JSON);
 }
 
 

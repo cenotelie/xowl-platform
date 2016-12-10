@@ -34,7 +34,7 @@ function renderInconsistency(inconsistency, index) {
 	icon.style.marginRight = "20px";
 	var cell2 = document.createElement("td");
 	cell2.appendChild(icon);
-	cell2.appendChild(renderMessage(inconsistency));
+	cell2.appendChild(renderInconsistencyMessage(inconsistency));
 	icon = document.createElement("img");
 	icon.src = "/web/assets/rule.svg";
 	icon.width = 40;
@@ -53,7 +53,7 @@ function renderInconsistency(inconsistency, index) {
 	return row;
 }
 
-function renderMessage(inconsistency) {
+function renderInconsistencyMessage(inconsistency) {
 	var span = document.createElement("span");
 	if (inconsistency.message.indexOf("?") < 0) {
 		span.appendChild(document.createTextNode(inconsistency.message));

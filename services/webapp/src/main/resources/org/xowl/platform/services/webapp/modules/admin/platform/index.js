@@ -12,8 +12,13 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ...", 2))
+	if (!onOperationRequest("Loading ...", 3))
 		return;
+	xowl.getPlatformProduct(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderProduct(content);
+		}
+	});
 	xowl.getPlatformOSGiImpl(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			document.getElementById("osgi-identifier").value = content.identifier;
@@ -26,6 +31,21 @@ function doGetData() {
 		}
 	});
 }
+
+function renderProduct(product) {
+	document.getElementById("field-identifier").value = product.identifier;
+	document.getElementById("field-name").value = product.name;
+	document.getElementById("field-version-number").value = product.version.number;
+	document.getElementById("field-version-scm-tag").value = product.version.scmTag;
+	document.getElementById("field-version-build-user").value = product.version.buildUser;
+	document.getElementById("field-version-build-tag").value = product.version.buildTag;
+	document.getElementById("field-version-build-timestamp").value = product.version.buildTimestamp;
+	document.getElementById("field-copyright").value = product.copyright;
+	document.getElementById("field-vendor").value = product.vendor;
+	document.getElementById("field-license-name").value = product.license.name;
+	document.getElementById("field-license-text").value = product.license.fullText;
+}
+
 
 function renderBundles(bundles) {
 	bundles.sort(function (x, y) {

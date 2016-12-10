@@ -25,9 +25,11 @@ import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
+import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -42,6 +44,7 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
 
@@ -73,6 +76,10 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
      * The cache of bundles
      */
     private final List<OSGiBundle> bundles;
+    /**
+     * The product descriptor
+     */
+    private final Product product;
 
     /**
      * Initializes this service
@@ -84,6 +91,16 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
         bundles = new ArrayList<>();
         osgiImpl = getCurrentOSGIImpl();
         osgiImpl.enforceHttpConfig(configurationService.getConfigFor(this), executionService);
+        Product product = null;
+        try {
+            product = new Product(
+                    "org.xowl.platform.XOWLFederationPlatform",
+                    "xOWL Federation Platform",
+                    XOWLPlatformManagementService.class);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+        }
+        this.product = product;
     }
 
     /**
@@ -144,6 +161,10 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getOSGiImplementation().serializedJSON());
+        } else if (request.getUri().equals(URI_API + "/product")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
         } else if (request.getUri().equals(URI_API + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
@@ -207,6 +228,11 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
     @Override
     public OSGiImplementation getOSGiImplementation() {
         return osgiImpl;
+    }
+
+    @Override
+    public Product getPlatformProduct() {
+        return product;
     }
 
     @Override

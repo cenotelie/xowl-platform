@@ -151,6 +151,38 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<instructions>
+						<XOWL-Product-Link>${pom.url}</XOWL-Product-Link>
+						<XOWL-SCM-Tag>${changeSet}</XOWL-SCM-Tag>
+						<XOWL-Build-Tag>${env.BUILD_TAG}</XOWL-Build-Tag>
+						<XOWL-Build-Timestamp>${timestamp}</XOWL-Build-Timestamp>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>generate-changeset</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>hgchangeset</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-timestamp</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>create-timestamp</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<timestampFormat>dd/MM/yyyy HH:mm:ss</timestampFormat>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

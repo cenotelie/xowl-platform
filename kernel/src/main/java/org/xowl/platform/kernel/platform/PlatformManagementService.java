@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
+import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -85,6 +86,13 @@ public interface PlatformManagementService extends Service, HttpApiService, Meas
      * @return The details of the OSGi implementation the platform is running on
      */
     OSGiImplementation getOSGiImplementation();
+
+    /**
+     * Gets the product descriptor for the platform
+     *
+     * @return The product descriptor
+     */
+    Product getPlatformProduct();
 
     /**
      * Gets the description of the bundles on this platform

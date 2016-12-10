@@ -46,6 +46,8 @@
 				<configuration>
 					<instructions>
 						<Bundle-Activator>org.xowl.platform.kernel.Activator</Bundle-Activator>
+						<XOWL-License-Name>LGPL v3</XOWL-License-Name>
+						<XOWL-License-Resource>/META-INF/LGPLv3.txt</XOWL-License-Resource>
 					</instructions>
 				</configuration>
 			</plugin>

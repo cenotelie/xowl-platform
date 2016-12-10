@@ -380,6 +380,16 @@ XOWL.prototype.getApiServices = function (callback) {
  * Kernel - Platform Management Service
  ****************************************************/
 
+XOWL.prototype.getPlatformProduct = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/platform/product", null, "GET", null, null);
+}
+
 XOWL.prototype.getPlatformOSGiImpl = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

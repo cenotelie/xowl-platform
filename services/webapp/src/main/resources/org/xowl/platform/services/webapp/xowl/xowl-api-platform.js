@@ -797,9 +797,9 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 
 
 
-////
-// Core Module - Data Import Service
-////
+/*****************************************************
+ * Importation - Importation Service
+ ****************************************************/
 
 XOWL.prototype.getUploadedDocuments = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -808,7 +808,7 @@ XOWL.prototype.getUploadedDocuments = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {what: "document"});
+	}, "services/importation/documents", null, "GET", null, null);
 }
 
 XOWL.prototype.getUploadedDocument = function (callback, docId) {
@@ -818,7 +818,7 @@ XOWL.prototype.getUploadedDocument = function (callback, docId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {document: docId});
+	}, "services/importation/documents/" + encodeURIComponent(docId), null, "GET", null, null);
 }
 
 XOWL.prototype.getDocumentImporters = function (callback) {
@@ -828,7 +828,7 @@ XOWL.prototype.getDocumentImporters = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {what: "importer"});
+	}, "services/importation/importers", null, "GET", null, null);
 }
 
 XOWL.prototype.getDocumentImporter = function (callback, importerId) {
@@ -838,7 +838,7 @@ XOWL.prototype.getDocumentImporter = function (callback, importerId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {importer: importerId});
+	}, "services/importation/importers/" + encodeURIComponent(importerId), null, "GET", null, null);
 }
 
 XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
@@ -848,7 +848,7 @@ XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer,
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {preview: docId, importer: importer}, configuration);
+	}, "services/importation/documents/" + encodeURIComponent(docId) + "/preview", {importer: importer}, "POST", MIME_JSON, configuration);
 }
 
 XOWL.prototype.dropUploadedDocument = function (callback, docId) {
@@ -858,7 +858,7 @@ XOWL.prototype.dropUploadedDocument = function (callback, docId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {drop: docId}, {});
+	}, "services/importation/documents/" + encodeURIComponent(docId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.importUploadedDocument = function (callback, docId, importer, configuration) {
@@ -868,7 +868,7 @@ XOWL.prototype.importUploadedDocument = function (callback, docId, importer, con
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/importation", {import: docId, importer: importer}, configuration);
+	}, "services/importation/documents/" + encodeURIComponent(docId) + "/import", {importer: importer}, "POST", MIME_JSON, configuration);
 }
 
 XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
@@ -878,7 +878,7 @@ XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "PUT", "services/core/importation", {name: name, fileName: fileName}, content, "application/octet-stream", MIME_JSON);
+	}, "services/importation/documents", {name: name, fileName: fileName}, "PUT", "application/octet-stream", content);
 }
 
 

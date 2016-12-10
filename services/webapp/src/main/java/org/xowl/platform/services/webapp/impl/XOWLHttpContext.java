@@ -62,7 +62,7 @@ public class XOWLHttpContext implements HttpContext {
         httpServletResponse.addHeader(HttpConstants.HEADER_X_FRAME_OPTIONS, "deny");
         httpServletResponse.addHeader(HttpConstants.HEADER_X_XSS_PROTECTION, "1; mode=block");
         httpServletResponse.addHeader(HttpConstants.HEADER_X_CONTENT_TYPE_OPTIONS, "nosniff");
-        return defaultContext.handleSecurity(httpServletRequest, httpServletResponse);
+        return true;
     }
 
     @Override
@@ -105,6 +105,28 @@ public class XOWLHttpContext implements HttpContext {
 
     @Override
     public String getMimeType(String name) {
+        if (name.endsWith("/") || name.endsWith(".html"))
+            return "text/html";
+        if (name.endsWith(".css"))
+            return "text/css";
+        if (name.endsWith(".js"))
+            return "application/javascript";
+        if (name.endsWith(".txt"))
+            return "text/plain";
+        if (name.endsWith(".eot"))
+            return "application/octet-stream";
+        if (name.endsWith(".ttf"))
+            return "application/octet-stream";
+        if (name.endsWith(".woff"))
+            return "application/font-woff";
+        if (name.endsWith(".woff2"))
+            return "application/font-woff";
+        if (name.endsWith(".svg"))
+            return "image/svg+xml";
+        if (name.endsWith(".png"))
+            return "image/png";
+        if (name.endsWith(".gif"))
+            return "image/gif";
         if (name.endsWith(".raml"))
             return HttpApiResource.MIME_RAML;
         if (name.endsWith(".json"))

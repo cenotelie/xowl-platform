@@ -167,7 +167,6 @@ function renderArtifactFamilies() {
 		for (var j = 0; j != result.children.length; j++)
 			table.appendChild(result.children[j]);
 	}
-	document.getElementById("loader").style.display = "none";
 }
 
 function renderArtifactFamily(family, index) {

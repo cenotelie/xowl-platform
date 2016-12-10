@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorDirectoryService extends HttpApiService {
+public interface ConnectionService extends HttpApiService {
     /**
      * Gets the available connectors
      *

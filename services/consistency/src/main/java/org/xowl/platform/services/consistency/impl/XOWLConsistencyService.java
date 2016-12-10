@@ -33,13 +33,11 @@ import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.KernelSchema;
@@ -47,7 +45,6 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -65,7 +62,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConsistencyService implements ConsistencyService, MeasurableService {
+public class XOWLConsistencyService implements ConsistencyService {
     /**
      * The URI for the API services
      */
@@ -131,16 +128,6 @@ public class XOWLConsistencyService implements ConsistencyService, MeasurableSer
      * The URI for the concept of antecedent
      */
     private static final String IRI_ANTECEDENT = IRI_SCHEMA + "#antecedent_";
-
-    /**
-     * The inconsistency count metric
-     */
-    private static final Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount",
-            "Consistency Service - Inconsistency count",
-            "inconsistencies",
-            1000000000,
-            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
-            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
      * Initializes this service

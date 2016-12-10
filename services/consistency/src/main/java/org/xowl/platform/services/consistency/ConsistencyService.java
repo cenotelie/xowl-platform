@@ -18,15 +18,29 @@
 package org.xowl.platform.services.consistency;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.metrics.Metric;
+import org.xowl.infra.utils.metrics.MetricBase;
+import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
 
 /**
  * Represents a service that manages the consistency on the platform
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyService extends Service, HttpApiService {
+public interface ConsistencyService extends HttpApiService, MeasurableService {
+    /**
+     * The inconsistency count metric
+     */
+    Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount",
+            "Consistency Service - Inconsistency count",
+            "inconsistencies",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+
     /**
      * Gets all the consistency rules
      *

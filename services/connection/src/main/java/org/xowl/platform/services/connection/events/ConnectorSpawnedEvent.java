@@ -19,7 +19,7 @@ package org.xowl.platform.services.connection.events;
 
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.services.connection.ConnectorDirectoryService;
+import org.xowl.platform.services.connection.ConnectionService;
 import org.xowl.platform.services.connection.ConnectorService;
 
 /**
@@ -44,7 +44,7 @@ public class ConnectorSpawnedEvent extends EventBase {
      * @param directoryService The originator service
      * @param connector        The spawned connector
      */
-    public ConnectorSpawnedEvent(ConnectorDirectoryService directoryService, ConnectorService connector) {
+    public ConnectorSpawnedEvent(ConnectionService directoryService, ConnectorService connector) {
         super(new RichString("Spawned connector ", connector), TYPE, directoryService);
         this.connectorService = connector;
     }

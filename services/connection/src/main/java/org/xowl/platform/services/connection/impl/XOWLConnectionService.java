@@ -58,7 +58,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConnectorDirectory implements ConnectorDirectoryService {
+public class XOWLConnectionService implements ConnectionService {
     /**
      * The data about a spawned connector
      */
@@ -84,15 +84,15 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLConnectorDirectory.class, "/org/xowl/platform/services/connection/api_service_connection.raml", "Connection Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLConnectionService.class, "/org/xowl/platform/services/connection/api_service_connection.raml", "Connection Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLConnectorDirectory.class, "/org/xowl/platform/services/connection/api_service_connection.html", "Connection Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLConnectionService.class, "/org/xowl/platform/services/connection/api_service_connection.html", "Connection Service - Documentation", HttpApiResource.MIME_HTML);
     /**
      * The resource for the API's schema
      */
-    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLConnectorDirectory.class, "/org/xowl/platform/services/connection/schema_platform_connection.json", "Connection Service - Schema", HttpConstants.MIME_JSON);
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLConnectionService.class, "/org/xowl/platform/services/connection/schema_platform_connection.json", "Connection Service - Schema", HttpConstants.MIME_JSON);
 
 
     /**
@@ -127,7 +127,7 @@ public class XOWLConnectorDirectory implements ConnectorDirectoryService {
 
     @Override
     public String getIdentifier() {
-        return XOWLConnectorDirectory.class.getCanonicalName();
+        return XOWLConnectionService.class.getCanonicalName();
     }
 
     @Override

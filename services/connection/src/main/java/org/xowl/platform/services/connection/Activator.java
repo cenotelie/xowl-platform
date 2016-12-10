@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.connection.impl.XOWLConnectorDirectory;
+import org.xowl.platform.services.connection.impl.XOWLConnectionService;
 import org.xowl.platform.services.connection.jobs.ConnectorJobFactory;
 
 /**
@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
     /**
      * The directory service
      */
-    private XOWLConnectorDirectory directory;
+    private XOWLConnectionService directory;
     /**
      * The tracker of the connector factories
      */
@@ -43,9 +43,9 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        directory = new XOWLConnectorDirectory();
+        directory = new XOWLConnectionService();
         bundleContext.registerService(HttpApiService.class, directory, null);
-        bundleContext.registerService(ConnectorDirectoryService.class, directory, null);
+        bundleContext.registerService(ConnectionService.class, directory, null);
 
         factoryTracker = new ServiceTracker<ConnectorServiceFactory, ConnectorServiceFactory>(bundleContext, ConnectorServiceFactory.class, null) {
             @Override

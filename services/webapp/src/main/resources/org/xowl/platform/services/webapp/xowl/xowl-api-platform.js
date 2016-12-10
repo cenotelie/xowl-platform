@@ -963,9 +963,9 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 
 
 
-////
-// Core Module - Impact Analysis Service
-////
+/*****************************************************
+ * Impact - Impact Analysis Service
+ ****************************************************/
 
 XOWL.prototype.newImpactAnalysis = function (callback, definition) {
 	this.doRequest(function (code, type, content) {
@@ -974,14 +974,14 @@ XOWL.prototype.newImpactAnalysis = function (callback, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/impact", null, definition);
+	}, "services/impact", null, "POST", MIME_JSON, definition);
 }
 
 
 
-////
-// Core Module - Evaluation Analysis Service
-////
+/*****************************************************
+ * Evaluation - Evaluation Service
+ ****************************************************/
 
 XOWL.prototype.getEvaluations = function (callback) {
 	this.doRequest(function (code, type, content) {
@@ -990,7 +990,7 @@ XOWL.prototype.getEvaluations = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluations", null);
+	}, "services/evaluation/evaluations", null, "GET", null, null);
 }
 
 XOWL.prototype.getEvaluation = function (callback, evaluationId) {
@@ -1000,7 +1000,7 @@ XOWL.prototype.getEvaluation = function (callback, evaluationId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluation", {id: evaluationId});
+	}, "services/evaluation/evaluations/" + encodeURIComponent(evaluationId), null, "GET", null, null);
 }
 
 XOWL.prototype.getEvaluableTypes = function (callback) {
@@ -1010,7 +1010,7 @@ XOWL.prototype.getEvaluableTypes = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluableTypes", null);
+	}, "services/evaluation/evaluableTypes", null, "GET", null, null);
 }
 
 XOWL.prototype.getEvaluables = function (callback, typeId) {
@@ -1020,7 +1020,7 @@ XOWL.prototype.getEvaluables = function (callback, typeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/evaluables", {type: typeId});
+	}, "services/evaluation/evaluables", {type: typeId}, "GET", null, null);
 }
 
 XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
@@ -1030,7 +1030,7 @@ XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/criterionTypes", {"for": typeId});
+	}, "services/evaluation/criterionTypes", {'for': typeId}, "GET", null, null);
 }
 
 XOWL.prototype.newEvaluation = function (callback, definition) {
@@ -1040,7 +1040,7 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/core/evaluation/service", null, definition);
+	}, "services/evaluation/evaluations", null, "PUT", MIME_JSON, definition);
 }
 
 

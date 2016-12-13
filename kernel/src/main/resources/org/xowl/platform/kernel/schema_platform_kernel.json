@@ -7,7 +7,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.platform.kernel.platform.OSGiBundle"
+            "org.osgi.framework.Bundle"
           ]
         },
         "identifier": {
@@ -56,27 +56,6 @@
           }
         ]
       }
-    },
-    "OSGiImplementation": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "org.xowl.platform.kernel.platform.OSGiImplementation"
-          ]
-        },
-        "identifier": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "type",
-        "identifier",
-        "name"
-      ]
     },
     "HttpApiResource": {
       "type": "object",

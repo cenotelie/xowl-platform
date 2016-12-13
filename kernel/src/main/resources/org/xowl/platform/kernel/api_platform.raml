@@ -6,26 +6,9 @@ types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
   OSGiBundle: !include schema_platform_kernel.json#/definitions/OSGiBundle
   OSGiBundles: !include schema_platform_kernel.json#/definitions/OSGiBundles
-  OSGiImplementation: !include schema_platform_kernel.json#/definitions/OSGiImplementation
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/platform:
-  description: Represents the platform implementation
-  get:
-    description: Gets the description of the platform implementation
-    is: [secured, mayFail]
-    responses:
-      200:
-        description: The description of the platform implementation
-        body:
-          application/json:
-            type: OSGiImplementation
-            example: |
-              {
-                "type": "org.xowl.platform.kernel.platform.OSGiImplementation",
-                "identifier": "impl1",
-                "name": "OSGi Implementation Name"
-              }
   /bundles:
     description: The list of the bundles deployed on this platform
     get:

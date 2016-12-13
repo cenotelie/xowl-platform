@@ -12,17 +12,11 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ...", 3))
+	if (!onOperationRequest("Loading ...", 2))
 		return;
 	xowl.getPlatformProduct(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderProduct(content);
-		}
-	});
-	xowl.getPlatformOSGiImpl(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			document.getElementById("osgi-identifier").value = content.identifier;
-			document.getElementById("osgi-name").value = content.name;
 		}
 	});
 	xowl.getPlatformBundles(function (status, ct, content) {

@@ -390,16 +390,6 @@ XOWL.prototype.getPlatformProduct = function (callback) {
 	}, "kernel/platform/product", null, "GET", null, null);
 }
 
-XOWL.prototype.getPlatformOSGiImpl = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "kernel/platform", null, "GET", null, null);
-}
-
 XOWL.prototype.getPlatformBundles = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

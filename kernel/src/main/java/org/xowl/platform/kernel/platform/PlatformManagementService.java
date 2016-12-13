@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
+import org.osgi.framework.Bundle;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
@@ -81,13 +82,6 @@ public interface PlatformManagementService extends Service, HttpApiService, Meas
             new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
-     * Gets the details of the OSGi implementation the platform is running on
-     *
-     * @return The details of the OSGi implementation the platform is running on
-     */
-    OSGiImplementation getOSGiImplementation();
-
-    /**
      * Gets the product descriptor for the platform
      *
      * @return The product descriptor
@@ -99,7 +93,7 @@ public interface PlatformManagementService extends Service, HttpApiService, Meas
      *
      * @return The bundle on this platform
      */
-    Collection<OSGiBundle> getPlatformBundles();
+    Collection<Bundle> getPlatformBundles();
 
     /**
      * Shutdowns the platform

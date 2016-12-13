@@ -19,8 +19,6 @@ package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.store.storage.NodeManager;
-import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.KernelSchema;
@@ -46,11 +44,6 @@ import java.util.Collection;
  */
 public class SemanticWebConnector extends ConnectorServiceBase {
     /**
-     * The node manager when loading quads
-     */
-    private final NodeManager nodeManager;
-
-    /**
      * Initializes this connector
      *
      * @param identifier The identifier for this connector
@@ -59,7 +52,6 @@ public class SemanticWebConnector extends ConnectorServiceBase {
      */
     public SemanticWebConnector(String identifier, String name, String[] uris) {
         super(identifier, name, uris);
-        this.nodeManager = new CachedNodes();
     }
 
     @Override

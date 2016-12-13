@@ -19,7 +19,6 @@ package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyFailure;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.loaders.*;

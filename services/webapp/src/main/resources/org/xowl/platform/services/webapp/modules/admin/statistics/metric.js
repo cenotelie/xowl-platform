@@ -3,6 +3,8 @@
 
 var xowl = new XOWL();
 var metricId = getParameterByName("id");
+var METRIC = null;
+var SNAPSHOT = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -16,28 +18,31 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ..."))
+	if (!onOperationRequest("Loading ...", 2))
 		return;
+	xowl.getMetric(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			METRIC = content;
+			document.getElementById("metric-name").value = METRIC.name;
+			doRender();
+		}
+	}, metricId);
 	xowl.getMetricSnapshot(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			var name = renderCouples(content);
-			document.getElementById("metric-name").value = name;
+			SNAPSHOT = content;
+			doRender();
 		}
 	}, metricId);
 }
 
-function renderCouples(couples) {
+function doRender() {
+	if (METRIC == null || SNAPSHOT == null)
+		return;
 	var table = document.getElementById("data");
 	while (table.hasChildNodes()) {
 		table.removeChild(table.lastChild);
 	}
-	var first = null;
-	for (var  i = 0; i != couples.length; i++) {
-		var name = renderCouple(table, couples[i].metric, couples[i].value, 0);
-		if (i == 0)
-			first = name;
-	}
-	return first;
+	renderCouple(table, METRIC, SNAPSHOT, 0);
 }
 
 function renderCouple(table, metric, value, offset) {

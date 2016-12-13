@@ -31,7 +31,7 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ...", 2))
+	if (!onOperationRequest("Loading ...", 4))
 		return;
 	xowl.getConnectors(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
@@ -51,6 +51,18 @@ function doGetData() {
 				select.add(option);
 			}
 			select.selectedIndex = -1;
+		}
+	});
+	loadComponent("/web/assets/xowl.svg", function (node) {
+		if (onOperationEnded(200, "")) {
+			SVG_DB = node.children[0];
+			render();
+		}
+	});
+	loadComponent("/web/assets/connector.svg", function (node) {
+		if (onOperationEnded(200, "")) {
+			SVG_CONNECTOR = node.children[0];
+			render();
 		}
 	});
 }
@@ -193,13 +205,6 @@ function onClickDeleteConnector() {
 	}, SELECTED_CONNECTOR.identifier);
 }
 
-function loadSVG() {
-	var doc = document.getElementById("xowlsvg").contentDocument.documentElement;
-	SVG_DB = doc.children[0];
-	doc = document.getElementById("connectorsvg").contentDocument.documentElement;
-	SVG_CONNECTOR = doc.children[0];
-}
-
 function createCanvas(nb) {
 	var height = SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE * nb * 1.5;
 	GRAPH_HEIGHT = (height < GRAPH_MIN_HEIGHT ? GRAPH_MIN_HEIGHT : height);
@@ -266,7 +271,8 @@ function newLink(def, x1, y1, x2, y2) {
 }
 
 function render() {
-	loadSVG();
+	if (CONNECTORS == null || SVG_DB == null || SVG_CONNECTOR == null)
+		return;
 	var svg = createCanvas(CONNECTORS.length);
 	svg.appendChild(newDB(GRAPH_DB_X, (GRAPH_HEIGHT - SVG_DB_SIZE * SVG_DB_SCALE) / 2));
 	var pad = (GRAPH_HEIGHT - CONNECTORS.length * SVG_CONNECTOR_SIZE * SVG_CONNECTOR_SCALE) / (CONNECTORS.length + 1);

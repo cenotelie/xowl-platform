@@ -47,5 +47,4 @@ doDeployBundle "$ROOT/services/security-internal/target"    "xowl-service-securi
 doDeployBundle "$ROOT/services/security-shiro/target"       "xowl-service-security-shiro-$VERSION.jar"      "$1/felix/bundle"
 doDeployBundle "$ROOT/services/webapp/target"               "xowl-service-webapp-$VERSION.jar"              "$1/felix/bundle"
 doDeployBundle "$ROOT/connectors/csv/target"                "xowl-connector-csv-$VERSION.jar"               "$1/felix/bundle"
-doDeployBundle "$ROOT/connectors/doors9/target"             "xowl-connector-doors9-$VERSION.jar"            "$1/felix/bundle"
 doDeployBundle "$ROOT/connectors/semanticweb/target"        "xowl-connector-semanticweb-$VERSION.jar"       "$1/felix/bundle"

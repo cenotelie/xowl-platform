@@ -18,6 +18,8 @@
 package org.xowl.platform.kernel.impl;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
@@ -33,11 +35,9 @@ import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.platform.OSGiBundle;
-import org.xowl.platform.kernel.platform.OSGiImplementation;
-import org.xowl.platform.kernel.platform.PlatformManagementService;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -53,7 +53,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLPlatformManagementService implements PlatformManagementService {
+public class XOWLPlatformManagementService implements PlatformManagementService, FrameworkListener {
     /**
      * The URI for the API services
      */
@@ -248,13 +248,35 @@ public class XOWLPlatformManagementService implements PlatformManagementService 
 
     @Override
     public XSPReply shutdown() {
-        System.exit(PLATFORM_EXIT_NORMAL);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.exit(PLATFORM_EXIT_NORMAL);
+            }
+        }, XOWLPlatformManagementService.class.getCanonicalName() + ".ThreadShutdown");
+        thread.start();
         return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply restart() {
-        System.exit(PLATFORM_EXIT_RESTART);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.exit(PLATFORM_EXIT_RESTART);
+            }
+        }, XOWLPlatformManagementService.class.getCanonicalName() + ".ThreadRestart");
+        thread.start();
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public void frameworkEvent(FrameworkEvent frameworkEvent) {
+        if (frameworkEvent.getType() == FrameworkEvent.STARTED) {
+            // the framework has started
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new PlatformStartupEvent(this));
+        }
     }
 }

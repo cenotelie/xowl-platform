@@ -36,12 +36,15 @@ import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventConsumer;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
-import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -52,15 +55,17 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implements a job execution service
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Closeable {
+public class XOWLJobExecutor implements JobExecutionService, HttpApiService, EventConsumer, Closeable {
     /**
      * The bound of the executor queue
      */
@@ -111,14 +116,23 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
             "The job is already completed.",
             ERROR_HELP_PREFIX + "0x0013.html");
 
+
+    /**
+     * The queue to use before the executor is activated
+     */
+    private final ConcurrentLinkedQueue<Runnable> initQueue;
+    /**
+     * Whether this executor can begin executing jobs
+     */
+    private final AtomicBoolean canExecute;
     /**
      * The pool of executor threads
      */
-    private ThreadPoolExecutor executorPool;
+    private final ThreadPoolExecutor executorPool;
     /**
      * The directory for the persistent storage of queued job
      */
-    private File storage;
+    private final File storage;
     /**
      * The buffer of completed jobs
      */
@@ -134,60 +148,51 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
 
     /**
      * Initializes this service
+     *
+     * @param configurationService The configuration service to use
      */
-    public XOWLJobExecutor() {
+    public XOWLJobExecutor(ConfigurationService configurationService, EventService eventService) {
+        Configuration configuration = configurationService.getConfigFor(this);
+        int queueBound = EXECUTOR_QUEUE_BOUND;
+        int poolMin = EXECUTOR_POOL_MIN;
+        int poolMax = EXECUTOR_POOL_MAX;
+        String value = configuration.get("storage");
+        if (value != null)
+            this.storage = new File(value);
+        else
+            this.storage = new File(System.getProperty("user.dir"));
+        try {
+            value = configuration.get("queueBound");
+            if (value != null)
+                queueBound = Integer.parseInt(value);
+            value = configuration.get("poolMinThreads");
+            if (value != null)
+                poolMin = Integer.parseInt(value);
+            value = configuration.get("poolMaxThreads");
+            if (value != null)
+                poolMax = Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            Logging.getDefault().error(exception);
+        }
+
+        this.initQueue = new ConcurrentLinkedQueue<>();
+        this.canExecute = new AtomicBoolean(false);
+        this.executorPool = new ThreadPoolExecutor(poolMin, poolMax, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueBound)) {
+            @Override
+            protected void beforeExecute(Thread thread, Runnable runnable) {
+                onJobRun((Job) runnable);
+            }
+
+            @Override
+            protected void afterExecute(Runnable runnable, Throwable throwable) {
+                onJobFinished((Job) runnable);
+            }
+        };
         this.completed = new Job[COMPLETED_QUEUED_BOUND];
         this.completedStart = -1;
         this.running = new Job[EXECUTOR_POOL_MAX];
-    }
-
-    /**
-     * Gets the executor pool
-     *
-     * @return The executor pool
-     */
-    private ThreadPoolExecutor getExecutorPool() {
-        if (executorPool == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-            Configuration configuration = configurationService != null ? configurationService.getConfigFor(this) : null;
-            int queueBound = EXECUTOR_QUEUE_BOUND;
-            int poolMin = EXECUTOR_POOL_MIN;
-            int poolMax = EXECUTOR_POOL_MAX;
-            if (configuration != null) {
-                String value = configuration.get("storage");
-                if (value != null)
-                    storage = new File(value);
-                else
-                    storage = new File(System.getProperty("user.dir"));
-                try {
-                    value = configuration.get("queueBound");
-                    if (value != null)
-                        queueBound = Integer.parseInt(value);
-                    value = configuration.get("poolMinThreads");
-                    if (value != null)
-                        poolMin = Integer.parseInt(value);
-                    value = configuration.get("poolMaxThreads");
-                    if (value != null)
-                        poolMax = Integer.parseInt(value);
-                } catch (NumberFormatException exception) {
-                    // do nothing
-                }
-            }
-            ArrayBlockingQueue<Runnable> executorQueue = new ArrayBlockingQueue<>(queueBound);
-            executorPool = new ThreadPoolExecutor(poolMin, poolMax, 0, TimeUnit.SECONDS, executorQueue) {
-                @Override
-                protected void beforeExecute(Thread thread, Runnable runnable) {
-                    onJobRun((Job) runnable);
-                }
-
-                @Override
-                protected void afterExecute(Runnable runnable, Throwable throwable) {
-                    onJobFinished((Job) runnable);
-                }
-            };
-            reloadQueue();
-        }
-        return executorPool;
+        reloadQueue();
+        eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
     }
 
     /**
@@ -297,12 +302,6 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
             Logging.getDefault().error("Unknown job type " + file);
             return;
         }
-        if (type.equals(PlatformRebootJob.class.getCanonicalName())) {
-            // do not reload reboot job
-            if (!file.delete()) {
-                Logging.getDefault().error("Failed to delete " + file.getAbsolutePath());
-            }
-        }
         Collection<JobFactory> factories = ServiceUtils.getServices(JobFactory.class);
         for (JobFactory factory : factories) {
             if (factory.canDeserialize(type)) {
@@ -340,17 +339,16 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
     @Override
     public MetricSnapshot pollMetric(Metric metric) {
         if (metric == METRIC_TOTAL_PROCESSED_JOBS)
-            return new MetricSnapshotLong(getExecutorPool().getCompletedTaskCount());
+            return new MetricSnapshotLong(executorPool.getCompletedTaskCount());
         if (metric == METRIC_SCHEDULED_JOBS)
-            return new MetricSnapshotInt(getExecutorPool().getQueue().size());
+            return new MetricSnapshotInt(executorPool.getQueue().size());
         if (metric == METRIC_EXECUTING_JOBS)
-            return new MetricSnapshotInt(getExecutorPool().getActiveCount());
+            return new MetricSnapshotInt(executorPool.getActiveCount());
         return null;
     }
 
     @Override
     public void schedule(Job job) {
-        ThreadPoolExecutor pool = getExecutorPool();
         boolean exists = storage.exists();
         if (!exists) {
             exists = storage.mkdirs();
@@ -365,13 +363,19 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
             Logging.getDefault().error("Cannot serialize the job, storage is inaccessible");
         }
         job.onScheduled();
-        pool.execute(job);
+        synchronized (initQueue) {
+            if (canExecute.get()) {
+                executorPool.execute(job);
+            } else {
+                initQueue.add(job);
+            }
+        }
         Logging.getDefault().info(new RichString("Scheduled job ", job));
     }
 
     @Override
     public XSPReply cancel(Job job) {
-        boolean success = getExecutorPool().remove(job);
+        boolean success = executorPool.remove(job);
         if (success) {
             // the job was queued and prevented from running
             job.onTerminated(true);
@@ -396,7 +400,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
     @Override
     public List<Job> getQueue() {
         List<Job> result = new ArrayList<>();
-        for (Runnable runnable : getExecutorPool().getQueue())
+        for (Runnable runnable : executorPool.getQueue())
             result.add((Job) runnable);
         return Collections.unmodifiableList(result);
     }
@@ -447,7 +451,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
      * @return The job, or null if it is not found
      */
     private Job getJobScheduled(String identifier) {
-        for (Runnable runnable : getExecutorPool().getQueue()) {
+        for (Runnable runnable : executorPool.getQueue()) {
             Job job = (Job) runnable;
             if (job.getIdentifier().equals(identifier))
                 return job;
@@ -489,6 +493,19 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Clo
             }
         }
         return null;
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        if (event.getType().equals(PlatformStartupEvent.TYPE)) {
+            // activate this executor
+            synchronized (initQueue) {
+                canExecute.set(true);
+                while (!initQueue.isEmpty()) {
+                    executorPool.execute(initQueue.poll());
+                }
+            }
+        }
     }
 
     @Override

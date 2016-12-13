@@ -32,7 +32,7 @@ import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformJobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
-import org.xowl.platform.kernel.platform.PlatformStartupEvent;
+import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -53,6 +53,10 @@ public class Activator implements BundleActivator {
      * The event service
      */
     private XOWLEventService eventService;
+    /**
+     * The platform management service
+     */
+    private XOWLPlatformManagementService platformService;
     /**
      * The HTTP API discovery service
      */
@@ -85,17 +89,17 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
         bundleContext.registerService(HttpApiService.class, statisticsService, null);
 
-        // register the job executor service
-        serviceJobExecutor = new XOWLJobExecutor();
-        bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
-        bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
-        bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
-        bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
-
         // register the event service
         eventService = new XOWLEventService();
         bundleContext.registerService(EventService.class, eventService, null);
         bundleContext.registerService(MeasurableService.class, eventService, null);
+
+        // register the job executor service
+        serviceJobExecutor = new XOWLJobExecutor(configurationService, eventService);
+        bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
+        bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
+        bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
+        bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
 
         // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
@@ -107,10 +111,11 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(HttpApiService.class, directoryService, null);
 
         // register the platform management service
-        XOWLPlatformManagementService managementService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
-        bundleContext.registerService(PlatformManagementService.class, managementService, null);
-        bundleContext.registerService(HttpApiService.class, managementService, null);
-        bundleContext.registerService(MeasurableService.class, managementService, null);
+        platformService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
+        bundleContext.registerService(PlatformManagementService.class, platformService, null);
+        bundleContext.registerService(HttpApiService.class, platformService, null);
+        bundleContext.registerService(MeasurableService.class, platformService, null);
+        bundleContext.addFrameworkListener(platformService);
 
         // register the HTTP API discovery service
         discoveryService = new XOWLHttpApiDiscoveryService();
@@ -128,12 +133,12 @@ public class Activator implements BundleActivator {
             }
         };
         discoveryServiceTracker.open();
-
-        eventService.onEvent(new PlatformStartupEvent(managementService));
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
+        if (eventService != null && platformService != null)
+            eventService.onEvent(new PlatformShutdownEvent(platformService));
         if (eventService != null)
             eventService.close();
         if (serviceJobExecutor != null)

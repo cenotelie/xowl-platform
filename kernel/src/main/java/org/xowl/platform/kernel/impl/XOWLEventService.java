@@ -23,11 +23,9 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.Identifiable;
-import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 
 import java.util.*;
@@ -76,11 +74,12 @@ public class XOWLEventService implements EventService {
             public void doRun() {
                 XOWLEventService.this.dispatchRun();
             }
-        });
+        }, XOWLEventService.class.getCanonicalName() + ".EventDispatcher");
         this.mustStop = new AtomicBoolean(false);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
         this.routes = new HashMap<>();
         this.totalProcessed = 0;
+        this.dispatchThread.start();
     }
 
     /**
@@ -88,9 +87,6 @@ public class XOWLEventService implements EventService {
      */
     public void close() {
         mustStop.set(true);
-        PlatformManagementService managementService = ServiceUtils.getService(PlatformManagementService.class);
-        if (managementService != null)
-            onEvent(new PlatformShutdownEvent(managementService));
         try {
             dispatchThread.join();
         } catch (InterruptedException exception) {

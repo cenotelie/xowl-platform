@@ -28,7 +28,7 @@ public class PlatformShutdownEvent extends EventBase {
     /**
      * The type for this event
      */
-    public static final String TYPE = PlatformStartupEvent.class.getCanonicalName();
+    public static final String TYPE = PlatformShutdownEvent.class.getCanonicalName();
 
     /**
      * Initializes this event
@@ -36,6 +36,6 @@ public class PlatformShutdownEvent extends EventBase {
      * @param managementService The platform management service
      */
     public PlatformShutdownEvent(PlatformManagementService managementService) {
-        super("Platform is shutting down", TYPE, managementService.getOSGiImplementation());
+        super("Platform is shutting down", TYPE, managementService);
     }
 }

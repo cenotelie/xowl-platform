@@ -17,9 +17,12 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
+import org.xowl.infra.server.xsp.XSPReplyExpiredSession;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.collections.Couple;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ServiceUtils;
@@ -36,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * The main server for the platform
@@ -90,6 +94,9 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         addCORSHeader(servletRequest, servletResponse);
         addCacheControlHeader(servletResponse);
 
+        if (!checkAuthentication(servletRequest, servletResponse))
+            return;
+
         HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
         try {
             Collection<HttpApiService> services = ServiceUtils.getServices(HttpApiService.class);
@@ -114,6 +121,52 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             if (securityService != null)
                 securityService.onRequestEnd(servletRequest.getRemoteAddr());
         }
+    }
+
+    /**
+     * Checks the authentication of the request
+     *
+     * @param request  The request
+     * @param response The response
+     * @return Whether a user is authenticated for the request
+     */
+    private boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        // do not perform authentication for pre-flight requests
+        if (request.getMethod().equals(HttpConstants.METHOD_OPTIONS))
+            return true;
+
+        // do not perform authentication for the login service
+        if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
+            return true;
+
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null) {
+            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+            return false;
+        }
+
+        Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);
+        if (values != null) {
+            while (values.hasMoreElements()) {
+                String content = values.nextElement();
+                String[] parts = content.split(";");
+                for (String cookie : parts) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(SecurityService.AUTH_TOKEN + "=")) {
+                        String token = cookie.substring(SecurityService.AUTH_TOKEN.length() + 1);
+                        XSPReply reply = securityService.authenticate(request.getRemoteAddr(), token);
+                        if (reply.isSuccess())
+                            return true;
+                        if (reply == XSPReplyExpiredSession.instance())
+                            response.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
+                        else
+                            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**

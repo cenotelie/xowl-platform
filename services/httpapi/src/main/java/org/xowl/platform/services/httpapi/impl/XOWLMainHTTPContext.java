@@ -19,18 +19,11 @@ package org.xowl.platform.services.httpapi.impl;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyExpiredSession;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.kernel.security.SecurityService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Enumeration;
 
 /**
  * The main HTTP context
@@ -54,42 +47,7 @@ public class XOWLMainHTTPContext implements HttpContext {
 
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // do not perform authentication for pre-flight requests
-        if (request.getMethod().equals(HttpConstants.METHOD_OPTIONS))
-            return true;
-
-        // do not perform authentication for the login service
-        if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
-            return true;
-
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
-        if (securityService == null) {
-            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
-            return false;
-        }
-
-        Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);
-        if (values != null) {
-            while (values.hasMoreElements()) {
-                String content = values.nextElement();
-                String[] parts = content.split(";");
-                for (String cookie : parts) {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(SecurityService.AUTH_TOKEN + "=")) {
-                        String token = cookie.substring(SecurityService.AUTH_TOKEN.length() + 1);
-                        XSPReply reply = securityService.authenticate(request.getRemoteAddr(), token);
-                        if (reply.isSuccess())
-                            return true;
-                        if (reply == XSPReplyExpiredSession.instance())
-                            response.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
-                        else
-                            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
-                        return false;
-                    }
-                }
-            }
-        }
-        return false;
+        return true;
     }
 
     @Override

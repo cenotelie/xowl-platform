@@ -110,6 +110,172 @@
       "required": [
         "type"
       ]
+    },
+    "License": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.product.License"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "fullText": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "fullText"
+      ]
+    },
+    "VersionInfo": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.product.VersionInfo"
+          ]
+        },
+        "number": {
+          "type": "string"
+        },
+        "scmTag": {
+          "type": "string"
+        },
+        "buildUser": {
+          "type": "string"
+        },
+        "buildTag": {
+          "type": "string"
+        },
+        "buildTimestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "number",
+        "scmTag",
+        "buildUser",
+        "buildTag",
+        "buildTimestamp"
+      ]
+    },
+    "EmbeddedDependency": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.product.EmbeddedDependency"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "license": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/License"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "contentType",
+        "version",
+        "copyright",
+        "link",
+        "license"
+      ]
+    },
+    "EmbeddedDependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/EmbeddedDependency"
+          }
+        ]
+      }
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.infra.utils.product.Product"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VersionInfo"
+            }
+          ]
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "vendorLink": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "license": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/License"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "version",
+        "copyright",
+        "vendor",
+        "vendorLink",
+        "link",
+        "license"
+      ]
     }
   }
 }

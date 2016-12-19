@@ -4,11 +4,44 @@ title: Platform Management Service
 version: v1
 types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Product: !include schema_infra_utils.json#/definitions/Product
   OSGiBundle: !include schema_platform_kernel.json#/definitions/OSGiBundle
   OSGiBundles: !include schema_platform_kernel.json#/definitions/OSGiBundles
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/platform:
+  /product:
+    description: The product's description of this platform
+    get:
+      description: Gets the product's description of this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The product's description of this platform
+          body:
+            application/json:
+              type: Product
+              example: |
+                {
+                  "type": "org.xowl.infra.utils.product.Product",
+                  "identifier": "org.xowl.platform.XOWLFederationPlatform",
+                  "name": "xOWL Federation Platform",
+                  "version": {
+                    "number": "1.0.0",
+                    "scmTag": "ffffffff",
+                    "buildUser": "jenkins",
+                    "buildTag": "jenkins-xxx-42",
+                    "buildTimestamp": "01/01/2010 10:10"
+                  },
+                  "copyright": "Copyright (c) Association Cénotélie",
+                  "vendor": "Association Cénotélie",
+                  "vendorLink": "http://cenotelie.fr",
+                  "link": "http://xowl.org",
+                  "license": {
+                    "name": "LGPLv3",
+                    "fullText": "..."
+                  }
+                }
   /bundles:
     description: The list of the bundles deployed on this platform
     get:

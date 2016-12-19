@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "http://xowl.org/platform/kernel/services/webapp",
+  "definitions": {
+    "WebModuleItem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.webapp.WebModuleItem"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "uri",
+        "icon"
+      ]
+    },
+    "WebModule": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.webapp.WebModule"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/WebModuleItem"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "uri",
+        "icon",
+        "items"
+      ]
+    },
+    "WebModules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/WebModule"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+#%RAML 1.0
+---
+title: Web Modules Directory Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  WebModules: !schema_platform_webappmodules.json#/definitions/WebModules
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/webapp:
+  /modules:
+    description: The list of the web modules for the web application
+    get:
+      description: Gets the list of the web modules for the web application
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the web modules for the web application
+          body:
+            application/json:
+              type: WebModules
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.webapp.WebModule",
+                    "identifier": "org.xowl.platform.services.webapp.XOWLWebModuleAdmin",
+                    "name": "Platform Administration",
+                    "uri": "admin",
+                    "icon": "/web/assets/module-admin.svg",
+                    "items": [
+                      {
+                        "type": "org.xowl.platform.services.webapp.WebModuleItem",
+                        "name": "Platform Security",
+                        "uri": "security",
+                        "icon": "/web/assets/security.svg"
+                      }
+                    ]
+                  }
+                ]

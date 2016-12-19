@@ -43,15 +43,15 @@ public class XOWLWebModuleDirectory implements HttpApiService {
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/api_service_webappmodules.raml", "Web Modules Directory Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/api_service_webappmodules.raml", "Web Modules Directory Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/api_service_webappmodules.html", "Web Modules Directory Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/api_service_webappmodules.html", "Web Modules Directory Service - Documentation", HttpApiResource.MIME_HTML);
     /**
      * The resource for the API's schema
      */
-    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/schema_platform_webappmodules.json", "Web Modules Directory Service - Schema", HttpConstants.MIME_JSON);
+    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/schema_platform_webappmodules.json", "Web Modules Directory Service - Schema", HttpConstants.MIME_JSON);
 
 
     /**

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 
 /**
  * Represents a parameter for this domain

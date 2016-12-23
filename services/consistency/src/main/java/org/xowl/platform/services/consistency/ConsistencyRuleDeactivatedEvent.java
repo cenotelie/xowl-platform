@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.consistency;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**

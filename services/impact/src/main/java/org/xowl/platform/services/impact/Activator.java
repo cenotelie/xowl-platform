@@ -21,8 +21,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisService;
 import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisJobFactory;
+import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisService;
 
 /**
  * Activator for this bundle

@@ -21,7 +21,11 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
- * Represents a service for the
+ * Represents a marketplace service that provides addons that can be installed in the platform
+ *
+ * @author Laurent Wouters
  */
 public interface MarketplaceService extends Service, HttpApiService {
+
+
 }

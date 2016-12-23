@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.events;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.Identifiable;
 
 import java.text.DateFormat;
 import java.util.Date;

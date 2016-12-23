@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.jobs;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**

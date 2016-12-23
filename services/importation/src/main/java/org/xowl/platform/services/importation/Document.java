@@ -18,9 +18,9 @@
 package org.xowl.platform.services.importation;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;

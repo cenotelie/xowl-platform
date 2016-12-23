@@ -18,11 +18,11 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.Identifiable;
 
 import java.io.File;
 import java.io.FileInputStream;

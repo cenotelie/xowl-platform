@@ -17,10 +17,10 @@
 
 package org.xowl.platform.kernel.events;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 

@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Identifiable;
 
 import java.util.Collection;
 

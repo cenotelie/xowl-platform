@@ -17,12 +17,12 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
-import org.xowl.platform.kernel.Identifiable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;

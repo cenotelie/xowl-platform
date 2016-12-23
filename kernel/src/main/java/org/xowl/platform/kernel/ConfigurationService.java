@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.config.Configuration;
 
 /**

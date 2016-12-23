@@ -17,6 +17,8 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.infra.utils.Identifiable;
+
 /**
  * Represents a service on the platform
  *

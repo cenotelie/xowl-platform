@@ -35,8 +35,8 @@ import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
-import org.xowl.platform.services.storage.TripleStore;
 import org.xowl.platform.services.storage.StorageService;
+import org.xowl.platform.services.storage.TripleStore;
 
 import java.util.ArrayList;
 import java.util.Collection;

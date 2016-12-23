@@ -405,7 +405,6 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         Files.deleteFolder(directory);
         descriptor.setInstalled();
         // TODO: fire installation event
-        restart();
         return new XSPReplyResult<>(descriptor);
     }
 

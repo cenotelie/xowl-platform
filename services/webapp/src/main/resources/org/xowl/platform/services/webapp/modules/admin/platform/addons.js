@@ -48,7 +48,12 @@ function renderAddon(addon) {
 	image.width = "100";
 	image.height = "100";
 	if (addon.iconContent !== "") {
-		image.src="data:image/png;base64," + addon.iconContent;
+		if (addon.iconName.endsWith(".png"))
+			image.src="data:image/png;base64," + addon.iconContent;
+		else if (addon.iconName.endsWith(".gif"))
+			image.src="data:image/gif;base64," + addon.iconContent;
+		else if (addon.iconName.endsWith(".svg"))
+			image.src="data:image/svg+xml;base64," + addon.iconContent;
 	}
 	var titleLink = document.createElement("a");
 	titleLink.href = "addon.html?id=" + encodeURIComponent(addon.identifier);

@@ -17,29 +17,30 @@
 
 package org.xowl.platform.services.marketplace;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceProvider;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceService;
+import org.xowl.platform.kernel.platform.Addon;
+
+import java.util.Collection;
 
 /**
- * Activator for the server service bundle
+ * Common interface for a marketplace
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public interface Marketplace {
+    /**
+     * Gets the available categories on this marketplace
+     *
+     * @return The available categories
+     */
+    Collection<Category> getCategories();
 
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
-        bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
-        bundleContext.registerService(HttpApiService.class, marketplaceService, null);
-        bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
-    }
-
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+    /**
+     * Lookups available addons on the marketplace
+     *
+     * @param identifier The identifier to look for, may be null
+     * @param name       The name to look for, may be null
+     * @param categoryId The category to look for, may be null
+     * @return The collection of matching addons
+     */
+    Collection<Addon> lookupAddons(String identifier, String name, String categoryId);
 }

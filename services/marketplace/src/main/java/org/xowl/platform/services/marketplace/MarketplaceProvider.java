@@ -17,29 +17,29 @@
 
 package org.xowl.platform.services.marketplace;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceProvider;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceService;
+import org.xowl.infra.utils.config.Section;
+import org.xowl.platform.kernel.Service;
 
 /**
- * Activator for the server service bundle
+ * A provider of marketplace implementations
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public interface MarketplaceProvider extends Service {
+    /**
+     * Gets whether this provider supports marketplace of the specified type
+     *
+     * @param type A type of marketplace
+     * @return Whether this provider supports the specified type
+     */
+    boolean supports(String type);
 
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
-        bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
-        bundleContext.registerService(HttpApiService.class, marketplaceService, null);
-        bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
-    }
-
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+    /**
+     * Creates a new marketplace for the specified type
+     *
+     * @param type          A type of marketplace
+     * @param configuration The configuration section for the marketplace
+     * @return The created marketplace
+     */
+    Marketplace newMarketplace(String type, Section configuration);
 }

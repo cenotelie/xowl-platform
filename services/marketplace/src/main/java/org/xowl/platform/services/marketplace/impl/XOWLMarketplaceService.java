@@ -19,18 +19,24 @@ package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.marketplace.Category;
+import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceService;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Implements a marketplace service for the platform
@@ -55,6 +61,29 @@ public class XOWLMarketplaceService implements MarketplaceService {
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLMarketplaceService.class, "/org/xowl/platform/services/marketplace/schema_platform_marketplace.json", "Marketplace Service - Schema", HttpConstants.MIME_JSON);
 
+    /**
+     * The available marketplaces
+     */
+    private Collection<Marketplace> marketplaces;
+
+    /**
+     * Gets the marketplaces
+     * @return The marketplaces
+     */
+    private synchronized Collection<Marketplace> getMarketplaces() {
+        if (marketplaces != null)
+            return Collections.unmodifiableCollection(marketplaces);
+        marketplaces = new ArrayList<>();
+        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        if (configurationService == null)
+            return Collections.unmodifiableCollection(marketplaces);
+        Configuration configuration = configurationService.getConfigFor(this);
+        if (configuration == null)
+            return Collections.unmodifiableCollection(marketplaces);
+
+
+        return Collections.unmodifiableCollection(marketplaces);
+    }
 
     @Override
     public String getIdentifier() {

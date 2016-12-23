@@ -15,31 +15,39 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.marketplace;
+package org.xowl.platform.services.marketplace.impl;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceProvider;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceService;
+import org.xowl.infra.utils.config.Section;
+import org.xowl.platform.services.marketplace.Marketplace;
+import org.xowl.platform.services.marketplace.MarketplaceProvider;
 
 /**
- * Activator for the server service bundle
+ * Implements a marketplace provider for the standard platform
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
-
+public class XOWLMarketplaceProvider implements MarketplaceProvider {
     @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
-        bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
-        bundleContext.registerService(HttpApiService.class, marketplaceService, null);
-        bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
+    public String getIdentifier() {
+        return XOWLMarketplaceProvider.class.getCanonicalName();
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {
+    public String getName() {
+        return "xOWL Federation Platform - Marketplace Provider";
+    }
 
+    @Override
+    public boolean supports(String type) {
+        if (FSMarketplace.class.getCanonicalName().equals(type))
+            return true;
+        return false;
+    }
+
+    @Override
+    public Marketplace newMarketplace(String type, Section configuration) {
+        if (FSMarketplace.class.getCanonicalName().equals(type))
+            return new FSMarketplace(configuration);
+        return null;
     }
 }

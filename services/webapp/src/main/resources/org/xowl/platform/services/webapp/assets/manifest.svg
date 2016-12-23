@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="manifest" version="1.1">
+  <path
+     style="fill:#ffffff;fill-opacity:1;stroke:#034091;stroke-width:8;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 20,10 35,0 25,25 0,55 -60,0 z"/>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#034091;stroke-width:8;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="m 55,10 0,25 6.440678,0 L 80,35 Z"/>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#009149;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="m 30,50 40,0"/>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#009149;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 30,62.5 40,0"/>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#009149;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 30,75 40,0"/>
+</svg>

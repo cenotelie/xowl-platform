@@ -24,6 +24,10 @@ var MIME_JSON = "application/json";
  * MIME type for SPARQL
  */
 var MIME_SPARQL = "application/sparql-query";
+/**
+ * MIME type for octet stream
+ */
+var MIME_OCTET_STREAM = "binary/octet-stream";
 
 
 /*****************************************************
@@ -398,6 +402,46 @@ XOWL.prototype.getPlatformBundles = function (callback) {
 			callback(code, type, content);
 		}
 	}, "kernel/platform/bundles", null, "GET", null, null);
+}
+
+XOWL.prototype.getPlatformAddons = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/platform/addons", null, "GET", null, null);
+}
+
+XOWL.prototype.getPlatformAddon = function (callback, addonId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/platform/addons/" + encodeURIComponent(addonId), null, "GET", null, null);
+}
+
+XOWL.prototype.installPlatformAddon = function (callback, addonId, package) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/platform/addons/" + encodeURIComponent(addonId), null, "PUT", MIME_OCTET_STREAM, package);
+}
+
+XOWL.prototype.uninstallPlatformAddon = function (callback, addonId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/platform/addons/" + encodeURIComponent(addonId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.platformShutdown = function (callback) {
@@ -878,7 +922,7 @@ XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/importation/documents", {name: name, fileName: fileName}, "PUT", "application/octet-stream", content);
+	}, "services/importation/documents", {name: name, fileName: fileName}, "PUT", MIME_OCTET_STREAM, content);
 }
 
 

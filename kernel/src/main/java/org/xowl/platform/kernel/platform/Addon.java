@@ -182,7 +182,7 @@ public class Addon extends Product {
         serializedJSONBase(builder);
         builder.append(", \"pricing\": \"");
         builder.append(TextUtils.escapeStringJSON(pricing));
-        builder.append(", \"bundles\": [");
+        builder.append("\", \"bundles\": [");
         boolean first = true;
         for (AddonBundle bundle : bundles) {
             if (!first)

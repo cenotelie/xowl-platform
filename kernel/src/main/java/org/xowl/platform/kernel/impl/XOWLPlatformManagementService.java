@@ -21,9 +21,10 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.FrameworkUtil;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.TextUtils;
@@ -41,20 +42,20 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.platform.PlatformManagementService;
-import org.xowl.platform.kernel.platform.PlatformRebootJob;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
-import org.xowl.platform.kernel.platform.PlatformStartupEvent;
+import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Implements the platform management service
@@ -76,6 +77,25 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
+     * API error - The addon is already installed
+     */
+    public static final ApiError ERROR_ADDON_ALREADY_INSTALLED = new ApiError(0x0021,
+            "The addon is already installed.",
+            ERROR_HELP_PREFIX + "0x0021.html");
+    /**
+     * API error - The addon is not installed
+     */
+    public static final ApiError ERROR_ADDON_NOT_INSTALLED = new ApiError(0x0022,
+            "The addon is not installed.",
+            ERROR_HELP_PREFIX + "0x0022.html");
+    /**
+     * API error - The provided addon package is invalid
+     */
+    public static final ApiError ERROR_INVALID_ADDON_PACKAGE = new ApiError(0x0023,
+            "The provided addon package is invalid.",
+            ERROR_HELP_PREFIX + "0x0023.html");
+
+    /**
      * The cache of bundles
      */
     private final List<Bundle> bundles;
@@ -83,6 +103,14 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
      * The product descriptor
      */
     private final Product product;
+    /**
+     * The cache of addons
+     */
+    private final List<Addon> addons;
+    /**
+     * The cache to the addons
+     */
+    private final File addonsCache;
 
     /**
      * Initializes this service
@@ -91,6 +119,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
      * @param executionService     The current execution service
      */
     public XOWLPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
+        Configuration configuration = configurationService.getConfigFor(this);
         bundles = new ArrayList<>();
         Product product = null;
         try {
@@ -102,7 +131,37 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             Logging.getDefault().error(exception);
         }
         this.product = product;
-        enforceHttpConfigFelix(configurationService.getConfigFor(this), executionService);
+        this.addons = new ArrayList<>();
+        this.addonsCache = new File(System.getenv(Env.ROOT), configuration.get("addonsStorage"));
+        if (this.addonsCache.exists())
+            loadAddonsCache();
+        enforceHttpConfigFelix(configuration, executionService);
+    }
+
+    /**
+     * Loads addon descriptors in the addons cache
+     */
+    private void loadAddonsCache() {
+        File[] files = addonsCache.listFiles();
+        if (files != null) {
+            for (int i = 0; i != files.length; i++) {
+                if (files[i].getName().endsWith(".descriptor")) {
+                    try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
+                        String content = Files.read(reader);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+                        if (definition == null) {
+                            Logging.getDefault().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
+                            return;
+                        }
+                        Addon addon = new Addon(definition);
+                        addon.setInstalled();
+                        addons.add(addon);
+                    } catch (IOException exception) {
+                        Logging.getDefault().error(exception);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -228,6 +287,123 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             }
         }
         return Collections.unmodifiableCollection(bundles);
+    }
+
+    @Override
+    public Collection<Addon> getAddons() {
+        return Collections.unmodifiableCollection(addons);
+    }
+
+    @Override
+    public XSPReply installAddon(String identifier, InputStream packageStream) {
+        for (Addon addon : addons) {
+            if (Objects.equals(addon.getIdentifier(), identifier))
+                return new XSPReplyApiError(ERROR_ADDON_ALREADY_INSTALLED);
+        }
+
+        File directory = new File(addonsCache, UUID.randomUUID().toString());
+        if (!directory.mkdirs()) {
+            Logging.getDefault().error("Failed to create directory " + directory.getAbsolutePath());
+            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+        }
+        try {
+            unpackAddon(packageStream, directory);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+        }
+        File fileDescriptor = new File(directory, "descriptor.json");
+        if (!fileDescriptor.exists()) {
+            // delete the directory
+            Files.deleteFolder(directory);
+            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
+        }
+
+        Addon descriptor;
+        try (InputStream stream = new FileInputStream(fileDescriptor)) {
+            String content = Files.read(stream, Files.CHARSET);
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            descriptor = new Addon(definition);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            Files.deleteFolder(directory);
+            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
+        }
+
+        // check the identifier
+        if (!Objects.equals(descriptor.getIdentifier(), identifier)) {
+            Files.deleteFolder(directory);
+            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
+        }
+        // check the presence of the bundles
+        Collection<File> fileBundles = new ArrayList<>();
+        for (AddonBundle bundle : descriptor.getBundles()) {
+            File fileBundle = new File(directory, bundle.serializedString() + ".jar");
+            if (!fileBundle.exists()) {
+                Files.deleteFolder(directory);
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
+            }
+            fileBundles.add(fileBundle);
+        }
+
+        addons.add(descriptor);
+        // move the content
+        try {
+            File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
+            java.nio.file.Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
+            for (File file : fileBundles) {
+                java.nio.file.Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
+            }
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            Files.deleteFolder(directory);
+            return new XSPReplyException(exception);
+        }
+        // delete the folder
+        Files.deleteFolder(directory);
+        descriptor.setInstalled();
+        // TODO: fire installation event
+        return new XSPReplyResult<>(descriptor);
+    }
+
+    /**
+     * Unpacks an addon into a directory
+     *
+     * @param packageStream the stream for the addon package
+     * @param directory     The directory to unpack to
+     */
+    private void unpackAddon(InputStream packageStream, File directory) throws IOException {
+        byte[] buffer = new byte[8192];
+        try (ZipInputStream zipInputStream = new ZipInputStream(packageStream)) {
+            while (zipInputStream.available() > 0) {
+                ZipEntry entry = zipInputStream.getNextEntry();
+                File target = new File(directory, entry.getName());
+                int total = 0;
+                try (FileOutputStream fileOutputStream = new FileOutputStream(target)) {
+                    while (total < entry.getSize()) {
+                        int read = zipInputStream.read(buffer, 0, buffer.length);
+                        total += read;
+                        fileOutputStream.write(buffer, 0, read);
+                    }
+                }
+                zipInputStream.closeEntry();
+            }
+        }
+    }
+
+    @Override
+    public XSPReply uninstallAddon(String identifier) {
+        Addon descriptor = null;
+        for (Addon addon : addons) {
+            if (Objects.equals(addon.getIdentifier(), identifier)) {
+                descriptor = addon;
+                break;
+            }
+        }
+        if (descriptor == null)
+            return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
+
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

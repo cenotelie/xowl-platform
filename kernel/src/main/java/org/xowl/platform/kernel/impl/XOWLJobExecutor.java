@@ -34,6 +34,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
@@ -156,13 +157,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
         int poolMax = EXECUTOR_POOL_MAX;
-        String value = configuration.get("storage");
-        if (value != null)
-            this.storage = new File(value);
-        else
-            this.storage = new File(System.getProperty("user.dir"));
+        this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
         try {
-            value = configuration.get("queueBound");
+            String value = configuration.get("queueBound");
             if (value != null)
                 queueBound = Integer.parseInt(value);
             value = configuration.get("poolMinThreads");

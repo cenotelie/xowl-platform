@@ -27,6 +27,7 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -96,12 +97,40 @@ public interface PlatformManagementService extends Service, HttpApiService, Meas
     Collection<Bundle> getPlatformBundles();
 
     /**
+     * Gets the addons installed on this platform
+     *
+     * @return The installed addons
+     */
+    Collection<Addon> getAddons();
+
+    /**
+     * Installs an addon on the platform
+     *
+     * @param identifier    The identifier of the addon
+     * @param packageStream A stream to the addon package
+     * @return The protocol reply
+     */
+    XSPReply installAddon(String identifier, InputStream packageStream);
+
+    /**
+     * Un-installs an addon from the platform
+     *
+     * @param identifier The identifier of the addon
+     * @return The protocol reply
+     */
+    XSPReply uninstallAddon(String identifier);
+
+    /**
      * Shutdowns the platform
+     *
+     * @return The protocol reply
      */
     XSPReply shutdown();
 
     /**
      * Restarts the platform
+     *
+     * @return The protocol reply
      */
     XSPReply restart();
 }

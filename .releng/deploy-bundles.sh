@@ -42,6 +42,7 @@ doDeployBundle "$ROOT/services/evaluation/target"           "xowl-service-evalua
 doDeployBundle "$ROOT/services/httpapi/target"              "xowl-service-httpapi-$VERSION.jar"             "$1/felix/bundle"
 doDeployBundle "$ROOT/services/impact/target"               "xowl-service-impact-$VERSION.jar"              "$1/felix/bundle"
 doDeployBundle "$ROOT/services/importation/target"          "xowl-service-importation-$VERSION.jar"         "$1/felix/bundle"
+doDeployBundle "$ROOT/services/marketplace/target"          "xowl-service-marketplace-$VERSION.jar"         "$1/felix/bundle"
 doDeployBundle "$ROOT/services/storage/target"              "xowl-service-storage-$VERSION.jar"             "$1/felix/bundle"
 doDeployBundle "$ROOT/services/security-internal/target"    "xowl-service-security-internal-$VERSION.jar"   "$1/felix/bundle"
 doDeployBundle "$ROOT/services/security-shiro/target"       "xowl-service-security-shiro-$VERSION.jar"      "$1/felix/bundle"

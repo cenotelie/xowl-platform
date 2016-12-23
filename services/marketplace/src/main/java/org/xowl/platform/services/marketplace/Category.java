@@ -17,27 +17,13 @@
 
 package org.xowl.platform.services.marketplace;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceService;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 
 /**
- * Activator for the server service bundle
+ * Represents a category of addons on a marketplace
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
-
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
-        bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
-        bundleContext.registerService(HttpApiService.class, marketplaceService, null);
-    }
-
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+public interface Category extends Identifiable, Serializable {
 }

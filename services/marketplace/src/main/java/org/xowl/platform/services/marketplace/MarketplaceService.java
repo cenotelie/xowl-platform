@@ -17,15 +17,41 @@
 
 package org.xowl.platform.services.marketplace;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.util.Collection;
+
 /**
- * Represents a marketplace service that provides addons that can be installed in the platform
+ * Represents a marketplace service that provides addons which can be installed in the platform
  *
  * @author Laurent Wouters
  */
 public interface MarketplaceService extends Service, HttpApiService {
+    /**
+     * Gets the available categories on this marketplace
+     *
+     * @return The available categories
+     */
+    Collection<Category> getCategories();
 
+    /**
+     * Lookups available addons on the marketplace
+     *
+     * @param identifier The identifier to look for, may be null
+     * @param name       The name to look for, may be null
+     * @param categoryId The category to look for, may be null
+     * @return The collection of matching addons
+     */
+    Collection<Addon> lookupAddons(String identifier, String name, String categoryId);
 
+    /**
+     * Launches a job for the installation of an addon
+     *
+     * @param identifier The identifier of the addon to install
+     * @return The protocol reply
+     */
+    XSPReply beginInstallOf(String identifier);
 }

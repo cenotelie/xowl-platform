@@ -7,6 +7,7 @@ types:
   Product: !include schema_infra_utils.json#/definitions/Product
   OSGiBundle: !include schema_platform_kernel.json#/definitions/OSGiBundle
   OSGiBundles: !include schema_platform_kernel.json#/definitions/OSGiBundles
+  Addon: !include schema_platform_kernel.json#/definitions/Addon
   Addons: !include schema_platform_kernel.json#/definitions/Addons
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
@@ -116,27 +117,61 @@ baseUri: https://localhost:8443/api
                     "isInstalled": "true"
                   }
                 ]
-    /install:
-      description: Action to install a new addon
-      post:
+    /{addonId}:
+      description: Represents a specific addon installed on the platform
+      get:
+        description: Gets a description of the addon
+        is: [secured, mayFail]
+        responses:
+          200:
+            description: The description of the addon
+            body:
+              application/json:
+                type: Addon
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.platform.Addon",
+                    "identifier": "org.xowl.platform.XOWLFederationPlatform",
+                    "name": "xOWL Federation Platform",
+                    "description": "Description for the product platform",
+                    "version": {
+                      "number": "1.0.0",
+                      "scmTag": "ffffffff",
+                      "buildUser": "jenkins",
+                      "buildTag": "jenkins-xxx-42",
+                      "buildTimestamp": "01/01/2010 10:10"
+                    },
+                    "copyright": "Copyright (c) Association Cénotélie",
+                    "iconName": "",
+                    "iconContent": "",
+                    "vendor": "Association Cénotélie",
+                    "vendorLink": "http://cenotelie.fr",
+                    "link": "http://xowl.org",
+                    "license": {
+                      "name": "LGPLv3",
+                      "fullText": "..."
+                    },
+                    "pricing": "Free",
+                    "bundles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.AddonBundle",
+                        "groupId": "fr.cenotelie.xxxx",
+                        "artifactId": "module01",
+                        "version": "1.0.0"
+                      }
+                    ],
+                    "isInstalled": "true"
+                  }
+      put:
         description: Installs a new addon
         is: [secured, mayFail]
-        queryParameters:
-          id:
-            displayName: Addon identifier
-            type: string
-            description: The identifier of the addon to install
-            example: fr.cenotelie.xxxx.module01
-            required: true
         body:
           binary/octet-stream:
             description: The content of the package for the addon
         responses:
           200:
             description: The operation succeeded
-    /uninstall:
-      description: Action to uninstall a previously installed addon
-      post:
+      delete:
         description: Uninstalls an addon
         is: [secured, mayFail]
         queryParameters:

@@ -31,6 +31,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -234,6 +235,47 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().equals(URI_API + "/addons")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (Addon addon : getAddons()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(addon.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().startsWith(URI_API + "/addons")) {
+            String rest = request.getUri().substring(URI_API.length() + "/addons".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String addonId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index >= 0)
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    for (Addon addon : addons) {
+                        if (Objects.equals(addonId, addon.getIdentifier()))
+                            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, addon.serializedJSON());
+                    }
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                }
+                case HttpConstants.METHOD_DELETE: {
+                    return XSPReplyUtils.toHttpResponse(uninstallAddon(addonId), null);
+                }
+                case HttpConstants.METHOD_PUT: {
+                    byte[] content = request.getContent();
+                    if (content == null || content.length == 0)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return XSPReplyUtils.toHttpResponse(installAddon(addonId, new ByteArrayInputStream(content)), null);
+                }
+                default:
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
+            }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }

@@ -7,6 +7,7 @@ types:
   Product: !include schema_infra_utils.json#/definitions/Product
   OSGiBundle: !include schema_platform_kernel.json#/definitions/OSGiBundle
   OSGiBundles: !include schema_platform_kernel.json#/definitions/OSGiBundles
+  Addons: !include schema_platform_kernel.json#/definitions/Addons
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/platform:
@@ -26,6 +27,7 @@ baseUri: https://localhost:8443/api
                   "type": "org.xowl.infra.utils.product.Product",
                   "identifier": "org.xowl.platform.XOWLFederationPlatform",
                   "name": "xOWL Federation Platform",
+                  "description": "Description for the product platform",
                   "version": {
                     "number": "1.0.0",
                     "scmTag": "ffffffff",
@@ -34,6 +36,8 @@ baseUri: https://localhost:8443/api
                     "buildTimestamp": "01/01/2010 10:10"
                   },
                   "copyright": "Copyright (c) Association Cénotélie",
+                  "iconName": "",
+                  "iconContent": "",
                   "vendor": "Association Cénotélie",
                   "vendorLink": "http://cenotelie.fr",
                   "link": "http://xowl.org",
@@ -65,6 +69,86 @@ baseUri: https://localhost:8443/api
                     "state": "ACTIVE"
                   }
                 ]
+  /addons:
+    description: The list of the addons installed on this platform
+    get:
+      description: Gets the list of the addons installed on this platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the addons installed on this platform
+          body:
+            application/json:
+              type: Addons
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.platform.Addon",
+                    "identifier": "org.xowl.platform.XOWLFederationPlatform",
+                    "name": "xOWL Federation Platform",
+                    "description": "Description for the product platform",
+                    "version": {
+                      "number": "1.0.0",
+                      "scmTag": "ffffffff",
+                      "buildUser": "jenkins",
+                      "buildTag": "jenkins-xxx-42",
+                      "buildTimestamp": "01/01/2010 10:10"
+                    },
+                    "copyright": "Copyright (c) Association Cénotélie",
+                    "iconName": "",
+                    "iconContent": "",
+                    "vendor": "Association Cénotélie",
+                    "vendorLink": "http://cenotelie.fr",
+                    "link": "http://xowl.org",
+                    "license": {
+                      "name": "LGPLv3",
+                      "fullText": "..."
+                    },
+                    "pricing": "Free",
+                    "bundles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.AddonBundle",
+                        "groupId": "fr.cenotelie.xxxx",
+                        "artifactId": "module01",
+                        "version": "1.0.0"
+                      }
+                    ],
+                    "isInstalled": "true"
+                  }
+                ]
+    /install:
+      description: Action to install a new addon
+      post:
+        description: Installs a new addon
+        is: [secured, mayFail]
+        queryParameters:
+          id:
+            displayName: Addon identifier
+            type: string
+            description: The identifier of the addon to install
+            example: fr.cenotelie.xxxx.module01
+            required: true
+        body:
+          binary/octet-stream:
+            description: The content of the package for the addon
+        responses:
+          200:
+            description: The operation succeeded
+    /uninstall:
+      description: Action to uninstall a previously installed addon
+      post:
+        description: Uninstalls an addon
+        is: [secured, mayFail]
+        queryParameters:
+          id:
+            displayName: Addon identifier
+            type: string
+            description: The identifier of the addon to uninstall
+            example: fr.cenotelie.xxxx.module01
+            required: true
+        responses:
+          200:
+            description: The operation succeeded
   /shutdown:
     description: Action to shut down the platform
     post:

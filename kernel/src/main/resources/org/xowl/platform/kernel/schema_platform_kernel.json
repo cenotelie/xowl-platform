@@ -57,6 +57,129 @@
         ]
       }
     },
+    "AddonBundle": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.AddonBundle"
+          ]
+        },
+        "groupId": {
+          "type": "string"
+        },
+        "artifactId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "groupId",
+        "artifactId",
+        "version"
+      ]
+    },
+    "Addon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.platform.Addon"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "version": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "schema_infra_utils.json#/definitions/VersionInfo"
+            }
+          ]
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "iconName": {
+          "type": "string"
+        },
+        "iconContent": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "vendorLink": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "license": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "schema_infra_utils.json#/definitions/License"
+            }
+          ]
+        },
+        "pricing": {
+          "type": "string"
+        },
+        "bundles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/AddonBundle"
+              }
+            ]
+          }
+        },
+        "isInstalled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "description",
+        "version",
+        "copyright",
+        "iconName",
+        "iconContent",
+        "vendor",
+        "vendorLink",
+        "link",
+        "license",
+        "pricing",
+        "bundles",
+        "isInstalled"
+      ]
+    },
+    "Addons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Addon"
+          }
+        ]
+      }
+    },
     "HttpApiResource": {
       "type": "object",
       "properties": {

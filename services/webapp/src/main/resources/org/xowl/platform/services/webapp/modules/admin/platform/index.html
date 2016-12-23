@@ -16,6 +16,22 @@
 <div id="placeholder-header"></div>
 <div class="body">
     <div class="panel panel-default">
+        <div class="panel-body">
+            <div>
+                <img src="/web/assets/manifest.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="product.html">Platform Properties</a>
+            </div>
+            <div>
+                <img src="/web/assets/platform.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="bundles.html">Platform Bundles</a>
+            </div>
+            <div>
+                <img src="/web/assets/marketplace.svg" width="30" height="30" style="margin-left: 20px;"/>
+                <a class="btn" href="marketplace.html">Marketplace</a>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
         <div class="panel-heading">
             Platform Actions
         </div>
@@ -28,105 +44,6 @@
             <img src="/web/assets/restart.svg" width="30" height="30"/>
             <span style="margin-left: 20px;">Restart the platform</span>
           </span>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            Platform Properties
-        </div>
-        <div class="panel-body">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="field-identifier" class="col-sm-2 control-label">Identifier:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-identifier" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-name" class="col-sm-2 control-label">Name:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-name" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-version-number" class="col-sm-2 control-label">Version Number:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-version-number" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-version-scm-tag" class="col-sm-2 control-label">Version SCM
-                        Tag:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-version-scm-tag" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-version-build-user" class="col-sm-2 control-label">Version Build
-                        User:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-version-build-user" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-version-build-tag" class="col-sm-2 control-label">Version Build
-                        Tag:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-version-build-tag" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-version-build-timestamp" class="col-sm-2 control-label">Version Build
-                        Timestamp:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-version-build-timestamp" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-copyright" class="col-sm-2 control-label">Copyright:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-copyright" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-vendor" class="col-sm-2 control-label">Vendor:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-vendor" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-license-name" class="col-sm-2 control-label">License Name:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="field-license-name" readonly/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="field-license-text" class="col-sm-2 control-label">License:</label>
-                    <div class="col-sm-10">
-                        <textarea class="form-control" id="field-license-text" rows="20" readonly></textarea>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            Platform Bundles
-        </div>
-        <div class="panel-body">
-            <table class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Vendor</th>
-                    <th>Name</th>
-                    <th>Version</th>
-                    <th>Status</th>
-                </tr>
-                </thead>
-                <tbody id="bundles">
-                </tbody>
-            </table>
         </div>
     </div>
 </div>

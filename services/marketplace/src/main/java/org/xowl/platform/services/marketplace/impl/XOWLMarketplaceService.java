@@ -18,8 +18,10 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.ConfigurationService;
@@ -31,6 +33,7 @@ import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.Marketplace;
+import org.xowl.platform.services.marketplace.MarketplaceProvider;
 import org.xowl.platform.services.marketplace.MarketplaceService;
 
 import java.net.HttpURLConnection;
@@ -68,6 +71,7 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     /**
      * Gets the marketplaces
+     *
      * @return The marketplaces
      */
     private synchronized Collection<Marketplace> getMarketplaces() {
@@ -80,8 +84,21 @@ public class XOWLMarketplaceService implements MarketplaceService {
         Configuration configuration = configurationService.getConfigFor(this);
         if (configuration == null)
             return Collections.unmodifiableCollection(marketplaces);
-
-
+        Collection<MarketplaceProvider> providers = ServiceUtils.getServices(MarketplaceProvider.class);
+        for (Section section : configuration.getSections()) {
+            String type = section.get("type");
+            if (type == null || type.isEmpty())
+                continue;
+            for (MarketplaceProvider provider : providers) {
+                if (provider.supports(type)) {
+                    Marketplace marketplace = provider.newMarketplace(type, section);
+                    if (marketplace != null) {
+                        marketplaces.add(marketplace);
+                        break;
+                    }
+                }
+            }
+        }
         return Collections.unmodifiableCollection(marketplaces);
     }
 
@@ -144,16 +161,24 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     @Override
     public Collection<Category> getCategories() {
-        return null;
+        Collection<Category> categories = new ArrayList<>();
+        for (Marketplace marketplace : getMarketplaces()) {
+            categories.addAll(marketplace.getCategories());
+        }
+        return categories;
     }
 
     @Override
     public Collection<Addon> lookupAddons(String identifier, String name, String categoryId) {
-        return null;
+        Collection<Addon> result = new ArrayList<>();
+        for (Marketplace marketplace : getMarketplaces()) {
+            result.addAll(marketplace.lookupAddons(identifier, name, categoryId));
+        }
+        return result;
     }
 
     @Override
     public XSPReply beginInstallOf(String identifier) {
-        return null;
+        return XSPReplyUnsupported.instance();
     }
 }

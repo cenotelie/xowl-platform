@@ -72,7 +72,11 @@ class FSMarketplace implements Marketplace {
      * @param configuration The configuration for this marketplace
      */
     public FSMarketplace(Section configuration) {
-        this.location = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
+        File target = new File(configuration.get("location"));
+        if (!target.isAbsolute())
+            // path is relative, make it relative to the distribution's root
+            target = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
+        this.location = target;
         this.categories = new HashMap<>();
         this.addons = new HashMap<>();
         this.addonsByCategory = new HashMap<>();

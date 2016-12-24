@@ -20,57 +20,55 @@ package org.xowl.platform.services.marketplace;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Implements the descriptor of a static marketplace
+ * Implements the descriptor of a static marketplace as produced by the Maven plugin:
+ * org.xowl.toolkit.xowl-marketplace-builder-maven-plugin
  *
  * @author Laurent Wouters
  */
 public class MarketplaceDescriptor {
     /**
-     * Represents a piece of content on the marketplace
+     * Represents an addon in the marketplace descriptor
      */
-    public static class Content {
+    public static class Addon {
         /**
-         * The identifier of this content
+         * The identifier of this addon
          */
         public final String identifier;
         /**
-         * The file (relative to this descriptor) that contains the descriptor of this content
+         * The categories for this addon
          */
-        public final String fileDescriptor;
-        /**
-         * The file (relative to this descriptor) that contains the content
-         */
-        public final String fileContent;
+        public final String[] categories;
 
         /**
          * Initializes this structure
          *
          * @param root The root for the description
          */
-        public Content(ASTNode root) {
+        public Addon(ASTNode root) {
             String identifier = "";
-            String fileDescriptor = "";
-            String fileContent = "";
+            String[] categories = null;
             for (ASTNode member : root.getChildren()) {
                 String head = TextUtils.unescape(member.getChildren().get(0).getValue());
                 head = head.substring(1, head.length() - 1);
                 if ("identifier".equals(head)) {
                     String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                     identifier = value.substring(1, value.length() - 1);
-                } else if ("fileDescriptor".equals(head)) {
-                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    fileDescriptor = value.substring(1, value.length() - 1);
-                } else if ("fileContent".equals(head)) {
-                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    fileContent = value.substring(1, value.length() - 1);
+                } else if ("categories".equals(head)) {
+                    categories = new String[member.getChildren().get(1).getChildren().size()];
+                    int i = 0;
+                    for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
+                        String value = TextUtils.unescape(member2.getValue());
+                        categories[i++] = value.substring(1, value.length() - 1);
+                    }
                 }
             }
             this.identifier = identifier;
-            this.fileDescriptor = fileDescriptor;
-            this.fileContent = fileContent;
+            this.categories = categories == null ? new String[0] : categories;
         }
     }
 
@@ -81,11 +79,7 @@ public class MarketplaceDescriptor {
     /**
      * All the addons in the marketplace
      */
-    private final Collection<Content> addons;
-    /**
-     * The identifiers of the addons in each category
-     */
-    private final Map<String, Collection<Content>> addonsByCategory;
+    private final Collection<Addon> addons;
 
     /**
      * Gets the categories
@@ -101,21 +95,8 @@ public class MarketplaceDescriptor {
      *
      * @return All the addons
      */
-    public Collection<Content> getAddons() {
+    public Collection<Addon> getAddons() {
         return Collections.unmodifiableCollection(addons);
-    }
-
-    /**
-     * Gets the addons in a category
-     *
-     * @param category The identifier of a category
-     * @return The associated addons
-     */
-    public Collection<Content> getAddonsInCategory(String category) {
-        Collection<Content> result = addonsByCategory.get(category);
-        if (result == null)
-            return Collections.emptyList();
-        return Collections.unmodifiableCollection(result);
     }
 
     /**
@@ -124,7 +105,6 @@ public class MarketplaceDescriptor {
     public MarketplaceDescriptor() {
         this.categories = new ArrayList<>();
         this.addons = new ArrayList<>();
-        this.addonsByCategory = new HashMap<>();
     }
 
     /**
@@ -135,7 +115,6 @@ public class MarketplaceDescriptor {
     public MarketplaceDescriptor(ASTNode root) {
         this.categories = new ArrayList<>();
         this.addons = new ArrayList<>();
-        this.addonsByCategory = new HashMap<>();
         for (ASTNode member : root.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -145,7 +124,7 @@ public class MarketplaceDescriptor {
                 }
             } else if ("addons".equals(head)) {
                 for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                    addons.add(new Content(member2));
+                    addons.add(new Addon(member2));
                 }
             }
         }

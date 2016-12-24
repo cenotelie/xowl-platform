@@ -32,9 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements a marketplace that is on the local file system
@@ -52,13 +50,21 @@ class FSMarketplace implements Marketplace {
      */
     private final File location;
     /**
-     * The descriptor for this marketplace
+     * The categories in this marketplace
      */
-    private final MarketplaceDescriptor descriptor;
+    private final Map<String, Category> categories;
     /**
      * All the addons in this marketplace
      */
     private final Map<String, Addon> addons;
+    /**
+     * The addons, by category
+     */
+    private final Map<String, Collection<Addon>> addonsByCategory;
+    /**
+     * Whether this marketplace must be reloaded
+     */
+    private boolean mustReload;
 
     /**
      * Initializes this marketplace
@@ -67,39 +73,160 @@ class FSMarketplace implements Marketplace {
      */
     public FSMarketplace(Section configuration) {
         this.location = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
+        this.categories = new HashMap<>();
         this.addons = new HashMap<>();
-        File fileDescriptor = new File(location, MARKETPLACE_DESCRIPTOR);
-        if (!fileDescriptor.exists()) {
-            this.descriptor = new MarketplaceDescriptor();
-            Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
-        } else {
-            String content = null;
-            try (InputStream stream = new FileInputStream(fileDescriptor)) {
-                content = Files.read(stream, Files.CHARSET);
-            } catch (IOException exception) {
-                Logging.getDefault().error(exception);
-            }
-            if (content == null) {
-                this.descriptor = new MarketplaceDescriptor();
-            } else {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-                if (definition == null) {
-                    Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
-                    this.descriptor = new MarketplaceDescriptor();
-                } else {
-                    this.descriptor = new MarketplaceDescriptor(definition);
+        this.addonsByCategory = new HashMap<>();
+        this.mustReload = true;
+    }
+
+    /**
+     * Loads the content of this marketplace
+     */
+    private synchronized void loadContent() {
+        if (!mustReload)
+            return;
+        MarketplaceDescriptor descriptor = loadMarketplaceDescriptor();
+        if (descriptor == null)
+            return;
+        categories.clear();
+        addons.clear();
+        addonsByCategory.clear();
+        for (Category category : descriptor.getCategories()) {
+            categories.put(category.getIdentifier(), category);
+        }
+        for (MarketplaceDescriptor.Addon addonDescriptor : descriptor.getAddons()) {
+            Addon addon = loadAddonDescriptor(addonDescriptor.identifier);
+            if (addon != null) {
+                addons.put(addon.getIdentifier(), addon);
+                for (int i = 0; i != addonDescriptor.categories.length; i++) {
+                    Collection<Addon> forCategory = addonsByCategory.get(addonDescriptor.categories[i]);
+                    if (forCategory == null) {
+                        forCategory = new ArrayList<>();
+                        addonsByCategory.put(addonDescriptor.categories[i], forCategory);
+                    }
+                    forCategory.add(addon);
                 }
             }
         }
+        mustReload = false;
+    }
+
+    /**
+     * Loads the marketplace descriptor
+     *
+     * @return The marketplace descriptor
+     */
+    private MarketplaceDescriptor loadMarketplaceDescriptor() {
+        File fileDescriptor = new File(location, MARKETPLACE_DESCRIPTOR);
+        if (!fileDescriptor.exists()) {
+            Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        String content = null;
+        try (InputStream stream = new FileInputStream(fileDescriptor)) {
+            content = Files.read(stream, Files.CHARSET);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+        }
+        if (content == null) {
+            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        if (definition == null) {
+            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        return new MarketplaceDescriptor(definition);
+    }
+
+    /**
+     * Loads an addon descriptor
+     *
+     * @param identifier The identifier of the addon to load
+     * @return The addon descriptor
+     */
+    private Addon loadAddonDescriptor(String identifier) {
+        File fileDescriptor = new File(location, identifier + ".descriptor");
+        if (!fileDescriptor.exists()) {
+            Logging.getDefault().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        String content = null;
+        try (InputStream stream = new FileInputStream(fileDescriptor)) {
+            content = Files.read(stream, Files.CHARSET);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+        }
+        if (content == null) {
+            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        if (definition == null) {
+            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+            return null;
+        }
+        return new Addon(definition);
     }
 
     @Override
     public Collection<Category> getCategories() {
-        return descriptor.getCategories();
+        loadContent();
+        return Collections.unmodifiableCollection(categories.values());
     }
 
     @Override
     public Collection<Addon> lookupAddons(String identifier, String name, String categoryId) {
-        return null;
+        loadContent();
+        // get the collection for the category
+        Collection<Addon> collection;
+        if (categoryId != null)
+            collection = addonsByCategory.get(categoryId);
+        else
+            collection = addons.values();
+        if (collection == null)
+            return Collections.emptyList();
+        // search by id?
+        if (identifier != null) {
+            Addon addon = addons.get(identifier);
+            if (addon != null)
+                return Collections.singletonList(addon);
+        }
+        Collection<Addon> result = new ArrayList<>();
+        for (Addon addon : collection) {
+            if (identifier != null && addon.getIdentifier().matches(identifier))
+                result.add(addon);
+            else if (name != null && addon.getIdentifier().matches(name))
+                result.add(addon);
+            else if (identifier == null && name == null)
+                result.add(addon);
+        }
+        return result;
+    }
+
+    @Override
+    public Addon getAddon(String identifier) {
+        loadContent();
+        return addons.get(identifier);
+    }
+
+    @Override
+    public InputStream getAddonPackage(String identifier) {
+        loadContent();
+        Addon addon = addons.get(identifier);
+        if (addon == null)
+            return null;
+        File filePackage = new File(location, identifier + ".zip");
+        if (!filePackage.exists()) {
+            Logging.getDefault().error("Cannot find addon package " + filePackage.getAbsolutePath());
+            return null;
+        }
+        try {
+            return new FileInputStream(filePackage);
+        } catch (IOException exception) {
+            Logging.getDefault().error("Cannot open addon package " + filePackage.getAbsolutePath());
+            return null;
+        }
     }
 }

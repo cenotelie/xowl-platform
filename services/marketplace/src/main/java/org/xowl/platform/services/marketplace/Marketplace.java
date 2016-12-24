@@ -19,6 +19,7 @@ package org.xowl.platform.services.marketplace;
 
 import org.xowl.platform.kernel.platform.Addon;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -43,4 +44,20 @@ public interface Marketplace {
      * @return The collection of matching addons
      */
     Collection<Addon> lookupAddons(String identifier, String name, String categoryId);
+
+    /**
+     * Gets the addon descriptor for the specified identifier
+     *
+     * @param identifier The identifier of an addon
+     * @return The associated descriptor (or null if it cannot be found)
+     */
+    Addon getAddon(String identifier);
+
+    /**
+     * Gets a stream for the specified addon
+     *
+     * @param identifier The identifier of an addon
+     * @return A stream on the package for the addon
+     */
+    InputStream getAddonPackage(String identifier);
 }

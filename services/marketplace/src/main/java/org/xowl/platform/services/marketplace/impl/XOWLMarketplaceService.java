@@ -178,6 +178,16 @@ public class XOWLMarketplaceService implements MarketplaceService {
     }
 
     @Override
+    public Addon getAddon(String identifier) {
+        for (Marketplace marketplace : getMarketplaces()) {
+            Addon addon = marketplace.getAddon(identifier);
+            if (addon != null)
+                return addon;
+        }
+        return null;
+    }
+
+    @Override
     public XSPReply beginInstallOf(String identifier) {
         return XSPReplyUnsupported.instance();
     }

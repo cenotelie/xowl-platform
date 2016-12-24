@@ -48,6 +48,14 @@ public interface MarketplaceService extends Service, HttpApiService {
     Collection<Addon> lookupAddons(String identifier, String name, String categoryId);
 
     /**
+     * Gets the addon descriptor for the specified identifier
+     *
+     * @param identifier The identifier of an addon
+     * @return The associated descriptor (or null if it cannot be found)
+     */
+    Addon getAddon(String identifier);
+
+    /**
      * Launches a job for the installation of an addon
      *
      * @param identifier The identifier of the addon to install

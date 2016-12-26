@@ -181,8 +181,14 @@ class FSMarketplace implements Marketplace {
     }
 
     @Override
-    public Collection<Addon> lookupAddons(String identifier, String name, String categoryId) {
+    public Collection<Addon> lookupAddons(String input, String categoryId) {
         loadContent();
+        // is this an exact ID match
+        if (input != null) {
+            Addon addon = addons.get(input);
+            if (addon != null)
+                return Collections.singletonList(addon);
+        }
         // get the collection for the category
         Collection<Addon> collection;
         if (categoryId != null)
@@ -191,22 +197,38 @@ class FSMarketplace implements Marketplace {
             collection = addons.values();
         if (collection == null)
             return Collections.emptyList();
-        // search by id?
-        if (identifier != null) {
-            Addon addon = addons.get(identifier);
-            if (addon != null)
-                return Collections.singletonList(addon);
+        if (input == null || input.isEmpty())
+            return Collections.unmodifiableCollection(collection);
+        String[] values = input.split(" ");
+        Collection<String> terms = new ArrayList<>(values.length);
+        for (int i = 0; i != values.length; i++) {
+            if (!values[i].isEmpty())
+                terms.add(values[i].toLowerCase());
         }
         Collection<Addon> result = new ArrayList<>();
         for (Addon addon : collection) {
-            if (identifier != null && addon.getIdentifier().matches(identifier))
+            if (stringMatches(addon.getIdentifier().toLowerCase(), terms)
+                    || stringMatches(addon.getName().toLowerCase(), terms)
+                    || stringMatches(addon.getDescription().toLowerCase(), terms)) {
                 result.add(addon);
-            else if (name != null && addon.getIdentifier().matches(name))
-                result.add(addon);
-            else if (identifier == null && name == null)
-                result.add(addon);
+            }
         }
         return result;
+    }
+
+    /**
+     * Gets whether the specified content string contains the terms to look for
+     *
+     * @param content A string
+     * @param terms   The list of terms to look for in the content
+     * @return Whether the string contains all the terms
+     */
+    private boolean stringMatches(String content, Collection<String> terms) {
+        for (String term : terms) {
+            if (!content.contains(term))
+                return false;
+        }
+        return true;
     }
 
     @Override

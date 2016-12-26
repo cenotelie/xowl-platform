@@ -169,10 +169,10 @@ public class XOWLMarketplaceService implements MarketplaceService {
     }
 
     @Override
-    public Collection<Addon> lookupAddons(String identifier, String name, String categoryId) {
+    public Collection<Addon> lookupAddons(String input, String categoryId) {
         Collection<Addon> result = new ArrayList<>();
         for (Marketplace marketplace : getMarketplaces()) {
-            result.addAll(marketplace.lookupAddons(identifier, name, categoryId));
+            result.addAll(marketplace.lookupAddons(input, categoryId));
         }
         return result;
     }

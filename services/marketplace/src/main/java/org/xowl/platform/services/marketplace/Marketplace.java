@@ -38,12 +38,11 @@ public interface Marketplace {
     /**
      * Lookups available addons on the marketplace
      *
-     * @param identifier The identifier to look for, may be null
-     * @param name       The name to look for, may be null
+     * @param input      The input to look for
      * @param categoryId The category to look for, may be null
      * @return The collection of matching addons
      */
-    Collection<Addon> lookupAddons(String identifier, String name, String categoryId);
+    Collection<Addon> lookupAddons(String input, String categoryId);
 
     /**
      * Gets the addon descriptor for the specified identifier

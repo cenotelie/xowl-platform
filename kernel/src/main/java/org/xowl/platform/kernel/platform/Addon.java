@@ -179,6 +179,9 @@ public class Addon extends Product {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{");
+        builder.append("\"type\": \"");
+        builder.append(TextUtils.escapeStringJSON(Addon.class.getCanonicalName()));
+        builder.append("\"");
         serializedJSONBase(builder);
         builder.append(", \"pricing\": \"");
         builder.append(TextUtils.escapeStringJSON(pricing));

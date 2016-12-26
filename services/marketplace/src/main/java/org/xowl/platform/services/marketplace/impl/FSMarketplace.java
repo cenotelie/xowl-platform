@@ -24,14 +24,12 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.platform.Addon;
-import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
 
 /**
  * Implements a static marketplace that is on the local file system
@@ -43,22 +41,6 @@ class FSMarketplace extends StaticMarketplace {
      * The location of the marketplace
      */
     private final File location;
-    /**
-     * The categories in this marketplace
-     */
-    private final Map<String, Category> categories;
-    /**
-     * All the addons in this marketplace
-     */
-    private final Map<String, Addon> addons;
-    /**
-     * The addons, by category
-     */
-    private final Map<String, Collection<Addon>> addonsByCategory;
-    /**
-     * Whether this marketplace must be reloaded
-     */
-    private boolean mustReload;
 
     /**
      * Initializes this marketplace
@@ -71,50 +53,10 @@ class FSMarketplace extends StaticMarketplace {
             // path is relative, make it relative to the distribution's root
             target = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
         this.location = target;
-        this.categories = new HashMap<>();
-        this.addons = new HashMap<>();
-        this.addonsByCategory = new HashMap<>();
-        this.mustReload = true;
     }
 
-    /**
-     * Loads the content of this marketplace
-     */
-    private synchronized void loadContent() {
-        if (!mustReload)
-            return;
-        MarketplaceDescriptor descriptor = loadMarketplaceDescriptor();
-        if (descriptor == null)
-            return;
-        categories.clear();
-        addons.clear();
-        addonsByCategory.clear();
-        for (Category category : descriptor.getCategories()) {
-            categories.put(category.getIdentifier(), category);
-        }
-        for (MarketplaceDescriptor.Addon addonDescriptor : descriptor.getAddons()) {
-            Addon addon = loadAddonDescriptor(addonDescriptor.identifier);
-            if (addon != null) {
-                addons.put(addon.getIdentifier(), addon);
-                for (int i = 0; i != addonDescriptor.categories.length; i++) {
-                    Collection<Addon> forCategory = addonsByCategory.get(addonDescriptor.categories[i]);
-                    if (forCategory == null) {
-                        forCategory = new ArrayList<>();
-                        addonsByCategory.put(addonDescriptor.categories[i], forCategory);
-                    }
-                    forCategory.add(addon);
-                }
-            }
-        }
-        mustReload = false;
-    }
-
-    /**
-     * Loads the marketplace descriptor
-     *
-     * @return The marketplace descriptor
-     */
-    private MarketplaceDescriptor loadMarketplaceDescriptor() {
+    @Override
+    protected MarketplaceDescriptor loadMarketplaceDescriptor() {
         File fileDescriptor = new File(location, MARKETPLACE_DESCRIPTOR);
         if (!fileDescriptor.exists()) {
             Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
@@ -138,13 +80,8 @@ class FSMarketplace extends StaticMarketplace {
         return new MarketplaceDescriptor(definition);
     }
 
-    /**
-     * Loads an addon descriptor
-     *
-     * @param identifier The identifier of the addon to load
-     * @return The addon descriptor
-     */
-    private Addon loadAddonDescriptor(String identifier) {
+    @Override
+    protected Addon loadAddonDescriptor(String identifier) {
         File fileDescriptor = new File(location, identifier + ".descriptor");
         if (!fileDescriptor.exists()) {
             Logging.getDefault().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
@@ -169,58 +106,10 @@ class FSMarketplace extends StaticMarketplace {
     }
 
     @Override
-    public Collection<Category> getCategories() {
-        loadContent();
-        return Collections.unmodifiableCollection(categories.values());
-    }
-
-    @Override
-    public Collection<Addon> lookupAddons(String input, String categoryId) {
-        loadContent();
-        // is this an exact ID match
-        if (input != null) {
-            Addon addon = addons.get(input);
-            if (addon != null)
-                return Collections.singletonList(addon);
-        }
-        // get the collection for the category
-        Collection<Addon> collection;
-        if (categoryId != null)
-            collection = addonsByCategory.get(categoryId);
-        else
-            collection = addons.values();
-        if (collection == null)
-            return Collections.emptyList();
-        if (input == null || input.isEmpty())
-            return Collections.unmodifiableCollection(collection);
-        String[] values = input.split(" ");
-        Collection<String> terms = new ArrayList<>(values.length);
-        for (int i = 0; i != values.length; i++) {
-            if (!values[i].isEmpty())
-                terms.add(values[i].toLowerCase());
-        }
-        Collection<Addon> result = new ArrayList<>();
-        for (Addon addon : collection) {
-            if (stringMatches(addon.getIdentifier().toLowerCase(), terms)
-                    || stringMatches(addon.getName().toLowerCase(), terms)
-                    || stringMatches(addon.getDescription().toLowerCase(), terms)) {
-                result.add(addon);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public Addon getAddon(String identifier) {
-        loadContent();
-        return addons.get(identifier);
-    }
-
-    @Override
     public InputStream getAddonPackage(String identifier) {
         loadContent();
-        Addon addon = addons.get(identifier);
-        if (addon == null)
+        Proxy proxy = addons.get(identifier);
+        if (proxy == null)
             return null;
         File filePackage = new File(location, identifier + ".zip");
         if (!filePackage.exists()) {

@@ -338,78 +338,82 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public XSPReply installAddon(String identifier, InputStream packageStream) {
-        for (Addon addon : addons) {
-            if (Objects.equals(addon.getIdentifier(), identifier))
-                return new XSPReplyApiError(ERROR_ADDON_ALREADY_INSTALLED);
-        }
+        synchronized (addons) {
+            for (Addon addon : addons) {
+                if (Objects.equals(addon.getIdentifier(), identifier))
+                    return new XSPReplyApiError(ERROR_ADDON_ALREADY_INSTALLED);
+            }
 
-        File directory = new File(addonsCache, UUID.randomUUID().toString());
-        if (!directory.mkdirs()) {
-            Logging.getDefault().error("Failed to create directory " + directory.getAbsolutePath());
-            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
-        }
-        try {
-            unpackAddon(packageStream, directory);
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
-        }
-        File fileDescriptor = new File(directory, "descriptor.json");
-        if (!fileDescriptor.exists()) {
-            // delete the directory
-            Files.deleteFolder(directory);
-            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
-        }
+            File directory = new File(addonsCache, UUID.randomUUID().toString());
+            if (!directory.mkdirs()) {
+                Logging.getDefault().error("Failed to create directory " + directory.getAbsolutePath());
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+            }
+            try {
+                unpackAddon(packageStream, directory);
+            } catch (IOException exception) {
+                Logging.getDefault().error(exception);
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+            }
+            File fileDescriptor = new File(directory, "descriptor.json");
+            if (!fileDescriptor.exists()) {
+                // delete the directory
+                Files.deleteFolder(directory);
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
+            }
 
-        Addon descriptor;
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            String content = Files.read(stream, Files.CHARSET);
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-            if (definition == null) {
+            Addon descriptor;
+            try (InputStream stream = new FileInputStream(fileDescriptor)) {
+                String content = Files.read(stream, Files.CHARSET);
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+                if (definition == null) {
+                    Files.deleteFolder(directory);
+                    return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
+                }
+                descriptor = new Addon(definition);
+            } catch (IOException exception) {
+                Logging.getDefault().error(exception);
                 Files.deleteFolder(directory);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
             }
-            descriptor = new Addon(definition);
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-            Files.deleteFolder(directory);
-            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
-        }
 
-        // check the identifier
-        if (!Objects.equals(descriptor.getIdentifier(), identifier)) {
-            Files.deleteFolder(directory);
-            return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
-        }
-        // check the presence of the bundles
-        Collection<File> fileBundles = new ArrayList<>();
-        for (AddonBundle bundle : descriptor.getBundles()) {
-            File fileBundle = new File(directory, bundle.serializedString() + ".jar");
-            if (!fileBundle.exists()) {
+            // check the identifier
+            if (!Objects.equals(descriptor.getIdentifier(), identifier)) {
                 Files.deleteFolder(directory);
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
             }
-            fileBundles.add(fileBundle);
-        }
+            // check the presence of the bundles
+            Collection<File> fileBundles = new ArrayList<>();
+            for (AddonBundle bundle : descriptor.getBundles()) {
+                File fileBundle = new File(directory, bundle.serializedString() + ".jar");
+                if (!fileBundle.exists()) {
+                    Files.deleteFolder(directory);
+                    return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
+                }
+                fileBundles.add(fileBundle);
+            }
 
-        addons.add(descriptor);
-        // move the content
-        try {
-            File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
-            java.nio.file.Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
-            for (File file : fileBundles) {
-                java.nio.file.Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
+            addons.add(descriptor);
+            // move the content
+            try {
+                File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
+                java.nio.file.Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
+                for (File file : fileBundles) {
+                    java.nio.file.Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
+                }
+            } catch (IOException exception) {
+                Logging.getDefault().error(exception);
+                Files.deleteFolder(directory);
+                return new XSPReplyException(exception);
             }
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            // delete the folder
             Files.deleteFolder(directory);
-            return new XSPReplyException(exception);
+            descriptor.setInstalled();
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new AddonInstalledEvent(this, descriptor));
+            return new XSPReplyResult<>(descriptor);
         }
-        // delete the folder
-        Files.deleteFolder(directory);
-        descriptor.setInstalled();
-        // TODO: fire installation event
-        return new XSPReplyResult<>(descriptor);
     }
 
     /**
@@ -442,17 +446,31 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     @Override
     public XSPReply uninstallAddon(String identifier) {
         Addon descriptor = null;
-        for (Addon addon : addons) {
-            if (Objects.equals(addon.getIdentifier(), identifier)) {
-                descriptor = addon;
-                break;
+        synchronized (addons) {
+            for (Addon addon : addons) {
+                if (Objects.equals(addon.getIdentifier(), identifier)) {
+                    descriptor = addon;
+                    break;
+                }
             }
+            if (descriptor == null)
+                return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
+
+            File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
+            for (AddonBundle bundle : descriptor.getBundles()) {
+                File fileBundle = new File(felixBundles, bundle.serializedString() + ".jar");
+                if (!fileBundle.delete())
+                    Logging.getDefault().error("Failed to delete file " + fileBundle.getAbsolutePath());
+            }
+            // delete the descriptor file
+            File fileDescriptor = new File(addonsCache, identifier + ".descriptor");
+            if (!fileDescriptor.delete())
+                Logging.getDefault().error("Failed to delete file " + fileDescriptor.getAbsolutePath());
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new AddonUninstalledEvent(this, descriptor));
+            return XSPReplySuccess.instance();
         }
-        if (descriptor == null)
-            return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
-        // TODO: implement uninstall here
-        // TODO: fire un-installation event here
-        return XSPReplyUnsupported.instance();
     }
 
     @Override

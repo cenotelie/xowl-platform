@@ -18,7 +18,7 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -26,6 +26,9 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -35,7 +38,9 @@ import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceProvider;
 import org.xowl.platform.services.marketplace.MarketplaceService;
+import org.xowl.platform.services.marketplace.jobs.AddonInstallationJob;
 
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -188,7 +193,22 @@ public class XOWLMarketplaceService implements MarketplaceService {
     }
 
     @Override
+    public InputStream getAddonPackage(String identifier) {
+        for (Marketplace marketplace : getMarketplaces()) {
+            InputStream stream = marketplace.getAddonPackage(identifier);
+            if (stream != null)
+                return stream;
+        }
+        return null;
+    }
+
+    @Override
     public XSPReply beginInstallOf(String identifier) {
-        return XSPReplyUnsupported.instance();
+        JobExecutionService service = ServiceUtils.getService(JobExecutionService.class);
+        if (service == null)
+            return XSPReplyServiceUnavailable.instance();
+        Job job = new AddonInstallationJob(identifier);
+        service.schedule(job);
+        return new XSPReplyResult<>(job);
     }
 }

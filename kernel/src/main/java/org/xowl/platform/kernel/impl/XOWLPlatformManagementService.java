@@ -444,7 +444,8 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         }
         if (descriptor == null)
             return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
-
+        // TODO: implement uninstall here
+        // TODO: fire un-installation event here
         return XSPReplyUnsupported.instance();
     }
 

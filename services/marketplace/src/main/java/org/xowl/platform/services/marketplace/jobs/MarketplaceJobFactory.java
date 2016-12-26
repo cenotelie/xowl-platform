@@ -15,40 +15,37 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.connection.jobs;
+package org.xowl.platform.services.marketplace.jobs;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobFactory;
 
 /**
- * The factory for connector-related jobs
+ * The factory for marketplace-related jobs
  *
  * @author Laurent Wouters
  */
-public class ConnectorJobFactory implements JobFactory {
+public class MarketplaceJobFactory implements JobFactory {
     @Override
     public String getIdentifier() {
-        return ConnectorJobFactory.class.getCanonicalName();
+        return MarketplaceJobFactory.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Connectors Job Factory";
+        return "xOWL Federation Platform - Marketplace Job Factory";
     }
 
     @Override
     public boolean canDeserialize(String type) {
-        return (type.equals(PullArtifactJob.class.getCanonicalName()) ||
-                type.equals(PushArtifactJob.class.getCanonicalName()));
+        return (type.equals(AddonInstallationJob.class.getCanonicalName()));
     }
 
     @Override
     public Job newJob(String type, ASTNode definition) {
-        if (type.equals(PullArtifactJob.class.getCanonicalName()))
-            return new PullArtifactJob(definition);
-        if (type.equals(PushArtifactJob.class.getCanonicalName()))
-            return new PushArtifactJob(definition);
+        if (type.equals(AddonInstallationJob.class.getCanonicalName()))
+            return new AddonInstallationJob(definition);
         return null;
     }
 }

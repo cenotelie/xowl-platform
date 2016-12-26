@@ -22,6 +22,7 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 /**
@@ -53,6 +54,14 @@ public interface MarketplaceService extends Service, HttpApiService {
      * @return The associated descriptor (or null if it cannot be found)
      */
     Addon getAddon(String identifier);
+
+    /**
+     * Gets a stream for the specified addon
+     *
+     * @param identifier The identifier of an addon
+     * @return A stream on the package for the addon
+     */
+    InputStream getAddonPackage(String identifier);
 
     /**
      * Launches a job for the installation of an addon

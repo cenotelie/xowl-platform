@@ -1,0 +1,167 @@
+#%RAML 1.0
+---
+title: Importation Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+  Addon: !include schema_platform_kernel.json#/definitions/Addon
+  Addons: !include schema_platform_kernel.json#/definitions/Addons
+  Categories: !include schema_platform_marketplace.json#/definitions/Categories
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/marketplace:
+  /categories:
+    description: The collection of categories on the marketplace
+    get:
+      description: Gets the list of categories on the marketplace
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the categories on the marketplace
+          body:
+            application/json:
+              type: Categories
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.marketplace.Category",
+                    "identifier": "org.xowl.platform.services.marketplace.categories.Connectors",
+                    "name": "Connectors"
+                  }
+                ]
+  /addons:
+    description: The collection of platform addons on the marketplace
+    get:
+      description: Requests the lookup of addons on the marketplace
+      is: [secured, mayFail]
+      queryParameters:
+        input:
+          displayName: Search
+          type: string
+          description: The text to look for in the addon
+          example: Connector
+          required: false
+        category:
+          displayName: Category
+          type: string
+          description: The identifier of a specific category to look into
+          example: org.xowl.platform.services.marketplace.categories.Connectors
+          required: false
+      responses:
+        200:
+          description: The list of the matching addons
+          body:
+            application/json:
+              type: Addons
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.kernel.platform.Addon",
+                    "identifier": "org.xowl.platform.addons.AddonXXX",
+                    "name": "The addon XXX",
+                    "description": "Description for the addon",
+                    "version": {
+                      "number": "1.0.0",
+                      "scmTag": "ffffffff",
+                      "buildUser": "jenkins",
+                      "buildTag": "jenkins-xxx-42",
+                      "buildTimestamp": "01/01/2010 10:10"
+                    },
+                    "copyright": "Copyright (c) Association Cénotélie",
+                    "iconName": "",
+                    "iconContent": "",
+                    "vendor": "Association Cénotélie",
+                    "vendorLink": "http://cenotelie.fr",
+                    "link": "http://xowl.org",
+                    "license": {
+                      "name": "LGPLv3",
+                      "fullText": "..."
+                    },
+                    "pricing": "Free",
+                    "bundles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.AddonBundle",
+                        "groupId": "fr.cenotelie.xxxx",
+                        "artifactId": "module01",
+                        "version": "1.0.0"
+                      }
+                    ],
+                    "isInstalled": "true"
+                  }
+                ]
+    /{addonId}:
+      description: A specific addon on the marketplace
+      get:
+        description: Gets a description of the addon
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the addon
+            body:
+              application/json:
+                type: Addon
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.platform.Addon",
+                    "identifier": "org.xowl.platform.addons.AddonXXX",
+                    "name": "The addon XXX",
+                    "description": "Description for the addon",
+                    "version": {
+                      "number": "1.0.0",
+                      "scmTag": "ffffffff",
+                      "buildUser": "jenkins",
+                      "buildTag": "jenkins-xxx-42",
+                      "buildTimestamp": "01/01/2010 10:10"
+                    },
+                    "copyright": "Copyright (c) Association Cénotélie",
+                    "iconName": "",
+                    "iconContent": "",
+                    "vendor": "Association Cénotélie",
+                    "vendorLink": "http://cenotelie.fr",
+                    "link": "http://xowl.org",
+                    "license": {
+                      "name": "LGPLv3",
+                      "fullText": "..."
+                    },
+                    "pricing": "Free",
+                    "bundles": [
+                      {
+                        "type": "org.xowl.platform.kernel.platform.AddonBundle",
+                        "groupId": "fr.cenotelie.xxxx",
+                        "artifactId": "module01",
+                        "version": "1.0.0"
+                      }
+                    ],
+                    "isInstalled": "true"
+                  }
+      /install:
+        description: Action to request the installation of the addon
+        post:
+          description: Requests the installation of the addon on the platform
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The job the is launched for the installation of the addon
+              body:
+                application/json:
+                  type: Job
+                  example: |
+                    {
+                      "type": "org.xowl.platform.kernel.jobs.Job",
+                      "identifier": "job1",
+                      "name": "Install addon xxxx",
+                      "jobType": "org.xowl.platform.services.marketplace.InstallationJob",
+                      "owner": {
+                        "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                        "identifier": "jdoe",
+                        "name": "Jane Doe"
+                      },
+                      "status": "Running",
+                      "timeScheduled": "01/01/2001 10:10",
+                      "timeRun": "01/01/2001 10:10",
+                      "timeCompleted": "",
+                      "completionRate": "0.5",
+                      "payload": "addonId",
+                      "result": {}
+                    }

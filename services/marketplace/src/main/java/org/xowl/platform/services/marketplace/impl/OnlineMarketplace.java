@@ -19,30 +19,69 @@ package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.http.HttpConnection;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.*;
 
 /**
- * Implements a static marketplace that is on the local file system
+ * Implements a static marketplace that is online
  *
  * @author Laurent Wouters
  */
-class FSMarketplace extends StaticMarketplace {
+class OnlineMarketplace extends StaticMarketplace {
     /**
-     * The location of the marketplace
+     * A proxy for the lazy loading of an addon descriptor
      */
-    private final File location;
+    private class Proxy {
+        /**
+         * The identifier of the addon
+         */
+        public final String identifier;
+        /**
+         * The cache
+         */
+        private Addon cache;
+
+        /**
+         * Initializes this proxy
+         *
+         * @param identifier The identifier of the addon
+         */
+        public Proxy(String identifier) {
+            this.identifier = identifier;
+        }
+
+        /**
+         * Gets the addon descriptor
+         *
+         * @return Tha addon descriptor
+         */
+        public synchronized Addon getDescriptor() {
+            if (cache != null)
+                return cache;
+            cache = loadAddonDescriptor(identifier);
+            return cache;
+        }
+    }
+
+    /**
+     * The URL location
+     */
+    private final String location;
+    /**
+     * The HTTP connection to use
+     */
+    private final HttpConnection connection;
     /**
      * The categories in this marketplace
      */
@@ -50,11 +89,11 @@ class FSMarketplace extends StaticMarketplace {
     /**
      * All the addons in this marketplace
      */
-    private final Map<String, Addon> addons;
+    private final Map<String, Proxy> addons;
     /**
      * The addons, by category
      */
-    private final Map<String, Collection<Addon>> addonsByCategory;
+    private final Map<String, Collection<Proxy>> addonsByCategory;
     /**
      * Whether this marketplace must be reloaded
      */
@@ -65,12 +104,14 @@ class FSMarketplace extends StaticMarketplace {
      *
      * @param configuration The configuration for this marketplace
      */
-    public FSMarketplace(Section configuration) {
-        File target = new File(configuration.get("location"));
-        if (!target.isAbsolute())
-            // path is relative, make it relative to the distribution's root
-            target = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
-        this.location = target;
+    public OnlineMarketplace(Section configuration) {
+        String url = configuration.get("url");
+        this.location = url.endsWith("/") ? url : (url + "/");
+        this.connection = new HttpConnection(
+                this.location,
+                configuration.get("login"),
+                configuration.get("password")
+        );
         this.categories = new HashMap<>();
         this.addons = new HashMap<>();
         this.addonsByCategory = new HashMap<>();
@@ -93,17 +134,15 @@ class FSMarketplace extends StaticMarketplace {
             categories.put(category.getIdentifier(), category);
         }
         for (MarketplaceDescriptor.Addon addonDescriptor : descriptor.getAddons()) {
-            Addon addon = loadAddonDescriptor(addonDescriptor.identifier);
-            if (addon != null) {
-                addons.put(addon.getIdentifier(), addon);
-                for (int i = 0; i != addonDescriptor.categories.length; i++) {
-                    Collection<Addon> forCategory = addonsByCategory.get(addonDescriptor.categories[i]);
-                    if (forCategory == null) {
-                        forCategory = new ArrayList<>();
-                        addonsByCategory.put(addonDescriptor.categories[i], forCategory);
-                    }
-                    forCategory.add(addon);
+            Proxy proxy = new Proxy(addonDescriptor.identifier);
+            addons.put(addonDescriptor.identifier, proxy);
+            for (int i = 0; i != addonDescriptor.categories.length; i++) {
+                Collection<Proxy> forCategory = addonsByCategory.get(addonDescriptor.categories[i]);
+                if (forCategory == null) {
+                    forCategory = new ArrayList<>();
+                    addonsByCategory.put(addonDescriptor.categories[i], forCategory);
                 }
+                forCategory.add(proxy);
             }
         }
         mustReload = false;
@@ -115,24 +154,19 @@ class FSMarketplace extends StaticMarketplace {
      * @return The marketplace descriptor
      */
     private MarketplaceDescriptor loadMarketplaceDescriptor() {
-        File fileDescriptor = new File(location, MARKETPLACE_DESCRIPTOR);
-        if (!fileDescriptor.exists()) {
-            Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
+        HttpResponse response = connection.request(MARKETPLACE_DESCRIPTOR, "GET", HttpConstants.MIME_JSON);
+        if (response.getCode() != HttpURLConnection.HTTP_OK) {
+            Logging.getDefault().error("Cannot find marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR + " (" + response.getCode() + ")");
             return null;
         }
-        String content = null;
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = Files.read(stream, Files.CHARSET);
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-        }
+        String content = response.getBodyAsString();
         if (content == null) {
-            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.getDefault().error("Marketplace descriptor is empty " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.getDefault().error("Failed to parse marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
         return new MarketplaceDescriptor(definition);
@@ -145,24 +179,19 @@ class FSMarketplace extends StaticMarketplace {
      * @return The addon descriptor
      */
     private Addon loadAddonDescriptor(String identifier) {
-        File fileDescriptor = new File(location, identifier + ".descriptor");
-        if (!fileDescriptor.exists()) {
-            Logging.getDefault().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
+        HttpResponse response = connection.request(identifier + ".descriptor", "GET", HttpConstants.MIME_JSON);
+        if (response.getCode() != HttpURLConnection.HTTP_OK) {
+            Logging.getDefault().error("Cannot find addon descriptor " + location + identifier + ".descriptor (" + response.getCode() + ")");
             return null;
         }
-        String content = null;
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = Files.read(stream, Files.CHARSET);
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-        }
+        String content = response.getBodyAsString();
         if (content == null) {
-            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.getDefault().error("Addon descriptor is empty " + location + identifier + ".descriptor");
             return null;
         }
         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.getDefault().error("Failed to parse addon descriptor  " + location + identifier + ".descriptor");
             return null;
         }
         return new Addon(definition);
@@ -179,28 +208,32 @@ class FSMarketplace extends StaticMarketplace {
         loadContent();
         // is this an exact ID match
         if (input != null) {
-            Addon addon = addons.get(input);
-            if (addon != null)
-                return Collections.singletonList(addon);
+            Proxy proxy = addons.get(input);
+            if (proxy != null)
+                return Collections.singletonList(proxy.getDescriptor());
         }
         // get the collection for the category
-        Collection<Addon> collection;
+        Collection<Proxy> collection;
         if (categoryId != null)
             collection = addonsByCategory.get(categoryId);
         else
             collection = addons.values();
         if (collection == null)
             return Collections.emptyList();
-        if (input == null || input.isEmpty())
-            return Collections.unmodifiableCollection(collection);
+        Collection<Addon> result = new ArrayList<>();
+        if (input == null || input.isEmpty()) {
+            for (Proxy proxy : collection)
+                result.add(proxy.getDescriptor());
+            return result;
+        }
         String[] values = input.split(" ");
         Collection<String> terms = new ArrayList<>(values.length);
         for (int i = 0; i != values.length; i++) {
             if (!values[i].isEmpty())
                 terms.add(values[i].toLowerCase());
         }
-        Collection<Addon> result = new ArrayList<>();
-        for (Addon addon : collection) {
+        for (Proxy proxy : collection) {
+            Addon addon = proxy.getDescriptor();
             if (stringMatches(addon.getIdentifier().toLowerCase(), terms)
                     || stringMatches(addon.getName().toLowerCase(), terms)
                     || stringMatches(addon.getDescription().toLowerCase(), terms)) {
@@ -213,25 +246,24 @@ class FSMarketplace extends StaticMarketplace {
     @Override
     public Addon getAddon(String identifier) {
         loadContent();
-        return addons.get(identifier);
+        Proxy proxy = addons.get(identifier);
+        if (proxy == null)
+            return null;
+        return proxy.getDescriptor();
     }
 
     @Override
     public InputStream getAddonPackage(String identifier) {
         loadContent();
-        Addon addon = addons.get(identifier);
-        if (addon == null)
+        Proxy proxy = addons.get(identifier);
+        if (proxy == null)
             return null;
-        File filePackage = new File(location, identifier + ".zip");
-        if (!filePackage.exists()) {
-            Logging.getDefault().error("Cannot find addon package " + filePackage.getAbsolutePath());
-            return null;
-        }
-        try {
-            return new FileInputStream(filePackage);
-        } catch (IOException exception) {
-            Logging.getDefault().error("Cannot open addon package " + filePackage.getAbsolutePath());
+        HttpResponse response = connection.request(identifier + ".zip", "GET", HttpConstants.MIME_JSON);
+        if (response.getCode() != HttpURLConnection.HTTP_OK) {
+            Logging.getDefault().error("Cannot find addon package " + location + identifier + ".zip (" + response.getCode() + ")");
             return null;
         }
+        byte[] content = response.getBodyAsBytes();
+        return new ByteArrayInputStream(content);
     }
 }

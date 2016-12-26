@@ -71,6 +71,7 @@ XOWL.prototype.login = function (callback, login, password) {
 }
 
 XOWL.prototype.logout = function () {
+	var _self = this;
 	this.doRequest(function (code, type, content) {
 		_self.userLogin = null;
 		_self.userIdentifier = null;

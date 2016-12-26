@@ -32,70 +32,16 @@ import java.util.Collections;
  */
 public class MarketplaceDescriptor {
     /**
-     * Represents an addon in the marketplace descriptor
-     */
-    public static class Addon {
-        /**
-         * The identifier of this addon
-         */
-        public final String identifier;
-        /**
-         * The categories for this addon
-         */
-        public final String[] categories;
-
-        /**
-         * Initializes this structure
-         *
-         * @param root The root for the description
-         */
-        public Addon(ASTNode root) {
-            String identifier = "";
-            String[] categories = null;
-            for (ASTNode member : root.getChildren()) {
-                String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-                head = head.substring(1, head.length() - 1);
-                if ("identifier".equals(head)) {
-                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    identifier = value.substring(1, value.length() - 1);
-                } else if ("categories".equals(head)) {
-                    categories = new String[member.getChildren().get(1).getChildren().size()];
-                    int i = 0;
-                    for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                        String value = TextUtils.unescape(member2.getValue());
-                        categories[i++] = value.substring(1, value.length() - 1);
-                    }
-                }
-            }
-            this.identifier = identifier;
-            this.categories = categories == null ? new String[0] : categories;
-        }
-    }
-
-    /**
-     * The categories in the marketplace
-     */
-    private final Collection<Category> categories;
-    /**
      * All the addons in the marketplace
      */
-    private final Collection<Addon> addons;
-
-    /**
-     * Gets the categories
-     *
-     * @return The categories
-     */
-    public Collection<Category> getCategories() {
-        return Collections.unmodifiableCollection(categories);
-    }
+    private final Collection<String> addons;
 
     /**
      * Gets all addons
      *
      * @return All the addons
      */
-    public Collection<Addon> getAddons() {
+    public Collection<String> getAddons() {
         return Collections.unmodifiableCollection(addons);
     }
 
@@ -103,7 +49,6 @@ public class MarketplaceDescriptor {
      * Initializes an empty descriptor
      */
     public MarketplaceDescriptor() {
-        this.categories = new ArrayList<>();
         this.addons = new ArrayList<>();
     }
 
@@ -113,18 +58,14 @@ public class MarketplaceDescriptor {
      * @param root The root node of the descriptor
      */
     public MarketplaceDescriptor(ASTNode root) {
-        this.categories = new ArrayList<>();
         this.addons = new ArrayList<>();
         for (ASTNode member : root.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("categories".equals(head)) {
+            if ("addons".equals(head)) {
                 for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                    categories.add(new Category(member2));
-                }
-            } else if ("addons".equals(head)) {
-                for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                    addons.add(new Addon(member2));
+                    String value = TextUtils.unescape(member2.getValue());
+                    addons.add(value.substring(1, value.length() - 1));
                 }
             }
         }

@@ -18,7 +18,6 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.platform.kernel.platform.Addon;
-import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 
@@ -70,43 +69,17 @@ abstract class StaticMarketplace implements Marketplace {
 
 
     /**
-     * The categories in this marketplace
-     */
-    protected final Map<String, Category> categories;
-    /**
      * All the addons in this marketplace
      */
     protected final Map<String, Proxy> addons;
-    /**
-     * The addons, by category
-     */
-    protected final Map<String, Collection<Proxy>> addonsByCategory;
     /**
      * Whether this marketplace must be reloaded
      */
     protected boolean mustReload;
 
     public StaticMarketplace() {
-        this.categories = new HashMap<>();
         this.addons = new HashMap<>();
-        this.addonsByCategory = new HashMap<>();
         this.mustReload = true;
-    }
-
-
-    /**
-     * Gets whether the specified content string contains the terms to look for
-     *
-     * @param content A string
-     * @param terms   The list of terms to look for in the content
-     * @return Whether the string contains all the terms
-     */
-    protected boolean stringMatches(String content, Collection<String> terms) {
-        for (String term : terms) {
-            if (!content.contains(term))
-                return false;
-        }
-        return true;
     }
 
     /**
@@ -118,35 +91,16 @@ abstract class StaticMarketplace implements Marketplace {
         MarketplaceDescriptor descriptor = loadMarketplaceDescriptor();
         if (descriptor == null)
             return;
-        categories.clear();
         addons.clear();
-        addonsByCategory.clear();
-        for (Category category : descriptor.getCategories()) {
-            categories.put(category.getIdentifier(), category);
-        }
-        for (MarketplaceDescriptor.Addon addonDescriptor : descriptor.getAddons()) {
-            Proxy proxy = new Proxy(addonDescriptor.identifier);
-            addons.put(addonDescriptor.identifier, proxy);
-            for (int i = 0; i != addonDescriptor.categories.length; i++) {
-                Collection<Proxy> forCategory = addonsByCategory.get(addonDescriptor.categories[i]);
-                if (forCategory == null) {
-                    forCategory = new ArrayList<>();
-                    addonsByCategory.put(addonDescriptor.categories[i], forCategory);
-                }
-                forCategory.add(proxy);
-            }
+        for (String addonId : descriptor.getAddons()) {
+            Proxy proxy = new Proxy(addonId);
+            addons.put(addonId, proxy);
         }
         mustReload = false;
     }
 
     @Override
-    public Collection<Category> getCategories() {
-        loadContent();
-        return Collections.unmodifiableCollection(categories.values());
-    }
-
-    @Override
-    public Collection<Addon> lookupAddons(String input, String categoryId) {
+    public Collection<Addon> lookupAddons(String input) {
         loadContent();
         // is this an exact ID match
         if (input != null && !input.isEmpty()) {
@@ -154,17 +108,10 @@ abstract class StaticMarketplace implements Marketplace {
             if (proxy != null)
                 return Collections.singletonList(proxy.getDescriptor());
         }
-        // get the collection for the category
-        Collection<Proxy> collection;
-        if (categoryId != null && !categoryId.isEmpty())
-            collection = addonsByCategory.get(categoryId);
-        else
-            collection = addons.values();
-        if (collection == null)
-            return Collections.emptyList();
+
         Collection<Addon> result = new ArrayList<>();
         if (input == null || input.isEmpty()) {
-            for (Proxy proxy : collection)
+            for (Proxy proxy : addons.values())
                 result.add(proxy.getDescriptor());
             return result;
         }
@@ -174,15 +121,45 @@ abstract class StaticMarketplace implements Marketplace {
             if (!values[i].isEmpty())
                 terms.add(values[i].toLowerCase());
         }
-        for (Proxy proxy : collection) {
+        for (Proxy proxy : addons.values()) {
             Addon addon = proxy.getDescriptor();
             if (stringMatches(addon.getIdentifier().toLowerCase(), terms)
                     || stringMatches(addon.getName().toLowerCase(), terms)
-                    || stringMatches(addon.getDescription().toLowerCase(), terms)) {
+                    || tagsMatches(addon.getTags(), terms)) {
                 result.add(addon);
             }
         }
         return result;
+    }
+
+    /**
+     * Gets whether the specified content string contains the terms to look for
+     *
+     * @param content A string
+     * @param terms   The list of terms to look for in the content
+     * @return Whether the string contains all the terms
+     */
+    private boolean stringMatches(String content, Collection<String> terms) {
+        for (String term : terms) {
+            if (!content.contains(term))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Gets whether one of term matches a tag
+     *
+     * @param tags  The tags to match
+     * @param terms The terms to match
+     * @return Whether at least one term is a tag
+     */
+    private boolean tagsMatches(Collection<String> tags, Collection<String> terms) {
+        for (String term : terms) {
+            if (tags.contains(term))
+                return true;
+        }
+        return false;
     }
 
     @Override

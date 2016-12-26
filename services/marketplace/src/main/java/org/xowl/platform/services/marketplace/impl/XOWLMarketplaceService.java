@@ -38,7 +38,6 @@ import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-import org.xowl.platform.services.marketplace.Category;
 import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceProvider;
 import org.xowl.platform.services.marketplace.MarketplaceService;
@@ -68,10 +67,6 @@ public class XOWLMarketplaceService implements MarketplaceService {
      * The resource for the API's documentation
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLMarketplaceService.class, "/org/xowl/platform/services/marketplace/api_service_marketplace.html", "Marketplace Service - Documentation", HttpApiResource.MIME_HTML);
-    /**
-     * The resource for the API's schema
-     */
-    private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLMarketplaceService.class, "/org/xowl/platform/services/marketplace/schema_platform_marketplace.json", "Marketplace Service - Schema", HttpConstants.MIME_JSON);
 
     /**
      * The available marketplaces
@@ -130,28 +125,11 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/categories")) {
-            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            StringBuilder builder = new StringBuilder("[");
-            boolean first = true;
-            for (Category category : getCategories()) {
-                if (!first)
-                    builder.append(", ");
-                first = false;
-                builder.append(category.serializedJSON());
-            }
-            builder.append("]");
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().equals(URI_API + "/addons")) {
+        if (request.getUri().equals(URI_API + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             String[] inputs = request.getParameter("input");
-            String[] categories = request.getParameter("category");
-            Collection<Addon> addons = lookupAddons(
-                    inputs != null && inputs.length > 0 ? inputs[0] : null,
-                    categories != null && categories.length > 0 ? categories[0] : null
-            );
+            Collection<Addon> addons = lookupAddons(inputs != null && inputs.length > 0 ? inputs[0] : null);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Addon addon : addons) {
@@ -205,7 +183,7 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     @Override
     public HttpApiResource[] getApiOtherResources() {
-        return new HttpApiResource[]{RESOURCE_SCHEMA};
+        return null;
     }
 
     @Override
@@ -229,19 +207,10 @@ public class XOWLMarketplaceService implements MarketplaceService {
     }
 
     @Override
-    public Collection<Category> getCategories() {
-        Collection<Category> categories = new ArrayList<>();
-        for (Marketplace marketplace : getMarketplaces()) {
-            categories.addAll(marketplace.getCategories());
-        }
-        return categories;
-    }
-
-    @Override
-    public Collection<Addon> lookupAddons(String input, String categoryId) {
+    public Collection<Addon> lookupAddons(String input) {
         Collection<Addon> result = new ArrayList<>();
         for (Marketplace marketplace : getMarketplaces()) {
-            result.addAll(marketplace.lookupAddons(input, categoryId));
+            result.addAll(marketplace.lookupAddons(input));
         }
         return result;
     }

@@ -42,6 +42,10 @@ public class Addon extends Product {
      */
     private final Collection<AddonBundle> bundles;
     /**
+     * The collection of tags for this addon
+     */
+    private final Collection<String> tags;
+    /**
      * Whether the addon is currently installed on the platform
      */
     private boolean isInstalled;
@@ -74,6 +78,15 @@ public class Addon extends Product {
     }
 
     /**
+     * Gets the tags for this addon
+     *
+     * @return The tags for this addon
+     */
+    public Collection<String> getTags() {
+        return Collections.unmodifiableCollection(tags);
+    }
+
+    /**
      * Sets this addon as installed
      */
     public void setInstalled() {
@@ -88,6 +101,7 @@ public class Addon extends Product {
     public Addon(ASTNode root) {
         String pricing = "";
         bundles = new ArrayList<>();
+        tags = new ArrayList<>();
         isInstalled = false;
         for (ASTNode member : root.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -171,6 +185,11 @@ public class Addon extends Product {
                 for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
                     bundles.add(new AddonBundle(member2));
                 }
+            } else if ("tags".equals(head)) {
+                for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
+                    String value = TextUtils.unescape(member2.getValue());
+                    tags.add(value.substring(1, value.length() - 1));
+                }
             }
         }
         this.pricing = pricing;
@@ -192,6 +211,16 @@ public class Addon extends Product {
                 builder.append(", ");
             first = false;
             builder.append(bundle.serializedJSON());
+        }
+        builder.append("], \"tags\": [");
+        first = true;
+        for (String tag : tags) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("\"");
+            builder.append(TextUtils.escapeStringJSON(tag));
+            builder.append("\"");
         }
         builder.append("], \"isInstalled\": \"");
         builder.append(isInstalled);

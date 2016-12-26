@@ -7,29 +7,9 @@ types:
   Job: !include schema_platform_kernel.json#/definitions/Job
   Addon: !include schema_platform_kernel.json#/definitions/Addon
   Addons: !include schema_platform_kernel.json#/definitions/Addons
-  Categories: !include schema_platform_marketplace.json#/definitions/Categories
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /services/marketplace:
-  /categories:
-    description: The collection of categories on the marketplace
-    get:
-      description: Gets the list of categories on the marketplace
-      is: [secured, mayFail]
-      responses:
-        200:
-          description: The list of the categories on the marketplace
-          body:
-            application/json:
-              type: Categories
-              example: |
-                [
-                  {
-                    "type": "org.xowl.platform.services.marketplace.Category",
-                    "identifier": "org.xowl.platform.services.marketplace.categories.Connectors",
-                    "name": "Connectors"
-                  }
-                ]
   /addons:
     description: The collection of platform addons on the marketplace
     get:
@@ -41,12 +21,6 @@ baseUri: https://localhost:8443/api
           type: string
           description: The text to look for in the addon
           example: Connector
-          required: false
-        category:
-          displayName: Category
-          type: string
-          description: The identifier of a specific category to look into
-          example: org.xowl.platform.services.marketplace.categories.Connectors
           required: false
       responses:
         200:
@@ -86,6 +60,9 @@ baseUri: https://localhost:8443/api
                         "artifactId": "module01",
                         "version": "1.0.0"
                       }
+                    ],
+                    "tags": [
+                      "tag1"
                     ],
                     "isInstalled": "true"
                   }
@@ -132,6 +109,9 @@ baseUri: https://localhost:8443/api
                         "artifactId": "module01",
                         "version": "1.0.0"
                       }
+                    ],
+                    "tags": [
+                      "tag1"
                     ],
                     "isInstalled": "true"
                   }

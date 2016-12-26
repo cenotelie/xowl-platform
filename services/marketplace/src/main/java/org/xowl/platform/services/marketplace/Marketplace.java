@@ -29,20 +29,12 @@ import java.util.Collection;
  */
 public interface Marketplace {
     /**
-     * Gets the available categories on this marketplace
-     *
-     * @return The available categories
-     */
-    Collection<Category> getCategories();
-
-    /**
      * Lookups available addons on the marketplace
      *
-     * @param input      The input to look for
-     * @param categoryId The category to look for, may be null
+     * @param input The input to look for
      * @return The collection of matching addons
      */
-    Collection<Addon> lookupAddons(String input, String categoryId);
+    Collection<Addon> lookupAddons(String input);
 
     /**
      * Gets the addon descriptor for the specified identifier

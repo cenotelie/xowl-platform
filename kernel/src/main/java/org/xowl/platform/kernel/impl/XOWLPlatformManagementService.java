@@ -421,8 +421,10 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     private void unpackAddon(InputStream packageStream, File directory) throws IOException {
         byte[] buffer = new byte[8192];
         try (ZipInputStream zipInputStream = new ZipInputStream(packageStream)) {
-            while (zipInputStream.available() > 0) {
+            while (true) {
                 ZipEntry entry = zipInputStream.getNextEntry();
+                if (entry == null)
+                    break;
                 File target = new File(directory, entry.getName());
                 try (FileOutputStream fileOutputStream = new FileOutputStream(target)) {
                     int read = 0;

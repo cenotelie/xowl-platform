@@ -19,11 +19,13 @@ package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -126,6 +128,59 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/categories")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (Category category : getCategories()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(category.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().equals(URI_API + "/addons")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            String[] inputs = request.getParameter("input");
+            String[] categories = request.getParameter("category");
+            Collection<Addon> addons = lookupAddons(
+                    inputs != null && inputs.length > 0 ? inputs[0] : null,
+                    categories != null && categories.length > 0 ? categories[0] : null
+            );
+            StringBuilder builder = new StringBuilder("[");
+            boolean first = true;
+            for (Addon addon : addons) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(addon.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().startsWith(URI_API + "/addons")) {
+            String rest = request.getUri().substring(URI_API.length() + "/addons".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String addonId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                Addon addon = getAddon(addonId);
+                if (addon == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, addon.serializedJSON());
+            }
+            rest = rest.substring(index);
+            if (rest.equals("install")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                return XSPReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
+            }
+        }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 

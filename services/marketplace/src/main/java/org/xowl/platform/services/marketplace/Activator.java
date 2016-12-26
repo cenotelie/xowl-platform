@@ -19,9 +19,11 @@ package org.xowl.platform.services.marketplace;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceProvider;
 import org.xowl.platform.services.marketplace.impl.XOWLMarketplaceService;
+import org.xowl.platform.services.marketplace.jobs.MarketplaceJobFactory;
 
 /**
  * Activator for the server service bundle
@@ -36,6 +38,8 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
         bundleContext.registerService(HttpApiService.class, marketplaceService, null);
         bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
+
+        bundleContext.registerService(JobFactory.class, new MarketplaceJobFactory(), null);
     }
 
     @Override

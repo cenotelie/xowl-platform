@@ -23,7 +23,7 @@ function create() {
 	}
 	xowl.createPlatformRole(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created role ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created role ", content, "."]});
 			waitAndGo("role.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, identifier, name);

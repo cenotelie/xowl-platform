@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Platform Marketplace</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <button class="btn btn-success" id="button-shutdown" onclick="onClickInstall()">
+                Install this addon
+            </button>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="field-identifier" class="col-sm-2 control-label">Identifier:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-identifier" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-name" class="col-sm-2 control-label">Name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-name" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-description" class="col-sm-2 control-label">Description:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-description" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-version-number" class="col-sm-2 control-label">Version Number:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-version-number" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-version-scm-tag" class="col-sm-2 control-label">Version SCM
+                        Tag:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-version-scm-tag" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-version-build-user" class="col-sm-2 control-label">Version Build
+                        User:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-version-build-user" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-version-build-tag" class="col-sm-2 control-label">Version Build
+                        Tag:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-version-build-tag" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-version-build-timestamp" class="col-sm-2 control-label">Version Build
+                        Timestamp:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-version-build-timestamp" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-copyright" class="col-sm-2 control-label">Copyright:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-copyright" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-vendor" class="col-sm-2 control-label">Vendor:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-vendor" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-pricing" class="col-sm-2 control-label">Pricing:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-pricing" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-license-name" class="col-sm-2 control-label">License Name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="field-license-name" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="field-license-text" class="col-sm-2 control-label">License:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="field-license-text" rows="20" readonly></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="marketplace_addon.js"></script>
+<script>init();</script>
+</body>
+
+</html>

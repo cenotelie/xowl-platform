@@ -80,11 +80,11 @@ function doActivateRule(toggle, rule) {
 	var result = confirm("Activate consistency rule " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Activating rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating rule ", rule, " ..."]}))
 		return;
 	xowl.activateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Activated rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated rule ", rule, "."]});
 			rule.isActive = true;
 			toggle.classList.add("toggle-button-selected");
 		}
@@ -95,11 +95,11 @@ function doDeactivateRule(toggle, rule) {
 	var result = confirm("De-activate consistency rule " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["De-activating rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating rule ", rule, " ..."]}))
 		return;
 	xowl.deactivateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["De-activated rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated rule ", rule, "."]});
 			rule.isActive = false;
 			toggle.classList.remove("toggle-button-selected");
 		}
@@ -110,11 +110,11 @@ function onDeleteRule(rule) {
 	var result = confirm("Delete rule " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Deleting rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting rule ", rule, " ..."]}))
 		return;
 	xowl.deleteConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Deleted rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted rule ", rule, "."]});
 			// TODO: do not do a full reload
 			waitAndRefresh();
 		}

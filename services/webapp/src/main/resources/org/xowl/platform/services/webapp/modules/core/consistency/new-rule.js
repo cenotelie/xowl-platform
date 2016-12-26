@@ -30,7 +30,7 @@ function onClickNewRule() {
 	}
 	xowl.newConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created rule ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created rule ", content, "."]});
 			waitAndGo("rules.html");
 		}
 	}, name, message, prefixes, conditions);

@@ -267,7 +267,7 @@ function onClickPull(connector) {
 		return;
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched job ", content]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onPullJobComplete(job.result);
 			});
@@ -281,7 +281,7 @@ function onPullJobComplete(xsp) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
 			"Pulled artifact ",
 			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
 		// TODO: do not do a full reload
@@ -305,7 +305,7 @@ function doPushToLive(artifact) {
 		return;
 	xowl.pushArtifactToLive(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched job ", content]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onPushToLiveCompleted(job.result, artifact);
 			});
@@ -319,7 +319,7 @@ function onPushToLiveCompleted(xsp, artifact) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
 			"Activated artifact ",
 			artifact,
 			" for live reasoning."]});
@@ -336,7 +336,7 @@ function doPullFromLive(artifact) {
 		return;
 	xowl.pullArtifactFromLive(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched job ", content]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onPullFromLiveCompleted(job.result, artifact);
 			});
@@ -350,7 +350,7 @@ function onPullFromLiveCompleted(xsp, artifact) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
 			"De-activated artifact ",
 			artifact,
 			" for live reasoning."]});

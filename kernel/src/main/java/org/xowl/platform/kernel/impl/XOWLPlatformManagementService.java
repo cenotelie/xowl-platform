@@ -365,6 +365,10 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         try (InputStream stream = new FileInputStream(fileDescriptor)) {
             String content = Files.read(stream, Files.CHARSET);
             ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            if (definition == null) {
+                Files.deleteFolder(directory);
+                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
+            }
             descriptor = new Addon(definition);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
@@ -420,12 +424,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             while (zipInputStream.available() > 0) {
                 ZipEntry entry = zipInputStream.getNextEntry();
                 File target = new File(directory, entry.getName());
-                int total = 0;
                 try (FileOutputStream fileOutputStream = new FileOutputStream(target)) {
-                    while (total < entry.getSize()) {
-                        int read = zipInputStream.read(buffer, 0, buffer.length);
-                        total += read;
-                        fileOutputStream.write(buffer, 0, read);
+                    int read = 0;
+                    while (read >= 0) {
+                        read = zipInputStream.read(buffer, 0, buffer.length);
+                        if (read > 0)
+                            fileOutputStream.write(buffer, 0, read);
                     }
                 }
                 zipInputStream.closeEntry();

@@ -54,7 +54,7 @@ function onClickPull() {
 		return;
 	xowl.pullFromConnector(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched job ", content]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onPullJobComplete(job.result);
 			});
@@ -68,7 +68,7 @@ function onPullJobComplete(xsp) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: [
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
 			"Pulled artifact ",
 			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
 	}

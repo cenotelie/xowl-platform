@@ -15,7 +15,31 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select class="form-control" id="input-category">
+                            <option value="">(Any)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="input-input" placeholder="Name">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" id="button-shutdown" onclick="onClickSearch()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body" id="addons">
+        </div>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

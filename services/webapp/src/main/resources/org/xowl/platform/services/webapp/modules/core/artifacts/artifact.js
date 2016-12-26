@@ -51,7 +51,7 @@ function onClickDelete() {
 		return;
 	xowl.deleteArtifact(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched deletion as job ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched deletion as job ", content, "."]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onJobCompleted(job);
 			});

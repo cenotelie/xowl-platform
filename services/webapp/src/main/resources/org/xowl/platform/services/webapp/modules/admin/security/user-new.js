@@ -31,7 +31,7 @@ function create() {
 	}
 	xowl.createPlatformUser(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created user ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created user ", content, "."]});
 			waitAndGo("user.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, identifier, name, password1);

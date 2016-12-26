@@ -32,6 +32,8 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.Addon;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -175,9 +177,16 @@ public class XOWLMarketplaceService implements MarketplaceService {
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, addon.serializedJSON());
             }
             rest = rest.substring(index);
-            if (rest.equals("install")) {
+            if (rest.equals("/install")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                // check for platform admin role
+                SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+                if (securityService == null)
+                    return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+                XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
+                if (!reply.isSuccess())
+                    return XSPReplyUtils.toHttpResponse(reply, null);
                 return XSPReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
             }
         }

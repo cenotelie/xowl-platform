@@ -149,14 +149,14 @@ abstract class StaticMarketplace implements Marketplace {
     public Collection<Addon> lookupAddons(String input, String categoryId) {
         loadContent();
         // is this an exact ID match
-        if (input != null) {
+        if (input != null && !input.isEmpty()) {
             Proxy proxy = addons.get(input);
             if (proxy != null)
                 return Collections.singletonList(proxy.getDescriptor());
         }
         // get the collection for the category
         Collection<Proxy> collection;
-        if (categoryId != null)
+        if (categoryId != null && !categoryId.isEmpty())
             collection = addonsByCategory.get(categoryId);
         else
             collection = addons.values();

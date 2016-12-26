@@ -406,6 +406,11 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = "/web/modules/admin/security/role.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
+	} else if (part.type === "org.xowl.platform.kernel.platform.Addon") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/admin/platform/addon.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
 	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));

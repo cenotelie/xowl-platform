@@ -59,7 +59,7 @@ function create() {
 	}
 	xowl.createPlatformGroup(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Created group ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created group ", content, "."]});
 			waitAndGo("group.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, identifier, name, admin);

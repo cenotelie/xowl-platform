@@ -59,11 +59,11 @@ function onDrop() {
 	var result = confirm("Drop document " + DOCUMENT.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Dropping document ", DOCUMENT, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Dropping document ", DOCUMENT, " ..."]}))
 		return;
 	xowl.dropUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Dropped document ", DOCUMENT, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", DOCUMENT, "."]});
 			waitAndGo("index.html");
 		}
 	}, docId);

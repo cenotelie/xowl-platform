@@ -41,6 +41,8 @@ public class XOWLMarketplaceProvider implements MarketplaceProvider {
     public boolean supports(String type) {
         if (FSMarketplace.class.getCanonicalName().equals(type))
             return true;
+        if (OnlineMarketplace.class.getCanonicalName().equals(type))
+            return true;
         return false;
     }
 
@@ -48,6 +50,8 @@ public class XOWLMarketplaceProvider implements MarketplaceProvider {
     public Marketplace newMarketplace(String type, Section configuration) {
         if (FSMarketplace.class.getCanonicalName().equals(type))
             return new FSMarketplace(configuration);
+        if (OnlineMarketplace.class.getCanonicalName().equals(type))
+            return new OnlineMarketplace(configuration);
         return null;
     }
 }

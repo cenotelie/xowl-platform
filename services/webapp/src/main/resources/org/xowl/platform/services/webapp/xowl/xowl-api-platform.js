@@ -1091,6 +1091,52 @@ XOWL.prototype.newEvaluation = function (callback, definition) {
 
 
 /*****************************************************
+ * Marketplace - Marketplace service
+ ****************************************************/
+
+XOWL.prototype.marketplaceGetCategories = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/marketplace/categories", null, "GET", null, null);
+}
+
+XOWL.prototype.marketplaceLookupAddons = function (callback, input, category) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/marketplace/addons", {input: input, category: category}, "GET", null, null);
+}
+
+XOWL.prototype.marketplaceGetAddon = function (callback, addonId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/marketplace/addons/" + encodeURIComponent(addonId), null, "GET", null, null);
+}
+
+XOWL.prototype.marketplaceInstallAddon = function (callback, addonId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/marketplace/addons/" + encodeURIComponent(addonId) + "/install", null, "POST", null, null);
+}
+
+
+
+/*****************************************************
  * Utility API
  ****************************************************/
 

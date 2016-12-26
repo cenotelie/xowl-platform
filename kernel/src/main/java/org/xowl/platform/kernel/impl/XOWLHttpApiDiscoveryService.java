@@ -59,16 +59,21 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
      */
     private final Map<String, HttpApiService> services;
     /**
-     * The known resources
+     * All the known resources
      */
-    private final Map<String, HttpApiResource> resources;
+    private final Map<String, HttpApiResource> allResources;
+    /**
+     * The other resources for the API documentation
+     */
+    private final Map<String, HttpApiResource> otherResources;
 
     /**
      * Initializes this service
      */
     public XOWLHttpApiDiscoveryService() {
         this.services = new HashMap<>();
-        this.resources = new HashMap<>();
+        this.allResources = new HashMap<>();
+        this.otherResources = new HashMap<>();
     }
 
     @Override
@@ -88,7 +93,7 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
 
     @Override
     public Collection<HttpApiResource> getResources() {
-        return resources.values();
+        return allResources.values();
     }
 
     @Override
@@ -116,7 +121,7 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
         } else if (request.getUri().equals(URI_API + "/resources")) {
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
-            for (HttpApiResource resource : resources.values()) {
+            for (HttpApiResource resource : otherResources.values()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -172,14 +177,15 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
         services.put(service.getIdentifier(), service);
         HttpApiResource resource = service.getApiSpecification();
         if (resource != null)
-            resources.put(resource.getIdentifier(), resource);
+            allResources.put(resource.getIdentifier(), resource);
         resource = service.getApiDocumentation();
         if (resource != null)
-            resources.put(resource.getIdentifier(), resource);
+            allResources.put(resource.getIdentifier(), resource);
         HttpApiResource[] resources = service.getApiOtherResources();
         if (resources != null) {
             for (int i = 0; i != resources.length; i++) {
-                this.resources.put(resources[i].getIdentifier(), resources[i]);
+                this.allResources.put(resources[i].getIdentifier(), resources[i]);
+                this.otherResources.put(resources[i].getIdentifier(), resources[i]);
             }
         }
     }
@@ -193,14 +199,15 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
         services.remove(service.getIdentifier());
         HttpApiResource resource = service.getApiSpecification();
         if (resource != null)
-            resources.remove(resource.getIdentifier());
+            allResources.remove(resource.getIdentifier());
         resource = service.getApiDocumentation();
         if (resource != null)
-            resources.remove(resource.getIdentifier());
+            allResources.remove(resource.getIdentifier());
         HttpApiResource[] resources = service.getApiOtherResources();
         if (resources != null) {
             for (int i = 0; i != resources.length; i++) {
-                this.resources.remove(resources[i].getIdentifier());
+                this.allResources.remove(resources[i].getIdentifier());
+                this.otherResources.remove(resources[i].getIdentifier());
             }
         }
     }

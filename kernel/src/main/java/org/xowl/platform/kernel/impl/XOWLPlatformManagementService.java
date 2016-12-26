@@ -469,8 +469,9 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             EventService eventService = ServiceUtils.getService(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new AddonUninstalledEvent(this, descriptor));
-            return new XSPReplyResult<>(descriptor);
+            addons.remove(descriptor);
         }
+        return new XSPReplyResult<>(descriptor);
     }
 
     @Override

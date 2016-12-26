@@ -41,3 +41,17 @@ function renderAddon(addon) {
 	document.getElementById("field-license-name").value = addon.license.name;
 	document.getElementById("field-license-text").value = addon.license.fullText;
 }
+
+function onClickUninstall() {
+	var result = confirm("Uninstall addon " + document.getElementById("field-name").value + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Uninstalling addon " + document.getElementById("field-name").value + " ..."))
+		return;
+	xowl.uninstallPlatformAddon(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Uninstalled addon " + document.getElementById("field-name").value + ", restart the platform to complete the update.");
+			waitAndGo("addons.html");
+		}
+	}, addonId);
+}

@@ -68,5 +68,6 @@ function onInstallJobComplete(xsp) {
 			"Installed addon ",
 			xsp.payload,
 			", restart the platform to complete the update."]});
+		waitAndGo("marketplace.html")
 	}
 }

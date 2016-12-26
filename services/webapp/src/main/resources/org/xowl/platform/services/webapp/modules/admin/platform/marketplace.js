@@ -13,13 +13,7 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ..."))
-		return;
-	xowl.marketplaceGetCategories(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderCategories(content);
-		}
-	});
+
 }
 
 function renderCategories(categories) {
@@ -39,12 +33,11 @@ function onClickSearch() {
 	if (!onOperationRequest("Loading ..."))
 		return;
 	var input = document.getElementById("input-input").value;
-	var category = document.getElementById("input-category").value;
 	xowl.marketplaceLookupAddons(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderAddons(content);
 		}
-	}, input, category);
+	}, input);
 }
 
 function renderAddons(addons) {
@@ -86,9 +79,16 @@ function renderAddon(addon) {
 	var titleLink = document.createElement("a");
 	titleLink.href = "marketplace_addon.html?id=" + encodeURIComponent(addon.identifier);
 	titleLink.appendChild(document.createTextNode(addon.name + " - v" + addon.version.number));
-	var title = document.createElement("h2");
+	var title = document.createElement("h4");
 	var contentDescription = document.createElement("p");
 	contentDescription.appendChild(document.createTextNode(addon.description));
+	var contentTags = document.createElement("p");
+	for (var i = 0; i != addon.tags.length; i++) {
+		var badge = document.createElement("span");
+		badge.className = "badge";
+		badge.appendChild(document.createTextNode(addon.tags[i]));
+		contentTags.appendChild(badge);
+	}
 	var contentPricing = document.createElement("p");
 	contentPricing.appendChild(document.createTextNode(addon.pricing));
 	var contentVendor = document.createElement("p");
@@ -101,6 +101,7 @@ function renderAddon(addon) {
 	title.appendChild(titleLink);
 	cell2.appendChild(title);
 	cell2.appendChild(contentDescription);
+	cell2.appendChild(contentTags);
 	cell2.appendChild(contentPricing);
 	cell2.appendChild(contentVendor);
 	cell1.appendChild(image);

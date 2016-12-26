@@ -38,6 +38,7 @@ function renderAddon(addon) {
 	document.getElementById("field-copyright").value = addon.copyright;
 	document.getElementById("field-vendor").value = addon.vendor;
 	document.getElementById("field-pricing").value = addon.pricing;
+	document.getElementById("field-tags").value = addon.tags;
 	document.getElementById("field-license-name").value = addon.license.name;
 	document.getElementById("field-license-text").value = addon.license.fullText;
 }

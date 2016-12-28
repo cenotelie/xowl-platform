@@ -25,7 +25,8 @@ CODE=5
 while [ "$CODE" -eq 5 ]
   do
     rm -rf "$DISTRIBUTION/felix-cache"
-    "$JAVA" "-Duser.dir=$DISTRIBUTION" "-Dgosh.args=--noi" "-Dxowl.root=$DISTRIBUTION" -jar "$DISTRIBUTION/felix/bin/felix.jar" -b "$DISTRIBUTION/felix/bundle"
+    cd "$DISTRIBUTION"
+    "$JAVA" "-Dgosh.args=--noi" "-Dxowl.root=$DISTRIBUTION" -jar "$DISTRIBUTION/felix/bin/felix.jar" -b "$DISTRIBUTION/felix/bundle"
     CODE=$?
     echo "Exit code is $CODE"
 done

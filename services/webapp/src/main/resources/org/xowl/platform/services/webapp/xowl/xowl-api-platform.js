@@ -116,7 +116,7 @@ XOWL.prototype.createPlatformUser = function (callback, userId, name, password) 
 XOWL.prototype.deletePlatformUser = function (callback, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -126,7 +126,7 @@ XOWL.prototype.deletePlatformUser = function (callback, userId) {
 XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -136,7 +136,7 @@ XOWL.prototype.renamePlatformUser = function (callback, userId, name) {
 XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassword, newPassword) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -146,7 +146,7 @@ XOWL.prototype.changePlatformUserPassword = function (callback, userId, oldPassw
 XOWL.prototype.resetPlatformUserPassword = function (callback, userId, newPassword) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -186,7 +186,7 @@ XOWL.prototype.createPlatformGroup = function (callback, groupId, name, admin) {
 XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -196,7 +196,7 @@ XOWL.prototype.deletePlatformGroup = function (callback, groupId) {
 XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -206,7 +206,7 @@ XOWL.prototype.renamePlatformGroup = function (callback, groupId, name) {
 XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -216,7 +216,7 @@ XOWL.prototype.addMemberToPlatformGroup = function (callback, groupId, userId) {
 XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -226,7 +226,7 @@ XOWL.prototype.removeMemberFromPlatformGroup = function (callback, groupId, user
 XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -236,7 +236,7 @@ XOWL.prototype.addAdminToPlatformGroup = function (callback, groupId, userId) {
 XOWL.prototype.removeAdminFromPlatformGroup = function (callback, groupId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -276,7 +276,7 @@ XOWL.prototype.createPlatformRole = function (callback, roleId, name) {
 XOWL.prototype.deletePlatformRole = function (callback, roleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -286,7 +286,7 @@ XOWL.prototype.deletePlatformRole = function (callback, roleId) {
 XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -296,7 +296,7 @@ XOWL.prototype.renamePlatformRole = function (callback, roleId, name) {
 XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -306,7 +306,7 @@ XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
 XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -316,7 +316,7 @@ XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId
 XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -326,7 +326,7 @@ XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) 
 XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, groupId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -336,7 +336,7 @@ XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, group
 XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedRoleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -346,7 +346,7 @@ XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedR
 XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impliedRoleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}

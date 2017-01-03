@@ -4,6 +4,9 @@
 var xowl = new XOWL();
 var groupId = getParameterByName("id");
 var oldName = null;
+var group = null;
+var users = null;
+var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -22,7 +25,27 @@ function init() {
 	});
 }
 
-function render(group) {
+function getData() {
+	if (!onOperationRequest("Loading ...", 3))
+		return;
+	xowl.getPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderGroup(content);
+		}
+	}, groupId);
+	xowl.getPlatformUsers(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderUsers(content);
+		}
+	});
+	xowl.getPlatformRoles(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			renderRoles(content);
+		}
+	});
+}
+
+function renderGroup(group) {
 	document.getElementById("group-identifier").value = group.identifier;
 	document.getElementById("group-name").value = group.name;
 	group.admins.sort(function (x, y) {

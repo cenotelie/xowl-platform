@@ -4,7 +4,6 @@
 var xowl = new XOWL();
 var groupId = getParameterByName("id");
 var oldName = null;
-var group = null;
 var users = null;
 var roles = null;
 
@@ -15,34 +14,91 @@ function init() {
 			{name: "Group " + groupId}], function() {
 		if (!groupId || groupId === null || groupId === "")
 			return;
+		setupAutocomplete();
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getPlatformGroup(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				render(content);
+				renderGroup(content);
 			}
 		}, groupId);
 	});
 }
 
-function getData() {
-	if (!onOperationRequest("Loading ...", 3))
-		return;
-	xowl.getPlatformGroup(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderGroup(content);
+function setupAutocomplete() {
+	var autocomplete1 = new AutoComplete("input-admin");
+	autocomplete1.lookupItems = function (value) {
+		if (users !== null) {
+			autocomplete1.onItems(filterItems(users, value));
+			return;
 		}
-	}, groupId);
-	xowl.getPlatformUsers(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderUsers(content);
+		xowl.getPlatformUsers(function (status, ct, content) {
+			if (status === 200) {
+				users = content;
+				autocomplete1.onItems(filterItems(users, value));
+			}
+		});
+	};
+	autocomplete1.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete1.getItemString = function (item) {
+		return item.identifier;
+	};
+	var autocomplete2 = new AutoComplete("input-member");
+	autocomplete2.lookupItems = function (value) {
+		if (users !== null) {
+			autocomplete2.onItems(filterItems(users, value));
+			return;
 		}
-	});
-	xowl.getPlatformRoles(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderRoles(content);
+		xowl.getPlatformUsers(function (status, ct, content) {
+			if (status === 200) {
+				users = content;
+				autocomplete2.onItems(filterItems(users, value));
+			}
+		});
+	};
+	autocomplete2.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete2.getItemString = function (item) {
+		return item.identifier;
+	};
+	var autocomplete3 = new AutoComplete("input-role");
+	autocomplete3.lookupItems = function (value) {
+		if (roles !== null) {
+			autocomplete3.onItems(filterItems(roles, value));
+			return;
 		}
-	});
+		xowl.getPlatformRoles(function (status, ct, content) {
+			if (status === 200) {
+				roles = content;
+				autocomplete3.onItems(filterItems(roles, value));
+			}
+		});
+	};
+	autocomplete3.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete3.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
 }
 
 function renderGroup(group) {
@@ -76,14 +132,26 @@ function renderPlatformUser(user) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "/web/assets/user.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(user.name));
 	link.href="user.html?id=" + encodeURIComponent(user.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = "/web/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }
@@ -93,14 +161,26 @@ function renderPlatformRole(role) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "/web/assets/role.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
 	link.href="role.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = "/web/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }

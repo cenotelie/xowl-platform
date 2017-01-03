@@ -468,6 +468,139 @@ function waitAndGo(target) {
 
 
 /*****************************************************
+ * Auto-complete field
+ ****************************************************/
+
+function AutoComplete(inputId) {
+	var __self = this;
+	this.input = document.getElementById(inputId);
+	this.indicator = document.getElementById(inputId + "-indicator");
+	this.panel = null;
+	this.input.oninput = function () {
+		__self.onInputChange();
+	};
+	this.input.onblur = function () {
+		/*if (__self.panel != null) {
+			__self.panel.remove();
+			__self.panel = null;
+			__self.isSet = false;
+		}*/
+	};
+}
+
+/**
+ * When the content of the input has changed
+ *
+ * @param items	The items to render
+ */
+AutoComplete.prototype.onInputChange = function () {
+	if (PAGE_BUSY != null)
+		return;
+	PAGE_BUSY = { count: 1 };
+	if (this.panel != null)
+		this.panel.remove();
+	if (this.input.value === null || this.input.value.length == 0) {
+		PAGE_BUSY = null;
+		return;
+	}
+	this.indicator.src = "/web/assets/spinner.gif";
+	this.indicator.style.display = "";
+	this.lookupItems(this.input.value);
+}
+
+/**
+ * When the items to suggest have been received
+ *
+ * @param items	The items items
+ */
+AutoComplete.prototype.onItems = function (items) {
+	var inputBounds = this.input.getBoundingClientRect();
+	this.panel = document.createElement("div");
+	this.panel.classList.add("autocomplete-panel");
+	this.panel.style.width = inputBounds.width + "px";
+	this.panel.style.left = inputBounds.left + "px";
+	this.panel.style.top = inputBounds.bottom + "px";
+	var count = items.length;
+	if (count > 5)
+		count = 5;
+	for (var i = 0; i != count; i++) {
+		var content = this.renderItem(items[i]);
+		var node = document.createElement("div");
+		node.appendChild(content);
+		node.classList.add("autocomplete-item");
+		(function (self, item, node) {
+			node.onclick = function () {
+				self.onItemClick(item);
+			};
+		})(this, items[i], node);
+		this.panel.appendChild(node);
+	}
+	this.input.parentElement.appendChild(this.panel);
+	this.indicator.style.display = "none";
+	PAGE_BUSY = null;
+}
+
+/**
+ * When an auto-complete suggestion has been clicked
+ *
+ * @param item The selected item
+ */
+AutoComplete.prototype.onItemClick = function (item) {
+	this.input.value = this.getItemString(item);
+	this.onItemSelected(item);
+	this.panel.remove();
+}
+
+/**
+ * Gets a list of the items that match the specified input
+ *
+ * @param value	The input value to match
+ * @return The list of the matching items
+ */
+AutoComplete.prototype.lookupItems = function (value) {
+	this.onItems([]);
+}
+
+/**
+ * Renders an item for the auto-complete list
+ *
+ * @param item The item to render
+ * @return The HTML DOM object for the item
+ */
+AutoComplete.prototype.renderItem = function (item) {
+	var result = document.createElement("div");
+	if (item instanceof String || typeof item === 'string') {
+		result.appendChild(document.createTextNode(item));
+	} else {
+		result.appendChild(document.createTextNode(JSON.stringify(item)));
+	}
+	return result;
+}
+
+/**
+ * Gets the string representation of an item
+ *
+ * @param item The item to render
+ * @return The string representation for the item
+ */
+AutoComplete.prototype.getItemString = function (item) {
+	if (item instanceof String || typeof item === 'string') {
+		return item;
+	}
+	return JSON.stringify(item);
+}
+
+/**
+ * Event when an item has been selected
+ *
+ * @param item The selected item
+ */
+AutoComplete.prototype.onItemSelected = function (item) {
+}
+
+
+
+/*****************************************************
  * Job tracking
  ****************************************************/
 

@@ -91,7 +91,7 @@ public class XOWLWebModuleDirectory implements HttpApiService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Web Modules Directory Service";
+        return "xOWL Collaboration Platform - Web Modules Directory Service";
     }
 
     @Override

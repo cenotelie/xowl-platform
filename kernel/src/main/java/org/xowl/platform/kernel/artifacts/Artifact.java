@@ -24,7 +24,7 @@ import org.xowl.infra.utils.Serializable;
 import java.util.Collection;
 
 /**
- * An artifact represents a package of data in the form of quads that can be managed by the federation platform
+ * An artifact represents a package of data in the form of quads that can be managed by the collaboration platform
  * The identifier of an artifact must be unique.
  * An artifact may have a version tag attached to it.
  * In this case, the base identifier refer to the common identifier for all versions of the artifact.

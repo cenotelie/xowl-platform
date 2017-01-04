@@ -34,7 +34,7 @@ public class XOWLMarketplaceProvider implements MarketplaceProvider {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Marketplace Provider";
+        return "xOWL Collaboration Platform - Marketplace Provider";
     }
 
     @Override

@@ -8,7 +8,7 @@
 	<artifactId>xowl-connector-semanticweb</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Connector Semantic Web</name>
+	<name>xOWL Collaboration Platform - Connector Semantic Web</name>
 	<description>The connector and importer for Semantic Web datasets</description>
 	<dependencies>
 		<dependency>

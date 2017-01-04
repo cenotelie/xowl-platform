@@ -83,7 +83,7 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - API Discovery Service";
+        return "xOWL Collaboration Platform - API Discovery Service";
     }
 
     @Override

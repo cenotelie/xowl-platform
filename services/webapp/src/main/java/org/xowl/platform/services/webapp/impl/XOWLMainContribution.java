@@ -39,7 +39,7 @@ public class XOWLMainContribution implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Main UI Contribution";
+        return "xOWL Collaboration Platform - Main UI Contribution";
     }
 
     @Override

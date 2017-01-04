@@ -45,7 +45,7 @@ public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Semantic Web Connector Factory";
+        return "xOWL Collaboration Platform - Semantic Web Connector Factory";
     }
 
     @Override

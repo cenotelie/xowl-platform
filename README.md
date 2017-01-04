@@ -1,6 +1,6 @@
 # xOWL Platform #
 
-This is the xOWL platform, a set of components for the construction of federation platform based on a semantic principles.
+This is the xOWL platform, a set of components for the construction of collaboration platform based on a semantic principles.
 The xOWL platform enables the federation of heterogeneous datasets into a semantically coherent common representation so that business analyses can be performed.
 Typical applications to system engineering include the federation of Requirements, Functional Architectures, System Architectures, Safety Analyses and more.
 

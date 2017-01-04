@@ -1,6 +1,6 @@
 # Distribution
 
-A distribution of the xOWL Federation Platform is structured as follow:
+A distribution of the xOWL Collaboration Platform is structured as follow:
 
 * Distribution root's directory
     * `config` The directory for the platform's configuration

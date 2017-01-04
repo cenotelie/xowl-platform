@@ -2,7 +2,7 @@
 // Provided under LGPLv3
 
 /*****************************************************
- * xOWL Federation Platform API - V1
+ * xOWL Collaboration Platform API - V1
  ****************************************************/
 
 function XOWL() {

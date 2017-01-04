@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-httpapi</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service HTTP API</name>
+	<name>xOWL Collaboration Platform - Service HTTP API</name>
 	<description>The service for serving the HTTP API of other services</description>
 	<dependencies>
 		<dependency>

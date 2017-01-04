@@ -62,7 +62,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - CSV Importer";
+        return "xOWL Collaboration Platform - CSV Importer";
     }
 
     @Override

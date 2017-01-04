@@ -58,7 +58,7 @@ public class CSVFactory implements ConnectorServiceFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - CSV Connector Factory";
+        return "xOWL Collaboration Platform - CSV Connector Factory";
     }
 
     @Override

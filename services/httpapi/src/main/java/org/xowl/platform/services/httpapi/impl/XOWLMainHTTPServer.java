@@ -54,7 +54,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - HTTP Server Service";
+        return "xOWL Collaboration Platform - HTTP Server Service";
     }
 
     @Override

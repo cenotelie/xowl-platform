@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-webapp</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Web Application</name>
+	<name>xOWL Collaboration Platform - Service Web Application</name>
 	<description>The web application client for the xOWL platform</description>
 	<dependencies>
 		<dependency>

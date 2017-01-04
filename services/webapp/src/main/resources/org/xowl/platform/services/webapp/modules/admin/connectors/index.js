@@ -230,7 +230,7 @@ function newDB(x, y) {
 	text.setAttribute("text-anchor", "middle");
 	text.setAttribute("font-family", "sans-serif");
 	text.setAttribute("font-size", "70");
-	text.appendChild(document.createTextNode("Federation Platform"));
+	text.appendChild(document.createTextNode("Platform"));
 	node.appendChild(text);
 	return node;
 }

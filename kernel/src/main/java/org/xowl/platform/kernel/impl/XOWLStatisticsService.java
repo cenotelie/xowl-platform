@@ -74,7 +74,7 @@ public class XOWLStatisticsService implements StatisticsService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Statistics Service";
+        return "xOWL Collaboration Platform - Statistics Service";
     }
 
     @Override

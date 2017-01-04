@@ -325,7 +325,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Jobs Management Service";
+        return "xOWL Collaboration Platform - Jobs Management Service";
     }
 
     @Override

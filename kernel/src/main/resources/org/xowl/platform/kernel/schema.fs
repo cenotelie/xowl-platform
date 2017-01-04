@@ -11,7 +11,7 @@ Ontology(<http://xowl.org/platform/kernel>
 
     Declaration(Class(:Resource))
     DataPropertyAssertion(rdfs:label :Resource "Resource")
-    DataPropertyAssertion(rdfs:comment :Resource "Represents a resource on a xOWL federation platform.")
+    DataPropertyAssertion(rdfs:comment :Resource "Represents a resource on a xOWL collaboration platform.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :Resource <http://xowl.org/platform/kernel>)
 
     Declaration(Class(:Artifact))
@@ -22,25 +22,25 @@ Ontology(<http://xowl.org/platform/kernel>
 
     Declaration(Class(:PlatformUser))
     DataPropertyAssertion(rdfs:label :PlatformUser "PlatformUser")
-    DataPropertyAssertion(rdfs:comment :PlatformUser "Represents a user of the xOWL federation platform.")
+    DataPropertyAssertion(rdfs:comment :PlatformUser "Represents a user of the xOWL collaboration platform.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :PlatformUser <http://xowl.org/platform/kernel>)
     SubClassOf(:PlatformUser :Resource)
 
     Declaration(Class(:PlatformGroup))
     DataPropertyAssertion(rdfs:label :PlatformGroup "PlatformGroup")
-    DataPropertyAssertion(rdfs:comment :PlatformGroup "Represents a group of users on the xOWL federation platform")
+    DataPropertyAssertion(rdfs:comment :PlatformGroup "Represents a group of users on the xOWL collaboration platform")
     ObjectPropertyAssertion(rdfs:isDefinedBy :PlatformGroup <http://xowl.org/platform/kernel>)
     SubClassOf(:PlatformGroup :Resource)
 
     Declaration(Class(:PlatformRole))
     DataPropertyAssertion(rdfs:label :PlatformRole "PlatformRole")
-    DataPropertyAssertion(rdfs:comment :PlatformRole "Represents a role for a users or groups on the xOWL federation platform")
+    DataPropertyAssertion(rdfs:comment :PlatformRole "Represents a role for a users or groups on the xOWL collaboration platform")
     ObjectPropertyAssertion(rdfs:isDefinedBy :PlatformRole <http://xowl.org/platform/kernel>)
     SubClassOf(:PlatformRole :Resource)
 
     Declaration(Class(:Rule))
     DataPropertyAssertion(rdfs:label :Rule "Consistency Rule")
-    DataPropertyAssertion(rdfs:comment :Rule "Represents a consistency rule on the xOWL federation platform.")
+    DataPropertyAssertion(rdfs:comment :Rule "Represents a consistency rule on the xOWL collaboration platform.")
     ObjectPropertyAssertion(rdfs:isDefinedBy :Rule <http://xowl.org/platform/kernel>)
     SubClassOf(:Rule :Resource)
 

@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-connection</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Connection</name>
+	<name>xOWL Collaboration Platform - Service Connection</name>
 	<description>The connection services for input/output with satellites</description>
 	<dependencies>
 		<dependency>

@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-marketplace</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Marketplace</name>
+	<name>xOWL Collaboration Platform - Service Marketplace</name>
 	<description>This service provides a marketplace within the platform so that add-ons can be dynamically installed and managed.</description>
 	<dependencies>
 		<dependency>

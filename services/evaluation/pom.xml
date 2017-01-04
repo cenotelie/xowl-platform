@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-evaluation</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Evaluation</name>
+	<name>xOWL Collaboration Platform - Service Evaluation</name>
 	<description>The artifact evaluation service</description>
 	<dependencies>
 		<dependency>

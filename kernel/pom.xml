@@ -8,8 +8,8 @@
 	<artifactId>xowl-kernel</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Kernel</name>
-	<description>Kernel APIs for the xOWL federation platform</description>
+	<name>xOWL Collaboration Platform - Kernel</name>
+	<description>Kernel APIs for the xOWL collaboration platform</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.osgi</groupId>

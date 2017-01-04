@@ -56,7 +56,7 @@ public class SemanticWebImporter extends Importer {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Semantic Web Importer";
+        return "xOWL Collaboration Platform - Semantic Web Importer";
     }
 
     @Override

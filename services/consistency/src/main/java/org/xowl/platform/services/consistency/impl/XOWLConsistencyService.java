@@ -142,7 +142,7 @@ public class XOWLConsistencyService implements ConsistencyService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Consistency Service";
+        return "xOWL Collaboration Platform - Consistency Service";
     }
 
     @Override

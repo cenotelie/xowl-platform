@@ -132,7 +132,7 @@ public class XOWLConnectionService implements ConnectionService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Connection Service";
+        return "xOWL Collaboration Platform - Connection Service";
     }
 
     @Override

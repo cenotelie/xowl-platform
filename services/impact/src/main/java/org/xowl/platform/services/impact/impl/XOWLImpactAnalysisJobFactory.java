@@ -34,7 +34,7 @@ public class XOWLImpactAnalysisJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Impact Analysis Job Factory";
+        return "xOWL Collaboration Platform - Impact Analysis Job Factory";
     }
 
 

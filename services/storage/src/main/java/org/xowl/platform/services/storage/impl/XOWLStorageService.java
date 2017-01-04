@@ -190,7 +190,7 @@ public class XOWLStorageService implements StorageService, Closeable {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Storage Service";
+        return "xOWL Collaboration Platform - Storage Service";
     }
 
     @Override

@@ -8,7 +8,7 @@
 	<artifactId>xowl-services</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Services</name>
+	<name>xOWL Collaboration Platform - Services</name>
 	<description>The set of services for the xOWL platform</description>
 	<modules>
 		<module>security-internal</module>

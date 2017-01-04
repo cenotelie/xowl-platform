@@ -99,7 +99,7 @@ public class XOWLEvaluationService implements EvaluationService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Evaluation Service";
+        return "xOWL Collaboration Platform - Evaluation Service";
     }
 
     @Override

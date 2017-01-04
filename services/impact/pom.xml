@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-impact</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Impact</name>
+	<name>xOWL Collaboration Platform - Service Impact</name>
 	<description>The impact analysis service</description>
 	<dependencies>
 		<dependency>

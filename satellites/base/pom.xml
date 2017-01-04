@@ -8,7 +8,7 @@
 	<artifactId>xowl-satellite-base</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Satellite Base</name>
+	<name>xOWL Collaboration Platform - Satellite Base</name>
 	<description>Base API for accessing a remote platform</description>
 	<dependencies>
 		<dependency>

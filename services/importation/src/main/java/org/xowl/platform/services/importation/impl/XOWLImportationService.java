@@ -157,7 +157,7 @@ public class XOWLImportationService implements ImportationService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Importation Service";
+        return "xOWL Collaboration Platform - Importation Service";
     }
 
     @Override

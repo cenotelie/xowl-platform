@@ -8,7 +8,7 @@
 	<artifactId>xowl-connector-csv</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Connector CSV</name>
+	<name>xOWL Collaboration Platform - Connector CSV</name>
 	<description>The CSV Connector and Importer</description>
 	<dependencies>
 		<dependency>

@@ -1,4 +1,4 @@
-This is the distribution for the xOWL Federation Platform.
+This is the distribution for the xOWL Collaboration Platform.
 
 
 # Licenses

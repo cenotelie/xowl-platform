@@ -8,7 +8,7 @@
 	<artifactId>xowl-connectors</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Connectors</name>
+	<name>xOWL Collaboration Platform - Connectors</name>
 	<description>The set of connectors for the xOWL platform</description>
 	<modules>
 		<module>csv</module>

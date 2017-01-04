@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-consistency</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Consistency</name>
+	<name>xOWL Collaboration Platform - Service Consistency</name>
 	<description>The consistency management service</description>
 	<dependencies>
 		<dependency>

@@ -71,7 +71,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Impact Analysis Service";
+        return "xOWL Collaboration Platform - Impact Analysis Service";
     }
 
     @Override

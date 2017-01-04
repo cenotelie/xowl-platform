@@ -113,7 +113,7 @@ public class XOWLMarketplaceService implements MarketplaceService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Marketplace Service";
+        return "xOWL Collaboration Platform - Marketplace Service";
     }
 
     @Override

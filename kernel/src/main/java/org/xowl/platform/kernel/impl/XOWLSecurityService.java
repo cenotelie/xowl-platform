@@ -150,7 +150,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Security Service";
+        return "xOWL Collaboration Platform - Security Service";
     }
 
     @Override

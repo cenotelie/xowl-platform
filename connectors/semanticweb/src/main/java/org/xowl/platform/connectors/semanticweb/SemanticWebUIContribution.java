@@ -43,7 +43,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Semantic Web Importer Contribution";
+        return "xOWL Collaboration Platform - Semantic Web Importer Contribution";
     }
 
     @Override

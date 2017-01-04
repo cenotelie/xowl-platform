@@ -34,7 +34,7 @@ public class CSVimportationJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - CSV Importation Job Factory";
+        return "xOWL Collaboration Platform - CSV Importation Job Factory";
     }
 
     @Override

@@ -1,6 +1,6 @@
 FROM java:openjdk-8u92-jre-alpine
 MAINTAINER Laurent Wouters <lwouters@xowl.org>
-LABEL description "Docker image for the xOWL federation platform"
+LABEL description "Docker image for the xOWL collaboration platform"
 EXPOSE 8443
 ENTRYPOINT ["sh", "do-run.sh"]
 VOLUME ["/config"]

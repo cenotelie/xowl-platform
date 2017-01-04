@@ -34,7 +34,7 @@ public class MarketplaceJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Marketplace Job Factory";
+        return "xOWL Collaboration Platform - Marketplace Job Factory";
     }
 
     @Override

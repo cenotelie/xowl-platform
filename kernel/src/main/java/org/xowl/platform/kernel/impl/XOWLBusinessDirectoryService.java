@@ -85,7 +85,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Business Directory Service";
+        return "xOWL Collaboration Platform - Business Directory Service";
     }
 
     @Override

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This is the script used to start and stop a xOWL Federation Platform.
+# This is the script used to start and stop a xOWL Collaboration Platform.
 # This script is supported by the do-run.sh script that is used to launch the server and monitor its execution.
 # In turn, the do-run.sh script launches the Java process for the application.
 # It also keeps running to monitor the exit code of the Java process.

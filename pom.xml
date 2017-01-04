@@ -4,7 +4,7 @@
 	<artifactId>xowl-platform</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation</name>
+	<name>xOWL Collaboration Platform</name>
 	<description>A platform for the federation of models and data supported by semantic web technologies.</description>
 	<url>https://xowl.org/</url>
 	<licenses>

@@ -34,7 +34,7 @@ public class ConnectorJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Connectors Job Factory";
+        return "xOWL Collaboration Platform - Connectors Job Factory";
     }
 
     @Override

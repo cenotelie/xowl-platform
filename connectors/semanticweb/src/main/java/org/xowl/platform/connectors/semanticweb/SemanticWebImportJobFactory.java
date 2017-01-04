@@ -34,7 +34,7 @@ public class SemanticWebImportJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Semantic Web Importation Job Factory";
+        return "xOWL Collaboration Platform - Semantic Web Importation Job Factory";
     }
 
     @Override

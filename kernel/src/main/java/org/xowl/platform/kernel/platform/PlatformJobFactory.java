@@ -34,7 +34,7 @@ public class PlatformJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Platform Job Factory";
+        return "xOWL Collaboration Platform - Platform Job Factory";
     }
 
     @Override

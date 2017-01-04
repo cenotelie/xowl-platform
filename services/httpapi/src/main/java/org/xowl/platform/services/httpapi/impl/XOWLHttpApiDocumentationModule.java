@@ -42,7 +42,7 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - API Documentation Contribution";
+        return "xOWL Collaboration Platform - API Documentation Contribution";
     }
 
     @Override

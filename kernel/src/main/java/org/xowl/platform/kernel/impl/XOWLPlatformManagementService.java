@@ -125,8 +125,8 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         Product product = null;
         try {
             product = new Product(
-                    "org.xowl.platform.XOWLFederationPlatform",
-                    "xOWL Federation Platform",
+                    "org.xowl.platform.XOWLCollaborationPlatform",
+                    "xOWL Collaboration Platform",
                     XOWLPlatformManagementService.class);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
@@ -172,7 +172,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Platform Management Service";
+        return "xOWL Collaboration Platform - Platform Management Service";
     }
 
     @Override

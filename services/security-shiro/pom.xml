@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-security-shiro</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Security Shiro Connector</name>
+	<name>xOWL Collaboration Platform - Service Security Shiro Connector</name>
 	<description>The security provider for external sources using Apache Shiro</description>
 	<dependencies>
 		<dependency>

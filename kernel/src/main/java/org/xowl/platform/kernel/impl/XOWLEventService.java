@@ -101,7 +101,7 @@ public class XOWLEventService implements EventService {
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - EVent Dispatch Service";
+        return "xOWL Collaboration Platform - EVent Dispatch Service";
     }
 
     @Override

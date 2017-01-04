@@ -176,7 +176,7 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
 
     @Override
     public String getName() {
-        return "xOWL Federation Platform - Logging Service";
+        return "xOWL Collaboration Platform - Logging Service";
     }
 
     @Override

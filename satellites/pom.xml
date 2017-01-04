@@ -8,7 +8,7 @@
 	<artifactId>xowl-satellites</artifactId>
 	<packaging>pom</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Satellites</name>
+	<name>xOWL Collaboration Platform - Satellites</name>
 	<description>The set of satellites components (deployed into client application) for the platform</description>
 	<modules>
 		<module>base</module>

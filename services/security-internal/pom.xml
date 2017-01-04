@@ -8,7 +8,7 @@
 	<artifactId>xowl-service-security-internal</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Federation - Service Security Internal Provider</name>
+	<name>xOWL Collaboration Platform - Service Security Internal Provider</name>
 	<description>The platform-native security provider</description>
 	<dependencies>
 		<dependency>

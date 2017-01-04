@@ -300,7 +300,7 @@ XOWL.prototype.assignRoleToPlatformUser = function (callback, roleId, userId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users/" + encodeURIComponent(userId) + "/assign", {role: userId}, "POST", null, null);
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/assign", {role: roleId}, "POST", null, null);
 }
 
 XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId) {
@@ -310,7 +310,7 @@ XOWL.prototype.unassignRoleFromPlatformUser = function (callback, roleId, userId
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/users/" + encodeURIComponent(userId) + "/unassign", {role: userId}, "POST", null, null);
+	}, "kernel/security/users/" + encodeURIComponent(userId) + "/unassign", {role: roleId}, "POST", null, null);
 }
 
 XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) {
@@ -320,7 +320,7 @@ XOWL.prototype.assignRoleToPlatformGroup = function (callback, roleId, groupId) 
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/assign", {role: userId}, "POST", null, null);
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/assign", {role: roleId}, "POST", null, null);
 }
 
 XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, groupId) {
@@ -330,7 +330,7 @@ XOWL.prototype.unassignRoleFromPlatformGroup = function (callback, roleId, group
 		} else {
 			callback(code, type, content);
 		}
-	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/unassign", {role: userId}, "POST", null, null);
+	}, "kernel/security/groups/" + encodeURIComponent(groupId) + "/unassign", {role: roleId}, "POST", null, null);
 }
 
 XOWL.prototype.addPlatformRoleImplication = function (callback, roleId, impliedRoleId) {

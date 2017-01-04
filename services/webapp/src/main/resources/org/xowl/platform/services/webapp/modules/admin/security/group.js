@@ -229,7 +229,8 @@ function onClickDelete() {
 		return;
 	xowl.deletePlatformGroup(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			window.location.href = "index.html";
+			displayMessage("success", "Deleted group " + roleId + ".");
+			waitAndGo("index.html");
 		}
 	}, groupId);
 }

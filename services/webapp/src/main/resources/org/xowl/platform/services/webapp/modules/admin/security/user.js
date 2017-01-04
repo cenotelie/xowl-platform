@@ -94,6 +94,9 @@ function renderPlatformRole(role) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(image);
+	button.onclick = function () {
+		onRemoveRole(role.identifier);
+	};
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
@@ -143,7 +146,36 @@ function onClickDelete() {
 		return;
 	xowl.deletePlatformUser(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			window.location.href = "index.html";
+			displayMessage("success", "Deleted user " + userId + ".");
+			waitAndGo("index.html");
 		}
 	}, userId);
+}
+
+function onAddRole() {
+	var roleId = document.getElementById("input-role").value;
+	if (roleId == null || roleId == "")
+		return;
+	if (!onOperationRequest("Assigning role " + roleId + " ..."))
+		return;
+	xowl.assignRoleToPlatformUser(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Assigned role " + roleId + ".");
+			waitAndRefresh();
+		}
+	}, roleId, userId);
+}
+
+function onRemoveRole(roleId) {
+	var result = confirm("Un-assign role " + roleId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
+		return;
+	xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Un-assigned role " + roleId + ".");
+			waitAndRefresh();
+		}
+	}, roleId, userId);
 }

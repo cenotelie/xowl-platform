@@ -71,7 +71,8 @@ function onClickDelete() {
 		return;
 	xowl.deletePlatformRole(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			window.location.href = "index.html";
+			displayMessage("success", "Deleted role " + roleId + ".");
+			waitAndGo("index.html");
 		}
 	}, roleId);
 }

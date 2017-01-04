@@ -189,6 +189,7 @@ class XOWLInternalRealm implements Realm {
             getProcedure("procedure-remove-admin");
             getProcedure("procedure-remove-member");
             getProcedure("procedure-assign-role");
+            getProcedure("procedure-unassign-role");
             getProcedure("procedure-check-role");
             getProcedure("procedure-create-group");
             getProcedure("procedure-create-role");
@@ -210,6 +211,7 @@ class XOWLInternalRealm implements Realm {
             deployProcedure("procedure-remove-admin", "group", "admin");
             deployProcedure("procedure-remove-member", "group", "user");
             deployProcedure("procedure-assign-role", "entity", "role");
+            deployProcedure("procedure-unassign-role", "entity", "role");
             deployProcedure("procedure-check-role", "user", "role");
             deployProcedure("procedure-create-group", "group", "name", "admin");
             deployProcedure("procedure-create-role", "role", "name");
@@ -642,7 +644,10 @@ class XOWLInternalRealm implements Realm {
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
-            cacheUsers.remove(identifier);
+            XOWLInternalUser deleted = cacheUsers.remove(identifier);
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new UserDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
         }
     }
@@ -666,7 +671,10 @@ class XOWLInternalRealm implements Realm {
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
-            cacheGroups.remove(identifier);
+            XOWLInternalGroup deleted = cacheGroups.remove(identifier);
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new GroupDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
         }
     }
@@ -693,7 +701,10 @@ class XOWLInternalRealm implements Realm {
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
-            cacheRoles.remove(identifier);
+            PlatformRoleBase deleted = cacheRoles.remove(identifier);
+            EventService eventService = ServiceUtils.getService(EventService.class);
+            if (eventService != null)
+                eventService.onEvent(new RoleDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
         }
     }
@@ -888,12 +899,60 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply unassignRoleToUser(String user, String role) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformUser userObj = getUser(user);
+        if (userObj == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+        PlatformRole roleObj = getRole(role);
+        if (roleObj == null)
+            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(USERS + user));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply unassignRoleToGroup(String group, String role) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformGroup groupObj = getGroup(group);
+        if (groupObj == null)
+            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+        PlatformRole roleObj = getRole(role);
+        if (roleObj == null)
+            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+        // check for current user with admin role
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        Map<String, Node> parameters = new HashMap<>();
+        parameters.put("entity", nodes.getIRINode(GROUPS + group));
+        parameters.put("role", nodes.getIRINode(ROLES + role));
+        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
+                new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+        if (!reply.isSuccess())
+            return reply;
+        return XSPReplySuccess.instance();
     }
 
     @Override

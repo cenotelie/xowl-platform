@@ -26,7 +26,7 @@ import java.util.Collections;
 
 /**
  * Implements the descriptor of a static marketplace as produced by the Maven plugin:
- * org.xowl.toolkit.xowl-marketplace-builder-maven-plugin
+ * org.xowl.toolkit.xowl-packaging-maven-plugin
  *
  * @author Laurent Wouters
  */

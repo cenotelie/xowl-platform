@@ -711,12 +711,31 @@ class XOWLInternalRealm implements Realm {
 
     @Override
     public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
-        return XSPReplyUnsupported.instance();
+        return resetUserKey(identifier, newKey);
     }
 
     @Override
     public XSPReply resetUserKey(String identifier, String newKey) {
-        return XSPReplyUnsupported.instance();
+        // check input data
+        PlatformUser platformUser = getUser(identifier);
+        if (platformUser == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
+        // check that the current user is either the target user or the admin
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser currentUser = securityService.getCurrentUser();
+        if (currentUser == null)
+            return XSPReplyUnauthenticated.instance();
+        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
+                && !currentUser.getIdentifier().equals(identifier))
+            return XSPReplyUnauthorized.instance();
+        // execute
+        XSPReply reply = server.getUser(identifier);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLUser xowlUser = ((XSPReplyResult<XOWLUser>) reply).getData();
+        return xowlUser.updatePassword(newKey);
     }
 
     @Override

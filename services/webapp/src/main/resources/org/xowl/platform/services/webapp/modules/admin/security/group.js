@@ -115,11 +115,17 @@ function renderGroup(group) {
 	});
 	var table = document.getElementById("admins");
 	for (var  i = 0; i != group.admins.length; i++) {
-		table.appendChild(renderPlatformUser(group.admins[i]));
+		(function(user) {
+			var onClickRemove = function() { onRemoveAdmin(user.identifier); };
+			table.appendChild(renderPlatformUser(user, onClickRemove));
+		})(group.admins[i]);
 	}
 	table = document.getElementById("members");
 	for (var  i = 0; i != group.members.length; i++) {
-		table.appendChild(renderPlatformUser(group.members[i]));
+		(function(user) {
+			var onClickRemove = function() { onRemoveMember(user.identifier); };
+			table.appendChild(renderPlatformUser(user, onClickRemove));
+		})(group.members[i]);
 	}
 	table = document.getElementById("roles");
 	for (var  i = 0; i != group.roles.length; i++) {
@@ -127,7 +133,7 @@ function renderGroup(group) {
 	}
 }
 
-function renderPlatformUser(user) {
+function renderPlatformUser(user, onClickRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
@@ -151,6 +157,7 @@ function renderPlatformUser(user) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(image);
+	button.onclick = onClickRemove;
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
@@ -180,6 +187,9 @@ function renderPlatformRole(role) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(image);
+	button.onclick = function () {
+		onRemoveRole(role.identifier);
+	};
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
@@ -233,4 +243,88 @@ function onClickDelete() {
 			waitAndGo("index.html");
 		}
 	}, groupId);
+}
+
+function onAddAdmin() {
+	var userId = document.getElementById("input-admin").value;
+	if (userId == null || userId == "")
+		return;
+	if (!onOperationRequest("Adding group administrator" + userId + " ..."))
+		return;
+	xowl.addAdminToPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Added group administrator " + userId + ".");
+			waitAndRefresh();
+		}
+	}, groupId, userId);
+}
+
+function onAddMember() {
+	var userId = document.getElementById("input-member").value;
+	if (userId == null || userId == "")
+		return;
+	if (!onOperationRequest("Adding group member" + userId + " ..."))
+		return;
+	xowl.addMemberToPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Added group member " + userId + ".");
+			waitAndRefresh();
+		}
+	}, groupId, userId);
+}
+
+function onAddRole() {
+	var roleId = document.getElementById("input-role").value;
+	if (roleId == null || roleId == "")
+		return;
+	if (!onOperationRequest("Assigning role " + roleId + " ..."))
+		return;
+	xowl.assignRoleToPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Assigned role " + roleId + ".");
+			waitAndRefresh();
+		}
+	}, roleId, groupId);
+}
+
+function onRemoveAdmin(userId) {
+	var result = confirm("Remove group administrator " + userId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Removing group administrator " + userId + " ..."))
+		return;
+	xowl.removeAdminFromPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Removed group administrator " + userId + ".");
+			waitAndRefresh();
+		}
+	}, groupId, userId);
+}
+
+function onRemoveMember(userId) {
+	var result = confirm("Remove group member " + userId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Removing group member " + userId + " ..."))
+		return;
+	xowl.removeMemberFromPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Removed group member " + userId + ".");
+			waitAndRefresh();
+		}
+	}, groupId, userId);
+}
+
+function onRemoveRole(roleId) {
+	var result = confirm("Un-assign role " + roleId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
+		return;
+	xowl.unassignRoleFromPlatformGroup(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Un-assigned role " + roleId + ".");
+			waitAndRefresh();
+		}
+	}, roleId, groupId);
 }

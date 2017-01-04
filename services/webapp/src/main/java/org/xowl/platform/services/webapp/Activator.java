@@ -61,6 +61,7 @@ public class Activator implements BundleActivator {
         moduleDirectory = new XOWLWebModuleDirectory();
         moduleDirectory.register(new XOWLWebModuleCore());
         moduleDirectory.register(new XOWLWebModuleAdmin());
+        moduleDirectory.register(new XOWLWebModuleCollaboration());
         bundleContext.registerService(HttpApiService.class, moduleDirectory, null);
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {

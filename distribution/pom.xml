@@ -73,6 +73,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.15.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.xowl.hime</groupId>
 			<artifactId>redist</artifactId>
 			<version>2.0.5</version>
@@ -117,6 +123,12 @@
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-kernel</artifactId>
+			<version>0.2.4-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xowl.platform</groupId>
+			<artifactId>xowl-service-collaboration</artifactId>
 			<version>0.2.4-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

@@ -135,7 +135,7 @@ function doSetupHeader() {
 		image.style.marginRight = "20px";
 		userLink.appendChild(image);
 		userLink.appendChild(document.createTextNode(PLATFORM.getLoggedInUserName()));
-		userLink.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
+		userLink.href = "/web/me.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
 	}
 	PAGE_READY_INDEX += 50;
 	if (PAGE_READY_INDEX >= 100)

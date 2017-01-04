@@ -152,6 +152,21 @@ function onClickDelete() {
 	}, userId);
 }
 
+function onClickResetPassword() {
+	var result = confirm("Reset password for user " + userId + "?");
+	if (!result)
+		return;
+	var newPassword = document.getElementById("user-new-password").value;
+	if (!onOperationRequest("Resetting password ..."))
+		return;
+	xowl.resetPlatformUserPassword(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Password has been reset.");
+			waitAndRefresh();
+		}
+	}, userId, newPassword);
+}
+
 function onAddRole() {
 	var roleId = document.getElementById("input-role").value;
 	if (roleId == null || roleId == "")

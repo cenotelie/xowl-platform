@@ -503,8 +503,10 @@ AutoComplete.prototype.onInputChange = function () {
 		PAGE_BUSY = null;
 		return;
 	}
-	this.indicator.src = "/web/assets/spinner.gif";
-	this.indicator.style.display = "";
+	if (this.indicator != null) {
+		this.indicator.src = "/web/assets/spinner.gif";
+		this.indicator.style.display = "";
+	}
 	this.lookupItems(this.input.value);
 }
 
@@ -536,7 +538,9 @@ AutoComplete.prototype.onItems = function (items) {
 		this.panel.appendChild(node);
 	}
 	this.input.parentElement.appendChild(this.panel);
-	this.indicator.style.display = "none";
+	if (this.indicator != null) {
+		this.indicator.style.display = "none";
+	}
 	PAGE_BUSY = null;
 }
 

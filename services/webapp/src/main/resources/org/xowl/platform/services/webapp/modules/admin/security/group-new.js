@@ -2,48 +2,49 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
+var users = null;
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Platform Administration", uri: "/web/modules/admin/"},
 			{name: "Platform Security", uri: "/web/modules/admin/security/"},
 			{name: "New Group"}], function() {
-			doGetUsers();
+			setupAutocomplete();
 	});
 }
 
-function doGetUsers() {
-	if (!onOperationRequest("Loading ..."))
-		return;
-	xowl.getPlatformUsers(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderPlatformUsers(content);
+function setupAutocomplete() {
+	var autocomplete1 = new AutoComplete("group-admin");
+	autocomplete1.lookupItems = function (value) {
+		if (users !== null) {
+			autocomplete1.onItems(filterItems(users, value));
+			return;
 		}
-	});
+		xowl.getPlatformUsers(function (status, ct, content) {
+			if (status === 200) {
+				users = content;
+				autocomplete1.onItems(filterItems(users, value));
+			}
+		});
+	};
+	autocomplete1.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete1.getItemString = function (item) {
+		return item.identifier;
+	};
 }
 
-function renderPlatformUsers(users) {
-	users.sort(function (x, y) {
-		return x.name.localeCompare(y.name);
-	});
-	var select = document.getElementById("group-admin");
-	for (var i = 0; i != users.length; i++) {
-		select.appendChild(renderPlatformUser(users[i]));
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
 	}
-	select.value = xowl.getLoggedInUserId();
-}
-
-function renderPlatformUser(user) {
-	var image = document.createElement("img");
-	image.src = "/web/assets/user.svg";
-	image.width = 30
-	image.height = 30
-	image.style.marginRight = "20px";
-	var option = document.createElement("option");
-	option.value = user.identifier;
-	option.appendChild(image);
-	option.appendChild(document.createTextNode(user.name));
-	return option;
+	return result;
 }
 
 function create() {
@@ -53,7 +54,8 @@ function create() {
 	var name = document.getElementById("group-name").value;
 	var admin = document.getElementById("group-admin").value;
 	if (identifier == null || identifier == ""
-		|| name == null || name == "") {
+		|| name == null || name == ""
+		|| admin == null || admin == "") {
 		onOperationAbort("All fields are mandatory.");
 		return false;
 	}

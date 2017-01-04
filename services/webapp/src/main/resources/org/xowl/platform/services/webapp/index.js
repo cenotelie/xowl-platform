@@ -37,10 +37,20 @@ function renderModule(myModule) {
 	var linkModule = document.createElement("a");
 	linkModule.appendChild(document.createTextNode(myModule.name));
 	linkModule.href = "/web/modules/" + myModule.uri + "/";
+	var button = document.createElement("a");
+	var buttonImage = document.createElement("img");
+	buttonImage.src = "/web/assets/action-plus.svg";
+	buttonImage.width = 30;
+	buttonImage.height = 30;
+	buttonImage.style.float = "right";
+	button.style.cursor = "pointer";
+	button.appendChild(buttonImage);
 	header.appendChild(icon);
 	header.appendChild(linkModule);
+	header.appendChild(button);
 	var body = document.createElement("div");
 	body.classList.add("panel-body");
+	body.style.display = "none";
 	for (var i = 0; i != myModule.items.length; i++) {
 		var part = myModule.items[i];
 		var li = document.createElement("div");
@@ -59,5 +69,14 @@ function renderModule(myModule) {
 	}
 	panel.appendChild(header);
 	panel.appendChild(body);
+	button.onclick = function() {
+		if (body.style.display === "none") {
+			buttonImage.src = "/web/assets/action-minus.svg";
+			body.style.display = "";
+		} else {
+			buttonImage.src = "/web/assets/action-plus.svg";
+			body.style.display = "none";
+		}
+	};
 	return panel;
 }

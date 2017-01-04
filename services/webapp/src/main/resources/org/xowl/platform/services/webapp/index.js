@@ -5,6 +5,10 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [], function() {
+		loadComponent("/web/widgets/placeholder/index.html", function (node) {
+			document.getElementById("panel-custom1").appendChild(node.cloneNode(true));
+			document.getElementById("panel-custom2").appendChild(node.cloneNode(true));
+		});
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getWebModules(function (status, ct, content) {

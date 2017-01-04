@@ -4,6 +4,7 @@
 var xowl = new XOWL();
 var userId = getParameterByName("id");
 var oldName = null;
+var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -12,17 +13,52 @@ function init() {
 			{name: "User " + userId}], function() {
 		if (!userId || userId === null || userId === "")
 			return;
+		setupAutocomplete();
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getPlatformUser(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				render(content);
+				renderUser(content);
 			}
 		}, userId);
 	});
 }
 
-function render(user) {
+function setupAutocomplete() {
+	var autocomplete3 = new AutoComplete("input-role");
+	autocomplete3.lookupItems = function (value) {
+		if (roles !== null) {
+			autocomplete3.onItems(filterItems(roles, value));
+			return;
+		}
+		xowl.getPlatformRoles(function (status, ct, content) {
+			if (status === 200) {
+				roles = content;
+				autocomplete3.onItems(filterItems(roles, value));
+			}
+		});
+	};
+	autocomplete3.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete3.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
+}
+
+function renderUser(user) {
 	document.getElementById("user-identifier").value = user.identifier;
 	document.getElementById("user-name").value = user.name;
 	user.roles.sort(function (x, y) {
@@ -47,6 +83,18 @@ function renderPlatformRole(role) {
 	link.href="role.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = "/web/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }

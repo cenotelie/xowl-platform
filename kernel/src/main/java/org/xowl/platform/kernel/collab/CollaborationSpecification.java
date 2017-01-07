@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.collab;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -58,6 +59,18 @@ public class CollaborationSpecification implements Serializable {
         this.outputs = new ArrayList<>();
         this.roles = new ArrayList<>();
         this.pattern = pattern;
+    }
+
+    /**
+     * Initializes this specification
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public CollaborationSpecification(ASTNode definition) {
+        this.inputs = new ArrayList<>();
+        this.outputs = new ArrayList<>();
+        this.roles = new ArrayList<>();
+        this.pattern = null;
     }
 
     /**

@@ -18,23 +18,31 @@
 package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
 
 import java.util.Collection;
 
 /**
  * Represents a service for the management of a network of collaborations.
- * Each collaboration is represented as implemented as an instance of the xOWL Collaboration Platform.
+ * Each collaboration is implemented as an instance of the xOWL Collaboration Platform.
  *
  * @author Laurent Wouters
  */
 public interface CollaborationNetworkService extends Service {
     /**
-     * Gets the collaborations in the neighbourhood
+     * Gets a list of the available platform distribution that can be used for spawning new collaborations
+     *
+     * @return The list of the available platform distributions
+     */
+    Collection<Product> getAvailablePlatforms();
+
+    /**
+     * Gets the known collaborations
      *
      * @return The known collaborations
      */
-    Collection<RemoteCollaboration> getNeighbours();
+    Collection<RemoteCollaboration> getCollaborations();
 
     /**
      * Spawns a new collaboration

@@ -30,7 +30,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationManagerService extends Service {
+public interface CollaborationService extends Service {
     /**
      * Gets the expected inputs for this collaboration
      *
@@ -92,4 +92,27 @@ public interface CollaborationManagerService extends Service {
      * @return The current collaboration pattern
      */
     CollaborationPattern getCollaborationPattern();
+
+    /**
+     * Gets the collaborations in the neighbourhood
+     *
+     * @return The known collaborations
+     */
+    Collection<RemoteCollaboration> getNeighbours();
+
+    /**
+     * Spawns a new collaboration
+     *
+     * @param specification The specification for the collaboration
+     * @return The protocol reply
+     */
+    XSPReply spawn(CollaborationSpecification specification);
+
+    /**
+     * Terminates a collaboration
+     *
+     * @param collaboration The collaboration to terminate
+     * @return The protocol reply
+     */
+    XSPReply terminate(RemoteCollaboration collaboration);
 }

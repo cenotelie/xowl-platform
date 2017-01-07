@@ -20,7 +20,6 @@ package org.xowl.platform.services.collaboration;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 
@@ -32,13 +31,6 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public interface RemoteCollaboration extends Identifiable, Serializable {
-    /**
-     * Gets the product descriptor for the platform
-     *
-     * @return The product descriptor
-     */
-    Product getPlatformProduct();
-
     /**
      * Gets the expected inputs for this collaboration
      *

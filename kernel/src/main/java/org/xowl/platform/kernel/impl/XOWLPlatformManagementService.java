@@ -65,6 +65,11 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  */
 public class XOWLPlatformManagementService implements PlatformManagementService, HttpApiService, FrameworkListener {
     /**
+     * The name of the descriptor file in a distribution
+     */
+    private static final String DESCRIPTOR_FILE = "descriptor.json";
+
+    /**
      * The URI for the API services
      */
     private static final String URI_API = HttpApiService.URI_API + "/kernel/platform";
@@ -121,22 +126,30 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
      */
     public XOWLPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
         Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
-        bundles = new ArrayList<>();
-        Product product = null;
-        try {
-            product = new Product(
-                    "org.xowl.platform.XOWLCollaborationPlatform",
-                    "xOWL Collaboration Platform",
-                    XOWLPlatformManagementService.class);
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-        }
-        this.product = product;
+        this.bundles = new ArrayList<>();
+        this.product = loadProductDescriptor();
         this.addons = new ArrayList<>();
         this.addonsCache = new File(System.getenv(Env.ROOT), configuration.get("addonsStorage"));
         if (this.addonsCache.exists())
             loadAddonsCache();
         enforceHttpConfigFelix(configuration, executionService);
+    }
+
+    /**
+     * Loads the descriptor for the platform product
+     *
+     * @return The descriptor
+     */
+    private Product loadProductDescriptor() {
+        File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
+        try (InputStream stream = new FileInputStream(fileDescriptor)) {
+            String content = Files.read(stream, Files.CHARSET);
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            return new ProductBase(definition);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return null;
+        }
     }
 
     /**

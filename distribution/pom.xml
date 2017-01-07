@@ -219,9 +219,10 @@
 				<version>0.1.0-SNAPSHOT</version>
 				<extensions>true</extensions>
 				<configuration>
-					<manifestChangeset>${changeSet}</manifestChangeset>
-					<manifestBuildTag>${env.BUILD_TAG}</manifestBuildTag>
-					<manifestBuildTimestamp>${timestamp}</manifestBuildTimestamp>
+					<icon>src/main/resources/xowl.png</icon>
+					<versionScmTag>${changeSet}</versionScmTag>
+					<versionBuildTag>${env.BUILD_TAG}</versionBuildTag>
+					<versionBuildTimestamp>${timestamp}</versionBuildTimestamp>
 					<resources>
 						<param>src/main/resources/config</param>
 						<param>src/main/resources/admin.sh</param>

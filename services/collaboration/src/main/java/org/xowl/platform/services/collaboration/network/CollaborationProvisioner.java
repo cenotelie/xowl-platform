@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.collaboration.network;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.product.Product;
@@ -24,12 +24,11 @@ import org.xowl.platform.kernel.Service;
 import java.util.Collection;
 
 /**
- * Represents a service for the management of a network of collaborations.
- * Each collaboration is implemented as an instance of the xOWL Collaboration Platform.
+ * Represents an entity that manages platform distributions
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkService extends Service {
+public interface CollaborationProvisioner extends Service {
     /**
      * Gets a list of the available platform distribution that can be used for spawning new collaborations
      *
@@ -38,25 +37,25 @@ public interface CollaborationNetworkService extends Service {
     Collection<Product> getAvailablePlatforms();
 
     /**
-     * Gets the known collaborations
+     * Gets the list of the deployed platform instances
      *
-     * @return The known collaborations
+     * @return The list of the deployed platform instances
      */
-    Collection<RemoteCollaboration> getCollaborations();
+    Collection<CollaborationInstance> getInstances();
 
     /**
-     * Spawns a new collaboration
+     * Provisions a platform for a new collaboration
      *
-     * @param specification The specification for the collaboration
+     * @param platformId The identifier of the requested platform product for the collaboration
      * @return The protocol reply
      */
-    XSPReply spawn(CollaborationSpecification specification);
+    XSPReply provision(String platformId);
 
     /**
      * Terminates a collaboration
      *
-     * @param collaboration The collaboration to terminate
+     * @param instanceId The identifier of the collaboration to terminate
      * @return The protocol reply
      */
-    XSPReply terminate(RemoteCollaboration collaboration);
+    XSPReply terminate(String instanceId);
 }

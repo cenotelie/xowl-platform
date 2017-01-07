@@ -17,34 +17,92 @@
 
 package org.xowl.platform.kernel.collab;
 
+import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Specifies a collaboration so that it can be spawned
  *
  * @author Laurent Wouters
  */
-public interface CollaborationSpecification {
+public class CollaborationSpecification implements Serializable {
     /**
-     * Gets the specifications of the inputs for this collaboration
-     *
-     * @return The specifications of the inputs for this collaboration
+     * The expected inputs
      */
-    Collection<CollaborationArtifactSpecification> getInputs();
+    private final Collection<ArtifactSpecification> inputs;
+    /**
+     * The expected outputs
+     */
+    private final Collection<ArtifactSpecification> outputs;
+    /**
+     * The roles for this collaboration
+     */
+    private final Collection<PlatformRole> roles;
+    /**
+     * The collaboration pattern
+     */
+    private final CollaborationPattern pattern;
 
     /**
-     * Gets the specifications of the outputs for this collaboration
+     * Initializes this specification
      *
-     * @return The specification of the outputs for this collaboration
+     * @param pattern The collaboration pattern
      */
-    Collection<CollaborationArtifactSpecification> getOutputs();
+    public CollaborationSpecification(CollaborationPattern pattern) {
+        this.inputs = new ArrayList<>();
+        this.outputs = new ArrayList<>();
+        this.roles = new ArrayList<>();
+        this.pattern = pattern;
+    }
 
     /**
-     * Gets the roles for the collaboration
+     * Gets the expected inputs for this collaboration
      *
-     * @return The roles for the collaboration
+     * @return The expected inputs
      */
-    Collection<PlatformRole> getRoles();
+    public Collection<ArtifactSpecification> getInputSpecifications() {
+        return Collections.unmodifiableCollection(inputs);
+    }
+
+    /**
+     * Gets the expected outputs for this collaboration
+     *
+     * @return The expected outputs
+     */
+    public Collection<ArtifactSpecification> getOutputSpecifications() {
+        return Collections.unmodifiableCollection(outputs);
+    }
+
+    /**
+     * Gets the roles for this collaboration
+     *
+     * @return The roles for this collaboration
+     */
+    public Collection<PlatformRole> getRoles() {
+        return Collections.unmodifiableCollection(roles);
+    }
+
+    /**
+     * Gets the collaboration pattern for the orchestration of this collaboration
+     *
+     * @return The collaboration pattern
+     */
+    public CollaborationPattern getCollaborationPattern() {
+        return pattern;
+    }
+
+    @Override
+    public String serializedString() {
+        return serializedJSON();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return null;
+    }
 }

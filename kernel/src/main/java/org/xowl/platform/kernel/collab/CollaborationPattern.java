@@ -21,15 +21,9 @@ import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 
 /**
- * Represents an input/output artifact for a collaboration
+ * Represents a collaboration pattern that orchestrates the current collaboration that takes place on this platform
  *
  * @author Laurent Wouters
  */
-public interface CollaborationArtifact extends Identifiable, Serializable {
-    /**
-     * Gets the specification for this artifact
-     *
-     * @return The specification for this artifact
-     */
-    CollaborationSpecification getSpecification();
+public interface CollaborationPattern extends Identifiable, Serializable {
 }

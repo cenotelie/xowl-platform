@@ -19,16 +19,17 @@ package org.xowl.platform.kernel.collab;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
 /**
  * Represents a service for the management of a network of collaborations.
- * A collaboration is represented as an instance of the xOWL Collaboration Platform.
+ * Each collaboration is represented as implemented as an instance of the xOWL Collaboration Platform.
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkService extends Service {
+public interface CollaborationNetworkService extends Service, HttpApiService {
     /**
      * Gets the collaborations in the neighbourhood
      *

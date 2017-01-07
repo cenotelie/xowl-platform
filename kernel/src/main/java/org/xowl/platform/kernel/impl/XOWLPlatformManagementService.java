@@ -63,7 +63,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  *
  * @author Laurent Wouters
  */
-public class XOWLPlatformManagementService implements PlatformManagementService, FrameworkListener {
+public class XOWLPlatformManagementService implements PlatformManagementService, HttpApiService, FrameworkListener {
     /**
      * The URI for the API services
      */

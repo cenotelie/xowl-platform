@@ -31,6 +31,7 @@ import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Laurent Wouters
  */
-public abstract class ConnectorServiceBase implements ConnectorService {
+public abstract class ConnectorServiceBase implements ConnectorService, HttpApiService {
     /**
      * The maximum number of queued data packages for input toward the platform
      */

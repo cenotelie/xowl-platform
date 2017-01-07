@@ -22,7 +22,6 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
 
 /**
@@ -30,7 +29,7 @@ import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyService extends HttpApiService, MeasurableService {
+public interface ConsistencyService extends MeasurableService {
     /**
      * The inconsistency count metric
      */

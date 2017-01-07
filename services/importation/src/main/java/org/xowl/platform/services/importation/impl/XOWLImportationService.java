@@ -52,7 +52,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLImportationService implements ImportationService {
+public class XOWLImportationService implements ImportationService, HttpApiService {
     /**
      * The URI for the API services
      */

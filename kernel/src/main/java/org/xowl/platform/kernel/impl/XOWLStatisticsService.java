@@ -46,7 +46,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public class XOWLStatisticsService implements StatisticsService {
+public class XOWLStatisticsService implements StatisticsService, HttpApiService {
     /**
      * The URI for the API services
      */

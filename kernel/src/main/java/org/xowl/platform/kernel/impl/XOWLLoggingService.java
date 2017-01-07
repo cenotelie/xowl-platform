@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Laurent Wouters
  */
-public class XOWLLoggingService extends DispatchLogger implements LoggingService {
+public class XOWLLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
     /**
      * The URI for the API services
      */

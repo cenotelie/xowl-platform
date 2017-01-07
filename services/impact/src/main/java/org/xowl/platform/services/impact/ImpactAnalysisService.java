@@ -19,7 +19,6 @@ package org.xowl.platform.services.impact;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
  * Represents a service for impact analyses
@@ -28,7 +27,7 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
  *
  * @author Laurent Wouters
  */
-public interface ImpactAnalysisService extends Service, HttpApiService {
+public interface ImpactAnalysisService extends Service {
     /**
      * Performs an impact analysis
      *

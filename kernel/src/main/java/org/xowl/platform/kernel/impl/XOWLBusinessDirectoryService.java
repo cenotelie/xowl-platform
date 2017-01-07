@@ -41,7 +41,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLBusinessDirectoryService implements BusinessDirectoryService {
+public class XOWLBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
     /**
      * The URI for the API services
      */

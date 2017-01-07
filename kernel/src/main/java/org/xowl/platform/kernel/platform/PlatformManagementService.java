@@ -25,7 +25,6 @@ import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -35,7 +34,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface PlatformManagementService extends Service, HttpApiService, MeasurableService {
+public interface PlatformManagementService extends Service, MeasurableService {
     /**
      * Exit code when the platform is shutting down as requested
      */

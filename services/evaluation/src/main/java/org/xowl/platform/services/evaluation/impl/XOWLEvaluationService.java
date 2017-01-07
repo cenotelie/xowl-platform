@@ -43,7 +43,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLEvaluationService implements EvaluationService {
+public class XOWLEvaluationService implements EvaluationService, HttpApiService {
     /**
      * The URI for the API services
      */

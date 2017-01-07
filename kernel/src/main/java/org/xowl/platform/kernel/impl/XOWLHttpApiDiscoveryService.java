@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService {
+public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
     /**
      * The URI for the API services
      */

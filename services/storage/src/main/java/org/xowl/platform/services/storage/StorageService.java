@@ -22,7 +22,6 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.storage.impl.XOWLStorageService;
 
 /**
@@ -30,7 +29,7 @@ import org.xowl.platform.services.storage.impl.XOWLStorageService;
  *
  * @author Laurent Wouters
  */
-public interface StorageService extends ArtifactStorageService, HttpApiService, MeasurableService {
+public interface StorageService extends ArtifactStorageService, MeasurableService {
     /**
      * The total artifacts count metric
      */

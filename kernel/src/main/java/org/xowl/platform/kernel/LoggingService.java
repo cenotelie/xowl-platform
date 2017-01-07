@@ -29,7 +29,7 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
  *
  * @author Laurent Wouters
  */
-public interface LoggingService extends Service, HttpApiService, MeasurableService, Logger {
+public interface LoggingService extends Service, MeasurableService, Logger {
     /**
      * The metric for the number of errors
      */

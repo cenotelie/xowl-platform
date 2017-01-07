@@ -20,7 +20,6 @@ package org.xowl.platform.services.marketplace;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.platform.Addon;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -30,7 +29,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface MarketplaceService extends Service, HttpApiService {
+public interface MarketplaceService extends Service {
     /**
      * Lookups available addons on the marketplace
      *

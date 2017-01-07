@@ -54,7 +54,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class XOWLMarketplaceService implements MarketplaceService {
+public class XOWLMarketplaceService implements MarketplaceService, HttpApiService {
     /**
      * The URI for the API services
      */

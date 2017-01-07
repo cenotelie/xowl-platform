@@ -71,7 +71,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class XOWLStorageService implements StorageService, Closeable {
+public class XOWLStorageService implements StorageService, HttpApiService, Closeable {
     /**
      * The URI for the API services
      */

@@ -62,7 +62,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConsistencyService implements ConsistencyService {
+public class XOWLConsistencyService implements ConsistencyService, HttpApiService {
     /**
      * The URI for the API services
      */

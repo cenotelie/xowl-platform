@@ -19,8 +19,8 @@ package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorService extends HttpApiService, Serializable {
+public interface ConnectorService extends Service, Serializable {
     /**
      * Pushes an artifact to the associated client
      *

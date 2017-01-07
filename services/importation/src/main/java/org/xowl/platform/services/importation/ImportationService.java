@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.Job;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.Collection;
 /**
  * Represents the importation service
  */
-public interface ImportationService extends HttpApiService {
+public interface ImportationService extends Service {
     /**
      * Gets the uploaded documents not yet completely imported
      *

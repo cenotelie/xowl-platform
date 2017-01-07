@@ -58,7 +58,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConnectionService implements ConnectionService {
+public class XOWLConnectionService implements ConnectionService, HttpApiService {
     /**
      * The data about a spawned connector
      */
@@ -273,7 +273,8 @@ public class XOWLConnectionService implements ConnectionService {
             properties.put("id", service.getIdentifier());
             BundleContext context = FrameworkUtil.getBundle(ConnectorService.class).getBundleContext();
             registration.refAsDomainConnector = context.registerService(ConnectorService.class, service, properties);
-            registration.refAsServedService = context.registerService(HttpApiService.class, service, null);
+            if (service instanceof HttpApiService)
+                registration.refAsServedService = context.registerService(HttpApiService.class, (HttpApiService) service, null);
             connectorsById.put(identifier, registration);
             EventService eventService = ServiceUtils.getService(EventService.class);
             if (eventService != null)

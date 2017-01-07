@@ -17,6 +17,8 @@
 
 package org.xowl.platform.kernel.webapi;
 
+import org.xowl.platform.kernel.Service;
+
 import java.util.Collection;
 
 /**
@@ -24,7 +26,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface HttpApiDiscoveryService extends HttpApiService {
+public interface HttpApiDiscoveryService extends Service {
     /**
      * Gets the known API services
      *

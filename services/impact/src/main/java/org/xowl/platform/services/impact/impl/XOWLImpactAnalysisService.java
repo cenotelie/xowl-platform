@@ -45,7 +45,7 @@ import java.net.HttpURLConnection;
  *
  * @author Laurent Wouters
  */
-public class XOWLImpactAnalysisService implements ImpactAnalysisService {
+public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApiService {
     /**
      * The URI for the API services
      */

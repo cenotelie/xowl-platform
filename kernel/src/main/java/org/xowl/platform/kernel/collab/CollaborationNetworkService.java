@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.collab;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
@@ -29,7 +28,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkService extends Service, HttpApiService {
+public interface CollaborationNetworkService extends Service {
     /**
      * Gets the collaborations in the neighbourhood
      *

@@ -22,7 +22,6 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
@@ -31,7 +30,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationManagerService extends Service, HttpApiService {
+public interface CollaborationManagerService extends Service {
     /**
      * Gets the expected inputs for this collaboration
      *

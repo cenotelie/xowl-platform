@@ -120,7 +120,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
      * @param executionService     The current execution service
      */
     public XOWLPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
-        Configuration configuration = configurationService.getConfigFor(this);
+        Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
         bundles = new ArrayList<>();
         Product product = null;
         try {

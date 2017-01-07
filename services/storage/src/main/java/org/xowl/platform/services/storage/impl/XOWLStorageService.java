@@ -108,7 +108,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
      */
     public XOWLStorageService() {
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(this);
+        Configuration configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
         this.server = resolveServer(configuration);
         this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
             @Override

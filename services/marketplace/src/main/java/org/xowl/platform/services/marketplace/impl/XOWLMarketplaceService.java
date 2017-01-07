@@ -85,7 +85,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
         if (configurationService == null)
             return Collections.unmodifiableCollection(marketplaces);
-        Configuration configuration = configurationService.getConfigFor(this);
+        Configuration configuration = configurationService.getConfigFor(MarketplaceService.class.getCanonicalName());
         if (configuration == null)
             return Collections.unmodifiableCollection(marketplaces);
         Collection<MarketplaceProvider> providers = ServiceUtils.getServices(MarketplaceProvider.class);

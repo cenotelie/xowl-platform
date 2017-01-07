@@ -334,7 +334,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
             if (configurationService == null)
                 return;
-            Configuration configuration = configurationService.getConfigFor(this);
+            Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
             toResolve = new HashMap<>();
             for (Section section : configuration.getSections()) {
                 String descriptorId = section.get("descriptor");

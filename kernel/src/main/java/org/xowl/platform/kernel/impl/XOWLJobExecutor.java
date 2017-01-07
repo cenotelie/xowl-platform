@@ -153,7 +153,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
      * @param configurationService The configuration service to use
      */
     public XOWLJobExecutor(ConfigurationService configurationService, EventService eventService) {
-        Configuration configuration = configurationService.getConfigFor(this);
+        Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
         int poolMax = EXECUTOR_POOL_MAX;

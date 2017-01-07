@@ -100,7 +100,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     private void onActivated() {
         if (storage == null) {
             ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-            Configuration configuration = configurationService != null ? configurationService.getConfigFor(this) : null;
+            Configuration configuration = configurationService != null ? configurationService.getConfigFor(ImportationService.class.getCanonicalName()) : null;
             if (configuration != null) {
                 String value = configuration.get("storage");
                 if (value != null)

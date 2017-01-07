@@ -123,7 +123,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * @param configurationService The configuration service
      */
     public XOWLSecurityService(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(this);
+        Configuration configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
         this.realmId = configuration.get("realm");

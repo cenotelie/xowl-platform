@@ -33,4 +33,12 @@ public interface ConfigurationService extends Service {
      * @return The corresponding configuration element
      */
     Configuration getConfigFor(Identifiable entity);
+
+    /**
+     * Gets the configuration for the entity with the specified identifier
+     *
+     * @param entityId The identifier of an entity
+     * @return The corresponding configuration element
+     */
+    Configuration getConfigFor(String entityId);
 }

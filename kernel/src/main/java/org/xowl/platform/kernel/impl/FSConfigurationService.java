@@ -68,8 +68,13 @@ public class FSConfigurationService implements ConfigurationService {
 
     @Override
     public Configuration getConfigFor(Identifiable entity) {
+        return getConfigFor(entity.getIdentifier());
+    }
+
+    @Override
+    public Configuration getConfigFor(String entityId) {
         Configuration configuration = new Configuration();
-        File file = new File(directory, entity.getIdentifier() + CONFIG_EXT);
+        File file = new File(directory, entityId + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
             try (FileInputStream stream = new FileInputStream(file)) {
                 configuration.load(stream, Files.CHARSET);

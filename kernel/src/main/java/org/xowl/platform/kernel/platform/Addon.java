@@ -19,9 +19,6 @@ package org.xowl.platform.kernel.platform;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.product.LicensePlain;
-import org.xowl.infra.utils.product.Product;
-import org.xowl.infra.utils.product.VersionInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +29,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class Addon extends Product {
+public class Addon extends ProductBase {
     /**
      * The description of the pricing policy for the addon
      */
@@ -99,6 +96,7 @@ public class Addon extends Product {
      * @param root The root of the JSON node describing the addon
      */
     public Addon(ASTNode root) {
+        super(root);
         String pricing = "";
         bundles = new ArrayList<>();
         tags = new ArrayList<>();
@@ -106,76 +104,7 @@ public class Addon extends Product {
         for (ASTNode member : root.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("identifier".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                identifier = value.substring(1, value.length() - 1);
-            } else if ("name".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                name = value.substring(1, value.length() - 1);
-            } else if ("description".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                description = value.substring(1, value.length() - 1);
-            } else if ("version".equals(head)) {
-                String versionNumber = "";
-                String versionScmTag = "";
-                String versionBuildTag = "";
-                String versionBuildUser = "";
-                String versionBuildTimestamp = "";
-                for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                    head = TextUtils.unescape(member2.getChildren().get(0).getValue());
-                    head = head.substring(1, head.length() - 1);
-                    if ("number".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionNumber = value.substring(1, value.length() - 1);
-                    } else if ("scmTag".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionScmTag = value.substring(1, value.length() - 1);
-                    } else if ("buildUser".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionBuildTag = value.substring(1, value.length() - 1);
-                    } else if ("buildTag".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionBuildUser = value.substring(1, value.length() - 1);
-                    } else if ("buildTimestamp".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionBuildTimestamp = value.substring(1, value.length() - 1);
-                    }
-                }
-                version = new VersionInfo(versionNumber, versionScmTag, versionBuildUser, versionBuildTag, versionBuildTimestamp);
-            } else if ("copyright".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                copyright = value.substring(1, value.length() - 1);
-            } else if ("iconName".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                iconName = value.substring(1, value.length() - 1);
-            } else if ("iconContent".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                iconContent = value.substring(1, value.length() - 1);
-            } else if ("vendor".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                vendor = value.substring(1, value.length() - 1);
-            } else if ("vendorLink".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                vendorLink = value.substring(1, value.length() - 1);
-            } else if ("link".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                link = value.substring(1, value.length() - 1);
-            } else if ("license".equals(head)) {
-                String licenseName = "";
-                String licenseFullText = "";
-                for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
-                    head = TextUtils.unescape(member2.getChildren().get(0).getValue());
-                    head = head.substring(1, head.length() - 1);
-                    if ("name".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        licenseName = value.substring(1, value.length() - 1);
-                    } else if ("fullText".equals(head)) {
-                        String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        licenseFullText = value.substring(1, value.length() - 1);
-                    }
-                }
-                license = new LicensePlain(licenseName, licenseFullText);
-            } else if ("pricing".equals(head)) {
+            if ("pricing".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 pricing = value.substring(1, value.length() - 1);
             } else if ("link".equals(head)) {

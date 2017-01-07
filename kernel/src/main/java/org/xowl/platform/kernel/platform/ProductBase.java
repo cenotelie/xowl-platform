@@ -50,8 +50,8 @@ public class ProductBase extends Product {
             } else if ("version".equals(head)) {
                 String versionNumber = "";
                 String versionScmTag = "";
-                String versionBuildTag = "";
                 String versionBuildUser = "";
+                String versionBuildTag = "";
                 String versionBuildTimestamp = "";
                 for (ASTNode member2 : member.getChildren().get(1).getChildren()) {
                     head = TextUtils.unescape(member2.getChildren().get(0).getValue());
@@ -64,10 +64,10 @@ public class ProductBase extends Product {
                         versionScmTag = value.substring(1, value.length() - 1);
                     } else if ("buildUser".equals(head)) {
                         String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionBuildTag = value.substring(1, value.length() - 1);
+                        versionBuildUser = value.substring(1, value.length() - 1);
                     } else if ("buildTag".equals(head)) {
                         String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
-                        versionBuildUser = value.substring(1, value.length() - 1);
+                        versionBuildTag = value.substring(1, value.length() - 1);
                     } else if ("buildTimestamp".equals(head)) {
                         String value = TextUtils.unescape(member2.getChildren().get(1).getValue());
                         versionBuildTimestamp = value.substring(1, value.length() - 1);

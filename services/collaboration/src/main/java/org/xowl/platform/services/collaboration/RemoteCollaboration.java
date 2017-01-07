@@ -15,22 +15,30 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.collab;
+package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
-import org.xowl.platform.kernel.platform.PlatformRole;
 
 import java.util.Collection;
 
 /**
- * Represents a service that manages the current collaboration that takes place on this instance of the xOWL Collaboration Platform
+ * Represents a remote collaboration in a network of collaboration
  *
  * @author Laurent Wouters
  */
-public interface CollaborationManagerService extends Service {
+public interface RemoteCollaboration extends Identifiable, Serializable {
+    /**
+     * Gets the product descriptor for the platform
+     *
+     * @return The product descriptor
+     */
+    Product getPlatformProduct();
+
     /**
      * Gets the expected inputs for this collaboration
      *
@@ -51,7 +59,7 @@ public interface CollaborationManagerService extends Service {
      * @param specification The specification of the input
      * @return The associated artifacts
      */
-    Collection<Artifact> getInputFor(ArtifactSpecification specification);
+    XSPReply getInputFor(ArtifactSpecification specification);
 
     /**
      * Gets the available artifacts for a specific output
@@ -59,37 +67,14 @@ public interface CollaborationManagerService extends Service {
      * @param specification The specification of the output
      * @return The associated artifacts
      */
-    Collection<Artifact> getOutputFor(ArtifactSpecification specification);
+    XSPReply getOutputFor(ArtifactSpecification specification);
 
     /**
-     * Registers an artifact as an input for this collaboration
+     * Sends a local artifact as an input to the remote collaboration
      *
      * @param specification The input specification that the artifact fulfills
      * @param artifact      The input artifact
      * @return The protocol reply
      */
-    XSPReply addInput(ArtifactSpecification specification, Artifact artifact);
-
-    /**
-     * Registers an artifact as an output for this collaboration
-     *
-     * @param specification The output specification that the artifact fulfills
-     * @param artifact      The output artifact
-     * @return The protocol reply
-     */
-    XSPReply publishOutput(ArtifactSpecification specification, Artifact artifact);
-
-    /**
-     * Gets the roles for this collaboration
-     *
-     * @return The roles for this collaboration
-     */
-    Collection<PlatformRole> getRoles();
-
-    /**
-     * Gets the collaboration pattern for the orchestration of this collaboration
-     *
-     * @return The current collaboration pattern
-     */
-    CollaborationPattern getCollaborationPattern();
+    XSPReply sendInput(ArtifactSpecification specification, Artifact artifact);
 }

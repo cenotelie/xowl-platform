@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.collaboration.chat;
 
 /**
  * Represents the current view of a particular user onto a conversation

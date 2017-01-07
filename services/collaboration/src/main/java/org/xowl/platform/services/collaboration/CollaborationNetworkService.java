@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.collab;
+package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;

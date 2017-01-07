@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.collaboration.chat;
 
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.Serializable;

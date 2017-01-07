@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.collaboration.chat;
 
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.webapi.HttpApiResource;

@@ -641,6 +641,17 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             }
         }
 
+        if (httpEnabled || httpsEnabled) {
+            // Felix default for org.apache.felix.http.host is null
+            valueTarget = platformConfiguration.get("httpHost");
+            valueReal = felixConfiguration.get("org.apache.felix.http.host");
+            if (!Objects.equals(valueReal, valueTarget)) {
+                // must update bound address
+                felixConfiguration.set("org.apache.felix.http.host", valueTarget);
+                mustReboot = true;
+            }
+        }
+
         if (httpEnabled) {
             // Felix default for org.osgi.service.http.port is 8080
             valueTarget = platformConfiguration.get("httpPort");

@@ -162,7 +162,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     /**
-     * Provision o platform instance of a collaboration
+     * Provision o platform instance for a collaboration
      *
      * @param specification The specification for the collaboration
      * @return The protocol reply

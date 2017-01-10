@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.network.impl;
+package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
@@ -30,24 +30,27 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
+import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.network.CollaborationInstance;
+import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.network.CollaborationProvisioner;
+import org.xowl.platform.services.collaboration.network.impl.FileSystemProvisioner;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implements a collaboration provisioner that directly manipulates the file system
+ * Implements collaboration network service that manages its own network of collaborations
  *
  * @author Laurent Wouters
  */
-public class FileSystemProvisioner implements CollaborationProvisioner {
+public class MasterNetworkService implements CollaborationNetworkService {
     /**
      * The storage area for the platform distributions
      */
@@ -74,11 +77,11 @@ public class FileSystemProvisioner implements CollaborationProvisioner {
     private final int portMax;
 
     /**
-     * Initializes this provisioner
+     * Initializes this service
      */
-    public FileSystemProvisioner() {
+    public MasterNetworkService() {
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(FileSystemProvisioner.class.getCanonicalName());
+        Configuration configuration = configurationService.getConfigFor(MasterNetworkService.class.getCanonicalName());
         File storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
         this.storageDistributions = new File(storage, "platforms");
         this.storageInstances = new File(storage, "instances");
@@ -120,31 +123,30 @@ public class FileSystemProvisioner implements CollaborationProvisioner {
 
     @Override
     public String getIdentifier() {
-        return FileSystemProvisioner.class.getCanonicalName();
+        return MasterNetworkService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - File System Collaboration Provisioner";
+        return "xOWL Collaboration Platform - Collaboration Network Service";
     }
 
     @Override
-    public Collection<Product> getAvailablePlatforms() {
-        return Collections.unmodifiableCollection(platforms.values());
+    public Collection<RemoteCollaboration> getCollaborations() {
+        Collection<RemoteCollaboration> result = new ArrayList<>();
+        for (CollaborationInstance instance : provisioner.getInstances()) {
+            result.add(new NetworkRemoteCollaboration(instance));
+        }
+        return result;
     }
 
     @Override
-    public Collection<CollaborationInstance> getInstances() {
-        return (Collection) Collections.unmodifiableCollection(instances.values());
-    }
-
-    @Override
-    public XSPReply provision(CollaborationSpecification specification) {
+    public XSPReply spawn(CollaborationSpecification specification) {
         return XSPReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply terminate(String instanceId) {
+    public XSPReply terminate(RemoteCollaboration collaboration) {
         return XSPReplyUnsupported.instance();
     }
 }

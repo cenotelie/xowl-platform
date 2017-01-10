@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.network.impl;
+package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;

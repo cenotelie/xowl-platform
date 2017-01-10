@@ -35,7 +35,6 @@ import org.xowl.platform.services.collaboration.CollaborationService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.network.impl.SimpleCollaborationNetworkService;
 
 import java.util.Collection;
 
@@ -52,11 +51,11 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.raml", "Collaboration Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(MasterNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.raml", "Collaboration Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.html", "Collaboration Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(MasterNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.html", "Collaboration Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * The collaboration network service

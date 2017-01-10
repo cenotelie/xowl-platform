@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,43 +15,43 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.platform;
+package org.xowl.platform.services.collaboration;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
 /**
- * Base implementation of a user role for the platform
+ * Base implementation for collaboration patterns
  *
  * @author Laurent Wouters
  */
-public class PlatformRoleBase implements PlatformRole {
+public class CollaborationPatternBase implements CollaborationPattern {
     /**
-     * The unique identifier of this role
+     * The identifier of this user
      */
     private final String identifier;
     /**
-     * The human-readable name of this role
+     * The name of this user
      */
     private final String name;
 
     /**
-     * Initializes this role
+     * Initializes this pattern
      *
-     * @param identifier The unique identifier of this role
-     * @param name       The human-readable name of this role
+     * @param identifier The identifier of this pattern
+     * @param name       The name of this pattern
      */
-    public PlatformRoleBase(String identifier, String name) {
+    public CollaborationPatternBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
     }
 
     /**
-     * Initializes this role
+     * Initializes this pattern
      *
      * @param definition The AST node for the serialized definition
      */
-    public PlatformRoleBase(ASTNode definition) {
+    public CollaborationPatternBase(ASTNode definition) {
         String identifier = "";
         String name = "";
         for (ASTNode member : definition.getChildren()) {
@@ -86,12 +86,16 @@ public class PlatformRoleBase implements PlatformRole {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \""
-                + TextUtils.escapeStringJSON(PlatformRole.class.getCanonicalName())
-                + "\", \"identifier\": \""
-                + TextUtils.escapeStringJSON(identifier)
-                + "\", \"name\":\""
-                + TextUtils.escapeStringJSON(name)
-                + "\"}";
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(CollaborationPattern.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(identifier) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(name) +
+                "\"}";
+    }
+
+    @Override
+    public String toString() {
+        return identifier;
     }
 }

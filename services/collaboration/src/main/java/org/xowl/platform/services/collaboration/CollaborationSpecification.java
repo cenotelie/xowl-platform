@@ -19,8 +19,10 @@ package org.xowl.platform.services.collaboration;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.platform.PlatformRoleBase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,7 +72,27 @@ public class CollaborationSpecification implements Serializable {
         this.inputs = new ArrayList<>();
         this.outputs = new ArrayList<>();
         this.roles = new ArrayList<>();
-        this.pattern = null;
+        CollaborationPattern pattern = null;
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("inputs".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    inputs.add(new ArtifactSpecification(child));
+                }
+            } else if ("outputs".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    outputs.add(new ArtifactSpecification(child));
+                }
+            } else if ("roles".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    roles.add(new PlatformRoleBase(child));
+                }
+            } else if ("pattern".equals(head)) {
+                pattern = new CollaborationPatternBase(member.getChildren().get(1));
+            }
+        }
+        this.pattern = pattern;
     }
 
     /**
@@ -109,6 +131,33 @@ public class CollaborationSpecification implements Serializable {
         return pattern;
     }
 
+    /**
+     * Adds a new input specification
+     *
+     * @param specification The input specification
+     */
+    public void addInput(ArtifactSpecification specification) {
+        inputs.add(specification);
+    }
+
+    /**
+     * Adds a new output specification
+     *
+     * @param specification The output specification
+     */
+    public void addOutput(ArtifactSpecification specification) {
+        outputs.add(specification);
+    }
+
+    /**
+     * Adds a new role
+     *
+     * @param role The role
+     */
+    public void addRole(PlatformRole role) {
+        roles.add(role);
+    }
+
     @Override
     public String serializedString() {
         return serializedJSON();
@@ -116,6 +165,35 @@ public class CollaborationSpecification implements Serializable {
 
     @Override
     public String serializedJSON() {
-        return null;
+        StringBuilder builder = new StringBuilder("{\"type\": \"");
+        builder.append(TextUtils.escapeStringJSON(CollaborationSpecification.class.getCanonicalName()));
+        builder.append("\", \"inputs\": [");
+        boolean first = true;
+        for (ArtifactSpecification specification : inputs) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(specification.serializedJSON());
+        }
+        builder.append("], \"outputs\": [");
+        first = true;
+        for (ArtifactSpecification specification : outputs) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(specification.serializedJSON());
+        }
+        builder.append("], \"roles\": [");
+        first = true;
+        for (PlatformRole role : roles) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(role.serializedJSON());
+        }
+        builder.append("], \"pattern\": ");
+        builder.append(pattern.serializedJSON());
+        builder.append("}");
+        return builder.toString();
     }
 }

@@ -35,6 +35,10 @@ import java.util.Collections;
  */
 public class CollaborationSpecification implements Serializable {
     /**
+     * The human-readable name for the collaboration
+     */
+    private final String name;
+    /**
      * The expected inputs
      */
     private final Collection<ArtifactSpecification> inputs;
@@ -54,9 +58,11 @@ public class CollaborationSpecification implements Serializable {
     /**
      * Initializes this specification
      *
+     * @param name    The human-readable name for the collaboration
      * @param pattern The collaboration pattern
      */
-    public CollaborationSpecification(CollaborationPattern pattern) {
+    public CollaborationSpecification(String name, CollaborationPattern pattern) {
+        this.name = name;
         this.inputs = new ArrayList<>();
         this.outputs = new ArrayList<>();
         this.roles = new ArrayList<>();
@@ -72,11 +78,15 @@ public class CollaborationSpecification implements Serializable {
         this.inputs = new ArrayList<>();
         this.outputs = new ArrayList<>();
         this.roles = new ArrayList<>();
+        String name = "";
         CollaborationPattern pattern = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("inputs".equals(head)) {
+            if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            } else if ("inputs".equals(head)) {
                 for (ASTNode child : member.getChildren().get(1).getChildren()) {
                     inputs.add(new ArtifactSpecification(child));
                 }
@@ -92,7 +102,17 @@ public class CollaborationSpecification implements Serializable {
                 pattern = new CollaborationPatternBase(member.getChildren().get(1));
             }
         }
+        this.name = name;
         this.pattern = pattern;
+    }
+
+    /**
+     * Gets the name for the collaboration
+     *
+     * @return The name for the collaboration
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -167,6 +187,8 @@ public class CollaborationSpecification implements Serializable {
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(CollaborationSpecification.class.getCanonicalName()));
+        builder.append("\", \"name\": \"");
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"inputs\": [");
         boolean first = true;
         for (ArtifactSpecification specification : inputs) {

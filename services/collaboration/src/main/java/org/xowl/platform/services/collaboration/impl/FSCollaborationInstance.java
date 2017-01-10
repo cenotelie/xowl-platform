@@ -59,6 +59,15 @@ public class FSCollaborationInstance implements CollaborationInstance {
     }
 
     /**
+     * Sets the status of this instance
+     *
+     * @param status The status of this instance
+     */
+    public void setStatus(CollaborationStatus status) {
+        this.status = status;
+    }
+
+    /**
      * Initializes this structure
      *
      * @param identifier The unique identifier for this instance

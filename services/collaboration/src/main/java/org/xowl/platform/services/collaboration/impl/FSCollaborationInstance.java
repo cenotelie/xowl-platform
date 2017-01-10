@@ -27,7 +27,7 @@ import org.xowl.platform.services.collaboration.network.CollaborationStatus;
  *
  * @author Laurent Wouters
  */
-public class FileSystemCollaborationInstance implements CollaborationInstance {
+public class FSCollaborationInstance implements CollaborationInstance {
     /**
      * The unique identifier for this instance
      */
@@ -66,7 +66,7 @@ public class FileSystemCollaborationInstance implements CollaborationInstance {
      * @param endpoint   The API endpoint for the instance
      * @param status     The status of the instance
      */
-    public FileSystemCollaborationInstance(String identifier, String name, String endpoint, CollaborationStatus status, int port) {
+    public FSCollaborationInstance(String identifier, String name, String endpoint, CollaborationStatus status, int port) {
         this.identifier = identifier;
         this.name = name;
         this.endpoint = endpoint;
@@ -79,7 +79,7 @@ public class FileSystemCollaborationInstance implements CollaborationInstance {
      *
      * @param definition The AST node for the serialized definition
      */
-    public FileSystemCollaborationInstance(ASTNode definition) {
+    public FSCollaborationInstance(ASTNode definition) {
         String identifier = "";
         String name = "";
         String endpoint = "";

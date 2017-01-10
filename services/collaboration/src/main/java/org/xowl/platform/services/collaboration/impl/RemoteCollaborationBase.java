@@ -33,7 +33,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class NetworkRemoteCollaboration implements RemoteCollaboration {
+public class RemoteCollaborationBase implements RemoteCollaboration {
     /**
      * The associated collaboration instance
      */
@@ -44,7 +44,7 @@ public class NetworkRemoteCollaboration implements RemoteCollaboration {
      *
      * @param collaborationInstance The associated collaboration instance
      */
-    public NetworkRemoteCollaboration(CollaborationInstance collaborationInstance) {
+    public RemoteCollaborationBase(CollaborationInstance collaborationInstance) {
         this.collaborationInstance = collaborationInstance;
     }
 

@@ -66,7 +66,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
     /**
      * The managed instances
      */
-    private final Map<String, FileSystemCollaborationInstance> instances;
+    private final Map<String, FSCollaborationInstance> instances;
     /**
      * The min in the available port range
      */
@@ -111,7 +111,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
                     try (InputStream stream = new FileInputStream(files[i])) {
                         String content = Files.read(stream, Files.CHARSET);
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-                        FileSystemCollaborationInstance instance = new FileSystemCollaborationInstance(definition);
+                        FSCollaborationInstance instance = new FSCollaborationInstance(definition);
                         instances.put(instance.getIdentifier(), instance);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
@@ -135,7 +135,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
     public Collection<RemoteCollaboration> getCollaborations() {
         Collection<RemoteCollaboration> result = new ArrayList<>();
         for (CollaborationInstance instance : provisioner.getInstances()) {
-            result.add(new NetworkRemoteCollaboration(instance));
+            result.add(new RemoteCollaborationBase(instance));
         }
         return result;
     }

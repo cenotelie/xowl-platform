@@ -31,17 +31,14 @@ import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.network.CollaborationInstance;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.network.CollaborationProvisioner;
-import org.xowl.platform.services.collaboration.network.impl.FileSystemProvisioner;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,9 +61,13 @@ public class MasterNetworkService implements CollaborationNetworkService {
      */
     private final Map<String, Product> platforms;
     /**
-     * The managed instances
+     * The managed platform instances
      */
     private final Map<String, FSCollaborationInstance> instances;
+    /**
+     * The managed collaboration instances
+     */
+    private final Map<String, RemoteCollaborationBase> collaborations;
     /**
      * The min in the available port range
      */
@@ -87,6 +88,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         this.storageInstances = new File(storage, "instances");
         this.platforms = new HashMap<>();
         this.instances = new HashMap<>();
+        this.collaborations = new HashMap<>();
         this.portMin = Integer.parseInt(configuration.get("portMin"));
         this.portMax = Integer.parseInt(configuration.get("portMax"));
         File[] files = storageDistributions.listFiles();
@@ -133,11 +135,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public Collection<RemoteCollaboration> getCollaborations() {
-        Collection<RemoteCollaboration> result = new ArrayList<>();
-        for (CollaborationInstance instance : provisioner.getInstances()) {
-            result.add(new RemoteCollaborationBase(instance));
-        }
-        return result;
+        return (Collection) Collections.unmodifiableCollection(collaborations.values());
     }
 
     @Override

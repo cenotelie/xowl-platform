@@ -19,6 +19,8 @@ package org.xowl.platform.services.collaboration.network;
 
 /**
  * The status of collaborations
+ *
+ * @author Laurent Wouters
  */
 public enum CollaborationStatus {
     /**

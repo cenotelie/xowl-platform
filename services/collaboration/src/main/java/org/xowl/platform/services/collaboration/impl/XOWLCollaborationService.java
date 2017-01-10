@@ -15,89 +15,126 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.network.impl;
+package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.collaboration.CollaborationPattern;
 import org.xowl.platform.services.collaboration.CollaborationService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.network.CollaborationInstance;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.network.CollaborationProvisioner;
+import org.xowl.platform.services.collaboration.network.impl.SimpleCollaborationNetworkService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Implements a simple collaboration network management service
+ * Implements the collaboration service for this platform
  *
  * @author Laurent Wouters
  */
-public class SimpleCollaborationNetworkService implements CollaborationNetworkService, HttpApiService {
+public class XOWLCollaborationService implements CollaborationService, HttpApiService {
     /**
      * The URI for the API services
      */
-    private static final String URI_API = HttpApiService.URI_API + "/services/collaboration/network";
+    private static final String URI_API = HttpApiService.URI_API + "/services/collaboration";
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_network.raml", "Collaboration Network Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.raml", "Collaboration Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_network.html", "Collaboration Network Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(SimpleCollaborationNetworkService.class, "/org/xowl/platform/services/collaboration/api_collaboration.html", "Collaboration Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
-     * The provisioner to use
+     * The collaboration network service
      */
-    private final CollaborationProvisioner provisioner;
+    private final CollaborationNetworkService networkService;
 
     /**
      * Initializes this service
      */
-    public SimpleCollaborationNetworkService() {
+    public XOWLCollaborationService() {
         ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-        this.provisioner = ServiceUtils.instantiate(configuration.get("network", "provisioner"));
+        this.networkService = ServiceUtils.instantiate(configuration.get("network", "service"));
     }
 
     @Override
     public String getIdentifier() {
-        return SimpleCollaborationNetworkService.class.getCanonicalName();
+        return XOWLCollaborationService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Collaboration Network Service";
+        return "xOWL Collaboration Platform - Collaboration Service";
     }
 
     @Override
-    public Collection<RemoteCollaboration> getCollaborations() {
-        Collection<RemoteCollaboration> result = new ArrayList<>();
-        for (CollaborationInstance instance : provisioner.getInstances()) {
-            result.add(new NetworkRemoteCollaboration(instance));
-        }
-        return result;
+    public Collection<ArtifactSpecification> getInputSpecifications() {
+        return null;
+    }
+
+    @Override
+    public Collection<ArtifactSpecification> getOutputSpecifications() {
+        return null;
+    }
+
+    @Override
+    public Collection<Artifact> getInputFor(ArtifactSpecification specification) {
+        return null;
+    }
+
+    @Override
+    public Collection<Artifact> getOutputFor(ArtifactSpecification specification) {
+        return null;
+    }
+
+    @Override
+    public XSPReply addInput(ArtifactSpecification specification, Artifact artifact) {
+        return null;
+    }
+
+    @Override
+    public XSPReply publishOutput(ArtifactSpecification specification, Artifact artifact) {
+        return null;
+    }
+
+    @Override
+    public Collection<PlatformRole> getRoles() {
+        return null;
+    }
+
+    @Override
+    public CollaborationPattern getCollaborationPattern() {
+        return null;
+    }
+
+    @Override
+    public Collection<RemoteCollaboration> getNeighbours() {
+        return networkService.getCollaborations();
     }
 
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
-        return XSPReplyUnsupported.instance();
+        return networkService.spawn(specification);
     }
 
     @Override
     public XSPReply terminate(RemoteCollaboration collaboration) {
-        return XSPReplyUnsupported.instance();
+        return networkService.terminate(collaboration);
     }
 
     @Override

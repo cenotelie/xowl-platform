@@ -20,6 +20,7 @@ package org.xowl.platform.services.collaboration.network;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.services.collaboration.CollaborationSpecification;
 
 import java.util.Collection;
 
@@ -46,10 +47,10 @@ public interface CollaborationProvisioner extends Service {
     /**
      * Provisions a platform for a new collaboration
      *
-     * @param platformId The identifier of the requested platform product for the collaboration
+     * @param specification The specification of the collaboration
      * @return The protocol reply
      */
-    XSPReply provision(String platformId);
+    XSPReply provision(CollaborationSpecification specification);
 
     /**
      * Terminates a collaboration

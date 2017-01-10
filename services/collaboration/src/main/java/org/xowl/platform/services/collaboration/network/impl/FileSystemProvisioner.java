@@ -19,6 +19,7 @@ package org.xowl.platform.services.collaboration.network.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
@@ -28,6 +29,7 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.ProductBase;
+import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.network.CollaborationInstance;
 import org.xowl.platform.services.collaboration.network.CollaborationProvisioner;
 
@@ -137,12 +139,12 @@ public class FileSystemProvisioner implements CollaborationProvisioner {
     }
 
     @Override
-    public XSPReply provision(String platformId) {
-        return null;
+    public XSPReply provision(CollaborationSpecification specification) {
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply terminate(String instanceId) {
-        return null;
+        return XSPReplyUnsupported.instance();
     }
 }

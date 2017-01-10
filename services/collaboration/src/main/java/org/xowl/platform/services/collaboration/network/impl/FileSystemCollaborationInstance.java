@@ -50,6 +50,15 @@ public class FileSystemCollaborationInstance implements CollaborationInstance {
     private final int port;
 
     /**
+     * Gets the selected network port for this instance
+     *
+     * @return The selected network port for this instance
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
      * Initializes this structure
      *
      * @param identifier The unique identifier for this instance

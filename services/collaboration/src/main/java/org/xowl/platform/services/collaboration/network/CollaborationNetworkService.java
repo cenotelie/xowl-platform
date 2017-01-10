@@ -18,7 +18,6 @@
 package org.xowl.platform.services.collaboration.network;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
@@ -32,13 +31,6 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public interface CollaborationNetworkService extends Service {
-    /**
-     * Gets a list of the available platform distribution that can be used for spawning new collaborations
-     *
-     * @return The list of the available platform distributions
-     */
-    Collection<Product> getAvailablePlatforms();
-
     /**
      * Gets the known collaborations
      *

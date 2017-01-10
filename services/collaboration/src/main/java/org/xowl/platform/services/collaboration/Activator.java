@@ -19,6 +19,8 @@ package org.xowl.platform.services.collaboration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.collaboration.impl.XOWLCollaborationService;
 
 /**
  * Activator for this bundle
@@ -29,6 +31,9 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        XOWLCollaborationService collaborationService = new XOWLCollaborationService();
+        bundleContext.registerService(CollaborationService.class, collaborationService, null);
+        bundleContext.registerService(HttpApiService.class, collaborationService, null);
     }
 
     @Override

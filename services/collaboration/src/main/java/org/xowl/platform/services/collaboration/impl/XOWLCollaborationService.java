@@ -60,15 +60,26 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
     /**
      * The collaboration network service
      */
-    private final CollaborationNetworkService networkService;
+    private CollaborationNetworkService networkService;
 
     /**
      * Initializes this service
      */
     public XOWLCollaborationService() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-        this.networkService = ServiceUtils.instantiate(configuration.get("network", "service"));
+    }
+
+    /**
+     * Resolves the current collaboration network service
+     *
+     * @return The collaboration network service
+     */
+    private synchronized CollaborationNetworkService getNetworkService() {
+        if (networkService == null) {
+            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
+            networkService = ServiceUtils.instantiate(configuration.get("network", "service"));
+        }
+        return networkService;
     }
 
     @Override
@@ -123,17 +134,17 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
 
     @Override
     public Collection<RemoteCollaboration> getNeighbours() {
-        return networkService.getCollaborations();
+        return getNetworkService().getCollaborations();
     }
 
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
-        return networkService.spawn(specification);
+        return getNetworkService().spawn(specification);
     }
 
     @Override
     public XSPReply terminate(RemoteCollaboration collaboration) {
-        return networkService.terminate(collaboration);
+        return getNetworkService().terminate(collaboration);
     }
 
     @Override

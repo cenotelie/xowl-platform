@@ -33,7 +33,7 @@ import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.network.CollaborationStatus;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 import java.io.*;
 import java.util.*;

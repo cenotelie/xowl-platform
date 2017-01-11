@@ -32,6 +32,20 @@ import java.util.Collection;
  */
 public interface CollaborationService extends Service {
     /**
+     * Stops and archive this collaboration
+     *
+     * @return The protocol reply
+     */
+    XSPReply archive();
+
+    /**
+     * Stops this collaboration and delete all its data
+     *
+     * @return The protocol reply
+     */
+    XSPReply delete();
+
+    /**
      * Gets the expected inputs for this collaboration
      *
      * @return The expected inputs
@@ -46,38 +60,70 @@ public interface CollaborationService extends Service {
     Collection<ArtifactSpecification> getOutputSpecifications();
 
     /**
+     * Adds a new specification for an input
+     *
+     * @param specification The specification
+     * @return The protocol reply
+     */
+    XSPReply addInputSpecification(ArtifactSpecification specification);
+
+    /**
+     * Adds a new specification for an output
+     *
+     * @param specification The specification
+     * @return The protocol reply
+     */
+    XSPReply addOutputSpecification(ArtifactSpecification specification);
+
+    /**
+     * Removes the specification of an input
+     *
+     * @param specificationId The identifier of the specification to remove
+     * @return The protocol reply
+     */
+    XSPReply removeInputSpecification(String specificationId);
+
+    /**
+     * Removes the specification of an output
+     *
+     * @param specificationId The identifier of the specification to remove
+     * @return The protocol reply
+     */
+    XSPReply removeOutputSpecification(String specificationId);
+
+    /**
      * Gets the available artifacts for a specific input
      *
-     * @param specification The specification of the input
+     * @param specificationId The identifier of the input specification
      * @return The associated artifacts
      */
-    Collection<Artifact> getInputFor(ArtifactSpecification specification);
+    Collection<Artifact> getInputFor(String specificationId);
 
     /**
      * Gets the available artifacts for a specific output
      *
-     * @param specification The specification of the output
+     * @param specificationId The identifier of the output specification
      * @return The associated artifacts
      */
-    Collection<Artifact> getOutputFor(ArtifactSpecification specification);
+    Collection<Artifact> getOutputFor(String specificationId);
 
     /**
      * Registers an artifact as an input for this collaboration
      *
-     * @param specification The input specification that the artifact fulfills
-     * @param artifact      The input artifact
+     * @param specificationId The identifier of the input specification that the artifact fulfills
+     * @param artifactId      The identifier of the input artifact
      * @return The protocol reply
      */
-    XSPReply addInput(ArtifactSpecification specification, Artifact artifact);
+    XSPReply registerInput(String specificationId, String artifactId);
 
     /**
      * Registers an artifact as an output for this collaboration
      *
-     * @param specification The output specification that the artifact fulfills
-     * @param artifact      The output artifact
+     * @param specificationId The identifier of the output specification that the artifact fulfills
+     * @param artifactId      The identifier of the output artifact
      * @return The protocol reply
      */
-    XSPReply publishOutput(ArtifactSpecification specification, Artifact artifact);
+    XSPReply registerOutput(String specificationId, String artifactId);
 
     /**
      * Gets the roles for this collaboration
@@ -87,6 +133,22 @@ public interface CollaborationService extends Service {
     Collection<PlatformRole> getRoles();
 
     /**
+     * Adds a role for this collaboration
+     *
+     * @param name The name for this role
+     * @return The protocol reply
+     */
+    XSPReply addRole(String name);
+
+    /**
+     * Removes a role from this collaboration
+     *
+     * @param identifier The identifier of the role to remove
+     * @return The protocol reply
+     */
+    XSPReply removeRole(String identifier);
+
+    /**
      * Gets the collaboration pattern for the orchestration of this collaboration
      *
      * @return The current collaboration pattern
@@ -94,7 +156,7 @@ public interface CollaborationService extends Service {
     CollaborationPattern getCollaborationPattern();
 
     /**
-     * Gets the collaborations in the neighbourhood
+     * Gets the remote collaborations in the neighbourhood
      *
      * @return The known collaborations
      */
@@ -107,12 +169,4 @@ public interface CollaborationService extends Service {
      * @return The protocol reply
      */
     XSPReply spawn(CollaborationSpecification specification);
-
-    /**
-     * Terminates a collaboration
-     *
-     * @param collaboration The collaboration to terminate
-     * @return The protocol reply
-     */
-    XSPReply terminate(RemoteCollaboration collaboration);
 }

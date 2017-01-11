@@ -32,6 +32,34 @@ import java.util.Collection;
  */
 public interface RemoteCollaboration extends Identifiable, Serializable {
     /**
+     * Gets the status of this collaboration
+     *
+     * @return The status of this collaboration
+     */
+    CollaborationStatus getStatus();
+
+    /**
+     * Stops and archive this collaboration
+     *
+     * @return The protocol reply
+     */
+    XSPReply archive();
+
+    /**
+     * Un-archives and re-starts this collaboration
+     *
+     * @return The protocol reply
+     */
+    XSPReply restart();
+
+    /**
+     * Stops this collaboration and delete all its data
+     *
+     * @return The protocol reply
+     */
+    XSPReply delete();
+
+    /**
      * Gets the expected inputs for this collaboration
      *
      * @return The expected inputs
@@ -48,25 +76,34 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
     /**
      * Gets the available artifacts for a specific input
      *
-     * @param specification The specification of the input
+     * @param specificationId The identifier for the specification of the input
      * @return The associated artifacts
      */
-    XSPReply getInputFor(ArtifactSpecification specification);
+    XSPReply getInputFor(String specificationId);
 
     /**
      * Gets the available artifacts for a specific output
      *
-     * @param specification The specification of the output
+     * @param specificationId The identifier for the specification of the output
      * @return The associated artifacts
      */
-    XSPReply getOutputFor(ArtifactSpecification specification);
+    XSPReply getOutputFor(String specificationId);
 
     /**
      * Sends a local artifact as an input to the remote collaboration
      *
-     * @param specification The input specification that the artifact fulfills
-     * @param artifact      The input artifact
+     * @param specificationId The identifier of the input specification that the artifact fulfills
+     * @param artifact        The input artifact
      * @return The protocol reply
      */
-    XSPReply sendInput(ArtifactSpecification specification, Artifact artifact);
+    XSPReply sendInput(ArtifactSpecification specificationId, Artifact artifact);
+
+    /**
+     * Retrieves the remote artifact that fulfills an output specification and copies it locally
+     *
+     * @param specificationId The identifier of the output specification
+     * @param artifactId      The identifier of the artifact to retrieve
+     * @return The protocol reply
+     */
+    XSPReply retrieveOutput(String specificationId, String artifactId);
 }

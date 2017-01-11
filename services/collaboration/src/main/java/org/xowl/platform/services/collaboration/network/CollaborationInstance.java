@@ -19,6 +19,7 @@ package org.xowl.platform.services.collaboration.network;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**
  * Represents the data about a provisioned collaboration

@@ -20,7 +20,7 @@ package org.xowl.platform.services.collaboration.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.collaboration.network.CollaborationInstance;
-import org.xowl.platform.services.collaboration.network.CollaborationStatus;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**
  * Implements the data about a collaboration provisioned on the local file system

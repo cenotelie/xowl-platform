@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.network;
+package org.xowl.platform.services.collaboration;
 
 /**
  * The status of collaborations
@@ -36,7 +36,7 @@ public enum CollaborationStatus {
      */
     Stopped,
     /**
-     * The collaboration has stopped, the platform is not running and archived
+     * The collaboration has stopped, the platform is not running and is archived
      */
     Archived
 }

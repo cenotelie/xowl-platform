@@ -53,4 +53,28 @@ public interface CollaborationNetworkService extends Service {
      * @return The protocol reply
      */
     XSPReply terminate(RemoteCollaboration collaboration);
+
+    /**
+     * Stops and archive a collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @return The protocol reply
+     */
+    XSPReply archive(String collaborationId);
+
+    /**
+     * Un-archives and re-starts a collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @return The protocol reply
+     */
+    XSPReply restart(String collaborationId);
+
+    /**
+     * Stops a collaboration and delete all its data
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @return The protocol reply
+     */
+    XSPReply delete(String collaborationId);
 }

@@ -20,7 +20,6 @@ package org.xowl.platform.services.collaboration;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 
 import java.util.Collection;
@@ -93,10 +92,10 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      * Sends a local artifact as an input to the remote collaboration
      *
      * @param specificationId The identifier of the input specification that the artifact fulfills
-     * @param artifact        The input artifact
+     * @param artifactId      The identifier of the artifact to send
      * @return The protocol reply
      */
-    XSPReply sendInput(ArtifactSpecification specificationId, Artifact artifact);
+    XSPReply sendInput(String specificationId, String artifactId);
 
     /**
      * Retrieves the remote artifact that fulfills an output specification and copies it locally

@@ -148,7 +148,12 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public Collection<RemoteCollaboration> getCollaborations() {
-        return Collections.emptyList();
+        return (Collection) Collections.unmodifiableCollection(collaborations.values());
+    }
+
+    @Override
+    public RemoteCollaboration getCollaboration(String identifier) {
+        return collaborations.get(identifier);
     }
 
     @Override

@@ -39,6 +39,14 @@ public interface CollaborationNetworkService extends Service {
     Collection<RemoteCollaboration> getCollaborations();
 
     /**
+     * Gets a collaboration
+     *
+     * @param identifier The identifier of the collaboration to retrieve
+     * @return The collaboration, or null if it cannot be found
+     */
+    RemoteCollaboration getCollaboration(String identifier);
+
+    /**
      * Spawns a new collaboration
      *
      * @param specification The specification for the collaboration

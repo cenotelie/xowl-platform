@@ -23,7 +23,10 @@ import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
@@ -42,6 +45,7 @@ import org.xowl.platform.services.collaboration.*;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -171,13 +175,19 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
     @Override
     public XSPReply addInputSpecification(ArtifactSpecification specification) {
         manifest.addInputSpecification(specification);
-        return serializeManifest();
+        XSPReply reply = serializeManifest();
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(specification);
     }
 
     @Override
     public XSPReply addOutputSpecification(ArtifactSpecification specification) {
         manifest.addOutputSpecification(specification);
-        return serializeManifest();
+        XSPReply reply = serializeManifest();
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(specification);
     }
 
     @Override
@@ -252,11 +262,20 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
             return reply;
         PlatformRole role = ((XSPReplyResult<PlatformRole>) reply).getData();
         manifest.addRole(role);
-        return serializeManifest();
+        reply = serializeManifest();
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(role);
     }
 
     @Override
     public XSPReply removeRole(String identifier) {
+        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.getRealm().deleteRole(identifier);
+        if (!reply.isSuccess())
+            return reply;
         manifest.removeRole(identifier);
         return serializeManifest();
     }
@@ -285,7 +304,270 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        return null;
+        if (request.getUri().equals(URI_API + "/archive")) {
+            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+            return XSPReplyUtils.toHttpResponse(archive(), null);
+        } else if (request.getUri().equals(URI_API + "/delete")) {
+            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+            return XSPReplyUtils.toHttpResponse(delete(), null);
+        } else if (request.getUri().startsWith(URI_API + "/inputs")) {
+            String rest = request.getUri().substring(URI_API.length() + "/inputs".length() + 1);
+            if (rest.isEmpty()) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        boolean first = true;
+                        StringBuilder builder = new StringBuilder("[");
+                        for (ArtifactSpecification specification : getInputSpecifications()) {
+                            if (!first)
+                                builder.append(", ");
+                            first = false;
+                            builder.append(specification.serializedJSON());
+                        }
+                        builder.append("]");
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+                    }
+                    case HttpConstants.METHOD_PUT: {
+                        String[] names = request.getParameter("name");
+                        String[] archetypes = request.getParameter("archetype");
+                        if (names == null || names.length == 0)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        if (archetypes == null || archetypes.length == 0)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+                        return XSPReplyUtils.toHttpResponse(addInputSpecification(new ArtifactSpecification(names[0], archetypes[0])), null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+            }
+            int index = rest.indexOf("/");
+            String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
+                return XSPReplyUtils.toHttpResponse(removeInputSpecification(specId), null);
+            }
+            rest = rest.substring(index + 1);
+            if (!rest.startsWith("artifacts"))
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            index = rest.indexOf("/");
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                boolean first = true;
+                StringBuilder builder = new StringBuilder("[");
+                for (Artifact artifact : getInputFor(specId)) {
+                    if (!first)
+                        builder.append(", ");
+                    first = false;
+                    builder.append(artifact.serializedJSON());
+                }
+                builder.append("]");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+            }
+            rest = rest.substring(index + 1);
+            String artifactId = URIUtils.decodeComponent(rest);
+            if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
+            return XSPReplyUtils.toHttpResponse(registerInput(specId, artifactId), null);
+        } else if (request.getUri().startsWith(URI_API + "/outputs")) {
+            String rest = request.getUri().substring(URI_API.length() + "/outputs".length() + 1);
+            if (rest.isEmpty()) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        boolean first = true;
+                        StringBuilder builder = new StringBuilder("[");
+                        for (ArtifactSpecification specification : getOutputSpecifications()) {
+                            if (!first)
+                                builder.append(", ");
+                            first = false;
+                            builder.append(specification.serializedJSON());
+                        }
+                        builder.append("]");
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+                    }
+                    case HttpConstants.METHOD_PUT: {
+                        String[] names = request.getParameter("name");
+                        String[] archetypes = request.getParameter("archetype");
+                        if (names == null || names.length == 0)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        if (archetypes == null || archetypes.length == 0)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+                        return XSPReplyUtils.toHttpResponse(addOutputSpecification(new ArtifactSpecification(names[0], archetypes[0])), null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+            }
+            int index = rest.indexOf("/");
+            String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
+                return XSPReplyUtils.toHttpResponse(removeOutputSpecification(specId), null);
+            }
+            rest = rest.substring(index + 1);
+            if (!rest.startsWith("artifacts"))
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            index = rest.indexOf("/");
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                boolean first = true;
+                StringBuilder builder = new StringBuilder("[");
+                for (Artifact artifact : getOutputFor(specId)) {
+                    if (!first)
+                        builder.append(", ");
+                    first = false;
+                    builder.append(artifact.serializedJSON());
+                }
+                builder.append("]");
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+            }
+            rest = rest.substring(index + 1);
+            String artifactId = URIUtils.decodeComponent(rest);
+            if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
+            return XSPReplyUtils.toHttpResponse(registerOutput(specId, artifactId), null);
+        } else if (request.getUri().startsWith(URI_API + "/roles")) {
+            String rest = request.getUri().substring(URI_API.length() + "/roles".length() + 1);
+            if (rest.isEmpty()) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        boolean first = true;
+                        StringBuilder builder = new StringBuilder("[");
+                        for (PlatformRole role : getRoles()) {
+                            if (!first)
+                                builder.append(", ");
+                            first = false;
+                            builder.append(role.serializedJSON());
+                        }
+                        builder.append("]");
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+                    }
+                    case HttpConstants.METHOD_PUT: {
+                        String[] names = request.getParameter("name");
+                        if (names == null || names.length == 0)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return XSPReplyUtils.toHttpResponse(addRole(names[0]), null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+            }
+            int index = rest.indexOf("/");
+            String roleId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
+                return XSPReplyUtils.toHttpResponse(removeRole(roleId), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        } else if (request.getUri().equals(URI_API + "/pattern")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            CollaborationPattern pattern = getCollaborationPattern();
+            if (pattern == null)
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, pattern.serializedJSON());
+        } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
+            String rest = request.getUri().substring(URI_API.length() + "/neighbours".length() + 1);
+            if (rest.isEmpty()) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        boolean first = true;
+                        StringBuilder builder = new StringBuilder("[");
+                        for (RemoteCollaboration collaboration : getNeighbours()) {
+                            if (!first)
+                                builder.append(", ");
+                            first = false;
+                            builder.append(collaboration.serializedJSON());
+                        }
+                        builder.append("]");
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+                    }
+                    case HttpConstants.METHOD_PUT: {
+                        String content = new String(request.getContent(), Files.CHARSET);
+                        if (content.isEmpty())
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        BufferedLogger logger = new BufferedLogger();
+                        ASTNode root = JSONLDLoader.parseJSON(logger, content);
+                        if (root == null)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        CollaborationSpecification specification = new CollaborationSpecification(root);
+                        return XSPReplyUtils.toHttpResponse(spawn(specification), null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+            }
+            int index = rest.indexOf("/");
+            String neighbourId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            RemoteCollaboration remoteCollaboration = getNetworkService().getCollaboration(neighbourId);
+            if (remoteCollaboration == null)
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET: {
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, remoteCollaboration.serializedJSON());
+                    }
+                    case HttpConstants.METHOD_DELETE: {
+                        return XSPReplyUtils.toHttpResponse(remoteCollaboration.delete(), null);
+                    }
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+            }
+            rest = rest.substring(index + 1);
+            if (rest.equals("archive")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                return XSPReplyUtils.toHttpResponse(remoteCollaboration.archive(), null);
+            } else if (rest.equals("restart")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                return XSPReplyUtils.toHttpResponse(remoteCollaboration.restart(), null);
+            } else if (rest.startsWith("inputs")) {
+                rest = request.getUri().substring("inputs".length());
+                if (rest.isEmpty())
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                index = rest.indexOf("/");
+                String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+                if (index < 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                rest = rest.substring(index + 1);
+                if (rest.equals("artifacts")) {
+                    if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                    return XSPReplyUtils.toHttpResponse(remoteCollaboration.getInputFor(specId), null);
+                }
+                if (!rest.startsWith("artifacts/"))
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                rest = rest.substring("artifacts/".length());
+                String artifactId = URIUtils.decodeComponent(rest);
+                if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
+                return XSPReplyUtils.toHttpResponse(remoteCollaboration.sendInput(specId, artifactId), null);
+            } else if (rest.startsWith("outputs")) {
+                rest = request.getUri().substring("outputs".length());
+                if (rest.isEmpty())
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                index = rest.indexOf("/");
+                String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+                if (index < 0)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                rest = rest.substring(index + 1);
+                if (rest.equals("artifacts")) {
+                    if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                    return XSPReplyUtils.toHttpResponse(remoteCollaboration.getOutputFor(specId), null);
+                }
+                if (!rest.startsWith("artifacts/"))
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                rest = rest.substring("artifacts/".length());
+                String artifactId = URIUtils.decodeComponent(rest);
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                return XSPReplyUtils.toHttpResponse(remoteCollaboration.retrieveOutput(specId, artifactId), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Override

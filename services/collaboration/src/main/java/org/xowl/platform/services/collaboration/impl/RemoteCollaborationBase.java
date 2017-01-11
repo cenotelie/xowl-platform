@@ -107,7 +107,7 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
     }
 
     @Override
-    public XSPReply sendInput(ArtifactSpecification specificationId, Artifact artifact) {
+    public XSPReply sendInput(String specificationId, Artifact artifact) {
         return XSPReplyUnsupported.instance();
     }
 
@@ -129,6 +129,8 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
         builder.append(TextUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(getName()));
+        builder.append("\", \"status\": \"");
+        builder.append(TextUtils.escapeStringJSON(getStatus().toString()));
         builder.append("\", \"inputs\": [");
         boolean first = true;
         for (ArtifactSpecification specification : getInputSpecifications()) {

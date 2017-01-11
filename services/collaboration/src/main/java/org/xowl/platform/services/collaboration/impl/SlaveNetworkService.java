@@ -76,6 +76,11 @@ public class SlaveNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public RemoteCollaboration getCollaboration(String identifier) {
+        return null;
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         return XSPReplyUnsupported.instance();
     }

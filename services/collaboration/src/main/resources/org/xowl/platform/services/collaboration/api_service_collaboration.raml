@@ -1,0 +1,116 @@
+#%RAML 1.0
+---
+title: Collaboration Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Job: !include schema_platform_kernel.json#/definitions/Job
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/collaboration:
+  /archive:
+    description: Action to archive this collaboration
+    is: [secured, mayFail]
+    post:
+      description: Archives this collaboration
+      responses:
+        200:
+          description: The description of the new job that will executes this action
+          body:
+            application/json:
+              type: Job
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.jobs.Job",
+                  "identifier": "job1",
+                  "name": "Archive the local collaboration",
+                  "jobType": "org.xowl.platform.services.collaboration.jobs.CollaborationArchiveJob",
+                  "owner": {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe"
+                  },
+                  "status": "Running",
+                  "timeScheduled": "01/01/2001 10:10",
+                  "timeRun": "01/01/2001 10:10",
+                  "timeCompleted": "",
+                  "completionRate": "0.5",
+                  "payload": "",
+                  "result": {}
+                }
+  /delete:
+    description: Action to delete this collaboration and its associated data
+    is: [secured, mayFail]
+    post:
+      description: Deletes this collaboration
+      responses:
+        200:
+          description: The description of the new job that will executes this action
+          body:
+            application/json:
+              type: Job
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.jobs.Job",
+                  "identifier": "job1",
+                  "name": "Delete the local collaboration",
+                  "jobType": "org.xowl.platform.services.collaboration.jobs.CollaborationDeletejob",
+                  "owner": {
+                    "type": "org.xowl.platform.kernel.platform.PlatformUser",
+                    "identifier": "jdoe",
+                    "name": "Jane Doe"
+                  },
+                  "status": "Running",
+                  "timeScheduled": "01/01/2001 10:10",
+                  "timeRun": "01/01/2001 10:10",
+                  "timeCompleted": "",
+                  "completionRate": "0.5",
+                  "payload": "",
+                  "result": {}
+                }
+  /inputs:
+    description: The list of input specifications for this collaboration
+    /{specId}:
+      description: An input specification for this collaboration
+      /artifacts:
+        description: The artifacts that fulfills the input specification
+  /outputs:
+    description: The list of output specifications for this collaboration
+    /{specId}:
+      description: An output specification for this collaboration
+      /artifacts:
+        description: The artifacts that fulfills the output specification
+  /roles:
+    description: The list of roles for this collaboration
+    /{roleId}:
+      description: A role in the collaboration
+  /pattern:
+    description: The collaboration pattern for this collaboration
+  /neighbours:
+    description: The list of neighbour collaborations
+    /{neighbourId}:
+      description: A remote collaboration
+      /status:
+        description: The status of the remote collaboration
+      /archive:
+        description: Action to archive the remote collaboration
+      /restart:
+        description: Action to restart the archived remoted collaboration
+      /delete:
+        description: Action to delete the remote collaboration
+      /inputs:
+        description: The list of the input specifications for the remote collaboration
+        /{specId}:
+          description: An input specification for the remote collaboration
+          /artifacts:
+            description: The artifacts that fulfills the input specification
+      /outputs:
+        description: The list of output specifications for the remote collaboration
+        /{specId}:
+          description: An output specification for the remote collaboration
+          /artifacts:
+            description: The artifacts that fulfills the output specification
+            /{artifactId}:
+              description: An artifact that fulfills the output specification
+    /spawn:
+      description: Action to spawn a new remote collaboration

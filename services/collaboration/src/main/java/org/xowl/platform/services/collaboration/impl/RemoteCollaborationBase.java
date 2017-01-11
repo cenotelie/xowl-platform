@@ -22,8 +22,10 @@ import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.network.CollaborationInstance;
+import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,14 +40,20 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
      * The associated collaboration instance
      */
     private final CollaborationInstance collaborationInstance;
+    /**
+     * The parent network service
+     */
+    private final CollaborationNetworkService networkService;
 
     /**
      * Initializes this remote collaboration
      *
      * @param collaborationInstance The associated collaboration instance
+     * @param networkService        The parent network service
      */
-    public RemoteCollaborationBase(CollaborationInstance collaborationInstance) {
+    public RemoteCollaborationBase(CollaborationInstance collaborationInstance, CollaborationNetworkService networkService) {
         this.collaborationInstance = collaborationInstance;
+        this.networkService = networkService;
     }
 
     @Override
@@ -59,6 +67,26 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
     }
 
     @Override
+    public CollaborationStatus getStatus() {
+        return collaborationInstance.getStatus();
+    }
+
+    @Override
+    public XSPReply archive() {
+        return networkService.archive(collaborationInstance.getIdentifier());
+    }
+
+    @Override
+    public XSPReply restart() {
+        return networkService.restart(collaborationInstance.getIdentifier());
+    }
+
+    @Override
+    public XSPReply delete() {
+        return networkService.delete(collaborationInstance.getIdentifier());
+    }
+
+    @Override
     public Collection<ArtifactSpecification> getInputSpecifications() {
         return Collections.emptyList();
     }
@@ -69,17 +97,22 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
     }
 
     @Override
-    public XSPReply getInputFor(ArtifactSpecification specification) {
+    public XSPReply getInputFor(String specificationId) {
         return XSPReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply getOutputFor(ArtifactSpecification specification) {
+    public XSPReply getOutputFor(String specificationId) {
         return XSPReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply sendInput(ArtifactSpecification specification, Artifact artifact) {
+    public XSPReply sendInput(ArtifactSpecification specificationId, Artifact artifact) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply retrieveOutput(String specificationId, String artifactId) {
         return XSPReplyUnsupported.instance();
     }
 

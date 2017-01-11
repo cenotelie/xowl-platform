@@ -31,9 +31,9 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 import java.io.*;
 import java.util.*;
@@ -126,7 +126,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         FSCollaborationInstance instance = new FSCollaborationInstance(definition);
                         instances.add(instance);
-                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationBase(instance));
+                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationBase(instance, this));
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
@@ -148,7 +148,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public Collection<RemoteCollaboration> getCollaborations() {
-        return (Collection) Collections.unmodifiableCollection(collaborations.values());
+        return Collections.emptyList();
     }
 
     @Override
@@ -157,7 +157,17 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply terminate(RemoteCollaboration collaboration) {
+    public XSPReply archive(String collaborationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply restart(String collaborationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply delete(String collaborationId) {
         return XSPReplyUnsupported.instance();
     }
 
@@ -174,7 +184,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         Product product = ((XSPReplyResult<Product>) reply).getData();
         // provision the instance objects
         FSCollaborationInstance instance = provisionCreateInstance(specification);
-        RemoteCollaborationBase collaboration = new RemoteCollaborationBase(instance);
+        RemoteCollaborationBase collaboration = new RemoteCollaborationBase(instance, this);
         collaborations.put(instance.getIdentifier(), collaboration);
         // extract the distribution
         reply = provisionExtractDistribution(product.getIdentifier(), instance.getIdentifier());

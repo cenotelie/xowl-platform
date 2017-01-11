@@ -81,7 +81,17 @@ public class SlaveNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply terminate(RemoteCollaboration collaboration) {
+    public XSPReply archive(String collaborationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply restart(String collaborationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply delete(String collaborationId) {
         return XSPReplyUnsupported.instance();
     }
 }

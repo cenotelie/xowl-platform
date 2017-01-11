@@ -47,14 +47,6 @@ public interface CollaborationNetworkService extends Service {
     XSPReply spawn(CollaborationSpecification specification);
 
     /**
-     * Terminates a collaboration
-     *
-     * @param collaboration The collaboration to terminate
-     * @return The protocol reply
-     */
-    XSPReply terminate(RemoteCollaboration collaboration);
-
-    /**
      * Stops and archive a collaboration
      *
      * @param collaborationId The identifier of the collaboration

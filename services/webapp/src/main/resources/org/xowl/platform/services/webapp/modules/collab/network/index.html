@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Collaboration</title>
+    <title>Collaborations Network</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="/web/assets/favicon.png">
@@ -15,19 +15,27 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div>
-                <img src="/web/assets/conversation.svg" width="30" height="30" style="margin-left: 20px;"/>
-                <a class="btn" href="/web/modules/collab/chat/">Conversations</a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Collaboration</th>
+                            <th>Status</th>
+                            <th>Link</th>
+                        </tr>
+                        </thead>
+                        <tbody id="neighbours">
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div>
-                <img src="/web/assets/collaboration.svg" width="30" height="30" style="margin-left: 20px;"/>
-                <a class="btn" href="/web/modules/collab/local/">Local Collaboration</a>
-            </div>
-            <div>
-                <img src="/web/assets/network.svg" width="30" height="30" style="margin-left: 20px;"/>
-                <a class="btn" href="/web/modules/collab/network/">Collaborations Network</a>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div><a class="btn" href="new.html">Create new collaboration ...</a></div>
+                </div>
             </div>
         </div>
     </div>

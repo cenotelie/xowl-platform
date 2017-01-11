@@ -20,7 +20,6 @@ package org.xowl.platform.services.collaboration.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
@@ -107,7 +106,7 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
     }
 
     @Override
-    public XSPReply sendInput(String specificationId, Artifact artifact) {
+    public XSPReply sendInput(String specificationId, String artifact) {
         return XSPReplyUnsupported.instance();
     }
 

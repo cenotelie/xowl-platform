@@ -103,7 +103,7 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
         }
         if (manifest == null)
             manifest = new CollaborationManifest(
-                    CollaborationManifest.class.getCanonicalName() + "." + UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
                     "Local collaboration",
                     CollaborationPatternFreeStyle.INSTANCE
             );

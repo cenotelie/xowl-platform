@@ -638,6 +638,272 @@ XOWL.prototype.getWebModules = function (callback) {
 
 
 /*****************************************************
+ * Collaboration - Collaboration Service
+ ****************************************************/
+
+XOWL.prototype.archiveCollaboration = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/archive", null, "POST", null, null);
+}
+
+XOWL.prototype.deleteCollaboration = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/delete", null, "POST", null, null);
+}
+
+XOWL.prototype.getCollaborationInputSpecifications = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/inputs", null, "GET", null, null);
+}
+
+XOWL.prototype.addCollaborationInputSpecification = function (callback, name, archetype) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/inputs", {name: name, archetype: archetype}, "GET", null, null);
+}
+
+XOWL.prototype.removeCollaborationInputSpecification = function (callback, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
+}
+
+XOWL.prototype.getArtifactsForCollaborationInput = function (callback, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+}
+
+XOWL.prototype.registerArtifactForCollaborationInput = function (callback, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+}
+
+XOWL.prototype.getCollaborationOutputSpecifications = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/outputs", null, "GET", null, null);
+}
+
+XOWL.prototype.addCollaborationOutputSpecification = function (callback, name, archetype) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/outputs", {name: name, archetype: archetype}, "GET", null, null);
+}
+
+XOWL.prototype.removeCollaborationOutputSpecification = function (callback, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
+}
+
+XOWL.prototype.getArtifactsForCollaborationOutput = function (callback, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+}
+
+XOWL.prototype.registerArtifactForCollaborationOutput = function (callback, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+}
+
+XOWL.prototype.getCollaborationRoles = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/roles", null, "GET", null, null);
+}
+
+XOWL.prototype.addCollaborationRole = function (callback, name) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/roles", {name: name}, "PUT", null, null);
+}
+
+XOWL.prototype.removeCollaborationRole = function (callback, roleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/roles/" + encodeURIComponent(roleId), null, "DELETE", null, null);
+}
+
+XOWL.prototype.getCollaborationPattern = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/pattern", null, "GET", null, null);
+}
+
+XOWL.prototype.getCollaborationNeighbours = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours", null, "GET", null, null);
+}
+
+XOWL.prototype.spawnCollaboration = function (callback, specification) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours", null, "PUT", MIME_JSON, specification);
+}
+
+XOWL.prototype.getCollaborationNeighbour = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId), null, "GET", null, null);
+}
+
+XOWL.prototype.deleteCollaborationNeighbour = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId), null, "DELETE", null, null);
+}
+
+XOWL.prototype.archiveCollaborationNeighbour = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/archive", null, "POST", null, null);
+}
+
+XOWL.prototype.restartCollaborationNeighbour = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/restart", null, "POST", null, null);
+}
+
+XOWL.prototype.getCollaborationNeighbourInputs = function (callback, neighbourId, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+}
+
+XOWL.prototype.sendArtifactForCollaborationNeighbourInput = function (callback, neighbourId, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "POST", null, null);
+}
+
+XOWL.prototype.getCollaborationNeighbourOutputs = function (callback, neighbourId, specificationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+}
+
+XOWL.prototype.retrieveArtifactForCollaborationNeighbourOutput = function (callback, neighbourId, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "POST", null, null);
+}
+
+
+
+/*****************************************************
  * Connection - Connection Service
  ****************************************************/
 

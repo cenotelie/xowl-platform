@@ -541,8 +541,8 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 rest = rest.substring("artifacts/".length());
                 String artifactId = URIUtils.decodeComponent(rest);
-                if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 return XSPReplyUtils.toHttpResponse(remoteCollaboration.sendInput(specId, artifactId), null);
             } else if (rest.startsWith("outputs")) {
                 rest = request.getUri().substring("outputs".length());
@@ -562,8 +562,8 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 rest = rest.substring("artifacts/".length());
                 String artifactId = URIUtils.decodeComponent(rest);
-                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 return XSPReplyUtils.toHttpResponse(remoteCollaboration.retrieveOutput(specId, artifactId), null);
             }
         }

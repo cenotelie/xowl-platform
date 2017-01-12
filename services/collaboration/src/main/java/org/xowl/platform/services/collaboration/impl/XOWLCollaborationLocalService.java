@@ -53,7 +53,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     /**
      * The manifest for this local collaboration
      */
-    private final CollaborationManifest manifest;
+    protected final CollaborationManifest manifest;
 
     /**
      * Initializes this service

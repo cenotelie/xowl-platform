@@ -18,16 +18,14 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.services.collaboration.CollaborationManifest;
+import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.CollaborationInstance;
-import org.xowl.platform.services.collaboration.CollaborationNetworkService;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Implements a remote collaboration access through the network
@@ -36,78 +34,117 @@ import java.util.Collections;
  */
 public class RemoteCollaborationBase implements RemoteCollaboration {
     /**
-     * The associated collaboration instance
+     * The time-to-live of a the manifest cache in nano-seconds
      */
-    private final CollaborationInstance collaborationInstance;
+    private static final long MANIFEST_TTL = 60000000000L;
+
+    /**
+     * The identifier of the remote collaboration
+     */
+    private final String identifier;
+    /**
+     * The name of the remote collaboration
+     */
+    private final String name;
+    /**
+     * The API endpoint for the remote collaboration
+     */
+    private final String endpoint;
     /**
      * The parent network service
      */
     private final CollaborationNetworkService networkService;
+    /**
+     * The cache for the manifest of the remote collaboration
+     */
+    private CollaborationManifest manifest;
+    /**
+     * The timestamp when the manifest was last retrieve
+     */
+    private long manifestTimestamp;
 
     /**
      * Initializes this remote collaboration
      *
-     * @param collaborationInstance The associated collaboration instance
-     * @param networkService        The parent network service
+     * @param identifier     The identifier of the remote collaboration
+     * @param name           The name of the remote collaboration
+     * @param endpoint       The API endpoint for the remove collaboration
+     * @param networkService The parent network service
      */
-    public RemoteCollaborationBase(CollaborationInstance collaborationInstance, CollaborationNetworkService networkService) {
-        this.collaborationInstance = collaborationInstance;
+    public RemoteCollaborationBase(String identifier, String name, String endpoint, CollaborationNetworkService networkService) {
+        this.identifier = identifier;
+        this.name = name;
+        this.endpoint = endpoint;
         this.networkService = networkService;
+    }
+
+    /**
+     * Gets or refresh the cached manifest
+     *
+     * @return The protocol reply
+     */
+    private XSPReply refreshManifestCache() {
+        if (manifest != null && System.nanoTime() < manifestTimestamp + MANIFEST_TTL)
+            return XSPReplySuccess.instance();
+        XSPReply reply = networkService.getNeighbourManifest(identifier);
+        if (!reply.isSuccess())
+            return reply;
+        manifest = ((XSPReplyResult<CollaborationManifest>) reply).getData();
+        manifestTimestamp = System.nanoTime();
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public String getIdentifier() {
-        return collaborationInstance.getIdentifier();
+        return identifier;
     }
 
     @Override
     public String getName() {
-        return collaborationInstance.getName();
+        return name;
+    }
+
+    @Override
+    public String getApiEndpoint() {
+        return endpoint;
     }
 
     @Override
     public CollaborationStatus getStatus() {
-        return collaborationInstance.getStatus();
+        return networkService.getNeighbourStatus(identifier);
+    }
+
+    @Override
+    public XSPReply getManifest() {
+        XSPReply reply = refreshManifestCache();
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResult<>(manifest);
+    }
+
+    @Override
+    public XSPReply getArtifactsForInput(String specificationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply getArtifactsForOutput(String specificationId) {
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply archive() {
-        return networkService.archive(collaborationInstance.getIdentifier());
+        return networkService.archive(identifier);
     }
 
     @Override
     public XSPReply restart() {
-        return networkService.restart(collaborationInstance.getIdentifier());
+        return networkService.restart(identifier);
     }
 
     @Override
     public XSPReply delete() {
-        return networkService.delete(collaborationInstance.getIdentifier());
-    }
-
-    @Override
-    public Collection<ArtifactSpecification> getInputSpecifications() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<ArtifactSpecification> getOutputSpecifications() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public XSPReply getInputFor(String specificationId) {
-        return XSPReplyUnsupported.instance();
-    }
-
-    @Override
-    public XSPReply getOutputFor(String specificationId) {
-        return XSPReplyUnsupported.instance();
-    }
-
-    @Override
-    public XSPReply sendInput(String specificationId, String artifact) {
-        return XSPReplyUnsupported.instance();
+        return networkService.delete(identifier);
     }
 
     @Override
@@ -122,31 +159,13 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(RemoteCollaboration.class.getCanonicalName()));
-        builder.append("\", \"identifier\": \"");
-        builder.append(TextUtils.escapeStringJSON(getIdentifier()));
-        builder.append("\", \"name\": \"");
-        builder.append(TextUtils.escapeStringJSON(getName()));
-        builder.append("\", \"status\": \"");
-        builder.append(TextUtils.escapeStringJSON(getStatus().toString()));
-        builder.append("\", \"inputs\": [");
-        boolean first = true;
-        for (ArtifactSpecification specification : getInputSpecifications()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(specification);
-        }
-        builder.append("], \"outputs\": [");
-        first = true;
-        for (ArtifactSpecification specification : getOutputSpecifications()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(specification);
-        }
-        builder.append("]}");
-        return builder.toString();
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(RemoteCollaboration.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"status\": \"" +
+                TextUtils.escapeStringJSON(getStatus().toString()) +
+                "\"}";
     }
 }

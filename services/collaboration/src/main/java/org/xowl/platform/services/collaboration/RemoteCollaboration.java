@@ -39,7 +39,7 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      *
      * @return The status of this collaboration
      */
-    XSPReply getStatus();
+    CollaborationStatus getStatus();
 
     /**
      * Gets the manifest for this collaboration

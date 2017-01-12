@@ -24,6 +24,10 @@ package org.xowl.platform.services.collaboration;
  */
 public enum CollaborationStatus {
     /**
+     * The collaboration does not exist, or is otherwise invalid
+     */
+    Invalid,
+    /**
      * The collaboration has not started yet, the platform is being provisioned
      */
     Provisioning,

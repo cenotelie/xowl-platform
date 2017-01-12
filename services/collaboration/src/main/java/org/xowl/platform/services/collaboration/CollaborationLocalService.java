@@ -32,6 +32,20 @@ import java.util.Collection;
  */
 public interface CollaborationLocalService extends Service {
     /**
+     * Gets the unique identifier of the local collaboration
+     *
+     * @return The collaboration's identifier
+     */
+    String getCollaborationIdentifier();
+
+    /**
+     * Gets the name of the local collaboration
+     *
+     * @return The collaboration's name
+     */
+    String getCollaborationName();
+
+    /**
      * Gets the expected inputs for this collaboration
      *
      * @return The expected inputs

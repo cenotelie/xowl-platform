@@ -18,8 +18,9 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.collaboration.CollaborationInstance;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**
@@ -27,7 +28,7 @@ import org.xowl.platform.services.collaboration.CollaborationStatus;
  *
  * @author Laurent Wouters
  */
-public class FSCollaborationInstance implements CollaborationInstance {
+public class FSCollaborationInstance implements Identifiable, Serializable {
     /**
      * The unique identifier for this instance
      */
@@ -48,6 +49,24 @@ public class FSCollaborationInstance implements CollaborationInstance {
      * The selected network port for this instance
      */
     private final int port;
+
+    /**
+     * Gets the API endpoint for the instance
+     *
+     * @return The API endpoint for the instance
+     */
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    /**
+     * Gets the status of the instance
+     *
+     * @return The status of the instance
+     */
+    public CollaborationStatus getStatus() {
+        return status;
+    }
 
     /**
      * Gets the selected network port for this instance
@@ -132,16 +151,6 @@ public class FSCollaborationInstance implements CollaborationInstance {
     }
 
     @Override
-    public String getApiEndpoint() {
-        return endpoint;
-    }
-
-    @Override
-    public CollaborationStatus getStatus() {
-        return status;
-    }
-
-    @Override
     public String serializedString() {
         return identifier;
     }
@@ -149,7 +158,7 @@ public class FSCollaborationInstance implements CollaborationInstance {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(CollaborationInstance.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(FSCollaborationInstance.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

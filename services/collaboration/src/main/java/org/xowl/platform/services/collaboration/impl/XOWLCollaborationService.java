@@ -18,7 +18,9 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
@@ -27,36 +29,26 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
-import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.*;
-import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 
-import java.io.*;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.UUID;
 
 /**
  * Implements the collaboration service for this platform
  *
  * @author Laurent Wouters
  */
-public class XOWLCollaborationService implements CollaborationService, HttpApiService {
+public class XOWLCollaborationService extends XOWLCollaborationLocalService implements CollaborationService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -71,14 +63,6 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLCollaborationService.class, "/org/xowl/platform/services/collaboration/api_service_collaboration.html", "Collaboration Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
-     * The file for storing the collaboration manifest
-     */
-    private final File fileManifest;
-    /**
-     * The manifest for this local collaboration
-     */
-    private final CollaborationManifest manifest;
-    /**
      * The collaboration network service
      */
     private CollaborationNetworkService networkService;
@@ -87,27 +71,7 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
      * Initializes this service
      */
     public XOWLCollaborationService() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-        this.fileManifest = new File(System.getenv(Env.ROOT), configuration.get("manifest"));
-        CollaborationManifest manifest = null;
-        if (fileManifest.exists()) {
-            try (InputStream stream = new FileInputStream(fileManifest)) {
-                String content = Files.read(stream, Files.CHARSET);
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-                if (definition != null)
-                    manifest = new CollaborationManifest(definition);
-            } catch (IOException exception) {
-                Logging.getDefault().error(exception);
-            }
-        }
-        if (manifest == null)
-            manifest = new CollaborationManifest(
-                    UUID.randomUUID().toString(),
-                    "Local collaboration",
-                    CollaborationPatternFreeStyle.INSTANCE
-            );
-        this.manifest = manifest;
+        super();
     }
 
     /**
@@ -124,24 +88,6 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
         return networkService;
     }
 
-    /**
-     * Serializes the manifest for this collaboration
-     *
-     * @return The protocol reply
-     */
-    private XSPReply serializeManifest() {
-        try (OutputStream stream = new FileOutputStream(fileManifest)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
-            writer.write(manifest.serializedJSON());
-            writer.flush();
-            writer.close();
-            return XSPReplySuccess.instance();
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-            return new XSPReplyException(exception);
-        }
-    }
-
     @Override
     public String getIdentifier() {
         return XOWLCollaborationService.class.getCanonicalName();
@@ -153,146 +99,53 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
     }
 
     @Override
-    public XSPReply archive() {
-        return getNetworkService().archive(manifest.getIdentifier());
-    }
-
-    @Override
-    public XSPReply delete() {
-        return getNetworkService().delete(manifest.getIdentifier());
-    }
-
-    @Override
-    public Collection<ArtifactSpecification> getInputSpecifications() {
-        return manifest.getInputSpecifications();
-    }
-
-    @Override
-    public Collection<ArtifactSpecification> getOutputSpecifications() {
-        return manifest.getOutputSpecifications();
-    }
-
-    @Override
-    public XSPReply addInputSpecification(ArtifactSpecification specification) {
-        manifest.addInputSpecification(specification);
-        XSPReply reply = serializeManifest();
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResult<>(specification);
-    }
-
-    @Override
-    public XSPReply addOutputSpecification(ArtifactSpecification specification) {
-        manifest.addOutputSpecification(specification);
-        XSPReply reply = serializeManifest();
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResult<>(specification);
-    }
-
-    @Override
-    public XSPReply removeInputSpecification(String specificationId) {
-        if (!manifest.removeInputSpecification(specificationId))
-            return XSPReplyNotFound.instance();
-        return serializeManifest();
-    }
-
-    @Override
-    public XSPReply removeOutputSpecification(String specificationId) {
-        if (!manifest.removeOutputSpecification(specificationId))
-            return XSPReplyNotFound.instance();
-        return serializeManifest();
-    }
-
-    @Override
-    public Collection<Artifact> getInputFor(String specificationId) {
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
-        if (storageService == null)
-            return Collections.emptyList();
-        Collection<Artifact> artifacts = new ArrayList<>();
-        for (String artifactId : manifest.getArtifactsForInput(specificationId)) {
-            XSPReply reply = storageService.retrieve(artifactId);
-            if (reply.isSuccess())
-                artifacts.add(((XSPReplyResult<Artifact>) reply).getData());
-        }
-        return artifacts;
-    }
-
-    @Override
-    public Collection<Artifact> getOutputFor(String specificationId) {
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
-        if (storageService == null)
-            return Collections.emptyList();
-        Collection<Artifact> artifacts = new ArrayList<>();
-        for (String artifactId : manifest.getArtifactsForOutput(specificationId)) {
-            XSPReply reply = storageService.retrieve(artifactId);
-            if (reply.isSuccess())
-                artifacts.add(((XSPReplyResult<Artifact>) reply).getData());
-        }
-        return artifacts;
-    }
-
-    @Override
-    public XSPReply registerInput(String specificationId, String artifactId) {
-        manifest.addInputArtifact(specificationId, artifactId);
-        return serializeManifest();
-    }
-
-    @Override
-    public XSPReply registerOutput(String specificationId, String artifactId) {
-        manifest.addOutputArtifact(specificationId, artifactId);
-        return serializeManifest();
-    }
-
-    @Override
-    public Collection<PlatformRole> getRoles() {
-        return manifest.getRoles();
-    }
-
-    @Override
-    public XSPReply addRole(String name) {
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getRealm().createRole(
-                PlatformRole.class.getCanonicalName() + "." + UUID.randomUUID().toString(),
-                name
-        );
-        if (!reply.isSuccess())
-            return reply;
-        PlatformRole role = ((XSPReplyResult<PlatformRole>) reply).getData();
-        manifest.addRole(role);
-        reply = serializeManifest();
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResult<>(role);
-    }
-
-    @Override
-    public XSPReply removeRole(String identifier) {
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getRealm().deleteRole(identifier);
-        if (!reply.isSuccess())
-            return reply;
-        manifest.removeRole(identifier);
-        return serializeManifest();
-    }
-
-    @Override
-    public CollaborationPattern getCollaborationPattern() {
-        return manifest.getCollaborationPattern();
-    }
-
-    @Override
     public Collection<RemoteCollaboration> getNeighbours() {
         return getNetworkService().getNeighbours();
     }
 
     @Override
+    public RemoteCollaboration getNeighbour(String collaborationId) {
+        return getNetworkService().getNeighbour(collaborationId);
+    }
+
+    @Override
+    public CollaborationStatus getNeighbourStatus(String collaborationId) {
+        return getNetworkService().getNeighbourStatus(collaborationId);
+    }
+
+    @Override
+    public XSPReply getNeighbourManifest(String collaborationId) {
+        return getNetworkService().getNeighbourManifest(collaborationId);
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         return getNetworkService().spawn(specification);
+    }
+
+    @Override
+    public XSPReply archive(String collaborationId) {
+        return getNetworkService().archive(collaborationId);
+    }
+
+    @Override
+    public XSPReply restart(String collaborationId) {
+        return getNetworkService().restart(collaborationId);
+    }
+
+    @Override
+    public XSPReply delete(String collaborationId) {
+        return getNetworkService().delete(collaborationId);
+    }
+
+    @Override
+    public XSPReply archive() {
+        return getNetworkService().archive(getCollaborationIdentifier());
+    }
+
+    @Override
+    public XSPReply delete() {
+        return getNetworkService().delete(getCollaborationIdentifier());
     }
 
     @Override

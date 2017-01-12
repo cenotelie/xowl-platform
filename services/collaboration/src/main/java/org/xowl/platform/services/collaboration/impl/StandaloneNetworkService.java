@@ -19,9 +19,10 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.platform.services.collaboration.CollaborationSpecification;
-import org.xowl.platform.services.collaboration.RemoteCollaboration;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
+import org.xowl.platform.services.collaboration.CollaborationSpecification;
+import org.xowl.platform.services.collaboration.CollaborationStatus;
+import org.xowl.platform.services.collaboration.RemoteCollaboration;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +50,18 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public RemoteCollaboration getNeighbour(String identifier) {
+    public RemoteCollaboration getNeighbour(String collaborationId) {
         return null;
+    }
+
+    @Override
+    public CollaborationStatus getNeighbourStatus(String collaborationId) {
+        return CollaborationStatus.Invalid;
+    }
+
+    @Override
+    public XSPReply getNeighbourManifest(String collaborationId) {
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

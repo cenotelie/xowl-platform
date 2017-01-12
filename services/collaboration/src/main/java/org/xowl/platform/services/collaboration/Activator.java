@@ -33,6 +33,8 @@ public class Activator implements BundleActivator {
     public void start(final BundleContext bundleContext) throws Exception {
         XOWLCollaborationService collaborationService = new XOWLCollaborationService();
         bundleContext.registerService(CollaborationService.class, collaborationService, null);
+        bundleContext.registerService(CollaborationLocalService.class, collaborationService, null);
+        bundleContext.registerService(CollaborationNetworkService.class, collaborationService, null);
         bundleContext.registerService(HttpApiService.class, collaborationService, null);
     }
 

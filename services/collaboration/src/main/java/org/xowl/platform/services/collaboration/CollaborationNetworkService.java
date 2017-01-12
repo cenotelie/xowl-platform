@@ -38,10 +38,26 @@ public interface CollaborationNetworkService extends Service {
     /**
      * Gets a neighbour collaboration
      *
-     * @param identifier The identifier of the collaboration to retrieve
+     * @param collaborationId The identifier of the collaboration to retrieve
      * @return The collaboration, or null if it cannot be found
      */
-    RemoteCollaboration getNeighbour(String identifier);
+    RemoteCollaboration getNeighbour(String collaborationId);
+
+    /**
+     * Gets the status of a neighbour collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @return The collaboration's status
+     */
+    CollaborationStatus getNeighbourStatus(String collaborationId);
+
+    /**
+     * Gets the manifest for a neighbour collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @return The protocol reply
+     */
+    XSPReply getNeighbourManifest(String collaborationId);
 
     /**
      * Spawns a new collaboration
@@ -50,4 +66,28 @@ public interface CollaborationNetworkService extends Service {
      * @return The protocol reply
      */
     XSPReply spawn(CollaborationSpecification specification);
+
+    /**
+     * Archives a running collaboration
+     *
+     * @param collaborationId The identifier of a collaboration
+     * @return the protocol reply
+     */
+    XSPReply archive(String collaborationId);
+
+    /**
+     * Restarts an archived collaboration
+     *
+     * @param collaborationId The identifier of a collaboration
+     * @return the protocol reply
+     */
+    XSPReply restart(String collaborationId);
+
+    /**
+     * Deletes a collaboration and its data
+     *
+     * @param collaborationId The identifier of a collaboration
+     * @return the protocol reply
+     */
+    XSPReply delete(String collaborationId);
 }

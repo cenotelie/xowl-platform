@@ -30,10 +30,10 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
 import org.xowl.platform.kernel.platform.ProductBase;
+import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 
 import java.io.*;
 import java.util.*;
@@ -126,7 +126,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         FSCollaborationInstance instance = new FSCollaborationInstance(definition);
                         instances.add(instance);
-                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationBase(instance, this));
+                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationBase(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this));
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
@@ -152,8 +152,18 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public RemoteCollaboration getNeighbour(String identifier) {
-        return collaborations.get(identifier);
+    public RemoteCollaboration getNeighbour(String collaborationId) {
+        return collaborations.get(collaborationId);
+    }
+
+    @Override
+    public CollaborationStatus getNeighbourStatus(String collaborationId) {
+        return CollaborationStatus.Invalid;
+    }
+
+    @Override
+    public XSPReply getNeighbourManifest(String collaborationId) {
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -189,7 +199,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         Product product = ((XSPReplyResult<Product>) reply).getData();
         // provision the instance objects
         FSCollaborationInstance instance = provisionCreateInstance(specification);
-        RemoteCollaborationBase collaboration = new RemoteCollaborationBase(instance, this);
+        RemoteCollaborationBase collaboration = new RemoteCollaborationBase(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this);
         collaborations.put(instance.getIdentifier(), collaboration);
         // extract the distribution
         reply = provisionExtractDistribution(product.getIdentifier(), instance.getIdentifier());

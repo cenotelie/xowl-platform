@@ -15,36 +15,33 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.network;
+package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.services.collaboration.CollaborationSpecification;
-import org.xowl.platform.services.collaboration.RemoteCollaboration;
 
 import java.util.Collection;
 
 /**
- * Represents a service for the management of a network of collaborations.
- * Each collaboration is implemented as an instance of the xOWL Collaboration Platform.
+ * Represents a service for the local access to a network of collaborations
  *
  * @author Laurent Wouters
  */
 public interface CollaborationNetworkService extends Service {
     /**
-     * Gets the known collaborations
+     * Gets the known neighbour collaborations
      *
-     * @return The known collaborations
+     * @return The known neighbour collaborations
      */
-    Collection<RemoteCollaboration> getCollaborations();
+    Collection<RemoteCollaboration> getNeighbours();
 
     /**
-     * Gets a collaboration
+     * Gets a neighbour collaboration
      *
      * @param identifier The identifier of the collaboration to retrieve
      * @return The collaboration, or null if it cannot be found
      */
-    RemoteCollaboration getCollaboration(String identifier);
+    RemoteCollaboration getNeighbour(String identifier);
 
     /**
      * Spawns a new collaboration
@@ -53,28 +50,4 @@ public interface CollaborationNetworkService extends Service {
      * @return The protocol reply
      */
     XSPReply spawn(CollaborationSpecification specification);
-
-    /**
-     * Stops and archive a collaboration
-     *
-     * @param collaborationId The identifier of the collaboration
-     * @return The protocol reply
-     */
-    XSPReply archive(String collaborationId);
-
-    /**
-     * Un-archives and re-starts a collaboration
-     *
-     * @param collaborationId The identifier of the collaboration
-     * @return The protocol reply
-     */
-    XSPReply restart(String collaborationId);
-
-    /**
-     * Stops a collaboration and delete all its data
-     *
-     * @param collaborationId The identifier of the collaboration
-     * @return The protocol reply
-     */
-    XSPReply delete(String collaborationId);
 }

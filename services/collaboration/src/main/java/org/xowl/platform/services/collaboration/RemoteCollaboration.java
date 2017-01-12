@@ -20,9 +20,6 @@ package org.xowl.platform.services.collaboration;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
-
-import java.util.Collection;
 
 /**
  * Represents a remote collaboration in a network of collaboration
@@ -31,11 +28,41 @@ import java.util.Collection;
  */
 public interface RemoteCollaboration extends Identifiable, Serializable {
     /**
+     * Gets the API endpoint
+     *
+     * @return The API endpoint
+     */
+    String getApiEndpoint();
+
+    /**
      * Gets the status of this collaboration
      *
      * @return The status of this collaboration
      */
-    CollaborationStatus getStatus();
+    XSPReply getStatus();
+
+    /**
+     * Gets the manifest for this collaboration
+     *
+     * @return The manifest
+     */
+    XSPReply getManifest();
+
+    /**
+     * Gets the available artifacts for a specific input
+     *
+     * @param specificationId The identifier for the specification of the input
+     * @return The associated artifacts
+     */
+    XSPReply getArtifactsForInput(String specificationId);
+
+    /**
+     * Gets the available artifacts for a specific output
+     *
+     * @param specificationId The identifier for the specification of the output
+     * @return The associated artifacts
+     */
+    XSPReply getArtifactsForOutput(String specificationId);
 
     /**
      * Stops and archive this collaboration
@@ -59,46 +86,7 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
     XSPReply delete();
 
     /**
-     * Gets the expected inputs for this collaboration
-     *
-     * @return The expected inputs
-     */
-    Collection<ArtifactSpecification> getInputSpecifications();
-
-    /**
-     * Gets the expected outputs for this collaboration
-     *
-     * @return The expected outputs
-     */
-    Collection<ArtifactSpecification> getOutputSpecifications();
-
-    /**
-     * Gets the available artifacts for a specific input
-     *
-     * @param specificationId The identifier for the specification of the input
-     * @return The associated artifacts
-     */
-    XSPReply getInputFor(String specificationId);
-
-    /**
-     * Gets the available artifacts for a specific output
-     *
-     * @param specificationId The identifier for the specification of the output
-     * @return The associated artifacts
-     */
-    XSPReply getOutputFor(String specificationId);
-
-    /**
-     * Sends a local artifact as an input to the remote collaboration
-     *
-     * @param specificationId The identifier of the input specification that the artifact fulfills
-     * @param artifactId      The identifier of the artifact to send
-     * @return The protocol reply
-     */
-    XSPReply sendInput(String specificationId, String artifactId);
-
-    /**
-     * Retrieves the remote artifact that fulfills an output specification and copies it locally
+     * Copies locally an output of the remote collaboration
      *
      * @param specificationId The identifier of the output specification
      * @param artifactId      The identifier of the artifact to retrieve

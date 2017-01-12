@@ -42,7 +42,7 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.*;
-import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
+import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -287,7 +287,7 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
 
     @Override
     public Collection<RemoteCollaboration> getNeighbours() {
-        return getNetworkService().getCollaborations();
+        return getNetworkService().getNeighbours();
     }
 
     @Override
@@ -500,7 +500,7 @@ public class XOWLCollaborationService implements CollaborationService, HttpApiSe
             }
             int index = rest.indexOf("/");
             String neighbourId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
-            RemoteCollaboration remoteCollaboration = getNetworkService().getCollaboration(neighbourId);
+            RemoteCollaboration remoteCollaboration = getNetworkService().getNeighbour(neighbourId);
             if (remoteCollaboration == null)
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             if (index < 0) {

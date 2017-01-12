@@ -23,8 +23,8 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.network.CollaborationInstance;
-import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
+import org.xowl.platform.services.collaboration.CollaborationInstance;
+import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.collaboration.network.CollaborationInstance;
+import org.xowl.platform.services.collaboration.CollaborationInstance;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**

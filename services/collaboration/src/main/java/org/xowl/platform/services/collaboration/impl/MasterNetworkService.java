@@ -33,7 +33,7 @@ import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
-import org.xowl.platform.services.collaboration.network.CollaborationNetworkService;
+import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 
 import java.io.*;
 import java.util.*;
@@ -147,12 +147,12 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public Collection<RemoteCollaboration> getCollaborations() {
+    public Collection<RemoteCollaboration> getNeighbours() {
         return (Collection) Collections.unmodifiableCollection(collaborations.values());
     }
 
     @Override
-    public RemoteCollaboration getCollaboration(String identifier) {
+    public RemoteCollaboration getNeighbour(String identifier) {
         return collaborations.get(identifier);
     }
 

@@ -97,7 +97,7 @@ public interface CollaborationLocalService extends Service {
      * @param specificationId The identifier of the input specification
      * @return The associated artifacts
      */
-    Collection<Artifact> getInputFor(String specificationId);
+    Collection<Artifact> getInputsFor(String specificationId);
 
     /**
      * Gets the available artifacts (in this collaboration) for a specific output
@@ -105,7 +105,7 @@ public interface CollaborationLocalService extends Service {
      * @param specificationId The identifier of the output specification
      * @return The associated artifacts
      */
-    Collection<Artifact> getOutputFor(String specificationId);
+    Collection<Artifact> getOutputsFor(String specificationId);
 
     /**
      * Registers an artifact as an input for this collaboration

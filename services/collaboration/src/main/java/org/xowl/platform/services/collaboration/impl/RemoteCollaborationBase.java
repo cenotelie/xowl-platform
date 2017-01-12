@@ -124,12 +124,12 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
 
     @Override
     public XSPReply getArtifactsForInput(String specificationId) {
-        return XSPReplyUnsupported.instance();
+        return networkService.getNeighbourInputsFor(identifier, specificationId);
     }
 
     @Override
     public XSPReply getArtifactsForOutput(String specificationId) {
-        return XSPReplyUnsupported.instance();
+        return networkService.getNeighbourOutputsFor(identifier, specificationId);
     }
 
     @Override

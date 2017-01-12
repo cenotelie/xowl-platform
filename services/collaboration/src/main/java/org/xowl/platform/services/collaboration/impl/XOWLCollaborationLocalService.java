@@ -163,7 +163,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public Collection<Artifact> getInputFor(String specificationId) {
+    public Collection<Artifact> getInputsFor(String specificationId) {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return Collections.emptyList();
@@ -177,7 +177,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public Collection<Artifact> getOutputFor(String specificationId) {
+    public Collection<Artifact> getOutputsFor(String specificationId) {
         ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
         if (storageService == null)
             return Collections.emptyList();

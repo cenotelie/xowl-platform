@@ -60,6 +60,24 @@ public interface CollaborationNetworkService extends Service {
     XSPReply getNeighbourManifest(String collaborationId);
 
     /**
+     * Gets the available artifacts for a specific input, for a neighbour collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @param specificationId The identifier of the input specification
+     * @return The associated artifacts
+     */
+    XSPReply getNeighbourInputsFor(String collaborationId, String specificationId);
+
+    /**
+     * Gets the available artifacts for a specific output, for a neighbour collaboration
+     *
+     * @param collaborationId The identifier of the collaboration
+     * @param specificationId The identifier of the output specification
+     * @return The associated artifacts
+     */
+    XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId);
+
+    /**
      * Spawns a new collaboration
      *
      * @param specification The specification for the collaboration

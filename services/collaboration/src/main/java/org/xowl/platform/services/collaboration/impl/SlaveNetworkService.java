@@ -92,6 +92,16 @@ public class SlaveNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         return XSPReplyUnsupported.instance();
     }

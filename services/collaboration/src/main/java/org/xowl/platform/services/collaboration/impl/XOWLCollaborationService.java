@@ -119,6 +119,16 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
+    public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+        return getNetworkService().getNeighbourInputsFor(collaborationId, specificationId);
+    }
+
+    @Override
+    public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        return getNetworkService().getNeighbourOutputsFor(collaborationId, specificationId);
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         return getNetworkService().spawn(specification);
     }
@@ -170,11 +180,6 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
             return handleNeighbours(request);
         }
-        /*
-        } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
-
-        }
-        */
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -268,7 +273,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Artifact artifact : getInputFor(specId)) {
+            for (Artifact artifact : getInputsFor(specId)) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -356,7 +361,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Artifact artifact : getOutputFor(specId)) {
+            for (Artifact artifact : getOutputsFor(specId)) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -513,6 +518,16 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 return XSPReplyUtils.toHttpResponse(delete(neighbourId), null);
             }
+        }
+        if (rest.startsWith("manifest/inputs/") && rest.endsWith("/artifacts")) {
+            rest = rest.substring("manifest/inputs/".length(), rest.length() - "/artifacts".length());
+            String specId = URIUtils.decodeComponent(rest);
+            return XSPReplyUtils.toHttpResponse(getNeighbourInputsFor(neighbourId, specId), null);
+        }
+        if (rest.startsWith("manifest/outputs/") && rest.endsWith("/artifacts")) {
+            rest = rest.substring("manifest/outputs/".length(), rest.length() - "/artifacts".length());
+            String specId = URIUtils.decodeComponent(rest);
+            return XSPReplyUtils.toHttpResponse(getNeighbourOutputsFor(neighbourId, specId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }

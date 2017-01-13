@@ -105,7 +105,7 @@ function renderIOElement(element, linkName, toRemove) {
 
 function renderArchetype(archetypeId) {
 	for (var i = 0; i != archetypes.length; i++) {
-		if (archetypes[i] === archetypeId) {
+		if (archetypes[i].identifier == archetypeId) {
 			var span = document.createElement("span");
 			span.appendChild(document.createTextNode(archetypes[i].name));
 			span.title = archetypes[i].identifier;

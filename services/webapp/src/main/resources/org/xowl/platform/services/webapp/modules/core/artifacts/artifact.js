@@ -4,7 +4,6 @@
 var xowl = new XOWL();
 var artifactId = getParameterByName("id");
 var artifactName = null;
-var METADATA = null;
 var CONTENT = null;
 
 function init() {
@@ -21,7 +20,7 @@ function init() {
 function doGetData() {
 	if (!onOperationRequest("Loading ..."))
 		return;
-	xowl.getArtifactMetadata(function (status, ct, content) {
+	xowl.getArtifact(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderMetadata(content);
 		}
@@ -71,34 +70,22 @@ function onJobCompleted(job) {
 }
 
 function renderMetadata(metadata) {
-	METADATA = parseNQuads(metadata);
-	var properties = METADATA[artifactId].properties;
-	document.getElementById("artifact-identifier").value = artifactId;
-	for (var i = 0; i != properties.length; i++) {
-		var name = properties[i].id;
-		if (name === "http://xowl.org/platform/schemas/kernel#name") {
-			artifactName = properties[i].value.lexical;
-			document.getElementById("artifact-name").value = artifactName;
-		} else if (name === "http://xowl.org/platform/schemas/kernel#archetype")
-			document.getElementById("artifact-archetype").value = properties[i].value.lexical;
-		else if (name === "http://xowl.org/platform/schemas/kernel#from") {
-			document.getElementById("artifact-origin").appendChild(document.createTextNode(properties[i].value.lexical));
-			document.getElementById("artifact-origin").href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(properties[i].value.lexical);
-		} else if (name === "http://xowl.org/platform/schemas/kernel#created")
-			document.getElementById("artifact-creation").value = properties[i].value.lexical;
-		else if (name === "http://xowl.org/platform/schemas/kernel#base") {
-			document.getElementById("artifact-base").appendChild(document.createTextNode(properties[i].value.value));
-			document.getElementById("artifact-base").href = "base.html?id=" + encodeURIComponent(properties[i].value.value);
-		} else if (name === "http://xowl.org/platform/schemas/kernel#version")
-			document.getElementById("artifact-version").value = properties[i].value.lexical;
-		else if (name === "http://xowl.org/platform/schemas/kernel#supersede") {
-			var link = document.createElement("a");
-			link.href = "artifact.html?id=" + encodeURIComponent(properties[i].value.value);
-			link.appendChild(document.createTextNode(properties[i].value.value));
-			var container = document.createElement("div");
-			container.appendChild(link);
-			document.getElementById("artifact-supersede").appendChild(container);
-		}
+	document.getElementById("artifact-identifier").value = metadata.identifier;
+	document.getElementById("artifact-name").value = metadata.name;
+	document.getElementById("artifact-archetype").value = metadata.archetype;
+	document.getElementById("artifact-origin").appendChild(document.createTextNode(metadata.from));
+	document.getElementById("artifact-origin").href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(metadata.from);
+	document.getElementById("artifact-base").appendChild(document.createTextNode(metadata.base));
+	document.getElementById("artifact-base").href = "base.html?id=" + encodeURIComponent(metadata.base);
+	document.getElementById("artifact-creation").value = metadata.creation;
+	document.getElementById("artifact-version").value = metadata.version;
+	for (var i = 0; i != metadata.supersede.length; i++) {
+		var link = document.createElement("a");
+		link.href = "artifact.html?id=" + encodeURIComponent(metadata.supersede[i]);
+		link.appendChild(document.createTextNode(metadata.supersede[i]));
+		var container = document.createElement("div");
+		container.appendChild(link);
+		document.getElementById("artifact-supersede").appendChild(container);
 	}
 }
 

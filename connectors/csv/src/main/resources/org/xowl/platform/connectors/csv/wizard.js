@@ -203,11 +203,11 @@ function onImport() {
 	var textMarker = document.getElementById("document-text-marker").value;
 	if (separator === null || textMarker === null || separator == "" || textMarker == "")
 		return;
-	if (!onOperationRequest({ type: "org.xowl.platform.kernel.RichString", parts: ["Importing document ", DOCUMENT, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", DOCUMENT, " ..."]}))
 		return;
 	xowl.importUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Launched importation job for ", DOCUMENT, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", DOCUMENT, "."]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onJobCompleted(job);
 			});
@@ -233,7 +233,7 @@ function onJobCompleted(job) {
 		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
 		var artifactId = job.result.payload;
-		displayMessage("success", { type: "org.xowl.platform.kernel.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
 		waitAndGo("/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
 	}
 }

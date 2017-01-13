@@ -20,6 +20,28 @@
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="collaboration-identifier" class="col-sm-2 control-label">Identifier</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="collaboration-identifier" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="collaboration-name" class="col-sm-2 control-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="collaboration-name" readonly>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
                         <span class="btn btn-default" id="button-archive" onclick="onClickArchive()">
                             <img src="/web/assets/collaboration_archived.svg" width="30" height="30"/>
                             <span style="margin-left: 20px;">Archive this collaboration</span>
@@ -27,47 +49,20 @@
                         <span class="btn btn-default" id="button-delete" onclick="onClickDelete()">
                             <img src="/web/assets/action-remove.svg" width="30" height="30"/>
                             <span style="margin-left: 20px;">Delete this collaboration</span>
-                      </span>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <div>
-                    <div><a class="btn" href="new_input.html">New input ...</a></div>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <th>Input Specification</th>
-                            <th>Archetype</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody id="inputs">
-                        </tbody>
-                    </table>
+                    <img src="/web/assets/specification.svg" width="30" height="30" style="margin-left: 20px;"/>
+                    <a class="btn" href="io.html">Inputs / Outputs</a>
                 </div>
-            </div>
-            <div class="col-md-4">
                 <div>
-                    <div><a class="btn" href="new_output.html">New output ...</a></div>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <th>Output Specification</th>
-                            <th>Archetype</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody id="outputs">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div><a class="btn" href="people.html">People ...</a></div>
+                    <img src="/web/assets/group.svg" width="30" height="30" style="margin-left: 20px;"/>
+                    <a class="btn" href="people.html">People and Roles</a>
                 </div>
             </div>
         </div>

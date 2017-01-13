@@ -2,6 +2,8 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
+var manifest = null;
+var archetypes = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -13,12 +15,24 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ..."))
+	if (!onOperationRequest("Loading ...", 2))
 		return;
 	xowl.getCollaborationManifest(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			renderInputs(content.inputs);
-			renderOutputs(content.outputs);
+			manifest = content;
+			if (archetypes !== null) {
+				renderInputs(manifest.inputs);
+				renderOutputs(manifest.outputs);
+			}
+		}
+	});
+	xowl.getArtifactArchetypes(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			archetypes = content;
+			if (manifest !== null) {
+				renderInputs(manifest.inputs);
+				renderOutputs(manifest.outputs);
+			}
 		}
 	});
 }
@@ -31,7 +45,7 @@ function renderInputs(inputs) {
 	for (var i = 0; i != inputs.length; i++) {
 		(function (input) {
 			var toRemove = function() { onClickRemoveInput(input.specification.identifier); };
-			var row = renderIOElement(inputs[i], "input", toRemove);
+			var row = renderIOElement(inputs[i], "io_input", toRemove);
 			table.appendChild(row);
 		})(inputs[i]);
 	}
@@ -45,13 +59,13 @@ function renderOutputs(outputs) {
 	for (var i = 0; i != outputs.length; i++) {
 		(function (output) {
 			var toRemove = function() { onClickRemoveInput(output.specification.identifier); };
-			var row = renderIOElement(output, "output", toRemove);
+			var row = renderIOElement(output, "io_output", toRemove);
 			table.appendChild(row);
 		})(outputs[i]);
 	}
 }
 
-function renderIOElement(element, link, toRemove) {
+function renderIOElement(element, linkName, toRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
@@ -61,13 +75,13 @@ function renderIOElement(element, link, toRemove) {
 	image.style.marginRight = "20px";
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(element.specification.name));
-	link.href = link + ".html?id=" + encodeURIComponent(element.specification.identifier) + "&name=" + encodeURIComponent(element.specification.name);
+	link.href = linkName + ".html?id=" + encodeURIComponent(element.specification.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	cell.appendChild(document.createTextNode(element.specification.archetype));
+	cell.appendChild(renderArchetype(element.specification.archetype));
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
@@ -87,6 +101,18 @@ function renderIOElement(element, link, toRemove) {
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
+}
+
+function renderArchetype(archetypeId) {
+	for (var i = 0; i != archetypes.length; i++) {
+		if (archetypes[i] === archetypeId) {
+			var span = document.createElement("span");
+			span.appendChild(document.createTextNode(archetypes[i].name));
+			span.title = archetypes[i].identifier;
+			return span;
+		}
+	}
+	return document.createTextNode(archetypeId);
 }
 
 function onClickRemoveInput(specId) {

@@ -39,7 +39,7 @@ function onJobCompleted(job) {
 function getTypeName(idType) {
 	for (var i = 0; i != SCHEMAS.length; i++) {
 		for (var j = 0; j != SCHEMAS[i].classes.length; j++) {
-			if (idType === SCHEMAS[i].classes[j].id) {
+			if (idType === SCHEMAS[i].classes[j].identifier) {
 				return SCHEMAS[i].name + " - " + SCHEMAS[i].classes[j].name;
 			}
 		}
@@ -50,7 +50,7 @@ function getTypeName(idType) {
 function getLinkName(idLink) {
 	for (var i = 0; i != SCHEMAS.length; i++) {
 		for (var j = 0; j != SCHEMAS[i].objectProperties.length; j++) {
-			if (idLink === SCHEMAS[i].objectProperties[j].id) {
+			if (idLink === SCHEMAS[i].objectProperties[j].identifier) {
 				return SCHEMAS[i].objectProperties[j].name;
 			}
 		}

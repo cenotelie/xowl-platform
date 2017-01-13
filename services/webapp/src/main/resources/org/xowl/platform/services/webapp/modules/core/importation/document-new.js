@@ -45,12 +45,12 @@ function renderArchetypes(data) {
 	var select = document.getElementById("input-archetype");
 	for (var i = 0; i != data.length; i++) {
 		var option = document.createElement("option");
-		option.value = data[i].id;
+		option.value = data[i].identifier;
 		option.appendChild(document.createTextNode(data[i].name));
 		select.appendChild(option);
 	}
 	if (data.length > 0)
-		select.value = data[0].id;
+		select.value = data[0].identifier;
 }
 
 function onImport() {

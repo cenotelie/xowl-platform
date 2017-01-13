@@ -39,7 +39,7 @@ function renderSchemas(schemas) {
 			return x.name.localeCompare(y.name);
 		});
 		var option = document.createElement("option");
-		option.value = schemas[i].id;
+		option.value = schemas[i].identifier;
 		option.appendChild(document.createTextNode(schemas[i].name));
 		select.appendChild(option);
 		var optgroup1 = document.createElement("optgroup");
@@ -50,30 +50,30 @@ function renderSchemas(schemas) {
 		select_types.appendChild(optgroup2);
 		for (var j = 0; j != schemas[i].objectProperties.length; j++) {
 			LINKS.push({
-				id: schemas[i].objectProperties[j].id,
+				id: schemas[i].objectProperties[j].identifier,
 				name: schemas[i].objectProperties[j].name,
 				schemaName: schemas[i].name
 			});
 			option = document.createElement("option");
-			option.value = schemas[i].objectProperties[j].id;
+			option.value = schemas[i].objectProperties[j].identifier;
 			option.appendChild(document.createTextNode(schemas[i].objectProperties[j].name));
 			optgroup1.appendChild(option);
 		}
 		for (var j = 0; j != schemas[i].classes.length; j++) {
 			TYPES.push({
-				id: schemas[i].classes[j].id,
+				id: schemas[i].classes[j].identifier,
 				name: schemas[i].classes[j].name,
 				schemaName: schemas[i].name
 			});
 			option = document.createElement("option");
-			option.value = schemas[i].classes[j].id;
+			option.value = schemas[i].classes[j].identifier;
 			option.appendChild(document.createTextNode(schemas[i].classes[j].name));
 			optgroup2.appendChild(option);
 		}
 	}
 
 	if (schemas.length > 0) {
-		select.value = schemas[0].id;
+		select.value = schemas[0].identifier;
 		onSchemaChange();
 	}
 }
@@ -82,7 +82,7 @@ function onSchemaChange() {
 	var id = document.getElementById("root-schema").value;
 	var schema = null;
 	for (var i = 0; i != SCHEMAS.length; i++) {
-		if (SCHEMAS[i].id === id) {
+		if (SCHEMAS[i].identifier === id) {
 			schema = SCHEMAS[i];
 			break;
 		}
@@ -93,12 +93,12 @@ function onSchemaChange() {
 	}
 	for (var i = 0; i != schema.classes.length; i++) {
 		var option = document.createElement("option");
-		option.value = schema.classes[i].id;
+		option.value = schema.classes[i].identifier;
 		option.appendChild(document.createTextNode(schema.classes[i].name));
 		select.appendChild(option);
 	}
 	if (schema.classes.length > 0) {
-		select.value = schema.classes[0].id;
+		select.value = schema.classes[0].identifier;
 		onTypeChange();
 	}
 }
@@ -128,7 +128,7 @@ function renderElements(data) {
 		var name = entity.id;
 		for (var j = 0; j != entity.properties.length; j++) {
 			var property = entity.properties[j];
-			if (property.id.endsWith("name") || property.id.endsWith("label") || property.id.endsWith("title")) {
+			if (property.identifier.endsWith("name") || property.identifier.endsWith("label") || property.identifier.endsWith("title")) {
 				var value = property.value;
 				name = value.hasOwnProperty("lexical") ? value.lexical : value.value;
 				name += " (" + entity.id + ")";
@@ -144,7 +144,7 @@ function renderElements(data) {
 function onClickNewFilterLink() {
 	var select_links = document.getElementById("filters-links-schema");
 	var link = LINKS[select_links.selectedIndex];
-	FILTER_LINKS.push(link.id);
+	FILTER_LINKS.push(link.identifier);
 	var table = document.getElementById("filters-links");
 	var row = document.createElement("tr");
 	var cell1 = document.createElement("td");
@@ -163,7 +163,7 @@ function onClickNewFilterLink() {
 	button.appendChild(span);
 	button.onclick = function (evt) {
 		table.removeChild(row);
-		FILTER_LINKS.splice(FILTER_LINKS.indexOf(link.id), 1);
+		FILTER_LINKS.splice(FILTER_LINKS.indexOf(link.identifier), 1);
 	};
 	cell2.appendChild(button);
 	row.appendChild(cell1);
@@ -174,7 +174,7 @@ function onClickNewFilterLink() {
 function onClickNewFilterType() {
 	var select_types = document.getElementById("filters-types-schema");
 	var type = TYPES[select_types.selectedIndex];
-	FILTER_TYPES.push(type.id);
+	FILTER_TYPES.push(type.identifier);
 	var table = document.getElementById("filters-types");
 	var row = document.createElement("tr");
 	var cell1 = document.createElement("td");
@@ -193,7 +193,7 @@ function onClickNewFilterType() {
 	button.appendChild(span);
 	button.onclick = function (evt) {
 		table.removeChild(row);
-		FILTER_TYPES.splice(FILTER_TYPES.indexOf(type.id), 1);
+		FILTER_TYPES.splice(FILTER_TYPES.indexOf(type.identifier), 1);
 	};
 	cell2.appendChild(button);
 	row.appendChild(cell1);

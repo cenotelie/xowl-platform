@@ -19,24 +19,30 @@
         <div class="panel-body">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label for="group-name" class="col-sm-2 control-label">Name</label>
+                    <label for="input-identifier" class="col-sm-2 control-label">Identifier</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="group-name" placeholder="Reviewers">
+                        <input type="text" class="form-control" id="input-identifier" placeholder="requirements">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="group-admin" class="col-sm-2 control-label">Initial administrator</label>
+                    <label for="input-name" class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="input-name" placeholder="System Requirements">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="input-archetype" class="col-sm-2 control-label">Archetype</label>
                     <div class="col-sm-10">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="group-admin" placeholder="jdoe">
+                            <input type="text" class="form-control" id="input-archetype" placeholder="archetype">
                             <div class="input-group-addon">
-                                <img src="" width="20" height="20" id="group-admin-indicator"
+                                <img src="" width="20" height="20" id="input-archetype-indicator"
                                      style="display: none;"/>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" onclick="create()">Create</button>
+                <button type="button" class="btn btn-primary" onclick="onClickCreate()">Create</button>
             </form>
         </div>
     </div>
@@ -45,7 +51,7 @@
 
 <script src="/web/xowl/xowl-api-platform.js"></script>
 <script src="/web/xowl/xowl-ui.js"></script>
-<script src="new_input.js"></script>
+<script src="io_new_input.js"></script>
 <script>init();</script>
 </body>
 

@@ -694,7 +694,7 @@ XOWL.prototype.addCollaborationInputSpecification = function (callback, specific
 XOWL.prototype.removeCollaborationInputSpecification = function (callback, specificationId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -714,7 +714,7 @@ XOWL.prototype.getArtifactsForCollaborationInput = function (callback, specifica
 XOWL.prototype.registerArtifactForCollaborationInput = function (callback, specificationId, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -724,7 +724,7 @@ XOWL.prototype.registerArtifactForCollaborationInput = function (callback, speci
 XOWL.prototype.unregisterArtifactForCollaborationInput = function (callback, specificationId, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -754,7 +754,7 @@ XOWL.prototype.addCollaborationOutputSpecification = function (callback, specifi
 XOWL.prototype.removeCollaborationOutputSpecification = function (callback, specificationId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -774,7 +774,7 @@ XOWL.prototype.getArtifactsForCollaborationOutput = function (callback, specific
 XOWL.prototype.registerArtifactForCollaborationOutput = function (callback, specificationId, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -784,7 +784,7 @@ XOWL.prototype.registerArtifactForCollaborationOutput = function (callback, spec
 XOWL.prototype.unregisterArtifactForCollaborationOutput = function (callback, specificationId, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -824,7 +824,7 @@ XOWL.prototype.addCollaborationRole = function (callback, roleId) {
 XOWL.prototype.removeCollaborationRole = function (callback, roleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -894,7 +894,7 @@ XOWL.prototype.getCollaborationNeighbourStatus = function (callback, neighbourId
 XOWL.prototype.deleteCollaborationNeighbour = function (callback, neighbourId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, MIME_JSON, null);
 		} else {
 			callback(code, type, content);
 		}

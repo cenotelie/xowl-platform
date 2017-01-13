@@ -9,7 +9,7 @@ function init() {
 			{name: "Collaboration", uri: "/web/modules/collab/"},
 			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
 			{name: "Inputs & Outputs", uri: "/web/modules/collab/local/io.html"},
-			{name: "New Input Spec ..."}], function() {
+			{name: "New Output Spec ..."}], function() {
 		setupAutocomplete();
 	});
 }
@@ -49,7 +49,7 @@ function filterItems(items, value) {
 }
 
 function onClickCreate() {
-	if (!onOperationRequest("Creating new input ..."))
+	if (!onOperationRequest("Creating new output ..."))
 		return false;
 	var identifier = document.getElementById("input-identifier").value;
 	var name = document.getElementById("input-name").value;
@@ -60,9 +60,9 @@ function onClickCreate() {
 		onOperationAbort("All fields are mandatory.");
 		return false;
 	}
-	xowl.addCollaborationInputSpecification(function (status, ct, content) {
+	xowl.addCollaborationOutputSpecification(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Created input " + identifier);
+			displayMessage("success", "Created output " + identifier);
 			waitAndGo("io.html");
 		}
 	}, {identifier: identifier, name: name, archetype: archetype});

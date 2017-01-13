@@ -7,7 +7,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Collaboration", uri: "/web/modules/collab/"},
 			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
-			{name: "Inputs / Outputs"}], function() {
+			{name: "Inputs & Outputs"}], function() {
 		doGetData();
 	});
 }
@@ -89,10 +89,32 @@ function renderIOElement(element, link, toRemove) {
 	return row;
 }
 
-function onClickRemoveInput(inputId) {
-
+function onClickRemoveInput(specId) {
+	var result = confirm("Remove input specification " + specId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Removing input specification ..."))
+		return;
+	xowl.removeCollaborationInputSpecification(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Removed input specification " + specId);
+			waitAndRefresh();
+		}
+	}, specId);
+	return;
 }
 
-function onClickRemoveOutput(inputId) {
-
+function onClickRemoveOutput(specId) {
+	var result = confirm("Remove output specification " + specId + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Removing input specification ..."))
+		return;
+	xowl.removeCollaborationOutputSpecification(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Removed output specification " + specId);
+			waitAndRefresh();
+		}
+	}, specId);
+	return;
 }

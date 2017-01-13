@@ -151,20 +151,29 @@ public interface CollaborationLocalService extends Service {
     Collection<PlatformRole> getRoles();
 
     /**
-     * Adds a role for this collaboration
+     * Creates a role and registers it for this collaboration
      *
-     * @param name The name for this role
+     * @param identifier The identifier for this role
+     * @param name       The name for this role
      * @return The protocol reply
      */
-    XSPReply addRole(String name);
+    XSPReply createRole(String identifier, String name);
 
     /**
-     * Removes a role from this collaboration
+     * Registers a role for this collaboration
      *
-     * @param identifier The identifier of the role to remove
+     * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    XSPReply removeRole(String identifier);
+    XSPReply addRole(String roleId);
+
+    /**
+     * Unregisters a role from this collaboration
+     *
+     * @param roleId The identifier of the role
+     * @return The protocol reply
+     */
+    XSPReply removeRole(String roleId);
 
     /**
      * Gets the collaboration pattern for the orchestration of this collaboration

@@ -220,14 +220,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply addRole(String name) {
+    public XSPReply createRole(String identifier, String name) {
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getRealm().createRole(
-                PlatformRole.class.getCanonicalName() + "." + UUID.randomUUID().toString(),
-                name
-        );
+        XSPReply reply = securityService.getRealm().createRole(identifier, name);
         if (!reply.isSuccess())
             return reply;
         PlatformRole role = ((XSPReplyResult<PlatformRole>) reply).getData();
@@ -239,14 +236,24 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply removeRole(String identifier) {
+    public XSPReply addRole(String roleId) {
         SecurityService securityService = ServiceUtils.getService(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getRealm().deleteRole(identifier);
+        PlatformRole role = securityService.getRealm().getRole(roleId);
+        if (role == null)
+            return XSPReplyNotFound.instance();
+        manifest.addRole(role);
+        XSPReply reply = serializeManifest();
         if (!reply.isSuccess())
             return reply;
-        manifest.removeRole(identifier);
+        return new XSPReplyResult<>(role);
+    }
+
+    @Override
+    public XSPReply removeRole(String roleId) {
+        if (!manifest.removeRole(roleId))
+            return XSPReplyNotFound.instance();
         return serializeManifest();
     }
 

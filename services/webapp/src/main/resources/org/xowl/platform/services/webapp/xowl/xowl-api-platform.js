@@ -661,6 +661,16 @@ XOWL.prototype.deleteCollaboration = function (callback) {
 	}, "services/collaboration/delete", null, "POST", null, null);
 }
 
+XOWL.prototype.getCollaborationManifest = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/manifest", null, "GET", null, null);
+}
+
 XOWL.prototype.getCollaborationInputSpecifications = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
@@ -668,17 +678,17 @@ XOWL.prototype.getCollaborationInputSpecifications = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/inputs", null, "GET", null, null);
+	}, "services/collaboration/manifest/inputs", null, "GET", null, null);
 }
 
-XOWL.prototype.addCollaborationInputSpecification = function (callback, name, archetype) {
+XOWL.prototype.addCollaborationInputSpecification = function (callback, specification) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/inputs", {name: name, archetype: archetype}, "GET", null, null);
+	}, "services/collaboration/manifest/inputs", null, "PUT", MIME_JSON, specification);
 }
 
 XOWL.prototype.removeCollaborationInputSpecification = function (callback, specificationId) {
@@ -688,7 +698,7 @@ XOWL.prototype.removeCollaborationInputSpecification = function (callback, speci
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
+	}, "services/collaboration/manifest/inputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.getArtifactsForCollaborationInput = function (callback, specificationId) {
@@ -698,7 +708,7 @@ XOWL.prototype.getArtifactsForCollaborationInput = function (callback, specifica
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+	}, "services/collaboration/manifest/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
 }
 
 XOWL.prototype.registerArtifactForCollaborationInput = function (callback, specificationId, artifactId) {
@@ -708,7 +718,17 @@ XOWL.prototype.registerArtifactForCollaborationInput = function (callback, speci
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+	}, "services/collaboration/manifest/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+}
+
+XOWL.prototype.unregisterArtifactForCollaborationInput = function (callback, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/manifest/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.getCollaborationOutputSpecifications = function (callback) {
@@ -718,17 +738,17 @@ XOWL.prototype.getCollaborationOutputSpecifications = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/outputs", null, "GET", null, null);
+	}, "services/collaboration/manifest/outputs", null, "GET", null, null);
 }
 
-XOWL.prototype.addCollaborationOutputSpecification = function (callback, name, archetype) {
+XOWL.prototype.addCollaborationOutputSpecification = function (callback, specification) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/outputs", {name: name, archetype: archetype}, "GET", null, null);
+	}, "services/collaboration/manifest/outputs", null, "PUT", MIME_JSON, specification);
 }
 
 XOWL.prototype.removeCollaborationOutputSpecification = function (callback, specificationId) {
@@ -738,7 +758,7 @@ XOWL.prototype.removeCollaborationOutputSpecification = function (callback, spec
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
+	}, "services/collaboration/manifest/outputs/" + encodeURIComponent(specificationId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.getArtifactsForCollaborationOutput = function (callback, specificationId) {
@@ -748,7 +768,7 @@ XOWL.prototype.getArtifactsForCollaborationOutput = function (callback, specific
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+	}, "services/collaboration/manifest/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
 }
 
 XOWL.prototype.registerArtifactForCollaborationOutput = function (callback, specificationId, artifactId) {
@@ -758,7 +778,17 @@ XOWL.prototype.registerArtifactForCollaborationOutput = function (callback, spec
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+	}, "services/collaboration/manifest/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "PUT", null, null);
+}
+
+XOWL.prototype.unregisterArtifactForCollaborationOutput = function (callback, specificationId, artifactId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/manifest/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.getCollaborationRoles = function (callback) {
@@ -768,17 +798,27 @@ XOWL.prototype.getCollaborationRoles = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/roles", null, "GET", null, null);
+	}, "services/collaboration/manifest/roles", null, "GET", null, null);
 }
 
-XOWL.prototype.addCollaborationRole = function (callback, name) {
+XOWL.prototype.createCollaborationRole = function (callback, role) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/roles", {name: name}, "PUT", null, null);
+	}, "services/collaboration/manifest/roles", null, "PUT", MIME_JSON, role);
+}
+
+XOWL.prototype.addCollaborationRole = function (callback, roleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/manifest/roles/" + encodeURIComponent(roleId), null, "PUT", null, null);
 }
 
 XOWL.prototype.removeCollaborationRole = function (callback, roleId) {
@@ -788,7 +828,7 @@ XOWL.prototype.removeCollaborationRole = function (callback, roleId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/roles/" + encodeURIComponent(roleId), null, "DELETE", null, null);
+	}, "services/collaboration/manifest/roles/" + encodeURIComponent(roleId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.getCollaborationPattern = function (callback) {
@@ -798,7 +838,7 @@ XOWL.prototype.getCollaborationPattern = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/pattern", null, "GET", null, null);
+	}, "services/collaboration/manifest/pattern", null, "GET", null, null);
 }
 
 XOWL.prototype.getCollaborationNeighbours = function (callback) {
@@ -829,6 +869,26 @@ XOWL.prototype.getCollaborationNeighbour = function (callback, neighbourId) {
 			callback(code, type, content);
 		}
 	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId), null, "GET", null, null);
+}
+
+XOWL.prototype.getCollaborationNeighbourManifest = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/manifest", null, "GET", null, null);
+}
+
+XOWL.prototype.getCollaborationNeighbourStatus = function (callback, neighbourId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/status", null, "GET", null, null);
 }
 
 XOWL.prototype.deleteCollaborationNeighbour = function (callback, neighbourId) {
@@ -868,17 +928,7 @@ XOWL.prototype.getCollaborationNeighbourInputs = function (callback, neighbourId
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
-}
-
-XOWL.prototype.sendArtifactForCollaborationNeighbourInput = function (callback, neighbourId, specificationId, artifactId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/inputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "POST", null, null);
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/manifest/inputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
 }
 
 XOWL.prototype.getCollaborationNeighbourOutputs = function (callback, neighbourId, specificationId) {
@@ -888,17 +938,7 @@ XOWL.prototype.getCollaborationNeighbourOutputs = function (callback, neighbourI
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
-}
-
-XOWL.prototype.retrieveArtifactForCollaborationNeighbourOutput = function (callback, neighbourId, specificationId, artifactId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/outputs/" + encodeURIComponent(specificationId) + "/artifacts/" + encodeURIComponent(artifactId), null, "POST", null, null);
+	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/manifest/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
 }
 
 

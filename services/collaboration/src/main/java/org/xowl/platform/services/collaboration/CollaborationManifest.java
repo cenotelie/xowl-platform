@@ -360,10 +360,11 @@ public class CollaborationManifest implements Identifiable, Serializable {
      * Removes a role
      *
      * @param roleId The identifier of the role to remove
+     * @return true if the role was removed, false if it was not present
      */
-    public void removeRole(String roleId) {
+    public boolean removeRole(String roleId) {
         synchronized (roles) {
-            roles.remove(roleId);
+            return roles.remove(roleId) != null;
         }
     }
 

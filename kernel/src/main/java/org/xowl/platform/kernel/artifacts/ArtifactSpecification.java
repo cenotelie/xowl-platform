@@ -22,8 +22,6 @@ import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 
-import java.util.UUID;
-
 /**
  * Represents the specification of an artifact
  *
@@ -46,11 +44,12 @@ public class ArtifactSpecification implements Identifiable, Serializable {
     /**
      * Initializes this specification
      *
-     * @param name      The name for this specification
-     * @param archetype The identifier of the archetype for the artifacts that match this specification
+     * @param identifier The identifier of this specification
+     * @param name       The name for this specification
+     * @param archetype  The identifier of the archetype for the artifacts that match this specification
      */
-    public ArtifactSpecification(String name, String archetype) {
-        this.identifier = ArtifactSpecification.class.getCanonicalName() + "." + UUID.randomUUID().toString();
+    public ArtifactSpecification(String identifier, String name, String archetype) {
+        this.identifier = identifier;
         this.name = name;
         this.archetype = archetype;
     }

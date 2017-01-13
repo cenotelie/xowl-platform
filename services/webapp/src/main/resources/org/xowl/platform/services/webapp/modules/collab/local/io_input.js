@@ -165,7 +165,7 @@ function onClickRegister() {
 			displayMessage("success", "Registered artifact " + artifactId);
 			waitAndRefresh();
 		}
-	}, specId, archetypeId);
+	}, specId, artifactId);
 	return false;
 }
 
@@ -180,6 +180,6 @@ function onClickUnregister(artifactId) {
 			displayMessage("success", "Un-registered artifact " + artifactId);
 			waitAndRefresh();
 		}
-	}, specId, archetypeId);
+	}, specId, artifactId);
 	return;
 }

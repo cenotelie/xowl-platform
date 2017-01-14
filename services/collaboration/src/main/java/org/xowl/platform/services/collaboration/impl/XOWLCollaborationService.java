@@ -439,18 +439,16 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        int index = rest.indexOf("/");
-        String roleId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
-        if (index < 0) {
-            switch (request.getMethod()) {
-                case HttpConstants.METHOD_DELETE:
-                    return XSPReplyUtils.toHttpResponse(removeRole(roleId), null);
-                case HttpConstants.METHOD_PUT:
-                    return XSPReplyUtils.toHttpResponse(addRole(roleId), null);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
+        if (!rest.startsWith("/"))
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        String roleId = URIUtils.decodeComponent(rest.substring(1));
+        switch (request.getMethod()) {
+            case HttpConstants.METHOD_DELETE:
+                return XSPReplyUtils.toHttpResponse(removeRole(roleId), null);
+            case HttpConstants.METHOD_PUT:
+                return XSPReplyUtils.toHttpResponse(addRole(roleId), null);
         }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
 
     /**

@@ -841,6 +841,16 @@ XOWL.prototype.getCollaborationPattern = function (callback) {
 	}, "services/collaboration/manifest/pattern", null, "GET", null, null);
 }
 
+XOWL.prototype.lookupCollaborationIOSpecs = function (callback, input) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/network/specifications", {input: input}, "GET", null, null);
+}
+
 XOWL.prototype.getCollaborationNeighbours = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

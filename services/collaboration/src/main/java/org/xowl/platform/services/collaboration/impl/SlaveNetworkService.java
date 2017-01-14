@@ -18,6 +18,7 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConnection;
@@ -88,16 +89,21 @@ public class SlaveNetworkService implements CollaborationNetworkService {
 
     @Override
     public XSPReply getNeighbourManifest(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        return XSPReplyNotFound.instance();
+    }
+
+    @Override
+    public XSPReply lookupSpecifications(String input) {
         return XSPReplyUnsupported.instance();
     }
 
@@ -108,16 +114,16 @@ public class SlaveNetworkService implements CollaborationNetworkService {
 
     @Override
     public XSPReply archive(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply restart(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply delete(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 }

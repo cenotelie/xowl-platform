@@ -148,12 +148,12 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public Collection<RemoteCollaboration> getNeighbours() {
-        return (Collection) Collections.unmodifiableCollection(collaborations.values());
+        return Collections.emptyList();
     }
 
     @Override
     public RemoteCollaboration getNeighbour(String collaborationId) {
-        return collaborations.get(collaborationId);
+        return null;
     }
 
     @Override
@@ -163,16 +163,21 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public XSPReply getNeighbourManifest(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        return XSPReplyNotFound.instance();
+    }
+
+    @Override
+    public XSPReply lookupSpecifications(String input) {
         return XSPReplyUnsupported.instance();
     }
 
@@ -183,17 +188,17 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public XSPReply archive(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply restart(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply delete(String collaborationId) {
-        return XSPReplyUnsupported.instance();
+        return XSPReplyNotFound.instance();
     }
 
     /**

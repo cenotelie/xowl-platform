@@ -19,6 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
@@ -75,8 +76,13 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public XSPReply lookupSpecifications(String input) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
-        return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override

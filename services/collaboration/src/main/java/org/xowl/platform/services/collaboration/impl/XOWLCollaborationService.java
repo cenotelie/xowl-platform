@@ -130,6 +130,11 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
+    public XSPReply lookupSpecifications(String input) {
+        return getNetworkService().lookupSpecifications(input);
+    }
+
+    @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         return getNetworkService().spawn(specification);
     }
@@ -178,6 +183,8 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             return XSPReplyUtils.toHttpResponse(delete(), null);
         } else if (request.getUri().startsWith(URI_API + "/manifest")) {
             return handleManifest(request);
+        } else if (request.getUri().startsWith(URI_API + "/network")) {
+            return handleNetwork(request);
         } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
             return handleNeighbours(request);
         }
@@ -442,7 +449,28 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     /**
-     * Handles a request to the manifest/neighbours resource
+     * Handles a request to the network resource
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleNetwork(HttpApiRequest request) {
+        String rest = request.getUri().substring(URI_API.length() + "/network".length());
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        if (rest.equals("/specifications")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            String[] inputs = request.getParameter("input");
+            if (inputs == null || inputs.length == 0)
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'input'"), null);
+            return XSPReplyUtils.toHttpResponse(lookupSpecifications(inputs[0]), null);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Handles a request to the neighbours resource
      *
      * @param request The request
      * @return The response
@@ -484,7 +512,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     /**
-     * Handles a request to the manifest/neighbours/{neighbourId} resource
+     * Handles a request to the neighbours/{neighbourId} resource
      *
      * @param request     The request
      * @param neighbourId The identifier of the neighbour

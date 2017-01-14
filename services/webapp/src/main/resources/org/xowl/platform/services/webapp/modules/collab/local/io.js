@@ -45,7 +45,7 @@ function renderInputs(inputs) {
 	for (var i = 0; i != inputs.length; i++) {
 		(function (input) {
 			var toRemove = function() { onClickRemoveInput(input.specification.identifier); };
-			var row = renderIOElement(inputs[i], "io_input", toRemove);
+			var row = renderIOElement(inputs[i], "io-input", toRemove);
 			table.appendChild(row);
 		})(inputs[i]);
 	}
@@ -59,7 +59,7 @@ function renderOutputs(outputs) {
 	for (var i = 0; i != outputs.length; i++) {
 		(function (output) {
 			var toRemove = function() { onClickRemoveInput(output.specification.identifier); };
-			var row = renderIOElement(output, "io_output", toRemove);
+			var row = renderIOElement(output, "io-output", toRemove);
 			table.appendChild(row);
 		})(outputs[i]);
 	}

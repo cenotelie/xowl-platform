@@ -102,21 +102,4 @@ public class ServiceUtils {
         }
         return result;
     }
-
-    /**
-     * Instantiates a service from the specified service identifier
-     *
-     * @param identifier The identifier of a service
-     * @param <S>        The service type
-     * @return The service, or null if it cannot be instantiated
-     */
-    public static <S extends Service> S instantiate(String identifier) {
-        try {
-            Class<? extends S> clazz = (Class) Class.forName(identifier);
-            return clazz.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException exception) {
-            Logging.getDefault().error(exception);
-        }
-        return null;
-    }
 }

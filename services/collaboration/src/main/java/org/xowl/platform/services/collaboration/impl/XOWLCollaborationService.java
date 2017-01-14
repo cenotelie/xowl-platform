@@ -84,7 +84,12 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (networkService == null) {
             ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
             Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-            networkService = ServiceUtils.instantiate(configuration.get("network", "service"));
+            String identifier = configuration.get("network", "service");
+            for (CollaborationNetworkServiceProvider provider : ServiceUtils.getServices(CollaborationNetworkServiceProvider.class)) {
+                networkService = provider.instantiate(identifier);
+                if (networkService != null)
+                    break;
+            }
         }
         return networkService;
     }

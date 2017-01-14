@@ -69,6 +69,7 @@ function renderPlatformUser(user) {
 	image.width = 30
 	image.height = 30
 	image.style.marginRight = "20px";
+	image.alt = user.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(user.name));
 	link.href="user.html?id=" + encodeURIComponent(user.identifier);
@@ -86,6 +87,7 @@ function renderPlatformGroup(group) {
 	image.width = 30
 	image.height = 30
 	image.style.marginRight = "20px";
+	image.alt = group.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(group.name));
 	link.href="group.html?id=" + encodeURIComponent(group.identifier);
@@ -103,6 +105,7 @@ function renderPlatformRole(role) {
 	image.width = 30
 	image.height = 30
 	image.style.marginRight = "20px";
+	image.alt = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
 	link.href="role.html?id=" + encodeURIComponent(role.identifier);

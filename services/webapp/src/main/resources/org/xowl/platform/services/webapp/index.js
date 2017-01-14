@@ -38,6 +38,7 @@ function renderModule(myModule) {
 	icon.width = 30;
 	icon.height = 30;
 	icon.style.marginRight = "20px";
+	icon.alt = myModule.identifier;
 	var linkModule = document.createElement("a");
 	linkModule.appendChild(document.createTextNode(myModule.name));
 	linkModule.href = "/web/modules/" + myModule.uri + "/";
@@ -47,6 +48,7 @@ function renderModule(myModule) {
 	buttonImage.width = 30;
 	buttonImage.height = 30;
 	buttonImage.style.float = "right";
+	buttonImage.alt = "TOGGLE";
 	button.style.cursor = "pointer";
 	button.appendChild(buttonImage);
 	header.appendChild(icon);
@@ -63,6 +65,7 @@ function renderModule(myModule) {
 		icon.width = 30;
 		icon.height = 30;
 		icon.style.marginRight = "20px";
+		icon.alt = myModule.items[i].name;
 		var link = document.createElement("a");
 		link.appendChild(document.createTextNode(part.name));
 		link.classList.add("btn");

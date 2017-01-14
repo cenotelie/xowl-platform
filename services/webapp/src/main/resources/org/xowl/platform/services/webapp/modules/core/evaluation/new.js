@@ -81,6 +81,7 @@ function renderEvaluable(evaluable) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
+	icon.alt = evaluable.identifier;
 	var cell1 = document.createElement("td");
 	cell1.appendChild(icon);
 	cell1.appendChild(document.createTextNode(evaluable.name));
@@ -172,6 +173,7 @@ function renderCriterion(criterion) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
+	icon.alt = criterion.identifier;
 	var cell2 = document.createElement("td");
 	cell2.appendChild(icon);
 	cell2.appendChild(document.createTextNode(criterion.name));

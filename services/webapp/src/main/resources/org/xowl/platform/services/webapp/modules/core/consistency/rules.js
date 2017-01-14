@@ -33,6 +33,7 @@ function renderRule(rule, index) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
+	icon.alt = rule.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(rule.name));
 	link.href = "rule.html?id=" + encodeURIComponent(rule.identifier);

@@ -76,6 +76,7 @@ function renderRole(role) {
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
+	image.alt = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
 	link.href = "/web/modules/admin/security/role.html.html?id=" + encodeURIComponent(role.identifier);
@@ -88,6 +89,7 @@ function renderRole(role) {
 	image.src = "/web/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
+	image.alt = "REMOVE";
 	var button = document.createElement("span");
 	button.classList.add("btn");
 	button.classList.add("btn-default");

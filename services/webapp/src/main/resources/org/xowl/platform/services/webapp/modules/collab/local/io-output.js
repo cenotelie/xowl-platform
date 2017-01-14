@@ -111,6 +111,7 @@ function renderArtifact(artifact) {
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
+	image.alt = artifact.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(artifact.name));
 	link.href = "/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifact.identifier);
@@ -127,6 +128,7 @@ function renderArtifact(artifact) {
 	image.src = "/web/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
+	image.alt = "UNREGISTER";
 	var button = document.createElement("span");
 	button.classList.add("btn");
 	button.classList.add("btn-default");

@@ -30,6 +30,7 @@ function renderEval(evaluation) {
 		icon.width = 40;
 		icon.height = 40;
 		icon.style.marginRight = "20px";
+		icon.alt = evaluation.evaluables[i].identifier;
 		var head = document.createElement("td");
 		head.appendChild(icon);
 		head.appendChild(document.createTextNode(evaluation.evaluables[i].name));
@@ -43,6 +44,7 @@ function renderEval(evaluation) {
 		icon.width = 40;
 		icon.height = 40;
 		icon.style.marginRight = "20px";
+		icon.alt = evaluation.criteria[i].identifier;
 		var cell = document.createElement("td");
 		cell.appendChild(icon);
 		cell.appendChild(document.createTextNode(evaluation.criteria[i].name));

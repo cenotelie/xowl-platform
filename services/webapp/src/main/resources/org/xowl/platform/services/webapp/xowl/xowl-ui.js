@@ -476,16 +476,61 @@ function AutoComplete(inputId) {
 	this.input = document.getElementById(inputId);
 	this.indicator = document.getElementById(inputId + "-indicator");
 	this.panel = null;
+	this.currentItems = null;
+	this.currentItemsNodes = null;
+	this.currentSelection = -1;
 	this.input.oninput = function () {
 		__self.onInputChange();
 	};
-	this.input.onblur = function () {
-		/*if (__self.panel != null) {
-			__self.panel.remove();
-			__self.panel = null;
-			__self.isSet = false;
-		}*/
+	this.input.onkeydown = function (event) {
+		__self.onKeyDown(event);
 	};
+}
+
+/**
+ * Cleanups the state of this autocomplete field
+ */
+AutoComplete.prototype.cleanup = function () {
+	if (this.panel != null)
+		this.input.parentElement.removeChild(this.panel);
+	this.panel = null;
+	this.currentItems = null;
+	this.currentItemsNodes = null;
+	this.currentSelection = -1;
+}
+
+/**
+ * When a key has been pushed down
+ *
+ * @param event The keyboard event
+ */
+AutoComplete.prototype.onKeyDown = function (event) {
+	if (this.panel == null || this.currentItems == null || this.currentItemsNodes == null)
+		return;
+	if (event.keyCode == 38) {
+		// up key
+		if (this.currentSelection <= 0)
+			return;
+		this.currentItemsNodes[this.currentSelection].style.backgroundColor = "";
+		this.currentSelection = this.currentSelection - 1;
+		this.currentItemsNodes[this.currentSelection].style.backgroundColor = "#D0D0D0";
+	} else if (event.keyCode == 40) {
+		// down key
+		if (this.currentSelection >= this.currentItems.length - 1)
+			return;
+		if (this.currentSelection >= 0)
+			this.currentItemsNodes[this.currentSelection].style.backgroundColor = "";
+		this.currentSelection = this.currentSelection + 1;
+		this.currentItemsNodes[this.currentSelection].style.backgroundColor = "#D0D0D0";
+	} else if (event.keyCode == 13) {
+		// enter key
+		if (this.currentSelection >= 0 && this.currentSelection < this.currentItems.length) {
+			var item = this.currentItems[this.currentSelection];
+			this.input.value = this.getItemString(item);
+			this.onItemSelected(item);
+			this.cleanup();
+		}
+	}
 }
 
 /**
@@ -498,7 +543,7 @@ AutoComplete.prototype.onInputChange = function () {
 		return;
 	PAGE_BUSY = { count: 1 };
 	if (this.panel != null)
-		this.panel.remove();
+		this.cleanup();
 	if (this.input.value === null || this.input.value.length == 0) {
 		PAGE_BUSY = null;
 		return;
@@ -516,6 +561,8 @@ AutoComplete.prototype.onInputChange = function () {
  * @param items	The items items
  */
 AutoComplete.prototype.onItems = function (items) {
+	this.currentItems = items;
+	this.currentItemsNodes = [];
 	var inputBounds = this.input.getBoundingClientRect();
 	this.panel = document.createElement("div");
 	this.panel.classList.add("autocomplete-panel");
@@ -536,6 +583,7 @@ AutoComplete.prototype.onItems = function (items) {
 			};
 		})(this, items[i], node);
 		this.panel.appendChild(node);
+		this.currentItemsNodes.push(node);
 	}
 	this.input.parentElement.appendChild(this.panel);
 	if (this.indicator != null) {
@@ -552,7 +600,7 @@ AutoComplete.prototype.onItems = function (items) {
 AutoComplete.prototype.onItemClick = function (item) {
 	this.input.value = this.getItemString(item);
 	this.onItemSelected(item);
-	this.panel.remove();
+	this.cleanup();
 }
 
 /**

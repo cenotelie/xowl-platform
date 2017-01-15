@@ -137,6 +137,52 @@ function setupAutocompletePattern(component) {
 	};
 }
 
+
+function onClickShowInputNew() {
+	document.getElementById("panel-input-new").style.display = "";
+	document.getElementById("panel-input-existing").style.display = "none";
+}
+
+function onClockShowInputAdd() {
+	document.getElementById("panel-input-new").style.display = "none";
+	document.getElementById("panel-input-existing").style.display = "";
+}
+
+function onClickCancelInput() {
+	document.getElementById("panel-input-new").style.display = "none";
+	document.getElementById("panel-input-existing").style.display = "none";
+}
+
+function onClickShowOutputNew() {
+	document.getElementById("panel-output-new").style.display = "";
+	document.getElementById("panel-output-existing").style.display = "none";
+}
+
+function onClockShowOutputAdd() {
+	document.getElementById("panel-output-new").style.display = "none";
+	document.getElementById("panel-output-existing").style.display = "";
+}
+
+function onClickCancelOutput() {
+	document.getElementById("panel-output-new").style.display = "none";
+	document.getElementById("panel-output-existing").style.display = "none";
+}
+
+function onClickShowRoleNew() {
+	document.getElementById("panel-role-new").style.display = "";
+	document.getElementById("panel-role-existing").style.display = "none";
+}
+
+function onClockShowRoleAdd() {
+	document.getElementById("panel-role-new").style.display = "none";
+	document.getElementById("panel-role-existing").style.display = "";
+}
+
+function onClickCancelRole() {
+	document.getElementById("panel-role-new").style.display = "none";
+	document.getElementById("panel-role-existing").style.display = "none";
+}
+
 function onClickCreateInput() {
 	var identifier = document.getElementById("input-identifier").value;
 	var name = document.getElementById("input-name").value;
@@ -155,6 +201,7 @@ function onClickCreateInput() {
 	document.getElementById("input-identifier").value = "";
 	document.getElementById("input-name").value = "";
 	document.getElementById("input-archetype").value = "";
+	onClickCancelInput();
 }
 
 function onClickAddInput() {
@@ -172,6 +219,7 @@ function onClickAddInput() {
 		return;
 	doAddInput(input);
 	document.getElementById("input-specification").value = "";
+	onClickCancelInput();
 }
 
 function doAddInput(input) {
@@ -204,6 +252,7 @@ function onClickCreateOutput() {
 	document.getElementById("output-identifier").value = "";
 	document.getElementById("output-name").value = "";
 	document.getElementById("output-archetype").value = "";
+	onClickCancelOutput();
 }
 
 function onClickAddOutput() {
@@ -221,6 +270,7 @@ function onClickAddOutput() {
 		return;
 	doAddOutput(output);
 	document.getElementById("output-specification").value = "";
+	onClickCancelOutput();
 }
 
 function doAddOutput(output) {
@@ -249,6 +299,7 @@ function onClickCreateRole() {
 	doAddRole(role);
 	document.getElementById("role-identifier").value = "";
 	document.getElementById("role-name").value = "";
+	onClickCancelRole();
 }
 
 function onClickAddRole() {
@@ -266,6 +317,7 @@ function onClickAddRole() {
 		return;
 	doAddRole(role);
 	document.getElementById("role-existing").value = "";
+	onClickCancelRole();
 }
 
 function doAddRole(role) {

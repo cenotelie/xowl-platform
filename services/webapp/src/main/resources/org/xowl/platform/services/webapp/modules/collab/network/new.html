@@ -51,10 +51,11 @@
             <div class="col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        New input specification
+                        <a onclick="onClickShowInputNew()" style="cursor: pointer;">New input</a>
+                        <a onclick="onClockShowInputAdd()" style="cursor: pointer; margin-left: 20px;">Add existing</a>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-input-new" style="display: none;">
                             <div class="form-group">
                                 <label for="input-identifier" class="col-sm-2 control-label">Identifier</label>
                                 <div class="col-sm-10">
@@ -83,15 +84,9 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-default" onclick="onClickCreateInput()">Create</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelInput()">Cancel</button>
                         </form>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Add existing specification
-                    </div>
-                    <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-input-existing" style="display: none;">
                             <div class="form-group">
                                 <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
                                 <div class="col-sm-10">
@@ -106,6 +101,7 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-default" onclick="onClickAddInput()">Add</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelInput()">Cancel</button>
                         </form>
                     </div>
                 </div>
@@ -128,10 +124,11 @@
             <div class="col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        New output specification
+                        <a onclick="onClickShowOutputNew()" style="cursor: pointer;">New output</a>
+                        <a onclick="onClockShowOutputAdd()" style="cursor: pointer; margin-left: 20px;">Add existing</a>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-output-new" style="display: none;">
                             <div class="form-group">
                                 <label for="output-identifier" class="col-sm-2 control-label">Identifier</label>
                                 <div class="col-sm-10">
@@ -159,16 +156,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-default" onclick="onClickCreateOutput()">Create</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCreateOutput()">Create
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelOutput()">Cancel
+                            </button>
                         </form>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Add existing specification
-                    </div>
-                    <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-output-existing" style="display: none;">
                             <div class="form-group">
                                 <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
                                 <div class="col-sm-10">
@@ -183,6 +176,8 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-default" onclick="onClickAddOutput()">Add</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelOutput()">Cancel
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -204,10 +199,11 @@
             <div class="col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        New role
+                        <a onclick="onClickShowRoleNew()" style="cursor: pointer;">New role</a>
+                        <a onclick="onClockShowRoleAdd()" style="cursor: pointer; margin-left: 20px;">Add existing</a>
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-role-new" style="display: none;">
                             <div class="form-group">
                                 <label for="role-identifier" class="col-sm-2 control-label">Identifier</label>
                                 <div class="col-sm-10">
@@ -223,15 +219,9 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-default" onclick="onClickCreateRole()">Create</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelRole()">Cancel</button>
                         </form>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Add existing role
-                    </div>
-                    <div class="panel-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" id="panel-role-existing" style="display: none;">
                             <div class="form-group">
                                 <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
                                 <div class="col-sm-10">
@@ -246,6 +236,7 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-default" onclick="onClickAddRole()">Add</button>
+                            <button type="button" class="btn btn-default" onclick="onClickCancelRole()">Cancel</button>
                         </form>
                     </div>
                 </div>

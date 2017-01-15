@@ -32,7 +32,7 @@ function renderInconsistency(inconsistency, index) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = inconsistency.identifier;
+	icon.title = inconsistency.identifier;
 	var cell2 = document.createElement("td");
 	cell2.appendChild(icon);
 	cell2.appendChild(renderInconsistencyMessage(inconsistency));
@@ -41,7 +41,7 @@ function renderInconsistency(inconsistency, index) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = inconsistency.ruleId;
+	icon.title = inconsistency.ruleId;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(inconsistency.ruleName));
 	link.href = "rule.html?id=" + encodeURIComponent(inconsistency.ruleId);

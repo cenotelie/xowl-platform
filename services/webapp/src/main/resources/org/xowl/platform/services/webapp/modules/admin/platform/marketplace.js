@@ -68,7 +68,7 @@ function renderAddon(addon) {
 	var image = document.createElement("img");
 	image.width = "100";
 	image.height = "100";
-	image.alt = addon.identifier;
+	image.title = addon.identifier;
 	if (addon.iconContent !== "") {
 		if (addon.iconName.endsWith(".png"))
 			image.src="data:image/png;base64," + addon.iconContent;

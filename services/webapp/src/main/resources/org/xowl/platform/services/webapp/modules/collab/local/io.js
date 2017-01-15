@@ -73,7 +73,7 @@ function renderIOElement(element, linkName, toRemove) {
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
-	image.alt = element.specification.identifier;
+	image.title = element.specification.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(element.specification.name));
 	link.href = linkName + ".html?id=" + encodeURIComponent(element.specification.identifier);
@@ -94,7 +94,7 @@ function renderIOElement(element, linkName, toRemove) {
 	image.src = "/web/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
-	image.alt = "REMOVE";
+	image.title = "REMOVE";
 	var button = document.createElement("span");
 	button.classList.add("btn");
 	button.classList.add("btn-default");

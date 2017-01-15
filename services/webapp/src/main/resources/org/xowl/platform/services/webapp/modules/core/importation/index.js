@@ -33,7 +33,7 @@ function renderDocument(index, doc) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = doc.identifier;
+	icon.title = doc.identifier;
 	var link = document.createElement("a");
 	link.href = "document.html?id=" + encodeURIComponent(doc.identifier);
 	link.appendChild(document.createTextNode(doc.name));
@@ -47,7 +47,7 @@ function renderDocument(index, doc) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = doc.uploader;
+	icon.title = doc.uploader;
 	link = document.createElement("a");
 	link.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(doc.uploader);
 	link.appendChild(document.createTextNode(doc.uploader));

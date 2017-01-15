@@ -109,7 +109,7 @@ function renderConnectors() {
 			img.src = "/web/assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
-			img.alt = CONNECTORS[i].identifier;
+			img.title = CONNECTORS[i].identifier;
 			var link = document.createElement("a");
 			link.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
@@ -134,7 +134,7 @@ function renderConnectors() {
 			img.src = "/web/assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
-			img.alt = CONNECTORS[i].identifier;
+			img.title = CONNECTORS[i].identifier;
 			var badge = document.createElement("span");
 			badge.className = "badge";
 			badge.appendChild(document.createTextNode(CONNECTORS[i].queue.length.toString()));
@@ -193,7 +193,7 @@ function renderArtifactFamily(family, index) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = family.name;
+	icon.title = family.name;
 	cells[1].appendChild(icon);
 	cells[1].appendChild(document.createTextNode(family.name));
 	cells[2].appendChild(document.createTextNode(family.version));
@@ -235,7 +235,7 @@ function renderArtifact(artifact) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.alt = artifact.identifier;
+	icon.title = artifact.identifier;
 	cells[1].appendChild(icon);
 	cells[1].appendChild(link);
 	cells[2].appendChild(document.createTextNode(artifact.version));

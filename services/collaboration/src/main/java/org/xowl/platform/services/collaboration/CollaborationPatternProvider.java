@@ -17,32 +17,36 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.Service;
+
+import java.util.Collection;
 
 /**
- * Represents a free-style collaboration pattern
+ * A provider of collaboration pattern
  *
  * @author Laurent Wouters
  */
-public class CollaborationPatternFreeStyle extends CollaborationPatternBase {
+public interface CollaborationPatternProvider extends Service {
     /**
-     * The descriptor for this collaboration pattern
-     */
-    public final static CollaborationPatternDescriptor DESCRIPTOR = new CollaborationPatternDescriptor(CollaborationPatternFreeStyle.class.getCanonicalName(), "Free-Style Collaboration Pattern");
-
-    /**
-     * Initializes this pattern
-     */
-    public CollaborationPatternFreeStyle() {
-        super(CollaborationPatternFreeStyle.class.getCanonicalName(), "Free-Style Collaboration Pattern");
-    }
-
-    /**
-     * Initializes this pattern
+     * Gets the descriptors for the supported patterns
      *
-     * @param definition The AST node for the serialized definition
+     * @return The descriptors for the supported patterns
      */
-    public CollaborationPatternFreeStyle(ASTNode definition) {
-        super(definition);
-    }
+    Collection<CollaborationPatternDescriptor> getPatterns();
+
+    /**
+     * Instantiates a collaboration pattern
+     *
+     * @param identifier The identifier of a collaboration pattern
+     * @return The collaboration pattern, or null it cannot be instantiated
+     */
+    CollaborationPattern instantiate(String identifier);
+
+    /**
+     * Instantiates a collaboration pattern
+     *
+     * @param descriptor The descriptor of the pattern
+     * @return The collaboration pattern, or null it cannot be instantiated
+     */
+    CollaborationPattern instantiate(CollaborationPatternDescriptor descriptor);
 }

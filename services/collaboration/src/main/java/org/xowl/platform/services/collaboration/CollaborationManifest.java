@@ -64,7 +64,7 @@ public class CollaborationManifest implements Identifiable, Serializable {
     /**
      * The collaboration pattern
      */
-    private final CollaborationPattern pattern;
+    private final CollaborationPatternDescriptor pattern;
 
     /**
      * Initializes this manifest
@@ -73,7 +73,7 @@ public class CollaborationManifest implements Identifiable, Serializable {
      * @param name       The human-readable name for the collaboration
      * @param pattern    The collaboration pattern
      */
-    public CollaborationManifest(String identifier, String name, CollaborationPattern pattern) {
+    public CollaborationManifest(String identifier, String name, CollaborationPatternDescriptor pattern) {
         this.identifier = identifier;
         this.name = name;
         this.pattern = pattern;
@@ -97,7 +97,7 @@ public class CollaborationManifest implements Identifiable, Serializable {
         this.roles = new HashMap<>();
         String identifier = "";
         String name = "";
-        CollaborationPattern pattern = null;
+        CollaborationPatternDescriptor pattern = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -178,7 +178,7 @@ public class CollaborationManifest implements Identifiable, Serializable {
                     break;
                 }
                 case "pattern": {
-                    pattern = new CollaborationPatternBase(member.getChildren().get(1));
+                    pattern = new CollaborationPatternDescriptor(member.getChildren().get(1));
                     break;
                 }
             }
@@ -373,7 +373,7 @@ public class CollaborationManifest implements Identifiable, Serializable {
      *
      * @return The collaboration pattern
      */
-    public CollaborationPattern getCollaborationPattern() {
+    public CollaborationPatternDescriptor getCollaborationPattern() {
         return pattern;
     }
 

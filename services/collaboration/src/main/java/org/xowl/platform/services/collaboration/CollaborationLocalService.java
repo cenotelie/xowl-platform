@@ -176,9 +176,9 @@ public interface CollaborationLocalService extends Service {
     XSPReply removeRole(String roleId);
 
     /**
-     * Gets the collaboration pattern for the orchestration of this collaboration
+     * Gets the descriptor of the collaboration pattern for the orchestration of this collaboration
      *
-     * @return The current collaboration pattern
+     * @return The descriptor of the current collaboration pattern
      */
-    CollaborationPattern getCollaborationPattern();
+    CollaborationPatternDescriptor getCollaborationPattern();
 }

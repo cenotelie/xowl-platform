@@ -19,6 +19,7 @@ package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 
 import java.util.Collection;
 
@@ -78,12 +79,11 @@ public interface CollaborationNetworkService extends Service {
     XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId);
 
     /**
-     * Lookups, across the collaboration network, input and output specifications that matches in the specified input string
+     * Gets the known specifications for collaboration inputs and outputs across the network of collaborations
      *
-     * @param input The string to match
-     * @return The protocol reply
+     * @return The known specifications
      */
-    XSPReply lookupSpecifications(String input);
+    Collection<ArtifactSpecification> getKnownIOSpecifications();
 
     /**
      * Spawns a new collaboration

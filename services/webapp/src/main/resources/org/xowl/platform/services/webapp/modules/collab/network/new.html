@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>New Collaboration</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="/web/app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="collaboration-name" class="col-sm-2 control-label">Collaboration
+                                    name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="collaboration-name"
+                                           placeholder="Collaboration for XXX">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Input</th>
+                        <th>Archetype</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="inputs">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        New input specification
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="input-identifier" class="col-sm-2 control-label">Identifier</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="input-identifier"
+                                           placeholder="requirements">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-name" class="col-sm-2 control-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="input-name"
+                                           placeholder="System Requirements">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-archetype" class="col-sm-2 control-label">Archetype</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="input-archetype"
+                                               placeholder="archetype">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="input-archetype-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickCreateInput()">Create</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Add existing specification
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="input-specification"
+                                               placeholder="requirements">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="input-specification-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickAddInput()">Add</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Output</th>
+                        <th>Archetype</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="outputs">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        New output specification
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="output-identifier" class="col-sm-2 control-label">Identifier</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="output-identifier"
+                                           placeholder="requirements">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="output-name" class="col-sm-2 control-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="output-name"
+                                           placeholder="System Requirements">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="output-archetype" class="col-sm-2 control-label">Archetype</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="output-archetype"
+                                               placeholder="archetype">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="output-archetype-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickCreateInput()">Create</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Add existing specification
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="output-specification"
+                                               placeholder="requirements">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="output-specification-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickAddOutput()">Add</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="roles">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        New role
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="role-identifier" class="col-sm-2 control-label">Identifier</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="role-identifier"
+                                           placeholder="reviewer">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="role-name" class="col-sm-2 control-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="role-name"
+                                           placeholder="Reviewer">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickCreateRole()">Create</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Add existing role
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="role-existing"
+                                               placeholder="reviewer">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="role-existing-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="onClickAddRole()">Add</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Collaboration pattern
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="input-archetype" class="col-sm-2 control-label">Specification</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="collaboration-pattern"
+                                               placeholder="pattern">
+                                        <div class="input-group-addon">
+                                            <img src="" width="20" height="20" id="collaboration-pattern-indicator"
+                                                 style="display: none;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <button type="button" class="btn btn-primary" onclick="onClickSpawn()">Create collaboration
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="/web/xowl/xowl-api-platform.js"></script>
+<script src="/web/xowl/xowl-ui.js"></script>
+<script src="new.js"></script>
+<script>init();</script>
+</body>
+
+</html>

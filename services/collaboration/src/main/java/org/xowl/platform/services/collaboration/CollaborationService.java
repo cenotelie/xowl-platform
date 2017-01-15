@@ -20,6 +20,8 @@ package org.xowl.platform.services.collaboration;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
 
+import java.util.Collection;
+
 /**
  * Represents a service that manages the current collaboration that takes place on this instance of the xOWL Collaboration Platform
  *
@@ -39,4 +41,11 @@ public interface CollaborationService extends Service, CollaborationLocalService
      * @return The protocol reply
      */
     XSPReply delete();
+
+    /**
+     * Gets the known collaboration patterns
+     *
+     * @return The known collaboration patterns
+     */
+    Collection<CollaborationPatternDescriptor> getKnownPatterns();
 }

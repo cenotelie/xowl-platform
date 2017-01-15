@@ -22,6 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.impl.XOWLCollaborationService;
 import org.xowl.platform.services.collaboration.impl.XOWLNetworkProvider;
+import org.xowl.platform.services.collaboration.impl.XOWLPatternProvider;
 
 /**
  * Activator for this bundle
@@ -40,6 +41,9 @@ public class Activator implements BundleActivator {
 
         XOWLNetworkProvider networkProvider = new XOWLNetworkProvider();
         bundleContext.registerService(CollaborationNetworkServiceProvider.class, networkProvider, null);
+
+        XOWLPatternProvider patternProvider = new XOWLPatternProvider();
+        bundleContext.registerService(CollaborationPatternProvider.class, patternProvider, null);
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
@@ -177,8 +178,8 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply lookupSpecifications(String input) {
-        return XSPReplyUnsupported.instance();
+    public Collection<ArtifactSpecification> getKnownIOSpecifications() {
+        return Collections.emptyList();
     }
 
     @Override

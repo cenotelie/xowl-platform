@@ -18,14 +18,16 @@
 package org.xowl.platform.services.collaboration;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 
 /**
- * Base implementation for collaboration patterns
+ * Represents a descriptor for a collaboration pattern
  *
  * @author Laurent Wouters
  */
-public class CollaborationPatternBase implements CollaborationPattern {
+public class CollaborationPatternDescriptor implements Identifiable, Serializable {
     /**
      * The identifier of this pattern
      */
@@ -41,7 +43,7 @@ public class CollaborationPatternBase implements CollaborationPattern {
      * @param identifier The identifier of this pattern
      * @param name       The name of this pattern
      */
-    public CollaborationPatternBase(String identifier, String name) {
+    public CollaborationPatternDescriptor(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
     }
@@ -51,7 +53,7 @@ public class CollaborationPatternBase implements CollaborationPattern {
      *
      * @param definition The AST node for the serialized definition
      */
-    public CollaborationPatternBase(ASTNode definition) {
+    public CollaborationPatternDescriptor(ASTNode definition) {
         String identifier = "";
         String name = "";
         for (ASTNode member : definition.getChildren()) {
@@ -86,7 +88,7 @@ public class CollaborationPatternBase implements CollaborationPattern {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(CollaborationPattern.class.getCanonicalName()) +
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(CollaborationPatternDescriptor.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

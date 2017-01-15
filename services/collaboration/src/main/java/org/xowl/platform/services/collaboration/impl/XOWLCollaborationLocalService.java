@@ -77,7 +77,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
             manifest = new CollaborationManifest(
                     UUID.randomUUID().toString(),
                     "Local collaboration",
-                    CollaborationPatternFreeStyle.INSTANCE
+                    CollaborationPatternFreeStyle.DESCRIPTOR
             );
         this.manifest = manifest;
     }
@@ -258,7 +258,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public CollaborationPattern getCollaborationPattern() {
+    public CollaborationPatternDescriptor getCollaborationPattern() {
         return manifest.getCollaborationPattern();
     }
 }

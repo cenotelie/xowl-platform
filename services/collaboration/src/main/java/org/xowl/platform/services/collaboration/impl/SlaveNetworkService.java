@@ -24,6 +24,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
@@ -103,8 +104,8 @@ public class SlaveNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply lookupSpecifications(String input) {
-        return XSPReplyUnsupported.instance();
+    public Collection<ArtifactSpecification> getKnownIOSpecifications() {
+        return Collections.emptyList();
     }
 
     @Override

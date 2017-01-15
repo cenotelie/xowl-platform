@@ -42,7 +42,10 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.*;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implements the collaboration service for this platform
@@ -135,8 +138,18 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
-    public XSPReply lookupSpecifications(String input) {
-        return getNetworkService().lookupSpecifications(input);
+    public Collection<ArtifactSpecification> getKnownIOSpecifications() {
+        Map<String, ArtifactSpecification> result = new HashMap<>();
+        for (ArtifactSpecification specification : getInputSpecifications()) {
+            result.put(specification.getIdentifier(), specification);
+        }
+        for (ArtifactSpecification specification : getOutputSpecifications()) {
+            result.put(specification.getIdentifier(), specification);
+        }
+        for (ArtifactSpecification specification : getNetworkService().getKnownIOSpecifications()) {
+            result.put(specification.getIdentifier(), specification);
+        }
+        return result.values();
     }
 
     @Override
@@ -170,6 +183,15 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
+    public Collection<CollaborationPatternDescriptor> getKnownPatterns() {
+        Collection<CollaborationPatternDescriptor> result = new ArrayList<>();
+        for (CollaborationPatternProvider provider : ServiceUtils.getServices(CollaborationPatternProvider.class)) {
+            result.addAll(provider.getPatterns());
+        }
+        return result;
+    }
+
+    @Override
     public int canHandle(HttpApiRequest request) {
         return request.getUri().startsWith(URI_API)
                 ? HttpApiService.PRIORITY_NORMAL
@@ -188,10 +210,34 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             return XSPReplyUtils.toHttpResponse(delete(), null);
         } else if (request.getUri().startsWith(URI_API + "/manifest")) {
             return handleManifest(request);
-        } else if (request.getUri().startsWith(URI_API + "/network")) {
-            return handleNetwork(request);
         } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
             return handleNeighbours(request);
+        } else if (request.getUri().equals(URI_API + "/specifications")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (ArtifactSpecification specification : getKnownIOSpecifications()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(specification.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else if (request.getUri().equals(URI_API + "/patterns")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (CollaborationPatternDescriptor descriptor : getKnownPatterns()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(descriptor.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -449,27 +495,6 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 return XSPReplyUtils.toHttpResponse(addRole(roleId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
-    }
-
-    /**
-     * Handles a request to the network resource
-     *
-     * @param request The request
-     * @return The response
-     */
-    private HttpResponse handleNetwork(HttpApiRequest request) {
-        String rest = request.getUri().substring(URI_API.length() + "/network".length());
-        if (rest.isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        if (rest.equals("/specifications")) {
-            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            String[] inputs = request.getParameter("input");
-            if (inputs == null || inputs.length == 0)
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'input'"), null);
-            return XSPReplyUtils.toHttpResponse(lookupSpecifications(inputs[0]), null);
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     /**

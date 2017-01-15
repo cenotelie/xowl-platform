@@ -51,17 +51,17 @@ public class CollaborationSpecification implements Serializable {
      */
     private final Collection<PlatformRole> roles;
     /**
-     * The identifier of the collaboration pattern
+     * The descriptor of the collaboration pattern
      */
-    private final String pattern;
+    private final CollaborationPatternDescriptor pattern;
 
     /**
      * Initializes this specification
      *
      * @param name    The human-readable name for the collaboration
-     * @param pattern The identifier of the collaboration pattern
+     * @param pattern The identifier of the descriptor pattern
      */
-    public CollaborationSpecification(String name, String pattern) {
+    public CollaborationSpecification(String name, CollaborationPatternDescriptor pattern) {
         this.name = name;
         this.inputs = new ArrayList<>();
         this.outputs = new ArrayList<>();
@@ -79,7 +79,7 @@ public class CollaborationSpecification implements Serializable {
         this.outputs = new ArrayList<>();
         this.roles = new ArrayList<>();
         String name = "";
-        String pattern = "";
+        CollaborationPatternDescriptor pattern = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -99,8 +99,7 @@ public class CollaborationSpecification implements Serializable {
                     roles.add(new PlatformRoleBase(child));
                 }
             } else if ("pattern".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                pattern = value.substring(1, value.length() - 1);
+                pattern = new CollaborationPatternDescriptor(member.getChildren().get(1));
             }
         }
         this.name = name;
@@ -144,11 +143,11 @@ public class CollaborationSpecification implements Serializable {
     }
 
     /**
-     * Gets the identifier of the collaboration pattern for the orchestration of this collaboration
+     * Gets the descriptor of the collaboration pattern for the orchestration of this collaboration
      *
-     * @return The identifier of the collaboration pattern
+     * @return The descriptor of the collaboration pattern
      */
-    public String getCollaborationPattern() {
+    public CollaborationPatternDescriptor getCollaborationPattern() {
         return pattern;
     }
 
@@ -214,9 +213,9 @@ public class CollaborationSpecification implements Serializable {
             first = false;
             builder.append(role.serializedJSON());
         }
-        builder.append("], \"pattern\": \"");
-        builder.append(TextUtils.escapeStringJSON(pattern));
-        builder.append("\"}");
+        builder.append("], \"pattern\": ");
+        builder.append(pattern.serializedJSON());
+        builder.append("}");
         return builder.toString();
     }
 }

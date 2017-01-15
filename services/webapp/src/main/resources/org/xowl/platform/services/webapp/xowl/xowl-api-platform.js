@@ -841,14 +841,24 @@ XOWL.prototype.getCollaborationPattern = function (callback) {
 	}, "services/collaboration/manifest/pattern", null, "GET", null, null);
 }
 
-XOWL.prototype.lookupCollaborationIOSpecs = function (callback, input) {
+XOWL.prototype.getKnownIOSpecifications = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/network/specifications", {input: input}, "GET", null, null);
+	}, "services/collaboration/specifications", "GET", null, null);
+}
+
+XOWL.prototype.getKnownPatterns = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/collaboration/patterns", "GET", null, null);
 }
 
 XOWL.prototype.getCollaborationNeighbours = function (callback) {

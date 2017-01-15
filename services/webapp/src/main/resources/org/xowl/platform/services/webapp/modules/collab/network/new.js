@@ -94,7 +94,7 @@ function setupAutocompleteRole(component) {
 			autocomplete.onItems(filterItems(platformRoles, value));
 			return;
 		}
-		xowl.getPlatformRole(function (status, ct, content) {
+		xowl.getPlatformRoles(function (status, ct, content) {
 			if (status === 200) {
 				platformRoles = content;
 				autocomplete.onItems(filterItems(platformRoles, value));

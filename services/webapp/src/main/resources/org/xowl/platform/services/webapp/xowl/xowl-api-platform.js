@@ -848,7 +848,7 @@ XOWL.prototype.getKnownIOSpecifications = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/specifications", "GET", null, null);
+	}, "services/collaboration/specifications", null, "GET", null, null);
 }
 
 XOWL.prototype.getKnownPatterns = function (callback) {
@@ -858,7 +858,7 @@ XOWL.prototype.getKnownPatterns = function (callback) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/collaboration/patterns", "GET", null, null);
+	}, "services/collaboration/patterns", null, "GET", null, null);
 }
 
 XOWL.prototype.getCollaborationNeighbours = function (callback) {

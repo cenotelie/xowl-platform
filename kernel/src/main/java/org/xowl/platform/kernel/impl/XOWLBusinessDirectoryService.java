@@ -25,6 +25,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
 import org.xowl.platform.kernel.artifacts.BusinessSchema;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -119,21 +120,6 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService, H
     }
 
     @Override
-    public void register(BusinessDomain domain) {
-        this.domains.put(domain.getIdentifier(), domain);
-    }
-
-    @Override
-    public void register(ArtifactArchetype archetype) {
-        this.archetypes.put(archetype.getIdentifier(), archetype);
-    }
-
-    @Override
-    public void register(BusinessSchema schema) {
-        this.schemas.put(schema.getIdentifier(), schema);
-    }
-
-    @Override
     public int canHandle(HttpApiRequest request) {
         return request.getUri().startsWith(URI_API)
                 ? HttpApiService.PRIORITY_NORMAL
@@ -141,7 +127,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService, H
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
         if (request.getUri().equals(URI_API + "/archetypes")) {

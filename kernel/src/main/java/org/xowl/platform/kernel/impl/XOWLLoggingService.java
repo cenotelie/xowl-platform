@@ -29,7 +29,9 @@ import org.xowl.infra.utils.logging.FileLogger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.Env;
+import org.xowl.platform.kernel.LoggingService;
+import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -202,10 +204,7 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         XSPReply reply = securityService.checkAction(ACTION_GET_LOG);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);

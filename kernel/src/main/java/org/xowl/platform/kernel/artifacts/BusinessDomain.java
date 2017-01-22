@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.server.api.XOWLFactory;
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface BusinessDomain extends Identifiable, Serializable {
+public interface BusinessDomain extends Registrable, Serializable {
     /**
      * Gets the human-readable description of this domain
      *

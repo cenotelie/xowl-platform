@@ -28,7 +28,6 @@ import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ServiceAction;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -90,12 +89,12 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
 
         if (request.getUri().equals(URI_API + "/metrics"))
-            return onMessageGetMetricList();
+            return onMessageGetMetricList(securityService);
 
         if (request.getUri().startsWith(URI_API + "/metrics")) {
             String rest = request.getUri().substring(URI_API.length() + "/metrics".length() + 1);
@@ -104,9 +103,9 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
             int index = rest.indexOf("/");
             String metricId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
             if (index < 0)
-                return onMessageGetMetric(metricId);
+                return onMessageGetMetric(securityService, metricId);
             else if (rest.substring(index).equals("/snapshot"))
-                return onMessageGetMetricValue(metricId);
+                return onMessageGetMetricValue(securityService, metricId);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -149,12 +148,10 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     /**
      * Responds to a request for the list of available metrics
      *
+     * @param securityService The current security service
      * @return The metrics
      */
-    private HttpResponse onMessageGetMetricList() {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+    private HttpResponse onMessageGetMetricList(SecurityService securityService) {
         XSPReply reply = securityService.checkAction(ACTION_GET_METRICS);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -175,13 +172,11 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     /**
      * Responds to a request for the definition of a metric
      *
-     * @param identifier The identifier of the requested metric
+     * @param securityService The current security service
+     * @param identifier      The identifier of the requested metric
      * @return The metrics
      */
-    private HttpResponse onMessageGetMetric(String identifier) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+    private HttpResponse onMessageGetMetric(SecurityService securityService, String identifier) {
         XSPReply reply = securityService.checkAction(ACTION_GET_METRICS);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -198,13 +193,11 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     /**
      * Responds to a request for the values of a metric
      *
-     * @param identifier The requested metric
+     * @param securityService The current security service
+     * @param identifier      The requested metric
      * @return The metrics' values
      */
-    private HttpResponse onMessageGetMetricValue(String identifier) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+    private HttpResponse onMessageGetMetricValue(SecurityService securityService, String identifier) {
         XSPReply reply = securityService.checkAction(ACTION_POLL);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);

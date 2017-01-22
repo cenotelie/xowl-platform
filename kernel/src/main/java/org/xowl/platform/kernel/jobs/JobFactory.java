@@ -18,14 +18,14 @@
 package org.xowl.platform.kernel.jobs;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 /**
  * A factory of jobs that is used to produce jobs from their serialized representation
  *
  * @author Laurent Wouters
  */
-public interface JobFactory extends Service {
+public interface JobFactory extends Registrable {
     /**
      * Gets whether this factory can de-serialize a job of the given type
      *

@@ -26,6 +26,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -55,6 +56,11 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
     @Override
     public String getName() {
         return "xOWL Collaboration Platform - HTTP Server Service";
+    }
+
+    @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS_NONE;
     }
 
     @Override
@@ -94,7 +100,13 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         addCORSHeader(servletRequest, servletResponse);
         addCacheControlHeader(servletResponse);
 
-        if (!checkAuthentication(servletRequest, servletResponse))
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null) {
+            servletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+            return;
+        }
+
+        if (!checkAuthentication(securityService, servletRequest, servletResponse))
             return;
 
         HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
@@ -112,25 +124,24 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             if (service == null)
                 servletResponse.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
             else
-                doResponse(servletResponse, service.handle(apiRequest));
+                doResponse(servletResponse, service.handle(securityService, apiRequest));
         } catch (Throwable exception) {
             Logging.getDefault().error(exception);
             doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
         } finally {
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService != null)
-                securityService.onRequestEnd(servletRequest.getRemoteAddr());
+            securityService.onRequestEnd(servletRequest.getRemoteAddr());
         }
     }
 
     /**
      * Checks the authentication of the request
      *
-     * @param request  The request
-     * @param response The response
+     * @param securityService The current security service
+     * @param request         The request
+     * @param response        The response
      * @return Whether a user is authenticated for the request
      */
-    private boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response) {
+    private boolean checkAuthentication(SecurityService securityService, HttpServletRequest request, HttpServletResponse response) {
         // do not perform authentication for pre-flight requests
         if (request.getMethod().equals(HttpConstants.METHOD_OPTIONS))
             return true;
@@ -138,12 +149,6 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         // do not perform authentication for the login service
         if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
             return true;
-
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null) {
-            response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
-            return false;
-        }
 
         Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);
         if (values != null) {

@@ -177,7 +177,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/login"))
             return handleRequestLogin(request);
         if (request.getUri().equals(URI_API + "/logout"))

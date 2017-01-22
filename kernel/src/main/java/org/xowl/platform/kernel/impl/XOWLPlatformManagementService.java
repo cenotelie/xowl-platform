@@ -37,10 +37,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.*;
@@ -189,6 +186,11 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     }
 
     @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS;
+    }
+
+    @Override
     public Collection<Metric> getMetrics() {
         return Arrays.asList(METRIC_USED_MEMORY, METRIC_FREE_MEMORY, METRIC_TOTAL_MEMORY, METRIC_MAX_MEMORY);
     }
@@ -215,17 +217,15 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        // check for platform admin role
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
-        if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-
         if (request.getUri().equals(URI_API + "/product")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            SecurityService securityService = Register.getComponent(SecurityService.class);
+            if (securityService == null)
+                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            XSPReply reply = securityService.checkAction(ACTION_GET_PRODUCT);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
         } else if (request.getUri().equals(URI_API + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -238,6 +238,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         } else if (request.getUri().equals(URI_API + "/bundles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            SecurityService securityService = Register.getComponent(SecurityService.class);
+            if (securityService == null)
+                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            XSPReply reply = securityService.checkAction(ACTION_GET_BUNDLES);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Bundle bundle : getPlatformBundles()) {
@@ -251,6 +257,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         } else if (request.getUri().equals(URI_API + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            SecurityService securityService = Register.getComponent(SecurityService.class);
+            if (securityService == null)
+                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Addon addon : getAddons()) {
@@ -271,6 +283,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
+                    SecurityService securityService = Register.getComponent(SecurityService.class);
+                    if (securityService == null)
+                        return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+                    XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
+                    if (!reply.isSuccess())
+                        return XSPReplyUtils.toHttpResponse(reply, null);
                     for (Addon addon : addons) {
                         if (Objects.equals(addonId, addon.getIdentifier()))
                             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, addon.serializedJSON());
@@ -351,6 +369,13 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public XSPReply installAddon(String identifier, InputStream packageStream) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_INSTALL_ADDON);
+        if (!reply.isSuccess())
+            return reply;
+
         synchronized (addons) {
             for (Addon addon : addons) {
                 if (Objects.equals(addon.getIdentifier(), identifier))
@@ -458,6 +483,13 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public XSPReply uninstallAddon(String identifier) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_UNINSTALL_ADDON);
+        if (!reply.isSuccess())
+            return reply;
+
         Addon descriptor = null;
         synchronized (addons) {
             for (Addon addon : addons) {
@@ -489,6 +521,13 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public XSPReply shutdown() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_SHUTDOWN);
+        if (!reply.isSuccess())
+            return reply;
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -501,6 +540,13 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public XSPReply restart() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RESTART);
+        if (!reply.isSuccess())
+            return reply;
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {

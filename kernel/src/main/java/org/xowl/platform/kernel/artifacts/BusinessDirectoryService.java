@@ -71,25 +71,4 @@ public interface BusinessDirectoryService extends Service {
      * @return The associated archetype, if any
      */
     ArtifactArchetype getArchetype(String identifier);
-
-    /**
-     * Registers a business domain
-     *
-     * @param domain The domain to register
-     */
-    void register(BusinessDomain domain);
-
-    /**
-     * Registers an artifact archetype
-     *
-     * @param archetype The artifact archetype to register
-     */
-    void register(ArtifactArchetype archetype);
-
-    /**
-     * Registers a business schema
-     *
-     * @param schema The schema to register
-     */
-    void register(BusinessSchema schema);
 }

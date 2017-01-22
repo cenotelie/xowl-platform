@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.store.ProxyObject;
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface BusinessSchema extends Identifiable, Serializable {
+public interface BusinessSchema extends Registrable, Serializable {
     /**
      * Gets the classes in this schema
      *

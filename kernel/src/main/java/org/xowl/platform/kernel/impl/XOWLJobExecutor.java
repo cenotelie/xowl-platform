@@ -18,10 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.*;
 import org.xowl.infra.utils.config.Configuration;
@@ -33,10 +30,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
@@ -44,7 +38,6 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -329,6 +322,11 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     }
 
     @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS;
+    }
+
+    @Override
     public Collection<Metric> getMetrics() {
         return Arrays.asList(METRIC_TOTAL_PROCESSED_JOBS, METRIC_SCHEDULED_JOBS, METRIC_EXECUTING_JOBS);
     }
@@ -345,7 +343,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     }
 
     @Override
-    public void schedule(Job job) {
+    public XSPReply schedule(Job job) {
         boolean exists = storage.exists();
         if (!exists) {
             exists = storage.mkdirs();
@@ -368,10 +366,18 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
             }
         }
         Logging.getDefault().info(new RichString("Scheduled job ", job));
+        return new XSPReplyResult<>(job);
     }
 
     @Override
     public XSPReply cancel(Job job) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_CANCEL);
+        if (!reply.isSuccess())
+            return reply;
+
         boolean success = executorPool.remove(job);
         if (success) {
             // the job was queued and prevented from running
@@ -539,6 +545,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 if (securityService.getCurrentUser().equals(job.getOwner()))
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
+                XSPReply reply = securityService.checkAction(ACTION_GET_JOBS);
+                if (!reply.isSuccess())
+                    return XSPReplyUtils.toHttpResponse(reply, null);
                 return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
             } else if (rest.substring(index).equals("/cancel")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -596,8 +605,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
      * @return The response
      */
     private HttpResponse onRequestJobs(SecurityService securityService) {
-        // check for platform admin role
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkAction(ACTION_GET_JOBS);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 

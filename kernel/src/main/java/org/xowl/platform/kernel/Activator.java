@@ -22,10 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
-import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
-import org.xowl.platform.kernel.artifacts.SchemaArtifactArchetype;
-import org.xowl.platform.kernel.artifacts.SchemaDomain;
+import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -33,11 +30,16 @@ import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformJobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
+import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.kernel.webapi.HttpApiDiscoveryService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Activator for this bundle
@@ -68,34 +70,51 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        // register security components
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(Realm.PROPERTY_ID, XOWLSecurityNosecRealm.class.getCanonicalName());
+        bundleContext.registerService(Realm.class, new XOWLSecurityNosecRealm(), dictionary);
+        dictionary = new Hashtable<>();
+        dictionary.put(SecurityPolicy.PROPERTY_ID, XOWLSecurityPolicyAuthenticated.class.getCanonicalName());
+        bundleContext.registerService(SecurityPolicy.class, new XOWLSecurityPolicyAuthenticated(), dictionary);
+        dictionary = new Hashtable<>();
+        dictionary.put(SecurityPolicy.PROPERTY_ID, XOWLSecurityPolicyCustom.class.getCanonicalName());
+        bundleContext.registerService(SecurityPolicy.class, new XOWLSecurityPolicyCustom(), dictionary);
+
         // register the logging service
-        LoggingService loggingService = new XOWLLoggingService();
+        XOWLLoggingService loggingService = new XOWLLoggingService();
         Logging.setDefault(loggingService);
+        bundleContext.registerService(Service.class, loggingService, null);
         bundleContext.registerService(LoggingService.class, loggingService, null);
         bundleContext.registerService(HttpApiService.class, loggingService, null);
         bundleContext.registerService(MeasurableService.class, loggingService, null);
 
         // register the configuration service
         ConfigurationService configurationService = new FSConfigurationService();
+        bundleContext.registerService(Service.class, configurationService, null);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
 
         // register the security service
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
+        bundleContext.registerService(Service.class, securityService, null);
         bundleContext.registerService(SecurityService.class, securityService, null);
         bundleContext.registerService(HttpApiService.class, securityService, null);
 
         // register the statistics service
-        StatisticsService statisticsService = new XOWLStatisticsService();
+        XOWLStatisticsService statisticsService = new XOWLStatisticsService();
+        bundleContext.registerService(Service.class, statisticsService, null);
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
         bundleContext.registerService(HttpApiService.class, statisticsService, null);
 
         // register the event service
         eventService = new XOWLEventService();
+        bundleContext.registerService(Service.class, eventService, null);
         bundleContext.registerService(EventService.class, eventService, null);
         bundleContext.registerService(MeasurableService.class, eventService, null);
 
         // register the job executor service
         serviceJobExecutor = new XOWLJobExecutor(configurationService, eventService);
+        bundleContext.registerService(Service.class, serviceJobExecutor, null);
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
         bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
@@ -103,15 +122,17 @@ public class Activator implements BundleActivator {
 
         // register the directory service
         XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
-        directoryService.register(KernelSchema.IMPL);
-        directoryService.register(SchemaArtifactArchetype.INSTANCE);
-        directoryService.register(FreeArtifactArchetype.INSTANCE);
-        directoryService.register(SchemaDomain.INSTANCE);
+        bundleContext.registerService(BusinessSchema.class, KernelSchema.IMPL, null);
+        bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
+        bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
+        bundleContext.registerService(ArtifactArchetype.class, FreeArtifactArchetype.INSTANCE, null);
+        bundleContext.registerService(Service.class, directoryService, null);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
         bundleContext.registerService(HttpApiService.class, directoryService, null);
 
         // register the platform management service
         platformService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
+        bundleContext.registerService(Service.class, platformService, null);
         bundleContext.registerService(PlatformManagementService.class, platformService, null);
         bundleContext.registerService(HttpApiService.class, platformService, null);
         bundleContext.registerService(MeasurableService.class, platformService, null);
@@ -119,6 +140,7 @@ public class Activator implements BundleActivator {
 
         // register the HTTP API discovery service
         discoveryService = new XOWLHttpApiDiscoveryService();
+        bundleContext.registerService(Service.class, discoveryService, null);
         bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
         bundleContext.registerService(HttpApiService.class, discoveryService, null);
         discoveryServiceTracker = new ServiceTracker<HttpApiService, HttpApiService>(bundleContext, HttpApiService.class, null) {

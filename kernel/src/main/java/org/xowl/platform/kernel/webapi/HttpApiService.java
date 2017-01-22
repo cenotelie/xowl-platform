@@ -21,6 +21,7 @@ import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecurityService;
 
 /**
  * Interface for services that offer an HTTP API interface
@@ -105,10 +106,11 @@ public interface HttpApiService extends Service, Serializable {
     /**
      * Handles an HTTP API request
      *
-     * @param request The request to handle
+     * @param securityService The current security service
+     * @param request         The request to handle
      * @return The HTTP response
      */
-    HttpResponse handle(HttpApiRequest request);
+    HttpResponse handle(SecurityService securityService, HttpApiRequest request);
 
     /**
      * Gets the resource that contains the specification for this service

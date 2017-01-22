@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.httpapi.impl.XOWLHttpApiDocumentationModule;
@@ -69,6 +70,7 @@ public class Activator implements BundleActivator {
         };
         server = new XOWLMainHTTPServer();
         httpTracker.open();
+        bundleContext.registerService(Service.class, server, null);
         bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
         bundleContext.registerService(WebUIContribution.class, new XOWLHttpApiDocumentationModule(), null);
     }

@@ -25,7 +25,7 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -99,7 +99,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
         HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
         try {
-            Collection<HttpApiService> services = ServiceUtils.getServices(HttpApiService.class);
+            Collection<HttpApiService> services = Register.getComponents(HttpApiService.class);
             HttpApiService service = null;
             int priority = HttpApiService.CANNOT_HANDLE;
             for (HttpApiService candidate : services) {
@@ -117,7 +117,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             Logging.getDefault().error(exception);
             doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
         } finally {
-            SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+            SecurityService securityService = Register.getComponent(SecurityService.class);
             if (securityService != null)
                 securityService.onRequestEnd(servletRequest.getRemoteAddr());
         }
@@ -139,7 +139,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
         if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
             return true;
 
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null) {
             response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
             return false;

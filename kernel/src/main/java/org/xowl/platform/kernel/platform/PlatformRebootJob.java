@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.platform;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 
@@ -62,7 +62,7 @@ public class PlatformRebootJob extends JobBase {
 
     @Override
     public void doRun() {
-        PlatformManagementService managementService = ServiceUtils.getService(PlatformManagementService.class);
+        PlatformManagementService managementService = Register.getComponent(PlatformManagementService.class);
         if (managementService == null) {
             result = XSPReplyServiceUnavailable.instance();
             return;

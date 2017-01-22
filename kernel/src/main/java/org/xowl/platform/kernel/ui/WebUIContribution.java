@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.ui;
 
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 import java.net.URL;
 
@@ -26,7 +26,7 @@ import java.net.URL;
  *
  * @author Laurent Wouters
  */
-public interface WebUIContribution extends Service {
+public interface WebUIContribution extends Registrable {
     /**
      * The URI prefix for web connections
      */

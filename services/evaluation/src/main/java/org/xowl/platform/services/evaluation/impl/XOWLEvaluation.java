@@ -29,7 +29,7 @@ import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
@@ -302,7 +302,7 @@ class XOWLEvaluation implements Evaluation {
             }
         }
         Artifact artifact = new ArtifactSimple(metadata, content);
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         return storageService.getServiceStore().store(artifact);
@@ -314,7 +314,7 @@ class XOWLEvaluation implements Evaluation {
      * @return The response
      */
     public static XSPReply retrieveAll() {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         Result sparqlResult = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
@@ -344,7 +344,7 @@ class XOWLEvaluation implements Evaluation {
      * @return The result
      */
     public static XSPReply retrieve(XOWLEvaluationService evaluationService, String identifier) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         XSPReply reply = storageService.getServiceStore().retrieve(identifier);

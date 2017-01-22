@@ -42,7 +42,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;
@@ -145,7 +145,7 @@ class XOWLInternalRealm implements Realm {
         XOWLServer server = null;
         XOWLDatabase database = null;
         try {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
             Configuration configuration = configurationService.getConfigFor(this);
             String location = (new File(System.getenv(Env.ROOT), configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
@@ -444,7 +444,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply createUser(String identifier, String name, String key) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -468,7 +468,7 @@ class XOWLInternalRealm implements Realm {
         if (!reply.isSuccess())
             return reply;
         XOWLInternalUser user = getUser(identifier, name);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new UserCreatedEvent(user, this));
         return new XSPReplyResult<>(user);
@@ -477,7 +477,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply createGroup(String identifier, String name, String adminId) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -500,7 +500,7 @@ class XOWLInternalRealm implements Realm {
         if (!reply.isSuccess())
             return reply;
         XOWLInternalGroup group = getGroup(identifier, name);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new GroupCreatedEvent(group, this));
         return new XSPReplyResult<>(group);
@@ -509,7 +509,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply createRole(String identifier, String name) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -529,7 +529,7 @@ class XOWLInternalRealm implements Realm {
         if (!reply.isSuccess())
             return reply;
         PlatformRoleBase role = getRole(identifier, name);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new RoleCreatedEvent(role, this));
         return new XSPReplyResult<>(role);
@@ -538,7 +538,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply renameUser(String identifier, String name) {
         // check for current user with admin role (or rename itself)
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -567,7 +567,7 @@ class XOWLInternalRealm implements Realm {
         if (groupObject == null)
             return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
         // check for current user with admin role on group
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -593,7 +593,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply renameRole(String identifier, String name) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -618,7 +618,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply deleteUser(String identifier) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -645,7 +645,7 @@ class XOWLInternalRealm implements Realm {
             if (!reply.isSuccess())
                 return reply;
             XOWLInternalUser deleted = cacheUsers.remove(identifier);
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new UserDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
@@ -655,7 +655,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply deleteGroup(String identifier) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -672,7 +672,7 @@ class XOWLInternalRealm implements Realm {
             if (!reply.isSuccess())
                 return reply;
             XOWLInternalGroup deleted = cacheGroups.remove(identifier);
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new GroupDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
@@ -682,7 +682,7 @@ class XOWLInternalRealm implements Realm {
     @Override
     public XSPReply deleteRole(String identifier) {
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -702,7 +702,7 @@ class XOWLInternalRealm implements Realm {
             if (!reply.isSuccess())
                 return reply;
             PlatformRoleBase deleted = cacheRoles.remove(identifier);
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new RoleDeletedEvent(deleted, this));
             return XSPReplySuccess.instance();
@@ -716,7 +716,7 @@ class XOWLInternalRealm implements Realm {
         if (platformUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
         // check that the current user is either the target user or the admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -740,7 +740,7 @@ class XOWLInternalRealm implements Realm {
         if (platformUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
         // check that the current user is either the target user or the admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -767,7 +767,7 @@ class XOWLInternalRealm implements Realm {
         if (newUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -797,7 +797,7 @@ class XOWLInternalRealm implements Realm {
         if (newUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -827,7 +827,7 @@ class XOWLInternalRealm implements Realm {
         if (newUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -857,7 +857,7 @@ class XOWLInternalRealm implements Realm {
         if (newUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -887,7 +887,7 @@ class XOWLInternalRealm implements Realm {
         if (roleObj == null)
             return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -916,7 +916,7 @@ class XOWLInternalRealm implements Realm {
         if (roleObj == null)
             return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -945,7 +945,7 @@ class XOWLInternalRealm implements Realm {
         if (roleObj == null)
             return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();
@@ -974,7 +974,7 @@ class XOWLInternalRealm implements Realm {
         if (roleObj == null)
             return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformUser currentUser = securityService.getCurrentUser();

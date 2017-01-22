@@ -23,7 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
@@ -100,10 +100,10 @@ public class AddonInstallationJob extends JobBase {
      * @return The protocol reply
      */
     public static XSPReply installAddon(String addonId) {
-        MarketplaceService marketplaceService = ServiceUtils.getService(MarketplaceService.class);
+        MarketplaceService marketplaceService = Register.getComponent(MarketplaceService.class);
         if (marketplaceService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformManagementService platformManagementService = ServiceUtils.getService(PlatformManagementService.class);
+        PlatformManagementService platformManagementService = Register.getComponent(PlatformManagementService.class);
         if (platformManagementService == null)
             return XSPReplyServiceUnavailable.instance();
 

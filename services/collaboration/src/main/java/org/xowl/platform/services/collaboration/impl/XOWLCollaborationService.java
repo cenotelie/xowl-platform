@@ -30,7 +30,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -85,10 +85,10 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      */
     private synchronized CollaborationNetworkService getNetworkService() {
         if (networkService == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
             Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
             String identifier = configuration.get("network", "service");
-            for (CollaborationNetworkServiceProvider provider : ServiceUtils.getServices(CollaborationNetworkServiceProvider.class)) {
+            for (CollaborationNetworkServiceProvider provider : Register.getComponents(CollaborationNetworkServiceProvider.class)) {
                 networkService = provider.instantiate(identifier);
                 if (networkService != null)
                     break;
@@ -185,7 +185,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     @Override
     public Collection<CollaborationPatternDescriptor> getKnownPatterns() {
         Collection<CollaborationPatternDescriptor> result = new ArrayList<>();
-        for (CollaborationPatternProvider provider : ServiceUtils.getServices(CollaborationPatternProvider.class)) {
+        for (CollaborationPatternProvider provider : Register.getComponents(CollaborationPatternProvider.class)) {
             result.addAll(provider.getPatterns());
         }
         return result;

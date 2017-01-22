@@ -22,7 +22,7 @@ import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
@@ -108,7 +108,7 @@ public class SemanticWebConnector extends ConnectorServiceBase {
         Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
         Artifact artifact = new ArtifactSimple(metadata, quads);
         queueInput(artifact);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConnectorReceivedDataEvent(this, artifact));
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, artifact.serializedJSON());

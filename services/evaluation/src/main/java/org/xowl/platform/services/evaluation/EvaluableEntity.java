@@ -27,7 +27,7 @@ import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.services.storage.StorageService;
@@ -70,8 +70,8 @@ public class EvaluableEntity implements Evaluable {
         this.identifier = parentType.getIdentifier() + "#" + UUID.randomUUID().toString();
         this.artifactId = artifactId;
         this.elementURI = elementURI;
-        ArtifactStorageService artifactStorageService = ServiceUtils.getService(ArtifactStorageService.class);
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        ArtifactStorageService artifactStorageService = Register.getComponent(ArtifactStorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (artifactStorageService == null || storageService == null) {
             this.name = identifier;
         } else {

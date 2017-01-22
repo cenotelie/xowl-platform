@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -30,7 +30,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface Realm extends Service {
+public interface Realm extends Registrable {
     /**
      * The identifier of the property for the realm identifier
      */

@@ -27,7 +27,7 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.services.evaluation.impl.XOWLEvaluationService;
@@ -68,7 +68,7 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
 
     @Override
     public XSPReply getElements() {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         String query = "SELECT DISTINCT ?a ?e WHERE { GRAPH <" +

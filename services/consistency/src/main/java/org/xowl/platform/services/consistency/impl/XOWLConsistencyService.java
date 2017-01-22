@@ -42,7 +42,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -288,7 +288,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply getRules() {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -330,7 +330,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return reply;
         Collection<XOWLConsistencyRule> rules = ((XSPReplyResultCollection<XOWLConsistencyRule>) reply).getData();
 
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -377,7 +377,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
      * @return The number of inconsistencies
      */
     private int getInconsistenciesCount() {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return -1;
         TripleStore live = storageService.getLiveStore();
@@ -394,7 +394,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply getRule(String identifier) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -466,7 +466,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         builder.append("}");
         definition = builder.toString();
 
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -482,7 +482,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (!result.isSuccess())
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
         return new XSPReplyResult<>(rule);
@@ -490,7 +490,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply activateRule(String identifier) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -501,7 +501,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         reply = live.activateRule(rule);
         if (!reply.isSuccess())
             return reply;
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
         return reply;
@@ -509,14 +509,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply activateRule(ConsistencyRule rule) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.activateRule(rule);
         if (!reply.isSuccess())
             return reply;
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
         return reply;
@@ -524,7 +524,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply deactivateRule(String identifier) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -535,7 +535,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         reply = live.deactivateRule(rule);
         if (!reply.isSuccess())
             return reply;
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
         return reply;
@@ -543,14 +543,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply deactivateRule(ConsistencyRule rule) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         XSPReply reply = live.deactivateRule(rule);
         if (!reply.isSuccess())
             return reply;
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
         return reply;
@@ -558,7 +558,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply deleteRule(String identifier) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -576,7 +576,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?p ?o } }");
         if (!result.isSuccess())
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
         return XSPReplySuccess.instance();
@@ -584,7 +584,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public XSPReply deleteRule(ConsistencyRule rule) {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
@@ -598,7 +598,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?p ?o } }");
         if (!result.isSuccess())
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
         return XSPReplySuccess.instance();

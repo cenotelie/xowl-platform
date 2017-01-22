@@ -23,6 +23,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
+import org.xowl.platform.kernel.ServiceAction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,6 +65,12 @@ public class FSConfigurationService implements ConfigurationService {
     @Override
     public String getName() {
         return "xOWL Collaboration Platform - Configuration Service";
+    }
+
+    @Override
+    public ServiceAction[] getActions() {
+        // no action for the configuration service
+        return ACTIONS_NONE;
     }
 
     @Override

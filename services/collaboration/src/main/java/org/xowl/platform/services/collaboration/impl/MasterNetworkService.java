@@ -28,7 +28,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
@@ -93,7 +93,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * Initializes this service
      */
     public MasterNetworkService() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(MasterNetworkService.class.getCanonicalName());
         File storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
         this.storageDistributions = new File(storage, "platforms");

@@ -22,7 +22,6 @@ import org.xowl.infra.utils.logging.Logger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
  * Represents the logging service for the platform
@@ -48,4 +47,16 @@ public interface LoggingService extends Service, MeasurableService, Logger {
             1000000000,
             new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
             new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+
+    /**
+     * Service action to get the current log events
+     */
+    ServiceAction ACTION_GET_LOG = new ServiceAction(LoggingService.class.getCanonicalName() + ".GetLog", "Logging Service - Get Log");
+
+    /**
+     * The actions for this service
+     */
+    ServiceAction[] ACTIONS = new ServiceAction[]{
+            ACTION_GET_LOG
+    };
 }

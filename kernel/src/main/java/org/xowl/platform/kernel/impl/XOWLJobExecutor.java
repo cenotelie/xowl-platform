@@ -35,7 +35,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
@@ -299,7 +299,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
             Logging.getDefault().error("Unknown job type " + file);
             return;
         }
-        Collection<JobFactory> factories = ServiceUtils.getServices(JobFactory.class);
+        Collection<JobFactory> factories = Register.getComponents(JobFactory.class);
         for (JobFactory factory : factories) {
             if (factory.canDeserialize(type)) {
                 Job job = factory.newJob(type, definition);
@@ -515,7 +515,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     @Override
     public HttpResponse handle(HttpApiRequest request) {
         // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
 

@@ -29,7 +29,7 @@ import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
@@ -90,7 +90,7 @@ class XOWLImpactAnalysisJob extends JobBase {
 
     @Override
     public void doRun() {
-        StorageService storageService = ServiceUtils.getService(StorageService.class);
+        StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null) {
             result = XSPReplyServiceUnavailable.instance();
             return;

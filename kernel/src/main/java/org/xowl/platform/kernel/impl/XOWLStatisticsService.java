@@ -26,9 +26,9 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -75,6 +75,11 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     @Override
     public String getName() {
         return "xOWL Collaboration Platform - Statistics Service";
+    }
+
+    @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -147,6 +152,13 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
      * @return The metrics
      */
     private HttpResponse onMessageGetMetricList() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkAction(ACTION_GET_METRICS);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+
         // get all the metrics
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
@@ -167,7 +179,14 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
      * @return The metrics
      */
     private HttpResponse onMessageGetMetric(String identifier) {
-        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkAction(ACTION_GET_METRICS);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+
+        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
                 if (metric.getIdentifier().equals(identifier))
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, metric.serializedJSON());
@@ -183,15 +202,14 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
      * @return The metrics' values
      */
     private HttpResponse onMessageGetMetricValue(String identifier) {
-        // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
+        XSPReply reply = securityService.checkAction(ACTION_POLL);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
                 if (metric.getIdentifier().equals(identifier)) {
                     MetricSnapshot value = provider.pollMetric(metric);
@@ -205,7 +223,7 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     @Override
     public Collection<Metric> getMetrics() {
         Collection<Metric> result = new ArrayList<>();
-        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             result.addAll(provider.getMetrics());
         }
         return result;
@@ -213,7 +231,7 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
 
     @Override
     public MetricSnapshot pollMetric(Metric metric) {
-        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             MetricSnapshot result = provider.pollMetric(metric);
             if (result != null)
                 return result;
@@ -223,7 +241,7 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
 
     @Override
     public MetricSnapshot pollMetric(String metricId) {
-        for (MetricProvider provider : ServiceUtils.getServices(MeasurableService.class)) {
+        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
                 if (metric.getIdentifier().equals(metricId))
                     return provider.pollMetric(metric);

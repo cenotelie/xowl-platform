@@ -107,7 +107,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
      * Initializes this service
      */
     public XOWLStorageService() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
         this.server = resolveServer(configuration);
         this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
@@ -590,7 +590,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
      * @return The response
      */
     private HttpResponse onMessageDeleteArtifact(String artifactId) {
-        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new DeleteArtifactJob(artifactId);
@@ -645,7 +645,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
      * @return The response
      */
     private HttpResponse onMessagePullFromLive(String artifactId) {
-        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PullArtifactFromLiveJob(artifactId);
@@ -661,7 +661,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
      * @return The response
      */
     private HttpResponse onMessagePushToLive(String artifactId) {
-        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PushArtifactToLiveJob(artifactId);

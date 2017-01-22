@@ -21,7 +21,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -85,7 +85,7 @@ public class PullArtifactFromLiveJob extends JobBase {
 
     @Override
     public void doRun() {
-        ArtifactStorageService storage = ServiceUtils.getService(ArtifactStorageService.class);
+        ArtifactStorageService storage = Register.getComponent(ArtifactStorageService.class);
         if (storage == null) {
             result = XSPReplyServiceUnavailable.instance();
             return;

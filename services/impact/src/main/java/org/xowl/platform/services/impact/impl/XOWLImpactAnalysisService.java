@@ -28,7 +28,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -133,7 +133,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
 
     @Override
     public XSPReply perform(ImpactAnalysisSetup setup) {
-        JobExecutionService executionService = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
             return XSPReplyServiceUnavailable.instance();
         XOWLImpactAnalysisJob job = new XOWLImpactAnalysisJob(setup);

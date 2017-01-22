@@ -22,7 +22,7 @@ import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -68,7 +68,7 @@ public class Document implements Identifiable, Serializable {
         this.name = name;
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
         this.uploader = currentUser == null ? null : currentUser.getIdentifier();
     }

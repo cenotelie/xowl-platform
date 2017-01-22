@@ -25,7 +25,7 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
@@ -59,7 +59,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
      * Initializes this service
      */
     public XOWLCollaborationLocalService() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
         this.fileManifest = new File(System.getenv(Env.ROOT), configuration.get("manifest"));
         CollaborationManifest manifest = null;
@@ -164,7 +164,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
 
     @Override
     public Collection<Artifact> getInputsFor(String specificationId) {
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
+        ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return Collections.emptyList();
         Collection<Artifact> artifacts = new ArrayList<>();
@@ -178,7 +178,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
 
     @Override
     public Collection<Artifact> getOutputsFor(String specificationId) {
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
+        ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return Collections.emptyList();
         Collection<Artifact> artifacts = new ArrayList<>();
@@ -221,7 +221,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
 
     @Override
     public XSPReply createRole(String identifier, String name) {
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         XSPReply reply = securityService.getRealm().createRole(identifier, name);
@@ -237,7 +237,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
 
     @Override
     public XSPReply addRole(String roleId) {
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         PlatformRole role = securityService.getRealm().getRole(roleId);

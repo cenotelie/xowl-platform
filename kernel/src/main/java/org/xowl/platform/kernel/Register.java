@@ -27,21 +27,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Utility APIs for services
+ * Represents the access to the register of components
  *
  * @author Laurent Wouters
  */
-public class ServiceUtils {
+public class Register {
     /**
-     * Gets the first service for the specified service type
+     * Gets the first component for the specified type of components
      *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
+     * @param componentType A type of components as the Java class that must be implemented
+     * @param <S>           The type of component
+     * @return The component, or null if there is none
      */
-    public static <S extends Service> S getService(Class<S> serviceType) {
-        BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
-        ServiceReference reference = context.getServiceReference(serviceType);
+    public static <S extends Registrable> S getComponent(Class<S> componentType) {
+        BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
+        ServiceReference reference = context.getServiceReference(componentType);
         if (reference == null)
             return null;
         S result = (S) context.getService(reference);
@@ -50,17 +50,17 @@ public class ServiceUtils {
     }
 
     /**
-     * Gets the first service for the specified service type
+     * Gets the all the components for the specified type of components
      *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
+     * @param componentType A type of components as the Java class that must be implemented
+     * @param <S>           The type of component
+     * @return The components
      */
-    public static <S extends Service> Collection<S> getServices(Class<S> serviceType) {
+    public static <S extends Registrable> Collection<S> getComponents(Class<S> componentType) {
         Collection<S> result = new ArrayList<>();
-        BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
+        BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
         try {
-            Collection references = context.getServiceReferences(serviceType, null);
+            Collection references = context.getServiceReferences(componentType, null);
             for (Object obj : references) {
                 ServiceReference reference = (ServiceReference) obj;
                 if (reference == null)
@@ -76,19 +76,19 @@ public class ServiceUtils {
     }
 
     /**
-     * Gets the service for the specified service type with a a specific parameter
+     * Gets the first component for the specified type of components that matches the specified parameter
      *
-     * @param serviceType A type of service as the Java class that must be implemented
-     * @param paramName   The name of the parameter to match
-     * @param paramValue  The value of the parameter to match
-     * @param <S>         The type of service
-     * @return The service, or null if there is none
+     * @param componentType A type of components as the Java class that must be implemented
+     * @param paramName     The name of the parameter to match
+     * @param paramValue    The value of the parameter to match
+     * @param <S>           The type of component
+     * @return The component, or null if there is none
      */
-    public static <S extends Service> S getService(Class<S> serviceType, String paramName, String paramValue) {
+    public static <S extends Registrable> S getComponent(Class<S> componentType, String paramName, String paramValue) {
         S result = null;
-        BundleContext context = FrameworkUtil.getBundle(serviceType).getBundleContext();
+        BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
         try {
-            Collection references = context.getServiceReferences(serviceType, "(" + paramName + "=" + paramValue + ")");
+            Collection references = context.getServiceReferences(componentType, "(" + paramName + "=" + paramValue + ")");
             for (Object obj : references) {
                 ServiceReference reference = (ServiceReference) obj;
                 if (reference == null)

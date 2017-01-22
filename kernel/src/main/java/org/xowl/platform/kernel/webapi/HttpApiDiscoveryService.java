@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.webapi;
 
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.ServiceAction;
 
 import java.util.Collection;
 
@@ -27,6 +28,23 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public interface HttpApiDiscoveryService extends Service {
+    /**
+     * Service action to get the API services
+     */
+    ServiceAction ACTION_GET_SERVICES = new ServiceAction(HttpApiDiscoveryService.class.getCanonicalName() + ".GetServices", "API Discovery Service - Get Services");
+    /**
+     * Service action to get the API description resources
+     */
+    ServiceAction ACTION_GET_RESOURCES = new ServiceAction(HttpApiDiscoveryService.class.getCanonicalName() + ".GetResources", "API Discovery Service - Get Resources");
+
+    /**
+     * The actions for this service
+     */
+    ServiceAction[] ACTIONS = new ServiceAction[]{
+            ACTION_GET_SERVICES,
+            ACTION_GET_RESOURCES
+    };
+
     /**
      * Gets the known API services
      *

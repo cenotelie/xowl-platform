@@ -33,7 +33,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
@@ -224,7 +224,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     @Override
     public Collection<ConnectorService> getConnectors() {
         resolveConfigConnectors(null);
-        return ServiceUtils.getServices(ConnectorService.class);
+        return Register.getComponents(ConnectorService.class);
     }
 
     @Override
@@ -233,7 +233,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
             return registration.service;
-        return ServiceUtils.getService(ConnectorService.class, "id", identifier);
+        return Register.getComponent(ConnectorService.class, "id", identifier);
     }
 
     @Override
@@ -276,7 +276,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             if (service instanceof HttpApiService)
                 registration.refAsServedService = context.registerService(HttpApiService.class, (HttpApiService) service, null);
             connectorsById.put(identifier, registration);
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorSpawnedEvent(this, registration.service));
             return new XSPReplyResult<>(registration.service);
@@ -291,7 +291,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
                 return XSPReplyNotFound.instance();
             registration.refAsDomainConnector.unregister();
             registration.refAsServedService.unregister();
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorDeletedEvent(this, registration.service));
             return XSPReplySuccess.instance();
@@ -331,7 +331,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             return;
         isResolving = true;
         if (toResolve == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
             if (configurationService == null)
                 return;
             Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
@@ -435,7 +435,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageListConnectors() {
-        Collection<ConnectorService> connectors = ServiceUtils.getServices(ConnectorService.class);
+        Collection<ConnectorService> connectors = Register.getComponents(ConnectorService.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (ConnectorService connector : connectors) {
@@ -455,7 +455,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageGetConnector(String connectorId) {
-        ConnectorService connector = ServiceUtils.getService(ConnectorService.class, "id", connectorId);
+        ConnectorService connector = Register.getComponent(ConnectorService.class, "id", connectorId);
         if (connector == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, connector.serializedJSON());
@@ -570,7 +570,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The name for the connector is not specified"), null);
 
         // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
@@ -591,7 +591,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      */
     private HttpResponse onMessageDeleteConnector(String connectorId) {
         // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
@@ -610,7 +610,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessagePullFromConnector(String connectorId) {
-        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PullArtifactJob(connectorId);
@@ -631,7 +631,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         if (artifacts == null || artifacts.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
 
-        JobExecutionService executor = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         Job job = new PushArtifactJob(connectorId, artifacts[0]);

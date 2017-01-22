@@ -30,7 +30,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
@@ -99,7 +99,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      */
     private void onActivated() {
         if (storage == null) {
-            ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
             Configuration configuration = configurationService != null ? configurationService.getConfigFor(ImportationService.class.getCanonicalName()) : null;
             if (configuration != null) {
                 String value = configuration.get("storage");
@@ -337,7 +337,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         Document document = getDocument(documentId);
         if (document == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        Collection<Importer> importers = Register.getComponents(Importer.class);
         for (Importer importer : importers) {
             if (importer.getIdentifier().equals(importerIds[0])) {
                 DocumentPreview preview = getPreview(document, importer, importer.getConfiguration(configuration));
@@ -353,7 +353,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetImporters() {
-        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        Collection<Importer> importers = Register.getComponents(Importer.class);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (Importer importer : importers) {
@@ -397,7 +397,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         Document document = getDocument(documentId);
         if (document == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        Collection<Importer> importers = Register.getComponents(Importer.class);
         for (Importer importer : importers) {
             if (importer.getIdentifier().equals(importerIds[0])) {
                 Job job = beginImport(document, importer, importer.getConfiguration(configuration));
@@ -446,7 +446,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return null;
         }
         documents.put(document.getIdentifier(), document);
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentUploadedEvent(document, this));
         return document;
@@ -466,7 +466,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             Logging.getDefault().error("Failed to delete " + fileDescriptor.getAbsolutePath());
         if (!fileContent.delete())
             Logging.getDefault().error("Failed to delete " + fileContent.getAbsolutePath());
-        EventService eventService = ServiceUtils.getService(EventService.class);
+        EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentDroppedEvent(document2, this));
     }
@@ -494,12 +494,12 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
 
     @Override
     public Collection<Importer> getImporters() {
-        return ServiceUtils.getServices(Importer.class);
+        return Register.getComponents(Importer.class);
     }
 
     @Override
     public Importer getImporter(String importerId) {
-        Collection<Importer> importers = ServiceUtils.getServices(Importer.class);
+        Collection<Importer> importers = Register.getComponents(Importer.class);
         for (Importer importer : importers) {
             if (importer.getIdentifier().equals(importerId))
                 return importer;
@@ -510,7 +510,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     @Override
     public Job beginImport(Document document, Importer importer, ImporterConfiguration configuration) {
         Job job = importer.getImportJob(document, configuration);
-        JobExecutionService executionService = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
             return null;
         executionService.schedule(job);

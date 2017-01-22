@@ -31,7 +31,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
 import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
@@ -80,7 +80,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public DocumentPreview getPreview(Document document, ImporterConfiguration configuration) {
-        ImportationService service = ServiceUtils.getService(ImportationService.class);
+        ImportationService service = Register.getComponent(ImportationService.class);
         if (service == null)
             return null;
         if (!(configuration instanceof CSVConfiguration))
@@ -148,10 +148,10 @@ public class CSVImporter extends Importer {
      * @return The result
      */
     public static XSPReply doImport(String documentId, CSVConfiguration configuration) {
-        ImportationService importationService = ServiceUtils.getService(ImportationService.class);
+        ImportationService importationService = Register.getComponent(ImportationService.class);
         if (importationService == null)
             return XSPReplyServiceUnavailable.instance();
-        ArtifactStorageService storageService = ServiceUtils.getService(ArtifactStorageService.class);
+        ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
 
@@ -172,7 +172,7 @@ public class CSVImporter extends Importer {
             XSPReply reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new DocumentImportedEvent(document, artifact, importationService));
             return new XSPReplyResult<>(artifact.getIdentifier());

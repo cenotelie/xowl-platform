@@ -27,7 +27,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -82,13 +82,13 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
         if (marketplaces != null)
             return Collections.unmodifiableCollection(marketplaces);
         marketplaces = new ArrayList<>();
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         if (configurationService == null)
             return Collections.unmodifiableCollection(marketplaces);
         Configuration configuration = configurationService.getConfigFor(MarketplaceService.class.getCanonicalName());
         if (configuration == null)
             return Collections.unmodifiableCollection(marketplaces);
-        Collection<MarketplaceProvider> providers = ServiceUtils.getServices(MarketplaceProvider.class);
+        Collection<MarketplaceProvider> providers = Register.getComponents(MarketplaceProvider.class);
         for (Section section : configuration.getSections()) {
             String type = section.get("type");
             if (type == null || type.isEmpty())
@@ -159,7 +159,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 // check for platform admin role
-                SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+                SecurityService securityService = Register.getComponent(SecurityService.class);
                 if (securityService == null)
                     return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
                 XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
@@ -237,7 +237,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
 
     @Override
     public XSPReply beginInstallOf(String identifier) {
-        JobExecutionService service = ServiceUtils.getService(JobExecutionService.class);
+        JobExecutionService service = Register.getComponent(JobExecutionService.class);
         if (service == null)
             return XSPReplyServiceUnavailable.instance();
         Job job = new AddonInstallationJob(identifier);

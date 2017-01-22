@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiDiscoveryService;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -58,7 +58,7 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
     @Override
     public URL getResource(String resource) {
         String rest = resource.substring(PREFIX.length() + 1);
-        HttpApiDiscoveryService discoveryService = ServiceUtils.getService(HttpApiDiscoveryService.class);
+        HttpApiDiscoveryService discoveryService = Register.getComponent(HttpApiDiscoveryService.class);
         if (discoveryService == null)
             return null;
         for (HttpApiResource apiResource : discoveryService.getResources()) {

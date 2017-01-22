@@ -23,7 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -84,7 +84,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
     public JobBase(String name, String type) {
         super(Logging.getDefault());
         PlatformUser owner = null;
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
             owner = securityService.getCurrentUser();
         this.identifier = Job.class.getCanonicalName() + "." + UUID.randomUUID().toString();
@@ -153,7 +153,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
             }
         }
         PlatformUser owner = null;
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
             owner = securityService.getRealm().getUser(ownerId);
         this.identifier = id;
@@ -246,7 +246,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         status = JobStatus.Running;
         timeRun = DateFormat.getDateTimeInstance().format(new Date());
         completionRate = 0.0f;
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
             securityService.authenticate(owner);
     }
@@ -256,7 +256,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         status = cancelled ? JobStatus.Cancelled : JobStatus.Completed;
         timeCompleted = DateFormat.getDateTimeInstance().format(new Date());
         completionRate = 1.0f;
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
             securityService.onRequestEnd(null);
     }

@@ -34,7 +34,7 @@ import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -113,7 +113,7 @@ public class ShiroRealm implements Realm {
      * Initializes this realm
      */
     public ShiroRealm() {
-        ConfigurationService configurationService = ServiceUtils.getService(ConfigurationService.class);
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService != null ? configurationService.getConfigFor(this) : null;
         String realmId = configuration.get("provider");
         AuthenticatingRealm realm = null;

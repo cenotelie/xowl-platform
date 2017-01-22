@@ -39,7 +39,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -216,7 +216,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     @Override
     public HttpResponse handle(HttpApiRequest request) {
         // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
         XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
@@ -422,7 +422,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             // delete the folder
             Files.deleteFolder(directory);
             descriptor.setInstalled();
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new AddonInstalledEvent(this, descriptor));
             return new XSPReplyResult<>(descriptor);
@@ -479,7 +479,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             File fileDescriptor = new File(addonsCache, identifier + ".descriptor");
             if (!fileDescriptor.delete())
                 Logging.getDefault().error("Failed to delete file " + fileDescriptor.getAbsolutePath());
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new AddonUninstalledEvent(this, descriptor));
             addons.remove(descriptor);
@@ -515,7 +515,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     public void frameworkEvent(FrameworkEvent frameworkEvent) {
         if (frameworkEvent.getType() == FrameworkEvent.STARTED) {
             // the framework has started
-            EventService eventService = ServiceUtils.getService(EventService.class);
+            EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new PlatformStartupEvent(this));
         }

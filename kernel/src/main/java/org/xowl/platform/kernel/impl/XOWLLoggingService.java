@@ -29,12 +29,8 @@ import org.xowl.infra.utils.logging.FileLogger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.LoggingService;
-import org.xowl.platform.kernel.ServiceUtils;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.Event;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -180,6 +176,11 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     }
 
     @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS;
+    }
+
+    @Override
     public Collection<Metric> getMetrics() {
         return Arrays.asList(METRIC_TOTAL_MESSAGES, METRIC_ERRORS_COUNT);
     }
@@ -202,11 +203,10 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
 
     @Override
     public HttpResponse handle(HttpApiRequest request) {
-        // check for platform admin role
-        SecurityService securityService = ServiceUtils.getService(SecurityService.class);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
+        XSPReply reply = securityService.checkAction(ACTION_GET_LOG);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 

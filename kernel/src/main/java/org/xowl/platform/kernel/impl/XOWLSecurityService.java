@@ -26,11 +26,13 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.ServiceUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -97,6 +99,10 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      */
     private final String realmId;
     /**
+     * The identifier of the authorization policy
+     */
+    private final String policyId;
+    /**
      * The Message Authentication Code algorithm to use for securing user tokens
      */
     private final Mac securityMAC;
@@ -116,6 +122,10 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      * The security realm
      */
     private Realm realm;
+    /**
+     * The authorization policy
+     */
+    private SecurityPolicy policy;
 
     /**
      * Initializes this service
@@ -127,6 +137,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
         this.realmId = configuration.get("realm");
+        this.policyId = configuration.get("policy");
         Mac mac = null;
         KeyGenerator keyGenerator = null;
         try {
@@ -151,6 +162,11 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     @Override
     public String getName() {
         return "xOWL Collaboration Platform - Security Service";
+    }
+
+    @Override
+    public ServiceAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -216,10 +232,20 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     public Realm getRealm() {
         if (realm != null)
             return realm;
-        realm = ServiceUtils.getService(Realm.class, Realm.PROPERTY_ID, realmId);
+        realm = Register.getComponent(Realm.class, Realm.PROPERTY_ID, realmId);
         if (realm == null)
             realm = new XOWLSecurityNosecRealm();
         return realm;
+    }
+
+    @Override
+    public SecurityPolicy getPolicy() {
+        if (policy != null)
+            return policy;
+        policy = Register.getComponent(SecurityPolicy.class, SecurityPolicy.PROPERTY_ID, policyId);
+        if (policy == null)
+            policy = new XOWLSecurityPolicyAuthenticated();
+        return policy;
     }
 
     @Override
@@ -283,13 +309,13 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public XSPReply checkCurrentHasRole(String roleId) {
-        PlatformUser user = CONTEXT.get();
-        if (user == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!getRealm().checkHasRole(user.getIdentifier(), roleId))
-            return XSPReplyUnauthorized.instance();
-        return XSPReplySuccess.instance();
+    public XSPReply checkAction(ServiceAction action) {
+        return getPolicy().checkAction(this, action);
+    }
+
+    @Override
+    public XSPReply checkAction(ServiceAction action, Object data) {
+        return getPolicy().checkAction(this, action, data);
     }
 
     /**

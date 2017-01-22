@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -20,20 +20,9 @@ package org.xowl.platform.kernel;
 import org.xowl.infra.utils.Identifiable;
 
 /**
- * Represents a service on the platform
+ * Represents a component that can be registered so that it can be discovered later
  *
  * @author Laurent Wouters
  */
-public interface Service extends Registrable, Identifiable {
-    /**
-     * When a service has no action
-     */
-    ServiceAction[] ACTIONS_NONE = new ServiceAction[0];
-
-    /**
-     * Gets the actions that can be performed through this service
-     *
-     * @return The actions that can be performed through this service
-     */
-    ServiceAction[] getActions();
+public interface Registrable extends Identifiable {
 }

@@ -15,36 +15,33 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.jobs;
+package org.xowl.platform.services.security.internal;
 
-import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.*;
+import org.xowl.infra.utils.config.Section;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.security.SecurityRealm;
+import org.xowl.platform.kernel.security.SecurityRealmProvider;
 
 /**
- * Represents an authorization policy that requires the user to be the owner of the associated job
+ * Implements a provider for the internal security realm
  *
  * @author Laurent Wouters
  */
-public class SecuredActionPolicyJobOwner extends SecuredActionPolicyBase {
-    /**
-     * The singleton instance for this policy
-     */
-    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyJobOwner();
-
-    /**
-     * Initializes this policy
-     */
-    private SecuredActionPolicyJobOwner() {
-        super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Job owner policy");
+class XOWLInternalSecurityProvider implements SecurityRealmProvider {
+    @Override
+    public String getIdentifier() {
+        return XOWLInternalSecurityProvider.class.getCanonicalName();
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
-        return false;
+    public String getName() {
+        return PlatformUtils.NAME + " - Internal Security Provider";
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        return data instanceof Job && ((Job) data).getOwner() == user;
+    public SecurityRealm newRealm(String identifier, Section configuration) {
+        if (XOWLInternalRealm.class.getCanonicalName().equals(identifier))
+            return new XOWLInternalRealm(configuration);
+        return null;
     }
 }

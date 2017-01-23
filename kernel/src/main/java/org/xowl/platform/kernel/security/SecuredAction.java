@@ -31,9 +31,9 @@ public class SecuredAction implements Identifiable, Serializable {
      * The default authorization policies
      */
     public static final String[] DEFAULT_POLICIES = new String[]{
-            SecuredActionPolicyNone.class.getCanonicalName(),
-            SecuredActionPolicyRole.class.getCanonicalName(),
-            SecuredActionPolicyRoleAdmin.class.getCanonicalName()
+            SecuredActionPolicyAllowAll.class.getCanonicalName(),
+            SecuredActionPolicyHasRole.class.getCanonicalName(),
+            SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName()
     };
 
     /**

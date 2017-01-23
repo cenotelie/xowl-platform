@@ -38,9 +38,8 @@ import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -140,13 +139,13 @@ class XOWLInternalRealm implements SecurityRealm {
 
     /**
      * Initialize this realm
+     *
+     * @param configuration The configuration for the realm
      */
-    public XOWLInternalRealm() {
+    public XOWLInternalRealm(Section configuration) {
         XOWLServer server = null;
         XOWLDatabase database = null;
         try {
-            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService.getConfigFor(this);
             String location = (new File(System.getenv(Env.ROOT), configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
             server = new EmbeddedServer(Logging.getDefault(), serverConfiguration);
@@ -162,6 +161,7 @@ class XOWLInternalRealm implements SecurityRealm {
         this.cacheGroups = new HashMap<>();
         this.cacheRoles = new HashMap<>();
         initializeDatabase();
+        Activator.register(this);
     }
 
     /**
@@ -443,20 +443,18 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply createUser(String identifier, String name, String key) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_USER);
+        if (!reply.isSuccess())
+            return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
             return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
         // create the user as an embedded server user
-        XSPReply reply = server.createUser(identifier, key);
+        reply = server.createUser(identifier, key);
         if (!reply.isSuccess())
             return reply;
         // create the user data
@@ -476,15 +474,13 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply createGroup(String identifier, String name, String adminId) {
-        // check for current user with admin role
+        /// check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_GROUP);
+        if (!reply.isSuccess())
+            return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
             return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
@@ -495,7 +491,7 @@ class XOWLInternalRealm implements SecurityRealm {
         parameters.put("group", nodes.getIRINode(GROUPS + identifier));
         parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
         parameters.put("admin", nodes.getIRINode(USERS + adminId));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -508,15 +504,13 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply createRole(String identifier, String name) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_ROLE);
+        if (!reply.isSuccess())
+            return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
             return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
@@ -524,7 +518,7 @@ class XOWLInternalRealm implements SecurityRealm {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("role", nodes.getIRINode(ROLES + identifier));
         parameters.put("name", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -537,22 +531,21 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply renameUser(String identifier, String name) {
-        // check for current user with admin role (or rename itself)
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !currentUser.getIdentifier().equals(identifier))
-            return XSPReplyUnauthorized.instance();
-        // rename
+        PlatformUser userObject = getUser(identifier);
+        if (userObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_USER, userObject);
+        if (!reply.isSuccess())
+            return reply;
         synchronized (cacheUsers) {
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(USERS + identifier));
             parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
-            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
@@ -563,25 +556,22 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply renameGroup(String identifier, String name) {
-        PlatformGroup groupObject = getGroup(identifier);
-        if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
-        // check for current user with admin role on group
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !groupObject.getAdmins().contains(currentUser))
-            return XSPReplyUnauthorized.instance();
+        PlatformGroup groupObject = getGroup(identifier);
+        if (groupObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         synchronized (cacheGroups) {
             // rename the entity
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(GROUPS + identifier));
             parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
-            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
@@ -592,21 +582,22 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply renameRole(String identifier, String name) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        PlatformRole roleObject = getRole(identifier);
+        if (roleObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_ROLE, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_ROLE, roleObject);
+        if (!reply.isSuccess())
+            return reply;
         synchronized (cacheRoles) {
             // rename the entity
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(ROLES + identifier));
             parameters.put("newName", nodes.getLiteralNode(name, Vocabulary.xsdString, null));
-            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-rename-entity"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
@@ -617,21 +608,22 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply deleteUser(String identifier) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        PlatformUser userObject = getUser(identifier);
+        if (userObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_USER, userObject);
+        if (!reply.isSuccess())
+            return reply;
         // check for entity that cannot be deleted
         if (PlatformUserRoot.INSTANCE.getIdentifier().equals(identifier))
             return new XSPReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
         // delete the server user
         synchronized (cacheUsers) {
-            XSPReply reply = server.getUser(identifier);
+            reply = server.getUser(identifier);
             if (!reply.isSuccess())
                 return reply;
             reply = server.deleteUser(((XSPReplyResult<XOWLUser>) reply).getData());
@@ -654,20 +646,21 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply deleteGroup(String identifier) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        PlatformGroup groupObject = getGroup(identifier);
+        if (groupObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         // delete the entity
         synchronized (cacheGroups) {
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(GROUPS + identifier));
-            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
@@ -681,15 +674,16 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply deleteRole(String identifier) {
-        // check for current user with admin role
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        PlatformRole roleObject = getRole(identifier);
+        if (roleObject == null)
+            return new XSPReplyApiError(ERROR_INVALID_ROLE, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_ROLE, roleObject);
+        if (!reply.isSuccess())
+            return reply;
         // check for entity that cannot be deleted
         if (PlatformRoleAdmin.INSTANCE.getIdentifier().equals(identifier))
             return new XSPReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
@@ -697,7 +691,7 @@ class XOWLInternalRealm implements SecurityRealm {
         synchronized (cacheRoles) {
             Map<String, Node> parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(ROLES + identifier));
-            XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
+            reply = database.executeStoredProcedure(procedures.get("procedure-delete-entity"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 return reply;
@@ -711,22 +705,18 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
-        // check input data
-        PlatformUser platformUser = authenticate(identifier, oldKey);
-        if (platformUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        // check that the current user is either the target user or the admin
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !currentUser.getIdentifier().equals(identifier))
-            return XSPReplyUnauthorized.instance();
+        PlatformUser platformUser = authenticate(identifier, oldKey);
+        if (platformUser == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RESET_USER_KEY, platformUser);
+        if (!reply.isSuccess())
+            return reply;
         // execute
-        XSPReply reply = server.getUser(identifier);
+        reply = server.getUser(identifier);
         if (!reply.isSuccess())
             return reply;
         XOWLUser xowlUser = ((XSPReplyResult<XOWLUser>) reply).getData();
@@ -735,22 +725,18 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public XSPReply resetUserKey(String identifier, String newKey) {
-        // check input data
-        PlatformUser platformUser = getUser(identifier);
-        if (platformUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        // check that the current user is either the target user or the admin
+        // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !currentUser.getIdentifier().equals(identifier))
-            return XSPReplyUnauthorized.instance();
+        PlatformUser platformUser = getUser(identifier);
+        if (platformUser == null)
+            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RESET_USER_KEY, platformUser);
+        if (!reply.isSuccess())
+            return reply;
         // execute
-        XSPReply reply = server.getUser(identifier);
+        reply = server.getUser(identifier);
         if (!reply.isSuccess())
             return reply;
         XOWLUser xowlUser = ((XSPReplyResult<XOWLUser>) reply).getData();
@@ -770,17 +756,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !groupObject.getAdmins().contains(currentUser))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_USER_TO_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(GROUPS + group));
         parameters.put("user", nodes.getIRINode(USERS + user));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-add-member"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-add-member"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -800,17 +783,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !groupObject.getAdmins().contains(currentUser))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_ADMIN_TO_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(GROUPS + group));
         parameters.put("admin", nodes.getIRINode(USERS + user));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -830,17 +810,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !groupObject.getAdmins().contains(currentUser))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_USER_FROM_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(GROUPS + group));
         parameters.put("user", nodes.getIRINode(USERS + user));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-remove-member"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-remove-member"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -860,17 +837,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier())
-                && !groupObject.getAdmins().contains(currentUser))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_ADMIN_FROM_GROUP, groupObject);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(GROUPS + group));
         parameters.put("admin", nodes.getIRINode(USERS + user));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-remove-admin"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-remove-admin"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -890,16 +864,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_USER);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(USERS + user));
         parameters.put("role", nodes.getIRINode(ROLES + role));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -919,16 +891,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_GROUP);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(GROUPS + group));
         parameters.put("role", nodes.getIRINode(ROLES + role));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -948,16 +918,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_USER);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(USERS + user));
         parameters.put("role", nodes.getIRINode(ROLES + role));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
@@ -977,16 +945,14 @@ class XOWLInternalRealm implements SecurityRealm {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        PlatformUser currentUser = securityService.getCurrentUser();
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        if (!checkHasRole(currentUser.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
-            return XSPReplyUnauthorized.instance();
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_GROUP);
+        if (!reply.isSuccess())
+            return reply;
         // execute
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(GROUPS + group));
         parameters.put("role", nodes.getIRINode(ROLES + role));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
+        reply = database.executeStoredProcedure(procedures.get("procedure-unassign-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;

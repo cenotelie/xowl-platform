@@ -27,7 +27,7 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  *
  * @author Laurent Wouters
  */
-public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
+public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
     /**
      * The identifier of the required role
      */
@@ -38,8 +38,8 @@ public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
      *
      * @param roleId The identifier of the required role
      */
-    public SecuredActionPolicyRole(String roleId) {
-        super(SecuredActionPolicyRole.class.getCanonicalName(), "Role policy");
+    public SecuredActionPolicyHasRole(String roleId) {
+        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "Has Role");
         this.role = roleId;
     }
 
@@ -48,7 +48,7 @@ public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
      *
      * @param role The required role
      */
-    public SecuredActionPolicyRole(PlatformRole role) {
+    public SecuredActionPolicyHasRole(PlatformRole role) {
         this(role.getIdentifier());
     }
 
@@ -57,8 +57,8 @@ public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
      *
      * @param definition The serialized definition
      */
-    public SecuredActionPolicyRole(ASTNode definition) {
-        super(SecuredActionPolicyRole.class.getCanonicalName(), "Role policy");
+    public SecuredActionPolicyHasRole(ASTNode definition) {
+        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "Role policy");
         String role = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());

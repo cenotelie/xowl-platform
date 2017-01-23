@@ -17,34 +17,29 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.platform.kernel.platform.PlatformGroup;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to be the administrator of the relevant group
+ * Represents an authorization policy that requires the user to have the role of platform administrator
  *
  * @author Laurent Wouters
  */
-public class SecuredActionPolicyGroupAdmin extends SecuredActionPolicyBase {
+public class SecuredActionPolicyIsPlatformAdmin extends SecuredActionPolicyBase {
     /**
      * The singleton instance for this policy
      */
-    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyGroupAdmin();
+    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsPlatformAdmin();
 
     /**
      * Initializes this policy
      */
-    private SecuredActionPolicyGroupAdmin() {
-        super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Group admin policy");
+    private SecuredActionPolicyIsPlatformAdmin() {
+        super(SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName(), "Is Platform Admin");
     }
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
-        return false;
-    }
-
-    @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        return data instanceof PlatformGroup && ((PlatformGroup) data).getAdmins().contains(user);
+        return securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier());
     }
 }

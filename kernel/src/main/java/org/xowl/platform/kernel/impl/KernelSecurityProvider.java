@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.jobs.SecuredActionPolicyJobOwner;
+import org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner;
 import org.xowl.platform.kernel.security.*;
 
 /**
@@ -41,16 +41,18 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
 
     @Override
     public SecuredActionPolicy newPolicy(String policyId, ASTNode definition) {
-        if (SecuredActionPolicyNone.class.getCanonicalName().equals(policyId))
-            return SecuredActionPolicyNone.INSTANCE;
-        else if (SecuredActionPolicyRoleAdmin.class.getCanonicalName().equals(policyId))
-            return SecuredActionPolicyRoleAdmin.INSTANCE;
-        else if (SecuredActionPolicyRole.class.getCanonicalName().equals(policyId))
-            return new SecuredActionPolicyRole(definition);
-        else if (SecuredActionPolicyGroupAdmin.class.getCanonicalName().equals(policyId))
-            return SecuredActionPolicyGroupAdmin.INSTANCE;
-        else if (SecuredActionPolicyJobOwner.class.getCanonicalName().equals(policyId))
-            return SecuredActionPolicyJobOwner.INSTANCE;
+        if (SecuredActionPolicyAllowAll.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyAllowAll.INSTANCE;
+        else if (SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsPlatformAdmin.INSTANCE;
+        else if (SecuredActionPolicyHasRole.class.getCanonicalName().equals(policyId))
+            return new SecuredActionPolicyHasRole(definition);
+        else if (SecuredActionPolicyIsGroupAdmin.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsGroupAdmin.INSTANCE;
+        else if (SecuredActionPolicyIsSelf.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsSelf.INSTANCE;
+        else if (SecuredActionPolicyIsJobOwner.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsJobOwner.INSTANCE;
         return null;
     }
 

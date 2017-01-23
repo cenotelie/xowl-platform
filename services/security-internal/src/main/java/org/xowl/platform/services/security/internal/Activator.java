@@ -19,10 +19,10 @@ package org.xowl.platform.services.security.internal;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.security.SecurityRealm;
+import org.xowl.platform.kernel.security.SecurityRealmProvider;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Activator for this bundle
@@ -31,21 +31,27 @@ import java.util.Hashtable;
  */
 public class Activator implements BundleActivator {
     /**
-     * The realm to register
+     * The created security realms
      */
-    private XOWLInternalRealm realm;
+    private static Collection<XOWLInternalRealm> realms = new ArrayList<>();
+
+    /**
+     * Register an internal security realm
+     *
+     * @param realm The realm to register
+     */
+    public static synchronized void register(XOWLInternalRealm realm) {
+        realms.add(realm);
+    }
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(SecurityRealm.PROPERTY_ID, XOWLInternalRealm.class.getCanonicalName());
-        realm = new XOWLInternalRealm();
-        bundleContext.registerService(SecurityRealm.class, realm, properties);
+        bundleContext.registerService(SecurityRealmProvider.class, new XOWLInternalSecurityProvider(), null);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (realm != null)
+        for (XOWLInternalRealm realm : realms)
             realm.onStop();
     }
 }

@@ -22,19 +22,19 @@ import org.xowl.platform.kernel.jobs.SecuredActionPolicyJobOwner;
 import org.xowl.platform.kernel.security.*;
 
 /**
- * Implements a provider of secured action policies for this bundle
+ * Implements a provider for security components for the kernel
  *
  * @author Laurent Wouters
  */
-public class KernelSecuredActionPolicyProvider implements SecuredActionPolicyProvider {
+public class KernelSecurityProvider implements SecuredActionPolicyProvider, SecurityPolicyProvider, SecurityRealmProvider {
     @Override
     public String getIdentifier() {
-        return KernelSecuredActionPolicyProvider.class.getCanonicalName();
+        return KernelSecurityProvider.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + " - Kernel Secured Action Policy Service";
+        return PlatformUtils.NAME + " - Kernel Security Provider";
     }
 
     @Override
@@ -49,6 +49,22 @@ public class KernelSecuredActionPolicyProvider implements SecuredActionPolicyPro
             return SecuredActionPolicyGroupAdmin.INSTANCE;
         else if (SecuredActionPolicyJobOwner.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyJobOwner.INSTANCE;
+        return null;
+    }
+
+    @Override
+    public SecurityRealm newRealm(String identifier) {
+        if (KernelSecurityNosecRealm.class.getCanonicalName().equals(identifier))
+            return new KernelSecurityNosecRealm();
+        return null;
+    }
+
+    @Override
+    public SecurityPolicy newPolicy(String identifier) {
+        if (KernelSecurityPolicyAuthenticated.class.getCanonicalName().equals(identifier))
+            return new KernelSecurityPolicyAuthenticated();
+        if (KernelSecurityPolicyCustom.class.getCanonicalName().equals(identifier))
+            return new KernelSecurityPolicyCustom();
         return null;
     }
 }

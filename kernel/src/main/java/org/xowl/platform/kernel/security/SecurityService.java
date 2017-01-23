@@ -147,7 +147,7 @@ public interface SecurityService extends SecuredService {
      *
      * @return The realm of this platform
      */
-    Realm getRealm();
+    SecurityRealm getRealm();
 
     /**
      * Gets the current authorization policy for this platform

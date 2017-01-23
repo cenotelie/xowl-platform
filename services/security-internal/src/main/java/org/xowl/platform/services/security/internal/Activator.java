@@ -19,7 +19,7 @@ package org.xowl.platform.services.security.internal;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityRealm;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -38,9 +38,9 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(Realm.PROPERTY_ID, XOWLInternalRealm.class.getCanonicalName());
+        properties.put(SecurityRealm.PROPERTY_ID, XOWLInternalRealm.class.getCanonicalName());
         realm = new XOWLInternalRealm();
-        bundleContext.registerService(Realm.class, realm, properties);
+        bundleContext.registerService(SecurityRealm.class, realm, properties);
     }
 
     @Override

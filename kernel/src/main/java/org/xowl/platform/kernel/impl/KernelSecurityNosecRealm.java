@@ -24,7 +24,7 @@ import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserBase;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityRealm;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +34,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityNosecRealm implements Realm {
+public class KernelSecurityNosecRealm implements SecurityRealm {
     /**
      * The internal representation of a user for this realm
      */

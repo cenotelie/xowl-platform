@@ -38,7 +38,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityRealm;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -48,7 +48,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class ShiroRealm implements Realm {
+public class ShiroRealm implements SecurityRealm {
     /**
      * The internal representation of a user for this realm
      */

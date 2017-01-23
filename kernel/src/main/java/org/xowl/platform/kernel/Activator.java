@@ -29,17 +29,11 @@ import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
-import org.xowl.platform.kernel.security.Realm;
-import org.xowl.platform.kernel.security.SecuredService;
-import org.xowl.platform.kernel.security.SecurityPolicy;
-import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
 import org.xowl.platform.kernel.webapi.HttpApiDiscoveryService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
-
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 /**
  * Activator for this bundle
@@ -70,17 +64,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        // register security components
-        Dictionary<String, Object> dictionary = new Hashtable<>();
-        dictionary.put(Realm.PROPERTY_ID, KernelSecurityNosecRealm.class.getCanonicalName());
-        bundleContext.registerService(Realm.class, new KernelSecurityNosecRealm(), dictionary);
-        dictionary = new Hashtable<>();
-        dictionary.put(SecurityPolicy.PROPERTY_ID, KernelSecurityPolicyAuthenticated.class.getCanonicalName());
-        bundleContext.registerService(SecurityPolicy.class, new KernelSecurityPolicyAuthenticated(), dictionary);
-        dictionary = new Hashtable<>();
-        dictionary.put(SecurityPolicy.PROPERTY_ID, KernelSecurityPolicyCustom.class.getCanonicalName());
-        bundleContext.registerService(SecurityPolicy.class, new KernelSecurityPolicyCustom(), dictionary);
-
         // register the logging service
         KernelLoggingService loggingService = new KernelLoggingService();
         Logging.setDefault(loggingService);
@@ -96,6 +79,10 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
 
         // register the security service
+        KernelSecurityProvider securityProvider = new KernelSecurityProvider();
+        bundleContext.registerService(SecurityRealmProvider.class, securityProvider, null);
+        bundleContext.registerService(SecurityPolicyProvider.class, securityProvider, null);
+        bundleContext.registerService(SecuredActionPolicyProvider.class, securityProvider, null);
         KernelSecurityService securityService = new KernelSecurityService(configurationService);
         bundleContext.registerService(Service.class, securityService, null);
         bundleContext.registerService(SecuredService.class, securityService, null);

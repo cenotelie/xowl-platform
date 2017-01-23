@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,30 +15,21 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.shiro;
+package org.xowl.platform.kernel.security;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.security.SecurityRealm;
-
-import java.util.Dictionary;
-import java.util.Hashtable;
+import org.xowl.platform.kernel.Registrable;
 
 /**
- * Activator for this bundle
+ * Represents a provider of security policies
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
-    @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(SecurityRealm.PROPERTY_ID, ShiroRealm.class.getCanonicalName());
-        bundleContext.registerService(SecurityRealm.class, new ShiroRealm(), properties);
-    }
-
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-
-    }
+public interface SecurityPolicyProvider extends Registrable {
+    /**
+     * Tries to instantiates a security policy
+     *
+     * @param identifier The identifier of a security policy
+     * @return The security policy, or null if it cannot be instantiated
+     */
+    SecurityPolicy newPolicy(String identifier);
 }

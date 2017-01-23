@@ -46,7 +46,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;
-import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecurityRealm;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
@@ -60,7 +60,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-class XOWLInternalRealm implements Realm {
+class XOWLInternalRealm implements SecurityRealm {
     /**
      * The path to the resources
      */

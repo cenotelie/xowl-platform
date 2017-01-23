@@ -26,7 +26,7 @@ import org.xowl.platform.kernel.Service;
  */
 public interface CollaborationNetworkServiceProvider extends Service {
     /**
-     * Tries to instantiate a collaboration network service
+     * Tries to newPolicy a collaboration network service
      *
      * @param identifier The identifier of the service
      * @return The instance, or null if it cannot be created

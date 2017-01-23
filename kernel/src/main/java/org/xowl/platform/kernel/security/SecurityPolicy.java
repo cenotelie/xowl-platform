@@ -18,19 +18,14 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Registrable;
+import org.xowl.infra.utils.Identifiable;
 
 /**
  * Represents an authorization policy for the platform
  *
  * @author Laurent Wouters
  */
-public interface SecurityPolicy extends Registrable {
-    /**
-     * The identifier of the property for the policy identifier
-     */
-    String PROPERTY_ID = "policyId";
-
+public interface SecurityPolicy extends Identifiable {
     /**
      * Checks the authorization policy for the specified action
      *

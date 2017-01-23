@@ -31,10 +31,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.Realm;
-import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.kernel.security.SecurityPolicy;
-import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -122,7 +119,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The security realm
      */
-    private Realm realm;
+    private SecurityRealm realm;
     /**
      * The authorization policy
      */
@@ -230,22 +227,28 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public Realm getRealm() {
+    public synchronized SecurityRealm getRealm() {
         if (realm != null)
             return realm;
-        realm = Register.getComponent(Realm.class, Realm.PROPERTY_ID, realmId);
-        if (realm == null)
-            realm = new KernelSecurityNosecRealm();
+        for (SecurityRealmProvider provider : Register.getComponents(SecurityRealmProvider.class)) {
+            realm = provider.newRealm(realmId);
+            if (realm != null)
+                return realm;
+        }
+        realm = new KernelSecurityNosecRealm();
         return realm;
     }
 
     @Override
-    public SecurityPolicy getPolicy() {
+    public synchronized SecurityPolicy getPolicy() {
         if (policy != null)
             return policy;
-        policy = Register.getComponent(SecurityPolicy.class, SecurityPolicy.PROPERTY_ID, policyId);
-        if (policy == null)
-            policy = new KernelSecurityPolicyAuthenticated();
+        for (SecurityPolicyProvider provider : Register.getComponents(SecurityPolicyProvider.class)) {
+            policy = provider.newPolicy(policyId);
+            if (policy != null)
+                return policy;
+        }
+        policy = new KernelSecurityPolicyAuthenticated();
         return policy;
     }
 

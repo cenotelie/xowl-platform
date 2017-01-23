@@ -27,10 +27,10 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.impl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
-import org.xowl.platform.kernel.platform.PlatformJobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 import org.xowl.platform.kernel.security.Realm;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
@@ -85,9 +85,10 @@ public class Activator implements BundleActivator {
         KernelLoggingService loggingService = new KernelLoggingService();
         Logging.setDefault(loggingService);
         bundleContext.registerService(Service.class, loggingService, null);
-        bundleContext.registerService(LoggingService.class, loggingService, null);
+        bundleContext.registerService(SecuredService.class, loggingService, null);
         bundleContext.registerService(HttpApiService.class, loggingService, null);
         bundleContext.registerService(MeasurableService.class, loggingService, null);
+        bundleContext.registerService(LoggingService.class, loggingService, null);
 
         // register the configuration service
         ConfigurationService configurationService = new FileSystemConfigurationService();
@@ -97,28 +98,31 @@ public class Activator implements BundleActivator {
         // register the security service
         XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
         bundleContext.registerService(Service.class, securityService, null);
-        bundleContext.registerService(SecurityService.class, securityService, null);
+        bundleContext.registerService(SecuredService.class, securityService, null);
         bundleContext.registerService(HttpApiService.class, securityService, null);
+        bundleContext.registerService(SecurityService.class, securityService, null);
 
         // register the statistics service
         KernelStatisticsService statisticsService = new KernelStatisticsService();
         bundleContext.registerService(Service.class, statisticsService, null);
-        bundleContext.registerService(StatisticsService.class, statisticsService, null);
         bundleContext.registerService(HttpApiService.class, statisticsService, null);
+        bundleContext.registerService(SecuredService.class, statisticsService, null);
+        bundleContext.registerService(StatisticsService.class, statisticsService, null);
 
         // register the event service
         eventService = new KernelEventService();
         bundleContext.registerService(Service.class, eventService, null);
-        bundleContext.registerService(EventService.class, eventService, null);
         bundleContext.registerService(MeasurableService.class, eventService, null);
+        bundleContext.registerService(EventService.class, eventService, null);
 
         // register the job executor service
         serviceJobExecutor = new KernelJobExecutor(configurationService, eventService);
         bundleContext.registerService(Service.class, serviceJobExecutor, null);
-        bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
+        bundleContext.registerService(SecuredService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
         bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
-        bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
+        bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
+        bundleContext.registerService(JobFactory.class, new KernelJobFactory(), null);
 
         // register the directory service
         KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
@@ -127,22 +131,23 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, FreeArtifactArchetype.INSTANCE, null);
         bundleContext.registerService(Service.class, directoryService, null);
-        bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
         bundleContext.registerService(HttpApiService.class, directoryService, null);
+        bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
 
         // register the platform management service
         platformService = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
         bundleContext.registerService(Service.class, platformService, null);
-        bundleContext.registerService(PlatformManagementService.class, platformService, null);
+        bundleContext.registerService(SecuredService.class, platformService, null);
         bundleContext.registerService(HttpApiService.class, platformService, null);
         bundleContext.registerService(MeasurableService.class, platformService, null);
+        bundleContext.registerService(PlatformManagementService.class, platformService, null);
         bundleContext.addFrameworkListener(platformService);
 
         // register the HTTP API discovery service
         discoveryService = new KernelHttpApiDiscoveryService();
         bundleContext.registerService(Service.class, discoveryService, null);
-        bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
         bundleContext.registerService(HttpApiService.class, discoveryService, null);
+        bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
         discoveryServiceTracker = new ServiceTracker<HttpApiService, HttpApiService>(bundleContext, HttpApiService.class, null) {
             public void removedService(ServiceReference reference, HttpApiService apiService) {
                 discoveryService.unregisterService(apiService);

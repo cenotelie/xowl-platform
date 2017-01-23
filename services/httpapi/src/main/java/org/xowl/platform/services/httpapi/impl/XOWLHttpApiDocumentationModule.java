@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiDiscoveryService;
@@ -42,7 +43,7 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - API Documentation Contribution";
+        return PlatformUtils.NAME + " - API Documentation Contribution";
     }
 
     @Override

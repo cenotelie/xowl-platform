@@ -25,9 +25,8 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.security.SecuredService;
-import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -56,12 +55,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - HTTP Server Service";
-    }
-
-    @Override
-    public SecuredAction[] getActions() {
-        return SecuredService.ACTIONS_NONE;
+        return PlatformUtils.NAME + " - HTTP Server Service";
     }
 
     @Override

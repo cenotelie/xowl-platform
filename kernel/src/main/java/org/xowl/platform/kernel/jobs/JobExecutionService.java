@@ -21,9 +21,8 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.kernel.security.SecuredActionPolicyJobOwner;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface JobExecutionService extends Service, MeasurableService {
+public interface JobExecutionService extends SecuredService, MeasurableService {
     /**
      * The metric for the total number of processed jobs
      */
@@ -65,7 +64,7 @@ public interface JobExecutionService extends Service, MeasurableService {
     /**
      * Service action to get the current jobs
      */
-    SecuredAction ACTION_GET_JOBS = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs", SecuredActionPolicyJobOwner.class);
+    SecuredAction ACTION_GET_JOBS = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs", SecuredActionPolicyJobOwner.class.getCanonicalName());
     /**
      * Service action to schedule new jobs
      */
@@ -73,7 +72,7 @@ public interface JobExecutionService extends Service, MeasurableService {
     /**
      * Service action to cancel running jobs
      */
-    SecuredAction ACTION_CANCEL = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job", SecuredActionPolicyJobOwner.class);
+    SecuredAction ACTION_CANCEL = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job", SecuredActionPolicyJobOwner.class.getCanonicalName());
 
     /**
      * The actions for this service

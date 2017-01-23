@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 /**
  * Represents a service that stores artifacts
@@ -30,7 +30,7 @@ import org.xowl.platform.kernel.security.SecuredAction;
  *
  * @author Laurent Wouters
  */
-public interface ArtifactStorageService extends Service {
+public interface ArtifactStorageService extends SecuredService {
     /**
      * Service action to store an artifact
      */

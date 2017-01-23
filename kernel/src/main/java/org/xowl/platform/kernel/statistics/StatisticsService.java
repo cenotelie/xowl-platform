@@ -19,8 +19,8 @@ package org.xowl.platform.kernel.statistics;
 
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
 
@@ -29,7 +29,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface StatisticsService extends Service {
+public interface StatisticsService extends SecuredService {
     /**
      * Service action to get the available metrics
      */

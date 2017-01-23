@@ -36,7 +36,7 @@ public class SecuredActionPolicyNone extends SecuredActionPolicyBase {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(SecuredActionPolicyRoleAdmin.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyNone.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

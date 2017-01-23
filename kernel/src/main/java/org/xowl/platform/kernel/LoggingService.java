@@ -22,6 +22,7 @@ import org.xowl.infra.utils.logging.Logger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 
 /**
@@ -29,7 +30,7 @@ import org.xowl.platform.kernel.statistics.MeasurableService;
  *
  * @author Laurent Wouters
  */
-public interface LoggingService extends Service, MeasurableService, Logger {
+public interface LoggingService extends SecuredService, MeasurableService, Logger {
     /**
      * The metric for the number of errors
      */

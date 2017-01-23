@@ -22,7 +22,7 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy for a service action
+ * Represents an authorization policy for a secured service action
  *
  * @author Laurent Wouters
  */

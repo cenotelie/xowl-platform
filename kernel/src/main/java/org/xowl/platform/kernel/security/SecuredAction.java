@@ -30,10 +30,10 @@ public class SecuredAction implements Identifiable, Serializable {
     /**
      * The default authorization policies
      */
-    public static final Class<? extends SecuredActionPolicy>[] DEFAULT_POLICIES = new Class[]{
-            SecuredActionPolicyNone.class,
-            SecuredActionPolicyRole.class,
-            SecuredActionPolicyRoleAdmin.class
+    public static final String[] DEFAULT_POLICIES = new String[]{
+            SecuredActionPolicyNone.class.getCanonicalName(),
+            SecuredActionPolicyRole.class.getCanonicalName(),
+            SecuredActionPolicyRoleAdmin.class.getCanonicalName()
     };
 
     /**
@@ -47,7 +47,7 @@ public class SecuredAction implements Identifiable, Serializable {
     /**
      * The possible authorization policies for this action
      */
-    protected final Class<? extends SecuredActionPolicy>[] policies;
+    protected final String[] policies;
 
     /**
      * Initializes this action
@@ -66,8 +66,7 @@ public class SecuredAction implements Identifiable, Serializable {
      * @param name       The name of this action
      * @param policies   The identifiers of the possible authorization policies for this action
      */
-    @SafeVarargs
-    public SecuredAction(String identifier, String name, Class<? extends SecuredActionPolicy>... policies) {
+    public SecuredAction(String identifier, String name, String... policies) {
         this.identifier = identifier;
         this.name = name;
         this.policies = policies;
@@ -78,7 +77,7 @@ public class SecuredAction implements Identifiable, Serializable {
      *
      * @return The identifiers of the possible authorization policies for this action
      */
-    public Class<? extends SecuredActionPolicy>[] getPolicies() {
+    public String[] getPolicies() {
         return policies;
     }
 
@@ -110,7 +109,7 @@ public class SecuredAction implements Identifiable, Serializable {
             if (i != 0)
                 builder.append(", ");
             builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(policies[i].getCanonicalName()));
+            builder.append(TextUtils.escapeStringJSON(policies[i]));
             builder.append("\"");
         }
         builder.append("]}");

@@ -15,11 +15,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.security;
+package org.xowl.platform.kernel.jobs;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredActionPolicyBase;
+import org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin;
+import org.xowl.platform.kernel.security.SecurityService;
 
 /**
  * Represents an authorization policy that requires the user to be the owner of the associated job

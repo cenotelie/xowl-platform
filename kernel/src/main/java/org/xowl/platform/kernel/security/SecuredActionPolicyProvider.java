@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,29 +15,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.webapi;
+package org.xowl.platform.kernel.security;
 
-import org.xowl.platform.kernel.security.SecuredService;
-
-import java.util.Collection;
+import org.xowl.platform.kernel.Registrable;
 
 /**
- * Represents a service for the discovery of other HTTP API services
+ * A providers for instances of secured action policies
  *
  * @author Laurent Wouters
  */
-public interface HttpApiDiscoveryService extends SecuredService {
+public interface SecuredActionPolicyProvider extends Registrable {
     /**
-     * Gets the known API services
+     * Tries to instantiate a policy
      *
-     * @return The known API services
+     * @param policyId   The identifier of the policy
+     * @param parameters The parameters for the policy
+     * @return The policy, or null if it cannot be instantiated
      */
-    Collection<HttpApiService> getServices();
-
-    /**
-     * Gets the known documentation resources
-     *
-     * @return The known documentation resources
-     */
-    Collection<HttpApiResource> getResources();
+    SecuredActionPolicy instantiate(String policyId, Object... parameters);
 }

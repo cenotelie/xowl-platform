@@ -23,6 +23,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyJobOwner;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 
 import java.util.List;
@@ -64,7 +65,7 @@ public interface JobExecutionService extends Service, MeasurableService {
     /**
      * Service action to get the current jobs
      */
-    ServiceAction ACTION_GET_JOBS = new ServiceAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs");
+    ServiceAction ACTION_GET_JOBS = new ServiceAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs", ServiceActionSecurityPolicyJobOwner.class);
     /**
      * Service action to schedule new jobs
      */
@@ -72,7 +73,7 @@ public interface JobExecutionService extends Service, MeasurableService {
     /**
      * Service action to cancel running jobs
      */
-    ServiceAction ACTION_CANCEL = new ServiceAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job");
+    ServiceAction ACTION_CANCEL = new ServiceAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job", ServiceActionSecurityPolicyJobOwner.class);
 
     /**
      * The actions for this service

@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
 import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -46,7 +47,12 @@ public class XOWLSecurityPolicyCustom implements SecurityPolicy {
     public XSPReply checkAction(SecurityService securityService, ServiceAction action) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
+            // no user => un-authenticated
             return XSPReplyUnauthenticated.instance();
+        if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            // user is platform admin => authorized
+            return XSPReplySuccess.instance();
+        // check the custom action policies
         return XSPReplySuccess.instance();
     }
 
@@ -54,7 +60,12 @@ public class XOWLSecurityPolicyCustom implements SecurityPolicy {
     public XSPReply checkAction(SecurityService securityService, ServiceAction action, Object data) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
+            // no user => un-authenticated
             return XSPReplyUnauthenticated.instance();
+        if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            // user is platform admin => authorized
+            return XSPReplySuccess.instance();
+        // check the custom action policies
         return XSPReplySuccess.instance();
     }
 }

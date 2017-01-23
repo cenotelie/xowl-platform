@@ -20,6 +20,7 @@ package org.xowl.platform.kernel;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.security.ServiceActionSecurityPolicy;
 import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyNone;
 import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyRole;
 import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyRoleAdmin;
@@ -33,10 +34,10 @@ public class ServiceAction implements Identifiable, Serializable {
     /**
      * The default authorization policies
      */
-    private static final String[] DEFAULT_POLICIES = new String[]{
-            ServiceActionSecurityPolicyNone.class.getCanonicalName(),
-            ServiceActionSecurityPolicyRole.class.getCanonicalName(),
-            ServiceActionSecurityPolicyRoleAdmin.class.getCanonicalName()
+    public static final Class<? extends ServiceActionSecurityPolicy>[] DEFAULT_POLICIES = new Class[]{
+            ServiceActionSecurityPolicyNone.class,
+            ServiceActionSecurityPolicyRole.class,
+            ServiceActionSecurityPolicyRoleAdmin.class
     };
 
     /**
@@ -50,7 +51,7 @@ public class ServiceAction implements Identifiable, Serializable {
     /**
      * The identifiers of the possible authorization policies for this action
      */
-    protected final String[] policies;
+    protected final Class<? extends ServiceActionSecurityPolicy>[] policies;
 
     /**
      * Initializes this action
@@ -59,9 +60,7 @@ public class ServiceAction implements Identifiable, Serializable {
      * @param name       The name of this action
      */
     public ServiceAction(String identifier, String name) {
-        this.identifier = identifier;
-        this.name = name;
-        this.policies = DEFAULT_POLICIES;
+        this(identifier, name, DEFAULT_POLICIES);
     }
 
     /**
@@ -71,7 +70,8 @@ public class ServiceAction implements Identifiable, Serializable {
      * @param name       The name of this action
      * @param policies   The identifiers of the possible authorization policies for this action
      */
-    public ServiceAction(String identifier, String name, String... policies) {
+    @SafeVarargs
+    public ServiceAction(String identifier, String name, Class<? extends ServiceActionSecurityPolicy>... policies) {
         this.identifier = identifier;
         this.name = name;
         this.policies = policies;
@@ -82,7 +82,7 @@ public class ServiceAction implements Identifiable, Serializable {
      *
      * @return The identifiers of the possible authorization policies for this action
      */
-    public String[] getPolicies() {
+    public Class<? extends ServiceActionSecurityPolicy>[] getPolicies() {
         return policies;
     }
 
@@ -114,7 +114,7 @@ public class ServiceAction implements Identifiable, Serializable {
             if (i != 0)
                 builder.append(", ");
             builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(policies[i]));
+            builder.append(TextUtils.escapeStringJSON(policies[i].getCanonicalName()));
             builder.append("\"");
         }
         builder.append("]}");

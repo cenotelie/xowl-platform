@@ -82,7 +82,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(SecurityPolicy.class, new XOWLSecurityPolicyCustom(), dictionary);
 
         // register the logging service
-        XOWLLoggingService loggingService = new XOWLLoggingService();
+        KernelLoggingService loggingService = new KernelLoggingService();
         Logging.setDefault(loggingService);
         bundleContext.registerService(Service.class, loggingService, null);
         bundleContext.registerService(LoggingService.class, loggingService, null);

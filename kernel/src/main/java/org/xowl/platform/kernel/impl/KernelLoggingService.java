@@ -31,8 +31,9 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.LoggingService;
-import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -50,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Laurent Wouters
  */
-public class XOWLLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
+public class KernelLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -159,7 +160,7 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
     /**
      * Initializes this service
      */
-    public XOWLLoggingService() {
+    public KernelLoggingService() {
         super(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
         this.messages = new Msg[BUFFER_SIZE];
         this.head = new AtomicInteger(-1);
@@ -169,12 +170,12 @@ public class XOWLLoggingService extends DispatchLogger implements LoggingService
 
     @Override
     public String getIdentifier() {
-        return XOWLLoggingService.class.getCanonicalName();
+        return KernelLoggingService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Logging Service";
+        return PlatformUtils.NAME + " - Logging Service";
     }
 
     @Override

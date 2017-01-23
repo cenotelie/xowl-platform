@@ -85,7 +85,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + "API Discovery Service";
+        return PlatformUtils.NAME + " - API Discovery Service";
     }
 
     @Override

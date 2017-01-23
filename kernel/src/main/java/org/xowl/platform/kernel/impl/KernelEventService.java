@@ -102,7 +102,7 @@ public class KernelEventService implements EventService {
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + "Event Dispatch Service";
+        return PlatformUtils.NAME + " - Event Dispatch Service";
     }
 
     @Override

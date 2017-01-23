@@ -39,8 +39,8 @@ import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class XOWLJobExecutor implements JobExecutionService, HttpApiService, EventConsumer, Closeable {
+public class KernelJobExecutor implements JobExecutionService, HttpApiService, EventConsumer, Closeable {
     /**
      * The bound of the executor queue
      */
@@ -146,7 +146,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
      *
      * @param configurationService The configuration service to use
      */
-    public XOWLJobExecutor(ConfigurationService configurationService, EventService eventService) {
+    public KernelJobExecutor(ConfigurationService configurationService, EventService eventService) {
         Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
@@ -314,12 +314,12 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
 
     @Override
     public String getIdentifier() {
-        return XOWLJobExecutor.class.getCanonicalName();
+        return KernelJobExecutor.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Jobs Management Service";
+        return PlatformUtils.NAME + " - Jobs Management Service";
     }
 
     @Override
@@ -375,7 +375,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_CANCEL);
+        XSPReply reply = securityService.checkAction(ACTION_CANCEL, job);
         if (!reply.isSuccess())
             return reply;
 
@@ -404,17 +404,28 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     @Override
     public List<Job> getQueue() {
         List<Job> result = new ArrayList<>();
-        for (Runnable runnable : executorPool.getQueue())
-            result.add((Job) runnable);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return result;
+
+        for (Runnable runnable : executorPool.getQueue()) {
+            Job job = (Job) runnable;
+            if (securityService.checkAction(ACTION_GET_JOBS, job).isSuccess())
+                result.add(job);
+        }
         return Collections.unmodifiableList(result);
     }
 
     @Override
     public List<Job> getRunning() {
         List<Job> result = new ArrayList<>();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return result;
+
         synchronized (running) {
             for (int i = 0; i != running.length; i++) {
-                if (running[i] != null)
+                if (running[i] != null && (securityService.checkAction(ACTION_GET_JOBS, running[i]).isSuccess()))
                     result.add(running[i]);
             }
         }
@@ -424,14 +435,18 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     @Override
     public List<Job> getCompleted() {
         List<Job> result = new ArrayList<>();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return result;
+
         synchronized (completed) {
             for (int i = completedStart; i != -1; i--) {
-                result.add(completed[i]);
+                if (completed[i] != null && (securityService.checkAction(ACTION_GET_JOBS, completed[i]).isSuccess()))
+                    result.add(completed[i]);
             }
             for (int i = COMPLETED_QUEUED_BOUND - 1; i != completedStart; i--) {
-                if (completed[i] == null)
-                    break;
-                result.add(completed[i]);
+                if (completed[i] != null && (securityService.checkAction(ACTION_GET_JOBS, completed[i]).isSuccess()))
+                    result.add(completed[i]);
             }
         }
         return Collections.unmodifiableList(result);
@@ -439,13 +454,29 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
 
     @Override
     public Job getJob(String identifier, JobStatus expectedStatus) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+
         Job job = getJobScheduled(identifier);
-        if (job != null)
-            return job;
+        if (job != null) {
+            if ((securityService.checkAction(ACTION_GET_JOBS, job).isSuccess()))
+                return job;
+            return null;
+        }
         job = getJobRunning(identifier);
-        if (job != null)
-            return job;
-        return getJobCompleted(identifier);
+        if (job != null) {
+            if ((securityService.checkAction(ACTION_GET_JOBS, job).isSuccess()))
+                return job;
+            return null;
+        }
+        job = getJobCompleted(identifier);
+        if (job != null) {
+            if ((securityService.checkAction(ACTION_GET_JOBS, job).isSuccess()))
+                return job;
+            return null;
+        }
+        return null;
     }
 
     /**
@@ -520,16 +551,11 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
-        // check for platform admin role
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API)) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            return onRequestJobs(securityService);
+            return onRequestJobs();
         }
 
         if (request.getUri().startsWith(URI_API)) {
@@ -544,21 +570,14 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
                 Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                if (securityService.getCurrentUser().equals(job.getOwner()))
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
-                XSPReply reply = securityService.checkAction(ACTION_GET_JOBS);
-                if (!reply.isSuccess())
-                    return XSPReplyUtils.toHttpResponse(reply, null);
-                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
             } else if (rest.substring(index).equals("/cancel")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                if (securityService.getCurrentUser().equals(job.getOwner()))
-                    return XSPReplyUtils.toHttpResponse(cancel(job), null);
-                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN);
+                return XSPReplyUtils.toHttpResponse(cancel(job), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -602,16 +621,9 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     /**
      * Responds to a request for the queue
      *
-     * @param securityService The current security service
      * @return The response
      */
-    private HttpResponse onRequestJobs(SecurityService securityService) {
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkAction(ACTION_GET_JOBS);
-        if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-
+    private HttpResponse onRequestJobs() {
         List<Job> scheduled = getQueue();
         List<Job> running = getRunning();
         List<Job> completed = getCompleted();

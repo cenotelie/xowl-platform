@@ -87,7 +87,7 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + "Business Directory Service";
+        return PlatformUtils.NAME + " - Business Directory Service";
     }
 
     @Override

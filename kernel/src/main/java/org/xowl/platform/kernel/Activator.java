@@ -50,7 +50,7 @@ public class Activator implements BundleActivator {
     /**
      * The job executor service
      */
-    private XOWLJobExecutor serviceJobExecutor;
+    private KernelJobExecutor serviceJobExecutor;
     /**
      * The event service
      */
@@ -113,7 +113,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(MeasurableService.class, eventService, null);
 
         // register the job executor service
-        serviceJobExecutor = new XOWLJobExecutor(configurationService, eventService);
+        serviceJobExecutor = new KernelJobExecutor(configurationService, eventService);
         bundleContext.registerService(Service.class, serviceJobExecutor, null);
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);

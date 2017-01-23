@@ -58,7 +58,7 @@ public class Activator implements BundleActivator {
     /**
      * The platform management service
      */
-    private XOWLPlatformManagementService platformService;
+    private KernelPlatformManagementService platformService;
     /**
      * The HTTP API discovery service
      */
@@ -101,7 +101,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(HttpApiService.class, securityService, null);
 
         // register the statistics service
-        XOWLStatisticsService statisticsService = new XOWLStatisticsService();
+        KernelStatisticsService statisticsService = new KernelStatisticsService();
         bundleContext.registerService(Service.class, statisticsService, null);
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
         bundleContext.registerService(HttpApiService.class, statisticsService, null);
@@ -131,7 +131,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(HttpApiService.class, directoryService, null);
 
         // register the platform management service
-        platformService = new XOWLPlatformManagementService(configurationService, serviceJobExecutor);
+        platformService = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
         bundleContext.registerService(Service.class, platformService, null);
         bundleContext.registerService(PlatformManagementService.class, platformService, null);
         bundleContext.registerService(HttpApiService.class, platformService, null);

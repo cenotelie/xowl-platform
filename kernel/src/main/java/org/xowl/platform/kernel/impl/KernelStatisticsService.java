@@ -45,7 +45,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public class XOWLStatisticsService implements StatisticsService, HttpApiService {
+public class KernelStatisticsService implements StatisticsService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -53,22 +53,22 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**
      * Initializes this provider
      */
-    public XOWLStatisticsService() {
+    public KernelStatisticsService() {
     }
 
     @Override
     public String getIdentifier() {
-        return XOWLStatisticsService.class.getCanonicalName();
+        return KernelStatisticsService.class.getCanonicalName();
     }
 
     @Override
@@ -202,20 +202,21 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
 
-        for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
-            for (Metric metric : provider.getMetrics()) {
-                if (metric.getIdentifier().equals(identifier)) {
-                    MetricSnapshot value = provider.pollMetric(metric);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, value.serializedJSON());
-                }
-            }
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        MetricSnapshot value = pollMetric(identifier);
+        if (value == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, value.serializedJSON());
     }
 
     @Override
     public Collection<Metric> getMetrics() {
         Collection<Metric> result = new ArrayList<>();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return result;
+        if (!securityService.checkAction(ACTION_GET_METRICS).isSuccess())
+            return result;
+
         for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             result.addAll(provider.getMetrics());
         }
@@ -224,6 +225,12 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
 
     @Override
     public MetricSnapshot pollMetric(Metric metric) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        if (!securityService.checkAction(ACTION_GET_METRICS).isSuccess())
+            return null;
+
         for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             MetricSnapshot result = provider.pollMetric(metric);
             if (result != null)
@@ -234,6 +241,12 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
 
     @Override
     public MetricSnapshot pollMetric(String metricId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        if (!securityService.checkAction(ACTION_GET_METRICS).isSuccess())
+            return null;
+
         for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
                 if (metric.getIdentifier().equals(metricId))

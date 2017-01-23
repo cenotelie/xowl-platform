@@ -51,11 +51,11 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_business.raml", "Business Directory Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelBusinessDirectoryService.class, "/org/xowl/platform/kernel/api_business.raml", "Business Directory Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_business.html", "Business Directory Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelBusinessDirectoryService.class, "/org/xowl/platform/kernel/api_business.html", "Business Directory Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**

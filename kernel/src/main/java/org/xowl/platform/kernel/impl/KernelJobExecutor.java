@@ -85,11 +85,11 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_jobs.raml", "Jobs Management Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/api_jobs.raml", "Jobs Management Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_jobs.html", "Jobs Management Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/api_jobs.html", "Jobs Management Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**

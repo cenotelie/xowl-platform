@@ -41,8 +41,8 @@ import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.*;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -61,7 +61,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  *
  * @author Laurent Wouters
  */
-public class XOWLPlatformManagementService implements PlatformManagementService, HttpApiService, FrameworkListener {
+public class KernelPlatformManagementService implements PlatformManagementService, HttpApiService, FrameworkListener {
     /**
      * The name of the descriptor file in a distribution
      */
@@ -74,11 +74,11 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * API error - The addon is already installed
@@ -122,7 +122,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
      * @param configurationService The current configuration service
      * @param executionService     The current execution service
      */
-    public XOWLPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
+    public KernelPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
         Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
         this.bundles = new ArrayList<>();
         this.product = loadProductDescriptor();
@@ -178,12 +178,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public String getIdentifier() {
-        return XOWLPlatformManagementService.class.getCanonicalName();
+        return KernelPlatformManagementService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Platform Management Service";
+        return PlatformUtils.NAME + " - Platform Management Service";
     }
 
     @Override
@@ -217,16 +217,13 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/product")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-            XSPReply reply = securityService.checkAction(ACTION_GET_PRODUCT);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
+            Product product = getPlatformProduct();
+            if (product == null)
+                return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
         } else if (request.getUri().equals(URI_API + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -239,12 +236,6 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         } else if (request.getUri().equals(URI_API + "/bundles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-            XSPReply reply = securityService.checkAction(ACTION_GET_BUNDLES);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Bundle bundle : getPlatformBundles()) {
@@ -258,12 +249,6 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
         } else if (request.getUri().equals(URI_API + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-            XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Addon addon : getAddons()) {
@@ -284,13 +269,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    SecurityService securityService = Register.getComponent(SecurityService.class);
-                    if (securityService == null)
-                        return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-                    XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
-                    if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
-                    for (Addon addon : addons) {
+                    for (Addon addon : getAddons()) {
                         if (Objects.equals(addonId, addon.getIdentifier()))
                             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, addon.serializedJSON());
                     }
@@ -349,13 +328,25 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public Product getPlatformProduct() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        XSPReply reply = securityService.checkAction(ACTION_GET_PRODUCT);
+        if (!reply.isSuccess())
+            return null;
         return product;
     }
 
     @Override
     public Collection<Bundle> getPlatformBundles() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return Collections.emptyList();
+        XSPReply reply = securityService.checkAction(ACTION_GET_BUNDLES);
+        if (!reply.isSuccess())
+            return Collections.emptyList();
         if (bundles.isEmpty()) {
-            Bundle[] bundles = FrameworkUtil.getBundle(XOWLPlatformManagementService.class).getBundleContext().getBundles();
+            Bundle[] bundles = FrameworkUtil.getBundle(KernelPlatformManagementService.class).getBundleContext().getBundles();
             for (int i = 0; i != bundles.length; i++) {
                 this.bundles.add(bundles[i]);
             }
@@ -365,6 +356,12 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
 
     @Override
     public Collection<Addon> getAddons() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return Collections.emptyList();
+        XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
+        if (!reply.isSuccess())
+            return Collections.emptyList();
         return Collections.unmodifiableCollection(addons);
     }
 
@@ -534,7 +531,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             public void run() {
                 System.exit(PLATFORM_EXIT_NORMAL);
             }
-        }, XOWLPlatformManagementService.class.getCanonicalName() + ".ThreadShutdown");
+        }, KernelPlatformManagementService.class.getCanonicalName() + ".ThreadShutdown");
         thread.start();
         return XSPReplySuccess.instance();
     }
@@ -553,7 +550,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
             public void run() {
                 System.exit(PLATFORM_EXIT_RESTART);
             }
-        }, XOWLPlatformManagementService.class.getCanonicalName() + ".ThreadRestart");
+        }, KernelPlatformManagementService.class.getCanonicalName() + ".ThreadRestart");
         thread.start();
         return XSPReplySuccess.instance();
     }

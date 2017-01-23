@@ -225,6 +225,7 @@
 					<versionBuildTimestamp>${timestamp}</versionBuildTimestamp>
 					<resources>
 						<param>src/main/resources/config</param>
+						<param>src/main/resources/securityPolicy.json</param>
 						<param>src/main/resources/admin.sh</param>
 						<param>src/main/resources/do-run.sh</param>
 						<param>src/main/resources/install-daemon.sh</param>

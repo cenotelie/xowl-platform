@@ -1,0 +1,230 @@
+[
+  {
+    "action": "org.xowl.platform.kernel.LoggingService.GetLog",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.statistics.StatisticsService.GetMetrics",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.statistics.StatisticsService.PollMetric",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetProduct",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetBundles",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetAddons",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.InstallAddon",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.UninstallAddon",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.Shutdown",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.Restart",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.jobs.JobExecutionService.GetJobs",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyJobOwner"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.jobs.JobExecutionService.Cancel",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyJobOwner"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.CreateUser",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.CreateGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.CreateRole",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RenameUser",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RenameGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RenameRole",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteUser",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteRole",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.ResetUserKey",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.AddUserToGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveUserFromGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.AddAdminToGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveAdminFromGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToUser",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToUser",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToGroup",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.AddRoleImplication",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveRoleImplication",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyRoleAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.StoreArtifact",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveMetadata",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveContent",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.DeleteArtifact",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PushLive",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PullLive",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyNone"
+    }
+  }
+]

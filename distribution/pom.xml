@@ -61,24 +61,6 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-core</artifactId>
-			<version>1.2.4</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.6</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.6</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.xowl.hime</groupId>
 			<artifactId>redist</artifactId>
 			<version>2.0.5</version>
@@ -177,12 +159,6 @@
 		<dependency>
 			<groupId>org.xowl.platform</groupId>
 			<artifactId>xowl-service-security-internal</artifactId>
-			<version>0.2.4-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-service-security-shiro</artifactId>
 			<version>0.2.4-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

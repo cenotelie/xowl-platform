@@ -40,6 +40,7 @@ import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -322,7 +323,7 @@ public class XOWLJobExecutor implements JobExecutionService, HttpApiService, Eve
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         return ACTIONS;
     }
 

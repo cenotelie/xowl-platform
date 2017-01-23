@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -42,7 +42,7 @@ public class XOWLSecurityPolicyAuthenticated implements SecurityPolicy {
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, ServiceAction action) {
+    public XSPReply checkAction(SecurityService securityService, SecuredAction action) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
             return XSPReplyUnauthenticated.instance();
@@ -50,7 +50,7 @@ public class XOWLSecurityPolicyAuthenticated implements SecurityPolicy {
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, ServiceAction action, Object data) {
+    public XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
             return XSPReplyUnauthenticated.instance();

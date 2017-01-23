@@ -18,63 +18,54 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Basic implementation of an authorization policy
+ * Represents an authorization policy that requires the user to have a specific role
  *
  * @author Laurent Wouters
  */
-public abstract class ServiceActionSecurityPolicyBase implements ServiceActionSecurityPolicy {
+public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
     /**
-     * The identifier for this policy
+     * The identifier of the required role
      */
-    protected final String identifier;
-    /**
-     * The name of this policy
-     */
-    protected final String name;
+    protected final String role;
 
     /**
      * Initializes this policy
      *
-     * @param identifier The identifier for this policy
-     * @param name       The name of this policy
+     * @param roleId The identifier of the required role
      */
-    protected ServiceActionSecurityPolicyBase(String identifier, String name) {
-        this.identifier = identifier;
-        this.name = name;
+    public SecuredActionPolicyRole(String roleId) {
+        super(SecuredActionPolicyRole.class.getCanonicalName(), "Role policy");
+        this.role = roleId;
     }
 
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String serializedString() {
-        return identifier;
+    /**
+     * Initializes this policy
+     *
+     * @param role The required role
+     */
+    public SecuredActionPolicyRole(PlatformRole role) {
+        this(role.getIdentifier());
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicy.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyRole.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
+                "\", \"role\": \"" +
+                TextUtils.escapeStringJSON(role) +
                 "\"}";
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action, Object data) {
-        return isAuthorized(securityService, user, action);
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
+        return securityService.getRealm().checkHasRole(user.getIdentifier(), role);
     }
 }

@@ -23,7 +23,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.*;
@@ -93,7 +93,7 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, Htt
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         return ACTIONS;
     }
 

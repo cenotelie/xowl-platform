@@ -42,6 +42,7 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -186,7 +187,7 @@ public class XOWLPlatformManagementService implements PlatformManagementService,
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         return ACTIONS;
     }
 

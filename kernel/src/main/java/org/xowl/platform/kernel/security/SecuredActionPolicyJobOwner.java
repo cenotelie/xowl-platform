@@ -18,27 +18,26 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to have the role of platform administrator
+ * Represents an authorization policy that requires the user to be the owner of the associated job
  *
  * @author Laurent Wouters
  */
-public class ServiceActionSecurityPolicyRoleAdmin extends ServiceActionSecurityPolicyBase {
+public class SecuredActionPolicyJobOwner extends SecuredActionPolicyBase {
     /**
      * Initializes this policy
      */
-    public ServiceActionSecurityPolicyRoleAdmin() {
-        super(ServiceActionSecurityPolicyRoleAdmin.class.getCanonicalName(), "Admin policy");
+    public SecuredActionPolicyJobOwner() {
+        super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Job owner policy");
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicyRoleAdmin.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyJobOwner.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
@@ -47,7 +46,12 @@ public class ServiceActionSecurityPolicyRoleAdmin extends ServiceActionSecurityP
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action) {
-        return securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier());
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
+        return false;
+    }
+
+    @Override
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
+        return data instanceof Job && ((Job) data).getOwner() == user;
     }
 }

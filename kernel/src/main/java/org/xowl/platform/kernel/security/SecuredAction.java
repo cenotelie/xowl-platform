@@ -15,29 +15,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.security.ServiceActionSecurityPolicy;
-import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyNone;
-import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyRole;
-import org.xowl.platform.kernel.security.ServiceActionSecurityPolicyRoleAdmin;
 
 /**
  * Represents a user action for a service
  *
  * @author Laurent Wouters
  */
-public class ServiceAction implements Identifiable, Serializable {
+public class SecuredAction implements Identifiable, Serializable {
     /**
      * The default authorization policies
      */
-    public static final Class<? extends ServiceActionSecurityPolicy>[] DEFAULT_POLICIES = new Class[]{
-            ServiceActionSecurityPolicyNone.class,
-            ServiceActionSecurityPolicyRole.class,
-            ServiceActionSecurityPolicyRoleAdmin.class
+    public static final Class<? extends SecuredActionPolicy>[] DEFAULT_POLICIES = new Class[]{
+            SecuredActionPolicyNone.class,
+            SecuredActionPolicyRole.class,
+            SecuredActionPolicyRoleAdmin.class
     };
 
     /**
@@ -49,9 +45,9 @@ public class ServiceAction implements Identifiable, Serializable {
      */
     protected final String name;
     /**
-     * The identifiers of the possible authorization policies for this action
+     * The possible authorization policies for this action
      */
-    protected final Class<? extends ServiceActionSecurityPolicy>[] policies;
+    protected final Class<? extends SecuredActionPolicy>[] policies;
 
     /**
      * Initializes this action
@@ -59,7 +55,7 @@ public class ServiceAction implements Identifiable, Serializable {
      * @param identifier The identifier for this action
      * @param name       The name of this action
      */
-    public ServiceAction(String identifier, String name) {
+    public SecuredAction(String identifier, String name) {
         this(identifier, name, DEFAULT_POLICIES);
     }
 
@@ -71,7 +67,7 @@ public class ServiceAction implements Identifiable, Serializable {
      * @param policies   The identifiers of the possible authorization policies for this action
      */
     @SafeVarargs
-    public ServiceAction(String identifier, String name, Class<? extends ServiceActionSecurityPolicy>... policies) {
+    public SecuredAction(String identifier, String name, Class<? extends SecuredActionPolicy>... policies) {
         this.identifier = identifier;
         this.name = name;
         this.policies = policies;
@@ -82,7 +78,7 @@ public class ServiceAction implements Identifiable, Serializable {
      *
      * @return The identifiers of the possible authorization policies for this action
      */
-    public Class<? extends ServiceActionSecurityPolicy>[] getPolicies() {
+    public Class<? extends SecuredActionPolicy>[] getPolicies() {
         return policies;
     }
 
@@ -104,7 +100,7 @@ public class ServiceAction implements Identifiable, Serializable {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(ServiceAction.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(SecuredAction.class.getCanonicalName()));
         builder.append("\", \"identifier\":\"");
         builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");

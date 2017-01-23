@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.statistics;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 
 import java.util.Collection;
 
@@ -33,16 +33,16 @@ public interface StatisticsService extends Service {
     /**
      * Service action to get the available metrics
      */
-    ServiceAction ACTION_GET_METRICS = new ServiceAction(StatisticsService.class.getCanonicalName() + ".GetMetrics", "Statistics Service - Get Metrics");
+    SecuredAction ACTION_GET_METRICS = new SecuredAction(StatisticsService.class.getCanonicalName() + ".GetMetrics", "Statistics Service - Get Metrics");
     /**
      * Service action to get the current log events
      */
-    ServiceAction ACTION_POLL = new ServiceAction(StatisticsService.class.getCanonicalName() + ".PollMetric", "Statistics Service - Poll Metric");
+    SecuredAction ACTION_POLL = new SecuredAction(StatisticsService.class.getCanonicalName() + ".PollMetric", "Statistics Service - Poll Metric");
 
     /**
      * The actions for this service
      */
-    ServiceAction[] ACTIONS = new ServiceAction[]{
+    SecuredAction[] ACTIONS = new SecuredAction[]{
             ACTION_GET_METRICS,
             ACTION_POLL
     };

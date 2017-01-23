@@ -27,7 +27,7 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -165,7 +165,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         return ACTIONS;
     }
 
@@ -309,12 +309,12 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public XSPReply checkAction(ServiceAction action) {
+    public XSPReply checkAction(SecuredAction action) {
         return getPolicy().checkAction(this, action);
     }
 
     @Override
-    public XSPReply checkAction(ServiceAction action, Object data) {
+    public XSPReply checkAction(SecuredAction action, Object data) {
         return getPolicy().checkAction(this, action, data);
     }
 

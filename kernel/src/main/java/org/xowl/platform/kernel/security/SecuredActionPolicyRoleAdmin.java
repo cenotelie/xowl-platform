@@ -18,55 +18,35 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
-import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to have a specific role
+ * Represents an authorization policy that requires the user to have the role of platform administrator
  *
  * @author Laurent Wouters
  */
-public class ServiceActionSecurityPolicyRole extends ServiceActionSecurityPolicyBase {
-    /**
-     * The identifier of the required role
-     */
-    protected final String role;
-
+public class SecuredActionPolicyRoleAdmin extends SecuredActionPolicyBase {
     /**
      * Initializes this policy
-     *
-     * @param roleId The identifier of the required role
      */
-    public ServiceActionSecurityPolicyRole(String roleId) {
-        super(ServiceActionSecurityPolicyRole.class.getCanonicalName(), "Role policy");
-        this.role = roleId;
-    }
-
-    /**
-     * Initializes this policy
-     *
-     * @param role The required role
-     */
-    public ServiceActionSecurityPolicyRole(PlatformRole role) {
-        this(role.getIdentifier());
+    public SecuredActionPolicyRoleAdmin() {
+        super(SecuredActionPolicyRoleAdmin.class.getCanonicalName(), "Admin policy");
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicyRole.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyRoleAdmin.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
-                "\", \"role\": \"" +
-                TextUtils.escapeStringJSON(role) +
                 "\"}";
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action) {
-        return securityService.getRealm().checkHasRole(user.getIdentifier(), role);
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
+        return securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier());
     }
 }

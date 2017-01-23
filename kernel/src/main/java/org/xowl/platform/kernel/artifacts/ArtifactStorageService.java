@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecuredAction;
 
 /**
  * Represents a service that stores artifacts
@@ -30,6 +31,43 @@ import org.xowl.platform.kernel.Service;
  * @author Laurent Wouters
  */
 public interface ArtifactStorageService extends Service {
+    /**
+     * Service action to store an artifact
+     */
+    SecuredAction ACTION_STORE = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".StoreArtifact", "Artifact Storage Service - Store Artifact");
+    /**
+     * Service action to retrieve the metadata of an artifact
+     */
+    SecuredAction ACTION_RETRIEVE_METADATA = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".RetrieveMetadata", "Artifact Storage Service - Retrieve Artifact Metadata");
+    /**
+     * Service action to retrieve the content of an artifact
+     */
+    SecuredAction ACTION_RETRIEVE_CONTENT = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".RetrieveContent", "Artifact Storage Service - Retrieve Artifact Content");
+    /**
+     * Service action to delete an artifact
+     */
+    SecuredAction ACTION_DELETE = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".DeleteArtifact", "Artifact Storage Service - Delete Artifact");
+    /**
+     * Service action to push an artifact for live reasoning
+     */
+    SecuredAction ACTION_PUSH_LIVE = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".PushLive", "Artifact Storage Service - Push Artifact Live");
+    /**
+     * Service action to pull an artifact from live reasoning
+     */
+    SecuredAction ACTION_PULL_LIVE = new SecuredAction(ArtifactStorageService.class.getCanonicalName() + ".PullLive", "Artifact Storage Service - Pull Artifact from Live");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_STORE,
+            ACTION_RETRIEVE_METADATA,
+            ACTION_RETRIEVE_CONTENT,
+            ACTION_DELETE,
+            ACTION_PUSH_LIVE,
+            ACTION_PULL_LIVE
+    };
+
     /**
      * Stores an artifact in a long-term storage facility
      *

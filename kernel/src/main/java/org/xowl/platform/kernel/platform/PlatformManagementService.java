@@ -24,7 +24,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 
 import java.io.InputStream;
@@ -85,43 +85,43 @@ public interface PlatformManagementService extends Service, MeasurableService {
     /**
      * Service action to get the product descriptor for the platform
      */
-    ServiceAction ACTION_GET_PRODUCT = new ServiceAction(
+    SecuredAction ACTION_GET_PRODUCT = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".GetProduct",
             "Logging Service - Get Product");
     /**
      * Service action to get the description of the bundles on this platform
      */
-    ServiceAction ACTION_GET_BUNDLES = new ServiceAction(
+    SecuredAction ACTION_GET_BUNDLES = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".GetBundles",
             "Platform Management Service - Get Bundles");
     /**
      * Service action to get the addons installed on this platform
      */
-    ServiceAction ACTION_GET_ADDONS = new ServiceAction(
+    SecuredAction ACTION_GET_ADDONS = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".GetAddons",
             "Platform Management Service - Get Addons");
     /**
      * Service action to install an addon on the platform
      */
-    ServiceAction ACTION_INSTALL_ADDON = new ServiceAction(
+    SecuredAction ACTION_INSTALL_ADDON = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".InstallAddon",
             "Platform Management Service - InstallAddon");
     /**
      * Service action to uninstall an addon from the platform
      */
-    ServiceAction ACTION_UNINSTALL_ADDON = new ServiceAction(
+    SecuredAction ACTION_UNINSTALL_ADDON = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".UninstallAddon",
             "Platform Management Service - Uninstall Addon");
     /**
      * Service action to shutdown the platform
      */
-    ServiceAction ACTION_SHUTDOWN = new ServiceAction(
+    SecuredAction ACTION_SHUTDOWN = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".Shutdown",
             "Platform Management Service - Shutdown");
     /**
      * Service action to restart the platform
      */
-    ServiceAction ACTION_RESTART = new ServiceAction(
+    SecuredAction ACTION_RESTART = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".Restart",
             "Platform Management Service - Restart");
 
@@ -129,7 +129,7 @@ public interface PlatformManagementService extends Service, MeasurableService {
     /**
      * The actions for this service
      */
-    ServiceAction[] ACTIONS = new ServiceAction[]{
+    SecuredAction[] ACTIONS = new SecuredAction[]{
             ACTION_GET_PRODUCT,
             ACTION_GET_BUNDLES,
             ACTION_GET_ADDONS,

@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Registrable;
-import org.xowl.platform.kernel.ServiceAction;
 
 /**
  * Represents an authorization policy for the platform
@@ -39,7 +38,7 @@ public interface SecurityPolicy extends Registrable {
      * @param action          The requested action
      * @return The protocol reply
      */
-    XSPReply checkAction(SecurityService securityService, ServiceAction action);
+    XSPReply checkAction(SecurityService securityService, SecuredAction action);
 
     /**
      * Checks the authorization policy for the specified action
@@ -49,5 +48,5 @@ public interface SecurityPolicy extends Registrable {
      * @param data            Custom data that may be required to make a decision
      * @return The protocol reply
      */
-    XSPReply checkAction(SecurityService securityService, ServiceAction action, Object data);
+    XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data);
 }

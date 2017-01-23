@@ -27,7 +27,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -77,7 +77,7 @@ public class XOWLStatisticsService implements StatisticsService, HttpApiService 
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         return ACTIONS;
     }
 

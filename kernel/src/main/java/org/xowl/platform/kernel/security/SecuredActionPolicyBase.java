@@ -18,27 +18,53 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
-import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to be the administrator of the relevant group
+ * Basic implementation of an authorization policy
  *
  * @author Laurent Wouters
  */
-public class ServiceActionSecurityPolicyGroupAdmin extends ServiceActionSecurityPolicyBase {
+public abstract class SecuredActionPolicyBase implements SecuredActionPolicy {
+    /**
+     * The identifier for this policy
+     */
+    protected final String identifier;
+    /**
+     * The name of this policy
+     */
+    protected final String name;
+
     /**
      * Initializes this policy
+     *
+     * @param identifier The identifier for this policy
+     * @param name       The name of this policy
      */
-    public ServiceActionSecurityPolicyGroupAdmin() {
-        super(ServiceActionSecurityPolicyGroupAdmin.class.getCanonicalName(), "Group admin policy");
+    protected SecuredActionPolicyBase(String identifier, String name) {
+        this.identifier = identifier;
+        this.name = name;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String serializedString() {
+        return identifier;
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicyGroupAdmin.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicy.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
@@ -47,12 +73,7 @@ public class ServiceActionSecurityPolicyGroupAdmin extends ServiceActionSecurity
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action) {
-        return false;
-    }
-
-    @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action, Object data) {
-        return data instanceof PlatformGroup && ((PlatformGroup) data).getAdmins().contains(user);
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
+        return isAuthorized(securityService, user, action);
     }
 }

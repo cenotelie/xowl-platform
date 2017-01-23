@@ -18,26 +18,26 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires nothing
+ * Represents an authorization policy that requires the user to be the administrator of the relevant group
  *
  * @author Laurent Wouters
  */
-public class ServiceActionSecurityPolicyNone extends ServiceActionSecurityPolicyBase {
+public class SecuredActionPolicyGroupAdmin extends SecuredActionPolicyBase {
     /**
      * Initializes this policy
      */
-    public ServiceActionSecurityPolicyNone() {
-        super(ServiceActionSecurityPolicyNone.class.getCanonicalName(), "Admin policy");
+    public SecuredActionPolicyGroupAdmin() {
+        super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Group admin policy");
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicyRoleAdmin.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyGroupAdmin.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
@@ -46,7 +46,12 @@ public class ServiceActionSecurityPolicyNone extends ServiceActionSecurityPolicy
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action) {
-        return true;
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
+        return false;
+    }
+
+    @Override
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
+        return data instanceof PlatformGroup && ((PlatformGroup) data).getAdmins().contains(user);
     }
 }

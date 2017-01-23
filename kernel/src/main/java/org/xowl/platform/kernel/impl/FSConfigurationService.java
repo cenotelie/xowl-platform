@@ -23,7 +23,8 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.ServiceAction;
+import org.xowl.platform.kernel.security.SecuredService;
+import org.xowl.platform.kernel.security.SecuredAction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,9 +69,9 @@ public class FSConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public ServiceAction[] getActions() {
+    public SecuredAction[] getActions() {
         // no action for the configuration service
-        return ACTIONS_NONE;
+        return SecuredService.ACTIONS_NONE;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,12 +15,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.security;
+
+import org.xowl.platform.kernel.Service;
 
 /**
- * Represents a service on the platform
- *
- * @author Laurent Wouters
+ * Represents a service that exposed actions that must be secured
  */
-public interface Service extends Registrable {
+public interface SecuredService extends Service {
+    /**
+     * When a service has no action
+     */
+    SecuredAction[] ACTIONS_NONE = new SecuredAction[0];
+
+    /**
+     * Gets the actions that can be performed through this service
+     *
+     * @return The actions that can be performed through this service
+     */
+    SecuredAction[] getActions();
 }

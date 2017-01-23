@@ -18,27 +18,25 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.ServiceAction;
-import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to be the owner of the associated job
+ * Represents an authorization policy that requires nothing
  *
  * @author Laurent Wouters
  */
-public class ServiceActionSecurityPolicyJobOwner extends ServiceActionSecurityPolicyBase {
+public class SecuredActionPolicyNone extends SecuredActionPolicyBase {
     /**
      * Initializes this policy
      */
-    public ServiceActionSecurityPolicyJobOwner() {
-        super(ServiceActionSecurityPolicyGroupAdmin.class.getCanonicalName(), "Job owner policy");
+    public SecuredActionPolicyNone() {
+        super(SecuredActionPolicyNone.class.getCanonicalName(), "Admin policy");
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ServiceActionSecurityPolicyJobOwner.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicyRoleAdmin.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
@@ -47,12 +45,7 @@ public class ServiceActionSecurityPolicyJobOwner extends ServiceActionSecurityPo
     }
 
     @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action) {
-        return false;
-    }
-
-    @Override
-    public boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action, Object data) {
-        return data instanceof Job && ((Job) data).getOwner() == user;
+    public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
+        return true;
     }
 }

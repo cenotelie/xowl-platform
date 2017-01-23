@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -27,7 +26,7 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  *
  * @author Laurent Wouters
  */
-public interface ServiceActionSecurityPolicy extends Identifiable, Serializable {
+public interface SecuredActionPolicy extends Identifiable, Serializable {
     /**
      * Determines whether the specified user is authorized to perform an action
      *
@@ -36,7 +35,7 @@ public interface ServiceActionSecurityPolicy extends Identifiable, Serializable 
      * @param action          The action
      * @return Whether the user is authorized
      */
-    boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action);
+    boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action);
 
     /**
      * Determines whether the specified user is authorized to perform an action
@@ -47,5 +46,5 @@ public interface ServiceActionSecurityPolicy extends Identifiable, Serializable 
      * @param data            Custom data that may be required to make a decision
      * @return Whether the user is authorized
      */
-    boolean isAuthorized(SecurityService securityService, PlatformUser user, ServiceAction action, Object data);
+    boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data);
 }

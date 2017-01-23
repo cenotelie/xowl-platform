@@ -21,6 +21,7 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 
 /**
@@ -51,12 +52,12 @@ public interface LoggingService extends Service, MeasurableService, Logger {
     /**
      * Service action to get the current log events
      */
-    ServiceAction ACTION_GET_LOG = new ServiceAction(LoggingService.class.getCanonicalName() + ".GetLog", "Logging Service - Get Log");
+    SecuredAction ACTION_GET_LOG = new SecuredAction(LoggingService.class.getCanonicalName() + ".GetLog", "Logging Service - Get Log");
 
     /**
      * The actions for this service
      */
-    ServiceAction[] ACTIONS = new ServiceAction[]{
+    SecuredAction[] ACTIONS = new SecuredAction[]{
             ACTION_GET_LOG
     };
 }

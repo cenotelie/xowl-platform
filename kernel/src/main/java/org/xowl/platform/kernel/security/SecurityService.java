@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.ServiceAction;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -40,88 +39,88 @@ public interface SecurityService extends Service {
     /**
      * Service action to create a user
      */
-    ServiceAction ACTION_CREATE_USER = new ServiceAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_CREATE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to create a group
      */
-    ServiceAction ACTION_CREATE_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".CreateGroup", "Security Service - Create Group", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_CREATE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateGroup", "Security Service - Create Group", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to create a role
      */
-    ServiceAction ACTION_CREATE_ROLE = new ServiceAction(SecurityService.class.getCanonicalName() + ".CreateRole", "Security Service - Create Role", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_CREATE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateRole", "Security Service - Create Role", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to rename a user
      */
-    ServiceAction ACTION_RENAME_USER = new ServiceAction(SecurityService.class.getCanonicalName() + ".RenameUser", "Security Service - Rename User", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_RENAME_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameUser", "Security Service - Rename User", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to rename a group
      */
-    ServiceAction ACTION_RENAME_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".RenameGroup", "Security Service - Rename Group", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_RENAME_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameGroup", "Security Service - Rename Group", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to rename a role
      */
-    ServiceAction ACTION_RENAME_ROLE = new ServiceAction(SecurityService.class.getCanonicalName() + ".RenameRole", "Security Service - Rename Role", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_RENAME_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameRole", "Security Service - Rename Role", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to delete a user
      */
-    ServiceAction ACTION_DELETE_USER = new ServiceAction(SecurityService.class.getCanonicalName() + ".DeleteUser", "Security Service - Delete User", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_DELETE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteUser", "Security Service - Delete User", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to delete a group
      */
-    ServiceAction ACTION_DELETE_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".DeleteGroup", "Security Service - Delete Group", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_DELETE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteGroup", "Security Service - Delete Group", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to delete a role
      */
-    ServiceAction ACTION_DELETE_ROLE = new ServiceAction(SecurityService.class.getCanonicalName() + ".DeleteRole", "Security Service - Delete Role", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_DELETE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteRole", "Security Service - Delete Role", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to reset the key for a user
      */
-    ServiceAction ACTION_RESET_USER_KEY = new ServiceAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset Use Key", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset Use Key", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to add a user to a group
      */
-    ServiceAction ACTION_ADD_USER_TO_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".AddUserToGroup", "Security Service - Add User to Group", ServiceActionSecurityPolicyGroupAdmin.class);
+    SecuredAction ACTION_ADD_USER_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddUserToGroup", "Security Service - Add User to Group", SecuredActionPolicyGroupAdmin.class);
     /**
      * Service action to remove a user from a group
      */
-    ServiceAction ACTION_REMOVE_USER_FROM_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".RemoveUserFromGroup", "Security Service - Remove User from Group", ServiceActionSecurityPolicyGroupAdmin.class);
+    SecuredAction ACTION_REMOVE_USER_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveUserFromGroup", "Security Service - Remove User from Group", SecuredActionPolicyGroupAdmin.class);
     /**
      * Service action to add an admin to a group
      */
-    ServiceAction ACTION_ADD_ADMIN_TO_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".AddAdminToGroup", "Security Service - Add Admin to Group", ServiceActionSecurityPolicyGroupAdmin.class);
+    SecuredAction ACTION_ADD_ADMIN_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddAdminToGroup", "Security Service - Add Admin to Group", SecuredActionPolicyGroupAdmin.class);
     /**
      * Service action to remove an admin from a group
      */
-    ServiceAction ACTION_REMOVE_ADMIN_FROM_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".RemoveAdminFromGroup", "Security Service - Remove Admin from Group", ServiceActionSecurityPolicyGroupAdmin.class);
+    SecuredAction ACTION_REMOVE_ADMIN_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveAdminFromGroup", "Security Service - Remove Admin from Group", SecuredActionPolicyGroupAdmin.class);
     /**
      * Service action to assign a role to a user
      */
-    ServiceAction ACTION_ASSIGN_ROLE_TO_USER = new ServiceAction(SecurityService.class.getCanonicalName() + ".AssignRoleToUser", "Security Service - Assign Role to User", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_ASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToUser", "Security Service - Assign Role to User", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to un-assign a role to a user
      */
-    ServiceAction ACTION_UNASSIGN_ROLE_TO_USER = new ServiceAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToUser", "Security Service - Un-assign Role to User", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_UNASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToUser", "Security Service - Un-assign Role to User", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to assign a role to a group
      */
-    ServiceAction ACTION_ASSIGN_ROLE_TO_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".AssignRoleToGroup", "Security Service - Assign Role to Group", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_ASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToGroup", "Security Service - Assign Role to Group", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to un-assign a role to a group
      */
-    ServiceAction ACTION_UNASSIGN_ROLE_TO_GROUP = new ServiceAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToGroup", "Security Service - Un-assign Role to Group", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_UNASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToGroup", "Security Service - Un-assign Role to Group", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to add a role implication
      */
-    ServiceAction ACTION_ADD_ROLE_IMPLICATION = new ServiceAction(SecurityService.class.getCanonicalName() + ".AddRoleImplication", "Security Service - Add Role Implication", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_ADD_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddRoleImplication", "Security Service - Add Role Implication", SecuredActionPolicyRoleAdmin.class);
     /**
      * Service action to remove a role implication
      */
-    ServiceAction ACTION_REMOVE_ROLE_IMPLICATION = new ServiceAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", ServiceActionSecurityPolicyRoleAdmin.class);
+    SecuredAction ACTION_REMOVE_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", SecuredActionPolicyRoleAdmin.class);
 
     /**
      * The actions for the security service
      */
-    ServiceAction[] ACTIONS = new ServiceAction[]{
+    SecuredAction[] ACTIONS = new SecuredAction[]{
             ACTION_CREATE_USER,
             ACTION_CREATE_GROUP,
             ACTION_CREATE_ROLE,
@@ -212,7 +211,7 @@ public interface SecurityService extends Service {
      * @param action The requested action
      * @return The protocol reply
      */
-    XSPReply checkAction(ServiceAction action);
+    XSPReply checkAction(SecuredAction action);
 
     /**
      * Checks the authorization policy for the specified action
@@ -221,5 +220,5 @@ public interface SecurityService extends Service {
      * @param data   Custom data that may be required to make a decision
      * @return The protocol reply
      */
-    XSPReply checkAction(ServiceAction action, Object data);
+    XSPReply checkAction(SecuredAction action, Object data);
 }

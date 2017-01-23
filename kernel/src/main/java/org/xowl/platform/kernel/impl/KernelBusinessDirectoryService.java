@@ -21,6 +21,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
@@ -42,7 +43,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
+public class KernelBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -73,7 +74,7 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService, H
     /**
      * Initializes this service
      */
-    public XOWLBusinessDirectoryService() {
+    public KernelBusinessDirectoryService() {
         this.domains = new HashMap<>();
         this.schemas = new HashMap<>();
         this.archetypes = new HashMap<>();
@@ -81,12 +82,12 @@ public class XOWLBusinessDirectoryService implements BusinessDirectoryService, H
 
     @Override
     public String getIdentifier() {
-        return XOWLBusinessDirectoryService.class.getCanonicalName();
+        return KernelBusinessDirectoryService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Business Directory Service";
+        return PlatformUtils.NAME + "Business Directory Service";
     }
 
     @Override

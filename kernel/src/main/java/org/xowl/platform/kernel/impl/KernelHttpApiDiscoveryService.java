@@ -17,14 +17,10 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.*;
 
@@ -38,7 +34,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
+public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -76,7 +72,7 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, Htt
     /**
      * Initializes this service
      */
-    public XOWLHttpApiDiscoveryService() {
+    public KernelHttpApiDiscoveryService() {
         this.services = new HashMap<>();
         this.allResources = new HashMap<>();
         this.otherResources = new HashMap<>();
@@ -84,17 +80,12 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, Htt
 
     @Override
     public String getIdentifier() {
-        return XOWLHttpApiDiscoveryService.class.getCanonicalName();
+        return KernelHttpApiDiscoveryService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - API Discovery Service";
-    }
-
-    @Override
-    public SecuredAction[] getActions() {
-        return ACTIONS;
+        return PlatformUtils.NAME + "API Discovery Service";
     }
 
     @Override
@@ -115,17 +106,10 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, Htt
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
         if (request.getUri().equals(URI_API + "/services")) {
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-            XSPReply reply = securityService.checkAction(ACTION_GET_SERVICES);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
-
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (HttpApiService service : services.values()) {
@@ -137,13 +121,6 @@ public class XOWLHttpApiDiscoveryService implements HttpApiDiscoveryService, Htt
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         } else if (request.getUri().equals(URI_API + "/resources")) {
-            SecurityService securityService = Register.getComponent(SecurityService.class);
-            if (securityService == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-            XSPReply reply = securityService.checkAction(ACTION_GET_RESOURCES);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
-
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (HttpApiResource resource : otherResources.values()) {

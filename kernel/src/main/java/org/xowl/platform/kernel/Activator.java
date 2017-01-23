@@ -54,7 +54,7 @@ public class Activator implements BundleActivator {
     /**
      * The event service
      */
-    private XOWLEventService eventService;
+    private KernelEventService eventService;
     /**
      * The platform management service
      */
@@ -62,7 +62,7 @@ public class Activator implements BundleActivator {
     /**
      * The HTTP API discovery service
      */
-    private XOWLHttpApiDiscoveryService discoveryService;
+    private KernelHttpApiDiscoveryService discoveryService;
     /**
      * The tracker of the HTTP API services
      */
@@ -107,7 +107,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(HttpApiService.class, statisticsService, null);
 
         // register the event service
-        eventService = new XOWLEventService();
+        eventService = new KernelEventService();
         bundleContext.registerService(Service.class, eventService, null);
         bundleContext.registerService(EventService.class, eventService, null);
         bundleContext.registerService(MeasurableService.class, eventService, null);
@@ -121,7 +121,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(JobFactory.class, new PlatformJobFactory(), null);
 
         // register the directory service
-        XOWLBusinessDirectoryService directoryService = new XOWLBusinessDirectoryService();
+        KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
         bundleContext.registerService(BusinessSchema.class, KernelSchema.IMPL, null);
         bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, SchemaArtifactArchetype.INSTANCE, null);
@@ -139,7 +139,7 @@ public class Activator implements BundleActivator {
         bundleContext.addFrameworkListener(platformService);
 
         // register the HTTP API discovery service
-        discoveryService = new XOWLHttpApiDiscoveryService();
+        discoveryService = new KernelHttpApiDiscoveryService();
         bundleContext.registerService(Service.class, discoveryService, null);
         bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
         bundleContext.registerService(HttpApiService.class, discoveryService, null);

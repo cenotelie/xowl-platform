@@ -27,9 +27,14 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyNone extends SecuredActionPolicyBase {
     /**
+     * The singleton instance for this policy
+     */
+    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyNone();
+
+    /**
      * Initializes this policy
      */
-    public SecuredActionPolicyNone() {
+    private SecuredActionPolicyNone() {
         super(SecuredActionPolicyNone.class.getCanonicalName(), "Admin policy");
     }
 

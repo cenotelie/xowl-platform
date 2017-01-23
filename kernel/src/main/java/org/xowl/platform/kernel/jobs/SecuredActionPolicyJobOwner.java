@@ -19,10 +19,7 @@ package org.xowl.platform.kernel.jobs;
 
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.kernel.security.SecuredActionPolicyBase;
-import org.xowl.platform.kernel.security.SecuredActionPolicyGroupAdmin;
-import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.*;
 
 /**
  * Represents an authorization policy that requires the user to be the owner of the associated job
@@ -31,9 +28,14 @@ import org.xowl.platform.kernel.security.SecurityService;
  */
 public class SecuredActionPolicyJobOwner extends SecuredActionPolicyBase {
     /**
+     * The singleton instance for this policy
+     */
+    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyJobOwner();
+
+    /**
      * Initializes this policy
      */
-    public SecuredActionPolicyJobOwner() {
+    private SecuredActionPolicyJobOwner() {
         super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Job owner policy");
     }
 

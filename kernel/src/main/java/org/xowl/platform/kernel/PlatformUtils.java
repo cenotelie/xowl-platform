@@ -32,6 +32,11 @@ import java.util.Map;
  */
 public class PlatformUtils {
     /**
+     * The name for the platform product
+     */
+    public static final String NAME = "xOWL Collaboration Platform";
+
+    /**
      * Maps a collection of quads by their subject
      *
      * @param quads A collection of quads

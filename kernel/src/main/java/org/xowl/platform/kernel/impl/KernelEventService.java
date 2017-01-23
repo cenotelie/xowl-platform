@@ -23,6 +23,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class XOWLEventService implements EventService {
+public class KernelEventService implements EventService {
     /**
      * The maximum number of queued events
      */
@@ -68,13 +69,13 @@ public class XOWLEventService implements EventService {
     /**
      * Initializes this service
      */
-    public XOWLEventService() {
+    public KernelEventService() {
         this.dispatchThread = new Thread(new SafeRunnable(Logging.getDefault()) {
             @Override
             public void doRun() {
-                XOWLEventService.this.dispatchRun();
+                KernelEventService.this.dispatchRun();
             }
-        }, XOWLEventService.class.getCanonicalName() + ".EventDispatcher");
+        }, KernelEventService.class.getCanonicalName() + ".EventDispatcher");
         this.mustStop = new AtomicBoolean(false);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
         this.routes = new HashMap<>();
@@ -96,12 +97,12 @@ public class XOWLEventService implements EventService {
 
     @Override
     public String getIdentifier() {
-        return XOWLEventService.class.getCanonicalName();
+        return KernelEventService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - EVent Dispatch Service";
+        return PlatformUtils.NAME + "Event Dispatch Service";
     }
 
     @Override

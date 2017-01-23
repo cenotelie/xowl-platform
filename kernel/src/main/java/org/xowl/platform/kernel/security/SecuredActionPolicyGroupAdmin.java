@@ -28,9 +28,14 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyGroupAdmin extends SecuredActionPolicyBase {
     /**
+     * The singleton instance for this policy
+     */
+    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyGroupAdmin();
+
+    /**
      * Initializes this policy
      */
-    public SecuredActionPolicyGroupAdmin() {
+    private SecuredActionPolicyGroupAdmin() {
         super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Group admin policy");
     }
 

@@ -17,7 +17,9 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -75,5 +77,31 @@ public abstract class SecuredActionPolicyBase implements SecuredActionPolicy {
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
         return isAuthorized(securityService, user, action);
+    }
+
+    /**
+     * Loads a policy definition
+     *
+     * @param definition The serialized definition
+     */
+    public static SecuredActionPolicy load(ASTNode definition) {
+        String identifier = null;
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+                break;
+            }
+        }
+        if (identifier == null)
+            return null;
+        for (SecuredActionPolicyProvider provider : Register.getComponents(SecuredActionPolicyProvider.class)) {
+            SecuredActionPolicy result = provider.newPolicy(identifier, definition);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 }

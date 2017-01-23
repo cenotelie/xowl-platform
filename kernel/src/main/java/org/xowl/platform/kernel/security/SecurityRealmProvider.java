@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -28,8 +29,9 @@ public interface SecurityRealmProvider extends Registrable {
     /**
      * Tries to instantiates a security realm
      *
-     * @param identifier The identifier of a security realm
+     * @param identifier    The identifier of a security realm
+     * @param configuration The configuration for the realm
      * @return The security realm, or null if it cannot be instantiated
      */
-    SecurityRealm newRealm(String identifier);
+    SecurityRealm newRealm(String identifier, Section configuration);
 }

@@ -17,6 +17,8 @@
 
 package org.xowl.platform.kernel.impl;
 
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.jobs.SecuredActionPolicyJobOwner;
 import org.xowl.platform.kernel.security.*;
@@ -38,13 +40,13 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
     }
 
     @Override
-    public SecuredActionPolicy instantiate(String policyId, Object... parameters) {
+    public SecuredActionPolicy newPolicy(String policyId, ASTNode definition) {
         if (SecuredActionPolicyNone.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyNone.INSTANCE;
         else if (SecuredActionPolicyRoleAdmin.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyRoleAdmin.INSTANCE;
         else if (SecuredActionPolicyRole.class.getCanonicalName().equals(policyId))
-            return new SecuredActionPolicyRole((String) parameters[0]);
+            return new SecuredActionPolicyRole(definition);
         else if (SecuredActionPolicyGroupAdmin.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyGroupAdmin.INSTANCE;
         else if (SecuredActionPolicyJobOwner.class.getCanonicalName().equals(policyId))
@@ -53,18 +55,18 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
     }
 
     @Override
-    public SecurityRealm newRealm(String identifier) {
+    public SecurityRealm newRealm(String identifier, Section configuration) {
         if (KernelSecurityNosecRealm.class.getCanonicalName().equals(identifier))
             return new KernelSecurityNosecRealm();
         return null;
     }
 
     @Override
-    public SecurityPolicy newPolicy(String identifier) {
+    public SecurityPolicy newPolicy(String identifier, Section configuration) {
         if (KernelSecurityPolicyAuthenticated.class.getCanonicalName().equals(identifier))
             return new KernelSecurityPolicyAuthenticated();
         if (KernelSecurityPolicyCustom.class.getCanonicalName().equals(identifier))
-            return new KernelSecurityPolicyCustom();
+            return new KernelSecurityPolicyCustom(configuration);
         return null;
     }
 }

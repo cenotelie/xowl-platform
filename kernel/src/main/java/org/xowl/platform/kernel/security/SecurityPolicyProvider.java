@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -28,8 +29,9 @@ public interface SecurityPolicyProvider extends Registrable {
     /**
      * Tries to instantiates a security policy
      *
-     * @param identifier The identifier of a security policy
+     * @param identifier    The identifier of a security policy
+     * @param configuration The configuration for the realm
      * @return The security policy, or null if it cannot be instantiated
      */
-    SecurityPolicy newPolicy(String identifier);
+    SecurityPolicy newPolicy(String identifier, Section configuration);
 }

@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -36,17 +35,6 @@ public class SecuredActionPolicyNone extends SecuredActionPolicyBase {
      */
     private SecuredActionPolicyNone() {
         super(SecuredActionPolicyNone.class.getCanonicalName(), "Admin policy");
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(SecuredActionPolicyNone.class.getCanonicalName()) +
-                "\", \"identifier\":\"" +
-                TextUtils.escapeStringJSON(identifier) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(name) +
-                "\"}";
     }
 
     @Override

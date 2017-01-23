@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -51,10 +52,29 @@ public class SecuredActionPolicyRole extends SecuredActionPolicyBase {
         this(role.getIdentifier());
     }
 
+    /**
+     * Initializes this policy
+     *
+     * @param definition The serialized definition
+     */
+    public SecuredActionPolicyRole(ASTNode definition) {
+        super(SecuredActionPolicyRole.class.getCanonicalName(), "Role policy");
+        String role = null;
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("role".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                role = value.substring(1, value.length() - 1);
+            }
+        }
+        this.role = role;
+    }
+
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(SecuredActionPolicyRole.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredActionPolicy.class.getCanonicalName()) +
                 "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

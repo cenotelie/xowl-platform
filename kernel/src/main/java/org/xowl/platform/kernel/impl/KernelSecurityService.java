@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
@@ -93,13 +94,13 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      */
     private final int banLength;
     /**
-     * The identifier of the security realm
+     * The configuration section for the security realm
      */
-    private final String realmId;
+    private final Section realmConfiguration;
     /**
-     * The identifier of the authorization policy
+     * The configuration section for the security policy
      */
-    private final String policyId;
+    private final Section policyConfiguration;
     /**
      * The Message Authentication Code algorithm to use for securing user tokens
      */
@@ -134,8 +135,8 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         Configuration configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
-        this.realmId = configuration.get("realm");
-        this.policyId = configuration.get("policy");
+        this.realmConfiguration = configuration.getSection("realm");
+        this.policyConfiguration = configuration.getSection("policy");
         Mac mac = null;
         KeyGenerator keyGenerator = null;
         try {
@@ -230,8 +231,9 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     public synchronized SecurityRealm getRealm() {
         if (realm != null)
             return realm;
+        String identifier = realmConfiguration.get("type");
         for (SecurityRealmProvider provider : Register.getComponents(SecurityRealmProvider.class)) {
-            realm = provider.newRealm(realmId);
+            realm = provider.newRealm(identifier, realmConfiguration);
             if (realm != null)
                 return realm;
         }
@@ -243,8 +245,9 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     public synchronized SecurityPolicy getPolicy() {
         if (policy != null)
             return policy;
+        String identifier = policyConfiguration.get("type");
         for (SecurityPolicyProvider provider : Register.getComponents(SecurityPolicyProvider.class)) {
-            policy = provider.newPolicy(policyId);
+            policy = provider.newPolicy(identifier, policyConfiguration);
             if (policy != null)
                 return policy;
         }

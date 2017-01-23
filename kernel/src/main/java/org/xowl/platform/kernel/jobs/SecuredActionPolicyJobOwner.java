@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.jobs;
 
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.*;
 
@@ -37,17 +36,6 @@ public class SecuredActionPolicyJobOwner extends SecuredActionPolicyBase {
      */
     private SecuredActionPolicyJobOwner() {
         super(SecuredActionPolicyGroupAdmin.class.getCanonicalName(), "Job owner policy");
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(SecuredActionPolicyJobOwner.class.getCanonicalName()) +
-                "\", \"identifier\":\"" +
-                TextUtils.escapeStringJSON(identifier) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(name) +
-                "\"}";
     }
 
     @Override

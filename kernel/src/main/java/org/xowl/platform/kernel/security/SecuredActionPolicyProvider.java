@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -29,8 +30,8 @@ public interface SecuredActionPolicyProvider extends Registrable {
      * Tries to newPolicy a policy
      *
      * @param policyId   The identifier of the policy
-     * @param parameters The parameters for the policy
+     * @param definition The serialized definition
      * @return The policy, or null if it cannot be instantiated
      */
-    SecuredActionPolicy instantiate(String policyId, Object... parameters);
+    SecuredActionPolicy newPolicy(String policyId, ASTNode definition);
 }

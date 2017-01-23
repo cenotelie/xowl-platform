@@ -26,6 +26,7 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -73,7 +74,7 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Statistics Service";
+        return PlatformUtils.NAME + " - Statistics Service";
     }
 
     @Override

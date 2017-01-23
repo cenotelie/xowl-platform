@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -33,7 +34,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityNosecRealm implements Realm {
+public class KernelSecurityNosecRealm implements Realm {
     /**
      * The internal representation of a user for this realm
      */
@@ -56,17 +57,17 @@ public class XOWLSecurityNosecRealm implements Realm {
     /**
      * Initializes this realm provider
      */
-    public XOWLSecurityNosecRealm() {
+    public KernelSecurityNosecRealm() {
     }
 
     @Override
     public String getIdentifier() {
-        return XOWLSecurityNosecRealm.class.getCanonicalName();
+        return KernelSecurityNosecRealm.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Nosec Realm";
+        return PlatformUtils.NAME + " - No Security Realm";
     }
 
     @Override

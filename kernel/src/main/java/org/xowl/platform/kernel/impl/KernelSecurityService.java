@@ -26,6 +26,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -53,7 +54,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityService implements SecurityService, HttpApiService {
+public class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The URI for the API services
      */
@@ -61,11 +62,11 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLSecurityService.class, "/org/xowl/platform/kernel/api_security.raml", "Security Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/api_security.raml", "Security Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLSecurityService.class, "/org/xowl/platform/kernel/api_security.html", "Security Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/api_security.html", "Security Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**
@@ -132,7 +133,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
      *
      * @param configurationService The configuration service
      */
-    public XOWLSecurityService(ConfigurationService configurationService) {
+    public KernelSecurityService(ConfigurationService configurationService) {
         Configuration configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
@@ -156,12 +157,12 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
 
     @Override
     public String getIdentifier() {
-        return XOWLSecurityService.class.getCanonicalName();
+        return KernelSecurityService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Security Service";
+        return PlatformUtils.NAME + " - Security Service";
     }
 
     @Override
@@ -234,7 +235,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
             return realm;
         realm = Register.getComponent(Realm.class, Realm.PROPERTY_ID, realmId);
         if (realm == null)
-            realm = new XOWLSecurityNosecRealm();
+            realm = new KernelSecurityNosecRealm();
         return realm;
     }
 
@@ -244,7 +245,7 @@ public class XOWLSecurityService implements SecurityService, HttpApiService {
             return policy;
         policy = Register.getComponent(SecurityPolicy.class, SecurityPolicy.PROPERTY_ID, policyId);
         if (policy == null)
-            policy = new XOWLSecurityPolicyAuthenticated();
+            policy = new KernelSecurityPolicyAuthenticated();
         return policy;
     }
 

@@ -20,32 +20,40 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
-import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
 
 /**
- * Implements an authorization policy in which any authenticated user can do anything
+ * Implements an authorization policy which can be configured by the users.
+ * When an authorization policy for a service action is not found the action is authorized for authenticated users.
  *
  * @author Laurent Wouters
  */
-public class XOWLSecurityPolicyAuthenticated implements SecurityPolicy {
+public class KernelSecurityPolicyCustom implements SecurityPolicy {
     @Override
     public String getIdentifier() {
-        return XOWLSecurityPolicyAuthenticated.class.getCanonicalName();
+        return KernelSecurityPolicyAuthenticated.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "xOWL Nosec Authorization Policy";
+        return PlatformUtils.NAME + " - Custom Security Policy";
     }
 
     @Override
     public XSPReply checkAction(SecurityService securityService, SecuredAction action) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
+            // no user => un-authenticated
             return XSPReplyUnauthenticated.instance();
+        if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            // user is platform admin => authorized
+            return XSPReplySuccess.instance();
+        // check the custom action policies
         return XSPReplySuccess.instance();
     }
 
@@ -53,7 +61,12 @@ public class XOWLSecurityPolicyAuthenticated implements SecurityPolicy {
     public XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
+            // no user => un-authenticated
             return XSPReplyUnauthenticated.instance();
+        if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
+            // user is platform admin => authorized
+            return XSPReplySuccess.instance();
+        // check the custom action policies
         return XSPReplySuccess.instance();
     }
 }

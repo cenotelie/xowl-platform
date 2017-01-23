@@ -72,14 +72,14 @@ public class Activator implements BundleActivator {
     public void start(final BundleContext bundleContext) throws Exception {
         // register security components
         Dictionary<String, Object> dictionary = new Hashtable<>();
-        dictionary.put(Realm.PROPERTY_ID, XOWLSecurityNosecRealm.class.getCanonicalName());
-        bundleContext.registerService(Realm.class, new XOWLSecurityNosecRealm(), dictionary);
+        dictionary.put(Realm.PROPERTY_ID, KernelSecurityNosecRealm.class.getCanonicalName());
+        bundleContext.registerService(Realm.class, new KernelSecurityNosecRealm(), dictionary);
         dictionary = new Hashtable<>();
-        dictionary.put(SecurityPolicy.PROPERTY_ID, XOWLSecurityPolicyAuthenticated.class.getCanonicalName());
-        bundleContext.registerService(SecurityPolicy.class, new XOWLSecurityPolicyAuthenticated(), dictionary);
+        dictionary.put(SecurityPolicy.PROPERTY_ID, KernelSecurityPolicyAuthenticated.class.getCanonicalName());
+        bundleContext.registerService(SecurityPolicy.class, new KernelSecurityPolicyAuthenticated(), dictionary);
         dictionary = new Hashtable<>();
-        dictionary.put(SecurityPolicy.PROPERTY_ID, XOWLSecurityPolicyCustom.class.getCanonicalName());
-        bundleContext.registerService(SecurityPolicy.class, new XOWLSecurityPolicyCustom(), dictionary);
+        dictionary.put(SecurityPolicy.PROPERTY_ID, KernelSecurityPolicyCustom.class.getCanonicalName());
+        bundleContext.registerService(SecurityPolicy.class, new KernelSecurityPolicyCustom(), dictionary);
 
         // register the logging service
         KernelLoggingService loggingService = new KernelLoggingService();
@@ -96,7 +96,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
 
         // register the security service
-        XOWLSecurityService securityService = new XOWLSecurityService(configurationService);
+        KernelSecurityService securityService = new KernelSecurityService(configurationService);
         bundleContext.registerService(Service.class, securityService, null);
         bundleContext.registerService(SecuredService.class, securityService, null);
         bundleContext.registerService(HttpApiService.class, securityService, null);

@@ -20,6 +20,8 @@ package org.xowl.platform.services.webapp.impl;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -27,8 +29,6 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.WebModule;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Implements a directory of registered web modules
@@ -53,37 +53,6 @@ public class XOWLWebModuleDirectory implements HttpApiService {
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/schema_platform_webappmodules.json", "Web Modules Directory Service - Schema", HttpConstants.MIME_JSON);
 
-
-    /**
-     * The registered modules
-     */
-    private final Collection<WebModule> modules;
-
-    /**
-     * Initializes this directory
-     */
-    public XOWLWebModuleDirectory() {
-        this.modules = new ArrayList<>();
-    }
-
-    /**
-     * Registers a web module
-     *
-     * @param module The web module to register
-     */
-    public void register(WebModule module) {
-        this.modules.add(module);
-    }
-
-    /**
-     * Unregisters a web module
-     *
-     * @param module The web module to unregister
-     */
-    public void unregister(WebModule module) {
-        this.modules.remove(module);
-    }
-
     @Override
     public String getIdentifier() {
         return XOWLWebModuleDirectory.class.getCanonicalName();
@@ -102,13 +71,13 @@ public class XOWLWebModuleDirectory implements HttpApiService {
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/modules")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
-            for (WebModule module : modules) {
+            for (WebModule module : Register.getComponents(WebModule.class)) {
                 if (!first)
                     builder.append(", ");
                 first = false;

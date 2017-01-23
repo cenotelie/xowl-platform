@@ -18,7 +18,7 @@
 package org.xowl.platform.services.webapp;
 
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 
@@ -27,7 +27,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface WebModule extends Service, Serializable {
+public interface WebModule extends Registrable, Serializable {
     /**
      * Gets the URI for this module
      *

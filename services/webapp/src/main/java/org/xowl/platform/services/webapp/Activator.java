@@ -23,6 +23,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.webapp.impl.*;
@@ -37,32 +38,22 @@ public class Activator implements BundleActivator {
      * The tracker of the HTTP service
      */
     private ServiceTracker httpTracker;
-    /**
-     * The tracker of ui contributions
-     */
-    private ServiceTracker contributionTracker;
-    /**
-     * The tracker of web modules
-     */
-    private ServiceTracker modulesTracker;
-    /**
-     * The directory of UI contributions
-     */
-    private ContributionDirectory contributionDirectory;
-    /**
-     * The directory of web modules
-     */
-    private XOWLWebModuleDirectory moduleDirectory;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        contributionDirectory = new XOWLContributionDirectory();
-        contributionDirectory.register(new XOWLMainContribution());
-        moduleDirectory = new XOWLWebModuleDirectory();
-        moduleDirectory.register(new XOWLWebModuleCore());
-        moduleDirectory.register(new XOWLWebModuleCollaboration());
-        moduleDirectory.register(new XOWLWebModuleAdmin());
+        final ContributionDirectory contributionDirectory = new XOWLContributionDirectory();
+        bundleContext.registerService(Service.class, contributionDirectory, null);
+        bundleContext.registerService(ContributionDirectory.class, contributionDirectory, null);
+
+        XOWLWebModuleDirectory moduleDirectory = new XOWLWebModuleDirectory();
+        bundleContext.registerService(Service.class, moduleDirectory, null);
         bundleContext.registerService(HttpApiService.class, moduleDirectory, null);
+
+        bundleContext.registerService(WebUIContribution.class, new XOWLMainContribution(), null);
+        bundleContext.registerService(WebModule.class, new XOWLWebModuleCore(), null);
+        bundleContext.registerService(WebModule.class, new XOWLWebModuleCollaboration(), null);
+        bundleContext.registerService(WebModule.class, new XOWLWebModuleAdmin(), null);
+
         httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
             public void removedService(ServiceReference reference, HttpService service) {
                 try {
@@ -83,38 +74,10 @@ public class Activator implements BundleActivator {
             }
         };
         httpTracker.open();
-
-        contributionTracker = new ServiceTracker<WebUIContribution, WebUIContribution>(bundleContext, WebUIContribution.class, null) {
-            public void removedService(ServiceReference reference, WebUIContribution contribution) {
-                contributionDirectory.unregister(contribution);
-            }
-
-            public WebUIContribution addingService(ServiceReference reference) {
-                WebUIContribution contribution = (WebUIContribution) bundleContext.getService(reference);
-                contributionDirectory.register(contribution);
-                return contribution;
-            }
-        };
-        contributionTracker.open();
-
-        modulesTracker = new ServiceTracker<WebModule, WebModule>(bundleContext, WebModule.class, null) {
-            public void removedService(ServiceReference reference, WebModule module) {
-                moduleDirectory.unregister(module);
-            }
-
-            public WebModule addingService(ServiceReference reference) {
-                WebModule module = (WebModule) bundleContext.getService(reference);
-                moduleDirectory.register(module);
-                return module;
-            }
-        };
-        modulesTracker.open();
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
         httpTracker.close();
-        contributionTracker.close();
-        modulesTracker.close();
     }
 }

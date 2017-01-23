@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,41 +15,40 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Event when a user is deleted
+ * Event when a group is deleted
  *
  * @author Laurent Wouters
  */
-public class UserDeletedEvent extends EventBase {
+public class PlatformGroupDeletedEvent extends EventBase {
     /**
-     * The deleted user
+     * The deleted group
      */
-    private final XOWLInternalUser user;
+    private final PlatformGroup group;
 
     /**
-     * Gets the deleted user
+     * Gets the deleted group
      *
-     * @return The deleted user
+     * @return The deleted group
      */
-    public PlatformUser getDeletedUser() {
-        return user;
+    public PlatformGroup getDeletedGroup() {
+        return group;
     }
 
     /**
      * Initializes this event
      *
-     * @param user       The deleted user
+     * @param group      The deleted group
      * @param originator The originator for this event
      */
-    public UserDeletedEvent(XOWLInternalUser user, Identifiable originator) {
-        super(new RichString("Deleted user ", user), UserDeletedEvent.class.getCanonicalName(), originator);
-        this.user = user;
+    public PlatformGroupDeletedEvent(PlatformGroup group, Identifiable originator) {
+        super(new RichString("Deleted group ", group), PlatformGroupDeletedEvent.class.getCanonicalName(), originator);
+        this.group = group;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,41 +15,40 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformGroup;
 
 /**
- * Event when a group is deleted
+ * Event when a new role is created
  *
  * @author Laurent Wouters
  */
-public class GroupDeletedEvent extends EventBase {
+public class PlatformRoleCreatedEvent extends EventBase {
     /**
-     * The deleted group
+     * The created role
      */
-    private final XOWLInternalGroup group;
+    private final PlatformRole role;
 
     /**
-     * Gets the deleted group
+     * Gets the created role
      *
-     * @return The deleted group
+     * @return The created role
      */
-    public PlatformGroup getDeletedGroup() {
-        return group;
+    public PlatformRole getCreatedRole() {
+        return role;
     }
 
     /**
      * Initializes this event
      *
-     * @param group      The deleted group
+     * @param role       The created role
      * @param originator The originator for this event
      */
-    public GroupDeletedEvent(XOWLInternalGroup group, Identifiable originator) {
-        super(new RichString("Deleted group ", group), GroupDeletedEvent.class.getCanonicalName(), originator);
-        this.group = group;
+    public PlatformRoleCreatedEvent(PlatformRole role, Identifiable originator) {
+        super(new RichString("Created role ", role), PlatformRoleCreatedEvent.class.getCanonicalName(), originator);
+        this.role = role;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,24 +15,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.platform.PlatformRoleBase;
 
 /**
  * Event when a role is deleted
  *
  * @author Laurent Wouters
  */
-public class RoleDeletedEvent extends EventBase {
+public class PlatformRoleDeletedEvent extends EventBase {
     /**
      * The deleted role
      */
-    private final PlatformRoleBase role;
+    private final PlatformRole role;
 
     /**
      * Gets the deleted role
@@ -49,8 +47,8 @@ public class RoleDeletedEvent extends EventBase {
      * @param role       The deleted role
      * @param originator The originator for this event
      */
-    public RoleDeletedEvent(PlatformRoleBase role, Identifiable originator) {
-        super(new RichString("Deleted role ", role), RoleDeletedEvent.class.getCanonicalName(), originator);
+    public PlatformRoleDeletedEvent(PlatformRole role, Identifiable originator) {
+        super(new RichString("Deleted role ", role), PlatformRoleDeletedEvent.class.getCanonicalName(), originator);
         this.role = role;
     }
 }

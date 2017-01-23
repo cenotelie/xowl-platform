@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,23 +15,22 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformGroup;
 
 /**
  * Event when a new group is created
  *
  * @author Laurent Wouters
  */
-public class GroupCreatedEvent extends EventBase {
+public class PlatformGroupCreatedEvent extends EventBase {
     /**
      * The created group
      */
-    private final XOWLInternalGroup group;
+    private final PlatformGroup group;
 
     /**
      * Gets the created group
@@ -48,8 +47,8 @@ public class GroupCreatedEvent extends EventBase {
      * @param group      The created group
      * @param originator The originator for this event
      */
-    public GroupCreatedEvent(XOWLInternalGroup group, Identifiable originator) {
-        super(new RichString("Created group ", group), GroupCreatedEvent.class.getCanonicalName(), originator);
+    public PlatformGroupCreatedEvent(PlatformGroup group, Identifiable originator) {
+        super(new RichString("Created group ", group), PlatformGroupCreatedEvent.class.getCanonicalName(), originator);
         this.group = group;
     }
 }

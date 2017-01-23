@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,42 +15,40 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.platform.PlatformRoleBase;
 
 /**
- * Event when a new role is created
+ * Event when a new user is created
  *
  * @author Laurent Wouters
  */
-public class RoleCreatedEvent extends EventBase {
+public class PlatformUserCreatedEvent extends EventBase {
     /**
-     * The created role
+     * The created user
      */
-    private final PlatformRoleBase role;
+    private final PlatformUser user;
 
     /**
-     * Gets the created role
+     * Gets the created user
      *
-     * @return The created role
+     * @return The created user
      */
-    public PlatformRole getCreatedRole() {
-        return role;
+    public PlatformUser getCreatedUser() {
+        return user;
     }
 
     /**
      * Initializes this event
      *
-     * @param role       The created role
+     * @param user       The created user
      * @param originator The originator for this event
      */
-    public RoleCreatedEvent(PlatformRoleBase role, Identifiable originator) {
-        super(new RichString("Created role ", role), RoleCreatedEvent.class.getCanonicalName(), originator);
-        this.role = role;
+    public PlatformUserCreatedEvent(PlatformUser user, Identifiable originator) {
+        super(new RichString("Created user ", user), PlatformUserCreatedEvent.class.getCanonicalName(), originator);
+        this.user = user;
     }
 }

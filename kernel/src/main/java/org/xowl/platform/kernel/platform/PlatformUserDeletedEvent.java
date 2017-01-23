@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,41 +15,40 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.security.internal;
+package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.events.EventBase;
-import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Event when a new user is created
+ * Event when a user is deleted
  *
  * @author Laurent Wouters
  */
-public class UserCreatedEvent extends EventBase {
+public class PlatformUserDeletedEvent extends EventBase {
     /**
-     * The created user
+     * The deleted user
      */
-    private final XOWLInternalUser user;
+    private final PlatformUser user;
 
     /**
-     * Gets the created user
+     * Gets the deleted user
      *
-     * @return The created user
+     * @return The deleted user
      */
-    public PlatformUser getCreatedUser() {
+    public PlatformUser getDeletedUser() {
         return user;
     }
 
     /**
      * Initializes this event
      *
-     * @param user       The created user
+     * @param user       The deleted user
      * @param originator The originator for this event
      */
-    public UserCreatedEvent(XOWLInternalUser user, Identifiable originator) {
-        super(new RichString("Created user ", user), UserCreatedEvent.class.getCanonicalName(), originator);
+    public PlatformUserDeletedEvent(PlatformUser user, Identifiable originator) {
+        super(new RichString("Deleted user ", user), PlatformUserDeletedEvent.class.getCanonicalName(), originator);
         this.user = user;
     }
 }

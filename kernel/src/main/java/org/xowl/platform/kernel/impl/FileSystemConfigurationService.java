@@ -23,8 +23,6 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.security.SecuredService;
-import org.xowl.platform.kernel.security.SecuredAction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +33,7 @@ import java.io.IOException;
  *
  * @author Laurent Wouters
  */
-public class FSConfigurationService implements ConfigurationService {
+public class FileSystemConfigurationService implements ConfigurationService {
     /**
      * From the distribution's root, the path to the configuration
      */
@@ -53,25 +51,19 @@ public class FSConfigurationService implements ConfigurationService {
     /**
      * Initializes this service
      */
-    public FSConfigurationService() {
+    public FileSystemConfigurationService() {
         File root = new File(System.getProperty(Env.ROOT));
         directory = new File(root, CONFIG_DIR);
     }
 
     @Override
     public String getIdentifier() {
-        return FSConfigurationService.class.getCanonicalName();
+        return FileSystemConfigurationService.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
         return "xOWL Collaboration Platform - Configuration Service";
-    }
-
-    @Override
-    public SecuredAction[] getActions() {
-        // no action for the configuration service
-        return SecuredService.ACTIONS_NONE;
     }
 
     @Override

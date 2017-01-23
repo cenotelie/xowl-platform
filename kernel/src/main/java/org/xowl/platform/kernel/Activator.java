@@ -90,7 +90,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(MeasurableService.class, loggingService, null);
 
         // register the configuration service
-        ConfigurationService configurationService = new FSConfigurationService();
+        ConfigurationService configurationService = new FileSystemConfigurationService();
         bundleContext.registerService(Service.class, configurationService, null);
         bundleContext.registerService(ConfigurationService.class, configurationService, null);
 

@@ -17,14 +17,14 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.platform.services.connection.ConnectorDescriptionBase;
+import org.xowl.platform.services.connection.ConnectorDescriptorBase;
 
 /**
  * The descriptor for the semantic web domain
  *
  * @author Laurent Wouters
  */
-public class SemanticWebConnectorDescriptor extends ConnectorDescriptionBase {
+public class SemanticWebConnectorDescriptor extends ConnectorDescriptorBase {
     /**
      * The singleton instance
      */

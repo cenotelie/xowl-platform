@@ -27,7 +27,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class ConnectorDescriptionBase implements ConnectorDescriptor {
+public class ConnectorDescriptorBase implements ConnectorDescriptor {
     /**
      * The domain's unique identifier
      */
@@ -48,7 +48,7 @@ public class ConnectorDescriptionBase implements ConnectorDescriptor {
      * @param name        The domain's name
      * @param description The domain's description
      */
-    public ConnectorDescriptionBase(String identifier, String name, String description) {
+    public ConnectorDescriptorBase(String identifier, String name, String description) {
         this.identifier = identifier;
         this.name = name;
         this.description = description;

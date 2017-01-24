@@ -17,14 +17,14 @@
 
 package org.xowl.platform.connectors.csv;
 
-import org.xowl.platform.services.connection.ConnectorDescriptionBase;
+import org.xowl.platform.services.connection.ConnectorDescriptorBase;
 
 /**
  * The descriptor for the CSV connector
  *
  * @author Laurent Wouters
  */
-public class CSVDescription extends ConnectorDescriptionBase {
+public class CSVDescription extends ConnectorDescriptorBase {
     /**
      * The singleton instance
      */

@@ -28,7 +28,11 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -75,6 +79,18 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
      * The queue iof input data packages, i.e. packages toward the platform
      */
     protected final BlockingQueue<Artifact> input;
+    /**
+     * Service action to pull an artifact from this connector
+     */
+    protected final SecuredAction actionPull;
+    /**
+     * Service action to push an artifact to the client
+     */
+    protected final SecuredAction actionPush;
+    /**
+     * The secured action for this connector
+     */
+    protected final SecuredAction[] actions;
 
     /**
      * Initializes this connector
@@ -88,6 +104,12 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
         this.name = name;
         this.uris = uris;
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
+        this.actionPull = new SecuredAction(identifier + ".Pull", name + " - Pull Artifact");
+        this.actionPush = new SecuredAction(identifier + ".Push", name + " - Push Artifact");
+        this.actions = new SecuredAction[]{
+                actionPull,
+                actionPush
+        };
     }
 
     /**
@@ -116,6 +138,11 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     }
 
     @Override
+    public SecuredAction[] getActions() {
+        return actions;
+    }
+
+    @Override
     public boolean canPullInput() {
         return false;
     }
@@ -140,20 +167,47 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     }
 
     @Override
-    public XSPReply getNextInput(boolean block) {
-        Artifact artifact = null;
-        if (block) {
-            try {
-                artifact = input.take();
-            } catch (InterruptedException exception) {
-                // do nothing
-            }
-        } else {
-            artifact = input.poll();
-        }
+    public XSPReply pullArtifact() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(actionPull);
+        if (!reply.isSuccess())
+            return reply;
+        return doPullArtifact();
+    }
+
+    /**
+     * Realizes the action to pull an artifact
+     *
+     * @return The operation's result
+     */
+    protected XSPReply doPullArtifact() {
+        Artifact artifact = input.poll();
         if (artifact == null)
             return new XSPReplyApiError(ERROR_EMPTY_QUEUE);
         return new XSPReplyResult<>(artifact);
+    }
+
+    @Override
+    public XSPReply pushArtifact(Artifact artifact) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(actionPush);
+        if (!reply.isSuccess())
+            return reply;
+        return doPushArtifact(artifact);
+    }
+
+    /**
+     * Realizes the action to push an artifact to the client
+     *
+     * @param artifact The artifact to push
+     * @return The operation's result
+     */
+    protected XSPReply doPushArtifact(Artifact artifact) {
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -166,7 +220,7 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securedService, HttpApiRequest request) {
         return XSPReplyUtils.toHttpResponse(XSPReplyUnsupported.instance(), null);
     }
 

@@ -57,7 +57,7 @@ public class ConnectorUtils {
         ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply replyArtifact = connector.getNextInput(false);
+        XSPReply replyArtifact = connector.pullArtifact();
         if (!replyArtifact.isSuccess())
             return replyArtifact;
         Artifact artifact = ((XSPReplyResult<Artifact>) replyArtifact).getData();
@@ -89,7 +89,7 @@ public class ConnectorUtils {
         if (!reply.isSuccess())
             return reply;
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
-        reply = connector.pushToClient(artifact);
+        reply = connector.pushArtifact(artifact);
         if (!reply.isSuccess())
             return reply;
         EventService eventService = Register.getComponent(EventService.class);

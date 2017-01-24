@@ -19,8 +19,8 @@ package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.List;
 
@@ -34,15 +34,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorService extends Service, Serializable {
-    /**
-     * Pushes an artifact to the associated client
-     *
-     * @param data The artifact to push
-     * @return The operation's result
-     */
-    XSPReply pushToClient(Artifact data);
-
+public interface ConnectorService extends SecuredService, Serializable {
     /**
      * Gets whether this connector supports pulling artifacts from the client
      * Clients are expected to push artifacts to the platform, but sometimes they can be pulled without a client explicitly pushing them.
@@ -76,8 +68,15 @@ public interface ConnectorService extends Service, Serializable {
     /**
      * Gets the next queued artifact
      *
-     * @param block Whether to wait until the artifact is available
      * @return The operation's result which can be casted to XSPReplyResult in case of success
      */
-    XSPReply getNextInput(boolean block);
+    XSPReply pullArtifact();
+
+    /**
+     * Pushes an artifact to the associated client
+     *
+     * @param artifact The artifact to push
+     * @return The operation's result
+     */
+    XSPReply pushArtifact(Artifact artifact);
 }

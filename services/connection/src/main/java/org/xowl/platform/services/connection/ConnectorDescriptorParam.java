@@ -17,6 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 
 /**
@@ -24,7 +26,24 @@ import org.xowl.infra.utils.TextUtils;
  *
  * @author Laurent Wouters
  */
-public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam {
+public class ConnectorDescriptorParam implements Identifiable, Serializable {
+    /**
+     * Type hint for a string parameter
+     */
+    public static final String TYPE_HINT_STRING = "string";
+    /**
+     * Type hint for a password parameter
+     */
+    public static final String TYPE_HINT_PASSWORD = "password";
+    /**
+     * Type hint for a number parameter
+     */
+    public static final String TYPE_HINT_NUMBER = "number";
+    /**
+     * Type hint for an uri parameter
+     */
+    public static final String TYPE_HINT_URI = "uri";
+
     /**
      * The parameter's unique identifier
      */
@@ -50,7 +69,7 @@ public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam 
      * @param isRequired Whether the parameter is required
      * @param typeHint   The type hint for the parameter
      */
-    public ConnectorDescriptionBaseParam(String id, String name, boolean isRequired, String typeHint) {
+    public ConnectorDescriptorParam(String id, String name, boolean isRequired, String typeHint) {
         this.identifier = id;
         this.name = name;
         this.isRequired = isRequired;
@@ -67,12 +86,20 @@ public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam 
         return name;
     }
 
-    @Override
+    /**
+     * Gets whether the parameter is required
+     *
+     * @return Whether the parameter is required
+     */
     public boolean isRequired() {
         return isRequired;
     }
 
-    @Override
+    /**
+     * Gets the type hint for this parameter
+     *
+     * @return The type hint
+     */
     public String typeHint() {
         return typeHint;
     }
@@ -85,7 +112,7 @@ public class ConnectorDescriptionBaseParam implements ConnectorDescriptionParam 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ConnectorDescriptionParam.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ConnectorDescriptorParam.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

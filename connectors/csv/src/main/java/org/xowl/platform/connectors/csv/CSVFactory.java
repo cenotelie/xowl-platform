@@ -19,8 +19,8 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.services.connection.ConnectorDescription;
-import org.xowl.platform.services.connection.ConnectorDescriptionParam;
+import org.xowl.platform.services.connection.ConnectorDescriptor;
+import org.xowl.platform.services.connection.ConnectorDescriptorParam;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class CSVFactory implements ConnectorServiceFactory {
     /**
      * The descriptions for this factory
      */
-    private final Collection<ConnectorDescription> descriptions;
+    private final Collection<ConnectorDescriptor> descriptions;
 
     /**
      * The singleton instance of the factory
@@ -62,12 +62,12 @@ public class CSVFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public Collection<ConnectorDescription> getDescriptors() {
+    public Collection<ConnectorDescriptor> getDescriptors() {
         return descriptions;
     }
 
     @Override
-    public XSPReply newConnector(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+    public XSPReply newConnector(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
         return new XSPReplyResult<>(new CSVConnector(identifier, name, uris));
     }
 }

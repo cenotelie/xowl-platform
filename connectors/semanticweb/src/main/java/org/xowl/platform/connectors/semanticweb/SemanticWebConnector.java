@@ -17,7 +17,10 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -52,11 +55,6 @@ public class SemanticWebConnector extends ConnectorServiceBase {
      */
     public SemanticWebConnector(String identifier, String name, String[] uris) {
         super(identifier, name, uris);
-    }
-
-    @Override
-    public XSPReply pushToClient(Artifact data) {
-        return XSPReplyUnsupported.instance();
     }
 
     @Override

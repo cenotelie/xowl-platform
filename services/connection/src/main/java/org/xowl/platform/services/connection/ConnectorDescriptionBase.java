@@ -27,8 +27,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class ConnectorDescriptionBase implements ConnectorDescription {
-
+public class ConnectorDescriptionBase implements ConnectorDescriptor {
     /**
      * The domain's unique identifier
      */
@@ -71,7 +70,7 @@ public class ConnectorDescriptionBase implements ConnectorDescription {
     }
 
     @Override
-    public Collection<ConnectorDescriptionParam> getParameters() {
+    public Collection<ConnectorDescriptorParam> getParameters() {
         return Collections.emptyList();
     }
 
@@ -83,7 +82,7 @@ public class ConnectorDescriptionBase implements ConnectorDescription {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(ConnectorDescription.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ConnectorDescriptor.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
         builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
@@ -92,7 +91,7 @@ public class ConnectorDescriptionBase implements ConnectorDescription {
         builder.append(TextUtils.escapeStringJSON(description));
         builder.append("\", \"parameters\": [");
         boolean first = true;
-        for (ConnectorDescriptionParam param : getParameters()) {
+        for (ConnectorDescriptorParam param : getParameters()) {
             if (!first)
                 builder.append(", ");
             first = false;

@@ -17,10 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -28,14 +26,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorServiceFactory extends Service {
-    /**
-     * Gets the descriptions of the connectors supported by this factory
-     *
-     * @return The supported connectors
-     */
-    Collection<ConnectorDescription> getDescriptors();
-
+public interface ConnectorServiceFactory extends Registrable {
     /**
      * Instantiates a new connector for a domain
      *
@@ -44,7 +35,7 @@ public interface ConnectorServiceFactory extends Service {
      * @param name       The new connector's name
      * @param uris       The new connector's API uris, if any
      * @param parameters The parameters for the new connector, if any
-     * @return The new connector
+     * @return The new connector, or null if it cannot be created
      */
-    XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters);
+    ConnectorService newConnector(ConnectorDescriptor descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters);
 }

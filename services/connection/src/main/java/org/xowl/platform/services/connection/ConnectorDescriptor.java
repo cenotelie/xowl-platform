@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 
@@ -27,8 +27,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface ConnectorDescription extends Identifiable, Serializable {
-
+public interface ConnectorDescriptor extends Registrable, Serializable {
     /**
      * Gets the description of this domain
      *
@@ -41,5 +40,5 @@ public interface ConnectorDescription extends Identifiable, Serializable {
      *
      * @return The parameters
      */
-    Collection<ConnectorDescriptionParam> getParameters();
+    Collection<ConnectorDescriptorParam> getParameters();
 }

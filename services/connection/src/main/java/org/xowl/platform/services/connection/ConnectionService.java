@@ -18,7 +18,8 @@
 package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +29,24 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface ConnectionService extends Service {
+public interface ConnectionService extends SecuredService {
+    /**
+     * Service action to spawn a new connector
+     */
+    SecuredAction ACTION_SPAWN = new SecuredAction(ConnectionService.class.getCanonicalName() + ".Spawn", "Connection Service - Spawn Connector");
+    /**
+     * Service action to delete a connector
+     */
+    SecuredAction ACTION_DELETE = new SecuredAction(ConnectionService.class.getCanonicalName() + ".Delete", "Connection Service - Delete Connector");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_SPAWN,
+            ACTION_DELETE
+    };
+
     /**
      * Gets the available connectors
      *
@@ -49,7 +67,7 @@ public interface ConnectionService extends Service {
      *
      * @return The descriptions of the supported connectors
      */
-    Collection<ConnectorDescription> getDescriptors();
+    Collection<ConnectorDescriptor> getDescriptors();
 
     /**
      * Spawns a new connector for a domain
@@ -61,7 +79,7 @@ public interface ConnectionService extends Service {
      * @param parameters  The parameters for the new connector, if any
      * @return The operation's result
      */
-    XSPReply spawn(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters);
+    XSPReply spawn(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters);
 
     /**
      * Deletes a spawned connector

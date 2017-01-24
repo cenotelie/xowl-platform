@@ -17,9 +17,6 @@
 
 package org.xowl.platform.connectors.csv;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 
 /**
@@ -37,10 +34,5 @@ public class CSVConnector extends ConnectorServiceBase {
      */
     public CSVConnector(String identifier, String name, String[] uris) {
         super(identifier, name, uris);
-    }
-
-    @Override
-    public XSPReply pushToClient(Artifact data) {
-        return XSPReplyUnsupported.instance();
     }
 }

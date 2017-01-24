@@ -32,13 +32,12 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -68,13 +67,9 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
          */
         public ConnectorService service;
         /**
-         * The reference to this service as a connector
+         * The reference to this service
          */
-        ServiceRegistration refAsDomainConnector;
-        /**
-         * The reference to this service as a served service
-         */
-        ServiceRegistration refAsServedService;
+        ServiceRegistration[] references;
     }
 
     /**
@@ -113,10 +108,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      */
     private final Map<String, Registration> connectorsById = new HashMap<>();
     /**
-     * The registered factories
-     */
-    private final Collection<ConnectorServiceFactory> factories = new ArrayList<>(8);
-    /**
      * The map of statically configured connectors to resolve
      */
     private Map<String, List<Section>> toResolve;
@@ -132,7 +123,12 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Connection Service";
+        return PlatformUtils.NAME + " - Connection Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -143,7 +139,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/descriptors")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -223,13 +219,13 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
     @Override
     public Collection<ConnectorService> getConnectors() {
-        resolveConfigConnectors(null);
+        resolveConfigConnectors();
         return Register.getComponents(ConnectorService.class);
     }
 
     @Override
     public ConnectorService get(String identifier) {
-        resolveConfigConnectors(null);
+        resolveConfigConnectors();
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
             return registration.service;
@@ -237,31 +233,29 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     @Override
-    public Collection<ConnectorDescription> getDescriptors() {
-        Collection<ConnectorDescription> result = new ArrayList<>(16);
-        for (ConnectorServiceFactory factory : factories) {
-            result.addAll(factory.getDescriptors());
-        }
-        return result;
+    public Collection<ConnectorDescriptor> getDescriptors() {
+        return Register.getComponents(ConnectorDescriptor.class);
     }
 
     @Override
-    public XSPReply spawn(ConnectorDescription description, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+    public XSPReply spawn(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_SPAWN);
+        if (!reply.isSuccess())
+            return reply;
+
         synchronized (connectorsById) {
             ConnectorService service = get(identifier);
             if (service != null)
                 // already exists
                 return new XSPReplyApiError(ERROR_CONNECTOR_SAME_ID);
 
-            for (ConnectorServiceFactory factory : factories) {
-                if (factory.getDescriptors().contains(description)) {
-                    // this is the factory
-                    XSPReply reply = factory.newConnector(description, identifier, name, uris, parameters);
-                    if (!reply.isSuccess())
-                        return reply;
-                    service = ((XSPReplyResult<ConnectorService>) reply).getData();
+            for (ConnectorServiceFactory factory : Register.getComponents(ConnectorServiceFactory.class)) {
+                service = factory.newConnector(description, identifier, name, uris, parameters);
+                if (service != null)
                     break;
-                }
             }
             if (service == null)
                 // failed to create the service (factory not fond?)
@@ -272,9 +266,20 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             Dictionary<String, Object> properties = new Hashtable<>();
             properties.put("id", service.getIdentifier());
             BundleContext context = FrameworkUtil.getBundle(ConnectorService.class).getBundleContext();
-            registration.refAsDomainConnector = context.registerService(ConnectorService.class, service, properties);
-            if (service instanceof HttpApiService)
-                registration.refAsServedService = context.registerService(HttpApiService.class, (HttpApiService) service, null);
+            if (service instanceof HttpApiService) {
+                registration.references = new ServiceRegistration[]{
+                        context.registerService(Service.class, service, properties),
+                        context.registerService(SecuredService.class, service, properties),
+                        context.registerService(ConnectorService.class, service, properties),
+                        context.registerService(HttpApiService.class, (HttpApiService) service, properties)
+                };
+            } else {
+                registration.references = new ServiceRegistration[]{
+                        context.registerService(Service.class, service, properties),
+                        context.registerService(SecuredService.class, service, properties),
+                        context.registerService(ConnectorService.class, service, properties)
+                };
+            }
             connectorsById.put(identifier, registration);
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
@@ -285,12 +290,19 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
     @Override
     public XSPReply delete(String identifier) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_DELETE);
+        if (!reply.isSuccess())
+            return reply;
+
         synchronized (connectorsById) {
             Registration registration = connectorsById.remove(identifier);
             if (registration == null)
                 return XSPReplyNotFound.instance();
-            registration.refAsDomainConnector.unregister();
-            registration.refAsServedService.unregister();
+            for (int i = 0; i != registration.references.length; i++)
+                registration.references[i].unregister();
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorDeletedEvent(this, registration.service));
@@ -299,34 +311,9 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     /**
-     * When a new connector factory service comes online
-     *
-     * @param factory The new factory
-     */
-    public void onFactoryOnline(ConnectorServiceFactory factory) {
-        synchronized (factories) {
-            factories.add(factory);
-        }
-        resolveConfigConnectors(factory);
-    }
-
-    /**
-     * When a connector factory service comes offline
-     *
-     * @param factory The factory
-     */
-    public void onFactoryOffline(ConnectorServiceFactory factory) {
-        synchronized (factories) {
-            factories.remove(factory);
-        }
-    }
-
-    /**
      * Resolve statically configured connectors
-     *
-     * @param factory The new factory, if any
      */
-    private void resolveConfigConnectors(ConnectorServiceFactory factory) {
+    private void resolveConfigConnectors() {
         if (isResolving)
             return;
         isResolving = true;
@@ -350,28 +337,10 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         }
         List<Map.Entry<String, List<Section>>> entries = new ArrayList<>(toResolve.entrySet());
         for (Map.Entry<String, List<Section>> entry : entries) {
-            if (factory != null) {
-                // this is a new factory
-                for (ConnectorDescription description : factory.getDescriptors()) {
-                    if (description.getIdentifier().equals(entry.getKey())) {
-                        resolveConfigConnectors(description, entry.getValue());
-                        break;
-                    }
-                }
-            } else {
-                synchronized (factories) {
-                    for (ConnectorServiceFactory existingFactory : factories) {
-                        boolean found = false;
-                        for (ConnectorDescription description : existingFactory.getDescriptors()) {
-                            if (description.getIdentifier().equals(entry.getKey())) {
-                                resolveConfigConnectors(description, entry.getValue());
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                            break;
-                    }
+            for (ConnectorDescriptor description : Register.getComponents(ConnectorDescriptor.class)) {
+                if (description.getIdentifier().equals(entry.getKey())) {
+                    resolveConfigConnectors(description, entry.getValue());
+                    break;
                 }
             }
         }
@@ -384,7 +353,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @param description The description
      * @param sections    The configurations to resolve
      */
-    private void resolveConfigConnectors(ConnectorDescription description, List<Section> sections) {
+    private void resolveConfigConnectors(ConnectorDescriptor description, List<Section> sections) {
         for (int i = sections.size() - 1; i != -1; i--) {
             if (resolveConfigConnector(description, sections.get(i)))
                 sections.remove(i);
@@ -400,18 +369,18 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @param section     The configuration to resolve
      * @return Whether the operation succeeded
      */
-    private boolean resolveConfigConnector(ConnectorDescription description, Section section) {
+    private boolean resolveConfigConnector(ConnectorDescriptor description, Section section) {
         String id = section.getName();
         String name = section.get("name");
         if (id == null || name == null)
             return false;
         List<String> uris = section.getAll("uris");
-        Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
+        Map<ConnectorDescriptorParam, Object> customParams = new HashMap<>();
         for (String property : section.getProperties()) {
             if (property.equals("name") || property.equals("uris"))
                 continue;
-            ConnectorDescriptionParam parameter = null;
-            for (ConnectorDescriptionParam p : description.getParameters()) {
+            ConnectorDescriptorParam parameter = null;
+            for (ConnectorDescriptorParam p : description.getParameters()) {
                 if (p.getIdentifier().equals(property)) {
                     parameter = p;
                     break;
@@ -467,10 +436,10 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageListDescriptors() {
-        Collection<ConnectorDescription> domains = getDescriptors();
+        Collection<ConnectorDescriptor> domains = getDescriptors();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (ConnectorDescription description : domains) {
+        for (ConnectorDescriptor description : domains) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -500,8 +469,8 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         if (root == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
 
-        ConnectorDescription descriptor = null;
-        for (ConnectorDescription description : getDescriptors()) {
+        ConnectorDescriptor descriptor = null;
+        for (ConnectorDescriptor description : getDescriptors()) {
             if (description.getIdentifier().equals(descriptorId[0])) {
                 descriptor = description;
                 break;
@@ -512,7 +481,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
         String name = null;
         List<String> uris = new ArrayList<>(2);
-        Map<ConnectorDescriptionParam, Object> customParams = new HashMap<>();
+        Map<ConnectorDescriptorParam, Object> customParams = new HashMap<>();
         for (ASTNode member : root.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -537,8 +506,8 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
                     break;
                 }
                 default: {
-                    ConnectorDescriptionParam parameter = null;
-                    for (ConnectorDescriptionParam p : descriptor.getParameters()) {
+                    ConnectorDescriptorParam parameter = null;
+                    for (ConnectorDescriptorParam p : descriptor.getParameters()) {
                         if (p.getIdentifier().equals(head)) {
                             parameter = p;
                             break;
@@ -568,16 +537,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
         if (name == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The name for the connector is not specified"), null);
-
-        // check for platform admin role
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
-        if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-
-        reply = spawn(descriptor, connectorId, name, uris.toArray(new String[uris.size()]), customParams);
+        XSPReply reply = spawn(descriptor, connectorId, name, uris.toArray(new String[uris.size()]), customParams);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConnectorService>) reply).getData().serializedJSON());
@@ -590,15 +550,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageDeleteConnector(String connectorId) {
-        // check for platform admin role
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
-        if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-
-        reply = delete(connectorId);
+        XSPReply reply = delete(connectorId);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 

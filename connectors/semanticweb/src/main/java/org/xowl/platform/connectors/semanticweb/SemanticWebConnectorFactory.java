@@ -19,8 +19,8 @@ package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.platform.services.connection.ConnectorDescription;
-import org.xowl.platform.services.connection.ConnectorDescriptionParam;
+import org.xowl.platform.services.connection.ConnectorDescriptor;
+import org.xowl.platform.services.connection.ConnectorDescriptorParam;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
     /**
      * The descriptions of the supported domains
      */
-    private static final Collection<ConnectorDescription> DESCRIPTIONS = Collections.unmodifiableCollection(Collections.singletonList((ConnectorDescription) SemanticWebConnectorDescriptor.INSTANCE));
+    private static final Collection<ConnectorDescriptor> DESCRIPTIONS = Collections.unmodifiableCollection(Collections.singletonList((ConnectorDescriptor) SemanticWebConnectorDescriptor.INSTANCE));
 
     @Override
     public String getIdentifier() {
@@ -49,12 +49,12 @@ public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public Collection<ConnectorDescription> getDescriptors() {
+    public Collection<ConnectorDescriptor> getDescriptors() {
         return DESCRIPTIONS;
     }
 
     @Override
-    public XSPReply newConnector(ConnectorDescription descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptionParam, Object> parameters) {
+    public XSPReply newConnector(ConnectorDescriptor descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
         return new XSPReplyResult<>(new SemanticWebConnector(identifier, name, uris));
     }
 }

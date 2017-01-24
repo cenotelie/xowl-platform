@@ -18,16 +18,16 @@
 package org.xowl.platform.services.collaboration;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Registrable;
 
 /**
  * Represents a descriptor for a collaboration pattern
  *
  * @author Laurent Wouters
  */
-public class CollaborationPatternDescriptor implements Identifiable, Serializable {
+public class CollaborationPatternDescriptor implements Registrable, Serializable {
     /**
      * The identifier of this pattern
      */

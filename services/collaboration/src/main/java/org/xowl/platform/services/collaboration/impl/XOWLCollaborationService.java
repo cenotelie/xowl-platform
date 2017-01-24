@@ -30,11 +30,14 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformRoleBase;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -104,36 +107,47 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Collaboration Service";
+        return PlatformUtils.NAME + " - Collaboration Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
     public Collection<RemoteCollaboration> getNeighbours() {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbours();
     }
 
     @Override
     public RemoteCollaboration getNeighbour(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbour(collaborationId);
     }
 
     @Override
     public CollaborationStatus getNeighbourStatus(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbourStatus(collaborationId);
     }
 
     @Override
     public XSPReply getNeighbourManifest(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbourManifest(collaborationId);
     }
 
     @Override
     public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbourInputsFor(collaborationId, specificationId);
     }
 
     @Override
     public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        // authorization is delegated to the network service
         return getNetworkService().getNeighbourOutputsFor(collaborationId, specificationId);
     }
 
@@ -154,31 +168,37 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
+        // authorization is delegated to the network service
         return getNetworkService().spawn(specification);
     }
 
     @Override
     public XSPReply archive(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().archive(collaborationId);
     }
 
     @Override
     public XSPReply restart(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().restart(collaborationId);
     }
 
     @Override
     public XSPReply delete(String collaborationId) {
+        // authorization is delegated to the network service
         return getNetworkService().delete(collaborationId);
     }
 
     @Override
     public XSPReply archive() {
+        // authorization is delegated to the network service
         return getNetworkService().archive(getCollaborationIdentifier());
     }
 
     @Override
     public XSPReply delete() {
+        // authorization is delegated to the network service
         return getNetworkService().delete(getCollaborationIdentifier());
     }
 
@@ -199,7 +219,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/archive")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");

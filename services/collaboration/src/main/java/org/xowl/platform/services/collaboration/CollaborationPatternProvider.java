@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 
@@ -26,7 +26,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationPatternProvider extends Service {
+public interface CollaborationPatternProvider extends Registrable {
     /**
      * Gets the descriptors for the supported patterns
      *

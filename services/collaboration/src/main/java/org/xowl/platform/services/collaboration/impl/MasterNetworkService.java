@@ -26,11 +26,11 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
@@ -144,36 +144,83 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Collaboration Network Service (Master)";
+        return PlatformUtils.NAME + " - Collaboration Network Service (Master)";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS_NETWORK;
     }
 
     @Override
     public Collection<RemoteCollaboration> getNeighbours() {
-        return Collections.emptyList();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return Collections.emptyList();
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        if (!reply.isSuccess())
+            return Collections.emptyList();
+        return Collections.unmodifiableCollection((Collection) collaborations.values());
     }
 
     @Override
     public RemoteCollaboration getNeighbour(String collaborationId) {
-        return null;
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        if (!reply.isSuccess())
+            return null;
+        return collaborations.get(collaborationId);
     }
 
     @Override
     public CollaborationStatus getNeighbourStatus(String collaborationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return CollaborationStatus.Invalid;
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        if (!reply.isSuccess())
+            return CollaborationStatus.Invalid;
+        RemoteCollaborationBase neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return CollaborationStatus.Invalid;
         return CollaborationStatus.Invalid;
     }
 
     @Override
     public XSPReply getNeighbourManifest(String collaborationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_MANIFEST);
+        if (!reply.isSuccess())
+            return reply;
+        RemoteCollaborationBase neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
         return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_INPUTS);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_OUTPUTS);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyNotFound.instance();
     }
 
@@ -184,21 +231,45 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_NETWORK_SPAWN);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply archive(String collaborationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply restart(String collaborationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyNotFound.instance();
     }
 
     @Override
     public XSPReply delete(String collaborationId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
+        if (!reply.isSuccess())
+            return reply;
         return XSPReplyNotFound.instance();
     }
 

@@ -18,8 +18,9 @@
 package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
 
@@ -28,7 +29,54 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkService extends Service {
+public interface CollaborationNetworkService extends SecuredService {
+    /**
+     * Service action to get the neighbour collaborations
+     */
+    SecuredAction ACTION_GET_NEIGHBOURS = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".GetNeighbours", "Collaboration Network Service - Get Neighbour Collaborations");
+    /**
+     * Service action to get the manifest for a neighbour collaboration
+     */
+    SecuredAction ACTION_GET_NEIGHBOUR_MANIFEST = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".GetNeighbourManifest", "Collaboration Network Service - Get Neighbour Manifest");
+    /**
+     * Service action to get the input artifacts for a neighbour collaboration
+     */
+    SecuredAction ACTION_GET_NEIGHBOUR_INPUTS = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".GetNeighbourInputs", "Collaboration Network Service - Get Neighbour Inputs");
+    /**
+     * Service action to get the output artifacts for a neighbour collaboration
+     */
+    SecuredAction ACTION_GET_NEIGHBOUR_OUTPUTS = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".GetNeighbourOutputs", "Collaboration Network Service - Get Neighbour Outputs");
+    /**
+     * Service action to spawn a new collaboration in the network of collaborations
+     */
+    SecuredAction ACTION_NETWORK_SPAWN = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".NetworkSpawn", "Collaboration Network Service - Network Spawn Collaboration");
+    /**
+     * Service action to archive an existing collaboration in the network of collaborations
+     */
+    SecuredAction ACTION_NETWORK_ARCHIVE = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".NetworkArchive", "Collaboration Network Service - Network Archive Collaboration");
+    /**
+     * Service action to restart an archived collaboration in the network of collaborations
+     */
+    SecuredAction ACTION_NETWORK_RESTART = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".NetworkRestart", "Collaboration Network Service - Network Restart Collaboration");
+    /**
+     * Service action to delete an existing collaboration in the network of collaborations
+     */
+    SecuredAction ACTION_NETWORK_DELETE = new SecuredAction(CollaborationNetworkService.class.getCanonicalName() + ".NetworkDelete", "Collaboration Network Service - Network Delete Collaboration");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS_NETWORK = new SecuredAction[]{
+            ACTION_GET_NEIGHBOURS,
+            ACTION_GET_NEIGHBOUR_MANIFEST,
+            ACTION_GET_NEIGHBOUR_INPUTS,
+            ACTION_GET_NEIGHBOUR_OUTPUTS,
+            ACTION_NETWORK_SPAWN,
+            ACTION_NETWORK_ARCHIVE,
+            ACTION_NETWORK_RESTART,
+            ACTION_NETWORK_DELETE
+    };
+
     /**
      * Gets the known neighbour collaborations
      *

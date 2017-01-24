@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.collaboration.CollaborationPattern;
 import org.xowl.platform.services.collaboration.CollaborationPatternDescriptor;
 import org.xowl.platform.services.collaboration.CollaborationPatternFreeStyle;
@@ -38,7 +39,7 @@ public class XOWLPatternProvider implements CollaborationPatternProvider {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Collaboration Pattern Provider";
+        return PlatformUtils.NAME + " - Collaboration Pattern Provider";
     }
 
     @Override

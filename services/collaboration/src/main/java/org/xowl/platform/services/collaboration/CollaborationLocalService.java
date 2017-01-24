@@ -18,10 +18,11 @@
 package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
 
@@ -30,7 +31,64 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationLocalService extends Service {
+public interface CollaborationLocalService extends SecuredService {
+    /**
+     * Service action to add an input specification
+     */
+    SecuredAction ACTION_ADD_INPUT_SPEC = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".AddInputSpec", "Collaboration Local Service - Add Input Specification");
+    /**
+     * Service action to remove an input specification
+     */
+    SecuredAction ACTION_REMOVE_INPUT_SPEC = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".RemoveInputSpec", "Collaboration Local Service - Remove Input Specification");
+    /**
+     * Service action to add an output specification
+     */
+    SecuredAction ACTION_ADD_OUTPUT_SPEC = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".AddOutputSpec", "Collaboration Local Service - Add Output Specification");
+    /**
+     * Service action to remove an output specification
+     */
+    SecuredAction ACTION_REMOVE_OUTPUT_SPEC = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".RemoveOutputSpec", "Collaboration Local Service - Remove Output Specification");
+    /**
+     * Service action to register an artifact as an input
+     */
+    SecuredAction ACTION_REGISTER_INPUT = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".RegisterInput", "Collaboration Local Service - Register Input Artifact");
+    /**
+     * Service action to unregister an artifact as an input
+     */
+    SecuredAction ACTION_UNREGISTER_INPUT = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".UnregisterInput", "Collaboration Local Service - Unregister Input Artifact");
+    /**
+     * Service action to register an artifact as an output
+     */
+    SecuredAction ACTION_REGISTER_OUTPUT = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".RegisterOutput", "Collaboration Local Service - Register Output Artifact");
+    /**
+     * Service action to register an artifact as an output
+     */
+    SecuredAction ACTION_UNREGISTER_OUTPUT = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".UnregisterOutput", "Collaboration Local Service - Unregister Output Artifact");
+    /**
+     * Service action to add a collaboration role
+     */
+    SecuredAction ACTION_ADD_ROLE = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".AddRole", "Collaboration Local Service - Add Collaboration Role");
+    /**
+     * Service action to remove a collaboration role
+     */
+    SecuredAction ACTION_REMOVE_ROLE = new SecuredAction(CollaborationLocalService.class.getCanonicalName() + ".RemoveRole", "Collaboration Local Service - Remove Collaboration Role");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS_LOCAL = new SecuredAction[]{
+            ACTION_ADD_INPUT_SPEC,
+            ACTION_REMOVE_INPUT_SPEC,
+            ACTION_ADD_OUTPUT_SPEC,
+            ACTION_REMOVE_OUTPUT_SPEC,
+            ACTION_REGISTER_INPUT,
+            ACTION_UNREGISTER_INPUT,
+            ACTION_REGISTER_OUTPUT,
+            ACTION_UNREGISTER_OUTPUT,
+            ACTION_ADD_ROLE,
+            ACTION_REMOVE_ROLE
+    };
+
     /**
      * Gets the unique identifier of the local collaboration
      *

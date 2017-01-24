@@ -17,14 +17,14 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 /**
  * A provider of implementations of the collaboration network service
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkServiceProvider extends Service {
+public interface CollaborationNetworkServiceProvider extends Registrable {
     /**
      * Tries to newPolicy a collaboration network service
      *

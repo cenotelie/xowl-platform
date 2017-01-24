@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkServiceProvider;
 
@@ -33,7 +34,7 @@ public class XOWLNetworkProvider implements CollaborationNetworkServiceProvider 
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Collaboration Network Service Provider";
+        return PlatformUtils.NAME + " - Collaboration Network Service Provider";
     }
 
     @Override

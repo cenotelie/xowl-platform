@@ -28,7 +28,6 @@ import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.Result;
-import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
@@ -47,6 +46,8 @@ import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -190,7 +191,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Storage Service";
+        return PlatformUtils.NAME + " - Storage Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -220,6 +226,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
 
     @Override
     public XSPReply retrieve(String base, String version) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+        if (!reply.isSuccess())
+            return reply;
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -234,10 +246,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         writer.write("> \"");
         writer.write(TextUtils.escapeStringW3C(version));
         writer.write("\" } }");
-        Result result = storeLongTerm.sparql(writer.toString());
-        if (result.isFailure())
-            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
-        Collection<Quad> metadata = ((ResultQuads) result).getQuads();
+        reply = storeLongTerm.doSparql(writer.toString());
+        if (!reply.isSuccess())
+            return reply;
+        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
         if (metadata.isEmpty())
             return XSPReplyNotFound.instance();
         return new XSPReplyResult<>(storeLongTerm.buildArtifact(metadata));
@@ -263,6 +275,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
 
     @Override
     public XSPReply getArtifactsForBase(String base) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+        if (!reply.isSuccess())
+            return reply;
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -273,15 +291,21 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         writer.write("> <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(base));
         writer.write("> } }");
-
-        Result sparqlResult = storeLongTerm.sparql(writer.toString());
-        if (sparqlResult.isFailure())
-            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
-        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
+        reply = storeLongTerm.doSparql(writer.toString());
+        if (!reply.isSuccess())
+            return reply;
+        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
+        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
     }
 
     @Override
     public XSPReply getArtifactsForArchetype(String archetype) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+        if (!reply.isSuccess())
+            return reply;
         StringWriter writer = new StringWriter();
         writer.write("DESCRIBE ?a WHERE { GRAPH <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -292,11 +316,11 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         writer.write("> \"");
         writer.write(TextUtils.escapeAbsoluteURIW3C(archetype));
         writer.write("\" } }");
-
-        Result sparqlResult = storeLongTerm.sparql(writer.toString());
-        if (sparqlResult.isFailure())
-            return new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
-        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(((ResultQuads) sparqlResult).getQuads()));
+        reply = storeLongTerm.doSparql(writer.toString());
+        if (!reply.isSuccess())
+            return reply;
+        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
+        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
     }
 
     @Override
@@ -358,7 +382,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/sparql")) {
             return onMessageSPARQL(request);
         } else if (request.getUri().equals(URI_API + "/artifacts")) {

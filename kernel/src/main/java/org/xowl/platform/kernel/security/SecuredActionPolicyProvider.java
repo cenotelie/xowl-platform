@@ -27,7 +27,7 @@ import org.xowl.platform.kernel.Registrable;
  */
 public interface SecuredActionPolicyProvider extends Registrable {
     /**
-     * Tries to newPolicy a policy
+     * Tries to instantiate a policy
      *
      * @param policyId   The identifier of the policy
      * @param definition The serialized definition

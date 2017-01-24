@@ -19,19 +19,30 @@ package org.xowl.platform.services.storage.impl;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.server.api.XOWLStoredProcedure;
+import org.xowl.infra.server.api.XOWLStoredProcedureContext;
 import org.xowl.infra.server.base.BaseDatabase;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.EntailmentRegime;
-import org.xowl.infra.store.rdf.*;
+import org.xowl.infra.store.rdf.LiteralNode;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.store.rdf.RDFPatternSolution;
+import org.xowl.infra.store.rdf.SubjectNode;
 import org.xowl.infra.store.sparql.*;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricComposite;
 import org.xowl.platform.kernel.KernelSchema;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactDeferred;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.storage.StorageService;
 import org.xowl.platform.services.storage.TripleStore;
 
 import java.io.StringWriter;
@@ -93,110 +104,6 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     protected abstract XOWLDatabase resolveBackend();
 
     @Override
-    public XSPReply sparql(String sparql, List<String> defaultIRIs, List<String> namedIRIs) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.sparql(sparql, defaultIRIs, namedIRIs);
-    }
-
-    @Override
-    public XSPReply sparql(Command sparql) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.sparql(sparql);
-    }
-
-    @Override
-    public XSPReply getEntailmentRegime() {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.getEntailmentRegime();
-    }
-
-    @Override
-    public XSPReply setEntailmentRegime(EntailmentRegime regime) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.setEntailmentRegime(regime);
-    }
-
-    @Override
-    public XSPReply getRule(String name) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.getRule(name);
-    }
-
-    @Override
-    public XSPReply getRules() {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.getRules();
-    }
-
-    @Override
-    public XSPReply addRule(String content, boolean activate) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.addRule(content, activate);
-    }
-
-    @Override
-    public XSPReply removeRule(XOWLRule rule) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.removeRule(rule);
-    }
-
-    @Override
-    public XSPReply activateRule(XOWLRule rule) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.activateRule(rule);
-    }
-
-    @Override
-    public XSPReply deactivateRule(XOWLRule rule) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.deactivateRule(rule);
-    }
-
-    @Override
-    public XSPReply getRuleStatus(XOWLRule rule) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.getRuleStatus(rule);
-    }
-
-    @Override
-    public XSPReply upload(String syntax, String content) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.upload(syntax, content);
-    }
-
-    @Override
-    public XSPReply upload(Collection<Quad> quads) {
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return XSPReplyNetworkError.instance();
-        return connection.upload(quads);
-    }
-
-    @Override
     public XSPReply getMetric() {
         if (metricStatistics != null)
             return new XSPReplyResult<>(metricStatistics);
@@ -218,11 +125,311 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
+    public XSPReply sparql(String sparql, List<String> defaultIRIs, List<String> namedIRIs) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_QUERY);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.sparql(sparql, defaultIRIs, namedIRIs);
+    }
+
+    @Override
+    public XSPReply sparql(Command sparql) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_QUERY);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.sparql(sparql);
+    }
+
+    @Override
+    public XSPReply getEntailmentRegime() {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getEntailmentRegime();
+    }
+
+    @Override
+    public XSPReply setEntailmentRegime(EntailmentRegime regime) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_SET_ENTAILMENT);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.setEntailmentRegime(regime);
+    }
+
+    @Override
+    public XSPReply getRules() {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRules();
+    }
+
+    @Override
+    public XSPReply getRule(String name) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRule(name);
+    }
+
+    @Override
+    public XSPReply addRule(String content, boolean activate) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_CREATE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.addRule(content, activate);
+    }
+
+    @Override
+    public XSPReply removeRule(XOWLRule rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DELETE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.removeRule(rule);
+    }
+
+    @Override
+    public XSPReply removeRule(String rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DELETE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.removeRule(rule);
+    }
+
+    @Override
+    public XSPReply activateRule(XOWLRule rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_ACTIVATE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.activateRule(rule);
+    }
+
+    @Override
+    public XSPReply activateRule(String rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_ACTIVATE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.activateRule(rule);
+    }
+
+    @Override
+    public XSPReply deactivateRule(XOWLRule rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DEACTIVATE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.deactivateRule(rule);
+    }
+
+    @Override
+    public XSPReply deactivateRule(String rule) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DEACTIVATE_RULE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.deactivateRule(rule);
+    }
+
+    @Override
+    public XSPReply getRuleStatus(XOWLRule rule) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRuleStatus(rule);
+    }
+
+    @Override
+    public XSPReply getRuleStatus(String rule) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getRuleStatus(rule);
+    }
+
+    @Override
+    public XSPReply getStoredProcedures() {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getStoredProcedures();
+    }
+
+    @Override
+    public XSPReply getStoreProcedure(String iri) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.getStoreProcedure(iri);
+    }
+
+    @Override
+    public XSPReply addStoredProcedure(String iri, String sparql, Collection<String> parameters) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_CREATE_PROCEDURE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.addStoredProcedure(iri, sparql, parameters);
+    }
+
+    @Override
+    public XSPReply removeStoredProcedure(XOWLStoredProcedure procedure) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DELETE_PROCEDURE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.removeStoredProcedure(procedure);
+    }
+
+    @Override
+    public XSPReply removeStoredProcedure(String procedure) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_DELETE_PROCEDURE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.removeStoredProcedure(procedure);
+    }
+
+    @Override
+    public XSPReply executeStoredProcedure(XOWLStoredProcedure procedure, XOWLStoredProcedureContext context) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_EXECUTE_PROCEDURE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.executeStoredProcedure(procedure, context);
+    }
+
+    @Override
+    public XSPReply executeStoredProcedure(String procedure, XOWLStoredProcedureContext context) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_EXECUTE_PROCEDURE);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.executeStoredProcedure(procedure, context);
+    }
+
+    @Override
+    public XSPReply upload(String syntax, String content) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_UPLOAD_RAW);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.upload(syntax, content);
+    }
+
+    @Override
+    public XSPReply upload(Collection<Quad> quads) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_UPLOAD_RAW);
+        if (!reply.isSuccess())
+            return reply;
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.upload(quads);
+    }
+
+    @Override
     public Result sparql(String query) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return new ResultFailure("Service unavailable");
+        XSPReply reply = securityService.checkAction(StorageService.ACTION_UPLOAD_RAW);
+        if (!reply.isSuccess())
+            return new ResultFailure(reply.getMessage());
         XOWLDatabase connection = getBackend();
         if (connection == null)
             return new ResultFailure("The connection to the remote host is not configured");
-        XSPReply reply = connection.sparql(query, null, null);
+        reply = connection.sparql(query, null, null);
         if (!reply.isSuccess())
             return new ResultFailure(reply.getMessage());
         return ((XSPReplyResult<Result>) reply).getData();
@@ -230,6 +437,12 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply getArtifacts() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_RETRIEVE_METADATA);
+        if (!reply.isSuccess())
+            return reply;
         XOWLDatabase connection = getBackend();
         if (connection == null)
             return XSPReplyNetworkError.instance();
@@ -239,7 +452,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         writer.write("> { ?a a <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.ARTIFACT));
         writer.write("> } }");
-        XSPReply reply = connection.sparql(writer.toString(), null, null);
+        reply = connection.sparql(writer.toString(), null, null);
         if (!reply.isSuccess())
             return reply;
         ResultQuads sparqlResult = ((XSPReplyResult<ResultQuads>) reply).getData();
@@ -271,13 +484,19 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply store(Artifact artifact) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_STORE);
+        if (!reply.isSuccess())
+            return reply;
         Collection<Quad> metadata = artifact.getMetadata();
         if (metadata == null || metadata.isEmpty())
             return new XSPReplyApiError(ERROR_INVALID_ARTIFACT, "Empty metadata.");
         Collection<Quad> content = artifact.getContent();
         if (content == null)
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to fetch the artifact's content.");
-        XSPReply reply = upload(metadata);
+        reply = upload(metadata);
         if (!reply.isSuccess())
             return reply;
         return upload(content);
@@ -285,9 +504,15 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply retrieve(String identifier) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_RETRIEVE_METADATA);
+        if (!reply.isSuccess())
+            return reply;
         Result result = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">");
         if (result.isFailure())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure)result).getMessage());
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
             return XSPReplyNotFound.instance();
@@ -296,6 +521,12 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
 
     @Override
     public XSPReply delete(String identifier) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_DELETE);
+        if (!reply.isSuccess())
+            return reply;
         StringWriter writer = new StringWriter();
         writer.write("DELETE WHERE { GRAPH <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS));
@@ -307,7 +538,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         Result result = sparql(writer.toString());
         if (result.isSuccess())
             return XSPReplySuccess.instance();
-        return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure)result).getMessage());
+        return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
     }
 
     /**
@@ -318,19 +549,8 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
      */
     public Collection<Artifact> buildArtifacts(Collection<Quad> quads) {
         Collection<Artifact> result = new ArrayList<>();
-        Map<IRINode, Collection<Quad>> data = new HashMap<>();
-        for (Quad quad : quads) {
-            if (quad.getSubject().getNodeType() == Node.TYPE_IRI) {
-                IRINode subject = (IRINode) quad.getSubject();
-                Collection<Quad> metadata = data.get(subject);
-                if (metadata == null) {
-                    metadata = new ArrayList<>();
-                    data.put(subject, metadata);
-                }
-                metadata.add(quad);
-            }
-        }
-        for (Map.Entry<IRINode, Collection<Quad>> entry : data.entrySet()) {
+        Map<SubjectNode, Collection<Quad>> data = PlatformUtils.mapBySubject(quads);
+        for (Map.Entry<SubjectNode, Collection<Quad>> entry : data.entrySet()) {
             result.add(buildArtifact(entry.getValue()));
         }
         return result;
@@ -346,11 +566,34 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         return new ArtifactDeferred(metadata) {
             @Override
             protected Collection<Quad> load() {
-                Result result = sparql("CONSTRUCT FROM NAMED <" + TextUtils.escapeAbsoluteURIW3C(identifier) + "> WHERE { ?s ?p ?o }");
-                if (result.isFailure())
-                    return null;
+                SecurityService securityService = Register.getComponent(SecurityService.class);
+                if (securityService == null)
+                    return Collections.emptyList();
+                XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_RETRIEVE_CONTENT);
+                if (!reply.isSuccess())
+                    return Collections.emptyList();
+                XOWLDatabase connection = getBackend();
+                if (connection == null)
+                    return Collections.emptyList();
+                reply = connection.sparql("CONSTRUCT FROM NAMED <" + TextUtils.escapeAbsoluteURIW3C(identifier) + "> WHERE { ?s ?p ?o }", null, null);
+                if (!reply.isSuccess())
+                    return Collections.emptyList();
+                Result result = ((XSPReplyResult<Result>) reply).getData();
                 return ((ResultQuads) result).getQuads();
             }
         };
+    }
+
+    /**
+     * Executes a SPARQL query without security checks
+     *
+     * @param query The SPARQL query to execute
+     * @return The result
+     */
+    public XSPReply doSparql(String query) {
+        XOWLDatabase connection = getBackend();
+        if (connection == null)
+            return XSPReplyNetworkError.instance();
+        return connection.sparql(query, null, null);
     }
 }

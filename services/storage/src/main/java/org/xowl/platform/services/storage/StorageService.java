@@ -21,6 +21,7 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.storage.impl.XOWLStorageService;
 
@@ -30,6 +31,69 @@ import org.xowl.platform.services.storage.impl.XOWLStorageService;
  * @author Laurent Wouters
  */
 public interface StorageService extends ArtifactStorageService, MeasurableService {
+    /**
+     * Service action to execute queries on the store
+     */
+    SecuredAction ACTION_QUERY = new SecuredAction(StorageService.class.getCanonicalName() + ".Query", "Storage Service - Execute Query");
+    /**
+     * Service action to execute queries on the store
+     */
+    SecuredAction ACTION_SET_ENTAILMENT = new SecuredAction(StorageService.class.getCanonicalName() + ".SetEntailment", "Storage Service - Set Entailment");
+    /**
+     * Service action to create a rule
+     */
+    SecuredAction ACTION_CREATE_RULE = new SecuredAction(StorageService.class.getCanonicalName() + ".CreateRule", "Storage Service - Create Rule");
+    /**
+     * Service action to delete a rule
+     */
+    SecuredAction ACTION_DELETE_RULE = new SecuredAction(StorageService.class.getCanonicalName() + ".DeleteRule", "Storage Service - Delete Rule");
+    /**
+     * Service action to activate a rule
+     */
+    SecuredAction ACTION_ACTIVATE_RULE = new SecuredAction(StorageService.class.getCanonicalName() + ".ActivateRule", "Storage Service - Activate Rule");
+    /**
+     * Service action to de-activate a rule
+     */
+    SecuredAction ACTION_DEACTIVATE_RULE = new SecuredAction(StorageService.class.getCanonicalName() + ".DeactivateRule", "Storage Service - Deactivate Rule");
+    /**
+     * Service action to de-activate a rule
+     */
+    SecuredAction ACTION_CREATE_PROCEDURE = new SecuredAction(StorageService.class.getCanonicalName() + ".CreateProcedure", "Storage Service - Create Procedure");
+    /**
+     * Service action to de-activate a rule
+     */
+    SecuredAction ACTION_DELETE_PROCEDURE = new SecuredAction(StorageService.class.getCanonicalName() + ".DeleteProcedure", "Storage Service - Delete Procedure");
+    /**
+     * Service action to de-activate a rule
+     */
+    SecuredAction ACTION_EXECUTE_PROCEDURE = new SecuredAction(StorageService.class.getCanonicalName() + ".ExecuteProcedure", "Storage Service - Execute Procedure");
+    /**
+     * Service action to de-activate a rule
+     */
+    SecuredAction ACTION_UPLOAD_RAW = new SecuredAction(StorageService.class.getCanonicalName() + ".UploadRaw", "Storage Service - Upload Raw");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_STORE,
+            ACTION_RETRIEVE_METADATA,
+            ACTION_RETRIEVE_CONTENT,
+            ACTION_DELETE,
+            ACTION_PUSH_LIVE,
+            ACTION_PULL_LIVE,
+            ACTION_QUERY,
+            ACTION_SET_ENTAILMENT,
+            ACTION_CREATE_RULE,
+            ACTION_DELETE_RULE,
+            ACTION_ACTIVATE_RULE,
+            ACTION_DEACTIVATE_RULE,
+            ACTION_CREATE_PROCEDURE,
+            ACTION_DELETE_PROCEDURE,
+            ACTION_EXECUTE_PROCEDURE,
+            ACTION_UPLOAD_RAW
+    };
+
     /**
      * The total artifacts count metric
      */

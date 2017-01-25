@@ -83,6 +83,26 @@ XOWL.prototype.logout = function () {
 	}, "kernel/security/logout", null, "POST", null, null);
 }
 
+XOWL.prototype.getSecurityPolicy = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/policy", null, "GET", null, null);
+}
+
+XOWL.prototype.setSecuredActionPolicy = function (callback, actionId, policy) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/policy/actions/" + encodeURIComponent(actionId), null, "PUT", MIME_JSON, policy);
+}
+
 XOWL.prototype.getPlatformUsers = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

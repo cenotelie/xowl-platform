@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.webapp.impl;
 
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
@@ -39,7 +40,7 @@ public class XOWLMainContribution implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Main UI Contribution";
+        return PlatformUtils.NAME + " - Main UI Contribution";
     }
 
     @Override

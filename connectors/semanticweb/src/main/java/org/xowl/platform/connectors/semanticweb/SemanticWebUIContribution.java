@@ -17,6 +17,7 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
@@ -43,7 +44,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Semantic Web Importer Contribution";
+        return PlatformUtils.NAME + " - Semantic Web Importer Contribution";
     }
 
     @Override

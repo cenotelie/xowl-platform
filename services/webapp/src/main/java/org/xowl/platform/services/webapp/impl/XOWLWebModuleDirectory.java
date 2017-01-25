@@ -20,6 +20,7 @@ package org.xowl.platform.services.webapp.impl;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -60,7 +61,7 @@ public class XOWLWebModuleDirectory implements HttpApiService {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Web Modules Directory Service";
+        return PlatformUtils.NAME + " - Web Modules Directory Service";
     }
 
     @Override

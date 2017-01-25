@@ -18,6 +18,7 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobFactory;
 
@@ -34,7 +35,7 @@ public class SemanticWebImportJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Semantic Web Importation Job Factory";
+        return PlatformUtils.NAME + " - Semantic Web Importation Job Factory";
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
 import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -62,7 +63,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - CSV Importer";
+        return PlatformUtils.NAME + " - CSV Importer";
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.xowl.platform.connectors.csv;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
 import org.xowl.platform.services.connection.ConnectorDescriptorParam;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
@@ -58,7 +59,7 @@ public class CSVFactory implements ConnectorServiceFactory {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - CSV Connector Factory";
+        return PlatformUtils.NAME + " - CSV Connector Factory";
     }
 
     @Override

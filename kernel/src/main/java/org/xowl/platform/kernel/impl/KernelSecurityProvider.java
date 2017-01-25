@@ -43,6 +43,8 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
     public SecuredActionPolicy newPolicy(String policyId, ASTNode definition) {
         if (SecuredActionPolicyAllowAll.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyAllowAll.INSTANCE;
+        else if (SecuredActionPolicyDenyAll.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyDenyAll.INSTANCE;
         else if (SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsPlatformAdmin.INSTANCE;
         else if (SecuredActionPolicyHasRole.class.getCanonicalName().equals(policyId))

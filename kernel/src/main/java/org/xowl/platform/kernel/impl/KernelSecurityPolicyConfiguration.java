@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.store.loaders.JSONLDLoader;
@@ -27,6 +28,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.*;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.*;
 import java.util.HashMap;
@@ -90,6 +92,11 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
                 }
             }
         }
+
+        // non-mapped actions
+        for (SecuredAction action : actions.values()) {
+            policies.put(action, SecuredActionPolicyDenyAll.INSTANCE);
+        }
     }
 
     /**
@@ -128,7 +135,7 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
             if ("identifier".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(0).getValue());
                 value = head.substring(1, value.length() - 1);
-                return actions.get(value);
+                return actions.remove(value);
             }
         }
         return null;
@@ -142,6 +149,16 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * @return The protocol reply
      */
     public XSPReply put(SecuredAction action, SecuredActionPolicy policy) {
+        String[] allowedPolicies = action.getPolicies();
+        boolean found = false;
+        for (int i = 0; i != allowedPolicies.length; i++) {
+            if (allowedPolicies[i].equals(policy.getIdentifier())) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return new XSPReplyApiError(HttpApiService.ERROR_PARAMETER_RANGE, "The specified policy is not allowed for this action");
         policies.put(action, policy);
         try (FileOutputStream stream = new FileOutputStream(storage)) {
             OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);

@@ -18,14 +18,14 @@
 package org.xowl.platform.services.marketplace;
 
 import org.xowl.infra.utils.config.Section;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.Registrable;
 
 /**
  * A provider of marketplace implementations
  *
  * @author Laurent Wouters
  */
-public interface MarketplaceProvider extends Service {
+public interface MarketplaceProvider extends Registrable {
     /**
      * Gets whether this provider supports marketplace of the specified type
      *

@@ -18,6 +18,7 @@
 package org.xowl.platform.services.marketplace.jobs;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobFactory;
 
@@ -34,7 +35,7 @@ public class MarketplaceJobFactory implements JobFactory {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Marketplace Job Factory";
+        return PlatformUtils.NAME + " - Marketplace Job Factory";
     }
 
     @Override

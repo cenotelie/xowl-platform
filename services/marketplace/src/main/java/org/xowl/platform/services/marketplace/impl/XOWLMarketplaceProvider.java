@@ -18,6 +18,7 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.infra.utils.config.Section;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceProvider;
 
@@ -34,7 +35,7 @@ public class XOWLMarketplaceProvider implements MarketplaceProvider {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Marketplace Provider";
+        return PlatformUtils.NAME + " - Marketplace Provider";
     }
 
     @Override

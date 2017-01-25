@@ -27,12 +27,14 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.Addon;
-import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
+import org.xowl.platform.kernel.platform.PlatformManagementService;
+import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -113,7 +115,12 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Marketplace Service";
+        return PlatformUtils.NAME + " - Marketplace Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -124,7 +131,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -158,13 +165,6 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
             if (rest.equals("/install")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                // check for platform admin role
-                SecurityService securityService = Register.getComponent(SecurityService.class);
-                if (securityService == null)
-                    return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-                XSPReply reply = securityService.checkCurrentHasRole(PlatformRoleAdmin.INSTANCE.getIdentifier());
-                if (!reply.isSuccess())
-                    return XSPReplyUtils.toHttpResponse(reply, null);
                 return XSPReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
             }
         }
@@ -237,6 +237,12 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
 
     @Override
     public XSPReply beginInstallOf(String identifier) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(PlatformManagementService.ACTION_INSTALL_ADDON);
+        if (!reply.isSuccess())
+            return reply;
         JobExecutionService service = Register.getComponent(JobExecutionService.class);
         if (service == null)
             return XSPReplyServiceUnavailable.instance();

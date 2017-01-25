@@ -18,8 +18,10 @@
 package org.xowl.platform.services.marketplace;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.platform.Addon;
+import org.xowl.platform.kernel.platform.PlatformManagementService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -29,7 +31,14 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface MarketplaceService extends Service {
+public interface MarketplaceService extends SecuredService {
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            PlatformManagementService.ACTION_INSTALL_ADDON
+    };
+
     /**
      * Lookups available addons on the marketplace
      *

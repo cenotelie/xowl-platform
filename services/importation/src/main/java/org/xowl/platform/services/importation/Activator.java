@@ -19,6 +19,8 @@ package org.xowl.platform.services.importation;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.importation.impl.XOWLImportationService;
 
@@ -30,9 +32,11 @@ import org.xowl.platform.services.importation.impl.XOWLImportationService;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        ImportationService service = new XOWLImportationService();
-        bundleContext.registerService(ImportationService.class, service, null);
+        XOWLImportationService service = new XOWLImportationService();
+        bundleContext.registerService(Service.class, service, null);
+        bundleContext.registerService(SecuredService.class, service, null);
         bundleContext.registerService(HttpApiService.class, service, null);
+        bundleContext.registerService(ImportationService.class, service, null);
     }
 
     @Override

@@ -18,8 +18,8 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface EvaluableType extends Identifiable, Serializable {
+public interface EvaluableType extends Registrable, Serializable {
     /**
      * Gets the evaluable elements of this type in the stored artifacts
      *

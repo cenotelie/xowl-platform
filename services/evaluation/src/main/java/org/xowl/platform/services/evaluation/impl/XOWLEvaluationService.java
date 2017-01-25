@@ -27,8 +27,12 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -36,7 +40,9 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.evaluation.*;
 
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * The implementation of the evaluation service for the xOWL platform
@@ -76,20 +82,9 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
             HttpApiService.ERROR_HELP_PREFIX + "0x00050002.html");
 
     /**
-     * The registered evaluable types
-     */
-    private final Map<String, EvaluableType> evaluableTypes;
-    /**
-     * The registered criterion types
-     */
-    private final Map<String, CriterionType> criterionTypes;
-
-    /**
      * Initializes this service
      */
     public XOWLEvaluationService() {
-        this.evaluableTypes = new HashMap<>();
-        this.criterionTypes = new HashMap<>();
     }
 
     @Override
@@ -99,7 +94,12 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Evaluation Service";
+        return PlatformUtils.NAME + " - Evaluation Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/evaluableTypes")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -187,39 +187,37 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     }
 
     @Override
-    public void register(EvaluableType evaluableType) {
-        evaluableTypes.put(evaluableType.getIdentifier(), evaluableType);
-    }
-
-    @Override
-    public void register(CriterionType criterionType) {
-        criterionTypes.put(criterionType.getIdentifier(), criterionType);
-    }
-
-    @Override
     public Collection<EvaluableType> getEvaluableTypes() {
-        return Collections.unmodifiableCollection(evaluableTypes.values());
+        return Register.getComponents(EvaluableType.class);
     }
 
     @Override
     public Collection<CriterionType> getCriterionTypes() {
-        return Collections.unmodifiableCollection(criterionTypes.values());
+        return Register.getComponents(CriterionType.class);
     }
 
     @Override
     public EvaluableType getEvaluableType(String typeId) {
-        return evaluableTypes.get(typeId);
+        for (EvaluableType evaluableType : Register.getComponents(EvaluableType.class)) {
+            if (evaluableType.getIdentifier().equals(typeId))
+                return evaluableType;
+        }
+        return null;
     }
 
     @Override
     public CriterionType getCriterionType(String typeId) {
-        return criterionTypes.get(typeId);
+        for (CriterionType criterionType : Register.getComponents(CriterionType.class)) {
+            if (criterionType.getIdentifier().equals(typeId))
+                return criterionType;
+        }
+        return null;
     }
 
     @Override
     public Collection<CriterionType> getCriterionTypes(EvaluableType evaluableType) {
-        Collection<CriterionType> result = new ArrayList<>(criterionTypes.size());
-        for (CriterionType criterionType : criterionTypes.values()) {
+        Collection<CriterionType> result = new ArrayList<>();
+        for (CriterionType criterionType : Register.getComponents(CriterionType.class)) {
             if (criterionType.supports(evaluableType))
                 result.add(criterionType);
         }
@@ -228,18 +226,36 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
 
     @Override
     public XSPReply getEvaluations() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
+        if (!reply.isSuccess())
+            return reply;
         return XOWLEvaluation.retrieveAll();
     }
 
     @Override
     public XSPReply getEvaluation(String evalId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
+        if (!reply.isSuccess())
+            return reply;
         return XOWLEvaluation.retrieve(this, evalId);
     }
 
     @Override
     public XSPReply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
+        if (!reply.isSuccess())
+            return reply;
         XOWLEvaluation evaluation = new XOWLEvaluation(null, name, evaluableType, evaluables, criteria);
-        XSPReply reply = evaluation.store();
+        reply = evaluation.store();
         if (!reply.isSuccess())
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
@@ -256,7 +272,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetEvaluableTypes() {
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (EvaluableType evaluableType : evaluableTypes.values()) {
+        for (EvaluableType evaluableType : getEvaluableTypes()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -276,7 +292,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
         String[] types = request.getParameter("type");
         if (types == null || types.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
-        EvaluableType evaluableType = evaluableTypes.get(types[0]);
+        EvaluableType evaluableType = getEvaluableType(types[0]);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         XSPReply reply = evaluableType.getElements();
@@ -304,7 +320,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
         String[] types = request.getParameter("for");
         if (types == null || types.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
-        EvaluableType evaluableType = evaluableTypes.get(types[0]);
+        EvaluableType evaluableType = getEvaluableType(types[0]);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         StringBuilder builder = new StringBuilder("[");
@@ -368,8 +384,14 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
         ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, Files.CHARSET));
         if (root == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+        XSPReply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
         XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
-        XSPReply reply = evaluation.store();
+        reply = evaluation.store();
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         EventService eventService = Register.getComponent(EventService.class);

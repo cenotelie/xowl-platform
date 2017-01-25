@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public interface CriterionType extends Identifiable, Serializable {
+public interface CriterionType extends Registrable, Serializable {
     /**
      * Gets the parameters for this type of criterion
      *

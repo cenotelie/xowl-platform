@@ -18,7 +18,8 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
 
@@ -28,20 +29,23 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface EvaluationService extends Service {
+public interface EvaluationService extends SecuredService {
     /**
-     * Registers a type of evaluable element
-     *
-     * @param evaluableType The type to register
+     * Service action to get the current evaluations
      */
-    void register(EvaluableType evaluableType);
+    SecuredAction ACTION_GET_EVALUATIONS = new SecuredAction(EvaluationService.class.getCanonicalName() + ".GetEvaluations", "Evaluation Service - Get Evaluation(s)");
+    /**
+     * Service action to create a new evaluation
+     */
+    SecuredAction ACTION_NEW_EVALUATION = new SecuredAction(EvaluationService.class.getCanonicalName() + ".CreateEvaluation", "Evaluation Service - Create Evaluation");
 
     /**
-     * Registers a type of criterion
-     *
-     * @param criterionType The type to register
+     * The actions for this service
      */
-    void register(CriterionType criterionType);
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_GET_EVALUATIONS,
+            ACTION_NEW_EVALUATION
+    };
 
     /**
      * Gets the registered evaluable types

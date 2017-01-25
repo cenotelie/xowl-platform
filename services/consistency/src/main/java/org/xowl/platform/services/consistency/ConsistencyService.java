@@ -25,8 +25,7 @@ import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
-
-import java.util.Collection;
+import org.xowl.platform.services.storage.StorageService;
 
 /**
  * Represents a service that manages the consistency on the platform
@@ -35,30 +34,13 @@ import java.util.Collection;
  */
 public interface ConsistencyService extends SecuredService, MeasurableService {
     /**
-     * Service action to create a consistency rule
-     */
-    SecuredAction ACTION_CREATE_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".CreateRule", "Consistency Service - Create Rule");
-    /**
-     * Service action to delete a consistency rule
-     */
-    SecuredAction ACTION_DELETE_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeleteRule", "Consistency Service - Delete Rule");
-    /**
-     * Service action to activate a consistency rule
-     */
-    SecuredAction ACTION_ACTIVATE_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".ActivateRule", "Consistency Service - Activate Rule");
-    /**
-     * Service action to de-activate a consistency rule
-     */
-    SecuredAction ACTION_DEACTIVATE_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeactivateRule", "Consistency Service - Deactivate Rule");
-
-    /**
      * The actions for this service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            ACTION_CREATE_RULE,
-            ACTION_DELETE_RULE,
-            ACTION_ACTIVATE_RULE,
-            ACTION_DEACTIVATE_RULE
+            StorageService.ACTION_CREATE_RULE,
+            StorageService.ACTION_DELETE_RULE,
+            StorageService.ACTION_ACTIVATE_RULE,
+            StorageService.ACTION_DEACTIVATE_RULE
     };
 
     /**
@@ -76,14 +58,14 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      *
      * @return The consistency rules
      */
-    Collection<ConsistencyRule> getRules();
+    XSPReply getRules();
 
     /**
      * Gets the current inconsistencies on the platform
      *
      * @return The current inconsistencies
      */
-    Collection<Inconsistency> getInconsistencies();
+    XSPReply getInconsistencies();
 
     /**
      * Gets the rule for the specified identifier
@@ -91,7 +73,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a rule
      * @return The operation's result
      */
-    ConsistencyRule getRule(String identifier);
+    XSPReply getRule(String identifier);
 
     /**
      * Creates a new consistency rule

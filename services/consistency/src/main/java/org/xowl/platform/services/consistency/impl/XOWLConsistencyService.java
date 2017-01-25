@@ -45,6 +45,8 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -142,7 +144,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Consistency Service";
+        return PlatformUtils.NAME + " - Consistency Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -153,7 +160,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/inconsistencies")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");

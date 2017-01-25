@@ -20,8 +20,11 @@ package org.xowl.platform.services.importation;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
+import org.xowl.platform.kernel.security.SecurityService;
 
 /**
  * Represents an importation method
@@ -81,7 +84,15 @@ public abstract class Importer implements SecuredService, Serializable {
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    public abstract XSPReply getPreview(String documentId, ImporterConfiguration configuration);
+    public XSPReply getPreview(String documentId, ImporterConfiguration configuration) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(actionPreview);
+        if (!reply.isSuccess())
+            return reply;
+        return doGetPreview(documentId, configuration);
+    }
 
     /**
      * Gets the preview of a document to be imported
@@ -95,13 +106,30 @@ public abstract class Importer implements SecuredService, Serializable {
     }
 
     /**
+     * Gets the preview of a document to be imported
+     *
+     * @param documentId    The identifier of a document
+     * @param configuration The configuration for this preview
+     * @return The preview, or null if it cannot be produced
+     */
+    protected abstract XSPReply doGetPreview(String documentId, ImporterConfiguration configuration);
+
+    /**
      * Gets the job for importing a document
      *
      * @param documentId    The identifier of a document
      * @param configuration The configuration for this import
      * @return The job for importing the document
      */
-    public abstract XSPReply getImportJob(String documentId, ImporterConfiguration configuration);
+    public XSPReply getImportJob(String documentId, ImporterConfiguration configuration) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(actionImport);
+        if (!reply.isSuccess())
+            return reply;
+        return doGetImportJob(documentId, configuration);
+    }
 
     /**
      * Gets the job for importing a document
@@ -113,6 +141,15 @@ public abstract class Importer implements SecuredService, Serializable {
     public XSPReply getImportJob(String documentId, String configuration) {
         return getImportJob(documentId, getConfiguration(configuration));
     }
+
+    /**
+     * Gets the job for importing a document
+     *
+     * @param documentId    The identifier of a document
+     * @param configuration The configuration for this import
+     * @return The job for importing the document
+     */
+    protected abstract XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration);
 
     @Override
     public String serializedString() {

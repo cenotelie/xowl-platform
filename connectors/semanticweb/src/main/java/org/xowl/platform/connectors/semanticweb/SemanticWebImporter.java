@@ -18,7 +18,10 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyException;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.writers.NQuadsSerializer;
@@ -34,7 +37,7 @@ import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.importation.*;
 
@@ -74,25 +77,26 @@ public class SemanticWebImporter extends Importer {
     }
 
     @Override
-    public DocumentPreview getPreview(Document document, ImporterConfiguration configuration) {
+    public XSPReply doGetPreview(String documentId, ImporterConfiguration configuration) {
         ImportationService service = Register.getComponent(ImportationService.class);
         if (service == null)
-            return null;
-        if (!(configuration instanceof SemanticWebImporterConfiguration))
-            return null;
+            return XSPReplyServiceUnavailable.instance();
         SemanticWebImporterConfiguration swConfig = (SemanticWebImporterConfiguration) configuration;
-        try (InputStream stream = service.getStreamFor(document)) {
+        XSPReply reply = service.getStreamFor(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();
-            XSPReply reply = loader.load(reader, document.getIdentifier(), swConfig.getSyntax());
+            reply = loader.load(reader, documentId, swConfig.getSyntax());
             if (!reply.isSuccess())
-                return null;
+                return reply;
             Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
             StringWriter writer = new StringWriter();
             RDFSerializer serializer = new NQuadsSerializer(writer);
             serializer.serialize(new BufferedLogger(), quads.iterator());
             final String result = writer.toString();
-            return new DocumentPreview() {
+            DocumentPreview preview = new DocumentPreview() {
                 @Override
                 public String serializedString() {
                     return result;
@@ -103,17 +107,16 @@ public class SemanticWebImporter extends Importer {
                     return "{\"quads\": \"" + TextUtils.escapeStringJSON(result) + "\"}";
                 }
             };
+            return new XSPReplyResult<>(preview);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return null;
+            return new XSPReplyException(exception);
         }
     }
 
     @Override
-    public Job getImportJob(Document document, ImporterConfiguration configuration) {
-        if (!(configuration instanceof SemanticWebImporterConfiguration))
-            return null;
-        return new SemanticWebImportJob(document.getIdentifier(), (SemanticWebImporterConfiguration) configuration);
+    public XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration) {
+        return new XSPReplyResult<>(new SemanticWebImportJob(documentId, (SemanticWebImporterConfiguration) configuration));
     }
 
     /**
@@ -127,16 +130,30 @@ public class SemanticWebImporter extends Importer {
         ImportationService importationService = Register.getComponent(ImportationService.class);
         if (importationService == null)
             return XSPReplyServiceUnavailable.instance();
+        SemanticWebImporter importer = (SemanticWebImporter) importationService.getImporter(SemanticWebImporter.class.getCanonicalName());
+        if (importer == null)
+            return XSPReplyServiceUnavailable.instance();
         ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        Document document = importationService.getDocument(documentId);
-        if (document == null)
-            return XSPReplyNotFound.instance();
-        try (InputStream stream = importationService.getStreamFor(document)) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(importer.actionImport);
+        if (!reply.isSuccess())
+            return reply;
+
+        reply = importationService.getDocument(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        Document document = ((XSPReplyResult<Document>) reply).getData();
+        reply = importationService.getStreamFor(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();
-            XSPReply reply = loader.load(reader, documentId, configuration.getSyntax());
+            reply = loader.load(reader, documentId, configuration.getSyntax());
             if (!reply.isSuccess())
                 return reply;
             Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();

@@ -31,6 +31,7 @@ import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.connection.events.ConnectorReceivedDataEvent;
@@ -58,7 +59,7 @@ public class SemanticWebConnector extends ConnectorServiceBase {
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         switch (request.getMethod()) {
             case HttpConstants.METHOD_GET:
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, serializedJSON());

@@ -294,7 +294,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             Logging.getDefault().info("Authentication failure from " + client + " with invalid token");
             return reply;
         }
-        PlatformUser user = realm.getUser(((XSPReplyResult<String>) reply).getData());
+        PlatformUser user = getRealm().getUser(((XSPReplyResult<String>) reply).getData());
         CONTEXT.set(user);
         return new XSPReplyResult<>(user);
     }
@@ -450,7 +450,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (request.getUri().equals(URI_API + "/users")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            Collection<PlatformUser> users = realm.getUsers();
+            Collection<PlatformUser> users = getRealm().getUsers();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (PlatformUser user : users) {
@@ -472,7 +472,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (index < 0) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    PlatformUser user = realm.getUser(userId);
+                    PlatformUser user = getRealm().getUser(userId);
                     if (user == null)
                         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, user.serializedJSON());
@@ -482,10 +482,10 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     if (displayNames == null || displayNames.length == 0)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
                     String password = new String(request.getContent(), Files.CHARSET);
-                    return XSPReplyUtils.toHttpResponse(realm.createUser(userId, displayNames[0], password), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().createUser(userId, displayNames[0], password), null);
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return XSPReplyUtils.toHttpResponse(realm.deleteUser(userId), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().deleteUser(userId), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -498,7 +498,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] displayNames = request.getParameter("name");
                 if (displayNames == null || displayNames.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.renameUser(userId, displayNames[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().renameUser(userId, displayNames[0]), null);
             }
             case "/updateKey": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -507,13 +507,13 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 if (oldKeys == null || oldKeys.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'oldKey'"), null);
                 String password = new String(request.getContent(), Files.CHARSET);
-                return XSPReplyUtils.toHttpResponse(realm.changeUserKey(userId, oldKeys[0], password), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().changeUserKey(userId, oldKeys[0], password), null);
             }
             case "/resetKey": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String password = new String(request.getContent(), Files.CHARSET);
-                return XSPReplyUtils.toHttpResponse(realm.resetUserKey(userId, password), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().resetUserKey(userId, password), null);
             }
             case "/assign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -521,7 +521,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] roles = request.getParameter("role");
                 if (roles == null || roles.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.assignRoleToUser(userId, roles[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().assignRoleToUser(userId, roles[0]), null);
             }
             case "/unassign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -529,7 +529,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] roles = request.getParameter("role");
                 if (roles == null || roles.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.unassignRoleToUser(userId, roles[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().unassignRoleToUser(userId, roles[0]), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -545,7 +545,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (request.getUri().equals(URI_API + "/groups")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            Collection<PlatformGroup> groups = realm.getGroups();
+            Collection<PlatformGroup> groups = getRealm().getGroups();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (PlatformGroup group : groups) {
@@ -567,7 +567,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (index < 0) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    PlatformGroup group = realm.getGroup(groupId);
+                    PlatformGroup group = getRealm().getGroup(groupId);
                     if (group == null)
                         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, group.serializedJSON());
@@ -579,10 +579,10 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     String[] admins = request.getParameter("admin");
                     if (admins == null || admins.length == 0)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'admin'"), null);
-                    return XSPReplyUtils.toHttpResponse(realm.createGroup(groupId, displayNames[0], admins[0]), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().createGroup(groupId, displayNames[0], admins[0]), null);
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return XSPReplyUtils.toHttpResponse(realm.deleteGroup(groupId), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().deleteGroup(groupId), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -595,7 +595,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] displayNames = request.getParameter("name");
                 if (displayNames == null || displayNames.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.renameGroup(groupId, displayNames[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().renameGroup(groupId, displayNames[0]), null);
             }
             case "/addMember": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -603,7 +603,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] users = request.getParameter("user");
                 if (users == null || users.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.addUserToGroup(users[0], groupId), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().addUserToGroup(users[0], groupId), null);
             }
             case "/removeMember": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -611,7 +611,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] users = request.getParameter("user");
                 if (users == null || users.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.removeUserFromGroup(users[0], groupId), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().removeUserFromGroup(users[0], groupId), null);
             }
             case "/addAdmin": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -619,7 +619,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] users = request.getParameter("user");
                 if (users == null || users.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.addAdminToGroup(users[0], groupId), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().addAdminToGroup(users[0], groupId), null);
             }
             case "/removeAdmin": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -627,7 +627,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] users = request.getParameter("user");
                 if (users == null || users.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.removeAdminFromGroup(users[0], groupId), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().removeAdminFromGroup(users[0], groupId), null);
             }
             case "/assign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -635,7 +635,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] roles = request.getParameter("role");
                 if (roles == null || roles.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.assignRoleToGroup(groupId, roles[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().assignRoleToGroup(groupId, roles[0]), null);
             }
             case "/unassign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -643,7 +643,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] roles = request.getParameter("role");
                 if (roles == null || roles.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.unassignRoleToGroup(groupId, roles[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().unassignRoleToGroup(groupId, roles[0]), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -659,7 +659,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (request.getUri().equals(URI_API + "/roles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            Collection<PlatformRole> roles = realm.getRoles();
+            Collection<PlatformRole> roles = getRealm().getRoles();
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (PlatformRole role : roles) {
@@ -681,7 +681,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (index < 0) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    PlatformRole role = realm.getRole(roleId);
+                    PlatformRole role = getRealm().getRole(roleId);
                     if (role == null)
                         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, role.serializedJSON());
@@ -690,10 +690,10 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     String[] displayNames = request.getParameter("name");
                     if (displayNames == null || displayNames.length == 0)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                    return XSPReplyUtils.toHttpResponse(realm.createRole(roleId, displayNames[0]), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().createRole(roleId, displayNames[0]), null);
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return XSPReplyUtils.toHttpResponse(realm.deleteRole(roleId), null);
+                    return XSPReplyUtils.toHttpResponse(getRealm().deleteRole(roleId), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -706,7 +706,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] displayNames = request.getParameter("name");
                 if (displayNames == null || displayNames.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.renameRole(roleId, displayNames[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().renameRole(roleId, displayNames[0]), null);
             }
             case "/imply": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -714,7 +714,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] targets = request.getParameter("target");
                 if (targets == null || targets.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.addRoleImplication(roleId, targets[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().addRoleImplication(roleId, targets[0]), null);
             }
             case "/unimply": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -722,7 +722,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String[] targets = request.getParameter("target");
                 if (targets == null || targets.length == 0)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
-                return XSPReplyUtils.toHttpResponse(realm.removeRoleImplication(roleId, targets[0]), null);
+                return XSPReplyUtils.toHttpResponse(getRealm().removeRoleImplication(roleId, targets[0]), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

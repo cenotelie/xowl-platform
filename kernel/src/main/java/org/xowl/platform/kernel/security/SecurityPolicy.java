@@ -44,4 +44,29 @@ public interface SecurityPolicy extends Identifiable {
      * @return The protocol reply
      */
     XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data);
+
+    /**
+     * Gets the description of the configuration for this policy
+     *
+     * @return The protocol reply
+     */
+    XSPReply getConfiguration();
+
+    /**
+     * Sets the policy for a secured action
+     *
+     * @param actionId The identifier of a secured action
+     * @param policy   The policy to set
+     * @return The protocol reply
+     */
+    XSPReply setPolicy(String actionId, SecuredActionPolicy policy);
+
+    /**
+     * Sets the policy for a secured action
+     *
+     * @param actionId         The identifier of a secured action
+     * @param policyDefinition The definition of the policy to set
+     * @return The protocol reply
+     */
+    XSPReply setPolicy(String actionId, String policyDefinition);
 }

@@ -36,6 +36,14 @@ public interface SecurityService extends SecuredService {
     String URI_LOGIN = "/api/kernel/security/login";
 
     /**
+     * Service action to get the configuration of the security policy
+     */
+    SecuredAction ACTION_GET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".GetPolicy", "Security Service - Get Security Policy", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    /**
+     * Service action to set the policy for a secured action
+     */
+    SecuredAction ACTION_SET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".SetPolicy", "Security Service - Set Security Policy", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    /**
      * Service action to create a user
      */
     SecuredAction ACTION_CREATE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
@@ -120,6 +128,8 @@ public interface SecurityService extends SecuredService {
      * The actions for the security service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_GET_POLICY,
+            ACTION_SET_POLICY,
             ACTION_CREATE_USER,
             ACTION_CREATE_GROUP,
             ACTION_CREATE_ROLE,

@@ -20,9 +20,11 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredActionPolicy;
 import org.xowl.platform.kernel.security.SecurityPolicy;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -56,5 +58,20 @@ public class KernelSecurityPolicyAuthenticated implements SecurityPolicy {
         if (user == null)
             return XSPReplyUnauthenticated.instance();
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public XSPReply getConfiguration() {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply setPolicy(String actionId, SecuredActionPolicy policy) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply setPolicy(String actionId, String policyDefinition) {
+        return XSPReplyUnsupported.instance();
     }
 }

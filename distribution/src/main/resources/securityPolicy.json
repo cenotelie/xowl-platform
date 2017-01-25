@@ -72,6 +72,18 @@
     }
   },
   {
+    "action": "org.xowl.platform.kernel.security.SecurityService.GetPolicy",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+    }
+  },
+  {
+    "action": "org.xowl.platform.kernel.security.SecurityService.SetPolicy",
+    "policy": {
+      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+    }
+  },
+  {
     "action": "org.xowl.platform.kernel.security.SecurityService.CreateUser",
     "policy": {
       "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"

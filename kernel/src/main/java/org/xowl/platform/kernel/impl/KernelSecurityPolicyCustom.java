@@ -18,10 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
-import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
-import org.xowl.infra.server.xsp.XSPReplyUnauthorized;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
@@ -29,14 +26,19 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.*;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,5 +163,52 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
         if (policy != null && policy.isAuthorized(securityService, user, action, data))
             return XSPReplySuccess.instance();
         return XSPReplyUnauthorized.instance();
+    }
+
+    @Override
+    public XSPReply getConfiguration() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_GET_POLICY);
+        if (!reply.isSuccess())
+            return reply;
+
+        KernelSecurityPolicyCustomConfiguration result = new KernelSecurityPolicyCustomConfiguration();
+        Collection<String> founds = new ArrayList<>();
+        for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
+            for (SecuredAction action : securedService.getActions()) {
+                if (!founds.contains(action.getIdentifier())) {
+                    founds.add(action.getIdentifier());
+                    SecuredActionPolicy policy = getPolicyFor(action.getIdentifier());
+                    if (policy != null) {
+                        result.add(action, policy);
+                    }
+                }
+            }
+        }
+        return new XSPReplyResult<>(result);
+    }
+
+    @Override
+    public XSPReply setPolicy(String actionId, SecuredActionPolicy policy) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_SET_POLICY);
+        if (!reply.isSuccess())
+            return reply;
+        getPolicyFor(actionId);
+        policies.put(actionId, policy);
+        return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public XSPReply setPolicy(String actionId, String policyDefinition) {
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), policyDefinition);
+        if (definition == null)
+            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
+        SecuredActionPolicy policy = SecuredActionPolicyBase.load(definition);
+        return setPolicy(actionId, policy);
     }
 }

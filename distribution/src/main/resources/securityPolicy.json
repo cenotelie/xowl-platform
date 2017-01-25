@@ -1,476 +1,637 @@
-[
-  {
-    "action": "org.xowl.platform.kernel.LoggingService.GetLog",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.statistics.StatisticsService.GetMetrics",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.statistics.StatisticsService.PollMetric",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetProduct",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetBundles",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.GetAddons",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.InstallAddon",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.UninstallAddon",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.Shutdown",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.platform.PlatformManagementService.Restart",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.jobs.JobExecutionService.GetJobs",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.jobs.JobExecutionService.Cancel",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.GetPolicy",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.SetPolicy",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.CreateUser",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.CreateGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.CreateRole",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RenameUser",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsSelf"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RenameGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RenameRole",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteUser",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.DeleteRole",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.ResetUserKey",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsSelf"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.AddUserToGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveUserFromGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.AddAdminToGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveAdminFromGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToUser",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToUser",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToGroup",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.AddRoleImplication",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.security.SecurityService.RemoveRoleImplication",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.StoreArtifact",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveMetadata",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveContent",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.DeleteArtifact",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PushLive",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PullLive",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddInputSpec",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveInputSpec",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddOutputSpec",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveOutputSpec",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.RegisterInput",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.UnregisterInput",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.RegisterOutput",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.UnregisterOutput",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddRole",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveRole",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbours",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourManifest",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourInputs",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourOutputs",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkSpawn",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkArchive",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkRestart",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkDelete",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationService.Archive",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.collaboration.CollaborationService.Delete",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.connection.ConnectionService.Spawn",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.connection.ConnectionService.Delete",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.Query",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.SetEntailment",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.CreateRule",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.DeleteRule",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.ActivateRule",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.DeactivateRule",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.CreateProcedure",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.DeleteProcedure",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.ExecuteProcedure",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.storage.StorageService.UploadRaw",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.importation.ImportationService.GetMetadata",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.importation.ImportationService.GetContent",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.importation.ImportationService.Upload",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.importation.ImportationService.DropDocument",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.impact.ImpactAnalysisService.Perform",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.evaluation.EvaluationService.GetEvaluations",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  },
-  {
-    "action": "org.xowl.platform.services.evaluation.EvaluationService.CreateEvaluation",
-    "policy": {
-      "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-    }
-  }
-]
+{
+  "type": "org.xowl.platform.kernel.impl.KernelSecurityPolicyConfiguration",
+  "parts": [
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.LoggingService.GetLog"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.statistics.StatisticsService.GetMetrics"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.statistics.StatisticsService.PollMetric"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.GetProduct"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.GetBundles"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.GetAddons"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.InstallAddon"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.UninstallAddon"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.Shutdown"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.platform.PlatformManagementService.Restart"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.jobs.JobExecutionService.GetJobs"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.jobs.JobExecutionService.Cancel"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.GetPolicy"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.SetPolicy"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.CreateUser"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.CreateGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.CreateRole"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RenameUser"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsSelf"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RenameGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RenameRole"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.DeleteUser"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.DeleteGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.DeleteRole"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ResetUserKey"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsSelf"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.AddUserToGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RemoveUserFromGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.AddAdminToGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RemoveAdminFromGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsGroupAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToUser"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToUser"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.AssignRoleToGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.UnassignRoleToGroup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.AddRoleImplication"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.RemoveRoleImplication"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.StoreArtifact"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveMetadata"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.RetrieveContent"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.DeleteArtifact"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PushLive"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.PullLive"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddInputSpec"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveInputSpec"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddOutputSpec"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveOutputSpec"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.RegisterInput"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.UnregisterInput"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.RegisterOutput"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.UnregisterOutput"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.AddRole"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationLocalService.RemoveRole"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbours"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourManifest"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourInputs"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.GetNeighbourOutputs"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkSpawn"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkArchive"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkRestart"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationNetworkService.NetworkDelete"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationService.Archive"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.collaboration.CollaborationService.Delete"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.connection.ConnectionService.Spawn"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.connection.ConnectionService.Delete"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.Query"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.SetEntailment"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.CreateRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.DeleteRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.ActivateRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.DeactivateRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.CreateProcedure"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.DeleteProcedure"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.ExecuteProcedure"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.storage.StorageService.UploadRaw"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.GetMetadata"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.GetContent"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.Upload"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.DropDocument"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.impact.ImpactAnalysisService.Perform"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.evaluation.EvaluationService.GetEvaluations"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.evaluation.EvaluationService.CreateEvaluation"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    }
+  ]
+}

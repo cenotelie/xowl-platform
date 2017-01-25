@@ -20,8 +20,6 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
@@ -34,13 +32,6 @@ import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Implements an authorization policy which can be configured by the users.
@@ -53,13 +44,13 @@ import java.util.Map;
  */
 public class KernelSecurityPolicyCustom implements SecurityPolicy {
     /**
-     * The file storage for the policy
+     * The storage for the configuration
      */
     private final File storage;
     /**
-     * The policies for the secured actions
+     * The configuration for this policy
      */
-    private Map<String, SecuredActionPolicy> policies;
+    private KernelSecurityPolicyConfiguration configuration;
 
     /**
      * Initializes this policy
@@ -71,56 +62,16 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
     }
 
     /**
-     * Gets the policy for a secured action, if defined
+     * Resolves the configuration for this policy
      *
-     * @param actionId The identifier of a secured action
-     * @return The policy, if defined
+     * @return The configuration
      */
-    private SecuredActionPolicy getPolicyFor(String actionId) {
-        if (policies != null)
-            return policies.get(actionId);
+    private KernelSecurityPolicyConfiguration resolveConfig() {
         synchronized (this) {
-            if (policies != null)
-                return policies.get(actionId);
-            policies = new HashMap<>();
-            if (storage.exists()) {
-                try (InputStream stream = new FileInputStream(storage)) {
-                    String content = Files.read(stream, Files.CHARSET);
-                    ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-                    if (definition == null)
-                        return null;
-                    for (ASTNode mapping : definition.getChildren()) {
-                        loadMapping(mapping);
-                    }
-                } catch (IOException exception) {
-                    Logging.getDefault().error(exception);
-                    return null;
-                }
-            }
-            return policies.get(actionId);
+            if (configuration == null)
+                configuration = new KernelSecurityPolicyConfiguration(storage);
+            return configuration;
         }
-    }
-
-    /**
-     * Loads a policy definition
-     *
-     * @param mapping The mapping to load
-     */
-    private void loadMapping(ASTNode mapping) {
-        String action = null;
-        SecuredActionPolicy policy = null;
-        for (ASTNode member : mapping.getChildren()) {
-            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("action".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                action = value.substring(1, value.length() - 1);
-            } else if ("policy".equals(head)) {
-                policy = SecuredActionPolicyBase.load(member.getChildren().get(1));
-            }
-        }
-        if (action != null && policy != null)
-            policies.put(action, policy);
     }
 
     @Override
@@ -143,7 +94,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
             // user is platform admin => authorized
             return XSPReplySuccess.instance();
         // check the custom action policies
-        SecuredActionPolicy policy = getPolicyFor(action.getIdentifier());
+        SecuredActionPolicy policy = resolveConfig().getPolicyFor(action);
         if (policy != null && policy.isAuthorized(securityService, user, action))
             return XSPReplySuccess.instance();
         return XSPReplyUnauthorized.instance();
@@ -159,7 +110,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
             // user is platform admin => authorized
             return XSPReplySuccess.instance();
         // check the custom action policies
-        SecuredActionPolicy policy = getPolicyFor(action.getIdentifier());
+        SecuredActionPolicy policy = resolveConfig().getPolicyFor(action);
         if (policy != null && policy.isAuthorized(securityService, user, action, data))
             return XSPReplySuccess.instance();
         return XSPReplyUnauthorized.instance();
@@ -173,21 +124,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
         XSPReply reply = securityService.checkAction(SecurityService.ACTION_GET_POLICY);
         if (!reply.isSuccess())
             return reply;
-
-        KernelSecurityPolicyCustomConfiguration result = new KernelSecurityPolicyCustomConfiguration();
-        Collection<String> founds = new ArrayList<>();
-        for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
-            for (SecuredAction action : securedService.getActions()) {
-                if (!founds.contains(action.getIdentifier())) {
-                    founds.add(action.getIdentifier());
-                    SecuredActionPolicy policy = getPolicyFor(action.getIdentifier());
-                    if (policy != null) {
-                        result.add(action, policy);
-                    }
-                }
-            }
-        }
-        return new XSPReplyResult<>(result);
+        return new XSPReplyResult<>(resolveConfig());
     }
 
     @Override
@@ -198,9 +135,14 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
         XSPReply reply = securityService.checkAction(SecurityService.ACTION_SET_POLICY);
         if (!reply.isSuccess())
             return reply;
-        getPolicyFor(actionId);
-        policies.put(actionId, policy);
-        return XSPReplySuccess.instance();
+        for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
+            for (SecuredAction securedAction : securedService.getActions()) {
+                if (securedAction.getIdentifier().equals(actionId)) {
+                    return resolveConfig().put(securedAction, policy);
+                }
+            }
+        }
+        return XSPReplyNotFound.instance();
     }
 
     @Override

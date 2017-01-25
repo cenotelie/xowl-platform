@@ -183,6 +183,8 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return handleRequestLogout(request);
         if (request.getUri().equals(URI_API + "/me"))
             return handleRequestMe(request);
+        if (request.getUri().startsWith(URI_API + "/policy"))
+            return handleRequestPolicy(request);
         if (request.getUri().startsWith(URI_API + "/users"))
             return handleRequestUsers(request);
         if (request.getUri().startsWith(URI_API + "/groups"))
@@ -441,7 +443,32 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     /**
-     * Responds to a request for the usets resource
+     * Responds to a request for the policy resource
+     *
+     * @param request The web API request to handle
+     * @return The HTTP response
+     */
+    private HttpResponse handleRequestPolicy(HttpApiRequest request) {
+        if (request.getUri().equals(URI_API + "/policy")) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return XSPReplyUtils.toHttpResponse(getPolicy().getConfiguration(), null);
+        }
+        if (request.getUri().startsWith(URI_API + "/policy/actions/")) {
+            String rest = request.getUri().substring(URI_API.length() + "/policy/actions/".length());
+            String actionId = URIUtils.decodeComponent(rest);
+            if (actionId.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
+            String definition = new String(request.getContent(), Files.CHARSET);
+            return XSPReplyUtils.toHttpResponse(getPolicy().setPolicy(actionId, definition), null);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Responds to a request for the users resource
      *
      * @param request The web API request to handle
      * @return The HTTP response

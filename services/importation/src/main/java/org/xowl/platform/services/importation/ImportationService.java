@@ -17,22 +17,49 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
-import java.io.InputStream;
 import java.util.Collection;
 
 /**
  * Represents the importation service
  */
-public interface ImportationService extends Service {
+public interface ImportationService extends SecuredService {
+    /**
+     * Service action to get the metadata of uploaded documents
+     */
+    SecuredAction ACTION_GET_DOCUMENT_METADATA = new SecuredAction(ImportationService.class.getCanonicalName() + ".GetMetadata", "Importation Service - Get Document Metadata");
+    /**
+     * Service action to get the content of uploaded documents
+     */
+    SecuredAction ACTION_GET_DOCUMENT_CONTENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".GetContent", "Importation Service - Get Document Content");
+    /**
+     * Service action to upload documents
+     */
+    SecuredAction ACTION_UPLOAD_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".Upload", "Importation Service - Upload Document");
+    /**
+     * Service action to drop uploaded documents
+     */
+    SecuredAction ACTION_DROP_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".DropDocument", "Importation Service - Drop Document");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_GET_DOCUMENT_METADATA,
+            ACTION_GET_DOCUMENT_CONTENT,
+            ACTION_UPLOAD_DOCUMENT,
+            ACTION_DROP_DOCUMENT
+    };
+
     /**
      * Gets the uploaded documents not yet completely imported
      *
      * @return The uploaded documents pending importation
      */
-    Collection<Document> getDocuments();
+    XSPReply getDocuments();
 
     /**
      * Gets an uploaded document
@@ -40,7 +67,7 @@ public interface ImportationService extends Service {
      * @param documentId The identifier of a document
      * @return The document, or null if it cannot be found
      */
-    Document getDocument(String documentId);
+    XSPReply getDocument(String documentId);
 
     /**
      * Uploads a new document
@@ -50,32 +77,22 @@ public interface ImportationService extends Service {
      * @param content          The document's content
      * @return The document
      */
-    Document upload(String name, String originalFileName, byte[] content);
+    XSPReply upload(String name, String originalFileName, byte[] content);
 
     /**
      * Drops the specified document
      *
-     * @param document The document to drop
+     * @param documentId The identifier of a document
      */
-    void drop(Document document);
+    XSPReply drop(String documentId);
 
     /**
      * Gets an input stream for a stored document
      *
-     * @param document The document
+     * @param documentId The identifier of a document
      * @return The input stream, or null if the document cannot be found
      */
-    InputStream getStreamFor(Document document);
-
-    /**
-     * Gets the preview of a document
-     *
-     * @param document      The document to preview
-     * @param importer      The importer to use
-     * @param configuration The importer's configuration
-     * @return The document preview, or null if it cannot be produced
-     */
-    DocumentPreview getPreview(Document document, Importer importer, ImporterConfiguration configuration);
+    XSPReply getStreamFor(String documentId);
 
     /**
      * Gets the registered importers
@@ -93,12 +110,42 @@ public interface ImportationService extends Service {
     Importer getImporter(String importerId);
 
     /**
+     * Gets the preview of a document
+     *
+     * @param documentId    The identifier of a document
+     * @param importerId    The identifier of an importer
+     * @param configuration The importer's configuration
+     * @return The document preview, or null if it cannot be produced
+     */
+    XSPReply getPreview(String documentId, String importerId, ImporterConfiguration configuration);
+
+    /**
+     * Gets the preview of a document
+     *
+     * @param documentId    The identifier of a document
+     * @param importerId    The identifier of an importer
+     * @param configuration The importer's configuration
+     * @return The document preview, or null if it cannot be produced
+     */
+    XSPReply getPreview(String documentId, String importerId, String configuration);
+
+    /**
      * Begins the importation job of a document
      *
-     * @param document      The document to import
-     * @param importer      The importer to use
+     * @param documentId    The identifier of a document
+     * @param importerId    The identifier of an importer
      * @param configuration The importer's configuration
      * @return The job, or null if the job cannot be created
      */
-    Job beginImport(Document document, Importer importer, ImporterConfiguration configuration);
+    XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration);
+
+    /**
+     * Begins the importation job of a document
+     *
+     * @param documentId    The identifier of a document
+     * @param importerId    The identifier of an importer
+     * @param configuration The importer's configuration
+     * @return The job, or null if the job cannot be created
+     */
+    XSPReply beginImport(String documentId, String importerId, String configuration);
 }

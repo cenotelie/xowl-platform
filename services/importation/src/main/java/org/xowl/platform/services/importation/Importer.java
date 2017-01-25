@@ -17,17 +17,48 @@
 
 package org.xowl.platform.services.importation;
 
+import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 /**
  * Represents an importation method
  *
  * @author Laurent Wouters
  */
-public abstract class Importer implements Service, Serializable {
+public abstract class Importer implements SecuredService, Serializable {
+    /**
+     * Service action to preview the import of a document
+     */
+    protected final SecuredAction actionPreview;
+    /**
+     * Service action to import a document
+     */
+    protected final SecuredAction actionImport;
+    /**
+     * The actions for this service
+     */
+    protected final SecuredAction[] actions;
+
+    /**
+     * Initializes this importer
+     */
+    protected Importer() {
+        this.actionPreview = new SecuredAction(getIdentifier() + ".Preview", getName() + " - Preview Import");
+        this.actionImport = new SecuredAction(getIdentifier() + ".Import", getName() + " - Do Import");
+        this.actions = new SecuredAction[]{
+                actionPreview,
+                actionImport
+        };
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return actions;
+    }
+
     /**
      * Gets the URI for the web wizard
      *
@@ -46,20 +77,42 @@ public abstract class Importer implements Service, Serializable {
     /**
      * Gets the preview of a document to be imported
      *
-     * @param document      The document to preview
+     * @param documentId    The identifier of a document
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    public abstract DocumentPreview getPreview(Document document, ImporterConfiguration configuration);
+    public abstract XSPReply getPreview(String documentId, ImporterConfiguration configuration);
+
+    /**
+     * Gets the preview of a document to be imported
+     *
+     * @param documentId    The identifier of a document
+     * @param configuration The configuration for this preview
+     * @return The preview, or null if it cannot be produced
+     */
+    public XSPReply getPreview(String documentId, String configuration) {
+        return getPreview(documentId, getConfiguration(configuration));
+    }
 
     /**
      * Gets the job for importing a document
      *
-     * @param document      The document to import
+     * @param documentId    The identifier of a document
      * @param configuration The configuration for this import
      * @return The job for importing the document
      */
-    public abstract Job getImportJob(Document document, ImporterConfiguration configuration);
+    public abstract XSPReply getImportJob(String documentId, ImporterConfiguration configuration);
+
+    /**
+     * Gets the job for importing a document
+     *
+     * @param documentId    The identifier of a document
+     * @param configuration The configuration for this import
+     * @return The job for importing the document
+     */
+    public XSPReply getImportJob(String documentId, String configuration) {
+        return getImportJob(documentId, getConfiguration(configuration));
+    }
 
     @Override
     public String serializedString() {

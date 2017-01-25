@@ -18,8 +18,7 @@
 package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
@@ -36,6 +35,8 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -162,6 +163,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
+    }
+
+    @Override
     public int canHandle(HttpApiRequest request) {
         return request.getUri().startsWith(URI_API)
                 ? HttpApiService.PRIORITY_NORMAL
@@ -169,7 +175,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(URI_API + "/importers")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -262,16 +268,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocuments() {
-        StringBuilder builder = new StringBuilder("[");
-        boolean first = true;
-        for (Document document : getDocuments()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(document.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        return XSPReplyUtils.toHttpResponse(getDocuments(), null);
     }
 
     /**
@@ -281,10 +278,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocument(String documentId) {
-        Document document = getDocument(documentId);
-        if (document == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
+        return XSPReplyUtils.toHttpResponse(getDocument(documentId), null);
     }
 
     /**
@@ -300,10 +294,8 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
         if (fileNames == null || fileNames.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
-        Document document = upload(names[0], fileNames[0], request.getContent());
-        if (document == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_OPERATION_FAILED), null);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, document.serializedJSON());
+        XSPReply reply = upload(names[0], fileNames[0], request.getContent());
+        return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
     /**
@@ -313,11 +305,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onPostDropDocument(String documentId) {
-        Document document = getDocument(documentId);
-        if (document == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        drop(document);
-        return new HttpResponse(HttpURLConnection.HTTP_OK);
+        return XSPReplyUtils.toHttpResponse(drop(documentId), null);
     }
 
     /**
@@ -334,18 +322,8 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String configuration = new String(request.getContent(), Files.CHARSET);
         if (configuration.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
-
-        Document document = getDocument(documentId);
-        if (document == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        Collection<Importer> importers = Register.getComponents(Importer.class);
-        for (Importer importer : importers) {
-            if (importer.getIdentifier().equals(importerIds[0])) {
-                DocumentPreview preview = getPreview(document, importer, importer.getConfiguration(configuration));
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, preview.serializedJSON());
-            }
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        XSPReply reply = getPreview(documentId, importerIds[0], configuration);
+        return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
     /**
@@ -394,41 +372,50 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String configuration = new String(request.getContent(), Files.CHARSET);
         if (configuration.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
+        XSPReply reply = beginImport(documentId, importerIds[0], configuration);
+        return XSPReplyUtils.toHttpResponse(reply, null);
+    }
 
-        Document document = getDocument(documentId);
+    @Override
+    public XSPReply getDocuments() {
+        onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_DOCUMENT_METADATA);
+        if (!reply.isSuccess())
+            return reply;
+        return new XSPReplyResultCollection<>(documents.values());
+    }
+
+    @Override
+    public XSPReply getDocument(String documentId) {
+        onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_DOCUMENT_METADATA);
+        if (!reply.isSuccess())
+            return reply;
+        Document document = documents.get(documentId);
         if (document == null)
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        Collection<Importer> importers = Register.getComponents(Importer.class);
-        for (Importer importer : importers) {
-            if (importer.getIdentifier().equals(importerIds[0])) {
-                Job job = beginImport(document, importer, importer.getConfiguration(configuration));
-                if (job == null)
-                    return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
-            }
-        }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            return XSPReplyNotFound.instance();
+        return new XSPReplyResult<>(document);
     }
 
     @Override
-    public Collection<Document> getDocuments() {
+    public XSPReply upload(String name, String fileName, byte[] content) {
         onActivated();
-        return documents.values();
-    }
-
-    @Override
-    public Document getDocument(String documentId) {
-        onActivated();
-        return documents.get(documentId);
-    }
-
-    @Override
-    public Document upload(String name, String fileName, byte[] content) {
-        onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_UPLOAD_DOCUMENT);
+        if (!reply.isSuccess())
+            return reply;
         if (storage == null)
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
         if (!storage.exists() && !storage.mkdirs())
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
         Document document = new Document(name, fileName);
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
@@ -438,29 +425,35 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.flush();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to write descriptor in storage");
         }
         try (FileOutputStream stream = new FileOutputStream(fileContent)) {
             stream.write(content);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to write document in storage");
         }
         documents.put(document.getIdentifier(), document);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentUploadedEvent(document, this));
-        return document;
+        return new XSPReplyResult<>(document);
     }
 
     @Override
-    public void drop(Document document) {
+    public XSPReply drop(String documentId) {
         onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_DROP_DOCUMENT);
+        if (!reply.isSuccess())
+            return reply;
         if (storage == null)
-            return;
-        Document document2 = documents.remove(document.getIdentifier());
-        if (document2 == null)
-            return;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+        Document document = documents.remove(documentId);
+        if (document == null)
+            return XSPReplyNotFound.instance();
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         if (!fileDescriptor.delete())
@@ -469,28 +462,34 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             Logging.getDefault().error("Failed to delete " + fileContent.getAbsolutePath());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new DocumentDroppedEvent(document2, this));
+            eventService.onEvent(new DocumentDroppedEvent(document, this));
+        return XSPReplySuccess.instance();
     }
 
     @Override
-    public InputStream getStreamFor(Document document) {
+    public XSPReply getStreamFor(String documentId) {
         onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_DOCUMENT_CONTENT);
+        if (!reply.isSuccess())
+            return reply;
         if (storage == null)
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+        Document document = documents.remove(documentId);
+        if (document == null)
+            return XSPReplyNotFound.instance();
         File fileContent = new File(storage, getDocContentFile(document));
         if (!fileContent.exists())
-            return null;
+            return XSPReplyNotFound.instance();
         try {
-            return new FileInputStream(fileContent);
+            FileInputStream result = new FileInputStream(fileContent);
+            return new XSPReplyResult<>(reply);
         } catch (FileNotFoundException exception) {
             Logging.getDefault().error(exception);
-            return null;
+            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
         }
-    }
-
-    @Override
-    public DocumentPreview getPreview(Document document, Importer importer, ImporterConfiguration configuration) {
-        return importer.getPreview(document, configuration);
     }
 
     @Override
@@ -509,13 +508,47 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
-    public Job beginImport(Document document, Importer importer, ImporterConfiguration configuration) {
-        Job job = importer.getImportJob(document, configuration);
+    public XSPReply getPreview(String documentId, String importerId, ImporterConfiguration configuration) {
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return XSPReplyNotFound.instance();
+        return importer.getPreview(documentId, configuration);
+    }
+
+    @Override
+    public XSPReply getPreview(String documentId, String importerId, String configuration) {
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return XSPReplyNotFound.instance();
+        return importer.getPreview(documentId, configuration);
+    }
+
+    @Override
+    public XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration) {
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return XSPReplyNotFound.instance();
         JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
-            return null;
-        executionService.schedule(job);
-        return job;
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = importer.getImportJob(documentId, configuration);
+        if (!reply.isSuccess())
+            return reply;
+        return executionService.schedule(((XSPReplyResult<Job>) reply).getData());
+    }
+
+    @Override
+    public XSPReply beginImport(String documentId, String importerId, String configuration) {
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return XSPReplyNotFound.instance();
+        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
+        if (executionService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = importer.getImportJob(documentId, configuration);
+        if (!reply.isSuccess())
+            return reply;
+        return executionService.schedule(((XSPReplyResult<Job>) reply).getData());
     }
 
     /**

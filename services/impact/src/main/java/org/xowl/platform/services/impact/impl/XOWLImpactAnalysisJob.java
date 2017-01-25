@@ -32,8 +32,10 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
+import org.xowl.platform.services.impact.ImpactAnalysisService;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;
 import org.xowl.platform.services.storage.StorageService;
 import org.xowl.platform.services.storage.TripleStore;
@@ -90,6 +92,16 @@ class XOWLImpactAnalysisJob extends JobBase {
 
     @Override
     public void doRun() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null) {
+            result = XSPReplyServiceUnavailable.instance();
+            return;
+        }
+        XSPReply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
+        if (!reply.isSuccess()) {
+            result = reply;
+            return;
+        }
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null) {
             result = XSPReplyServiceUnavailable.instance();

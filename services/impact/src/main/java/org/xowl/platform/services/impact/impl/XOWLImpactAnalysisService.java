@@ -28,9 +28,12 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
@@ -71,7 +74,12 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - Impact Analysis Service";
+        return PlatformUtils.NAME + " - Impact Analysis Service";
+    }
+
+    @Override
+    public SecuredAction[] getActions() {
+        return ACTIONS;
     }
 
     @Override
@@ -82,7 +90,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
     }
 
     @Override
-    public HttpResponse handle(HttpApiRequest request) {
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         byte[] content = request.getContent();
@@ -133,6 +141,12 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
 
     @Override
     public XSPReply perform(ImpactAnalysisSetup setup) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
+        if (!reply.isSuccess())
+            return reply;
         JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
             return XSPReplyServiceUnavailable.instance();

@@ -18,7 +18,8 @@
 package org.xowl.platform.services.impact;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredService;
 
 /**
  * Represents a service for impact analyses
@@ -27,7 +28,19 @@ import org.xowl.platform.kernel.Service;
  *
  * @author Laurent Wouters
  */
-public interface ImpactAnalysisService extends Service {
+public interface ImpactAnalysisService extends SecuredService {
+    /**
+     * Service action to perform a new impact analysis
+     */
+    SecuredAction ACTION_PERFORM = new SecuredAction(ImpactAnalysisService.class.getCanonicalName() + ".Perform", "Impact Analysis Service - Perform Analysis");
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            ACTION_PERFORM
+    };
+
     /**
      * Performs an impact analysis
      *

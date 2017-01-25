@@ -17,15 +17,12 @@
 
 package org.xowl.platform.connectors.csv;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
 import org.xowl.platform.services.connection.ConnectorDescriptorParam;
+import org.xowl.platform.services.connection.ConnectorService;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -33,28 +30,15 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class CSVFactory implements ConnectorServiceFactory {
-    /**
-     * The descriptions for this factory
-     */
-    private final Collection<ConnectorDescriptor> descriptions;
-
+public class CSVConnectorFactory implements ConnectorServiceFactory {
     /**
      * The singleton instance of the factory
      */
-    public static final CSVFactory INSTANCE = new CSVFactory();
-
-    /**
-     * Initializes the factory
-     */
-    private CSVFactory() {
-        descriptions = new ArrayList<>(1);
-        descriptions.add(CSVDescription.INSTANCE);
-    }
+    public static final CSVConnectorFactory INSTANCE = new CSVConnectorFactory();
 
     @Override
     public String getIdentifier() {
-        return CSVFactory.class.getCanonicalName();
+        return CSVConnectorFactory.class.getCanonicalName();
     }
 
     @Override
@@ -63,12 +47,7 @@ public class CSVFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public Collection<ConnectorDescriptor> getDescriptors() {
-        return descriptions;
-    }
-
-    @Override
-    public XSPReply newConnector(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
-        return new XSPReplyResult<>(new CSVConnector(identifier, name, uris));
+    public ConnectorService newConnector(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
+        return new CSVConnector(identifier, name, uris);
     }
 }

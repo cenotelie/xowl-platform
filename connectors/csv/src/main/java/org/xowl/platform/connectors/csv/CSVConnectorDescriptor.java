@@ -24,17 +24,17 @@ import org.xowl.platform.services.connection.ConnectorDescriptorBase;
  *
  * @author Laurent Wouters
  */
-public class CSVDescription extends ConnectorDescriptorBase {
+public class CSVConnectorDescriptor extends ConnectorDescriptorBase {
     /**
      * The singleton instance
      */
-    public static final CSVDescription INSTANCE = new CSVDescription();
+    public static final CSVConnectorDescriptor INSTANCE = new CSVConnectorDescriptor();
 
     /**
      * Initializes this description
      */
-    private CSVDescription() {
-        super(CSVDescription.class.getCanonicalName(),
+    private CSVConnectorDescriptor() {
+        super(CSVConnectorDescriptor.class.getCanonicalName(),
                 "Generic Domain - CSV Syntax",
                 "A generic domain with a CSV syntax.");
     }

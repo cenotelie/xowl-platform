@@ -20,7 +20,6 @@ package org.xowl.platform.connectors.csv;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
@@ -29,8 +28,6 @@ import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.connectors.csv.impl.CSVImportationJob;
-import org.xowl.platform.connectors.csv.impl.CSVUIContribution;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -38,7 +35,7 @@ import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.importation.*;
 
@@ -80,14 +77,15 @@ public class CSVImporter extends Importer {
     }
 
     @Override
-    public DocumentPreview getPreview(Document document, ImporterConfiguration configuration) {
+    public XSPReply doGetPreview(String documentId, ImporterConfiguration configuration) {
         ImportationService service = Register.getComponent(ImportationService.class);
         if (service == null)
-            return null;
-        if (!(configuration instanceof CSVConfiguration))
-            return null;
+            return XSPReplyServiceUnavailable.instance();
         CSVConfiguration csvConfiguration = (CSVConfiguration) configuration;
-        try (InputStream stream = service.getStreamFor(document)) {
+        XSPReply reply = service.getStreamFor(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             CSVParser parser = new CSVParser(reader, csvConfiguration.getSeparator(), csvConfiguration.getTextMarker());
             Iterator<Iterator<String>> content = parser.parse();
@@ -101,7 +99,7 @@ public class CSVImporter extends Importer {
                 data.add(rowData);
                 count++;
             }
-            return new DocumentPreview() {
+            DocumentPreview preview = new DocumentPreview() {
                 @Override
                 public String serializedString() {
                     return serializedJSON();
@@ -128,17 +126,16 @@ public class CSVImporter extends Importer {
                     return builder.toString();
                 }
             };
+            return new XSPReplyResult<>(preview);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return null;
+            return new XSPReplyException(exception);
         }
     }
 
     @Override
-    public Job getImportJob(Document document, ImporterConfiguration configuration) {
-        if (!(configuration instanceof CSVConfiguration))
-            return null;
-        return new CSVImportationJob(document.getIdentifier(), (CSVConfiguration) configuration);
+    public XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration) {
+        return new XSPReplyResult<>(new CSVImportationJob(documentId, (CSVConfiguration) configuration));
     }
 
     /**
@@ -152,15 +149,27 @@ public class CSVImporter extends Importer {
         ImportationService importationService = Register.getComponent(ImportationService.class);
         if (importationService == null)
             return XSPReplyServiceUnavailable.instance();
+        CSVImporter importer = (CSVImporter) importationService.getImporter(CSVImporter.class.getCanonicalName());
+        if (importer == null)
+            return XSPReplyServiceUnavailable.instance();
         ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(importer.actionImport);
+        if (!reply.isSuccess())
+            return reply;
 
-        Document document = importationService.getDocument(documentId);
-        if (document == null)
-            return XSPReplyNotFound.instance();
-
-        try (InputStream stream = importationService.getStreamFor(document)) {
+        reply = importationService.getDocument(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        Document document = ((XSPReplyResult<Document>) reply).getData();
+        reply = importationService.getStreamFor(documentId);
+        if (!reply.isSuccess())
+            return reply;
+        try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             CSVParser parser = new CSVParser(reader, configuration.getSeparator(), configuration.getTextMarker());
             Iterator<Iterator<String>> content = parser.parse();
@@ -170,7 +179,7 @@ public class CSVImporter extends Importer {
             Collection<Quad> quads = context.getQuads();
             Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(documentId, configuration.getFamily(), configuration.getSuperseded(), document.getName(), configuration.getVersion(), configuration.getArchetype(), CSVImporter.class.getCanonicalName());
             Artifact artifact = new ArtifactSimple(metadata, quads);
-            XSPReply reply = storageService.store(artifact);
+            reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;
             EventService eventService = Register.getComponent(EventService.class);

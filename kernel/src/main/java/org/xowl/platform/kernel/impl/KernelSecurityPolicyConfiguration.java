@@ -274,7 +274,11 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
                 first = false;
                 builder.append("{\"action\": {\"identifier\": \"");
                 builder.append(TextUtils.escapeStringJSON(couple.getKey()));
-                builder.append("\"}, \"policy\": ");
+                builder.append("\", \"name\": \"");
+                builder.append(TextUtils.escapeStringJSON(couple.getKey()));
+                builder.append("\", \"policies\": [");
+                builder.append(couple.getValue().getDescriptor().serializedJSON());
+                builder.append("]}, \"policy\": ");
                 builder.append(couple.getValue().serializedJSON());
                 builder.append("}");
             }

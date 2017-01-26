@@ -80,6 +80,10 @@ public interface SecurityService extends SecuredService {
      */
     SecuredAction ACTION_DELETE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteRole", "Security Service - Delete Role", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
+     * Service action to update the key for a user
+     */
+    SecuredAction ACTION_UPDATE_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".UpdateUserKey", "Security Service - Update User Key", SecuredActionPolicyIsSelf.DESCRIPTOR);
+    /**
      * Service action to reset the key for a user
      */
     SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset User Key", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
@@ -139,6 +143,7 @@ public interface SecurityService extends SecuredService {
             ACTION_DELETE_USER,
             ACTION_DELETE_GROUP,
             ACTION_DELETE_ROLE,
+            ACTION_UPDATE_USER_KEY,
             ACTION_RESET_USER_KEY,
             ACTION_ADD_USER_TO_GROUP,
             ACTION_REMOVE_USER_FROM_GROUP,

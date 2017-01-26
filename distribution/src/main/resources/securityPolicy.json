@@ -187,10 +187,18 @@
     },
     {
       "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecurityService.ResetUserKey"
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.UpdateUserKey"
       },
       "policy": {
         "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsSelf"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ResetUserKey"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
       }
     },
     {

@@ -19,7 +19,9 @@ package org.xowl.platform.services.impact;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.JobFactory;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisJobFactory;
 import org.xowl.platform.services.impact.impl.XOWLImpactAnalysisService;
@@ -33,8 +35,10 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         XOWLImpactAnalysisService service = new XOWLImpactAnalysisService();
-        bundleContext.registerService(ImpactAnalysisService.class, service, null);
+        bundleContext.registerService(Service.class, service, null);
+        bundleContext.registerService(SecuredService.class, service, null);
         bundleContext.registerService(HttpApiService.class, service, null);
+        bundleContext.registerService(ImpactAnalysisService.class, service, null);
         bundleContext.registerService(JobFactory.class, new XOWLImpactAnalysisJobFactory(), null);
     }
 

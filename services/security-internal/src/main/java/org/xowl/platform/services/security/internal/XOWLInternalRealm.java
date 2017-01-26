@@ -712,7 +712,7 @@ class XOWLInternalRealm implements SecurityRealm {
         PlatformUser platformUser = authenticate(identifier, oldKey);
         if (platformUser == null)
             return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RESET_USER_KEY, platformUser);
+        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UPDATE_USER_KEY, platformUser);
         if (!reply.isSuccess())
             return reply;
         // execute

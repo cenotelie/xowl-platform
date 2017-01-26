@@ -22,6 +22,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
@@ -34,9 +35,6 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.net.HttpURLConnection;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Implements the business directory service
@@ -57,29 +55,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelBusinessDirectoryService.class, "/org/xowl/platform/kernel/api_business.html", "Business Directory Service - Documentation", HttpApiResource.MIME_HTML);
 
-
-    /**
-     * The registered domains
-     */
-    private final Map<String, BusinessDomain> domains;
-    /**
-     * The registered schemas
-     */
-    private final Map<String, BusinessSchema> schemas;
-    /**
-     * The registered archetypes
-     */
-    private final Map<String, ArtifactArchetype> archetypes;
-
-    /**
-     * Initializes this service
-     */
-    public KernelBusinessDirectoryService() {
-        this.domains = new HashMap<>();
-        this.schemas = new HashMap<>();
-        this.archetypes = new HashMap<>();
-    }
-
     @Override
     public String getIdentifier() {
         return KernelBusinessDirectoryService.class.getCanonicalName();
@@ -92,32 +67,44 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
 
     @Override
     public Collection<BusinessDomain> getDomains() {
-        return Collections.unmodifiableCollection(domains.values());
+        return Register.getComponents(BusinessDomain.class);
     }
 
     @Override
     public Collection<BusinessSchema> getSchemas() {
-        return Collections.unmodifiableCollection(schemas.values());
+        return Register.getComponents(BusinessSchema.class);
     }
 
     @Override
     public Collection<ArtifactArchetype> getArchetypes() {
-        return Collections.unmodifiableCollection(archetypes.values());
+        return Register.getComponents(ArtifactArchetype.class);
     }
 
     @Override
     public BusinessDomain getDomain(String identifier) {
-        return domains.get(identifier);
+        for (BusinessDomain domain : getDomains()) {
+            if (domain.getIdentifier().equals(identifier))
+                return domain;
+        }
+        return null;
     }
 
     @Override
     public BusinessSchema getSchema(String identifier) {
-        return schemas.get(identifier);
+        for (BusinessSchema schema : getSchemas()) {
+            if (schema.getIdentifier().equals(identifier))
+                return schema;
+        }
+        return null;
     }
 
     @Override
     public ArtifactArchetype getArchetype(String identifier) {
-        return archetypes.get(identifier);
+        for (ArtifactArchetype archetype : getArchetypes()) {
+            if (archetype.getIdentifier().equals(identifier))
+                return archetype;
+        }
+        return null;
     }
 
     @Override

@@ -20,6 +20,10 @@ package org.xowl.platform.kernel.security;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Register;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents a user action for a service
@@ -113,5 +117,20 @@ public class SecuredAction implements Identifiable, Serializable {
         }
         builder.append("]}");
         return builder.toString();
+    }
+
+    /**
+     * Retrieves all the currently registered secured actions on the platform
+     *
+     * @return The registered secured actions
+     */
+    public static Map<String, SecuredAction> getAll() {
+        Map<String, SecuredAction> actions = new HashMap<>();
+        for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
+            for (SecuredAction securedAction : securedService.getActions()) {
+                actions.put(securedAction.getIdentifier(), securedAction);
+            }
+        }
+        return actions;
     }
 }

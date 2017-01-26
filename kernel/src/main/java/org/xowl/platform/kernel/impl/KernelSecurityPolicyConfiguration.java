@@ -26,11 +26,12 @@ import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +49,10 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * The parts of this configuration
      */
     private final Map<SecuredAction, SecuredActionPolicy> policies;
+    /**
+     * The policies for actions that are configured but cannot be found on the platform
+     */
+    private final Map<String, SecuredActionPolicy> unknownActions;
 
     /**
      * Initializes this configuration
@@ -57,6 +62,7 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
     public KernelSecurityPolicyConfiguration(File storage) {
         this.storage = storage;
         this.policies = new HashMap<>();
+        this.unknownActions = new HashMap<>();
         if (storage.exists()) {
             try (InputStream stream = new FileInputStream(storage)) {
                 String content = Files.read(stream, Files.CHARSET);
@@ -76,12 +82,7 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * @param definition The serialized definition
      */
     private void loadDefinition(ASTNode definition) {
-        Map<String, SecuredAction> actions = new HashMap<>();
-        for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
-            for (SecuredAction securedAction : securedService.getActions()) {
-                actions.put(securedAction.getIdentifier(), securedAction);
-            }
-        }
+        Map<String, SecuredAction> actions = SecuredAction.getAll();
 
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -106,41 +107,98 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * @param mapping The mapping to load
      */
     private void loadDefinitionPart(Map<String, SecuredAction> actions, ASTNode mapping) {
-        SecuredAction action = null;
+        String actionId = null;
         SecuredActionPolicy policy = null;
         for (ASTNode member : mapping.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("action".equals(head)) {
-                action = getAction(actions, member.getChildren().get(1));
+                actionId = getActionId(member.getChildren().get(1));
             } else if ("policy".equals(head)) {
                 policy = SecuredActionPolicyBase.load(member.getChildren().get(1));
             }
         }
-        if (action != null && policy != null) {
+        if (actionId == null || policy == null) {
+            // the action is invalid or the policy is invalid
+            return;
+        }
+        SecuredAction action = actions.remove(actionId);
+        if (action == null) {
+            // the action is unknown
+            unknownActions.put(actionId, policy);
+        } else {
             policies.put(action, policy);
-            actions.remove(action.getIdentifier());
         }
     }
 
     /**
-     * Gets the secured action for the specified identifier
+     * Gets the identifier of the secured action for the specified serialized configuration
      *
-     * @param actions    The known actions
      * @param definition The AST definition
-     * @return The secured action, or null if it does not exist
+     * @return The identifier of the serialized action
      */
-    private SecuredAction getAction(Map<String, SecuredAction> actions, ASTNode definition) {
+    private String getActionId(ASTNode definition) {
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("identifier".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 value = value.substring(1, value.length() - 1);
-                return actions.get(value);
+                return value;
             }
         }
         return null;
+    }
+
+    /**
+     * Write the current configuration to the storage
+     *
+     * @return The protocol reply
+     */
+    private XSPReply writeBack() {
+        try (FileOutputStream stream = new FileOutputStream(storage)) {
+            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
+            writer.write(serializedJSON());
+            writer.flush();
+            writer.close();
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
+        return XSPReplySuccess.instance();
+    }
+
+    /**
+     * Synchronizes the secured actions with the current state of the configuration
+     */
+    public void synchronizeActions() {
+        Map<String, SecuredAction> actions = SecuredAction.getAll();
+        boolean changed = false;
+        synchronized (policies) {
+            // remove the mapped actions
+            for (SecuredAction action : policies.keySet()) {
+                actions.remove(action.getIdentifier());
+            }
+            // try to resolve the unknown actions
+            if (unknownActions.size() > 0) {
+                Collection<String> identifiers = new ArrayList<>(unknownActions.keySet());
+                for (String identifier : identifiers) {
+                    SecuredAction action = actions.get(identifier);
+                    if (action != null) {
+                        actions.remove(identifier);
+                        policies.put(action, unknownActions.remove(identifier));
+                        changed = true;
+                    }
+                }
+            }
+            // the remaining actions are then unmapped
+            for (SecuredAction action : actions.values()) {
+                policies.put(action, SecuredActionPolicyDenyAll.INSTANCE);
+                changed = true;
+            }
+        }
+        if (changed)
+            writeBack();
     }
 
     /**
@@ -161,17 +219,11 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
         }
         if (!found)
             return new XSPReplyApiError(HttpApiService.ERROR_PARAMETER_RANGE, "The specified policy is not allowed for this action");
-        policies.put(action, policy);
-        try (FileOutputStream stream = new FileOutputStream(storage)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
-            writer.write(serializedJSON());
-            writer.flush();
-            writer.close();
-        } catch (IOException exception) {
-            Logging.getDefault().error(exception);
-            return new XSPReplyException(exception);
+        synchronized (policies) {
+            policies.put(action, policy);
+            unknownActions.remove(action.getIdentifier());
         }
-        return XSPReplySuccess.instance();
+        return writeBack();
     }
 
     /**
@@ -181,7 +233,17 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * @return The associated policy
      */
     public SecuredActionPolicy getPolicyFor(SecuredAction action) {
-        return policies.get(action);
+        synchronized (policies) {
+            SecuredActionPolicy policy = policies.get(action);
+            if (policy != null)
+                return policy;
+            policy = unknownActions.get(action.getIdentifier());
+            if (policy != null) {
+                policies.put(action, policy);
+                unknownActions.remove(action.getIdentifier());
+            }
+            return policy;
+        }
     }
 
     @Override
@@ -195,15 +257,27 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
         builder.append(TextUtils.escapeStringJSON(SecurityPolicyConfiguration.class.getCanonicalName()));
         builder.append("\", \"parts\": [");
         boolean first = true;
-        for (Map.Entry<SecuredAction, SecuredActionPolicy> couple : policies.entrySet()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append("{\"action\": ");
-            builder.append(couple.getKey().serializedJSON());
-            builder.append(", \"policy\": ");
-            builder.append(couple.getValue().serializedJSON());
-            builder.append("}");
+        synchronized (policies) {
+            for (Map.Entry<SecuredAction, SecuredActionPolicy> couple : policies.entrySet()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append("{\"action\": ");
+                builder.append(couple.getKey().serializedJSON());
+                builder.append(", \"policy\": ");
+                builder.append(couple.getValue().serializedJSON());
+                builder.append("}");
+            }
+            for (Map.Entry<String, SecuredActionPolicy> couple : unknownActions.entrySet()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append("{\"action\": {\"identifier\": \"");
+                builder.append(TextUtils.escapeStringJSON(couple.getKey()));
+                builder.append("\"}, \"policy\": ");
+                builder.append(couple.getValue().serializedJSON());
+                builder.append("}");
+            }
         }
         builder.append("]}");
         return builder.toString();

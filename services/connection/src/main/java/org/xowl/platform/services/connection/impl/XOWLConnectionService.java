@@ -224,7 +224,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     @Override
-    public ConnectorService get(String identifier) {
+    public ConnectorService getConnector(String identifier) {
         resolveConfigConnectors();
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
@@ -247,7 +247,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             return reply;
 
         synchronized (connectorsById) {
-            ConnectorService service = get(identifier);
+            ConnectorService service = getConnector(identifier);
             if (service != null)
                 // already exists
                 return new XSPReplyApiError(ERROR_CONNECTOR_SAME_ID);
@@ -404,7 +404,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageListConnectors() {
-        Collection<ConnectorService> connectors = Register.getComponents(ConnectorService.class);
+        Collection<ConnectorService> connectors = getConnectors();
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (ConnectorService connector : connectors) {
@@ -424,7 +424,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageGetConnector(String connectorId) {
-        ConnectorService connector = Register.getComponent(ConnectorService.class, "id", connectorId);
+        ConnectorService connector = getConnector(connectorId);
         if (connector == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, connector.serializedJSON());

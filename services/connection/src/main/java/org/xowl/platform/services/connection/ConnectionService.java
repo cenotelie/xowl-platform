@@ -60,7 +60,7 @@ public interface ConnectionService extends SecuredService {
      * @param identifier The identifier of a connector
      * @return The connector, or null if it does not exist
      */
-    ConnectorService get(String identifier);
+    ConnectorService getConnector(String identifier);
 
     /**
      * Gets the descriptions of the supported connectors

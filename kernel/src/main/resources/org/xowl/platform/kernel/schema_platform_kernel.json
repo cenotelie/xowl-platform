@@ -763,6 +763,158 @@
           }
         ]
       }
+    },
+    "SecuredActionPolicyDescriptorParameter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "SecuredActionPolicyDescriptor": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredActionPolicyDescriptor"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/SecuredActionPolicyDescriptorParameter"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "parameters"
+      ]
+    },
+    "SecuredActionPolicy": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredActionPolicy"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name"
+      ]
+    },
+    "SecuredAction": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredAction"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/SecuredActionPolicyDescriptor"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "policies"
+      ]
+    },
+    "SecurityPolicyConfigurationPart": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecuredAction"
+            }
+          ]
+        },
+        "policy": {
+          "type": "object",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecuredActionPolicy"
+            }
+          ]
+        }
+      },
+      "required": [
+        "action",
+        "policy"
+      ]
+    },
+    "SecurityPolicyConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecurityPolicyConfiguration"
+          ]
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/SecurityPolicyConfigurationPart"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "parts"
+      ]
     }
   }
 }

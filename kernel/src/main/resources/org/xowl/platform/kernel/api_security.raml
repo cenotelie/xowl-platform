@@ -10,6 +10,8 @@ types:
   PlatformGroups: !include schema_platform_kernel.json#/definitions/PlatformGroups
   PlatformRole: !include schema_platform_kernel.json#/definitions/PlatformRole
   PlatformRoles: !include schema_platform_kernel.json#/definitions/PlatformRoles
+  SecurityPolicyConfiguration: !include schema_platform_kernel.json#/definitions/SecurityPolicyConfiguration
+  SecuredActionPolicy: !include schema_platform_kernel.json#/definitions/SecuredActionPolicy
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/security:
@@ -94,6 +96,61 @@ baseUri: https://localhost:8443/api
               description: Resets the authentication token
               example: __Secure-xOWL-Token-v1=; Max-Age=0
               required: true
+  /policy:
+    description: The security authorization policy
+    get:
+      description: Gets the configuration of the current security authoriation policy
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The configuration of the current security authorization polocy
+          body:
+            application/json:
+              type: SecurityPolicyConfiguration
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.security.SecurityPolicyConfiguration",
+                  "parts": [
+                    {
+                      "action": {
+                        "type": "org.xowl.platform.kernel.security.SecuredAction",
+                        "identifier": "org.xowl.platform.kernel.security.SecurityService.GetPolicy",
+                        "name": "Security Service - Get Security Policy",
+                        "policies": [
+                          {
+                            "type": "org.xowl.platform.kernel.security.SecuredActionPolicyDescriptor",
+                            "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin",
+                            "name": "User is platform administrator",
+                            "parameters": []
+                          }
+                        ]
+                      },
+                      "policy": {
+                        "type": "org.xowl.platform.kernel.security.SecuredActionPolicy",
+                        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin",
+                        "name": "User is platform administrator"
+                      }
+                    }
+                  ]
+                }
+    /actions:
+      /{actionId}:
+        description: Represents a secured action in the configration of the security authorization policy
+        put:
+          description: Sets the policy for the secured action
+          is: [secured, mayFail]
+          body:
+            application/json:
+              type: SecuredActionPolicy
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.security.SecuredActionPolicy",
+                  "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin",
+                  "name": "User is platform administrator"
+                }
+          responses:
+            200:
+              description: The operation succeeded
   /users:
     description: The collection of users on the platform
     get:

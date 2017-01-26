@@ -192,7 +192,7 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(KernelSecurityPolicyConfiguration.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(SecurityPolicyConfiguration.class.getCanonicalName()));
         builder.append("\", \"parts\": [");
         boolean first = true;
         for (Map.Entry<SecuredAction, SecuredActionPolicy> couple : policies.entrySet()) {

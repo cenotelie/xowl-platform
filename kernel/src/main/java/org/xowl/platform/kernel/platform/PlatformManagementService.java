@@ -87,7 +87,7 @@ public interface PlatformManagementService extends SecuredService, MeasurableSer
      */
     SecuredAction ACTION_GET_PRODUCT = new SecuredAction(
             PlatformManagementService.class.getCanonicalName() + ".GetProduct",
-            "Logging Service - Get Product");
+            "Platform Management Service - Get Product");
     /**
      * Service action to get the description of the bundles on this platform
      */

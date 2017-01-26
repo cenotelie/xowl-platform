@@ -34,7 +34,7 @@ public class SecuredActionPolicyIsSelf extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsSelf() {
-        super(SecuredActionPolicyIsSelf.class.getCanonicalName(), "Is Self User");
+        super(SecuredActionPolicyIsSelf.class.getCanonicalName(), "User is self");
     }
 
     @Override

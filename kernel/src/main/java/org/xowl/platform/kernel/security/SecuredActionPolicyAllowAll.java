@@ -34,7 +34,7 @@ public class SecuredActionPolicyAllowAll extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyAllowAll() {
-        super(SecuredActionPolicyAllowAll.class.getCanonicalName(), "Allow All");
+        super(SecuredActionPolicyAllowAll.class.getCanonicalName(), "Allow any user");
     }
 
     @Override

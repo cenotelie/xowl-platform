@@ -39,7 +39,7 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
      * @param roleId The identifier of the required role
      */
     public SecuredActionPolicyHasRole(String roleId) {
-        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "Has Role");
+        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "User has role");
         this.role = roleId;
     }
 
@@ -58,7 +58,7 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
      * @param definition The serialized definition
      */
     public SecuredActionPolicyHasRole(ASTNode definition) {
-        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "Role policy");
+        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "User has role");
         String role = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());

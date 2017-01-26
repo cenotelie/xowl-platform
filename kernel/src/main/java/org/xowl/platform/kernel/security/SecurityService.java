@@ -82,7 +82,7 @@ public interface SecurityService extends SecuredService {
     /**
      * Service action to reset the key for a user
      */
-    SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset Use Key", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset User Key", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
     /**
      * Service action to add a user to a group
      */

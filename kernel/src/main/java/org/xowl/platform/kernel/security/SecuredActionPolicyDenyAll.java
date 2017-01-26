@@ -32,7 +32,7 @@ public class SecuredActionPolicyDenyAll extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyDenyAll() {
-        super(SecuredActionPolicyDenyAll.class.getCanonicalName(), "Deny All");
+        super(SecuredActionPolicyDenyAll.class.getCanonicalName(), "Deny all users");
     }
 
     @Override

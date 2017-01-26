@@ -35,7 +35,7 @@ public class SecuredActionPolicyIsPlatformAdmin extends SecuredActionPolicyBase 
      * Initializes this policy
      */
     private SecuredActionPolicyIsPlatformAdmin() {
-        super(SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName(), "Is Platform Admin");
+        super(SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName(), "User is platform administrator");
     }
 
     @Override

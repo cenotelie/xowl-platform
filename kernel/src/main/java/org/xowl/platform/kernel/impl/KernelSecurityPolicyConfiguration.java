@@ -117,8 +117,10 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
                 policy = SecuredActionPolicyBase.load(member.getChildren().get(1));
             }
         }
-        if (action != null && policy != null)
+        if (action != null && policy != null) {
             policies.put(action, policy);
+            actions.remove(action.getIdentifier());
+        }
     }
 
     /**
@@ -133,9 +135,9 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("identifier".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(0).getValue());
-                value = head.substring(1, value.length() - 1);
-                return actions.remove(value);
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                value = value.substring(1, value.length() - 1);
+                return actions.get(value);
             }
         }
         return null;

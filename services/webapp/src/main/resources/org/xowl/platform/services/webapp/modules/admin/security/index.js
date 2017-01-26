@@ -66,8 +66,8 @@ function renderPlatformUser(user) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "/web/assets/user.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = user.identifier;
 	var link = document.createElement("a");
@@ -84,8 +84,8 @@ function renderPlatformGroup(group) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "/web/assets/group.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = group.identifier;
 	var link = document.createElement("a");
@@ -102,8 +102,8 @@ function renderPlatformRole(role) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "/web/assets/role.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = role.identifier;
 	var link = document.createElement("a");

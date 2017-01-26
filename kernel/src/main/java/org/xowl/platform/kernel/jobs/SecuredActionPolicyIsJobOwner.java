@@ -35,7 +35,7 @@ public class SecuredActionPolicyIsJobOwner extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsJobOwner() {
-        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "Job owner policy");
+        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "User is job owner");
     }
 
     @Override

@@ -35,7 +35,7 @@ public class SecuredActionPolicyIsGroupAdmin extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsGroupAdmin() {
-        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "Is Group Admin");
+        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "User is group administrator");
     }
 
     @Override

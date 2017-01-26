@@ -1,5 +1,5 @@
 {
-  "type": "org.xowl.platform.kernel.impl.KernelSecurityPolicyConfiguration",
+  "type": "org.xowl.platform.kernel.security.SecurityPolicyConfiguration",
   "parts": [
     {
       "action": {

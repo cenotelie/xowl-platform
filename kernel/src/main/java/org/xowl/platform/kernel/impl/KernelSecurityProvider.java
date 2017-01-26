@@ -48,7 +48,7 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
         else if (SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsPlatformAdmin.INSTANCE;
         else if (SecuredActionPolicyHasRole.class.getCanonicalName().equals(policyId))
-            return new SecuredActionPolicyHasRole(definition);
+            return SecuredActionPolicyHasRole.newInstance(definition);
         else if (SecuredActionPolicyIsGroupAdmin.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsGroupAdmin.INSTANCE;
         else if (SecuredActionPolicyIsSelf.class.getCanonicalName().equals(policyId))

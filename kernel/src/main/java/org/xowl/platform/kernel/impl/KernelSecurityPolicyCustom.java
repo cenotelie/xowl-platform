@@ -151,6 +151,8 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
         if (definition == null)
             return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
         SecuredActionPolicy policy = SecuredActionPolicyBase.load(definition);
+        if (policy == null)
+            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, "Invalid policy definition");
         return setPolicy(actionId, policy);
     }
 }

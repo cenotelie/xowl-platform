@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.security;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
@@ -39,17 +40,7 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
     /**
      * The identifier of the required role
      */
-    protected final String role;
-
-    /**
-     * Initializes this policy
-     *
-     * @param roleId The identifier of the required role
-     */
-    public SecuredActionPolicyHasRole(String roleId) {
-        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
-        this.role = roleId;
-    }
+    protected final PlatformRole role;
 
     /**
      * Initializes this policy
@@ -57,26 +48,35 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
      * @param role The required role
      */
     public SecuredActionPolicyHasRole(PlatformRole role) {
-        this(role.getIdentifier());
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+        this.role = role;
     }
 
     /**
-     * Initializes this policy
+     * Creates a new instance from a serialized definition
      *
      * @param definition The serialized definition
+     * @return The configured policy, or null if the definition is not valid
      */
-    public SecuredActionPolicyHasRole(ASTNode definition) {
-        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "User has role");
-        String role = null;
+    public static SecuredActionPolicyHasRole newInstance(ASTNode definition) {
+        String roleId = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("role".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                role = value.substring(1, value.length() - 1);
+                roleId = value.substring(1, value.length() - 1);
             }
         }
-        this.role = role;
+        if (roleId == null)
+            return null;
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        PlatformRole role = securityService.getRealm().getRole(roleId);
+        if (role == null)
+            return null;
+        return new SecuredActionPolicyHasRole(role);
     }
 
     @Override
@@ -93,12 +93,12 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
                 "\", \"role\": \"" +
-                TextUtils.escapeStringJSON(role) +
+                TextUtils.escapeStringJSON(role.getIdentifier()) +
                 "\"}";
     }
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action) {
-        return securityService.getRealm().checkHasRole(user.getIdentifier(), role);
+        return securityService.getRealm().checkHasRole(user.getIdentifier(), role.getIdentifier());
     }
 }

@@ -30,10 +30,11 @@ public class SecuredAction implements Identifiable, Serializable {
     /**
      * The default authorization policies
      */
-    public static final String[] DEFAULT_POLICIES = new String[]{
-            SecuredActionPolicyAllowAll.class.getCanonicalName(),
-            SecuredActionPolicyHasRole.class.getCanonicalName(),
-            SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName()
+    public static final SecuredActionPolicyDescriptor[] DEFAULT_POLICIES = new SecuredActionPolicyDescriptor[]{
+            SecuredActionPolicyDenyAll.DESCRIPTOR,
+            SecuredActionPolicyAllowAll.DESCRIPTOR,
+            SecuredActionPolicyHasRole.DESCRIPTOR,
+            SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR
     };
 
     /**
@@ -47,7 +48,7 @@ public class SecuredAction implements Identifiable, Serializable {
     /**
      * The possible authorization policies for this action
      */
-    protected final String[] policies;
+    protected final SecuredActionPolicyDescriptor[] policies;
 
     /**
      * Initializes this action
@@ -66,7 +67,7 @@ public class SecuredAction implements Identifiable, Serializable {
      * @param name       The name of this action
      * @param policies   The identifiers of the possible authorization policies for this action
      */
-    public SecuredAction(String identifier, String name, String... policies) {
+    public SecuredAction(String identifier, String name, SecuredActionPolicyDescriptor... policies) {
         this.identifier = identifier;
         this.name = name;
         this.policies = policies;
@@ -77,7 +78,7 @@ public class SecuredAction implements Identifiable, Serializable {
      *
      * @return The identifiers of the possible authorization policies for this action
      */
-    public String[] getPolicies() {
+    public SecuredActionPolicyDescriptor[] getPolicies() {
         return policies;
     }
 
@@ -108,9 +109,7 @@ public class SecuredAction implements Identifiable, Serializable {
         for (int i = 0; i != policies.length; i++) {
             if (i != 0)
                 builder.append(", ");
-            builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(policies[i]));
-            builder.append("\"");
+            builder.append(policies[i].serializedJSON());
         }
         builder.append("]}");
         return builder.toString();

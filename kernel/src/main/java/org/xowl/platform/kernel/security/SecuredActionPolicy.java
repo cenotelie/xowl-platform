@@ -28,6 +28,13 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public interface SecuredActionPolicy extends Identifiable, Serializable {
     /**
+     * Gets the descriptor for this policy
+     *
+     * @return The descriptor for this policy
+     */
+    SecuredActionPolicyDescriptor getDescriptor();
+
+    /**
      * Determines whether the specified user is authorized to perform an action
      *
      * @param securityService The current security service

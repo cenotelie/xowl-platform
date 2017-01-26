@@ -64,11 +64,11 @@ public interface JobExecutionService extends SecuredService, MeasurableService {
     /**
      * Service action to get the current jobs
      */
-    SecuredAction ACTION_GET_JOBS = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs", SecuredActionPolicyIsJobOwner.class.getCanonicalName());
+    SecuredAction ACTION_GET_JOBS = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".GetJobs", "Jobs Management Service - Get Jobs", SecuredActionPolicyIsJobOwner.DESCRIPTOR);
     /**
      * Service action to cancel running jobs
      */
-    SecuredAction ACTION_CANCEL = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job", SecuredActionPolicyIsJobOwner.class.getCanonicalName());
+    SecuredAction ACTION_CANCEL = new SecuredAction(JobExecutionService.class.getCanonicalName() + ".Cancel", "Jobs Management Service - Cancel running job", SecuredActionPolicyIsJobOwner.DESCRIPTOR);
 
     /**
      * The actions for this service

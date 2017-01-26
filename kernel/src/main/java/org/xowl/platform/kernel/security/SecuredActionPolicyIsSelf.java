@@ -26,6 +26,11 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyIsSelf extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsSelf.class.getCanonicalName(), "User is self");
+
+    /**
      * The singleton instance for this policy
      */
     public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsSelf();
@@ -34,7 +39,12 @@ public class SecuredActionPolicyIsSelf extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsSelf() {
-        super(SecuredActionPolicyIsSelf.class.getCanonicalName(), "User is self");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

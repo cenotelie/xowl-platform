@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.security.*;
  */
 public class SecuredActionPolicyIsJobOwner extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsJobOwner.class.getCanonicalName(), "User is job owner");
+
+    /**
      * The singleton instance for this policy
      */
     public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsJobOwner();
@@ -35,7 +40,12 @@ public class SecuredActionPolicyIsJobOwner extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsJobOwner() {
-        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "User is job owner");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

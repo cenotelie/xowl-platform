@@ -29,6 +29,14 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(
+            SecuredActionPolicyHasRole.class.getCanonicalName(),
+            "User has role",
+            new SecuredActionPolicyDescriptor.Parameter("role", PlatformRole.class.getCanonicalName()));
+
+    /**
      * The identifier of the required role
      */
     protected final String role;
@@ -39,7 +47,7 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
      * @param roleId The identifier of the required role
      */
     public SecuredActionPolicyHasRole(String roleId) {
-        super(SecuredActionPolicyHasRole.class.getCanonicalName(), "User has role");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
         this.role = roleId;
     }
 
@@ -69,6 +77,11 @@ public class SecuredActionPolicyHasRole extends SecuredActionPolicyBase {
             }
         }
         this.role = role;
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

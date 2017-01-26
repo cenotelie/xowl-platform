@@ -38,91 +38,91 @@ public interface SecurityService extends SecuredService {
     /**
      * Service action to get the configuration of the security policy
      */
-    SecuredAction ACTION_GET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".GetPolicy", "Security Service - Get Security Policy", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_GET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".GetPolicy", "Security Service - Get Security Policy", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to set the policy for a secured action
      */
-    SecuredAction ACTION_SET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".SetPolicy", "Security Service - Set Security Policy", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_SET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".SetPolicy", "Security Service - Set Security Policy", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to create a user
      */
-    SecuredAction ACTION_CREATE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_CREATE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to create a group
      */
-    SecuredAction ACTION_CREATE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateGroup", "Security Service - Create Group", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_CREATE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateGroup", "Security Service - Create Group", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to create a role
      */
-    SecuredAction ACTION_CREATE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateRole", "Security Service - Create Role", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_CREATE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateRole", "Security Service - Create Role", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to rename a user
      */
-    SecuredAction ACTION_RENAME_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameUser", "Security Service - Rename User", SecuredActionPolicyIsSelf.class.getCanonicalName());
+    SecuredAction ACTION_RENAME_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameUser", "Security Service - Rename User", SecuredActionPolicyIsSelf.DESCRIPTOR);
     /**
      * Service action to rename a group
      */
-    SecuredAction ACTION_RENAME_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameGroup", "Security Service - Rename Group", SecuredActionPolicyIsGroupAdmin.class.getCanonicalName());
+    SecuredAction ACTION_RENAME_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameGroup", "Security Service - Rename Group", SecuredActionPolicyIsGroupAdmin.DESCRIPTOR);
     /**
      * Service action to rename a role
      */
-    SecuredAction ACTION_RENAME_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameRole", "Security Service - Rename Role", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_RENAME_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".RenameRole", "Security Service - Rename Role", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to delete a user
      */
-    SecuredAction ACTION_DELETE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteUser", "Security Service - Delete User", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_DELETE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteUser", "Security Service - Delete User", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to delete a group
      */
-    SecuredAction ACTION_DELETE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteGroup", "Security Service - Delete Group", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_DELETE_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteGroup", "Security Service - Delete Group", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to delete a role
      */
-    SecuredAction ACTION_DELETE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteRole", "Security Service - Delete Role", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_DELETE_ROLE = new SecuredAction(SecurityService.class.getCanonicalName() + ".DeleteRole", "Security Service - Delete Role", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to reset the key for a user
      */
-    SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset User Key", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_RESET_USER_KEY = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResetUserKey", "Security Service - Reset User Key", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to add a user to a group
      */
-    SecuredAction ACTION_ADD_USER_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddUserToGroup", "Security Service - Add User to Group", SecuredActionPolicyIsGroupAdmin.class.getCanonicalName());
+    SecuredAction ACTION_ADD_USER_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddUserToGroup", "Security Service - Add User to Group", SecuredActionPolicyIsGroupAdmin.DESCRIPTOR);
     /**
      * Service action to remove a user from a group
      */
-    SecuredAction ACTION_REMOVE_USER_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveUserFromGroup", "Security Service - Remove User from Group", SecuredActionPolicyIsGroupAdmin.class.getCanonicalName());
+    SecuredAction ACTION_REMOVE_USER_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveUserFromGroup", "Security Service - Remove User from Group", SecuredActionPolicyIsGroupAdmin.DESCRIPTOR);
     /**
      * Service action to add an admin to a group
      */
-    SecuredAction ACTION_ADD_ADMIN_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddAdminToGroup", "Security Service - Add Admin to Group", SecuredActionPolicyIsGroupAdmin.class.getCanonicalName());
+    SecuredAction ACTION_ADD_ADMIN_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddAdminToGroup", "Security Service - Add Admin to Group", SecuredActionPolicyIsGroupAdmin.DESCRIPTOR);
     /**
      * Service action to remove an admin from a group
      */
-    SecuredAction ACTION_REMOVE_ADMIN_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveAdminFromGroup", "Security Service - Remove Admin from Group", SecuredActionPolicyIsGroupAdmin.class.getCanonicalName());
+    SecuredAction ACTION_REMOVE_ADMIN_FROM_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveAdminFromGroup", "Security Service - Remove Admin from Group", SecuredActionPolicyIsGroupAdmin.DESCRIPTOR);
     /**
      * Service action to assign a role to a user
      */
-    SecuredAction ACTION_ASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToUser", "Security Service - Assign Role to User", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_ASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToUser", "Security Service - Assign Role to User", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to un-assign a role to a user
      */
-    SecuredAction ACTION_UNASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToUser", "Security Service - Un-assign Role to User", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_UNASSIGN_ROLE_TO_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToUser", "Security Service - Un-assign Role to User", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to assign a role to a group
      */
-    SecuredAction ACTION_ASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToGroup", "Security Service - Assign Role to Group", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_ASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".AssignRoleToGroup", "Security Service - Assign Role to Group", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to un-assign a role to a group
      */
-    SecuredAction ACTION_UNASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToGroup", "Security Service - Un-assign Role to Group", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_UNASSIGN_ROLE_TO_GROUP = new SecuredAction(SecurityService.class.getCanonicalName() + ".UnassignRoleToGroup", "Security Service - Un-assign Role to Group", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to add a role implication
      */
-    SecuredAction ACTION_ADD_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddRoleImplication", "Security Service - Add Role Implication", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_ADD_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".AddRoleImplication", "Security Service - Add Role Implication", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
      * Service action to remove a role implication
      */
-    SecuredAction ACTION_REMOVE_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName());
+    SecuredAction ACTION_REMOVE_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
 
     /**
      * The actions for the security service

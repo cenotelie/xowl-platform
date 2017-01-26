@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyIsPlatformAdmin extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName(), "User is platform administrator");
+
+    /**
      * The singleton instance for this policy
      */
     public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsPlatformAdmin();
@@ -35,7 +40,12 @@ public class SecuredActionPolicyIsPlatformAdmin extends SecuredActionPolicyBase 
      * Initializes this policy
      */
     private SecuredActionPolicyIsPlatformAdmin() {
-        super(SecuredActionPolicyIsPlatformAdmin.class.getCanonicalName(), "User is platform administrator");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyIsGroupAdmin extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "User is group administrator");
+
+    /**
      * The singleton instance for this policy
      */
     public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsGroupAdmin();
@@ -35,7 +40,12 @@ public class SecuredActionPolicyIsGroupAdmin extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyIsGroupAdmin() {
-        super(SecuredActionPolicyIsGroupAdmin.class.getCanonicalName(), "User is group administrator");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

@@ -24,6 +24,11 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public class SecuredActionPolicyDenyAll extends SecuredActionPolicyBase {
     /**
+     * The descriptor for this policy
+     */
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyDenyAll.class.getCanonicalName(), "Deny all users");
+
+    /**
      * The singleton instance for this policy
      */
     public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyDenyAll();
@@ -32,7 +37,12 @@ public class SecuredActionPolicyDenyAll extends SecuredActionPolicyBase {
      * Initializes this policy
      */
     private SecuredActionPolicyDenyAll() {
-        super(SecuredActionPolicyDenyAll.class.getCanonicalName(), "Deny all users");
+        super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
+    }
+
+    @Override
+    public SecuredActionPolicyDescriptor getDescriptor() {
+        return DESCRIPTOR;
     }
 
     @Override

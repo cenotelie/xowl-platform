@@ -151,10 +151,10 @@ public class KernelSecurityPolicyConfiguration implements SecurityPolicyConfigur
      * @return The protocol reply
      */
     public XSPReply put(SecuredAction action, SecuredActionPolicy policy) {
-        String[] allowedPolicies = action.getPolicies();
+        SecuredActionPolicyDescriptor[] allowedPolicies = action.getPolicies();
         boolean found = false;
         for (int i = 0; i != allowedPolicies.length; i++) {
-            if (allowedPolicies[i].equals(policy.getIdentifier())) {
+            if (policy.getDescriptor() == allowedPolicies[i]) {
                 found = true;
                 break;
             }

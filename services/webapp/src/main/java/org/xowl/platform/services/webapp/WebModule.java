@@ -43,6 +43,13 @@ public interface WebModule extends Registrable, Serializable {
     String getIcon();
 
     /**
+     * Gets the order of this module
+     *
+     * @return The order for this module
+     */
+    int getOrder();
+
+    /**
      * Gets the items for this module, if any
      *
      * @return The items for this module

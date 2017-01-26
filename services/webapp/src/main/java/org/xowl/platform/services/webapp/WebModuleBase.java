@@ -47,6 +47,10 @@ public abstract class WebModuleBase implements WebModule {
      */
     protected final String icon;
     /**
+     * The order for this module
+     */
+    protected final int order;
+    /**
      * The items of this module
      */
     protected final List<WebModuleItem> items;
@@ -58,12 +62,14 @@ public abstract class WebModuleBase implements WebModule {
      * @param name       The service's human readable name
      * @param uri        The service URI part
      * @param icon       The icon for this module, if any
+     * @param order      The order for this module
      */
-    public WebModuleBase(String identifier, String name, String uri, String icon) {
+    public WebModuleBase(String identifier, String name, String uri, String icon, int order) {
         this.identifier = identifier;
         this.name = name;
         this.uri = uri;
         this.icon = icon;
+        this.order = order;
         this.items = new ArrayList<>(5);
     }
 
@@ -85,6 +91,11 @@ public abstract class WebModuleBase implements WebModule {
     @Override
     public String getIcon() {
         return icon;
+    }
+
+    @Override
+    public int getOrder() {
+        return order;
     }
 
     @Override
@@ -110,7 +121,9 @@ public abstract class WebModuleBase implements WebModule {
         builder.append(TextUtils.escapeStringJSON(getURI()));
         builder.append("\", \"icon\": \"");
         builder.append(getIcon() == null ? "" : TextUtils.escapeStringJSON(getIcon()));
-        builder.append("\", \"items\": [");
+        builder.append("\", \"order\": ");
+        builder.append(Integer.toString(order));
+        builder.append(", \"items\": [");
         for (int i = 0; i != items.size(); i++) {
             if (i != 0)
                 builder.append(", ");

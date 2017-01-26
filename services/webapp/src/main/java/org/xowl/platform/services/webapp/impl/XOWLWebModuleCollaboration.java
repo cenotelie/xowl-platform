@@ -30,7 +30,7 @@ public class XOWLWebModuleCollaboration extends WebModuleBase {
      * Initializes this service
      */
     public XOWLWebModuleCollaboration() {
-        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Collaboration", "collab", "/web/assets/module-collaboration.svg");
+        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Collaboration", "collab", "/web/assets/module-collaboration.svg", 50);
         this.items.add(new WebModuleItem("Conversations", "chat", "/web/assets/conversation.svg"));
         this.items.add(new WebModuleItem("Local Collaboration", "local", "/web/assets/collaboration.svg"));
         this.items.add(new WebModuleItem("Collaborations Network", "network", "/web/assets/network.svg"));

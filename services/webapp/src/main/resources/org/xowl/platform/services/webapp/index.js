@@ -20,6 +20,9 @@ function init() {
 }
 
 function renderModules(modules) {
+	modules.sort(function (x, y) {
+		return x.order - y.order;
+	});
 	var panel = document.getElementById("panel-modules");
 	for (var i = 0; i != modules.length; i++) {
 		var content = renderModule(modules[i]);

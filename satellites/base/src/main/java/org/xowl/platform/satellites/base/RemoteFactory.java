@@ -17,7 +17,6 @@
 
 package org.xowl.platform.satellites.base;
 
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 
 /**
@@ -25,13 +24,5 @@ import org.xowl.infra.server.api.XOWLFactory;
  *
  * @author Laurent Wouters
  */
-class RemoteFactory implements XOWLFactory {
-    @Override
-    public Object newObject(String type, ASTNode definition) {
-        if (type.equals("org.xowl.platform.services.connection.ConnectorService"))
-            return new RemoteConnector(definition);
-        if (type.contains("Job"))
-            return new RemoteJob(definition, this);
-        return null;
-    }
+public interface RemoteFactory extends XOWLFactory {
 }

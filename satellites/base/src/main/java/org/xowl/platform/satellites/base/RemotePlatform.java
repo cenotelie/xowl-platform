@@ -18,19 +18,11 @@
 package org.xowl.platform.satellites.base;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.hime.redist.ParseError;
-import org.xowl.hime.redist.ParseResult;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.server.api.XOWLFactory;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.http.HttpConnection;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.logging.Logger;
-import org.xowl.infra.utils.logging.Logging;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -47,133 +39,43 @@ public class RemotePlatform {
     /**
      * The factory of remote objects
      */
-    private final RemoteFactory factory;
+    private final Collection<RemoteFactory> factories;
+    /**
+     * The aggregated factory for
+     */
+    private final XOWLFactory aggregatedFactory;
 
     /**
      * Initializes this platform connection
      *
      * @param endpoint The API endpoint (https://something:port/api/)
-     * @param login    The login for connecting to the platform
-     * @param password The password for connecting to the platform
      */
-    public RemotePlatform(String endpoint, String login, String password) {
-        this.connection = new HttpConnection(endpoint, login, password);
-        this.factory = new RemoteFactory();
-    }
-
-    /**
-     * Gets the connectors on the current platform
-     *
-     * @return The connectors
-     */
-    public Collection<RemoteConnector> getConnectors() {
-        Collection<RemoteConnector> result = new ArrayList<>();
-        HttpResponse response = connection.request("services/admin/connectors", "GET", "", null, HttpConstants.MIME_JSON);
-        ASTNode root = parseJson(response);
-        if (root == null)
-            return result;
-        for (ASTNode element : root.getChildren()) {
-            result.add(new RemoteConnector(element));
-        }
-        return result;
-    }
-
-    /**
-     * Pulls an artifact from a connector
-     *
-     * @param connectorId The connector to pull from
-     * @return The triggered job, or null if an error occurred
-     */
-    public RemoteJob pullFromConnector(String connectorId) {
-        HttpResponse response = connection.request("services/admin/connectors?action=pull&id=" + URIUtils.encodeComponent(connectorId), "POST", "", null, HttpConstants.MIME_JSON);
-        ASTNode root = parseJson(response);
-        if (root == null)
-            return null;
-        return new RemoteJob(root, factory);
-    }
-
-    /**
-     * Pushes an artifact to a client through a connector
-     *
-     * @param connectorId The connector to push through
-     * @param artifactId  The artifact to push
-     * @return The triggered job, or null if an error occurred
-     */
-    public RemoteJob pushFromConnector(String connectorId, String artifactId) {
-        HttpResponse response = connection.request("services/admin/connectors?action=push&id=" + URIUtils.encodeComponent(connectorId) + "&artifact=" + URIUtils.encodeComponent(artifactId), "POST", null, null, HttpConstants.MIME_JSON);
-        ASTNode root = parseJson(response);
-        if (root == null)
-            return null;
-        return new RemoteJob(root, factory);
-    }
-
-    /**
-     * Retrieves the info of a job on the platform
-     *
-     * @param identifier The job's identifier
-     * @return The job, or null if it cannot be found
-     */
-    public RemoteJob getJob(String identifier) {
-        HttpResponse response = connection.request("services/admin/connectors", "GET", "", null, HttpConstants.MIME_JSON);
-        ASTNode root = parseJson(response);
-        if (root == null)
-            return null;
-        return new RemoteJob(root, factory);
-    }
-
-    /**
-     * Wait for specified job to terminate
-     *
-     * @param job The job to wait for
-     * @return The job, or null if an error occurred
-     */
-    public RemoteJob waitFor(RemoteJob job) {
-        while (RemoteJob.STATUS_SCHEDULED.equals(job.getStatus()) || RemoteJob.STATUS_RUNNING.equals(job.getStatus())) {
-            HttpResponse response = connection.request("services/admin/jobs?id=" + URIUtils.encodeComponent(job.getIdentifier()), "GET", "", null, HttpConstants.MIME_JSON);
-            ASTNode root = parseJson(response);
-            if (root == null)
-                return null;
-            job.update(root, factory);
-        }
-        return job;
-    }
-
-    /**
-     * Parses a JSON response
-     *
-     * @param response The response
-     * @return The AST root, or null if an error occurred
-     */
-    public static ASTNode parseJson(HttpResponse response) {
-        if (response == null)
-            return null;
-        if (response.getCode() != HttpURLConnection.HTTP_OK)
-            return null;
-        return parseJson(Logging.getDefault(), response.getBodyAsString());
-    }
-
-    /**
-     * Parses the JSON content
-     *
-     * @param logger  The logger to use
-     * @param content The content to parse
-     * @return The AST root node, or null of the parsing failed
-     */
-    public static ASTNode parseJson(Logger logger, String content) {
-        JSONLDLoader loader = new JSONLDLoader(null) {
+    public RemotePlatform(String endpoint) {
+        this.connection = new HttpConnection(endpoint);
+        this.factories = new ArrayList<>();
+        this.aggregatedFactory = new XOWLFactory() {
             @Override
-            protected Reader getReaderFor(Logger logger, String iri) {
+            public Object newObject(String type, ASTNode definition) {
+                for (RemoteFactory factory : factories) {
+                    Object result = factory.newObject(type, definition);
+                    if (result != null)
+                        return result;
+                }
                 return null;
             }
         };
-        ParseResult result = loader.parse(logger, new StringReader(content));
-        if (result == null)
-            return null;
-        if (!result.getErrors().isEmpty()) {
-            for (ParseError error : result.getErrors())
-                logger.error(error);
-            return null;
-        }
-        return result.getRoot();
+    }
+
+    /**
+     * Registers a factory for remote objects
+     *
+     * @param factory The factory to add
+     */
+    public void addFactory(RemoteFactory factory) {
+        factories.add(factory);
+    }
+
+    public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
+        return XSPReplyUnsupported.instance();
     }
 }

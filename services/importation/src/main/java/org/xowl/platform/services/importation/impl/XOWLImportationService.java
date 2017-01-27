@@ -477,7 +477,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return reply;
         if (storage == null)
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
-        Document document = documents.remove(documentId);
+        Document document = documents.get(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
         File fileContent = new File(storage, getDocContentFile(document));
@@ -485,7 +485,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return XSPReplyNotFound.instance();
         try {
             FileInputStream result = new FileInputStream(fileContent);
-            return new XSPReplyResult<>(reply);
+            return new XSPReplyResult<>(result);
         } catch (FileNotFoundException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");

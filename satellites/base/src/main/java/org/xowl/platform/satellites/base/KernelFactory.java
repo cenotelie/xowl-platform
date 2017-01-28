@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,12 +17,17 @@
 
 package org.xowl.platform.satellites.base;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 
 /**
- * Implements a factory for remote objects
+ * Implements a factory for the kernel objects
  *
  * @author Laurent Wouters
  */
-public interface RemoteFactory extends XOWLFactory {
+public class KernelFactory implements XOWLFactory {
+    @Override
+    public Object newObject(String type, ASTNode definition) {
+        return null;
+    }
 }

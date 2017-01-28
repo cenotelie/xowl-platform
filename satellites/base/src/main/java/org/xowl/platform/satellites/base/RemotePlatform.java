@@ -19,9 +19,12 @@ package org.xowl.platform.satellites.base;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.http.HttpConnection;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,16 +42,28 @@ public class RemotePlatform {
     /**
      * The factory of remote objects
      */
-    private final Collection<RemoteFactory> factories;
+    private final Collection<XOWLFactory> factories;
     /**
      * The aggregated factory for
      */
     private final XOWLFactory aggregatedFactory;
+    /**
+     * The currently logged-in user
+     */
+    private PlatformUser currentUser;
+    /**
+     * The login for the current user
+     */
+    private String currentLogin;
+    /**
+     * The password for the current user
+     */
+    private String currentPassword;
 
     /**
      * Initializes this platform connection
      *
-     * @param endpoint The API endpoint (https://something:port/api/)
+     * @param endpoint The API endpoint (https://something:port/api)
      */
     public RemotePlatform(String endpoint) {
         this.connection = new HttpConnection(endpoint);
@@ -56,7 +71,7 @@ public class RemotePlatform {
         this.aggregatedFactory = new XOWLFactory() {
             @Override
             public Object newObject(String type, ASTNode definition) {
-                for (RemoteFactory factory : factories) {
+                for (XOWLFactory factory : factories) {
                     Object result = factory.newObject(type, definition);
                     if (result != null)
                         return result;
@@ -71,9 +86,75 @@ public class RemotePlatform {
      *
      * @param factory The factory to add
      */
-    public void addFactory(RemoteFactory factory) {
+    public void addFactory(XOWLFactory factory) {
         factories.add(factory);
     }
+
+    /**
+     * Gets whether a user is logged-in
+     *
+     * @return Whether a user is logged-in
+     */
+    public boolean isLoggedIn() {
+        return (currentUser != null);
+    }
+
+    /**
+     * Gets the currently logged-in user, if any
+     *
+     * @return The currently logged-in user, if any
+     */
+    public PlatformUser getLoggedInUser() {
+        return currentUser;
+    }
+
+    /**
+     * Login a user
+     *
+     * @param login    The user to log in
+     * @param password The user password
+     * @return The protocol reply, or null if the client is banned
+     */
+    public XSPReply login(String login, String password) {
+        HttpResponse response = connection.request("/kernel/security/login" +
+                        "?login=" + URIUtils.encodeComponent(login),
+                HttpConstants.METHOD_POST,
+                password,
+                HttpConstants.MIME_TEXT_PLAIN,
+                HttpConstants.MIME_TEXT_PLAIN
+        );
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        if (reply.isSuccess()) {
+            currentUser = ((XSPReplyResult<PlatformUser>) reply).getData();
+            currentLogin = login;
+            currentPassword = password;
+        } else {
+            currentUser = null;
+            currentLogin = null;
+            currentPassword = null;
+        }
+        return reply;
+    }
+
+    /**
+     * Logout the current user
+     *
+     * @return The protocol reply
+     */
+    public XSPReply logout() {
+        if (currentUser == null)
+            return XSPReplyNetworkError.instance();
+        HttpResponse response = connection.request("/kernel/security/logout",
+                HttpConstants.METHOD_POST,
+                HttpConstants.MIME_TEXT_PLAIN
+        );
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        currentUser = null;
+        currentLogin = null;
+        currentPassword = null;
+        return reply;
+    }
+
 
     /**
      * Sends an HTTP request to the endpoint, completed with an URI complement
@@ -87,6 +168,33 @@ public class RemotePlatform {
      * @return The response, or null if the request failed before reaching the server
      */
     public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
-        return XSPReplyUnsupported.instance();
+        // not logged in
+        if (currentUser == null)
+            return XSPReplyNetworkError.instance();
+        HttpResponse response = connection.request(uriComplement,
+                method,
+                body,
+                contentType,
+                compressed,
+                accept
+        );
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        if (reply != XSPReplyExpiredSession.instance())
+            // not an authentication problem => return this reply
+            return reply;
+        // try to re-login
+        reply = login(currentLogin, currentPassword);
+        if (!reply.isSuccess())
+            // failed => unauthenticated
+            return XSPReplyUnauthenticated.instance();
+        // now that we are logged-in, retry
+        response = connection.request(uriComplement,
+                method,
+                body,
+                contentType,
+                compressed,
+                accept
+        );
+        return XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
     }
 }

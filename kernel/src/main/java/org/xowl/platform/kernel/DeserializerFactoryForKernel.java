@@ -19,8 +19,7 @@ package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.platform.Addon;
-import org.xowl.platform.kernel.platform.ProductBase;
+import org.xowl.platform.kernel.platform.*;
 
 /**
  * Implements a factory for the kernel platform objects
@@ -44,7 +43,12 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return new ProductBase(definition);
         if (Addon.class.getCanonicalName().equals(type))
             return new Addon(definition);
-
+        if (PlatformUser.class.getCanonicalName().equals(type))
+            return new PlatformUserRemote(definition);
+        if (PlatformGroup.class.getCanonicalName().equals(type))
+            return new PlatformGroupRemote(definition);
+        if (PlatformRole.class.getCanonicalName().equals(type))
+            return new PlatformRoleBase(definition);
         return null;
     }
 }

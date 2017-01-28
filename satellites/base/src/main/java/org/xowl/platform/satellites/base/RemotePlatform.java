@@ -17,7 +17,6 @@
 
 package org.xowl.platform.satellites.base;
 
-import org.xowl.infra.server.api.XOWLFactory;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -25,9 +24,6 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.Deserializer;
 import org.xowl.platform.kernel.platform.PlatformUser;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * The base API for accessing a remote platform
@@ -39,10 +35,6 @@ public class RemotePlatform {
      * The connection to the platform
      */
     private final HttpConnection connection;
-    /**
-     * The factory of remote objects
-     */
-    private final Collection<XOWLFactory> factories;
     /**
      * The deserializer to use
      */
@@ -68,7 +60,6 @@ public class RemotePlatform {
      */
     public RemotePlatform(String endpoint, Deserializer deserializer) {
         this.connection = new HttpConnection(endpoint);
-        this.factories = new ArrayList<>();
         this.deserializer = deserializer;
     }
 

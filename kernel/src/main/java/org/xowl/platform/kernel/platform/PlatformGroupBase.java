@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
 /**
@@ -41,6 +42,29 @@ public abstract class PlatformGroupBase implements PlatformGroup {
      * @param name       The name of this group
      */
     public PlatformGroupBase(String identifier, String name) {
+        this.identifier = identifier;
+        this.name = name;
+    }
+
+    /**
+     * Initializes this group
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public PlatformGroupBase(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            }
+        }
         this.identifier = identifier;
         this.name = name;
     }

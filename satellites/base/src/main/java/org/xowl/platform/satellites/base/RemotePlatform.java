@@ -75,6 +75,17 @@ public class RemotePlatform {
         factories.add(factory);
     }
 
+    /**
+     * Sends an HTTP request to the endpoint, completed with an URI complement
+     *
+     * @param uriComplement The URI complement to append to the original endpoint URI, if any
+     * @param method        The HTTP method to use, if any
+     * @param body          The request body, if any
+     * @param contentType   The request body content type, if any
+     * @param compressed    Whether the body is compressed with gzip
+     * @param accept        The MIME type to accept for the response, if any
+     * @return The response, or null if the request failed before reaching the server
+     */
     public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
         return XSPReplyUnsupported.instance();
     }

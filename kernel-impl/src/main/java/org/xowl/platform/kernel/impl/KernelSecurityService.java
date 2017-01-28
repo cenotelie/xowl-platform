@@ -60,11 +60,11 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/api_security.raml", "Security Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/impl/api_security.raml", "Security Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/api_security.html", "Security Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelSecurityService.class, "/org/xowl/platform/kernel/impl/api_security.html", "Security Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**

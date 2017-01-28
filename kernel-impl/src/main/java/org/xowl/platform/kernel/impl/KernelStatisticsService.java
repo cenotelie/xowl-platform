@@ -54,11 +54,11 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/impl/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/impl/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**

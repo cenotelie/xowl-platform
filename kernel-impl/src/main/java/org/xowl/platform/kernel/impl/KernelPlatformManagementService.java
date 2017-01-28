@@ -74,11 +74,11 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * API error - The addon is already installed

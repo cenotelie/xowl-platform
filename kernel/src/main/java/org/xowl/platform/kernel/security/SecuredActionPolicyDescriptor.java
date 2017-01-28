@@ -17,9 +17,13 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Registrable;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Represents the description of a policy for a secured action
@@ -47,6 +51,29 @@ public class SecuredActionPolicyDescriptor implements Registrable, Serializable 
          * @param type The parameter's type
          */
         public Parameter(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        /**
+         * Initializes this parameter
+         *
+         * @param definition The AST node for the serialized definition
+         */
+        public Parameter(ASTNode definition) {
+            String name = "";
+            String type = "";
+            for (ASTNode member : definition.getChildren()) {
+                String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+                head = head.substring(1, head.length() - 1);
+                if ("name".equals(head)) {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    name = value.substring(1, value.length() - 1);
+                } else if ("type".equals(head)) {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    type = value.substring(1, value.length() - 1);
+                }
+            }
             this.name = name;
             this.type = type;
         }
@@ -102,6 +129,35 @@ public class SecuredActionPolicyDescriptor implements Registrable, Serializable 
         this.identifier = identifier;
         this.name = name;
         this.parameters = parameters;
+    }
+
+    /**
+     * Initializes this descriptor
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public SecuredActionPolicyDescriptor(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        Collection<Parameter> parameters = new ArrayList<>();
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            } else if ("parameters".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    parameters.add(new Parameter(child));
+                }
+            }
+        }
+        this.identifier = identifier;
+        this.name = name;
+        this.parameters = (Parameter[]) parameters.toArray();
     }
 
     @Override

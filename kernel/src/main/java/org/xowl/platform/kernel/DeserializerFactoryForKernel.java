@@ -20,6 +20,8 @@ package org.xowl.platform.kernel;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.platform.*;
+import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredActionPolicyDescriptor;
 
 /**
  * Implements a factory for the kernel platform objects
@@ -49,6 +51,10 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return new PlatformGroupRemote(definition);
         if (PlatformRole.class.getCanonicalName().equals(type))
             return new PlatformRoleBase(definition);
+        if (SecuredAction.class.getCanonicalName().equals(type))
+            return new SecuredAction(definition);
+        if (SecuredActionPolicyDescriptor.class.getCanonicalName().equals(type))
+            return new SecuredActionPolicyDescriptor(definition);
         return null;
     }
 }

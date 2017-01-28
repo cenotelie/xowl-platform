@@ -17,11 +17,14 @@
 
 package org.xowl.platform.kernel.security;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,6 +78,35 @@ public class SecuredAction implements Identifiable, Serializable {
         this.identifier = identifier;
         this.name = name;
         this.policies = policies;
+    }
+
+    /**
+     * Initializes this action
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public SecuredAction(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        Collection<SecuredActionPolicyDescriptor> policies = new ArrayList<>();
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            } else if ("parameters".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    policies.add(new SecuredActionPolicyDescriptor(child));
+                }
+            }
+        }
+        this.identifier = identifier;
+        this.name = name;
+        this.policies = (SecuredActionPolicyDescriptor[]) policies.toArray();
     }
 
     /**

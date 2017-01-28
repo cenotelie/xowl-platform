@@ -21,6 +21,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.*;
 
@@ -57,25 +58,9 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
     };
 
     /**
-     * The known services
-     */
-    private final Map<String, HttpApiService> services;
-    /**
-     * All the known resources
-     */
-    private final Map<String, HttpApiResource> allResources;
-    /**
-     * The other resources for the API documentation
-     */
-    private final Map<String, HttpApiResource> otherResources;
-
-    /**
      * Initializes this service
      */
     public KernelHttpApiDiscoveryService() {
-        this.services = new HashMap<>();
-        this.allResources = new HashMap<>();
-        this.otherResources = new HashMap<>();
     }
 
     @Override
@@ -90,12 +75,28 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
 
     @Override
     public Collection<HttpApiService> getServices() {
-        return services.values();
+        return Register.getComponents(HttpApiService.class);
     }
 
     @Override
     public Collection<HttpApiResource> getResources() {
-        return allResources.values();
+        Map<String, HttpApiResource> resources = new HashMap<>();
+        for (HttpApiService httpApiService : getServices()) {
+            HttpApiResource resource = httpApiService.getApiSpecification();
+            if (resource != null)
+                resources.put(resource.getIdentifier(), resource);
+            resource = httpApiService.getApiDocumentation();
+            if (resource != null)
+                resources.put(resource.getIdentifier(), resource);
+            HttpApiResource[] additionalResources = httpApiService.getApiOtherResources();
+            if (additionalResources != null) {
+                for (int i = 0; i != additionalResources.length; i++) {
+                    resources.put(additionalResources[i].getIdentifier(), additionalResources[i]);
+                    resources.put(additionalResources[i].getIdentifier(), additionalResources[i]);
+                }
+            }
+        }
+        return resources.values();
     }
 
     @Override
@@ -112,7 +113,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
         if (request.getUri().equals(URI_API + "/services")) {
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
-            for (HttpApiService service : services.values()) {
+            for (HttpApiService service : getServices()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -123,7 +124,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
         } else if (request.getUri().equals(URI_API + "/resources")) {
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
-            for (HttpApiResource resource : otherResources.values()) {
+            for (HttpApiResource resource : getResources()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -168,49 +169,5 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
                 ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
                 "}";
-    }
-
-    /**
-     * Registers an API service
-     *
-     * @param service The service to register
-     */
-    public void registerService(HttpApiService service) {
-        services.put(service.getIdentifier(), service);
-        HttpApiResource resource = service.getApiSpecification();
-        if (resource != null)
-            allResources.put(resource.getIdentifier(), resource);
-        resource = service.getApiDocumentation();
-        if (resource != null)
-            allResources.put(resource.getIdentifier(), resource);
-        HttpApiResource[] resources = service.getApiOtherResources();
-        if (resources != null) {
-            for (int i = 0; i != resources.length; i++) {
-                this.allResources.put(resources[i].getIdentifier(), resources[i]);
-                this.otherResources.put(resources[i].getIdentifier(), resources[i]);
-            }
-        }
-    }
-
-    /**
-     * Un-registers an API service
-     *
-     * @param service The service to un-register
-     */
-    public void unregisterService(HttpApiService service) {
-        services.remove(service.getIdentifier());
-        HttpApiResource resource = service.getApiSpecification();
-        if (resource != null)
-            allResources.remove(resource.getIdentifier());
-        resource = service.getApiDocumentation();
-        if (resource != null)
-            allResources.remove(resource.getIdentifier());
-        HttpApiResource[] resources = service.getApiOtherResources();
-        if (resources != null) {
-            for (int i = 0; i != resources.length; i++) {
-                this.allResources.remove(resources[i].getIdentifier());
-                this.otherResources.remove(resources[i].getIdentifier());
-            }
-        }
     }
 }

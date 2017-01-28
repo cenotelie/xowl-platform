@@ -19,8 +19,6 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.events.EventService;
@@ -53,14 +51,6 @@ public class Activator implements BundleActivator {
      * The platform management service
      */
     private KernelPlatformManagementService platformService;
-    /**
-     * The HTTP API discovery service
-     */
-    private KernelHttpApiDiscoveryService discoveryService;
-    /**
-     * The tracker of the HTTP API services
-     */
-    private ServiceTracker discoveryServiceTracker;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
@@ -131,22 +121,10 @@ public class Activator implements BundleActivator {
         bundleContext.addFrameworkListener(platformService);
 
         // register the HTTP API discovery service
-        discoveryService = new KernelHttpApiDiscoveryService();
+        KernelHttpApiDiscoveryService discoveryService = new KernelHttpApiDiscoveryService();
         bundleContext.registerService(Service.class, discoveryService, null);
         bundleContext.registerService(HttpApiService.class, discoveryService, null);
         bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
-        discoveryServiceTracker = new ServiceTracker<HttpApiService, HttpApiService>(bundleContext, HttpApiService.class, null) {
-            public void removedService(ServiceReference reference, HttpApiService apiService) {
-                discoveryService.unregisterService(apiService);
-            }
-
-            public HttpApiService addingService(ServiceReference reference) {
-                HttpApiService apiService = (HttpApiService) bundleContext.getService(reference);
-                discoveryService.registerService(apiService);
-                return apiService;
-            }
-        };
-        discoveryServiceTracker.open();
     }
 
     @Override
@@ -157,6 +135,5 @@ public class Activator implements BundleActivator {
             eventService.close();
         if (serviceJobExecutor != null)
             serviceJobExecutor.close();
-        discoveryServiceTracker.close();
     }
 }

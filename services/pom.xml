@@ -1,26 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.xowl.platform</groupId>
-		<artifactId>xowl-platform</artifactId>
-		<version>0.2.4-SNAPSHOT</version>
-	</parent>
-	<artifactId>xowl-services</artifactId>
-	<packaging>pom</packaging>
-	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Collaboration Platform - Services</name>
-	<description>The set of services for the xOWL platform</description>
-	<modules>
-		<module>security-internal</module>
-		<module>collaboration</module>
-		<module>marketplace</module>
-		<module>storage</module>
-		<module>consistency</module>
-		<module>impact</module>
-		<module>importation</module>
-		<module>evaluation</module>
-		<module>connection</module>
-		<module>httpapi</module>
-		<module>webapp</module>
-	</modules>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xowl.platform</groupId>
+        <artifactId>xowl-platform</artifactId>
+        <version>0.2.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>xowl-services</artifactId>
+    <packaging>pom</packaging>
+    <version>0.2.4-SNAPSHOT</version>
+    <name>xOWL Collaboration Platform - Services</name>
+    <description>The set of services for the xOWL platform</description>
+    <modules>
+        <module>security-internal</module>
+        <module>collaboration</module>
+        <module>marketplace</module>
+        <module>storage</module>
+        <module>consistency</module>
+        <module>impact</module>
+        <module>importation</module>
+        <module>evaluation</module>
+        <module>connection</module>
+        <module>httpapi</module>
+        <module>webapp</module>
+    </modules>
 </project>

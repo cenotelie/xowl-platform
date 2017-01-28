@@ -1,38 +1,39 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.xowl.platform</groupId>
-		<artifactId>xowl-platform</artifactId>
-		<version>0.2.4-SNAPSHOT</version>
-	</parent>
-	<artifactId>xowl-kernel-impl</artifactId>
-	<packaging>bundle</packaging>
-	<version>0.2.4-SNAPSHOT</version>
-	<name>xOWL Collaboration Platform - Kernel Impl</name>
-	<description>Implementation of the kernel APIs for the xOWL collaboration platform</description>
-	<dependencies>
-		<dependency>
-			<groupId>org.xowl.platform</groupId>
-			<artifactId>xowl-kernel</artifactId>
-			<version>0.2.4-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>3.0.1</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-Activator>org.xowl.platform.kernel.impl.Activator</Bundle-Activator>
-						<XOWL-License-Name>LGPL v3</XOWL-License-Name>
-						<XOWL-License-Resource>/META-INF/LGPLv3.txt</XOWL-License-Resource>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xowl.platform</groupId>
+        <artifactId>xowl-platform</artifactId>
+        <version>0.2.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>xowl-kernel-impl</artifactId>
+    <packaging>bundle</packaging>
+    <version>0.2.4-SNAPSHOT</version>
+    <name>xOWL Collaboration Platform - Kernel Impl</name>
+    <description>Implementation of the kernel APIs for the xOWL collaboration platform</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-kernel</artifactId>
+            <version>0.2.4-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.0.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>org.xowl.platform.kernel.impl.Activator</Bundle-Activator>
+                        <XOWL-License-Name>LGPL v3</XOWL-License-Name>
+                        <XOWL-License-Resource>/META-INF/LGPLv3.txt</XOWL-License-Resource>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

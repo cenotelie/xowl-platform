@@ -17,13 +17,13 @@
 
 package org.xowl.platform.satellites.base;
 
-import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.Deserializer;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.ArrayList;
@@ -44,9 +44,9 @@ public class RemotePlatform {
      */
     private final Collection<XOWLFactory> factories;
     /**
-     * The aggregated factory for
+     * The deserializer to use
      */
-    private final XOWLFactory aggregatedFactory;
+    private final Deserializer deserializer;
     /**
      * The currently logged-in user
      */
@@ -63,31 +63,13 @@ public class RemotePlatform {
     /**
      * Initializes this platform connection
      *
-     * @param endpoint The API endpoint (https://something:port/api)
+     * @param endpoint     The API endpoint (https://something:port/api)
+     * @param deserializer The deserializer to use
      */
-    public RemotePlatform(String endpoint) {
+    public RemotePlatform(String endpoint, Deserializer deserializer) {
         this.connection = new HttpConnection(endpoint);
         this.factories = new ArrayList<>();
-        this.aggregatedFactory = new XOWLFactory() {
-            @Override
-            public Object newObject(String type, ASTNode definition) {
-                for (XOWLFactory factory : factories) {
-                    Object result = factory.newObject(type, definition);
-                    if (result != null)
-                        return result;
-                }
-                return null;
-            }
-        };
-    }
-
-    /**
-     * Registers a factory for remote objects
-     *
-     * @param factory The factory to add
-     */
-    public void addFactory(XOWLFactory factory) {
-        factories.add(factory);
+        this.deserializer = deserializer;
     }
 
     /**
@@ -123,7 +105,7 @@ public class RemotePlatform {
                 HttpConstants.MIME_TEXT_PLAIN,
                 HttpConstants.MIME_TEXT_PLAIN
         );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
         if (reply.isSuccess()) {
             currentUser = ((XSPReplyResult<PlatformUser>) reply).getData();
             currentLogin = login;
@@ -148,7 +130,7 @@ public class RemotePlatform {
                 HttpConstants.METHOD_POST,
                 HttpConstants.MIME_TEXT_PLAIN
         );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
         currentUser = null;
         currentLogin = null;
         currentPassword = null;
@@ -178,7 +160,7 @@ public class RemotePlatform {
                 compressed,
                 accept
         );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
         if (reply != XSPReplyExpiredSession.instance())
             // not an authentication problem => return this reply
             return reply;
@@ -195,6 +177,6 @@ public class RemotePlatform {
                 compressed,
                 accept
         );
-        return XSPReplyUtils.fromHttpResponse(response, aggregatedFactory);
+        return XSPReplyUtils.fromHttpResponse(response, deserializer);
     }
 }

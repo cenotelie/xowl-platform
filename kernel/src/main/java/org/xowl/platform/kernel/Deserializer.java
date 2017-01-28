@@ -15,19 +15,33 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.satellites.base;
+package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 
+import java.util.Collection;
+
 /**
- * Implements a factory for the kernel objects
+ * Represents a deserializer of platform objects
  *
  * @author Laurent Wouters
  */
-public class KernelFactory implements XOWLFactory {
+public abstract class Deserializer implements XOWLFactory {
+    /**
+     * Gets the factories for this deserializer
+     *
+     * @return The factories
+     */
+    protected abstract Collection<DeserializerFactory> getFactories();
+
     @Override
     public Object newObject(String type, ASTNode definition) {
+        for (DeserializerFactory factory : getFactories()) {
+            Object result = factory.newObject(type, definition);
+            if (result != null)
+                return result;
+        }
         return null;
     }
 }

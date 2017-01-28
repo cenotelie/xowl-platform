@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,22 +17,32 @@
 
 package org.xowl.platform.kernel;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Activator for this bundle
+ * Implements a deserializer that requires the manual registering of factories
  *
  * @author Laurent Wouters
  */
-public class Activator implements BundleActivator {
+public class DeserializerAggregate extends Deserializer {
+    /**
+     * The registered factories
+     */
+    private final Collection<DeserializerFactory> factories = new ArrayList<>();
 
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
+    /**
+     * Registers a factory
+     *
+     * @param factory The factory to register
+     */
+    public void register(DeserializerFactory factory) {
+        this.factories.add(factory);
     }
 
     @Override
-    public void stop(BundleContext bundleContext) throws Exception {
+    protected Collection<DeserializerFactory> getFactories() {
+        return Collections.unmodifiableCollection(factories);
     }
 }

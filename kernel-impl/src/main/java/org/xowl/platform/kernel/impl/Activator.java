@@ -21,7 +21,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.*;
@@ -106,7 +105,8 @@ public class Activator implements BundleActivator {
 
         // register the directory service
         KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
-        bundleContext.registerService(ArtifactSchema.class, KernelSchema.IMPL, null);
+        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);
+        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);
         bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeSchema.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeFree.INSTANCE, null);

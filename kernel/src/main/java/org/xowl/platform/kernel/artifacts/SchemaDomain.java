@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.server.api.XOWLFactory;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.KernelSchema;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -64,7 +63,7 @@ public class SchemaDomain implements BusinessDomain {
 
     @Override
     public ArtifactSchema getSchema() {
-        return KernelSchema.IMPL;
+        return ArtifactSchemaKernel.INSTANCE;
     }
 
     @Override

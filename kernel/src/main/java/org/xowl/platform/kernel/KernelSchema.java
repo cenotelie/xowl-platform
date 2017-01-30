@@ -17,9 +17,6 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.platform.kernel.artifacts.ArtifactSchema;
-import org.xowl.platform.kernel.artifacts.BusinessSchemaResource;
-
 /**
  * Schema URIs for the core of the platform
  *
@@ -108,10 +105,4 @@ public interface KernelSchema {
      * The hasRole property
      */
     String HAS_ROLE = URI_KERNEL + "#hasRole";
-
-
-    /**
-     * The implementation of this schema
-     */
-    ArtifactSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", URI_KERNEL);
 }

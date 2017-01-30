@@ -38,7 +38,7 @@ import java.util.Iterator;
  *
  * @author Laurent Wouters
  */
-public class BusinessSchemaResource implements ArtifactSchema {
+public class ArtifactSchemaFromResource implements ArtifactSchema {
     /**
      * The rdfs:label property
      */
@@ -84,7 +84,7 @@ public class BusinessSchemaResource implements ArtifactSchema {
      * @param resource The resource URI, e.g. /com/business/serious/schema.fs
      * @param iri      The iri for this schema
      */
-    public BusinessSchemaResource(Class<?> type, String resource, String iri) {
+    public ArtifactSchemaFromResource(Class<?> type, String resource, String iri) {
         this.iri = iri;
         this.repository = new RepositoryRDF(StoreFactory.create().inMemory().make());
         InputStream stream = type.getResourceAsStream(resource);

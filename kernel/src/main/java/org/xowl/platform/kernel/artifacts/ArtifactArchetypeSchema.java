@@ -17,8 +17,6 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.platform.kernel.KernelSchema;
-
 /**
  * Implements an archetype of schemas stored in artifacts
  *
@@ -47,6 +45,6 @@ public class ArtifactArchetypeSchema extends ArtifactArchetypeBase {
 
     @Override
     public ArtifactSchema getSchema() {
-        return KernelSchema.IMPL;
+        return ArtifactSchemaRDFS.INSTANCE;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,29 +17,23 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import org.xowl.platform.kernel.KernelSchema;
+
 /**
- * Represents the archetype of an artifact that follow no specific schema
+ * The schema for the kernel data for the platform, including the metadata of artifacts
  *
  * @author Laurent Wouters
  */
-public class ArtifactArchetypeFree extends ArtifactArchetypeBase {
+public class ArtifactSchemaKernel extends ArtifactSchemaFromResource {
     /**
-     * The singleton instance
+     * The instance for this schema
      */
-    public static final ArtifactArchetype INSTANCE = new ArtifactArchetypeFree(
-            ArtifactArchetypeFree.class.getCanonicalName(),
-            "Free Artifact Archetype",
-            "An archetype for artifacts that follow no specific schema."
-    );
+    public static final ArtifactSchema INSTANCE = new ArtifactSchemaKernel();
 
     /**
-     * Initializes this archetype
-     *
-     * @param identifier  The archetype's identifier
-     * @param name        The archetype's name
-     * @param description The archetype's description
+     * Initializes this schema
      */
-    private ArtifactArchetypeFree(String identifier, String name, String description) {
-        super(identifier, name, description);
+    private ArtifactSchemaKernel() {
+        super(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", KernelSchema.URI_KERNEL);
     }
 }

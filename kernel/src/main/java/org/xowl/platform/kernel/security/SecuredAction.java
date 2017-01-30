@@ -98,7 +98,7 @@ public class SecuredAction implements Identifiable, Serializable {
             } else if ("name".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
-            } else if ("parameters".equals(head)) {
+            } else if ("policies".equals(head)) {
                 for (ASTNode child : member.getChildren().get(1).getChildren()) {
                     policies.add(new SecuredActionPolicyDescriptor(child));
                 }

@@ -125,8 +125,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
         if (!reply.isSuccess())
             return reply;
         KernelSecurityPolicyConfiguration configuration = resolveConfig();
-        configuration.synchronizeActions();
-        return new XSPReplyResult<>(configuration);
+        return new XSPReplyResult<>(configuration.synchronize());
     }
 
     @Override

@@ -69,7 +69,7 @@ public class SchemaDomain implements BusinessDomain {
 
     @Override
     public Collection<ArtifactArchetype> getArchetypes() {
-        return Collections.singletonList(SchemaArtifactArchetype.INSTANCE);
+        return Collections.singletonList(ArtifactArchetypeSchema.INSTANCE);
     }
 
     @Override

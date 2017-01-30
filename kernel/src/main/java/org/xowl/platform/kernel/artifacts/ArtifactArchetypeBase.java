@@ -20,8 +20,6 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
-import java.util.Collection;
-
 /**
  * Base implementation for artifact archetypes
  *
@@ -117,11 +115,6 @@ public class ArtifactArchetypeBase implements ArtifactArchetype {
 
     @Override
     public ArtifactSchema getSchema() {
-        return null;
-    }
-
-    @Override
-    public Collection<BusinessDomain> getDomains() {
         return null;
     }
 }

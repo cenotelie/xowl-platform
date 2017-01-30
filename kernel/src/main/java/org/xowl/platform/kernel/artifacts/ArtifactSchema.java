@@ -24,7 +24,7 @@ import org.xowl.platform.kernel.Registrable;
 import java.util.Collection;
 
 /**
- * Represents the schema of a domain, or artifact
+ * Represents the schema of a domain or artifact
  *
  * @author Laurent Wouters
  */

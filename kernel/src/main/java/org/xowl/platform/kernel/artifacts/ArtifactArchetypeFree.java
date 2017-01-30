@@ -19,22 +19,19 @@ package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.platform.kernel.KernelSchema;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
- * Implements an archetype of schemas stored in artifacts
+ * Represents the archetype of an artifact that follow no specific schema
  *
  * @author Laurent Wouters
  */
-public class SchemaArtifactArchetype extends ArtifactArchetypeBase {
+public class ArtifactArchetypeFree extends ArtifactArchetypeBase {
     /**
      * The singleton instance
      */
-    public static final ArtifactArchetype INSTANCE = new SchemaArtifactArchetype(
-            SchemaArtifactArchetype.class.getCanonicalName(),
-            "Schema Artifact Archetype",
-            "An archetype for artifacts that contain schemas for other artifacts."
+    public static final ArtifactArchetype INSTANCE = new ArtifactArchetypeFree(
+            ArtifactArchetypeFree.class.getCanonicalName(),
+            "Free Artifact Archetype",
+            "An archetype for artifacts that follow no specific schema."
     );
 
     /**
@@ -44,17 +41,12 @@ public class SchemaArtifactArchetype extends ArtifactArchetypeBase {
      * @param name        The archetype's name
      * @param description The archetype's description
      */
-    private SchemaArtifactArchetype(String identifier, String name, String description) {
+    private ArtifactArchetypeFree(String identifier, String name, String description) {
         super(identifier, name, description);
     }
 
     @Override
     public ArtifactSchema getSchema() {
         return KernelSchema.IMPL;
-    }
-
-    @Override
-    public Collection<BusinessDomain> getDomains() {
-        return Collections.singletonList(SchemaDomain.INSTANCE);
     }
 }

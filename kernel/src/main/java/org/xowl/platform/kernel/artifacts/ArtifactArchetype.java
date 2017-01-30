@@ -20,11 +20,9 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Registrable;
 
-import java.util.Collection;
-
 /**
  * Represents an archetype of artifacts.
- * An archetype is a kind of recurrent kind of data stored within an artifact. This is usually related to a business domain.
+ * An archetype represent a kind of recurrent type of data stored within an artifact. This is usually related to a business domain.
  * Examples of archetypes: A functional architecture in system engineering, etc.
  *
  * @author Laurent Wouters
@@ -43,11 +41,4 @@ public interface ArtifactArchetype extends Registrable, Serializable {
      * @return The associated schema
      */
     ArtifactSchema getSchema();
-
-    /**
-     * Gets the business domains related to this archetype
-     *
-     * @return The related business domains
-     */
-    Collection<BusinessDomain> getDomains();
 }

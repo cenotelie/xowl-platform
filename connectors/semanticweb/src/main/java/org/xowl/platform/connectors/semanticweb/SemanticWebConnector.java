@@ -29,7 +29,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
-import org.xowl.platform.kernel.artifacts.FreeArtifactArchetype;
+import org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -89,7 +89,7 @@ public class SemanticWebConnector extends ConnectorServiceBase {
         if (versions == null || versions.length <= 0)
             versions = new String[]{null};
         if (archetypes == null || archetypes.length <= 0)
-            archetypes = new String[]{FreeArtifactArchetype.INSTANCE.getIdentifier()};
+            archetypes = new String[]{ArtifactArchetypeFree.INSTANCE.getIdentifier()};
         if (contentType == null || contentType.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_HEADER_CONTENT_TYPE), null);
         int index = contentType.indexOf(";");

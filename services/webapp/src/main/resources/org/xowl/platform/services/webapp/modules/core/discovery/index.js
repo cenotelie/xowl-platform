@@ -11,7 +11,7 @@ function init() {
 			{name: "Traceability Exploration"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getBusinessSchemas(function (status, ct, content) {
+		xowl.getArtifactSchemas(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				SCHEMAS = content;
 				renderQuery();

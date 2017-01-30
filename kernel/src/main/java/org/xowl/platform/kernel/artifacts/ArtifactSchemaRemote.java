@@ -18,38 +18,35 @@
 package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.store.ProxyObject;
 import org.xowl.infra.utils.TextUtils;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
- * Base implementation for artifact archetypes
+ * Represents an artifact schema from a remote platform
  *
  * @author Laurent Wouters
  */
-public class ArtifactArchetypeBase implements ArtifactArchetype {
+public class ArtifactSchemaRemote implements ArtifactSchema {
     /**
-     * The archetype's identifier
+     * The schema's identifier
      */
     protected final String identifier;
     /**
-     * The archetype's name
+     * The schema's name
      */
     protected final String name;
-    /**
-     * The archetype's description
-     */
-    protected final String description;
 
     /**
-     * Initializes this archetype
+     * Initializes this schema
      *
-     * @param identifier  The archetype's identifier
-     * @param name        The archetype's name
-     * @param description The archetype's description
+     * @param iri The schema's iri
      */
-    public ArtifactArchetypeBase(String identifier, String name, String description) {
-        this.identifier = identifier;
-        this.name = name;
-        this.description = description;
+    public ArtifactSchemaRemote(String iri) {
+        this.identifier = iri;
+        this.name = iri;
     }
 
     /**
@@ -57,10 +54,9 @@ public class ArtifactArchetypeBase implements ArtifactArchetype {
      *
      * @param definition The JSON definition
      */
-    public ArtifactArchetypeBase(ASTNode definition) {
+    public ArtifactSchemaRemote(ASTNode definition) {
         String identifier = null;
         String name = null;
-        String description = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -70,15 +66,12 @@ public class ArtifactArchetypeBase implements ArtifactArchetype {
             } else if ("name".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
-            } else if ("description".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                description = value.substring(1, value.length() - 1);
             }
         }
         this.identifier = identifier;
         this.name = name;
-        this.description = description;
     }
+
 
     @Override
     public String getIdentifier() {
@@ -91,11 +84,6 @@ public class ArtifactArchetypeBase implements ArtifactArchetype {
     }
 
     @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
     public String serializedString() {
         return identifier;
     }
@@ -103,20 +91,46 @@ public class ArtifactArchetypeBase implements ArtifactArchetype {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ArtifactArchetype.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ArtifactSchema.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
-                "\", \"description\": \"" +
-                TextUtils.escapeStringJSON(description) +
-                "\", \"schema\": \"" +
-                (getSchema() != null ? TextUtils.escapeStringJSON(getSchema().getIdentifier()) : "") +
-                "\"}";
+                "\", \"classes\": [" +
+                "], \"datatypes\": [" +
+                "], \"objectProperties\": [" +
+                "], \"dataProperties\": [" +
+                "], \"individuals\": [" +
+                "]}";
     }
 
     @Override
-    public ArtifactSchema getSchema() {
+    public Collection<ProxyObject> getClasses() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<ProxyObject> getDatatypes() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<ProxyObject> getObjectProperties() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<ProxyObject> getDataProperties() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<ProxyObject> getIndividuals() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ProxyObject getEntity(String uri) {
         return null;
     }
 }

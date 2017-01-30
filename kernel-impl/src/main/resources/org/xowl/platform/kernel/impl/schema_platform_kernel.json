@@ -543,13 +543,17 @@
         },
         "description": {
           "type": "string"
+        },
+        "schema": {
+          "type": "string"
         }
       },
       "required": [
         "type",
         "identifier",
         "name",
-        "description"
+        "description",
+        "schema"
       ]
     },
     "ArtifactArchetypes": {
@@ -563,48 +567,12 @@
         ]
       }
     },
-    "BusinessDomain": {
+    "ArtifactSchema": {
       "type": "object",
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.platform.kernel.artifacts.BusinessDomain"
-          ]
-        },
-        "identifier": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "type",
-        "identifier",
-        "name",
-        "description"
-      ]
-    },
-    "BusinessDomains": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "oneOf": [
-          {
-            "$ref": "#/definitions/BusinessDomain"
-          }
-        ]
-      }
-    },
-    "BusinessSchema": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "org.xowl.platform.kernel.artifacts.BusinessSchema"
+            "org.xowl.platform.kernel.artifacts.ArtifactSchema"
           ]
         },
         "identifier": {
@@ -694,13 +662,13 @@
         "individuals"
       ]
     },
-    "BusinessSchemas": {
+    "ArtifactSchemas": {
       "type": "array",
       "items": {
         "type": "object",
         "oneOf": [
           {
-            "$ref": "#/definitions/BusinessSchema"
+            "$ref": "#/definitions/ArtifactSchema"
           }
         ]
       }

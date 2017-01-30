@@ -14,7 +14,7 @@ function init() {
 			{name: "Impact Analysis"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getBusinessSchemas(function (status, ct, content) {
+		xowl.getArtifactSchemas(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				SCHEMAS = content;
 				renderSchemas(content);

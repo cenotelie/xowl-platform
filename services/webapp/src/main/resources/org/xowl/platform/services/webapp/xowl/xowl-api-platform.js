@@ -579,26 +579,6 @@ XOWL.prototype.getMetricSnapshot = function (callback, metricId) {
  * Kernel - Business Directory Service
  ****************************************************/
 
-XOWL.prototype.getBusinessDomains = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "kernel/business/domains", null, "GET", null, null);
-}
-
-XOWL.prototype.getBusinessDomain = function (callback, domainId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "kernel/business/domains/" + encodeURIComponent(domainId), null, "GET", null, null);
-}
-
 XOWL.prototype.getArtifactArchetypes = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
@@ -619,7 +599,7 @@ XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
 	}, "kernel/business/archetypes/" + encodeURIComponent(archetypeId), null, "GET", null, null);
 }
 
-XOWL.prototype.getBusinessSchemas = function (callback) {
+XOWL.prototype.getArtifactSchemas = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -629,7 +609,7 @@ XOWL.prototype.getBusinessSchemas = function (callback) {
 	}, "kernel/business/schemas", null, "GET", null, null);
 }
 
-XOWL.prototype.getBusinessSchema = function (callback, schemaId) {
+XOWL.prototype.getArtifactSchema = function (callback, schemaId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));

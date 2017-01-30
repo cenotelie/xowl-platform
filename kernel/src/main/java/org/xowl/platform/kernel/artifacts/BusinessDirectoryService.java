@@ -28,13 +28,6 @@ import java.util.Collection;
  */
 public interface BusinessDirectoryService extends Service {
     /**
-     * Gets the registered domains
-     *
-     * @return The registered domains
-     */
-    Collection<BusinessDomain> getDomains();
-
-    /**
      * Gets the registered schemas
      *
      * @return The registered schemas
@@ -47,14 +40,6 @@ public interface BusinessDirectoryService extends Service {
      * @return The registered artifact archetypes
      */
     Collection<ArtifactArchetype> getArchetypes();
-
-    /**
-     * Gets the domain for the specified identifier
-     *
-     * @param identifier The identifier of a domain
-     * @return The associated domain, if any
-     */
-    BusinessDomain getDomain(String identifier);
 
     /**
      * Gets the schema for the specified identifier (usually its URI)

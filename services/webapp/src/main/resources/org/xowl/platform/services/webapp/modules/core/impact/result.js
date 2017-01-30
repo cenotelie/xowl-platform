@@ -15,7 +15,7 @@ function init() {
 			return;
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getBusinessSchemas(function (status, ct, content) {
+		xowl.getArtifactSchemas(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				SCHEMAS = content;
 				waitForJob(jobId, jobName, function (job) {

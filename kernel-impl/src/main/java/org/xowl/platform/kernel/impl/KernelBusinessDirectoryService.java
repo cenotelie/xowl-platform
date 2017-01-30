@@ -24,9 +24,8 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
-import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
-import org.xowl.platform.kernel.artifacts.BusinessDomain;
 import org.xowl.platform.kernel.artifacts.ArtifactSchema;
+import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -66,11 +65,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     }
 
     @Override
-    public Collection<BusinessDomain> getDomains() {
-        return Register.getComponents(BusinessDomain.class);
-    }
-
-    @Override
     public Collection<ArtifactSchema> getSchemas() {
         return Register.getComponents(ArtifactSchema.class);
     }
@@ -78,15 +72,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     @Override
     public Collection<ArtifactArchetype> getArchetypes() {
         return Register.getComponents(ArtifactArchetype.class);
-    }
-
-    @Override
-    public BusinessDomain getDomain(String identifier) {
-        for (BusinessDomain domain : getDomains()) {
-            if (domain.getIdentifier().equals(identifier))
-                return domain;
-        }
-        return null;
     }
 
     @Override
@@ -120,8 +105,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
         if (request.getUri().equals(URI_API + "/archetypes")) {
             return onGetArchetypes();
-        } else if (request.getUri().equals(URI_API + "/domains")) {
-            return onGetDomains();
         } else if (request.getUri().equals(URI_API + "/schemas")) {
             return onGetSchemas();
         } else if (request.getUri().startsWith(URI_API + "/archetypes")) {
@@ -129,11 +112,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             return onGetArchetype(rest);
-        } else if (request.getUri().startsWith(URI_API + "/domains")) {
-            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/domains".length() + 1));
-            if (rest.isEmpty())
-                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            return onGetDomain(rest);
         } else if (request.getUri().startsWith(URI_API + "/schemas")) {
             String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/schemas".length() + 1));
             if (rest.isEmpty())
@@ -205,36 +183,6 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
         ArtifactArchetype archetype = getArchetype(identifier);
         if (archetype != null)
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, archetype.serializedJSON());
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    /**
-     * Responds to a request for the registered domains
-     *
-     * @return The response
-     */
-    private HttpResponse onGetDomains() {
-        StringBuilder builder = new StringBuilder("[");
-        boolean first = true;
-        for (BusinessDomain domain : getDomains()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(domain.serializedJSON());
-        }
-        builder.append("]");
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-    }
-
-    /**
-     * Responds to a request for a registered domain
-     *
-     * @return The response
-     */
-    private HttpResponse onGetDomain(String identifier) {
-        BusinessDomain domain = getDomain(identifier);
-        if (domain != null)
-            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, domain.serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 

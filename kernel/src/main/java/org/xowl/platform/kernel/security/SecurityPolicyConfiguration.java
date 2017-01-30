@@ -25,6 +25,7 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -211,6 +212,15 @@ public class SecurityPolicyConfiguration implements Serializable {
             unknownActions.remove(action.getIdentifier());
         }
         return XSPReplySuccess.instance();
+    }
+
+    /**
+     * Gets the secured actions known to this configuration
+     *
+     * @return The secured actions
+     */
+    public Collection<SecuredAction> getActions() {
+        return policies.keySet();
     }
 
     /**

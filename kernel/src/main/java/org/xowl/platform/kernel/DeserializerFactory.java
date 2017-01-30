@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 
 /**
@@ -25,4 +26,13 @@ import org.xowl.infra.server.api.XOWLFactory;
  * @author Laurent Wouters
  */
 public interface DeserializerFactory extends Registrable, XOWLFactory {
+    /**
+     * Creates a new object
+     *
+     * @param deserializer The parent deserializer
+     * @param type         The object's type
+     * @param definition   The definition
+     * @return The new object
+     */
+    Object newObject(Deserializer deserializer, String type, ASTNode definition);
 }

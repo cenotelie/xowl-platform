@@ -38,7 +38,7 @@ public abstract class Deserializer implements XOWLFactory {
     @Override
     public Object newObject(String type, ASTNode definition) {
         for (DeserializerFactory factory : getFactories()) {
-            Object result = factory.newObject(type, definition);
+            Object result = factory.newObject(this, type, definition);
             if (result != null)
                 return result;
         }

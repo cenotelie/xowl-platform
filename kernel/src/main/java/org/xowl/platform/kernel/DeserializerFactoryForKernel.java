@@ -19,6 +19,8 @@ package org.xowl.platform.kernel;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.product.Product;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobRemote;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.*;
 
@@ -40,6 +42,11 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
 
     @Override
     public Object newObject(String type, ASTNode definition) {
+        return newObject(null, type, definition);
+    }
+
+    @Override
+    public Object newObject(Deserializer deserializer, String type, ASTNode definition) {
         if (Product.class.getCanonicalName().equals(type))
             return new ProductBase(definition);
         if (Addon.class.getCanonicalName().equals(type))
@@ -58,6 +65,8 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return SecuredActionPolicyBase.load(definition);
         if (SecurityPolicyConfiguration.class.getCanonicalName().equals(type))
             return new SecurityPolicyConfiguration(definition);
+        if (Job.class.getCanonicalName().equals(type))
+            return new JobRemote(definition, deserializer);
         return null;
     }
 }

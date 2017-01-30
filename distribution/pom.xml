@@ -117,6 +117,12 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-remote-api</artifactId>
+            <version>0.2.4-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-collaboration</artifactId>
             <version>0.2.4-SNAPSHOT</version>
             <scope>compile</scope>

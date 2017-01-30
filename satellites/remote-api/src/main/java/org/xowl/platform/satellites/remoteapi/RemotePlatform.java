@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.satellites.base;
+package org.xowl.platform.satellites.remoteapi;
 
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.http.HttpConnection;

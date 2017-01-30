@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.satellites.base.objects;
+package org.xowl.platform.satellites.remoteapi.objects;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;

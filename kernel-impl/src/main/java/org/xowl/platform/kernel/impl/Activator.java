@@ -107,7 +107,6 @@ public class Activator implements BundleActivator {
         KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);
-        bundleContext.registerService(BusinessDomain.class, SchemaDomain.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeSchema.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeFree.INSTANCE, null);
         bundleContext.registerService(Service.class, directoryService, null);

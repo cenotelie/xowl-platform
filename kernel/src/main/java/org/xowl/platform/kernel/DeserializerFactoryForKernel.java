@@ -70,6 +70,8 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return new JobRemote(definition, deserializer);
         if (Artifact.class.getCanonicalName().equals(type))
             return new ArtifactRemote(definition);
+        if (ArtifactSpecification.class.getCanonicalName().equals(type))
+            return new ArtifactSpecification(definition);
         if (ArtifactArchetype.class.getCanonicalName().equals(type))
             return new ArtifactArchetypeRemote(definition);
         if (ArtifactSchema.class.getCanonicalName().equals(type))

@@ -38,7 +38,7 @@ import java.util.Iterator;
  *
  * @author Laurent Wouters
  */
-public class BusinessSchemaResource implements BusinessSchema {
+public class BusinessSchemaResource implements ArtifactSchema {
     /**
      * The rdfs:label property
      */
@@ -188,7 +188,7 @@ public class BusinessSchemaResource implements BusinessSchema {
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(BusinessSchema.class.getCanonicalName()));
+        builder.append(TextUtils.escapeStringJSON(ArtifactSchema.class.getCanonicalName()));
         builder.append("\", \"identifier\": \"");
         builder.append(TextUtils.escapeStringJSON(iri));
         builder.append("\", \"name\": \"");

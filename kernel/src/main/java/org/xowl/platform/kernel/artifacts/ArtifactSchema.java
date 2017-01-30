@@ -28,7 +28,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface BusinessSchema extends Registrable, Serializable {
+public interface ArtifactSchema extends Registrable, Serializable {
     /**
      * Gets the classes in this schema
      *

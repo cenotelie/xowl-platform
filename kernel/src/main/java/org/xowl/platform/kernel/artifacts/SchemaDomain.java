@@ -63,7 +63,7 @@ public class SchemaDomain implements BusinessDomain {
     }
 
     @Override
-    public BusinessSchema getSchema() {
+    public ArtifactSchema getSchema() {
         return KernelSchema.IMPL;
     }
 

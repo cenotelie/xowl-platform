@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,37 +17,29 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.Registrable;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.store.rdf.Quad;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Represents an archetype of artifacts.
- * An archetype is a kind of recurrent kind of data stored within an artifact. This is usually related to a business domain.
- * Examples of archetypes: A functional architecture in system engineering, etc.
+ * Represents an artifact stored on a remote platform
  *
  * @author Laurent Wouters
  */
-public interface ArtifactArchetype extends Registrable, Serializable {
+public class ArtifactRemote extends ArtifactBase {
     /**
-     * Gets the human-readable description of this archetype
+     * Initializes this artifact
      *
-     * @return The description of this archetype
+     * @param definition The AST root for the serialized definition
      */
-    String getDescription();
+    public ArtifactRemote(ASTNode definition) {
+        super(definition);
+    }
 
-    /**
-     * Gets the schema associated to this archetype
-     *
-     * @return The associated schema
-     */
-    ArtifactSchema getSchema();
-
-    /**
-     * Gets the business domains related to this archetype
-     *
-     * @return The related business domains
-     */
-    Collection<BusinessDomain> getDomains();
+    @Override
+    public Collection<Quad> getContent() {
+        return Collections.emptyList();
+    }
 }

@@ -39,7 +39,7 @@ public interface BusinessDirectoryService extends Service {
      *
      * @return The registered schemas
      */
-    Collection<BusinessSchema> getSchemas();
+    Collection<ArtifactSchema> getSchemas();
 
     /**
      * Gets the registered artifact archetypes
@@ -62,7 +62,7 @@ public interface BusinessDirectoryService extends Service {
      * @param identifier The identifier of a schema
      * @return The associated schema, if any
      */
-    BusinessSchema getSchema(String identifier);
+    ArtifactSchema getSchema(String identifier);
 
     /**
      * Gets the artifact archetype for the specified identifier

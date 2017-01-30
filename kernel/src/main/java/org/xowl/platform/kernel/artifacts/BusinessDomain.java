@@ -48,7 +48,7 @@ public interface BusinessDomain extends Registrable, Serializable {
      *
      * @return The associated schema
      */
-    BusinessSchema getSchema();
+    ArtifactSchema getSchema();
 
     /**
      * Gets the artifact archetypes related to this domain

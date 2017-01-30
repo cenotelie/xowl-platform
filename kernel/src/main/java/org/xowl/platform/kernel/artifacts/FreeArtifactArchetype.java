@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 
 import java.util.Collection;
@@ -28,58 +27,34 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class FreeArtifactArchetype implements ArtifactArchetype {
+public class FreeArtifactArchetype extends ArtifactArchetypeBase {
     /**
      * The singleton instance
      */
-    public static final ArtifactArchetype INSTANCE = new FreeArtifactArchetype();
+    public static final ArtifactArchetype INSTANCE = new FreeArtifactArchetype(
+            FreeArtifactArchetype.class.getCanonicalName(),
+            "Free Artifact Archetype",
+            "An archetype for artifacts that follow no specific schema."
+    );
 
     /**
      * Initializes this archetype
+     *
+     * @param identifier  The archetype's identifier
+     * @param name        The archetype's name
+     * @param description The archetype's description
      */
-    private FreeArtifactArchetype() {
+    private FreeArtifactArchetype(String identifier, String name, String description) {
+        super(identifier, name, description);
     }
 
     @Override
-    public String getIdentifier() {
-        return FreeArtifactArchetype.class.getCanonicalName();
-    }
-
-    @Override
-    public String getName() {
-        return "Free Artifact Archetype";
-    }
-
-    @Override
-    public String getDescription() {
-        return "An archetype for artifacts that follow no specific schema.";
-    }
-
-    @Override
-    public BusinessSchema getSchema() {
+    public ArtifactSchema getSchema() {
         return KernelSchema.IMPL;
     }
 
     @Override
     public Collection<BusinessDomain> getDomains() {
         return Collections.emptyList();
-    }
-
-    @Override
-    public String serializedString() {
-        return getIdentifier();
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ArtifactArchetype.class.getCanonicalName()) +
-                "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(getIdentifier()) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(getName()) +
-                "\", \"description\": \"" +
-                TextUtils.escapeStringJSON(getDescription()) +
-                "\"}";
     }
 }

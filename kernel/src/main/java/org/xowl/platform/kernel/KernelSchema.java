@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.platform.kernel.artifacts.BusinessSchema;
+import org.xowl.platform.kernel.artifacts.ArtifactSchema;
 import org.xowl.platform.kernel.artifacts.BusinessSchemaResource;
 
 /**
@@ -113,5 +113,5 @@ public interface KernelSchema {
     /**
      * The implementation of this schema
      */
-    BusinessSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", URI_KERNEL);
+    ArtifactSchema IMPL = new BusinessSchemaResource(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", URI_KERNEL);
 }

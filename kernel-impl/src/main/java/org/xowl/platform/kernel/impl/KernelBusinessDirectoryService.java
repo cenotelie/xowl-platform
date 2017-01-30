@@ -26,7 +26,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.artifacts.BusinessDomain;
-import org.xowl.platform.kernel.artifacts.BusinessSchema;
+import org.xowl.platform.kernel.artifacts.ArtifactSchema;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
@@ -71,8 +71,8 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     }
 
     @Override
-    public Collection<BusinessSchema> getSchemas() {
-        return Register.getComponents(BusinessSchema.class);
+    public Collection<ArtifactSchema> getSchemas() {
+        return Register.getComponents(ArtifactSchema.class);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     }
 
     @Override
-    public BusinessSchema getSchema(String identifier) {
-        for (BusinessSchema schema : getSchemas()) {
+    public ArtifactSchema getSchema(String identifier) {
+        for (ArtifactSchema schema : getSchemas()) {
             if (schema.getIdentifier().equals(identifier))
                 return schema;
         }
@@ -246,7 +246,7 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     private HttpResponse onGetSchemas() {
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (BusinessSchema schema : getSchemas()) {
+        for (ArtifactSchema schema : getSchemas()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -262,7 +262,7 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
      * @return The response
      */
     private HttpResponse onGetSchema(String identifier) {
-        BusinessSchema schema = getSchema(identifier);
+        ArtifactSchema schema = getSchema(identifier);
         if (schema != null)
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, schema.serializedJSON());
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

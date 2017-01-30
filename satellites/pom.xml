@@ -12,6 +12,6 @@
     <name>xOWL Collaboration Platform - Satellites</name>
     <description>The set of satellites components (deployed into client application) for the platform</description>
     <modules>
-        <module>base</module>
+        <module>remote-api</module>
     </modules>
 </project>

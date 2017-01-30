@@ -6,11 +6,11 @@
         <artifactId>xowl-satellites</artifactId>
         <version>0.2.4-SNAPSHOT</version>
     </parent>
-    <artifactId>xowl-satellite-base</artifactId>
+    <artifactId>xowl-remote-api</artifactId>
     <packaging>bundle</packaging>
     <version>0.2.4-SNAPSHOT</version>
-    <name>xOWL Collaboration Platform - Satellite Base</name>
-    <description>Base API for accessing a remote platform</description>
+    <name>xOWL Collaboration Platform - Satellite Remote AP*i</name>
+    <description>Base API for accessing a remote xOWL Collaboration Platform</description>
     <dependencies>
         <dependency>
             <groupId>org.xowl.platform</groupId>

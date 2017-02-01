@@ -1179,66 +1179,141 @@ public class RemotePlatform {
                 HttpConstants.METHOD_POST);
     }
 
-
-/*****************************************************
- * Storage - Storage Service
- ****************************************************/
-/*
-    public XSPReply sparql(payload) {
-        return doRequest("services/storage/sparql", null, "POST", "application/sparql-query", payload);
+    /**
+     * Executes a SPARQL query against the RDF live storage
+     *
+     * @param query The SPARQL query
+     * @return The protocol reply
+     */
+    public XSPReply sparql(String query) {
+        return doRequest("services/storage/sparql",
+                HttpConstants.METHOD_POST,
+                query.getBytes(Files.CHARSET),
+                "application/sparql-query",
+                false,
+                HttpConstants.MIME_JSON);
     }
 
+    /**
+     * Gets a description of all the stored artifacts
+     *
+     * @return The protocol reply
+     */
     public XSPReply getAllArtifacts() {
         return doRequest("services/storage/artifacts", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets a description of the artifacts currently active for reasoning
+     *
+     * @return The protocol reply
+     */
     public XSPReply getLiveArtifacts() {
         return doRequest("services/storage/artifacts/live", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getArtifactsForBase(base) {
-        return doRequest("services/storage/artifacts", {base: base}, "GET", null, null);
+    /**
+     * Gets a description of the artifacts with the specified base
+     *
+     * @param base The base URI to look for
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactsForBase(String base) {
+        return doRequest(
+                "services/storage/artifacts?=base" + URIUtils.encodeComponent(base),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getArtifactsForArchetype(archetype) {
-        return doRequest("services/storage/artifacts", {archetype: archetype}, "GET", null, null);
+    /**
+     * Gets a description of the artifacts of the specified archetype
+     *
+     * @param archetype The identifier of an archetype
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactsForArchetype(String archetype) {
+        return doRequest(
+                "services/storage/artifacts?=archetype" + URIUtils.encodeComponent(archetype),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getArtifact(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), HttpConstants.METHOD_GET);
+    /**
+     * Gets a description of a specific artifact
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply getArtifact(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getArtifactMetadata(artifactId) {
-        return doRequest("application/n-quads", content);
-            } else {
-                (code, type, content);
-            }
-        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/metadata", HttpConstants.METHOD_GET);
+    /**
+     * Gets the metadata quads for a specific artifact
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactMetadata(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/metadata",
+                HttpConstants.METHOD_GET,
+                null,
+                HttpConstants.MIME_TEXT_PLAIN,
+                false,
+                "application/n-quads"
+        );
     }
 
-    public XSPReply getArtifactContent(artifactId) {
-        return doRequest("application/n-quads", content);
-            } else {
-                (code, type, content);
-            }
-        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/content", HttpConstants.METHOD_GET);
+    /**
+     * Gets the quads contained by a specific artifact
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactContent(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/content",
+                HttpConstants.METHOD_GET,
+                null,
+                HttpConstants.MIME_TEXT_PLAIN,
+                false,
+                "application/n-quads"
+        );
     }
 
-    public XSPReply deleteArtifact(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), HttpConstants.METHOD_DELETE);
+    /**
+     * Deletes an artifact
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply deleteArtifact(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply diffArtifacts(artifactLeft, artifactRight) {
-        return doRequest("--xowlQuads");
+    /**
+     * Computes the diff between two artifacts
+     * @param artifactLeft The identifier of the artifact on the left
+     * @param artifactRight The identifier of the artifact on the right
+     * @return The protocol reply
+     */
+    /*
+    public XSPReply diffArtifacts(String artifactLeft, String artifactRight) {
+        this.doRequest(function (code, type, content) {
+            if (code === 200) {
+                var leftIndex = content.indexOf("--xowlQuads");
                 var rightIndex = content.lastIndexOf("--xowlQuads");
                 var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
                 var contentRight = content.substring(rightIndex + "--xowlQuads".length);
-                (code, MIME_JSON, {
+                callback(code, MIME_JSON, {
                         left: contentLeft,
                         right: contentRight
 			});
             } else {
-                (code, type, content);
+                callback(code, type, content);
             }
         }, "services/storage/artifacts/diff", {left: artifactLeft, right: artifactRight}, "POST", null, null);
     }
@@ -1247,11 +1322,10 @@ public class RemotePlatform {
         return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/deactivate", HttpConstants.METHOD_POST);
     }
 
-    public XSPReply pushArtifactToLive(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/activate", HttpConstants.METHOD_POST);
-    }
+    public XSPReply pushArtifactToLive(artifactId){
+        return doRequest("services/storage/artifacts/"+URIUtils.encodeComponent(artifactId)+"/activate",HttpConstants.METHOD_POST);
+        }
 */
-
 
 /*****************************************************
  * Importation - Importation Service

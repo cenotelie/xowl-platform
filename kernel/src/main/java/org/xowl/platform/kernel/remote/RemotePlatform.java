@@ -24,6 +24,7 @@ import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
 
@@ -734,139 +735,301 @@ public class RemotePlatform {
         return doRequest("services/webapp/modules", HttpConstants.METHOD_GET);
     }
 
-
-/*****************************************************
- * Collaboration - Collaboration Service
- ****************************************************/
-/*
+    /**
+     * Archives the current collaboration (stops the current platform's instance)
+     *
+     * @return The protocol reply
+     */
     public XSPReply archiveCollaboration() {
-        return doRequest("services/collaboration/archive", null, "POST", null, null);
+        return doRequest("services/collaboration/archive", HttpConstants.METHOD_POST);
     }
 
+    /**
+     * Deletes the current collaboration (and all the data for the platform's instance)
+     *
+     * @return The protocol reply
+     */
     public XSPReply deleteCollaboration() {
-        return doRequest("services/collaboration/delete", null, "POST", null, null);
+        return doRequest("services/collaboration/delete", HttpConstants.METHOD_POST);
     }
 
+    /**
+     * Gets the manifest for the collaboration implemented by the platform's instance
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationManifest() {
         return doRequest("services/collaboration/manifest", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the specifications of inputs
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationInputSpecifications() {
         return doRequest("services/collaboration/manifest/inputs", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply addCollaborationInputSpecification(specification) {
-        return doRequest("services/collaboration/manifest/inputs", null, "PUT", MIME_JSON, specification);
+    /**
+     * Adds a specification for a new input
+     *
+     * @param specification The input specification
+     * @return The protocol reply
+     */
+    public XSPReply addCollaborationInputSpecification(Object specification) {
+        return doRequest(
+                "services/collaboration/manifest/inputs",
+                HttpConstants.METHOD_PUT,
+                specification);
     }
 
-    public XSPReply removeCollaborationInputSpecification(specificationId) {
-        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId), null, "DELETE", null, null);
+    /**
+     * Removes a specification for an input
+     *
+     * @param specificationId The identifier of the specification
+     * @return The protocol reply
+     */
+    public XSPReply removeCollaborationInputSpecification(String specificationId) {
+        return doRequest(
+                "services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId),
+                HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply getArtifactsForCollaborationInput(specificationId) {
-        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+    /**
+     * Gets the artifacts registered as fulfilling an input specification
+     *
+     * @param specificationId The identifier of the specification
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactsForCollaborationInput(String specificationId) {
+        return doRequest("services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply registerArtifactForCollaborationInput(specificationId, artifactId) {
-        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "PUT", null, null);
+    /**
+     * Registers an artifact as fulfilling an input specification
+     *
+     * @param specificationId The identifier of the specification
+     * @param artifactId      The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply registerArtifactForCollaborationInput(String specificationId, String artifactId) {
+        return doRequest(
+                "services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_PUT);
     }
 
-    public XSPReply unregisterArtifactForCollaborationInput(specificationId, artifactId) {
-        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "DELETE", null, null);
+    /**
+     * Un-registers an artifact as fulfilling an input specification
+     *
+     * @param specificationId The identifier of the specification
+     * @param artifactId      The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply unregisterArtifactForCollaborationInput(String specificationId, String artifactId) {
+        return doRequest(
+                "services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_DELETE);
     }
 
+    /**
+     * Gets the specification of outputs
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationOutputSpecifications() {
         return doRequest("services/collaboration/manifest/outputs", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply addCollaborationOutputSpecification(specification) {
-        return doRequest("services/collaboration/manifest/outputs", null, "PUT", MIME_JSON, specification);
+    /**
+     * Adds a specification for a new output
+     *
+     * @param specification The output specification
+     * @return The protocol reply
+     */
+    public XSPReply addCollaborationOutputSpecification(Object specification) {
+        return doRequest(
+                "services/collaboration/manifest/outputs",
+                HttpConstants.METHOD_PUT,
+                specification);
     }
 
-    public XSPReply removeCollaborationOutputSpecification(specificationId) {
-        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId), null, "DELETE", null, null);
+    /**
+     * Removes a specification for an output
+     *
+     * @param specificationId The identifier of the specification
+     * @return The protocol reply
+     */
+    public XSPReply removeCollaborationOutputSpecification(String specificationId) {
+        return doRequest(
+                "services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId),
+                HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply getArtifactsForCollaborationOutput(specificationId) {
-        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+    /**
+     * Gets the artifacts registered as fulfilling an output specification
+     *
+     * @param specificationId The identifier of the specification
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactsForCollaborationOutput(String specificationId) {
+        return doRequest(
+                "services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply registerArtifactForCollaborationOutput(specificationId, artifactId) {
-        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "PUT", null, null);
+    /**
+     * Registers an artifact as fulfilling an output specification
+     *
+     * @param specificationId The identifier of the specification
+     * @param artifactId      The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply registerArtifactForCollaborationOutput(String specificationId, String artifactId) {
+        return doRequest(
+                "services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_PUT);
     }
 
-    public XSPReply unregisterArtifactForCollaborationOutput(specificationId, artifactId) {
-        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "DELETE", null, null);
+    /**
+     * Un-registers an artifact as fulfilling an output specification
+     *
+     * @param specificationId The identifier of the specification
+     * @param artifactId      The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply unregisterArtifactForCollaborationOutput(String specificationId, String artifactId) {
+        return doRequest(
+                "services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_DELETE);
     }
 
+    /**
+     * Gets the collaboration's role on the platform
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationRoles() {
         return doRequest("services/collaboration/manifest/roles", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply createCollaborationRole(role) {
-        return doRequest("services/collaboration/manifest/roles", null, "PUT", MIME_JSON, role);
+    /**
+     * Creates a new collaboration role
+     *
+     * @param role The role to create
+     * @return The protocol reply
+     */
+    public XSPReply createCollaborationRole(PlatformRole role) {
+        return doRequest(
+                "services/collaboration/manifest/roles",
+                HttpConstants.METHOD_PUT,
+                role);
     }
 
-    public XSPReply addCollaborationRole(roleId) {
-        return doRequest("services/collaboration/manifest/roles/" +  URIUtils.encodeComponent(roleId), null, "PUT", null, null);
+    /**
+     * Adds an existing role as a collaboration role
+     *
+     * @param roleId The identifier of the role
+     * @return The protocol reply
+     */
+    public XSPReply addCollaborationRole(String roleId) {
+        return doRequest(
+                "services/collaboration/manifest/roles/" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_PUT);
     }
 
-    public XSPReply removeCollaborationRole(roleId) {
-        return doRequest("services/collaboration/manifest/roles/" +  URIUtils.encodeComponent(roleId), null, "DELETE", null, null);
+    /**
+     * Removes a role as a collaboration role
+     *
+     * @param roleId The identifier of the role
+     * @return The protocol reply
+     */
+    public XSPReply removeCollaborationRole(String roleId) {
+        return doRequest(
+                "services/collaboration/manifest/roles/" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_DELETE);
     }
 
+    /**
+     * Gets the used collaboration pattern
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationPattern() {
         return doRequest("services/collaboration/manifest/pattern", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the known input and output specifications
+     *
+     * @return The protocol reply
+     */
     public XSPReply getKnownIOSpecifications() {
         return doRequest("services/collaboration/specifications", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the known collaboration patterns
+     *
+     * @return The protocol reply
+     */
     public XSPReply getKnownPatterns() {
         return doRequest("services/collaboration/patterns", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the neighbour collaborations
+     *
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbours() {
         return doRequest("services/collaboration/neighbours", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply spawnCollaboration(specification) {
-        return doRequest("services/collaboration/neighbours", null, "PUT", MIME_JSON, specification);
+    /**
+     * Spawns a new collaboration in the neighbourhood
+     *
+     * @param specification The specification for the collaboration
+     * @return The protocol reply
+     */
+    public XSPReply spawnCollaboration(Object specification) {
+        return doRequest(
+                "services/collaboration/neighbours",
+                HttpConstants.METHOD_PUT,
+                specification);
     }
 
-    public XSPReply getCollaborationNeighbour(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_GET);
+    public XSPReply getCollaborationNeighbour(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getCollaborationNeighbourManifest(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest", HttpConstants.METHOD_GET);
+    public XSPReply getCollaborationNeighbourManifest(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getCollaborationNeighbourStatus(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/status", HttpConstants.METHOD_GET);
+    public XSPReply getCollaborationNeighbourStatus(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/status", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply deleteCollaborationNeighbour(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId), null, "DELETE", null, null);
+    public XSPReply deleteCollaborationNeighbour(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply archiveCollaborationNeighbour(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/archive", null, "POST", null, null);
+    public XSPReply archiveCollaborationNeighbour(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/archive", HttpConstants.METHOD_POST);
     }
 
-    public XSPReply restartCollaborationNeighbour(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/restart", null, "POST", null, null);
+    public XSPReply restartCollaborationNeighbour(String neighbourId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/restart", HttpConstants.METHOD_POST);
     }
 
-    public XSPReply getCollaborationNeighbourInputs(neighbourId, specificationId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+    public XSPReply getCollaborationNeighbourInputs(String neighbourId, String specificationId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getCollaborationNeighbourOutputs(neighbourId, specificationId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+    public XSPReply getCollaborationNeighbourOutputs(String neighbourId, String specificationId) {
+        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
-*/
 
 
 /*****************************************************
@@ -890,11 +1053,11 @@ public class RemotePlatform {
     }
 
     public XSPReply deleteConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), null, "DELETE", null, null);
+        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), HttpConstants.METHOD_DELETE);
     }
 
     public XSPReply pullFromConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId) + "/pull", null, "POST", null, null);
+        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId) + "/pull", HttpConstants.METHOD_POST);
     }
 
     public XSPReply pushToConnector(connectorId, artifactId) {
@@ -948,7 +1111,7 @@ public class RemotePlatform {
     }
 
     public XSPReply deleteArtifact(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "DELETE", null, null);
+        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), HttpConstants.METHOD_DELETE);
     }
 
     public XSPReply diffArtifacts(artifactLeft, artifactRight) {
@@ -967,11 +1130,11 @@ public class RemotePlatform {
     }
 
     public XSPReply pullArtifactFromLive(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/deactivate", null, "POST", null, null);
+        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/deactivate", HttpConstants.METHOD_POST);
     }
 
     public XSPReply pushArtifactToLive(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/activate", null, "POST", null, null);
+        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/activate", HttpConstants.METHOD_POST);
     }
 */
 
@@ -1001,7 +1164,7 @@ public class RemotePlatform {
     }
 
     public XSPReply dropUploadedDocument(docId) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), null, "DELETE", null, null);
+        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), HttpConstants.METHOD_DELETE);
     }
 
     public XSPReply importUploadedDocument(docId, importer, configuration) {
@@ -1039,15 +1202,15 @@ public class RemotePlatform {
     }
 
     public XSPReply activateConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/activate", null, "POST", null, null);
+        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/activate", HttpConstants.METHOD_POST);
     }
 
     public XSPReply deactivateConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/deactivate", null, "POST", null, null);
+        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/deactivate", HttpConstants.METHOD_POST);
     }
 
     public XSPReply deleteConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), null, "DELETE", null, null);
+        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), HttpConstants.METHOD_DELETE);
     }
 */
 
@@ -1107,7 +1270,7 @@ public class RemotePlatform {
     }
 
     public XSPReply marketplaceInstallAddon(addonId) {
-        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId) + "/install", null, "POST", null, null);
+        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId) + "/install", HttpConstants.METHOD_POST);
     }
     
     

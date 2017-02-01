@@ -22,7 +22,6 @@ import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Implements a directory service for the domain connectors
@@ -72,14 +71,11 @@ public interface ConnectionService extends SecuredService {
     /**
      * Spawns a new connector for a domain
      *
-     * @param description The domain's description
-     * @param identifier  The new connector's unique identifier
-     * @param name        The new connector's name
-     * @param uris        The new connector's API uris, if any
-     * @param parameters  The parameters for the new connector, if any
+     * @param description   The domain's description
+     * @param specification The specification for the new connector
      * @return The operation's result
      */
-    XSPReply spawn(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters);
+    XSPReply spawn(ConnectorDescriptor description, ConnectorServiceData specification);
 
     /**
      * Deletes a spawned connector

@@ -95,14 +95,12 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     /**
      * Initializes this connector
      *
-     * @param identifier The identifier for this connector
-     * @param name       The name for this connector
-     * @param uris       The API URIs for this connector
+     * @param specification The specification for the new connector
      */
-    protected ConnectorServiceBase(String identifier, String name, String[] uris) {
-        this.identifier = identifier;
-        this.name = name;
-        this.uris = uris;
+    protected ConnectorServiceBase(ConnectorServiceData specification) {
+        this.identifier = specification.getIdentifier();
+        this.name = specification.getName();
+        this.uris = specification.getUris();
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
         this.actionPull = new SecuredAction(identifier + ".Pull", name + " - Pull Artifact");
         this.actionPush = new SecuredAction(identifier + ".Push", name + " - Push Artifact");

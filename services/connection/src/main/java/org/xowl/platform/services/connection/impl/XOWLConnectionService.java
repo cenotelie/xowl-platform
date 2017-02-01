@@ -238,7 +238,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     @Override
-    public XSPReply spawn(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
+    public XSPReply spawn(ConnectorDescriptor description, ConnectorServiceData specification) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -247,13 +247,13 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             return reply;
 
         synchronized (connectorsById) {
-            ConnectorService service = getConnector(identifier);
+            ConnectorService service = getConnector(specification.getIdentifier());
             if (service != null)
                 // already exists
                 return new XSPReplyApiError(ERROR_CONNECTOR_SAME_ID);
 
             for (ConnectorServiceFactory factory : Register.getComponents(ConnectorServiceFactory.class)) {
-                service = factory.newConnector(description, identifier, name, uris, parameters);
+                service = factory.newConnector(description, specification);
                 if (service != null)
                     break;
             }
@@ -280,7 +280,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
                         context.registerService(ConnectorService.class, service, properties)
                 };
             }
-            connectorsById.put(identifier, registration);
+            connectorsById.put(specification.getIdentifier(), registration);
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorSpawnedEvent(this, registration.service));
@@ -375,7 +375,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         if (id == null || name == null)
             return false;
         List<String> uris = section.getAll("uris");
-        Map<ConnectorDescriptorParam, Object> customParams = new HashMap<>();
+        ConnectorServiceData specification = new ConnectorServiceData(id, name, (String[]) uris.toArray());
         for (String property : section.getProperties()) {
             if (property.equals("name") || property.equals("uris"))
                 continue;
@@ -390,11 +390,11 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
                 continue;
             List<String> values = section.getAll(property);
             if (values.size() == 1)
-                customParams.put(parameter, values.get(0));
+                specification.addParameter(parameter, values.get(0));
             else if (values.size() > 1)
-                customParams.put(parameter, values.toArray());
+                specification.addParameter(parameter, values.toArray());
         }
-        XSPReply reply = spawn(description, id, name, uris.toArray(new String[uris.size()]), customParams);
+        XSPReply reply = spawn(description, specification);
         return reply.isSuccess();
     }
 
@@ -478,66 +478,10 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         }
         if (descriptor == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
-
-        String name = null;
-        List<String> uris = new ArrayList<>(2);
-        Map<ConnectorDescriptorParam, Object> customParams = new HashMap<>();
-        for (ASTNode member : root.getChildren()) {
-            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            switch (head) {
-                case "name":
-                    name = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    name = name.substring(1, name.length() - 1);
-                    break;
-                case "uris": {
-                    ASTNode valueNode = member.getChildren().get(1);
-                    if (valueNode.getValue() != null) {
-                        String value = TextUtils.unescape(valueNode.getValue());
-                        value = value.substring(1, value.length() - 1);
-                        uris.add(value);
-                    } else if (valueNode.getChildren().size() > 0) {
-                        for (ASTNode childNode : valueNode.getChildren()) {
-                            String value = TextUtils.unescape(childNode.getValue());
-                            value = value.substring(1, value.length() - 1);
-                            uris.add(value);
-                        }
-                    }
-                    break;
-                }
-                default: {
-                    ConnectorDescriptorParam parameter = null;
-                    for (ConnectorDescriptorParam p : descriptor.getParameters()) {
-                        if (p.getIdentifier().equals(head)) {
-                            parameter = p;
-                            break;
-                        }
-                    }
-                    if (parameter != null) {
-                        ASTNode valueNode = member.getChildren().get(1);
-                        if (valueNode.getValue() != null) {
-                            String value = TextUtils.unescape(valueNode.getValue());
-                            if (value.startsWith("\"") && value.endsWith("\""))
-                                value = value.substring(1, value.length() - 1);
-                            customParams.put(parameter, value);
-                        } else if (valueNode.getChildren().size() > 0) {
-                            String[] values = new String[valueNode.getChildren().size()];
-                            for (int i = 0; i != valueNode.getChildren().size(); i++) {
-                                String value = TextUtils.unescape(valueNode.getChildren().get(i).getValue());
-                                if (value.startsWith("\"") && value.endsWith("\""))
-                                    value = value.substring(1, value.length() - 1);
-                                values[i] = value;
-                            }
-                            customParams.put(parameter, values);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (name == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "The name for the connector is not specified"), null);
-        XSPReply reply = spawn(descriptor, connectorId, name, uris.toArray(new String[uris.size()]), customParams);
+        ConnectorServiceData specification = new ConnectorServiceData(descriptor, root);
+        if (!specification.getIdentifier().equals(connectorId))
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'identifier' is not the same as URI parameter"), null);
+        XSPReply reply = spawn(descriptor, specification);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConnectorService>) reply).getData().serializedJSON());

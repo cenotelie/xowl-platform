@@ -1004,7 +1004,7 @@ XOWL.prototype.createConnector = function (callback, descriptor, definition) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/connection/connectors/" + encodeURIComponent(connectorId), {descriptor: descriptor.identifier}, "PUT", MIME_JSON, definition);
+	}, "services/connection/connectors/" + encodeURIComponent(definition.identifier), {descriptor: descriptor.identifier}, "PUT", MIME_JSON, definition);
 }
 
 XOWL.prototype.deleteConnector = function (callback, connectorId) {

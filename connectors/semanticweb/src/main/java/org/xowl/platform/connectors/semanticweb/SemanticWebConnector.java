@@ -27,13 +27,14 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
-import org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.services.connection.ConnectorServiceBase;
+import org.xowl.platform.services.connection.ConnectorServiceData;
 import org.xowl.platform.services.connection.events.ConnectorReceivedDataEvent;
 
 import java.io.ByteArrayInputStream;
@@ -50,12 +51,10 @@ public class SemanticWebConnector extends ConnectorServiceBase {
     /**
      * Initializes this connector
      *
-     * @param identifier The identifier for this connector
-     * @param name       The name for this connector
-     * @param uris       The API URIs for this connector
+     * @param specification The specification for the new connector
      */
-    public SemanticWebConnector(String identifier, String name, String[] uris) {
-        super(identifier, name, uris);
+    public SemanticWebConnector(ConnectorServiceData specification) {
+        super(specification);
     }
 
     @Override

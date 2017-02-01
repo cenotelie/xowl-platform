@@ -137,6 +137,11 @@
     "ConnectorServiceData": {
       "type": "object",
       "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.services.connection.ConnectorServiceData"
+          ]
+        },
         "identifier": {
           "type": "string"
         },
@@ -151,6 +156,7 @@
         }
       },
       "required": [
+        "type",
         "identifier",
         "name",
         "uris"

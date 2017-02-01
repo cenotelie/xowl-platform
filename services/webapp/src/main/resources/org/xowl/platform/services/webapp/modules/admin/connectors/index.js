@@ -152,6 +152,7 @@ function onClickNewConnector() {
 	document.getElementById("input-name-help").innerHTML = "";
 
 	var data = {
+		"type": "org.xowl.platform.services.connection.ConnectorServiceData",
 		"identifier": id,
 		"name": name,
 		"uris": (typeof uri == "undefined" || uri == null || uri == "" ? [] : [uri])

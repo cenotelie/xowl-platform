@@ -18,6 +18,7 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.platform.services.connection.ConnectorServiceBase;
+import org.xowl.platform.services.connection.ConnectorServiceData;
 
 /**
  * Represents a CSV connector
@@ -28,11 +29,9 @@ public class CSVConnector extends ConnectorServiceBase {
     /**
      * Initializes this connector
      *
-     * @param identifier The identifier for this connector
-     * @param name       The name for this connector
-     * @param uris       The API URIs for this connector
+     * @param specification The specification for the new connector
      */
-    public CSVConnector(String identifier, String name, String[] uris) {
-        super(identifier, name, uris);
+    public CSVConnector(ConnectorServiceData specification) {
+        super(specification);
     }
 }

@@ -19,8 +19,6 @@ package org.xowl.platform.services.connection;
 
 import org.xowl.platform.kernel.Registrable;
 
-import java.util.Map;
-
 /**
  * A factory that can create new connectors for the platform
  *
@@ -30,12 +28,9 @@ public interface ConnectorServiceFactory extends Registrable {
     /**
      * Instantiates a new connector for a domain
      *
-     * @param descriptor The connector's description
-     * @param identifier The new connector's unique identifier
-     * @param name       The new connector's name
-     * @param uris       The new connector's API uris, if any
-     * @param parameters The parameters for the new connector, if any
+     * @param descriptor    The connector's description
+     * @param specification The specification for the new connector
      * @return The new connector, or null if it cannot be created
      */
-    ConnectorService newConnector(ConnectorDescriptor descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters);
+    ConnectorService newConnector(ConnectorDescriptor descriptor, ConnectorServiceData specification);
 }

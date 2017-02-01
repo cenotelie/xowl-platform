@@ -18,10 +18,7 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.services.connection.ConnectorDescriptor;
-import org.xowl.platform.services.connection.ConnectorDescriptorParam;
-import org.xowl.platform.services.connection.ConnectorService;
-import org.xowl.platform.services.connection.ConnectorServiceFactory;
+import org.xowl.platform.services.connection.*;
 
 import java.util.Map;
 
@@ -47,7 +44,7 @@ public class CSVConnectorFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public ConnectorService newConnector(ConnectorDescriptor description, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
-        return new CSVConnector(identifier, name, uris);
+    public ConnectorService newConnector(ConnectorDescriptor description, ConnectorServiceData specification) {
+        return new CSVConnector(specification);
     }
 }

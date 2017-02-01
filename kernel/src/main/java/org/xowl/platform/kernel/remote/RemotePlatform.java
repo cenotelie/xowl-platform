@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.remote;
 
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -999,71 +1000,184 @@ public class RemotePlatform {
                 specification);
     }
 
+    /**
+     * Gets the description of a collaboration in the neighbourhood
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbour(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_GET);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId),
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the manifest of a collaboration in the neighbourhood
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbourManifest(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest", HttpConstants.METHOD_GET);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest",
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the status of a collaboration in the neighbourhood
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbourStatus(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/status", HttpConstants.METHOD_GET);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/status",
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Stops and deletes all data related to a neighbour collaboration
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply deleteCollaborationNeighbour(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_DELETE);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId),
+                HttpConstants.METHOD_DELETE);
     }
 
+    /**
+     * Archives a neighbour collaboration
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply archiveCollaborationNeighbour(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/archive", HttpConstants.METHOD_POST);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/archive",
+                HttpConstants.METHOD_POST);
     }
 
+    /**
+     * Restarts an archived neighbour collaboration
+     *
+     * @param neighbourId The identifier of the collaboration
+     * @return The protocol reply
+     */
     public XSPReply restartCollaborationNeighbour(String neighbourId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/restart", HttpConstants.METHOD_POST);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/restart",
+                HttpConstants.METHOD_POST);
     }
 
+    /**
+     * Gets the input artifacts for a neighbour collaboration
+     *
+     * @param neighbourId     The identifier of the collaboration
+     * @param specificationId The identifier of the requested input specification
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbourInputs(String neighbourId, String specificationId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the output artifacts for an neighbour collaboration
+     *
+     * @param neighbourId     The identifier of the collaboration
+     * @param specificationId The identifier of the requested output specification
+     * @return The protocol reply
+     */
     public XSPReply getCollaborationNeighbourOutputs(String neighbourId, String specificationId) {
-        return doRequest("services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
+        return doRequest(
+                "services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
+                HttpConstants.METHOD_GET);
     }
 
-
-/*****************************************************
- * Connection - Connection Service
- ****************************************************/
-/*
+    /**
+     * Gets the descriptors for available connectors
+     *
+     * @return The protocol reply
+     */
     public XSPReply getDescriptors() {
         return doRequest("services/connection/descriptors", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the descriptions of the spawned connectors
+     *
+     * @return The protocol reply
+     */
     public XSPReply getConnectors() {
         return doRequest("services/connection/connectors", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), HttpConstants.METHOD_GET);
+    /**
+     * Gets the description of a specific connector
+     *
+     * @param connectorId The identifier of a connector
+     * @return The protocol reply
+     */
+    public XSPReply getConnector(String connectorId) {
+        return doRequest(
+                "services/connection/connectors/" + URIUtils.encodeComponent(connectorId),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply createConnector(descriptor, definition) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), {descriptor: descriptor.identifier}, "PUT", MIME_JSON, definition);
+    /**
+     * Creates a new connector
+     *
+     * @param descriptorId  The identifier of the descriptor for the requested connector
+     * @param specification The specification data for the connector
+     * @return The protocol reply
+     */
+    public XSPReply createConnector(String descriptorId, Identifiable specification) {
+        return doRequest(
+                "services/connection/connectors/" + URIUtils.encodeComponent(specification.getIdentifier()) + "?descriptor=" + URIUtils.encodeComponent(descriptorId),
+                HttpConstants.METHOD_PUT,
+                specification);
     }
 
-    public XSPReply deleteConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), HttpConstants.METHOD_DELETE);
+    /**
+     * Deletes a spawned connector
+     *
+     * @param connectorId The identifier of the connector
+     * @return The protocol reply
+     */
+    public XSPReply deleteConnector(String connectorId) {
+        return doRequest(
+                "services/connection/connectors/" + URIUtils.encodeComponent(connectorId),
+                HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply pullFromConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId) + "/pull", HttpConstants.METHOD_POST);
+    /**
+     * Pulls the next available artifact from a connector
+     *
+     * @param connectorId The identifier of the connector
+     * @return The protocol reply
+     */
+    public XSPReply pullFromConnector(String connectorId) {
+        return doRequest(
+                "services/connection/connectors/" + URIUtils.encodeComponent(connectorId) + "/pull",
+                HttpConstants.METHOD_POST);
     }
 
-    public XSPReply pushToConnector(connectorId, artifactId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId) + "/push", {artifact: artifactId}, "POST", null, null);
+    /**
+     * Pushes an artifact through a connector to its client
+     *
+     * @param connectorId The identifier of a connector
+     * @param artifactId  The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply pushToConnector(String connectorId, String artifactId) {
+        return doRequest(
+                "services/connection/connectors/" + URIUtils.encodeComponent(connectorId) + "/push?artifact=" + URIUtils.encodeComponent(artifactId),
+                HttpConstants.METHOD_POST);
     }
-*/
 
 
 /*****************************************************

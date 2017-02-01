@@ -21,7 +21,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.Deserializer;
+import org.xowl.platform.kernel.remote.Deserializer;
 
 /**
  * Represents a job running on a remote platform

@@ -15,10 +15,11 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.remote;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.product.Product;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobRemote;

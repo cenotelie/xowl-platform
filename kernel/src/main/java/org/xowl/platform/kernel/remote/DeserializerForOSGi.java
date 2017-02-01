@@ -15,28 +15,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.remote;
 
-import java.util.ArrayList;
+import org.xowl.platform.kernel.Register;
+
 import java.util.Collection;
-import java.util.ServiceLoader;
 
 /**
- * Implements a deserializer that relies on the java service discovery to discover the factories
+ * Implements a deserializer that relies on the OSGi service register to discover the factories
  *
  * @author Laurent Wouters
  */
-public class DeserializerForJava extends Deserializer {
-    /**
-     * The loader for the factories
-     */
-    private final ServiceLoader<DeserializerFactory> serviceLoader = ServiceLoader.load(DeserializerFactory.class);
-
+public class DeserializerForOSGi extends Deserializer {
     @Override
     protected Collection<DeserializerFactory> getFactories() {
-        Collection<DeserializerFactory> result = new ArrayList<>();
-        for (DeserializerFactory factory : serviceLoader)
-            result.add(factory);
-        return result;
+        return Register.getComponents(DeserializerFactory.class);
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.satellites.remoteapi;
+package org.xowl.platform.kernel.remote;
 
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.Files;
@@ -24,7 +24,6 @@ import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.platform.kernel.Deserializer;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
 
@@ -37,11 +36,11 @@ public class RemotePlatform {
     /**
      * The connection to the platform
      */
-    private final HttpConnection connection;
+    protected final HttpConnection connection;
     /**
      * The deserializer to use
      */
-    private final Deserializer deserializer;
+    protected final Deserializer deserializer;
     /**
      * The currently logged-in user
      */

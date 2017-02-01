@@ -15,24 +15,34 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.remote;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.api.XOWLFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Represents a factory for serialized platform objects
+ * Implements a deserializer that requires the manual registering of factories
  *
  * @author Laurent Wouters
  */
-public interface DeserializerFactory extends Registrable, XOWLFactory {
+public class DeserializerAggregate extends Deserializer {
     /**
-     * Creates a new object
-     *
-     * @param deserializer The parent deserializer
-     * @param type         The object's type
-     * @param definition   The definition
-     * @return The new object
+     * The registered factories
      */
-    Object newObject(Deserializer deserializer, String type, ASTNode definition);
+    private final Collection<DeserializerFactory> factories = new ArrayList<>();
+
+    /**
+     * Registers a factory
+     *
+     * @param factory The factory to register
+     */
+    public void register(DeserializerFactory factory) {
+        this.factories.add(factory);
+    }
+
+    @Override
+    protected Collection<DeserializerFactory> getFactories() {
+        return Collections.unmodifiableCollection(factories);
+    }
 }

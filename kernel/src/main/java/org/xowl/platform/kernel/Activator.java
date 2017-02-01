@@ -19,6 +19,8 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.remote.DeserializerFactory;
+import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
 
 /**
  * Activator for this bundle

@@ -589,7 +589,7 @@ XOWL.prototype.getArtifactArchetypes = function (callback) {
 	}, "kernel/business/archetypes", null, "GET", null, null);
 }
 
-XOWL.prototype.getBusinessArchetype = function (callback, archetypeId) {
+XOWL.prototype.getArtifactArchetype = function (callback, archetypeId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));

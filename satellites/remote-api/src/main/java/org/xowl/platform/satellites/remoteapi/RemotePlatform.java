@@ -645,56 +645,95 @@ public class RemotePlatform {
                 HttpConstants.METHOD_POST);
     }
 
-
-/*****************************************************
- * Kernel - Statistics Service
- ****************************************************/
-/*
+    /**
+     * Gets all the metrics for the platform
+     *
+     * @return The protocol reply
+     */
     public XSPReply getAllMetrics() {
-        return doRequest("kernel/statistics/metrics", null, "GET", null, null);
+        return doRequest(
+                "kernel/statistics/metrics",
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getMetric(metricId) {
-        return doRequest("kernel/statistics/metrics/" +  URIUtils.encodeComponent(metricId), null, "GET", null, null);
+    /**
+     * Gets the description of a specific metric for the platform
+     *
+     * @param metricId The identifier of the metric
+     * @return The protocol reply
+     */
+    public XSPReply getMetric(String metricId) {
+        return doRequest(
+                "kernel/statistics/metrics/" + URIUtils.encodeComponent(metricId),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getMetricSnapshot(metricId) {
-        return doRequest("kernel/statistics/metrics/" +  URIUtils.encodeComponent(metricId) + "/snapshot", null, "GET", null, null);
+    /**
+     * Gets a snapshot of a metric for the platform
+     *
+     * @param metricId The identifier of the metric
+     * @return The protocol reply
+     */
+    public XSPReply getMetricSnapshot(String metricId) {
+        return doRequest(
+                "kernel/statistics/metrics/" + URIUtils.encodeComponent(metricId) + "/snapshot",
+                HttpConstants.METHOD_GET);
     }
-*/
 
-
-/*****************************************************
- * Kernel - Business Directory Service
- ****************************************************/
-
-/*
+    /**
+     * Gets the description of the available artifact archetypes
+     *
+     * @return The protocol reply
+     */
     public XSPReply getArtifactArchetypes() {
-        return doRequest("kernel/business/archetypes", null, "GET", null, null);
+        return doRequest(
+                "kernel/business/archetypes",
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getBusinessArchetype(archetypeId) {
-        return doRequest("kernel/business/archetypes/" +  URIUtils.encodeComponent(archetypeId), null, "GET", null, null);
+    /**
+     * Gets the description of a specific artifact archetype
+     *
+     * @param archetypeId The identifier of the archetype
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactArchetype(String archetypeId) {
+        return doRequest(
+                "kernel/business/archetypes/" + URIUtils.encodeComponent(archetypeId),
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the description of the available artifact schemas
+     *
+     * @return The protocol reply
+     */
     public XSPReply getArtifactSchemas() {
-        return doRequest("kernel/business/schemas", null, "GET", null, null);
+        return doRequest(
+                "kernel/business/schemas",
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getArtifactSchema(schemaId) {
-        return doRequest("kernel/business/schemas/" +  URIUtils.encodeComponent(schemaId), null, "GET", null, null);
+    /**
+     * Gets the description of a specific artifact schema
+     *
+     * @param schemaId The identifier of the schema
+     * @return The protocol reply
+     */
+    public XSPReply getArtifactSchema(String schemaId) {
+        return doRequest(
+                "kernel/business/schemas/" + URIUtils.encodeComponent(schemaId),
+                HttpConstants.METHOD_GET);
     }
-*/
 
-
-/*****************************************************
- * Webapp - Web Modules Directory Service
- ****************************************************/
-/*
+    /**
+     * Gets a list of the modules for the web application UI
+     *
+     * @return The protocol reply
+     */
     public XSPReply getWebModules() {
-        return doRequest("services/webapp/modules", null, "GET", null, null);
+        return doRequest("services/webapp/modules", HttpConstants.METHOD_GET);
     }
-*/
 
 
 /*****************************************************
@@ -710,11 +749,11 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationManifest() {
-        return doRequest("services/collaboration/manifest", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getCollaborationInputSpecifications() {
-        return doRequest("services/collaboration/manifest/inputs", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/inputs", HttpConstants.METHOD_GET);
     }
 
     public XSPReply addCollaborationInputSpecification(specification) {
@@ -726,7 +765,7 @@ public class RemotePlatform {
     }
 
     public XSPReply getArtifactsForCollaborationInput(specificationId) {
-        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
     public XSPReply registerArtifactForCollaborationInput(specificationId, artifactId) {
@@ -738,7 +777,7 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationOutputSpecifications() {
-        return doRequest("services/collaboration/manifest/outputs", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/outputs", HttpConstants.METHOD_GET);
     }
 
     public XSPReply addCollaborationOutputSpecification(specification) {
@@ -750,7 +789,7 @@ public class RemotePlatform {
     }
 
     public XSPReply getArtifactsForCollaborationOutput(specificationId) {
-        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
     public XSPReply registerArtifactForCollaborationOutput(specificationId, artifactId) {
@@ -762,7 +801,7 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationRoles() {
-        return doRequest("services/collaboration/manifest/roles", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/roles", HttpConstants.METHOD_GET);
     }
 
     public XSPReply createCollaborationRole(role) {
@@ -778,19 +817,19 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationPattern() {
-        return doRequest("services/collaboration/manifest/pattern", null, "GET", null, null);
+        return doRequest("services/collaboration/manifest/pattern", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getKnownIOSpecifications() {
-        return doRequest("services/collaboration/specifications", null, "GET", null, null);
+        return doRequest("services/collaboration/specifications", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getKnownPatterns() {
-        return doRequest("services/collaboration/patterns", null, "GET", null, null);
+        return doRequest("services/collaboration/patterns", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getCollaborationNeighbours() {
-        return doRequest("services/collaboration/neighbours", null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours", HttpConstants.METHOD_GET);
     }
 
     public XSPReply spawnCollaboration(specification) {
@@ -798,15 +837,15 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationNeighbour(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId), null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply getCollaborationNeighbourManifest(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest", null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getCollaborationNeighbourStatus(neighbourId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/status", null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/status", HttpConstants.METHOD_GET);
     }
 
     public XSPReply deleteCollaborationNeighbour(neighbourId) {
@@ -822,11 +861,11 @@ public class RemotePlatform {
     }
 
     public XSPReply getCollaborationNeighbourInputs(neighbourId, specificationId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getCollaborationNeighbourOutputs(neighbourId, specificationId) {
-        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", null, "GET", null, null);
+        return doRequest("services/collaboration/neighbours/" +  URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 */
 
@@ -836,15 +875,15 @@ public class RemotePlatform {
  ****************************************************/
 /*
     public XSPReply getDescriptors() {
-        return doRequest("services/connection/descriptors", null, "GET", null, null);
+        return doRequest("services/connection/descriptors", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getConnectors() {
-        return doRequest("services/connection/connectors", null, "GET", null, null);
+        return doRequest("services/connection/connectors", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getConnector(connectorId) {
-        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), null, "GET", null, null);
+        return doRequest("services/connection/connectors/" +  URIUtils.encodeComponent(connectorId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply createConnector(descriptor, definition) {
@@ -874,11 +913,11 @@ public class RemotePlatform {
     }
 
     public XSPReply getAllArtifacts() {
-        return doRequest("services/storage/artifacts", null, "GET", null, null);
+        return doRequest("services/storage/artifacts", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getLiveArtifacts() {
-        return doRequest("services/storage/artifacts/live", null, "GET", null, null);
+        return doRequest("services/storage/artifacts/live", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getArtifactsForBase(base) {
@@ -890,7 +929,7 @@ public class RemotePlatform {
     }
 
     public XSPReply getArtifact(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "GET", null, null);
+        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply getArtifactMetadata(artifactId) {
@@ -898,7 +937,7 @@ public class RemotePlatform {
             } else {
                 (code, type, content);
             }
-        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/metadata", null, "GET", null, null);
+        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/metadata", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getArtifactContent(artifactId) {
@@ -906,7 +945,7 @@ public class RemotePlatform {
             } else {
                 (code, type, content);
             }
-        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/content", null, "GET", null, null);
+        }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/content", HttpConstants.METHOD_GET);
     }
 
     public XSPReply deleteArtifact(artifactId) {
@@ -943,19 +982,19 @@ public class RemotePlatform {
  ****************************************************/
 /*
     public XSPReply getUploadedDocuments() {
-        return doRequest("services/importation/documents", null, "GET", null, null);
+        return doRequest("services/importation/documents", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getUploadedDocument(docId) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), null, "GET", null, null);
+        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply getDocumentImporters() {
-        return doRequest("services/importation/importers", null, "GET", null, null);
+        return doRequest("services/importation/importers", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getDocumentImporter(importerId) {
-        return doRequest("services/importation/importers/" +  URIUtils.encodeComponent(importerId), null, "GET", null, null);
+        return doRequest("services/importation/importers/" +  URIUtils.encodeComponent(importerId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply getUploadedDocumentPreview(docId, importer, configuration) {
@@ -981,15 +1020,15 @@ public class RemotePlatform {
  ****************************************************/
 /*
     public XSPReply getInconsistencies() {
-        return doRequest("services/consistency/inconsistencies", null, "GET", null, null);
+        return doRequest("services/consistency/inconsistencies", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getConsistencyRules() {
-        return doRequest("services/consistency/rules", null, "GET", null, null);
+        return doRequest("services/consistency/rules", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), null, "GET", null, null);
+        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply newConsistencyRule(name, message, prefixes, conditions) {
@@ -1030,15 +1069,15 @@ public class RemotePlatform {
 
 /*
     public XSPReply getEvaluations() {
-        return doRequest("services/evaluation/evaluations", null, "GET", null, null);
+        return doRequest("services/evaluation/evaluations", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getEvaluation(evaluationId) {
-        return doRequest("services/evaluation/evaluations/" +  URIUtils.encodeComponent(evaluationId), null, "GET", null, null);
+        return doRequest("services/evaluation/evaluations/" +  URIUtils.encodeComponent(evaluationId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply getEvaluableTypes() {
-        return doRequest("services/evaluation/evaluableTypes", null, "GET", null, null);
+        return doRequest("services/evaluation/evaluableTypes", HttpConstants.METHOD_GET);
     }
 
     public XSPReply getEvaluables(typeId) {
@@ -1065,7 +1104,7 @@ public class RemotePlatform {
     }
 
     public XSPReply marketplaceGetAddon(addonId) {
-        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId), null, "GET", null, null);
+        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId), HttpConstants.METHOD_GET);
     }
 
     public XSPReply marketplaceInstallAddon(addonId) {

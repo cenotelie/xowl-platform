@@ -43,7 +43,6 @@
         <module>kernel-impl</module>
         <module>services</module>
         <module>connectors</module>
-        <module>satellites</module>
         <module>distribution</module>
     </modules>
     <build>

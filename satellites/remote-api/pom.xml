@@ -9,7 +9,7 @@
     <artifactId>xowl-remote-api</artifactId>
     <packaging>bundle</packaging>
     <version>0.2.4-SNAPSHOT</version>
-    <name>xOWL Collaboration Platform - Satellite Remote AP*i</name>
+    <name>xOWL Collaboration Platform - Satellite Remote API</name>
     <description>Base API for accessing a remote xOWL Collaboration Platform</description>
     <dependencies>
         <dependency>

@@ -66,10 +66,6 @@ public class RemotePlatform {
         this.deserializer = deserializer;
     }
 
-    /*****************************************************
-     * Kernel - Security Service
-     ****************************************************/
-
     /**
      * Gets whether a user is logged-in
      *
@@ -268,182 +264,422 @@ public class RemotePlatform {
                 HttpConstants.METHOD_GET,
                 null);
     }
-/*
-    public XSPReply getPlatformGroup(groupId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId), null, "GET", null, null);
+
+    /**
+     * Gets the a group on the target platform
+     *
+     * @param groupId The identifier of the group
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformGroup(String groupId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId),
+                HttpConstants.METHOD_GET,
+                null);
     }
 
-    public XSPReply createPlatformGroup(groupId, name, admin) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId), {name:name, admin:admin},
-        "PUT", null, null);
+    /**
+     * Creates a new group on the platform
+     *
+     * @param groupId The identifier of the new group
+     * @param name    The name for the group
+     * @param adminId The identifier of the first administrator for the group
+     * @return The protocol reply
+     */
+    public XSPReply createPlatformGroup(String groupId, String name, String adminId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "?name=" + URIUtils.encodeComponent(name) + "&admin=" + URIUtils.encodeComponent(adminId),
+                HttpConstants.METHOD_PUT,
+                null);
     }
 
-    public XSPReply deletePlatformGroup(groupId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId), null, "DELETE", null, null);
+    /**
+     * Deletes a group from the platform
+     *
+     * @param groupId The identifier of the group to delete
+     * @return The protocol reply
+     */
+    public XSPReply deletePlatformGroup(String groupId) {
+        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId),
+                HttpConstants.METHOD_DELETE,
+                null);
     }
 
-    public XSPReply renamePlatformGroup(groupId, name) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/rename", {name:name},
-        "POST", null, null);
+    /**
+     * Renames a group on the platform
+     *
+     * @param groupId The identifier of the group
+     * @param name    The new name for the group
+     * @return The protocol reply
+     */
+    public XSPReply renamePlatformGroup(String groupId, String name) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/rename?name=" + URIUtils.encodeComponent(name),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply addMemberToPlatformGroup(groupId, userId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addMember", {user:userId},
-        "POST", null, null);
+    /**
+     * Adds a member to a group
+     *
+     * @param groupId The identifier of the group
+     * @param userId  The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply addMemberToPlatformGroup(String groupId, String userId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addMember?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply removeMemberFromPlatformGroup(groupId, userId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeMember", {user:userId},
-        "POST", null, null);
+    /**
+     * Removes a member from a group
+     *
+     * @param groupId The identifier of the group
+     * @param userId  The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply removeMemberFromPlatformGroup(String groupId, String userId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeMember?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply addAdminToPlatformGroup(groupId, userId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addAdmin", {user:userId},
-        "POST", null, null);
+    /**
+     * Adds an administrator member to a group
+     *
+     * @param groupId The identifier of the group
+     * @param userId  The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply addAdminToPlatformGroup(String groupId, String userId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addAdmin?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply removeAdminFromPlatformGroup(groupId, userId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeAdmin", {user:userId},
-        "POST", null, null);
+    /**
+     * Removes an administrator member from a group
+     *
+     * @param groupId The identifier of the group
+     * @param userId  The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply removeAdminFromPlatformGroup(String groupId, String userId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeAdmin?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply getPlatformRoles(callback) {
-        return doRequest("kernel/security/roles", null, "GET", null, null);
+    /**
+     * Gets the roles on the platform
+     *
+     * @return the protocol reply
+     */
+    public XSPReply getPlatformRoles() {
+        return doRequest(
+                "kernel/security/roles",
+                HttpConstants.METHOD_GET,
+                null);
     }
 
-    public XSPReply getPlatformRole(roleId) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId), null, "GET", null, null);
+    /**
+     * Gets a role on the platform
+     *
+     * @param roleId The identifier of the role
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformRole(String roleId) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_GET,
+                null);
     }
 
-    public XSPReply createPlatformRole(roleId, name) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId), {name:name},"PUT", null, null);
+    /**
+     * Creates a new role on the platform
+     *
+     * @param roleId The identifier for the new role
+     * @param name   The name for the new role
+     * @return The protocol reply
+     */
+    public XSPReply createPlatformRole(String roleId, String name) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "?name=" + URIUtils.encodeComponent(name),
+                HttpConstants.METHOD_PUT,
+                null);
     }
 
-    public XSPReply deletePlatformRole(roleId) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId), null, "DELETE", null, null);
+    /**
+     * Deletes a role from the platform
+     *
+     * @param roleId The identifier of the role
+     * @return The protocol reply
+     */
+    public XSPReply deletePlatformRole(String roleId) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_DELETE,
+                null);
     }
 
-    public XSPReply renamePlatformRole(roleId, name) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/rename", {name:name},
-        "POST", null, null);
+    /**
+     * Renames a role on the platform
+     *
+     * @param roleId The identifier of the role
+     * @param name   The new name for the role
+     * @return The protocol reply
+     */
+    public XSPReply renamePlatformRole(String roleId, String name) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/rename?name=" + URIUtils.encodeComponent(name),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply assignRoleToPlatformUser(roleId, userId) {
-        return doRequest("kernel/security/users/" + URIUtils.encodeComponent(userId) + "/assign", {role:roleId},
-        "POST", null, null);
+    /**
+     * Assigns a platform role to a user
+     *
+     * @param roleId The identifier of the role
+     * @param userId The identifier of the target user
+     * @return The protocol reply
+     */
+    public XSPReply assignRoleToPlatformUser(String roleId, String userId) {
+        return doRequest(
+                "kernel/security/users/" + URIUtils.encodeComponent(userId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply unassignRoleFromPlatformUser(roleId, userId) {
-        return doRequest("kernel/security/users/" + URIUtils.encodeComponent(userId) + "/unassign", {role:roleId},
-        "POST", null, null);
+    /**
+     * Un-assigns a platform role from a user
+     *
+     * @param roleId The identifier of the role
+     * @param userId The identifier of the target user
+     * @return The protocol reply
+     */
+    public XSPReply unassignRoleFromPlatformUser(String roleId, String userId) {
+        return doRequest(
+                "kernel/security/users/" + URIUtils.encodeComponent(userId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply assignRoleToPlatformGroup(roleId, groupId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/assign", {role:roleId},
-        "POST", null, null);
+    /**
+     * Assigns a platform role to a group
+     *
+     * @param roleId  The identifier of the role
+     * @param groupId The identifier of the target group
+     * @return The protocol reply
+     */
+    public XSPReply assignRoleToPlatformGroup(String roleId, String groupId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply unassignRoleFromPlatformGroup(roleId, groupId) {
-        return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/unassign", {role:roleId},
-        "POST", null, null);
+    /**
+     * Un-assigns a platform role from a group
+     *
+     * @param roleId  The identifier of the role
+     * @param groupId The identifier of the target group
+     * @return The protocol reply
+     */
+    public XSPReply unassignRoleFromPlatformGroup(String roleId, String groupId) {
+        return doRequest(
+                "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply addPlatformRoleImplication(roleId, impliedRoleId) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/imply", {target:impliedRoleId},
-        "POST", null, null);
+    /**
+     * Adds the fact that a role implies another role
+     *
+     * @param roleId        The identifier of a role
+     * @param impliedRoleId The identifier of the role implied by the first one
+     * @return The protocol reply
+     */
+    public XSPReply addPlatformRoleImplication(String roleId, String impliedRoleId) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/imply?target=" + URIUtils.encodeComponent(impliedRoleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-    public XSPReply removePlatformRoleImplication(roleId, impliedRoleId) {
-        return doRequest("kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/unimply", {target:impliedRoleId},
-        "POST", null, null);
+    /**
+     * Removes the fact that a role implies another role
+     *
+     * @param roleId        The identifier of a role
+     * @param impliedRoleId The identifier of the role implied by the first one
+     * @return The protocol reply
+     */
+    public XSPReply removePlatformRoleImplication(String roleId, String impliedRoleId) {
+        return doRequest(
+                "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/unimply?target=" + URIUtils.encodeComponent(impliedRoleId),
+                HttpConstants.METHOD_POST,
+                null);
     }
 
-
-/*****************************************************
- * Kernel - API Discovery Service
- ****************************************************/
-/*
-    public XSPReply getApiResources(callback) {
-        return doRequest("kernel/discovery/resources", null, "GET", null, null);
+    /**
+     * Gets the list of the existing resources for the document of known APIs
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getApiResources() {
+        return doRequest("kernel/discovery/resources", HttpConstants.METHOD_GET, null);
     }
 
-    public XSPReply getApiServices(callback) {
-        return doRequest("kernel/discovery/services", null, "GET", null, null);
-    }
-*/
-
-
-/*****************************************************
- * Kernel - Platform Management Service
- ****************************************************/
-/*
-    public XSPReply getPlatformProduct(callback) {
-        return doRequest("kernel/platform/product", null, "GET", null, null);
+    /**
+     * Gets the list of the known APIs on the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getApiServices() {
+        return doRequest("kernel/discovery/services", HttpConstants.METHOD_GET, null);
     }
 
-    public XSPReply getPlatformBundles(callback) {
-        return doRequest("kernel/platform/bundles", null, "GET", null, null);
+    /**
+     * Gets a description of the platform's product
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformProduct() {
+        return doRequest("kernel/platform/product", HttpConstants.METHOD_GET, null);
     }
 
-    public XSPReply getPlatformAddons(callback) {
-        return doRequest("kernel/platform/addons", null, "GET", null, null);
+    /**
+     * Gets a list of the OSGi bundles deployed on the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformBundles() {
+        return doRequest("kernel/platform/bundles", HttpConstants.METHOD_GET, null);
     }
 
-    public XSPReply getPlatformAddon(addonId) {
-        return doRequest("kernel/platform/addons/" +  URIUtils.encodeComponent(addonId), null, "GET", null, null);
+    /**
+     * Gets a list of the addons currently installed on the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformAddons() {
+        return doRequest("kernel/platform/addons", HttpConstants.METHOD_GET, null);
     }
 
-    public XSPReply installPlatformAddon(addonId, package) {
-        return doRequest("kernel/platform/addons/" +  URIUtils.encodeComponent(addonId), null, "PUT", MIME_OCTET_STREAM, package);
+    /**
+     * Gets a description of an addon installed on the platform
+     *
+     * @param addonId The identifier of an addon
+     * @return The protocol reply
+     */
+    public XSPReply getPlatformAddon(String addonId) {
+        return doRequest(
+                "kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
+                HttpConstants.METHOD_GET,
+                null);
     }
 
-    public XSPReply uninstallPlatformAddon(addonId) {
-        return doRequest("kernel/platform/addons/" +  URIUtils.encodeComponent(addonId), null, "DELETE", null, null);
+    /**
+     * Installs an addon on the platform from the raw data of the addon
+     *
+     * @param addonId The identifier of the addon
+     * @param stream  The data stream containing the addon
+     * @return The protocol reply
+     */
+    public XSPReply installPlatformAddon(String addonId, byte[] stream) {
+        return doRequest("kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
+                HttpConstants.METHOD_PUT,
+                stream,
+                HttpConstants.MIME_OCTET_STREAM,
+                false,
+                HttpConstants.MIME_JSON);
     }
 
-    public XSPReply platformShutdown(callback) {
-        return doRequest("kernel/platform/shutdown", null, "POST", null, null);
+    /**
+     * Un-installs an addon from the platform
+     *
+     * @param addonId The identifier of the addon
+     * @return The protocol reply
+     */
+    public XSPReply uninstallPlatformAddon(String addonId) {
+        return doRequest(
+                "kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
+                HttpConstants.METHOD_DELETE,
+                null);
     }
 
-    public XSPReply platformRestart(callback) {
-        return doRequest("kernel/platform/restart", null, "POST", null, null);
-    }
-*/
-
-
-/*****************************************************
- * Kernel - Logging Service
- ****************************************************/
-/*
-    public XSPReply getLogMessages(callback) {
-        return doRequest("kernel/log", null, "GET", null, null);
-    }
-*/
-
-
-/*****************************************************
- * Kernel - Jobs Management Service
- ****************************************************/
-/*
-    public XSPReply getJobs(callback) {
-        return doRequest("kernel/jobs", null, "GET", null, null);
+    /**
+     * Initiates a complete shutdown of the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply platformShutdown() {
+        return doRequest("kernel/platform/shutdown", HttpConstants.METHOD_POST, null);
     }
 
-    public XSPReply getJob(jobId) {
-        return doRequest("kernel/jobs/" +  URIUtils.encodeComponent(jobId), null, "GET", null, null);
+    /**
+     * Initiates a restart sequence of the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply platformRestart() {
+        return doRequest("kernel/platform/restart", HttpConstants.METHOD_POST, null);
     }
 
-    public XSPReply cancelJob(jobId) {
-        return doRequest("kernel/jobs/" +  URIUtils.encodeComponent(jobId) + "/cancel", null, "POST", null, null);
+    /**
+     * Gets the log messages on the platform
+     *
+     * @return The log messages
+     */
+    public XSPReply getLogMessages() {
+        return doRequest("kernel/log", HttpConstants.METHOD_GET, null);
     }
-*/
+
+    /**
+     * Gets the description of the current jobs on the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getJobs() {
+        return doRequest("kernel/jobs", HttpConstants.METHOD_GET, null);
+    }
+
+    /**
+     * Gets the description of a specific job on the platform
+     *
+     * @param jobId The identifier of the job
+     * @return The protocol reply
+     */
+    public XSPReply getJob(String jobId) {
+        return doRequest(
+                "kernel/jobs/" + URIUtils.encodeComponent(jobId),
+                HttpConstants.METHOD_GET,
+                null);
+    }
+
+    /**
+     * Attempts to cancel a job running on the platform
+     *
+     * @param jobId The identifier of the job
+     * @return The protocol reply
+     */
+    public XSPReply cancelJob(String jobId) {
+        return doRequest(
+                "kernel/jobs/" + URIUtils.encodeComponent(jobId) + "/cancel",
+                HttpConstants.METHOD_POST,
+                null);
+    }
 
 
 /*****************************************************
  * Kernel - Statistics Service
  ****************************************************/
 /*
-    public XSPReply getAllMetrics(callback) {
+    public XSPReply getAllMetrics() {
         return doRequest("kernel/statistics/metrics", null, "GET", null, null);
     }
 
@@ -462,7 +698,7 @@ public class RemotePlatform {
  ****************************************************/
 
 /*
-    public XSPReply getArtifactArchetypes(callback) {
+    public XSPReply getArtifactArchetypes() {
         return doRequest("kernel/business/archetypes", null, "GET", null, null);
     }
 
@@ -470,7 +706,7 @@ public class RemotePlatform {
         return doRequest("kernel/business/archetypes/" +  URIUtils.encodeComponent(archetypeId), null, "GET", null, null);
     }
 
-    public XSPReply getArtifactSchemas(callback) {
+    public XSPReply getArtifactSchemas() {
         return doRequest("kernel/business/schemas", null, "GET", null, null);
     }
 
@@ -484,7 +720,7 @@ public class RemotePlatform {
  * Webapp - Web Modules Directory Service
  ****************************************************/
 /*
-    public XSPReply getWebModules(callback) {
+    public XSPReply getWebModules() {
         return doRequest("services/webapp/modules", null, "GET", null, null);
     }
 */
@@ -494,19 +730,19 @@ public class RemotePlatform {
  * Collaboration - Collaboration Service
  ****************************************************/
 /*
-    public XSPReply archiveCollaboration(callback) {
+    public XSPReply archiveCollaboration() {
         return doRequest("services/collaboration/archive", null, "POST", null, null);
     }
 
-    public XSPReply deleteCollaboration(callback) {
+    public XSPReply deleteCollaboration() {
         return doRequest("services/collaboration/delete", null, "POST", null, null);
     }
 
-    public XSPReply getCollaborationManifest(callback) {
+    public XSPReply getCollaborationManifest() {
         return doRequest("services/collaboration/manifest", null, "GET", null, null);
     }
 
-    public XSPReply getCollaborationInputSpecifications(callback) {
+    public XSPReply getCollaborationInputSpecifications() {
         return doRequest("services/collaboration/manifest/inputs", null, "GET", null, null);
     }
 
@@ -530,7 +766,7 @@ public class RemotePlatform {
         return doRequest("services/collaboration/manifest/inputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "DELETE", null, null);
     }
 
-    public XSPReply getCollaborationOutputSpecifications(callback) {
+    public XSPReply getCollaborationOutputSpecifications() {
         return doRequest("services/collaboration/manifest/outputs", null, "GET", null, null);
     }
 
@@ -554,7 +790,7 @@ public class RemotePlatform {
         return doRequest("services/collaboration/manifest/outputs/" +  URIUtils.encodeComponent(specificationId) + "/artifacts/" +  URIUtils.encodeComponent(artifactId), null, "DELETE", null, null);
     }
 
-    public XSPReply getCollaborationRoles(callback) {
+    public XSPReply getCollaborationRoles() {
         return doRequest("services/collaboration/manifest/roles", null, "GET", null, null);
     }
 
@@ -570,19 +806,19 @@ public class RemotePlatform {
         return doRequest("services/collaboration/manifest/roles/" +  URIUtils.encodeComponent(roleId), null, "DELETE", null, null);
     }
 
-    public XSPReply getCollaborationPattern(callback) {
+    public XSPReply getCollaborationPattern() {
         return doRequest("services/collaboration/manifest/pattern", null, "GET", null, null);
     }
 
-    public XSPReply getKnownIOSpecifications(callback) {
+    public XSPReply getKnownIOSpecifications() {
         return doRequest("services/collaboration/specifications", null, "GET", null, null);
     }
 
-    public XSPReply getKnownPatterns(callback) {
+    public XSPReply getKnownPatterns() {
         return doRequest("services/collaboration/patterns", null, "GET", null, null);
     }
 
-    public XSPReply getCollaborationNeighbours(callback) {
+    public XSPReply getCollaborationNeighbours() {
         return doRequest("services/collaboration/neighbours", null, "GET", null, null);
     }
 
@@ -628,11 +864,11 @@ public class RemotePlatform {
  * Connection - Connection Service
  ****************************************************/
 /*
-    public XSPReply getDescriptors(callback) {
+    public XSPReply getDescriptors() {
         return doRequest("services/connection/descriptors", null, "GET", null, null);
     }
 
-    public XSPReply getConnectors(callback) {
+    public XSPReply getConnectors() {
         return doRequest("services/connection/connectors", null, "GET", null, null);
     }
 
@@ -666,11 +902,11 @@ public class RemotePlatform {
         return doRequest("services/storage/sparql", null, "POST", "application/sparql-query", payload);
     }
 
-    public XSPReply getAllArtifacts(callback) {
+    public XSPReply getAllArtifacts() {
         return doRequest("services/storage/artifacts", null, "GET", null, null);
     }
 
-    public XSPReply getLiveArtifacts(callback) {
+    public XSPReply getLiveArtifacts() {
         return doRequest("services/storage/artifacts/live", null, "GET", null, null);
     }
 
@@ -689,7 +925,7 @@ public class RemotePlatform {
     public XSPReply getArtifactMetadata(artifactId) {
         return doRequest("application/n-quads", content);
             } else {
-                callback(code, type, content);
+                (code, type, content);
             }
         }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/metadata", null, "GET", null, null);
     }
@@ -697,7 +933,7 @@ public class RemotePlatform {
     public XSPReply getArtifactContent(artifactId) {
         return doRequest("application/n-quads", content);
             } else {
-                callback(code, type, content);
+                (code, type, content);
             }
         }, "services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/content", null, "GET", null, null);
     }
@@ -711,12 +947,12 @@ public class RemotePlatform {
                 var rightIndex = content.lastIndexOf("--xowlQuads");
                 var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
                 var contentRight = content.substring(rightIndex + "--xowlQuads".length);
-                callback(code, MIME_JSON, {
+                (code, MIME_JSON, {
                         left: contentLeft,
                         right: contentRight
 			});
             } else {
-                callback(code, type, content);
+                (code, type, content);
             }
         }, "services/storage/artifacts/diff", {left: artifactLeft, right: artifactRight}, "POST", null, null);
     }
@@ -735,7 +971,7 @@ public class RemotePlatform {
  * Importation - Importation Service
  ****************************************************/
 /*
-    public XSPReply getUploadedDocuments(callback) {
+    public XSPReply getUploadedDocuments() {
         return doRequest("services/importation/documents", null, "GET", null, null);
     }
 
@@ -743,7 +979,7 @@ public class RemotePlatform {
         return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), null, "GET", null, null);
     }
 
-    public XSPReply getDocumentImporters(callback) {
+    public XSPReply getDocumentImporters() {
         return doRequest("services/importation/importers", null, "GET", null, null);
     }
 
@@ -773,11 +1009,11 @@ public class RemotePlatform {
  * Consistency - Consistency Service
  ****************************************************/
 /*
-    public XSPReply getInconsistencies(callback) {
+    public XSPReply getInconsistencies() {
         return doRequest("services/consistency/inconsistencies", null, "GET", null, null);
     }
 
-    public XSPReply getConsistencyRules(callback) {
+    public XSPReply getConsistencyRules() {
         return doRequest("services/consistency/rules", null, "GET", null, null);
     }
 
@@ -822,7 +1058,7 @@ public class RemotePlatform {
  ****************************************************/
 
 /*
-    public XSPReply getEvaluations(callback) {
+    public XSPReply getEvaluations() {
         return doRequest("services/evaluation/evaluations", null, "GET", null, null);
     }
 
@@ -830,7 +1066,7 @@ public class RemotePlatform {
         return doRequest("services/evaluation/evaluations/" +  URIUtils.encodeComponent(evaluationId), null, "GET", null, null);
     }
 
-    public XSPReply getEvaluableTypes(callback) {
+    public XSPReply getEvaluableTypes() {
         return doRequest("services/evaluation/evaluableTypes", null, "GET", null, null);
     }
 

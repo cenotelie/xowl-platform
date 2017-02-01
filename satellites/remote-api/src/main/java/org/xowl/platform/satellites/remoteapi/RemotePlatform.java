@@ -97,7 +97,7 @@ public class RemotePlatform {
                 HttpConstants.METHOD_POST,
                 password,
                 HttpConstants.MIME_TEXT_PLAIN,
-                HttpConstants.MIME_TEXT_PLAIN
+                HttpConstants.MIME_JSON
         );
         XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
         if (reply.isSuccess()) {
@@ -122,7 +122,7 @@ public class RemotePlatform {
             return XSPReplyNetworkError.instance();
         HttpResponse response = connection.request("/kernel/security/logout",
                 HttpConstants.METHOD_POST,
-                HttpConstants.MIME_TEXT_PLAIN
+                HttpConstants.MIME_JSON
         );
         XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
         currentUser = null;
@@ -139,8 +139,7 @@ public class RemotePlatform {
     public XSPReply getSecurityPolicy() {
         return doRequest(
                 "kernel/security/policy",
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -165,8 +164,7 @@ public class RemotePlatform {
     public XSPReply getPlatformUsers() {
         return doRequest(
                 "kernel/security/users",
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -178,8 +176,7 @@ public class RemotePlatform {
     public XSPReply getPlatformUser(String userId) {
         return doRequest(
                 "kernel/security/users/" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -206,8 +203,7 @@ public class RemotePlatform {
     public XSPReply deletePlatformUser(String userId) {
         return doRequest(
                 "kernel/security/users/" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_DELETE,
-                null);
+                HttpConstants.METHOD_DELETE);
     }
 
     /**
@@ -220,8 +216,7 @@ public class RemotePlatform {
     public XSPReply renamePlatformUser(String userId, String name) {
         return doRequest(
                 "kernel/security/users/" + URIUtils.encodeComponent(userId) + "/rename" + "?name=" + URIUtils.encodeComponent(name),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -261,8 +256,7 @@ public class RemotePlatform {
     public XSPReply getPlatformGroups() {
         return doRequest(
                 "kernel/security/groups",
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -274,8 +268,7 @@ public class RemotePlatform {
     public XSPReply getPlatformGroup(String groupId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId),
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -289,8 +282,7 @@ public class RemotePlatform {
     public XSPReply createPlatformGroup(String groupId, String name, String adminId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "?name=" + URIUtils.encodeComponent(name) + "&admin=" + URIUtils.encodeComponent(adminId),
-                HttpConstants.METHOD_PUT,
-                null);
+                HttpConstants.METHOD_PUT);
     }
 
     /**
@@ -301,8 +293,7 @@ public class RemotePlatform {
      */
     public XSPReply deletePlatformGroup(String groupId) {
         return doRequest("kernel/security/groups/" + URIUtils.encodeComponent(groupId),
-                HttpConstants.METHOD_DELETE,
-                null);
+                HttpConstants.METHOD_DELETE);
     }
 
     /**
@@ -315,8 +306,7 @@ public class RemotePlatform {
     public XSPReply renamePlatformGroup(String groupId, String name) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/rename?name=" + URIUtils.encodeComponent(name),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -329,8 +319,7 @@ public class RemotePlatform {
     public XSPReply addMemberToPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addMember?user=" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -343,8 +332,7 @@ public class RemotePlatform {
     public XSPReply removeMemberFromPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeMember?user=" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -357,8 +345,7 @@ public class RemotePlatform {
     public XSPReply addAdminToPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addAdmin?user=" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -371,8 +358,7 @@ public class RemotePlatform {
     public XSPReply removeAdminFromPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeAdmin?user=" + URIUtils.encodeComponent(userId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -383,8 +369,7 @@ public class RemotePlatform {
     public XSPReply getPlatformRoles() {
         return doRequest(
                 "kernel/security/roles",
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -396,8 +381,7 @@ public class RemotePlatform {
     public XSPReply getPlatformRole(String roleId) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -410,8 +394,7 @@ public class RemotePlatform {
     public XSPReply createPlatformRole(String roleId, String name) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "?name=" + URIUtils.encodeComponent(name),
-                HttpConstants.METHOD_PUT,
-                null);
+                HttpConstants.METHOD_PUT);
     }
 
     /**
@@ -423,8 +406,7 @@ public class RemotePlatform {
     public XSPReply deletePlatformRole(String roleId) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_DELETE,
-                null);
+                HttpConstants.METHOD_DELETE);
     }
 
     /**
@@ -437,8 +419,7 @@ public class RemotePlatform {
     public XSPReply renamePlatformRole(String roleId, String name) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/rename?name=" + URIUtils.encodeComponent(name),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -451,8 +432,7 @@ public class RemotePlatform {
     public XSPReply assignRoleToPlatformUser(String roleId, String userId) {
         return doRequest(
                 "kernel/security/users/" + URIUtils.encodeComponent(userId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -465,8 +445,7 @@ public class RemotePlatform {
     public XSPReply unassignRoleFromPlatformUser(String roleId, String userId) {
         return doRequest(
                 "kernel/security/users/" + URIUtils.encodeComponent(userId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -479,8 +458,7 @@ public class RemotePlatform {
     public XSPReply assignRoleToPlatformGroup(String roleId, String groupId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -493,8 +471,7 @@ public class RemotePlatform {
     public XSPReply unassignRoleFromPlatformGroup(String roleId, String groupId) {
         return doRequest(
                 "kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -507,8 +484,7 @@ public class RemotePlatform {
     public XSPReply addPlatformRoleImplication(String roleId, String impliedRoleId) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/imply?target=" + URIUtils.encodeComponent(impliedRoleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -521,8 +497,7 @@ public class RemotePlatform {
     public XSPReply removePlatformRoleImplication(String roleId, String impliedRoleId) {
         return doRequest(
                 "kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/unimply?target=" + URIUtils.encodeComponent(impliedRoleId),
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -531,7 +506,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getApiResources() {
-        return doRequest("kernel/discovery/resources", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/discovery/resources", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -540,7 +515,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getApiServices() {
-        return doRequest("kernel/discovery/services", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/discovery/services", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -549,7 +524,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getPlatformProduct() {
-        return doRequest("kernel/platform/product", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/platform/product", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -558,7 +533,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getPlatformBundles() {
-        return doRequest("kernel/platform/bundles", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/platform/bundles", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -567,7 +542,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getPlatformAddons() {
-        return doRequest("kernel/platform/addons", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/platform/addons", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -579,8 +554,7 @@ public class RemotePlatform {
     public XSPReply getPlatformAddon(String addonId) {
         return doRequest(
                 "kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -608,8 +582,7 @@ public class RemotePlatform {
     public XSPReply uninstallPlatformAddon(String addonId) {
         return doRequest(
                 "kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
-                HttpConstants.METHOD_DELETE,
-                null);
+                HttpConstants.METHOD_DELETE);
     }
 
     /**
@@ -618,7 +591,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply platformShutdown() {
-        return doRequest("kernel/platform/shutdown", HttpConstants.METHOD_POST, null);
+        return doRequest("kernel/platform/shutdown", HttpConstants.METHOD_POST);
     }
 
     /**
@@ -627,7 +600,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply platformRestart() {
-        return doRequest("kernel/platform/restart", HttpConstants.METHOD_POST, null);
+        return doRequest("kernel/platform/restart", HttpConstants.METHOD_POST);
     }
 
     /**
@@ -636,7 +609,7 @@ public class RemotePlatform {
      * @return The log messages
      */
     public XSPReply getLogMessages() {
-        return doRequest("kernel/log", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/log", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -645,7 +618,7 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply getJobs() {
-        return doRequest("kernel/jobs", HttpConstants.METHOD_GET, null);
+        return doRequest("kernel/jobs", HttpConstants.METHOD_GET);
     }
 
     /**
@@ -657,8 +630,7 @@ public class RemotePlatform {
     public XSPReply getJob(String jobId) {
         return doRequest(
                 "kernel/jobs/" + URIUtils.encodeComponent(jobId),
-                HttpConstants.METHOD_GET,
-                null);
+                HttpConstants.METHOD_GET);
     }
 
     /**
@@ -670,8 +642,7 @@ public class RemotePlatform {
     public XSPReply cancelJob(String jobId) {
         return doRequest(
                 "kernel/jobs/" + URIUtils.encodeComponent(jobId) + "/cancel",
-                HttpConstants.METHOD_POST,
-                null);
+                HttpConstants.METHOD_POST);
     }
 
 
@@ -1109,6 +1080,17 @@ public class RemotePlatform {
     /*****************************************************
      * Utility API
      ****************************************************/
+
+    /**
+     * Sends an HTTP request to the endpoint, completed with an URI complement
+     *
+     * @param uriComplement The URI complement to append to the original endpoint URI, if any
+     * @param method        The HTTP method to use, if any
+     * @return The response, or null if the request failed before reaching the server
+     */
+    public XSPReply doRequest(String uriComplement, String method) {
+        return doRequest(uriComplement, method, null, HttpConstants.MIME_TEXT_PLAIN, false, HttpConstants.MIME_JSON);
+    }
 
     /**
      * Sends an HTTP request to the endpoint, completed with an URI complement

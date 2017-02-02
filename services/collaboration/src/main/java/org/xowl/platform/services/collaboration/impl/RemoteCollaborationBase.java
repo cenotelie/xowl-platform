@@ -159,13 +159,16 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(RemoteCollaboration.class.getCanonicalName()) +
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(RemoteCollaboration.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(getIdentifier()) +
+                TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(getName()) +
+                TextUtils.escapeStringJSON(name) +
                 "\", \"status\": \"" +
                 TextUtils.escapeStringJSON(getStatus().toString()) +
+                "\", \"endpoint\": \"" +
+                TextUtils.escapeStringJSON(endpoint) +
                 "\"}";
     }
 }

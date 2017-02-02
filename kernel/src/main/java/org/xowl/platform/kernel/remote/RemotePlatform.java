@@ -18,6 +18,8 @@
 package org.xowl.platform.kernel.remote;
 
 import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.Repository;
+import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
@@ -1189,7 +1191,7 @@ public class RemotePlatform {
         return doRequest("services/storage/sparql",
                 HttpConstants.METHOD_POST,
                 query.getBytes(Files.CHARSET),
-                "application/sparql-query",
+                Command.MIME_SPARQL_QUERY,
                 false,
                 HttpConstants.MIME_JSON);
     }
@@ -1261,8 +1263,7 @@ public class RemotePlatform {
                 null,
                 HttpConstants.MIME_TEXT_PLAIN,
                 false,
-                "application/n-quads"
-        );
+                Repository.SYNTAX_NQUADS);
     }
 
     /**
@@ -1278,8 +1279,7 @@ public class RemotePlatform {
                 null,
                 HttpConstants.MIME_TEXT_PLAIN,
                 false,
-                "application/n-quads"
-        );
+                Repository.SYNTAX_NQUADS);
     }
 
     /**
@@ -1480,7 +1480,7 @@ public class RemotePlatform {
                         "&prefixes=" + URIUtils.encodeComponent(prefixes),
                 HttpConstants.METHOD_PUT,
                 conditions.getBytes(Files.CHARSET),
-                "application/x-xowl-rdft",
+                Repository.SYNTAX_RDFT,
                 false,
                 HttpConstants.MIME_JSON);
     }
@@ -1521,73 +1521,121 @@ public class RemotePlatform {
                 HttpConstants.METHOD_DELETE);
     }
 
-
-/*****************************************************
- * Impact - Impact Analysis Service
- ****************************************************/
-/*
-    public XSPReply newImpactAnalysis(definition) {
-        return doRequest("services/impact", null, "POST", MIME_JSON, definition);
+    /**
+     * Launches a new impact analysis
+     *
+     * @param definition The specification for the analysis
+     * @return
+     */
+    public XSPReply newImpactAnalysis(Serializable definition) {
+        return doRequest(
+                "services/impact",
+                HttpConstants.METHOD_POST,
+                definition);
     }
-*/
 
-
-/*****************************************************
- * Evaluation - Evaluation Service
- ****************************************************/
-
-/*
+    /**
+     * Gets the description of the current evaluations
+     *
+     * @return The protocol reply
+     */
     public XSPReply getEvaluations() {
         return doRequest("services/evaluation/evaluations", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getEvaluation(evaluationId) {
-        return doRequest("services/evaluation/evaluations/" +  URIUtils.encodeComponent(evaluationId), HttpConstants.METHOD_GET);
+    /**
+     * Gets the description a specification evaluation
+     *
+     * @param evaluationId The identifier of an evaluation
+     * @return The protocol reply
+     */
+    public XSPReply getEvaluation(String evaluationId) {
+        return doRequest(
+                "services/evaluation/evaluations/" + URIUtils.encodeComponent(evaluationId),
+                HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the list of the known types of elements that can be the subject of an evaluation
+     *
+     * @return The protocol reply
+     */
     public XSPReply getEvaluableTypes() {
         return doRequest("services/evaluation/evaluableTypes", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getEvaluables(typeId) {
-        return doRequest("services/evaluation/evaluables", {type: typeId}, "GET", null, null);
-    }
-
-    public XSPReply getEvaluationCriteria(typeId) {
-        return doRequest("services/evaluation/criterionTypes", {'for': typeId}, "GET", null, null);
-    }
-
-    public XSPReply newEvaluation(definition) {
-        return doRequest("services/evaluation/evaluations", null, "PUT", MIME_JSON, definition);
-    }
-    */
-
-
-/*****************************************************
- * Marketplace - Marketplace service
- ****************************************************/
-
-    /*
-    public XSPReply marketplaceLookupAddons(input) {
-        return doRequest("services/marketplace/addons", {input: input}, "GET", null, null);
-    }
-
-    public XSPReply marketplaceGetAddon(addonId) {
-        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId), HttpConstants.METHOD_GET);
-    }
-
-    public XSPReply marketplaceInstallAddon(addonId) {
-        return doRequest("services/marketplace/addons/" +  URIUtils.encodeComponent(addonId) + "/install", HttpConstants.METHOD_POST);
-    }
-    
-    
-    
+    /**
+     * Gets the list of evaluable elements for a certain type
+     *
+     * @param typeId The identifier of the evaluable type
+     * @return The protocol reply
      */
+    public XSPReply getEvaluables(String typeId) {
+        return doRequest(
+                "services/evaluation/evaluables?type=" + URIUtils.encodeComponent(typeId),
+                HttpConstants.METHOD_GET);
+    }
 
+    /**
+     * Gets the description of the possible criteria for a type of evaluable element
+     *
+     * @param typeId The identifier of the evaluable type
+     * @return The protocol reply
+     */
+    public XSPReply getEvaluationCriteria(String typeId) {
+        return doRequest(
+                "services/evaluation/criterionTypes?for=typeId" + URIUtils.encodeComponent(typeId),
+                HttpConstants.METHOD_GET);
+    }
 
-    /*****************************************************
-     * Utility API
-     ****************************************************/
+    /**
+     * Creates a new evaluation from the specified definition
+     *
+     * @param definition the definition of an evaluation
+     * @return The protocol reply
+     */
+    public XSPReply newEvaluation(Serializable definition) {
+        return doRequest(
+                "services/evaluation/evaluations",
+                HttpConstants.METHOD_PUT,
+                definition);
+    }
+
+    /**
+     * Lookups available addons in the current marketplace that match the specified input
+     *
+     * @param input The input string to look for
+     * @return The protocol reply
+     */
+    public XSPReply marketplaceLookupAddons(String input) {
+        return doRequest(
+                "services/marketplace/addons?input=" + URIUtils.encodeComponent(input),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific addon
+     *
+     * @param addonId The identifier of the addon in the marketplace
+     * @return The protocol reply
+     */
+    public XSPReply marketplaceGetAddon(String addonId) {
+        return doRequest(
+                "services/marketplace/addons/" + URIUtils.encodeComponent(addonId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Requests the installation of an addon from the marketplace
+     *
+     * @param addonId The identifier of the addon in the marketplace
+     * @return The protocol reply
+     */
+    public XSPReply marketplaceInstallAddon(String addonId) {
+        return doRequest(
+                "services/marketplace/addons/" + URIUtils.encodeComponent(addonId) + "/install",
+                HttpConstants.METHOD_POST);
+    }
 
     /**
      * Sends an HTTP request to the endpoint, completed with an URI complement

@@ -25,6 +25,7 @@ import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
@@ -90,9 +91,10 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (networkService == null) {
             ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
             Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-            String identifier = configuration.get("network", "service");
+            Section configNetwork = configuration.getSection("network");
+            String identifier = configNetwork.get("service");
             for (CollaborationNetworkServiceProvider provider : Register.getComponents(CollaborationNetworkServiceProvider.class)) {
-                networkService = provider.instantiate(identifier);
+                networkService = provider.instantiate(identifier, configNetwork);
                 if (networkService != null)
                     break;
             }

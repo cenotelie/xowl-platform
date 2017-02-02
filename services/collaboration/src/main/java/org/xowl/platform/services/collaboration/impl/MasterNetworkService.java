@@ -23,10 +23,13 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.Env;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -91,10 +94,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
     /**
      * Initializes this service
+     *
+     * @param configuration The configuration for this service
      */
-    public MasterNetworkService() {
-        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(MasterNetworkService.class.getCanonicalName());
+    public MasterNetworkService(Section configuration) {
         File storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
         this.storageDistributions = new File(storage, "platforms");
         this.storageInstances = new File(storage, "instances");

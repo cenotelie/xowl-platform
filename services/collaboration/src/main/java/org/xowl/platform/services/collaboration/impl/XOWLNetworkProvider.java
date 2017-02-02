@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkServiceProvider;
@@ -38,13 +39,13 @@ public class XOWLNetworkProvider implements CollaborationNetworkServiceProvider 
     }
 
     @Override
-    public CollaborationNetworkService instantiate(String identifier) {
+    public CollaborationNetworkService instantiate(String identifier, Section configuration) {
         if (StandaloneNetworkService.class.getCanonicalName().equals(identifier))
             return new StandaloneNetworkService();
         if (MasterNetworkService.class.getCanonicalName().equals(identifier))
-            return new MasterNetworkService();
+            return new MasterNetworkService(configuration);
         if (SlaveNetworkService.class.getCanonicalName().equals(identifier))
-            return new SlaveNetworkService();
+            return new SlaveNetworkService(configuration);
         return null;
     }
 }

@@ -20,9 +20,8 @@ package org.xowl.platform.services.collaboration.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.infra.utils.config.Configuration;
+import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConnection;
-import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -58,10 +57,10 @@ public class SlaveNetworkService implements CollaborationNetworkService {
 
     /**
      * Initializes this service
+     *
+     * @param configuration The configuration for this service
      */
-    public SlaveNetworkService() {
-        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(SlaveNetworkService.class.getCanonicalName());
+    public SlaveNetworkService(Section configuration) {
         this.connection = new HttpConnection(configuration.get("master"));
         this.login = configuration.get("login");
         this.password = configuration.get("password");

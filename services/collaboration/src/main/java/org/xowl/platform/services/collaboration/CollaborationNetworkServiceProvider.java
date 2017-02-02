@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
+import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -28,8 +29,9 @@ public interface CollaborationNetworkServiceProvider extends Registrable {
     /**
      * Tries to newPolicy a collaboration network service
      *
-     * @param identifier The identifier of the service
+     * @param identifier    The identifier of the service
+     * @param configuration The configuration for the service
      * @return The instance, or null if it cannot be created
      */
-    CollaborationNetworkService instantiate(String identifier);
+    CollaborationNetworkService instantiate(String identifier, Section configuration);
 }

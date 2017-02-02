@@ -19,11 +19,9 @@ package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
-import org.xowl.platform.services.connection.ConnectorDescriptorParam;
 import org.xowl.platform.services.connection.ConnectorService;
+import org.xowl.platform.services.connection.ConnectorServiceData;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
-
-import java.util.Map;
 
 /**
  * The factory for Semantic Web connectors
@@ -42,7 +40,7 @@ public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
     }
 
     @Override
-    public ConnectorService newConnector(ConnectorDescriptor descriptor, String identifier, String name, String[] uris, Map<ConnectorDescriptorParam, Object> parameters) {
-        return new SemanticWebConnector(identifier, name, uris);
+    public ConnectorService newConnector(ConnectorDescriptor descriptor, ConnectorServiceData specification) {
+        return new SemanticWebConnector(specification);
     }
 }

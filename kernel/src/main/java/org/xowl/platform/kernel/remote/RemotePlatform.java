@@ -778,7 +778,7 @@ public class RemotePlatform {
      * @param specification The input specification
      * @return The protocol reply
      */
-    public XSPReply addCollaborationInputSpecification(Object specification) {
+    public XSPReply addCollaborationInputSpecification(Serializable specification) {
         return doRequest(
                 "services/collaboration/manifest/inputs",
                 HttpConstants.METHOD_PUT,
@@ -848,7 +848,7 @@ public class RemotePlatform {
      * @param specification The output specification
      * @return The protocol reply
      */
-    public XSPReply addCollaborationOutputSpecification(Object specification) {
+    public XSPReply addCollaborationOutputSpecification(Serializable specification) {
         return doRequest(
                 "services/collaboration/manifest/outputs",
                 HttpConstants.METHOD_PUT,
@@ -993,7 +993,7 @@ public class RemotePlatform {
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    public XSPReply spawnCollaboration(Object specification) {
+    public XSPReply spawnCollaboration(Serializable specification) {
         return doRequest(
                 "services/collaboration/neighbours",
                 HttpConstants.METHOD_PUT,
@@ -1296,111 +1296,230 @@ public class RemotePlatform {
 
     /**
      * Computes the diff between two artifacts
-     * @param artifactLeft The identifier of the artifact on the left
+     *
+     * @param artifactLeft  The identifier of the artifact on the left
      * @param artifactRight The identifier of the artifact on the right
      * @return The protocol reply
      */
-    /*
+
     public XSPReply diffArtifacts(String artifactLeft, String artifactRight) {
-        this.doRequest(function (code, type, content) {
-            if (code === 200) {
-                var leftIndex = content.indexOf("--xowlQuads");
-                var rightIndex = content.lastIndexOf("--xowlQuads");
-                var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
-                var contentRight = content.substring(rightIndex + "--xowlQuads".length);
-                callback(code, MIME_JSON, {
-                        left: contentLeft,
-                        right: contentRight
-			});
-            } else {
-                callback(code, type, content);
-            }
-        }, "services/storage/artifacts/diff", {left: artifactLeft, right: artifactRight}, "POST", null, null);
+        return doRequest(
+                "services/storage/artifacts/diff?left=" + URIUtils.encodeComponent(artifactLeft) + "&right=" + URIUtils.encodeComponent(artifactRight),
+                HttpConstants.METHOD_POST);
     }
 
-    public XSPReply pullArtifactFromLive(artifactId) {
-        return doRequest("services/storage/artifacts/" +  URIUtils.encodeComponent(artifactId) + "/deactivate", HttpConstants.METHOD_POST);
+    /**
+     * Activates an artifact for live reasoning
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply pullArtifactFromLive(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/deactivate",
+                HttpConstants.METHOD_POST);
     }
 
-    public XSPReply pushArtifactToLive(artifactId){
-        return doRequest("services/storage/artifacts/"+URIUtils.encodeComponent(artifactId)+"/activate",HttpConstants.METHOD_POST);
-        }
-*/
+    /**
+     * De-activates an artifact for live reasoning
+     *
+     * @param artifactId The identifier of the artifact
+     * @return The protocol reply
+     */
+    public XSPReply pushArtifactToLive(String artifactId) {
+        return doRequest(
+                "services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/activate",
+                HttpConstants.METHOD_POST);
+    }
 
-/*****************************************************
- * Importation - Importation Service
- ****************************************************/
-/*
+    /**
+     * Gets a description of the uploaded documents
+     *
+     * @return The protocol reply
+     */
     public XSPReply getUploadedDocuments() {
         return doRequest("services/importation/documents", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getUploadedDocument(docId) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), HttpConstants.METHOD_GET);
+    /**
+     * Gets the description of a specific uploaded document
+     *
+     * @param documentId The identifier of the document
+     * @return The protocol reply
+     */
+    public XSPReply getUploadedDocument(String documentId) {
+        return doRequest
+                ("services/importation/documents/" + URIUtils.encodeComponent(documentId),
+                        HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the list of the available importers for uploaded documents
+     *
+     * @return The protocol reply
+     */
     public XSPReply getDocumentImporters() {
         return doRequest("services/importation/importers", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getDocumentImporter(importerId) {
-        return doRequest("services/importation/importers/" +  URIUtils.encodeComponent(importerId), HttpConstants.METHOD_GET);
+    /**
+     * Gets the description ofa specific importer for uploaded documents
+     *
+     * @param importerId The identifier of an importer
+     * @return The protocol reply
+     */
+    public XSPReply getDocumentImporter(String importerId) {
+        return doRequest(
+                "services/importation/importers/" + URIUtils.encodeComponent(importerId),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getUploadedDocumentPreview(docId, importer, configuration) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId) + "/preview", {importer: importer}, "POST", MIME_JSON, configuration);
+    /**
+     * Gets a preview of the result of importing a document
+     *
+     * @param documentId    The identifier of the document to import
+     * @param importerId    The identifier of the importer to user
+     * @param configuration The configuration for the importer
+     * @return The protocol reply
+     */
+    public XSPReply getUploadedDocumentPreview(String documentId, String importerId, Serializable configuration) {
+        return doRequest(
+                "services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview?importer=" + URIUtils.encodeComponent(importerId),
+                HttpConstants.METHOD_POST,
+                configuration);
     }
 
-    public XSPReply dropUploadedDocument(docId) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId), HttpConstants.METHOD_DELETE);
+    /**
+     * Drops (delete) a previously uploaded document
+     *
+     * @param documentId The identifier of the document
+     * @return The protocol reply
+     */
+    public XSPReply dropUploadedDocument(String documentId) {
+        return doRequest(
+                "services/importation/documents/" + URIUtils.encodeComponent(documentId),
+                HttpConstants.METHOD_DELETE);
     }
 
-    public XSPReply importUploadedDocument(docId, importer, configuration) {
-        return doRequest("services/importation/documents/" +  URIUtils.encodeComponent(docId) + "/import", {importer: importer}, "POST", MIME_JSON, configuration);
+    /**
+     * Performs the import of a document
+     *
+     * @param documentId    The identifier of the document to import
+     * @param importerId    The identifier of the importer to user
+     * @param configuration The configuration for the importer
+     * @return The protocol reply
+     */
+    public XSPReply importUploadedDocument(String documentId, String importerId, Serializable configuration) {
+        return doRequest(
+                "services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import?importer=" + URIUtils.encodeComponent(importerId),
+                HttpConstants.METHOD_POST,
+                configuration);
     }
 
-    public XSPReply uploadDocument(name, content, fileName) {
-        return doRequest("services/importation/documents", {name: name, fileName: fileName}, "PUT", MIME_OCTET_STREAM, content);
+    /**
+     * Uploads a document
+     *
+     * @param name     The name for the document
+     * @param fileName The original file name
+     * @param content  The file's content
+     * @return The protocol reply
+     */
+    public XSPReply uploadDocument(String name, String fileName, byte[] content) {
+        return doRequest(
+                "services/importation/documents?name=" + URIUtils.encodeComponent(name) + "&fileName=" + URIUtils.encodeComponent(fileName),
+                HttpConstants.METHOD_PUT,
+                content,
+                HttpConstants.MIME_OCTET_STREAM,
+                false,
+                HttpConstants.MIME_JSON);
     }
-*/
 
-
-/*****************************************************
- * Consistency - Consistency Service
- ****************************************************/
-/*
+    /**
+     * Gets the current inconsistencies in the live data
+     *
+     * @return The protocol reply
+     */
     public XSPReply getInconsistencies() {
         return doRequest("services/consistency/inconsistencies", HttpConstants.METHOD_GET);
     }
 
+    /**
+     * Gets the current consistency rules used to detect inconsistencies in the live data
+     *
+     * @return The protocol reply
+     */
     public XSPReply getConsistencyRules() {
         return doRequest("services/consistency/rules", HttpConstants.METHOD_GET);
     }
 
-    public XSPReply getConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), HttpConstants.METHOD_GET);
+    /**
+     * Gets the description of a specific consistency rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply getConsistencyRule(String ruleId) {
+        return doRequest(
+                "services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_GET);
     }
 
-    public XSPReply newConsistencyRule(name, message, prefixes, conditions) {
-        return doRequest("services/consistency/rules", {
-                name: name,
-                message: message,
-                prefixes: prefixes
-	}, "PUT", "application/x-xowl-rdft", conditions);
+    /**
+     * Creates a new consistency rule
+     *
+     * @param name       The rule's name
+     * @param message    The message produced by the rule
+     * @param prefixes   The prefixes for the rule definition
+     * @param conditions The conditions for matching the rule
+     * @return The protocol reply
+     */
+    public XSPReply newConsistencyRule(String name, String message, String prefixes, String conditions) {
+        return doRequest("services/consistency/rules" +
+                        "?name=" + URIUtils.encodeComponent(name) +
+                        "&message=" + URIUtils.encodeComponent(message) +
+                        "&prefixes=" + URIUtils.encodeComponent(prefixes),
+                HttpConstants.METHOD_PUT,
+                conditions.getBytes(Files.CHARSET),
+                "application/x-xowl-rdft",
+                false,
+                HttpConstants.MIME_JSON);
     }
 
-    public XSPReply activateConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/activate", HttpConstants.METHOD_POST);
+    /**
+     * Activates a consistency rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply activateConsistencyRule(String ruleId) {
+        return doRequest(
+                "services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
+                HttpConstants.METHOD_POST);
     }
 
-    public XSPReply deactivateConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId) + "/deactivate", HttpConstants.METHOD_POST);
+    /**
+     * Deactivates a consistency rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deactivateConsistencyRule(String ruleId) {
+        return doRequest(
+                "services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
+                HttpConstants.METHOD_POST);
     }
 
-    public XSPReply deleteConsistencyRule(ruleId) {
-        return doRequest("services/consistency/rules/" +  URIUtils.encodeComponent(ruleId), HttpConstants.METHOD_DELETE);
+    /**
+     * Deletes a consistency rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deleteConsistencyRule(String ruleId) {
+        return doRequest(
+                "services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_DELETE);
     }
-*/
 
 
 /*****************************************************

@@ -654,11 +654,13 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
-        writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
+        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + Files.LINE_SEPARATOR);
+        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + Files.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getAdded().iterator());
-        writer.write("--xowlQuads" + Files.LINE_SEPARATOR);
+        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + Files.LINE_SEPARATOR);
+        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + Files.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getRemoved().iterator());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY, writer.toString());
     }
 
     /**

@@ -203,6 +203,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <icon>src/main/resources/xowl.png</icon>
+                    <licenseFullText>../LICENSE.txt</licenseFullText>
                     <versionScmTag>${changeSet}</versionScmTag>
                     <versionBuildTag>${env.BUILD_TAG}</versionBuildTag>
                     <versionBuildTimestamp>${timestamp}</versionBuildTimestamp>

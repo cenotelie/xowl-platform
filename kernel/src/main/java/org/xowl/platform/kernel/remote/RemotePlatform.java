@@ -27,6 +27,9 @@ import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.jobs.Job;
+import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
@@ -1710,5 +1713,30 @@ public class RemotePlatform {
                 accept
         );
         return XSPReplyUtils.fromHttpResponse(response, deserializer);
+    }
+
+    /**
+     * Waits for a job to finish
+     *
+     * @param jobId The identifier of the job
+     * @return The job's result, or the error
+     */
+    public XSPReply waitForJob(String jobId) {
+        while (true) {
+            XSPReply reply = getJob(jobId);
+            if (!reply.isSuccess())
+                return reply;
+            Job job = ((XSPReplyResult<Job>) reply).getData();
+            if (job.getStatus() == JobStatus.Completed)
+                return job.getResult();
+            if (job.getStatus() == JobStatus.Cancelled)
+                return job.getResult();
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException exception) {
+                Logging.getDefault().error(exception);
+                return new XSPReplyException(exception);
+            }
+        }
     }
 }

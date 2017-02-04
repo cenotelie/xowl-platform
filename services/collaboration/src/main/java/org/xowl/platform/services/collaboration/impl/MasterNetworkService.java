@@ -32,6 +32,7 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -491,10 +492,22 @@ public class MasterNetworkService implements CollaborationNetworkService {
             return new XSPReplyException(exception);
         }
 
-        // write the collaboration service configuration
+        // write the platform management service configuration
         File instanceConfigDir = new File(instanceDirectory, "config");
-        File serviceCollabConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
+        File servicePlatformConfigFile = new File(instanceConfigDir, PlatformManagementService.class.getCanonicalName() + ".ini");
         Configuration configuration = new Configuration();
+        try {
+            configuration.load(servicePlatformConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.set("httpsPort", Integer.toString(instance.getDescriptor().getPort()));
+            configuration.save(servicePlatformConfigFile.getAbsolutePath(), Files.CHARSET);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
+
+        // write the collaboration service configuration
+        File serviceCollabConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
+        configuration = new Configuration();
         try {
             configuration.load(serviceCollabConfigFile.getAbsolutePath(), Files.CHARSET);
             configuration.set("manifest", "collaboration.json");

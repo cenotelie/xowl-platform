@@ -28,7 +28,7 @@ import org.xowl.platform.services.collaboration.CollaborationStatus;
  *
  * @author Laurent Wouters
  */
-public class FSCollaborationInstance implements Identifiable, Serializable {
+class RemoteCollaborationManagedDescriptor implements Identifiable, Serializable {
     /**
      * The unique identifier for this instance
      */
@@ -49,6 +49,14 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
      * The selected network port for this instance
      */
     private final int port;
+    /**
+     * The login for the master manager
+     */
+    private final String masterLogin;
+    /**
+     * The password for the master manager
+     */
+    private final String masterPassword;
 
     /**
      * Gets the API endpoint for the instance
@@ -87,19 +95,22 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
     }
 
     /**
-     * Initializes this structure
+     * Initializes this structure when provisioning
      *
-     * @param identifier The unique identifier for this instance
-     * @param name       The name for the instance
-     * @param endpoint   The API endpoint for the instance
-     * @param status     The status of the instance
+     * @param identifier     The unique identifier for this instance
+     * @param name           The name for the instance
+     * @param endpoint       The API endpoint for the instance
+     * @param masterLogin    The login for the master manager
+     * @param masterPassword The password for the master manager
      */
-    public FSCollaborationInstance(String identifier, String name, String endpoint, CollaborationStatus status, int port) {
+    public RemoteCollaborationManagedDescriptor(String identifier, String name, String endpoint, int port, String masterLogin, String masterPassword) {
         this.identifier = identifier;
         this.name = name;
         this.endpoint = endpoint;
-        this.status = status;
+        this.status = CollaborationStatus.Provisioning;
         this.port = port;
+        this.masterLogin = masterLogin;
+        this.masterPassword = masterPassword;
     }
 
     /**
@@ -107,12 +118,14 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
      *
      * @param definition The AST node for the serialized definition
      */
-    public FSCollaborationInstance(ASTNode definition) {
+    public RemoteCollaborationManagedDescriptor(ASTNode definition) {
         String identifier = "";
         String name = "";
         String endpoint = "";
         String status = "";
         String port = "";
+        String masterLogin = "";
+        String masterPassword = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -129,8 +142,13 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 status = value.substring(1, value.length() - 1);
             } else if ("port".equals(head)) {
+                port = TextUtils.unescape(member.getChildren().get(1).getValue());
+            } else if ("masterLogin".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                port = value.substring(1, value.length() - 1);
+                masterLogin = value.substring(1, value.length() - 1);
+            } else if ("masterPassword".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                masterPassword = value.substring(1, value.length() - 1);
             }
         }
         this.identifier = identifier;
@@ -138,6 +156,8 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
         this.endpoint = endpoint;
         this.status = CollaborationStatus.valueOf(status);
         this.port = Integer.parseInt(port);
+        this.masterLogin = masterLogin;
+        this.masterPassword = masterPassword;
     }
 
     @Override
@@ -158,7 +178,7 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(FSCollaborationInstance.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(RemoteCollaborationManagedDescriptor.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
@@ -167,6 +187,12 @@ public class FSCollaborationInstance implements Identifiable, Serializable {
                 TextUtils.escapeStringJSON(endpoint) +
                 "\", \"status\": \"" +
                 TextUtils.escapeStringJSON(status.toString()) +
+                "\", \"port\": " +
+                TextUtils.escapeStringJSON(Integer.toString(port)) +
+                ", \"masterLogin\": \"" +
+                TextUtils.escapeStringJSON(masterLogin) +
+                "\", \"masterPassword\": \"" +
+                TextUtils.escapeStringJSON(masterPassword) +
                 "\"}";
     }
 }

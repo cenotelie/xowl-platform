@@ -23,6 +23,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
@@ -40,6 +41,7 @@ import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 
 import java.io.*;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -54,14 +56,9 @@ public class MasterNetworkService implements CollaborationNetworkService {
      */
     private static final int EXECUTABLE_MODE = 0100755;
     /**
-     * The comparator for platform instances
+     * The login for the master manager
      */
-    private static final Comparator<FSCollaborationInstance> COMPARATOR = new Comparator<FSCollaborationInstance>() {
-        @Override
-        public int compare(FSCollaborationInstance instance1, FSCollaborationInstance instance2) {
-            return Integer.compare(instance1.getPort(), instance2.getPort());
-        }
-    };
+    private static final String MASTER_LOGIN = "master";
 
     /**
      * The storage area for the platform distributions
@@ -76,13 +73,9 @@ public class MasterNetworkService implements CollaborationNetworkService {
      */
     private final Collection<Product> platforms;
     /**
-     * The managed platform instances
-     */
-    private final List<FSCollaborationInstance> instances;
-    /**
      * The managed collaboration instances
      */
-    private final Map<String, RemoteCollaborationBase> collaborations;
+    private final Map<String, RemoteCollaborationManaged> collaborations;
     /**
      * The min in the available port range
      */
@@ -102,7 +95,6 @@ public class MasterNetworkService implements CollaborationNetworkService {
         this.storageDistributions = new File(storage, "platforms");
         this.storageInstances = new File(storage, "instances");
         this.platforms = new ArrayList<>();
-        this.instances = new ArrayList<>();
         this.collaborations = new HashMap<>();
         this.portMin = Integer.parseInt(configuration.get("portMin"));
         this.portMax = Integer.parseInt(configuration.get("portMax"));
@@ -128,16 +120,14 @@ public class MasterNetworkService implements CollaborationNetworkService {
                     try (InputStream stream = new FileInputStream(files[i])) {
                         String content = Files.read(stream, Files.CHARSET);
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-                        FSCollaborationInstance instance = new FSCollaborationInstance(definition);
-                        instances.add(instance);
-                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationManaged(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this));
+                        RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
+                        collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
                 }
             }
         }
-        Collections.sort(instances, COMPARATOR);
     }
 
     @Override
@@ -185,10 +175,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return CollaborationStatus.Invalid;
-        RemoteCollaborationBase neighbour = collaborations.get(collaborationId);
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
             return CollaborationStatus.Invalid;
-        return CollaborationStatus.Invalid;
+        return neighbour.getStatus();
     }
 
     @Override
@@ -199,10 +189,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_MANIFEST);
         if (!reply.isSuccess())
             return reply;
-        RemoteCollaborationBase neighbour = collaborations.get(collaborationId);
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
             return XSPReplyNotFound.instance();
-        return XSPReplyNotFound.instance();
+        return neighbour.getManifest();
     }
 
     @Override
@@ -213,7 +203,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_INPUTS);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
+        return neighbour.getArtifactsForInput(specificationId);
     }
 
     @Override
@@ -224,7 +217,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_OUTPUTS);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
+        return neighbour.getArtifactsForOutput(specificationId);
     }
 
     @Override
@@ -240,7 +236,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_SPAWN);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyUnsupported.instance();
+        return provision(specification);
     }
 
     @Override
@@ -251,7 +247,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -262,7 +261,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -273,7 +275,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
+        if (neighbour == null)
+            return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     /**
@@ -288,24 +293,22 @@ public class MasterNetworkService implements CollaborationNetworkService {
             return reply;
         Product product = ((XSPReplyResult<Product>) reply).getData();
         // provision the instance objects
-        FSCollaborationInstance instance = provisionCreateInstance(specification);
-        RemoteCollaborationBase collaboration = new RemoteCollaborationManaged(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this);
-        collaborations.put(instance.getIdentifier(), collaboration);
+        RemoteCollaborationManaged collaboration = provisionCreateInstance(specification);
         // extract the distribution
-        reply = provisionExtractDistribution(product.getIdentifier(), instance.getIdentifier());
+        reply = provisionExtractDistribution(product.getIdentifier(), collaboration.getIdentifier());
         if (!reply.isSuccess())
             return reply;
         // deploy the configuration
-        reply = provisionDeployConfiguration(instance);
+        reply = provisionDeployConfiguration(collaboration);
         if (!reply.isSuccess())
             return reply;
         // launch the platform
-        reply = provisionLaunchPlatform(instance);
+        reply = provisionLaunchPlatform(collaboration);
         if (!reply.isSuccess())
             return reply;
         // write the instance descriptor file
-        instance.setStatus(CollaborationStatus.Running);
-        reply = provisionWriteDescriptor(instance);
+        collaboration.getDescriptor().setStatus(CollaborationStatus.Running);
+        reply = provisionWriteDescriptor(collaboration);
         if (!reply.isSuccess())
             return reply;
         return new XSPReplyResult<>(collaboration);
@@ -329,18 +332,23 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param specification The specification for the collaboration
      * @return The instance
      */
-    private FSCollaborationInstance provisionCreateInstance(CollaborationSpecification specification) {
-        synchronized (instances) {
+    private RemoteCollaborationManaged provisionCreateInstance(CollaborationSpecification specification) {
+        SecureRandom random = new SecureRandom();
+        byte[] buffer = new byte[20];
+        random.nextBytes(buffer);
+        String masterPassword = SHA1.hashSHA1(buffer);
+        synchronized (collaborations) {
             int port = provisionReservePort();
-            FSCollaborationInstance instance = new FSCollaborationInstance(
+            RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(
                     UUID.randomUUID().toString(),
                     specification.getName(),
                     "https://localhost:" + Integer.toString(port) + "/api",
-                    CollaborationStatus.Provisioning,
-                    port);
-            instances.add(instance);
-            Collections.sort(instances, COMPARATOR);
-            return instance;
+                    port,
+                    MASTER_LOGIN,
+                    masterPassword);
+            RemoteCollaborationManaged collaboration = new RemoteCollaborationManaged(this, descriptor);
+            collaborations.put(descriptor.getIdentifier(), collaboration);
+            return collaboration;
         }
     }
 
@@ -350,17 +358,18 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @return The port
      */
     private int provisionReservePort() {
+        List<RemoteCollaborationManaged> instances = new ArrayList<>(collaborations.values());
         if (instances.isEmpty())
             return portMin;
-        int max = instances.get(instances.size() - 1).getPort();
+        int max = instances.get(instances.size() - 1).getDescriptor().getPort();
         if (max != portMax)
             return max + 1;
-        int min = instances.get(0).getPort();
+        int min = instances.get(0).getDescriptor().getPort();
         if (min != portMin)
             return portMin;
         int current = portMin;
         for (int i = 1; i != instances.size() - 1; i++) {
-            int x = instances.get(i).getPort();
+            int x = instances.get(i).getDescriptor().getPort();
             if (x > current + 1)
                 return current + 1;
             current = x;
@@ -374,10 +383,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instance The platform instance
      * @return The protocol reply
      */
-    private XSPReply provisionWriteDescriptor(FSCollaborationInstance instance) {
+    private XSPReply provisionWriteDescriptor(RemoteCollaborationManaged instance) {
         File fileDescriptor = new File(storageInstances, instance.getIdentifier() + ".json");
         try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileDescriptor), Files.CHARSET)) {
-            writer.write(instance.serializedJSON());
+            writer.write(instance.getDescriptor().serializedJSON());
             writer.flush();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
@@ -460,7 +469,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instance The instance being provisioned
      * @return The protocol reply
      */
-    private XSPReply provisionDeployConfiguration(FSCollaborationInstance instance) {
+    private XSPReply provisionDeployConfiguration(RemoteCollaborationManaged instance) {
         return XSPReplySuccess.instance();
     }
 
@@ -470,7 +479,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instance The instance being provisioned
      * @return The protocol reply
      */
-    private XSPReply provisionLaunchPlatform(FSCollaborationInstance instance) {
+    private XSPReply provisionLaunchPlatform(RemoteCollaborationManaged instance) {
         return XSPReplySuccess.instance();
     }
 }

@@ -18,10 +18,9 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.platform.services.collaboration.CollaborationManifest;
+import org.xowl.platform.kernel.remote.DeserializerForOSGi;
+import org.xowl.platform.kernel.remote.RemotePlatform;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
@@ -32,73 +31,69 @@ import org.xowl.platform.services.collaboration.CollaborationStatus;
  */
 public class RemoteCollaborationManaged extends RemoteCollaborationBase {
     /**
-     * The time-to-live of a the manifest cache in nano-seconds
-     */
-    private static final long MANIFEST_TTL = 60000000000L;
-
-    /**
      * The parent network service
      */
     private final CollaborationNetworkService networkService;
     /**
-     * The cache for the manifest of the remote collaboration
+     * The descriptor for this remote platform
      */
-    private CollaborationManifest manifest;
+    private final RemoteCollaborationManagedDescriptor descriptor;
     /**
-     * The timestamp when the manifest was last retrieve
+     * The remote platform endpoint
      */
-    private long manifestTimestamp;
+    private RemotePlatform remotePlatform;
+
+    /**
+     * Gets the descriptor for this remote platform
+     *
+     * @return The descriptor for this remote platform
+     */
+    public RemoteCollaborationManagedDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    /**
+     * Gets the remote platform instance so that API call can be performed
+     *
+     * @return The remote platform
+     */
+    public synchronized RemotePlatform getRemotePlatform() {
+        if (remotePlatform == null) {
+            remotePlatform = new RemotePlatform(endpoint, new DeserializerForOSGi());
+        }
+        return remotePlatform;
+    }
 
     /**
      * Initializes this remote collaboration
      *
-     * @param identifier     The identifier of the remote collaboration
-     * @param name           The name of the remote collaboration
-     * @param endpoint       The API endpoint for the remove collaboration
      * @param networkService The parent network service
+     * @param descriptor     The descriptor for this remote platform
      */
-    public RemoteCollaborationManaged(String identifier, String name, String endpoint, CollaborationNetworkService networkService) {
-        super(identifier, name, endpoint);
+    public RemoteCollaborationManaged(CollaborationNetworkService networkService, RemoteCollaborationManagedDescriptor descriptor) {
+        super(descriptor.getIdentifier(), descriptor.getName(), descriptor.getEndpoint());
         this.networkService = networkService;
-    }
-
-    /**
-     * Gets or refresh the cached manifest
-     *
-     * @return The protocol reply
-     */
-    private XSPReply refreshManifestCache() {
-        if (manifest != null && System.nanoTime() < manifestTimestamp + MANIFEST_TTL)
-            return XSPReplySuccess.instance();
-        XSPReply reply = networkService.getNeighbourManifest(identifier);
-        if (!reply.isSuccess())
-            return reply;
-        manifest = ((XSPReplyResult<CollaborationManifest>) reply).getData();
-        manifestTimestamp = System.nanoTime();
-        return XSPReplySuccess.instance();
+        this.descriptor = descriptor;
     }
 
     @Override
     public CollaborationStatus getStatus() {
-        return networkService.getNeighbourStatus(identifier);
+        return descriptor.getStatus();
     }
 
     @Override
     public XSPReply getManifest() {
-        XSPReply reply = refreshManifestCache();
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResult<>(manifest);
+        return getRemotePlatform().getCollaborationManifest();
     }
 
     @Override
     public XSPReply getArtifactsForInput(String specificationId) {
-        return networkService.getNeighbourInputsFor(identifier, specificationId);
+        return getRemotePlatform().getArtifactsForCollaborationInput(specificationId);
     }
 
     @Override
     public XSPReply getArtifactsForOutput(String specificationId) {
-        return networkService.getNeighbourOutputsFor(identifier, specificationId);
+        return getRemotePlatform().getArtifactsForCollaborationOutput(specificationId);
     }
 
     @Override

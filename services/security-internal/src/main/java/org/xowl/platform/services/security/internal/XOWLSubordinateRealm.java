@@ -102,15 +102,18 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
 
     @Override
     public PlatformUser getUser(String identifier) {
+        PlatformUser result = cacheUsers.get(identifier);
+        if (result != null)
+            return result;
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
 
-        XSPReply reply = getAccess(currentUser.getIdentifier()).getPlatformUser(identifier);
+        XSPReply reply = getAccess(currentUser == null ? identifier : currentUser.getIdentifier()).getPlatformUser(identifier);
         if (!reply.isSuccess())
             return null;
-        PlatformUser result = ((XSPReplyResult<PlatformUser>) reply).getData();
+        result = ((XSPReplyResult<PlatformUser>) reply).getData();
         return getUser(result.getIdentifier(), result.getName());
     }
 

@@ -1687,7 +1687,7 @@ public class RemotePlatform {
     public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
         // not logged in
         if (currentUser == null)
-            return XSPReplyNetworkError.instance();
+            return XSPReplyUnauthenticated.instance();
         HttpResponse response = connection.request(uriComplement,
                 method,
                 body,

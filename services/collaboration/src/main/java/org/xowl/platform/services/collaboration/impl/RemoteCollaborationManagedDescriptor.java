@@ -21,6 +21,8 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.remote.DeserializerForOSGi;
+import org.xowl.platform.kernel.remote.RemotePlatform;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**
@@ -158,6 +160,17 @@ class RemoteCollaborationManagedDescriptor implements Identifiable, Serializable
         this.port = Integer.parseInt(port);
         this.masterLogin = masterLogin;
         this.masterPassword = masterPassword;
+    }
+
+    /**
+     * Gets the remote platform instance so that API call can be performed
+     *
+     * @return The remote platform
+     */
+    public RemotePlatform createRemotePlatform() {
+        RemotePlatform platform = new RemotePlatform(endpoint, new DeserializerForOSGi());
+        platform.login(masterLogin, masterPassword);
+        return platform;
     }
 
     @Override

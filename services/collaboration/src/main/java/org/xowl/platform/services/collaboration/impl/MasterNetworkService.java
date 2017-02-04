@@ -23,7 +23,6 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
-import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
@@ -41,7 +40,6 @@ import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 
 import java.io.*;
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -58,7 +56,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
     /**
      * The login for the master manager
      */
-    private static final String MASTER_LOGIN = "master";
+    private static final String MASTER_LOGIN = "admin";
 
     /**
      * The storage area for the platform distributions
@@ -333,10 +331,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @return The instance
      */
     private RemoteCollaborationManaged provisionCreateInstance(CollaborationSpecification specification) {
-        SecureRandom random = new SecureRandom();
-        byte[] buffer = new byte[20];
-        random.nextBytes(buffer);
-        String masterPassword = SHA1.hashSHA1(buffer);
+        String masterPassword = "admin";
         synchronized (collaborations) {
             int port = provisionReservePort();
             RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(

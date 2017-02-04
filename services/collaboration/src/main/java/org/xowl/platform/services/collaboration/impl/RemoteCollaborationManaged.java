@@ -19,7 +19,6 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.platform.kernel.remote.DeserializerForOSGi;
 import org.xowl.platform.kernel.remote.RemotePlatform;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
@@ -59,7 +58,7 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
      */
     public synchronized RemotePlatform getRemotePlatform() {
         if (remotePlatform == null) {
-            remotePlatform = new RemotePlatform(endpoint, new DeserializerForOSGi());
+            remotePlatform = descriptor.createRemotePlatform();
         }
         return remotePlatform;
     }

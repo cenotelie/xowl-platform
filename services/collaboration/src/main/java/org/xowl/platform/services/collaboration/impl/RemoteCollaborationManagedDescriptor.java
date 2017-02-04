@@ -22,7 +22,7 @@ import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.remote.DeserializerForOSGi;
-import org.xowl.platform.kernel.remote.RemotePlatform;
+import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
 /**
@@ -167,8 +167,8 @@ class RemoteCollaborationManagedDescriptor implements Identifiable, Serializable
      *
      * @return The remote platform
      */
-    public RemotePlatform createRemotePlatform() {
-        RemotePlatform platform = new RemotePlatform(endpoint, new DeserializerForOSGi());
+    public RemotePlatformAccess createRemotePlatform() {
+        RemotePlatformAccess platform = new RemotePlatformAccess(endpoint, new DeserializerForOSGi());
         platform.login(masterLogin, masterPassword);
         return platform;
     }

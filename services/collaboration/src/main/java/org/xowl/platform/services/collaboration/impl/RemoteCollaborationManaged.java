@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
-import org.xowl.platform.kernel.remote.RemotePlatform;
+import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
@@ -40,7 +40,7 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
     /**
      * The remote platform endpoint
      */
-    private RemotePlatform remotePlatform;
+    private RemotePlatformAccess remotePlatform;
 
     /**
      * Gets the descriptor for this remote platform
@@ -56,7 +56,7 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
      *
      * @return The remote platform
      */
-    public synchronized RemotePlatform getRemotePlatform() {
+    public synchronized RemotePlatformAccess getRemotePlatform() {
         if (remotePlatform == null) {
             remotePlatform = descriptor.createRemotePlatform();
         }

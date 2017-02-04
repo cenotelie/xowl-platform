@@ -127,7 +127,7 @@ class XOWLInternalRealm implements SecurityRealm {
     /**
      * The cache of users
      */
-    private final Map<String, XOWLInternalUser> cacheUsers;
+    protected final Map<String, XOWLInternalUser> cacheUsers;
     /**
      * The cache of groups
      */

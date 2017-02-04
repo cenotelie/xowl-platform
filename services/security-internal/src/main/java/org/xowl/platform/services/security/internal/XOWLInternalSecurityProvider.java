@@ -42,6 +42,8 @@ class XOWLInternalSecurityProvider implements SecurityRealmProvider {
     public SecurityRealm newRealm(String identifier, Section configuration) {
         if (XOWLInternalRealm.class.getCanonicalName().equals(identifier))
             return new XOWLInternalRealm(configuration);
+        if (XOWLSubordinateRealm.class.getCanonicalName().equals(identifier))
+            return new XOWLSubordinateRealm(configuration);
         return null;
     }
 }

@@ -17,7 +17,10 @@
 
 package org.xowl.platform.kernel.remote;
 
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyException;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.utils.Files;
@@ -31,7 +34,6 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRole;
-import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
 
 /**
@@ -39,27 +41,11 @@ import org.xowl.platform.kernel.security.SecuredActionPolicy;
  *
  * @author Laurent Wouters
  */
-public class RemotePlatform {
-    /**
-     * The connection to the platform
-     */
-    protected final HttpConnection connection;
+public class RemotePlatformAccess extends HttpConnection {
     /**
      * The deserializer to use
      */
     protected final Deserializer deserializer;
-    /**
-     * The currently logged-in user
-     */
-    private PlatformUser currentUser;
-    /**
-     * The login for the current user
-     */
-    private String currentLogin;
-    /**
-     * The password for the current user
-     */
-    private String currentPassword;
 
     /**
      * Initializes this platform connection
@@ -67,27 +53,9 @@ public class RemotePlatform {
      * @param endpoint     The API endpoint (https://something:port/api)
      * @param deserializer The deserializer to use
      */
-    public RemotePlatform(String endpoint, Deserializer deserializer) {
-        this.connection = new HttpConnection(endpoint);
+    public RemotePlatformAccess(String endpoint, Deserializer deserializer) {
+        super(endpoint);
         this.deserializer = deserializer;
-    }
-
-    /**
-     * Gets whether a user is logged-in
-     *
-     * @return Whether a user is logged-in
-     */
-    public boolean isLoggedIn() {
-        return (currentUser != null);
-    }
-
-    /**
-     * Gets the currently logged-in user, if any
-     *
-     * @return The currently logged-in user, if any
-     */
-    public PlatformUser getLoggedInUser() {
-        return currentUser;
     }
 
     /**
@@ -98,24 +66,10 @@ public class RemotePlatform {
      * @return The protocol reply, or null if the client is banned
      */
     public XSPReply login(String login, String password) {
-        HttpResponse response = connection.request("/kernel/security/login" +
-                        "?login=" + URIUtils.encodeComponent(login),
+        return doRequest(
+                "/kernel/security/login?login=" + URIUtils.encodeComponent(login),
                 HttpConstants.METHOD_POST,
-                password,
-                HttpConstants.MIME_TEXT_PLAIN,
-                HttpConstants.MIME_JSON
-        );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
-        if (reply.isSuccess()) {
-            currentUser = ((XSPReplyResult<PlatformUser>) reply).getData();
-            currentLogin = login;
-            currentPassword = password;
-        } else {
-            currentUser = null;
-            currentLogin = null;
-            currentPassword = null;
-        }
-        return reply;
+                password);
     }
 
     /**
@@ -124,17 +78,8 @@ public class RemotePlatform {
      * @return The protocol reply
      */
     public XSPReply logout() {
-        if (currentUser == null)
-            return XSPReplyNetworkError.instance();
-        HttpResponse response = connection.request("/kernel/security/logout",
-                HttpConstants.METHOD_POST,
-                HttpConstants.MIME_JSON
-        );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
-        currentUser = null;
-        currentLogin = null;
-        currentPassword = null;
-        return reply;
+        return doRequest("/kernel/security/logout",
+                HttpConstants.METHOD_POST);
     }
 
     /**
@@ -1685,27 +1630,7 @@ public class RemotePlatform {
      * @return The response, or null if the request failed before reaching the server
      */
     public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
-        // not logged in
-        if (currentUser == null)
-            return XSPReplyUnauthenticated.instance();
-        HttpResponse response = connection.request(uriComplement,
-                method,
-                body,
-                contentType,
-                compressed,
-                accept
-        );
-        XSPReply reply = XSPReplyUtils.fromHttpResponse(response, deserializer);
-        if (reply != XSPReplyExpiredSession.instance())
-            // not an authentication problem => return this reply
-            return reply;
-        // try to re-login
-        reply = login(currentLogin, currentPassword);
-        if (!reply.isSuccess())
-            // failed => unauthenticated
-            return XSPReplyUnauthenticated.instance();
-        // now that we are logged-in, retry
-        response = connection.request(uriComplement,
+        HttpResponse response = request(uriComplement,
                 method,
                 body,
                 contentType,

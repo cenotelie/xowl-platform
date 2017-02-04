@@ -99,10 +99,14 @@ public class CollaborationManifest implements Identifiable, Serializable {
         this.inputArtifacts = new HashMap<>();
         this.outputArtifacts = new HashMap<>();
         this.roles = new HashMap<>();
-        for (ArtifactSpecification artifactSpecification : specification.getInputSpecifications())
+        for (ArtifactSpecification artifactSpecification : specification.getInputSpecifications()) {
             inputSpecifications.put(artifactSpecification.getIdentifier(), artifactSpecification);
-        for (ArtifactSpecification artifactSpecification : specification.getOutputSpecifications())
+            inputArtifacts.put(artifactSpecification.getIdentifier(), new ArrayList<String>());
+        }
+        for (ArtifactSpecification artifactSpecification : specification.getOutputSpecifications()) {
             outputSpecifications.put(artifactSpecification.getIdentifier(), artifactSpecification);
+            outputArtifacts.put(artifactSpecification.getIdentifier(), new ArrayList<String>());
+        }
     }
 
     /**

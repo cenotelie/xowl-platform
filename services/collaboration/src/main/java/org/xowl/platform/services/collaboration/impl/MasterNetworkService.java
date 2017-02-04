@@ -507,7 +507,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         }
 
         // write the security service configuration
-        File serviceSecurityConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
+        File serviceSecurityConfigFile = new File(instanceConfigDir, SecurityService.class.getCanonicalName() + ".ini");
         configuration = new Configuration();
         try {
             configuration.load(serviceSecurityConfigFile.getAbsolutePath(), Files.CHARSET);

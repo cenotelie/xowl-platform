@@ -20,6 +20,7 @@ package org.xowl.platform.services.collaboration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.remote.DeserializerFactory;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.impl.XOWLCollaborationService;
@@ -35,6 +36,8 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCollaboration(), null);
+
         XOWLCollaborationService collaborationService = new XOWLCollaborationService();
         bundleContext.registerService(Service.class, collaborationService, null);
         bundleContext.registerService(SecuredService.class, collaborationService, null);

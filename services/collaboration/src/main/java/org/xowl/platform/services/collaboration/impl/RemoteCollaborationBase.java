@@ -17,13 +17,10 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.collaboration.CollaborationManifest;
-import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
 
@@ -34,65 +31,78 @@ import org.xowl.platform.services.collaboration.RemoteCollaboration;
  */
 public class RemoteCollaborationBase implements RemoteCollaboration {
     /**
-     * The time-to-live of a the manifest cache in nano-seconds
-     */
-    private static final long MANIFEST_TTL = 60000000000L;
-
-    /**
      * The identifier of the remote collaboration
      */
-    private final String identifier;
+    protected final String identifier;
     /**
      * The name of the remote collaboration
      */
-    private final String name;
+    protected final String name;
     /**
      * The API endpoint for the remote collaboration
      */
-    private final String endpoint;
+    protected final String endpoint;
     /**
-     * The parent network service
+     * The status of the collaboration
      */
-    private final CollaborationNetworkService networkService;
-    /**
-     * The cache for the manifest of the remote collaboration
-     */
-    private CollaborationManifest manifest;
-    /**
-     * The timestamp when the manifest was last retrieve
-     */
-    private long manifestTimestamp;
+    protected final CollaborationStatus status;
 
     /**
      * Initializes this remote collaboration
      *
-     * @param identifier     The identifier of the remote collaboration
-     * @param name           The name of the remote collaboration
-     * @param endpoint       The API endpoint for the remove collaboration
-     * @param networkService The parent network service
+     * @param identifier The identifier of the remote collaboration
+     * @param name       The name of the remote collaboration
+     * @param endpoint   The API endpoint for the remove collaboration
      */
-    public RemoteCollaborationBase(String identifier, String name, String endpoint, CollaborationNetworkService networkService) {
+    public RemoteCollaborationBase(String identifier, String name, String endpoint) {
         this.identifier = identifier;
         this.name = name;
         this.endpoint = endpoint;
-        this.networkService = networkService;
+        this.status = CollaborationStatus.Invalid;
     }
 
     /**
-     * Gets or refresh the cached manifest
+     * Initializes this remote collaboration
      *
-     * @return The protocol reply
+     * @param definition The AST node for the serialized definition
      */
-    private XSPReply refreshManifestCache() {
-        if (manifest != null && System.nanoTime() < manifestTimestamp + MANIFEST_TTL)
-            return XSPReplySuccess.instance();
-        XSPReply reply = networkService.getNeighbourManifest(identifier);
-        if (!reply.isSuccess())
-            return reply;
-        manifest = ((XSPReplyResult<CollaborationManifest>) reply).getData();
-        manifestTimestamp = System.nanoTime();
-        return XSPReplySuccess.instance();
+    public RemoteCollaborationBase(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        String endpoint = "";
+        String status = CollaborationStatus.Invalid.toString();
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            switch (head) {
+                case "identifier": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    identifier = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "name": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    name = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "endpoint": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    endpoint = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "status": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    status = value.substring(1, value.length() - 1);
+                    break;
+                }
+            }
+        }
+        this.identifier = identifier;
+        this.name = name;
+        this.endpoint = endpoint;
+        this.status = CollaborationStatus.valueOf(status);
     }
+
 
     @Override
     public String getIdentifier() {
@@ -111,40 +121,37 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
 
     @Override
     public CollaborationStatus getStatus() {
-        return networkService.getNeighbourStatus(identifier);
+        return status;
     }
 
     @Override
     public XSPReply getManifest() {
-        XSPReply reply = refreshManifestCache();
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResult<>(manifest);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply getArtifactsForInput(String specificationId) {
-        return networkService.getNeighbourInputsFor(identifier, specificationId);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply getArtifactsForOutput(String specificationId) {
-        return networkService.getNeighbourOutputsFor(identifier, specificationId);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply archive() {
-        return networkService.archive(identifier);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply restart() {
-        return networkService.restart(identifier);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
     public XSPReply delete() {
-        return networkService.delete(identifier);
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -154,7 +161,7 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
 
     @Override
     public String serializedString() {
-        return getIdentifier();
+        return identifier;
     }
 
     @Override
@@ -165,10 +172,10 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
-                "\", \"status\": \"" +
-                TextUtils.escapeStringJSON(getStatus().toString()) +
                 "\", \"endpoint\": \"" +
                 TextUtils.escapeStringJSON(endpoint) +
+                "\", \"status\": \"" +
+                TextUtils.escapeStringJSON(getStatus().toString()) +
                 "\"}";
     }
 }

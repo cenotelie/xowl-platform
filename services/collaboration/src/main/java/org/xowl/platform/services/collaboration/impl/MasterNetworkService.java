@@ -130,7 +130,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         FSCollaborationInstance instance = new FSCollaborationInstance(definition);
                         instances.add(instance);
-                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationBase(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this));
+                        collaborations.put(instance.getIdentifier(), new RemoteCollaborationManaged(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this));
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
@@ -289,7 +289,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         Product product = ((XSPReplyResult<Product>) reply).getData();
         // provision the instance objects
         FSCollaborationInstance instance = provisionCreateInstance(specification);
-        RemoteCollaborationBase collaboration = new RemoteCollaborationBase(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this);
+        RemoteCollaborationBase collaboration = new RemoteCollaborationManaged(instance.getIdentifier(), instance.getName(), instance.getEndpoint(), this);
         collaborations.put(instance.getIdentifier(), collaboration);
         // extract the distribution
         reply = provisionExtractDistribution(product.getIdentifier(), instance.getIdentifier());

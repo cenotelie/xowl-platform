@@ -23,6 +23,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
@@ -34,12 +35,10 @@ import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.services.collaboration.CollaborationNetworkService;
-import org.xowl.platform.services.collaboration.CollaborationSpecification;
-import org.xowl.platform.services.collaboration.CollaborationStatus;
-import org.xowl.platform.services.collaboration.RemoteCollaboration;
+import org.xowl.platform.services.collaboration.*;
 
 import java.io.*;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -297,7 +296,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         if (!reply.isSuccess())
             return reply;
         // deploy the configuration
-        reply = provisionDeployConfiguration(collaboration);
+        reply = provisionDeployConfiguration(collaboration, specification);
         if (!reply.isSuccess())
             return reply;
         // launch the platform
@@ -400,22 +399,34 @@ public class MasterNetworkService implements CollaborationNetworkService {
     private XSPReply provisionExtractDistribution(String productId, String instanceId) {
         File distributionFile = new File(storageDistributions, productId + ".tar.gz");
         if (!distributionFile.exists())
-            return XSPReplyNotFound.instance();
-        File targetDir = new File(storageInstances, instanceId);
-        if (targetDir.exists())
-            Files.deleteFolder(targetDir);
-        if (!targetDir.mkdirs()) {
-            Logging.getDefault().error("Failed to create directory " + targetDir.getAbsolutePath());
+            return new XSPReplyFailure("Failed to find the distribution " + productId);
+        File extractionDirectory = new File(storageInstances, instanceId + "_provision");
+        if (extractionDirectory.exists())
+            Files.deleteFolder(extractionDirectory);
+        if (!extractionDirectory.mkdirs()) {
+            Logging.getDefault().error("Failed to create directory " + extractionDirectory.getAbsolutePath());
             return XSPReplyNotFound.instance();
         }
         try {
-            provisionExtractTarGz(distributionFile, targetDir);
+            provisionExtractTarGz(distributionFile, extractionDirectory);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
         }
-
-
+        File[] children = extractionDirectory.listFiles();
+        if (children == null || children.length != 1) {
+            Logging.getDefault().error("Unexpected distribution content for " + productId);
+            return XSPReplyNotFound.instance();
+        }
+        File target = new File(storageInstances, instanceId);
+        if (target.exists())
+            Files.deleteFolder(extractionDirectory);
+        try {
+            java.nio.file.Files.move(children[0].toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
         return XSPReplySuccess.instance();
     }
 
@@ -461,10 +472,38 @@ public class MasterNetworkService implements CollaborationNetworkService {
     /**
      * Deploys the configuration for a new platform instance
      *
-     * @param instance The instance being provisioned
+     * @param instance      The instance being provisioned
+     * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    private XSPReply provisionDeployConfiguration(RemoteCollaborationManaged instance) {
+    private XSPReply provisionDeployConfiguration(RemoteCollaborationManaged instance, CollaborationSpecification specification) {
+        File instanceDirectory = new File(storageInstances, instance.getIdentifier());
+
+        // write the collaboration manifest
+        File collaborationManifest = new File(instanceDirectory, "collaboration.json");
+        CollaborationManifest manifest = new CollaborationManifest(instance.getIdentifier(), specification);
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(collaborationManifest), Files.CHARSET)) {
+            writer.write(manifest.serializedJSON());
+            writer.flush();
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
+
+        // write the collaboration service configuration
+        File instanceConfigDir = new File(instanceDirectory, "config");
+        File serviceCollabConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
+        Configuration configuration = new Configuration();
+        try {
+            configuration.load(serviceCollabConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.set("manifest", "collaboration.json");
+            configuration.set("network", "service", SlaveNetworkService.class.getCanonicalName());
+            configuration.set("network", "master", "https://localhost:8443/api");
+            configuration.save(serviceCollabConfigFile.getAbsolutePath(), Files.CHARSET);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
         return XSPReplySuccess.instance();
     }
 

@@ -53,7 +53,7 @@ function renderNeighbour(neighbour) {
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	var linkValue = status.endpoint.substring(0, status.endpoint.length - "api".length) + "web/";
+	var linkValue = neighbour.endpoint.substring(0, neighbour.endpoint.length - "api".length) + "web/";
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(linkValue));
 	link.href = linkValue;

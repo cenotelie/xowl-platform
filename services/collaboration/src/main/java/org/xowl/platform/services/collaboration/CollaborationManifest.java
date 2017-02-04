@@ -87,6 +87,27 @@ public class CollaborationManifest implements Identifiable, Serializable {
     /**
      * Initializes this manifest
      *
+     * @param identifier    The identifier for the collaboration
+     * @param specification The specification for the collaboration
+     */
+    public CollaborationManifest(String identifier, CollaborationSpecification specification) {
+        this.identifier = identifier;
+        this.name = specification.getName();
+        this.pattern = specification.getCollaborationPattern();
+        this.inputSpecifications = new HashMap<>();
+        this.outputSpecifications = new HashMap<>();
+        this.inputArtifacts = new HashMap<>();
+        this.outputArtifacts = new HashMap<>();
+        this.roles = new HashMap<>();
+        for (ArtifactSpecification artifactSpecification : specification.getInputSpecifications())
+            inputSpecifications.put(artifactSpecification.getIdentifier(), artifactSpecification);
+        for (ArtifactSpecification artifactSpecification : specification.getOutputSpecifications())
+            outputSpecifications.put(artifactSpecification.getIdentifier(), artifactSpecification);
+    }
+
+    /**
+     * Initializes this manifest
+     *
      * @param definition The AST node for the serialized definition
      */
     public CollaborationManifest(ASTNode definition) {

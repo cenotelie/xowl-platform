@@ -174,10 +174,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         // authorization is delegated to the network service
-        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
-        if (executionService == null)
-            return XSPReplyServiceUnavailable.instance();
-        return executionService.schedule(new CollaborationSpawnJob(specification));
+        return getNetworkService().spawn(specification);
     }
 
     @Override
@@ -556,7 +553,10 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     if (root == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     CollaborationSpecification specification = new CollaborationSpecification(root);
-                    return XSPReplyUtils.toHttpResponse(spawn(specification), null);
+                    JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
+                    if (executionService == null)
+                        return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+                    return XSPReplyUtils.toHttpResponse(executionService.schedule(new CollaborationSpawnJob(specification)), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");

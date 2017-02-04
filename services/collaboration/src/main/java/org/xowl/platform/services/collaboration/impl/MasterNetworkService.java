@@ -427,6 +427,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
         }
+        Files.deleteFolder(extractionDirectory);
         return XSPReplySuccess.instance();
     }
 

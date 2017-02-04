@@ -23,31 +23,26 @@ import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.remote.Deserializer;
 import org.xowl.platform.kernel.remote.DeserializerForOSGi;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
+import org.xowl.platform.kernel.remote.RemotePlatformAccessManager;
+import org.xowl.platform.kernel.remote.RemotePlatformAccessProvider;
 import org.xowl.platform.kernel.security.SecurityService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * An authentication realm that uses a remote xOWL platform as a user base, but still manages its own set of groups and roles
  *
  * @author Laurent Wouters
  */
-public class XOWLSubordinateRealm extends XOWLInternalRealm {
+class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAccessProvider {
     /**
-     * The deserializer to use
+     * The access manager to use
      */
-    private final Deserializer deserializer;
-    /**
-     * The API endpoint for the master platform
-     */
-    private final String masterEndpoint;
-    /**
-     * The user connections to the master platform
-     */
-    private final Map<String, RemotePlatformAccess> connections;
+    private final RemotePlatformAccessManager accessManager;
 
     /**
      * Initialize this realm
@@ -56,9 +51,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
      */
     public XOWLSubordinateRealm(Section configuration) {
         super(configuration);
-        this.deserializer = new DeserializerForOSGi();
-        this.masterEndpoint = configuration.get("master");
-        this.connections = new HashMap<>();
+        this.accessManager = new RemotePlatformAccessManager(configuration.get("master"), new DeserializerForOSGi());
     }
 
     @Override
@@ -72,8 +65,18 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
     }
 
     @Override
+    public String getEndpoint() {
+        return accessManager.getEndpoint();
+    }
+
+    @Override
+    public RemotePlatformAccess getAccess(String userId) {
+        return accessManager.getAccess(userId);
+    }
+
+    @Override
     public PlatformUser authenticate(String login, String password) {
-        XSPReply reply = getRemotePlatformFor(login).login(login, password);
+        XSPReply reply = getAccess(login).login(login, password);
         if (!reply.isSuccess())
             return null;
         PlatformUser result = ((XSPReplyResult<PlatformUser>) reply).getData();
@@ -87,7 +90,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
             return Collections.emptyList();
         PlatformUser currentUser = securityService.getCurrentUser();
 
-        XSPReply reply = getRemotePlatformFor(currentUser.getIdentifier()).getPlatformUsers();
+        XSPReply reply = getAccess(currentUser.getIdentifier()).getPlatformUsers();
         if (!reply.isSuccess())
             return Collections.emptyList();
         Collection<PlatformUser> result = new ArrayList<>();
@@ -104,7 +107,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
 
-        XSPReply reply = getRemotePlatformFor(currentUser.getIdentifier()).getPlatformUser(identifier);
+        XSPReply reply = getAccess(currentUser.getIdentifier()).getPlatformUser(identifier);
         if (!reply.isSuccess())
             return null;
         PlatformUser result = ((XSPReplyResult<PlatformUser>) reply).getData();
@@ -117,7 +120,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
-        return getRemotePlatformFor(currentUser.getIdentifier()).createPlatformUser(identifier, name, key);
+        return getAccess(currentUser.getIdentifier()).createPlatformUser(identifier, name, key);
     }
 
     @Override
@@ -126,7 +129,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
-        return getRemotePlatformFor(currentUser.getIdentifier()).renamePlatformUser(identifier, name);
+        return getAccess(currentUser.getIdentifier()).renamePlatformUser(identifier, name);
     }
 
     @Override
@@ -135,7 +138,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
-        return getRemotePlatformFor(currentUser.getIdentifier()).deletePlatformUser(identifier);
+        return getAccess(currentUser.getIdentifier()).deletePlatformUser(identifier);
     }
 
     @Override
@@ -144,7 +147,7 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
-        return getRemotePlatformFor(currentUser.getIdentifier()).changePlatformUserPassword(identifier, oldKey, newKey);
+        return getAccess(currentUser.getIdentifier()).changePlatformUserPassword(identifier, oldKey, newKey);
     }
 
     @Override
@@ -153,23 +156,6 @@ public class XOWLSubordinateRealm extends XOWLInternalRealm {
         if (securityService == null)
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
-        return getRemotePlatformFor(currentUser.getIdentifier()).resetPlatformUserPassword(identifier, newKey);
-    }
-
-    /**
-     * Gets the remote platform access for a user
-     *
-     * @param userId The identifier of the user
-     * @return The remote platform access
-     */
-    private RemotePlatformAccess getRemotePlatformFor(String userId) {
-        synchronized (connections) {
-            RemotePlatformAccess connection = connections.get(userId);
-            if (connection == null) {
-                connection = new RemotePlatformAccess(masterEndpoint, deserializer);
-                connections.put(userId, connection);
-            }
-            return connection;
-        }
+        return getAccess(currentUser.getIdentifier()).resetPlatformUserPassword(identifier, newKey);
     }
 }

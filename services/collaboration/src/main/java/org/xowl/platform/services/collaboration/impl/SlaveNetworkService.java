@@ -17,15 +17,14 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.config.Section;
-import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.kernel.remote.RemotePlatformAccess;
+import org.xowl.platform.kernel.remote.RemotePlatformAccessProvider;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
@@ -43,27 +42,11 @@ import java.util.Collections;
  */
 public class SlaveNetworkService implements CollaborationNetworkService {
     /**
-     * The connection to the master platform
-     */
-    private final HttpConnection connection;
-    /**
-     * The login for accessing the master platform
-     */
-    private final String login;
-    /**
-     * The password for accessing the master platform
-     */
-    private final String password;
-
-    /**
      * Initializes this service
      *
      * @param configuration The configuration for this service
      */
     public SlaveNetworkService(Section configuration) {
-        this.connection = new HttpConnection(configuration.get("master"));
-        this.login = configuration.get("login");
-        this.password = configuration.get("password");
     }
 
     @Override
@@ -89,7 +72,15 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return Collections.emptyList();
-        return Collections.emptyList();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return Collections.emptyList();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return Collections.emptyList();
+        reply = remotePlatform.getCollaborationNeighbours();
+        if (!reply.isSuccess())
+            return Collections.emptyList();
+        return ((XSPReplyResultCollection<RemoteCollaboration>) reply).getData();
     }
 
     @Override
@@ -100,7 +91,15 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return null;
-        return null;
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return null;
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return null;
+        reply = remotePlatform.getCollaborationNeighbour(collaborationId);
+        if (!reply.isSuccess())
+            return null;
+        return ((XSPReplyResult<RemoteCollaboration>) reply).getData();
     }
 
     @Override

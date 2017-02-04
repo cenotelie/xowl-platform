@@ -504,6 +504,20 @@ public class MasterNetworkService implements CollaborationNetworkService {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
         }
+
+        // write the security service configuration
+        File serviceSecurityConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
+        configuration = new Configuration();
+        try {
+            configuration.load(serviceSecurityConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.set("realm", "type", "org.xowl.platform.services.security.internal.XOWLSubordinateRealm");
+            configuration.set("realm", "location", "users");
+            configuration.set("realm", "master", "https://localhost:8443/api");
+            configuration.save(serviceSecurityConfigFile.getAbsolutePath(), Files.CHARSET);
+        } catch (IOException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
         return XSPReplySuccess.instance();
     }
 

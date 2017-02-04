@@ -514,6 +514,17 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @return The protocol reply
      */
     private XSPReply provisionLaunchPlatform(RemoteCollaborationManaged instance) {
+        File instanceDirectory = new File(storageInstances, instance.getIdentifier());
+        File adminScript = new File(instanceDirectory, "admin.sh");
+        ProcessBuilder processBuilder = new ProcessBuilder("sh", adminScript.getAbsolutePath(), "start");
+        processBuilder.directory(instanceDirectory);
+        try {
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException exception) {
+            Logging.getDefault().error(exception);
+            return new XSPReplyException(exception);
+        }
         return XSPReplySuccess.instance();
     }
 }

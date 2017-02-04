@@ -33,8 +33,10 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
+import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformRoleBase;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -44,6 +46,7 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.*;
+import org.xowl.platform.services.collaboration.jobs.CollaborationSpawnJob;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -171,7 +174,10 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     @Override
     public XSPReply spawn(CollaborationSpecification specification) {
         // authorization is delegated to the network service
-        return getNetworkService().spawn(specification);
+        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
+        if (executionService == null)
+            return XSPReplyServiceUnavailable.instance();
+        return executionService.schedule(new CollaborationSpawnJob(specification));
     }
 
     @Override

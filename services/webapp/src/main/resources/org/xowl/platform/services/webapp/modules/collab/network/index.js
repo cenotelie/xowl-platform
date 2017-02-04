@@ -16,7 +16,7 @@ function doGetData() {
 		return;
 	xowl.getCollaborationNeighbours(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-
+			renderNeighbours(content);
 		}
 	});
 }
@@ -36,38 +36,43 @@ function renderNeighbour(neighbour) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/specification.svg";
+	image.src = "/web/assets/" + renderNeighbourGetIcon(neighbour);
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
-	image.title = element.specification.identifier;
+	image.title = neighbour.identifier;
 	var link = document.createElement("a");
-	link.appendChild(document.createTextNode(element.specification.name));
-	link.href = linkName + ".html?id=" + encodeURIComponent(element.specification.identifier);
+	link.appendChild(document.createTextNode(neighbour.name));
+	link.href = "neighbour.html?id=" + encodeURIComponent(neighbour.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	cell.appendChild(renderArchetype(element.specification.archetype));
+	cell.appendChild(document.createTextNode(neighbour.status));
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	cell.appendChild(document.createTextNode(element.artifacts.length));
+	var linkValue = status.endpoint.substring(0, status.endpoint.length - "api".length) + "web/";
+	var link = document.createElement("a");
+	link.appendChild(document.createTextNode(linkValue));
+	link.href = linkValue;
+	cell.appendChild(link);
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
-	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
-	image.width = 20;
-	image.height = 20;
-	image.title = "REMOVE";
-	var button = document.createElement("span");
-	button.classList.add("btn");
-	button.classList.add("btn-default");
-	button.appendChild(image);
-	button.onclick = toRemove;
-	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
+}
+
+function renderNeighbourGetIcon(neighbour) {
+	if (neighbour.status == "Provisioning")
+		return "collaboration_provisioning.svg";
+	if (neighbour.status == "Running")
+		return "collaboration_running.svg";
+	if (neighbour.status == "Stopped")
+		return "collaboration_stopped.svg";
+	if (neighbour.status == "Archived")
+		return "collaboration_archived.svg";
+	return "collaboration.svg";
 }

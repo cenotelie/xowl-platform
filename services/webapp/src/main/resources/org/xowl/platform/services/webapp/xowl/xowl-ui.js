@@ -441,6 +441,11 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = part.wizardUri;
 		return dom;
+	} else if (part.type === "org.xowl.platform.services.collaboration.RemoteCollaboration") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = "/web/modules/collab/network/neighbour.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
 	}
 	return document.createTextNode(JSON.stringify(part));
 }

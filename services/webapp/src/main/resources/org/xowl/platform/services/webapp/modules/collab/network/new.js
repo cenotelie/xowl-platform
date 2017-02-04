@@ -12,7 +12,7 @@ var specification = {
 	inputs: [],
 	outputs: [],
 	roles: [],
-	pattern: {}
+	pattern: null
 };
 
 function init() {
@@ -333,9 +333,53 @@ function doAddRole(role) {
 }
 
 function onClickSpawn() {
+	if (!onOperationRequest("Spawning collaboration ..."))
+		return false;
+	var name = document.getElementById("collaboration-name").value;
+	var patternId = document.getElementById("collaboration-pattern").value;
+	if (name == null || name == ""
+		|| patternId == null || patternId == ""
+		|| platformPatterns == null) {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	var found = false;
+	for (var i = 0; i != platformPatterns.length; i++) {
+		if (platformPatterns[i].identifier == patternId) {
+			specification.pattern = platformPatterns[i];
+			found = true;
+			break;
+		}
+	}
+	if (!found) {
+		onOperationAbort("Failed to find pattern " + patternId);
+		return false;
+	}
+	specification.name = name;
+	xowl.spawnCollaboration(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
+			waitForJob(content.identifier, content.name, function (job) {
+				onSpawnJobComplete(job.result);
+			});
+		}
+	}, specification);
+	return false;
 }
 
-
+function onSpawnJobComplete(xsp) {
+	if (!xsp.hasOwnProperty("isSuccess")) {
+		displayMessage("error", "No result ...");
+	} else if (!xsp.isSuccess) {
+		displayMessage("error", "FAILURE: " + xsp.message);
+	} else {
+		displayMessage("success", {
+			type: "org.xowl.infra.utils.RichString",
+			parts: ["Spawned collaboration ", xsp.payload]
+		});
+		waitAndGo("neighbour.html?id=" + encodeURIComponent(xsp.payload.identifier));
+	}
+}
 
 
 function renderSpecification(specification, toRemove) {

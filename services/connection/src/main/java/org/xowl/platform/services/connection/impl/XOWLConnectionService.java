@@ -375,7 +375,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         if (id == null || name == null)
             return false;
         List<String> uris = section.getAll("uris");
-        ConnectorServiceData specification = new ConnectorServiceData(id, name, (String[]) uris.toArray());
+        ConnectorServiceData specification = new ConnectorServiceData(id, name, uris.toArray(new String[uris.size()]));
         for (String property : section.getProperties()) {
             if (property.equals("name") || property.equals("uris"))
                 continue;

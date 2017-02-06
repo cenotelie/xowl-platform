@@ -128,7 +128,7 @@ public class ConnectorServiceData implements Identifiable, Serializable {
         }
         this.identifier = identifier;
         this.name = name;
-        this.uris = (String[]) uris.toArray();
+        this.uris = uris.toArray(new String[uris.size()]);
     }
 
     /**

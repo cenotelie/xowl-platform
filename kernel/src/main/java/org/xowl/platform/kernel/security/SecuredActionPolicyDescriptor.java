@@ -157,7 +157,7 @@ public class SecuredActionPolicyDescriptor implements Registrable, Serializable 
         }
         this.identifier = identifier;
         this.name = name;
-        this.parameters = (Parameter[]) parameters.toArray();
+        this.parameters = parameters.toArray(new Parameter[parameters.size()]);
     }
 
     @Override

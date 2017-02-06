@@ -111,7 +111,7 @@ class XOWLHttpApiRequest implements HttpApiRequest {
         Enumeration<String> values = request.getHeaders(name);
         while (values.hasMoreElements())
             result.add(values.nextElement());
-        return (String[]) result.toArray();
+        return result.toArray(new String[result.size()]);
     }
 
     @Override

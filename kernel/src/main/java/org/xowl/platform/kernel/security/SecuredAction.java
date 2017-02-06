@@ -106,7 +106,7 @@ public class SecuredAction implements Identifiable, Serializable {
         }
         this.identifier = identifier;
         this.name = name;
-        this.policies = (SecuredActionPolicyDescriptor[]) policies.toArray();
+        this.policies = policies.toArray(new SecuredActionPolicyDescriptor[policies.size()]);
     }
 
     /**

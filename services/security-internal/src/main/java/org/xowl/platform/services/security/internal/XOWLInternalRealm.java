@@ -41,6 +41,7 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
@@ -226,25 +227,25 @@ class XOWLInternalRealm implements SecurityRealm {
             deployProcedure("procedure-get-group-admins", "group");
             deployProcedure("procedure-get-group-members", "group");
             deployProcedure("procedure-imply-role", "source", "target");
-            // deploy admin user
-            Map<String, Node> parameters = new HashMap<>();
-            parameters.put("user", nodes.getIRINode(USERS + "admin"));
-            parameters.put("name", nodes.getLiteralNode("Administrator", Vocabulary.xsdString, null));
-            reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
-                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
-            if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
             // deploy root user
-            parameters = new HashMap<>();
+            Map<String, Node> parameters = new HashMap<>();
             parameters.put("user", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             parameters.put("name", nodes.getLiteralNode(PlatformUserRoot.INSTANCE.getName(), Vocabulary.xsdString, null));
             reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
                 Logging.getDefault().error(reply);
+            // deploy admin user
+            parameters = new HashMap<>();
+            parameters.put("user", nodes.getIRINode(USERS + PlatformUtils.DEFAULT_ADMIN_LOGIN));
+            parameters.put("name", nodes.getLiteralNode("Administrator", Vocabulary.xsdString, null));
+            reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
+                    new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
+            if (!reply.isSuccess())
+                Logging.getDefault().error(reply);
             // deploy admin group
             parameters = new HashMap<>();
-            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("group", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
             parameters.put("name", nodes.getLiteralNode("Administrators", Vocabulary.xsdString, null));
             parameters.put("admin", nodes.getIRINode(USERS + PlatformUserRoot.INSTANCE.getIdentifier()));
             reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
@@ -261,7 +262,7 @@ class XOWLInternalRealm implements SecurityRealm {
                 Logging.getDefault().error(reply);
             // assign platform admin role to admin group
             parameters = new HashMap<>();
-            parameters.put("entity", nodes.getIRINode(GROUPS + "admin"));
+            parameters.put("entity", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
             parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
             reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
@@ -269,8 +270,8 @@ class XOWLInternalRealm implements SecurityRealm {
                 Logging.getDefault().error(reply);
             // add user admin as administrator of group admin
             parameters = new HashMap<>();
-            parameters.put("group", nodes.getIRINode(GROUPS + "admin"));
-            parameters.put("admin", nodes.getIRINode(USERS + "admin"));
+            parameters.put("group", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
+            parameters.put("admin", nodes.getIRINode(USERS + PlatformUtils.DEFAULT_ADMIN_LOGIN));
             reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())

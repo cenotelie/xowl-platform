@@ -35,6 +35,18 @@ public class PlatformUtils {
      * The name for the platform product
      */
     public static final String NAME = "xOWL Collaboration Platform";
+    /**
+     * The login for the default administrator account
+     */
+    public static final String DEFAULT_ADMIN_LOGIN = "admin";
+    /**
+     * The password for the default administrator account
+     */
+    public static final String DEFAULT_ADMIN_PASSWORD = "admin";
+    /**
+     * The identifier of the default administrator group
+     */
+    public static final String DEFAULT_ADMIN_GROUP = "admins";
 
     /**
      * Maps a collection of quads by their subject

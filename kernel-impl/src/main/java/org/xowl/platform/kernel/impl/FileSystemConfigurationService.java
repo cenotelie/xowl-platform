@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
@@ -26,7 +25,6 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
@@ -77,8 +75,8 @@ public class FileSystemConfigurationService implements ConfigurationService {
         Configuration configuration = new Configuration();
         File file = new File(directory, entityId + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
-            try (FileInputStream stream = new FileInputStream(file)) {
-                configuration.load(stream, Files.CHARSET);
+            try {
+                configuration.load(file);
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
             }

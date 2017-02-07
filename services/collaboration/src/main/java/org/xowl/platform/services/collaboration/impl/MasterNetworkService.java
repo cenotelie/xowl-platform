@@ -497,9 +497,9 @@ public class MasterNetworkService implements CollaborationNetworkService {
         File servicePlatformConfigFile = new File(instanceConfigDir, PlatformManagementService.class.getCanonicalName() + ".ini");
         Configuration configuration = new Configuration();
         try {
-            configuration.load(servicePlatformConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.load(servicePlatformConfigFile);
             configuration.set("httpsPort", Integer.toString(instance.getDescriptor().getPort()));
-            configuration.save(servicePlatformConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.save(servicePlatformConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
@@ -509,11 +509,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
         File serviceCollabConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
         configuration = new Configuration();
         try {
-            configuration.load(serviceCollabConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.load(serviceCollabConfigFile);
             configuration.set("manifest", "collaboration.json");
             configuration.set("network", "service", SlaveNetworkService.class.getCanonicalName());
             configuration.set("network", "master", "https://localhost:8443/api");
-            configuration.save(serviceCollabConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.save(serviceCollabConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
@@ -523,11 +523,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
         File serviceSecurityConfigFile = new File(instanceConfigDir, SecurityService.class.getCanonicalName() + ".ini");
         configuration = new Configuration();
         try {
-            configuration.load(serviceSecurityConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.load(serviceSecurityConfigFile);
             configuration.set("realm", "type", "org.xowl.platform.services.security.internal.XOWLSubordinateRealm");
             configuration.set("realm", "location", "users");
             configuration.set("realm", "master", "https://localhost:8443/api");
-            configuration.save(serviceSecurityConfigFile.getAbsolutePath(), Files.CHARSET);
+            configuration.save(serviceSecurityConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);

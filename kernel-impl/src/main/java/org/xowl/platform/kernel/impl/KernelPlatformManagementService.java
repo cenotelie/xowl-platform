@@ -640,7 +640,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         File confFile = new File(new File(new File(root, "felix"), "conf"), "config.properties");
         Configuration felixConfiguration = new Configuration();
         try {
-            felixConfiguration.load(confFile.getAbsolutePath(), Files.CHARSET);
+            felixConfiguration.load(confFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return;
@@ -754,7 +754,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
         if (mustReboot) {
             try {
-                felixConfiguration.save(confFile.getAbsolutePath(), Files.CHARSET);
+                felixConfiguration.save(confFile);
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
                 return;

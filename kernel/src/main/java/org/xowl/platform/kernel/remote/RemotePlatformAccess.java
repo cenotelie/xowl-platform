@@ -1473,7 +1473,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * Launches a new impact analysis
      *
      * @param definition The specification for the analysis
-     * @return
+     * @return The protocol reply
      */
     public XSPReply newImpactAnalysis(Serializable definition) {
         return doRequest(

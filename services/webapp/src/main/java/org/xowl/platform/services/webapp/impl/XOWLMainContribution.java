@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.webapp.impl;
 
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
@@ -45,7 +46,7 @@ public class XOWLMainContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return URI_WEB;
+        return PlatformHttp.getUriPrefixWeb();
     }
 
     @Override

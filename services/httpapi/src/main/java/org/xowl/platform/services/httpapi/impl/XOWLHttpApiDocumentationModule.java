@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ui.WebUIContribution;
@@ -34,7 +35,14 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
     /**
      * The URI prefix for this contribution
      */
-    public static final String PREFIX = URI_WEB + "/contributions/documentation";
+    private final String prefix;
+
+    /**
+     * Initializes this contribution
+     */
+    public XOWLHttpApiDocumentationModule() {
+        this.prefix = PlatformHttp.getUriPrefixWeb() + "/contributions/documentation";
+    }
 
     @Override
     public String getIdentifier() {
@@ -48,7 +56,7 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return PREFIX;
+        return prefix;
     }
 
     @Override
@@ -58,7 +66,7 @@ public class XOWLHttpApiDocumentationModule implements WebUIContribution {
 
     @Override
     public URL getResource(String resource) {
-        String rest = resource.substring(PREFIX.length() + 1);
+        String rest = resource.substring(prefix.length() + 1);
         HttpApiDiscoveryService discoveryService = Register.getComponent(HttpApiDiscoveryService.class);
         if (discoveryService == null)
             return null;

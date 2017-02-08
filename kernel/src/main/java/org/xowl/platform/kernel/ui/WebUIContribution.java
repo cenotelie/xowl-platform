@@ -28,11 +28,6 @@ import java.net.URL;
  */
 public interface WebUIContribution extends Registrable {
     /**
-     * The URI prefix for web connections
-     */
-    String URI_WEB = "/web";
-
-    /**
      * Gets the contribution-specific prefix of the URI
      * This essentially is what identifies this contribution
      *

@@ -17,6 +17,7 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
@@ -35,7 +36,14 @@ public class SemanticWebUIContribution implements WebUIContribution {
     /**
      * The URI prefix for this contribution
      */
-    public static final String PREFIX = URI_WEB + "/contributions/connectors/semanticweb";
+    private final String prefix;
+
+    /**
+     * Initializes this contribution
+     */
+    public SemanticWebUIContribution() {
+        this.prefix = PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/semanticweb";
+    }
 
     @Override
     public String getIdentifier() {
@@ -49,7 +57,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return PREFIX;
+        return prefix;
     }
 
     @Override
@@ -59,7 +67,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public URL getResource(String resource) {
-        return SemanticWebUIContribution.class.getResource(RESOURCES + resource.substring(PREFIX.length()));
+        return SemanticWebUIContribution.class.getResource(RESOURCES + resource.substring(prefix.length()));
 
     }
 }

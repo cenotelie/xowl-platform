@@ -17,6 +17,7 @@
 
 package org.xowl.platform.connectors.csv;
 
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
@@ -31,10 +32,18 @@ public class CSVUIContribution implements WebUIContribution {
      * The root resource for the web app files
      */
     private static final String RESOURCES = "/org/xowl/platform/connectors/csv";
+
     /**
      * The URI prefix for this contribution
      */
-    public static final String PREFIX = URI_WEB + "/contributions/connectors/csv";
+    private final String prefix;
+
+    /**
+     * Initializes this contribution
+     */
+    public CSVUIContribution() {
+        this.prefix = PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/csv";
+    }
 
     @Override
     public String getIdentifier() {
@@ -48,7 +57,7 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return PREFIX;
+        return prefix;
     }
 
     @Override
@@ -58,6 +67,6 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public URL getResource(String resource) {
-        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(PREFIX.length()));
+        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(prefix.length()));
     }
 }

@@ -19,6 +19,9 @@ package org.xowl.platform.connectors.csv;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
@@ -32,12 +35,17 @@ import org.xowl.platform.services.importation.Importer;
  */
 public class Activator implements BundleActivator {
     @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(Importer.class, new CSVImporter(), null);
-        bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
-        bundleContext.registerService(ConnectorDescriptor.class, CSVConnectorDescriptor.INSTANCE, null);
-        bundleContext.registerService(ConnectorServiceFactory.class, CSVConnectorFactory.INSTANCE, null);
-        bundleContext.registerService(WebUIContribution.class, new CSVUIContribution(), null);
+    public void start(final BundleContext bundleContext) throws Exception {
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(PlatformHttp component) {
+                bundleContext.registerService(Importer.class, new CSVImporter(), null);
+                bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
+                bundleContext.registerService(ConnectorDescriptor.class, CSVConnectorDescriptor.INSTANCE, null);
+                bundleContext.registerService(ConnectorServiceFactory.class, CSVConnectorFactory.INSTANCE, null);
+                bundleContext.registerService(WebUIContribution.class, new CSVUIContribution(), null);
+            }
+        });
     }
 
     @Override

@@ -74,10 +74,6 @@ import java.util.List;
  */
 public class XOWLStorageService implements StorageService, HttpApiService, Closeable {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/storage";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLStorageService.class, "/org/xowl/platform/services/storage/api_service_storage.raml", "Storage Service - Specification", HttpApiResource.MIME_RAML);
@@ -87,6 +83,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLStorageService.class, "/org/xowl/platform/services/storage/api_service_storage.html", "Storage Service - Documentation", HttpApiResource.MIME_HTML);
 
 
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri;
     /**
      * The remote server
      */
@@ -110,6 +110,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
     public XOWLStorageService() {
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/storage";
         this.server = resolveServer(configuration);
         this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
             @Override
@@ -376,16 +377,16 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/sparql")) {
+        if (request.getUri().equals(apiUri + "/sparql")) {
             return onMessageSPARQL(request);
-        } else if (request.getUri().equals(URI_API + "/artifacts")) {
+        } else if (request.getUri().equals(apiUri + "/artifacts")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             // get artifacts
@@ -437,7 +438,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
                 builder.append("]");
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
             }
-        } else if (request.getUri().equals(URI_API + "/artifacts/diff")) {
+        } else if (request.getUri().equals(apiUri + "/artifacts/diff")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             // diff artifacts left and right
@@ -448,7 +449,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             if (rights == null || rights.length == 0)
                 return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
             return onMessageDiffArtifacts(lefts[0], rights[0]);
-        } else if (request.getUri().equals(URI_API + "/artifacts/live")) {
+        } else if (request.getUri().equals(apiUri + "/artifacts/live")) {
             XSPReply reply = getLiveArtifacts();
             if (!reply.isSuccess())
                 return XSPReplyUtils.toHttpResponse(reply, null);
@@ -462,8 +463,8 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().startsWith(URI_API + "/artifacts")) {
-            String rest = request.getUri().substring(URI_API.length() + "/artifacts".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/artifacts")) {
+            String rest = request.getUri().substring(apiUri.length() + "/artifacts".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

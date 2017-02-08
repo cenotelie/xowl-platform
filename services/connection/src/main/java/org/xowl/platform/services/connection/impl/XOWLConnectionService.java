@@ -73,10 +73,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/connection";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLConnectionService.class, "/org/xowl/platform/services/connection/api_service_connection.raml", "Connection Service - Specification", HttpApiResource.MIME_RAML);
@@ -104,9 +100,13 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             ERROR_HELP_PREFIX + "0x00010002.html");
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+    /**
      * The spawned connectors by identifier
      */
-    private final Map<String, Registration> connectorsById = new HashMap<>();
+    private final Map<String, Registration> connectorsById;
     /**
      * The map of statically configured connectors to resolve
      */
@@ -115,6 +115,14 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * Flag whether resolving operations are in progress
      */
     private boolean isResolving;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLConnectionService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/connection";
+        this.connectorsById = new HashMap<>();
+    }
 
     @Override
     public String getIdentifier() {
@@ -133,23 +141,23 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/descriptors")) {
+        if (request.getUri().equals(apiUri + "/descriptors")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onMessageListDescriptors();
-        } else if (request.getUri().equals(URI_API + "/connectors")) {
+        } else if (request.getUri().equals(apiUri + "/connectors")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onMessageListConnectors();
-        } else if (request.getUri().startsWith(URI_API + "/connectors")) {
-            String rest = request.getUri().substring(URI_API.length() + "/connectors".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/connectors")) {
+            String rest = request.getUri().substring(apiUri.length() + "/connectors".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

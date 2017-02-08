@@ -54,7 +54,14 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     /**
      * The URI for the API services
      */
-    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/business";
+    private final String apiUri;
+
+    /**
+     * Initializes this service
+     */
+    public KernelBusinessDirectoryService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/business";
+    }
 
     @Override
     public String getIdentifier() {

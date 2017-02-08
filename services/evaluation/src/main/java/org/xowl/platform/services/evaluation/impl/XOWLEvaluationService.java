@@ -27,6 +27,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -50,10 +51,6 @@ import java.util.Collections;
  * @author Laurent Wouters
  */
 public class XOWLEvaluationService implements EvaluationService, HttpApiService {
-    /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/evaluation";
     /**
      * The resource for the API's specification
      */
@@ -82,9 +79,15 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
             HttpApiService.ERROR_HELP_PREFIX + "0x00050002.html");
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+
+    /**
      * Initializes this service
      */
     public XOWLEvaluationService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/evaluation";
     }
 
     @Override
@@ -104,29 +107,29 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/evaluableTypes")) {
+        if (request.getUri().equals(apiUri + "/evaluableTypes")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onGetEvaluableTypes();
         }
-        if (request.getUri().equals(URI_API + "/evaluables")) {
+        if (request.getUri().equals(apiUri + "/evaluables")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onGetEvaluables(request);
         }
-        if (request.getUri().equals(URI_API + "/criterionTypes")) {
+        if (request.getUri().equals(apiUri + "/criterionTypes")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onGetCriterionTypes(request);
         }
-        if (request.getUri().equals(URI_API + "/evaluations")) {
+        if (request.getUri().equals(apiUri + "/evaluations")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET:
                     return onGetEvaluations();
@@ -135,8 +138,8 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        if (request.getUri().startsWith(URI_API + "/evaluations")) {
-            String rest = request.getUri().substring(URI_API.length() + "/evaluations".length() + 1);
+        if (request.getUri().startsWith(apiUri + "/evaluations")) {
+            String rest = request.getUri().substring(apiUri.length() + "/evaluations".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

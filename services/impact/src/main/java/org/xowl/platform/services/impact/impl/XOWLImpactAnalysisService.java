@@ -28,6 +28,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -50,10 +51,6 @@ import java.net.HttpURLConnection;
  */
 public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/impact";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImpactAnalysisService.class, "/org/xowl/platform/services/impact/api_service_impact.raml", "Impact Analysis Service - Specification", HttpApiResource.MIME_RAML);
@@ -66,6 +63,17 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImpactAnalysisService.class, "/org/xowl/platform/services/impact/schema_platform_impact.json", "Impact Analysis Service - Schema", HttpConstants.MIME_JSON);
 
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLImpactAnalysisService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/impact";
+    }
 
     @Override
     public String getIdentifier() {
@@ -84,7 +92,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }

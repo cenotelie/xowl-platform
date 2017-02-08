@@ -57,12 +57,13 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
     /**
      * The URI for the API services
      */
-    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/discovery";
+    private final String apiUri;
 
     /**
      * Initializes this service
      */
     public KernelHttpApiDiscoveryService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/discovery";
     }
 
     @Override

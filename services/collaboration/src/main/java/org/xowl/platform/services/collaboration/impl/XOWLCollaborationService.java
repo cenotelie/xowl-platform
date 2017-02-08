@@ -30,10 +30,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -61,10 +58,6 @@ import java.util.Map;
  */
 public class XOWLCollaborationService extends XOWLCollaborationLocalService implements CollaborationService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/collaboration";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLCollaborationService.class, "/org/xowl/platform/services/collaboration/api_service_collaboration.raml", "Collaboration Service - Specification", HttpApiResource.MIME_RAML);
@@ -73,6 +66,10 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLCollaborationService.class, "/org/xowl/platform/services/collaboration/api_service_collaboration.html", "Collaboration Service - Documentation", HttpApiResource.MIME_HTML);
 
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri;
     /**
      * The collaboration network service
      */
@@ -83,6 +80,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      */
     public XOWLCollaborationService() {
         super();
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/collaboration";
     }
 
     /**
@@ -218,26 +216,26 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/archive")) {
+        if (request.getUri().equals(apiUri + "/archive")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             return XSPReplyUtils.toHttpResponse(archive(), null);
-        } else if (request.getUri().equals(URI_API + "/delete")) {
+        } else if (request.getUri().equals(apiUri + "/delete")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             return XSPReplyUtils.toHttpResponse(delete(), null);
-        } else if (request.getUri().startsWith(URI_API + "/manifest")) {
+        } else if (request.getUri().startsWith(apiUri + "/manifest")) {
             return handleManifest(request);
-        } else if (request.getUri().startsWith(URI_API + "/neighbours")) {
+        } else if (request.getUri().startsWith(apiUri + "/neighbours")) {
             return handleNeighbours(request);
-        } else if (request.getUri().equals(URI_API + "/specifications")) {
+        } else if (request.getUri().equals(apiUri + "/specifications")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             boolean first = true;
@@ -250,7 +248,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().equals(URI_API + "/patterns")) {
+        } else if (request.getUri().equals(apiUri + "/patterns")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             boolean first = true;
@@ -274,12 +272,12 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      * @return The response
      */
     private HttpResponse handleManifest(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/manifest")) {
+        if (request.getUri().equals(apiUri + "/manifest")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, manifest.serializedJSON());
         }
-        String rest = request.getUri().substring(URI_API.length() + "/manifest".length());
+        String rest = request.getUri().substring(apiUri.length() + "/manifest".length());
         if (rest.startsWith("/inputs"))
             return handleManifestInputs(request);
         else if (rest.startsWith("/outputs"))
@@ -301,7 +299,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      * @return The response
      */
     private HttpResponse handleManifestInputs(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/manifest/inputs")) {
+        if (request.getUri().equals(apiUri + "/manifest/inputs")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
                     boolean first = true;
@@ -329,7 +327,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        String rest = request.getUri().substring(URI_API.length() + "/manifest/inputs".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/manifest/inputs".length() + 1);
         int index = rest.indexOf("/");
         String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
         if (specId.isEmpty())
@@ -391,7 +389,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      * @return The response
      */
     private HttpResponse handleManifestOutputs(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/manifest/outputs")) {
+        if (request.getUri().equals(apiUri + "/manifest/outputs")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
                     boolean first = true;
@@ -419,7 +417,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        String rest = request.getUri().substring(URI_API.length() + "/manifest/inputs".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/manifest/inputs".length() + 1);
         int index = rest.indexOf("/");
         String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
         if (specId.isEmpty())
@@ -481,7 +479,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      * @return The response
      */
     private HttpResponse handleManifestRoles(HttpApiRequest request) {
-        String rest = request.getUri().substring(URI_API.length() + "/manifest/roles".length());
+        String rest = request.getUri().substring(apiUri.length() + "/manifest/roles".length());
         if (rest.isEmpty()) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
@@ -529,7 +527,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
      * @return The response
      */
     private HttpResponse handleNeighbours(HttpApiRequest request) {
-        String rest = request.getUri().substring(URI_API.length() + "/neighbours".length());
+        String rest = request.getUri().substring(apiUri.length() + "/neighbours".length());
         if (rest.isEmpty()) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {

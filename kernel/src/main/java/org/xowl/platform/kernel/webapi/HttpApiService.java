@@ -30,11 +30,6 @@ import org.xowl.platform.kernel.security.SecurityService;
  */
 public interface HttpApiService extends Service, Serializable {
     /**
-     * The URI prefix for API connections
-     */
-    String URI_API = "/api";
-
-    /**
      * The response when this service cannot handle a request
      */
     int CANNOT_HANDLE = -1;

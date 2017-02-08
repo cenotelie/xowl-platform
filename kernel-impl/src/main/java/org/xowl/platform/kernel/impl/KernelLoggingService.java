@@ -140,7 +140,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     /**
      * The URI for the API services
      */
-    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/log";
+    private final String apiUri;
     /**
      * The buffer of the last messages
      */
@@ -163,6 +163,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
      */
     public KernelLoggingService() {
         super(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/log";
         this.messages = new Msg[BUFFER_SIZE];
         this.head = new AtomicInteger(-1);
         this.errorsCount = new AtomicInteger(0);

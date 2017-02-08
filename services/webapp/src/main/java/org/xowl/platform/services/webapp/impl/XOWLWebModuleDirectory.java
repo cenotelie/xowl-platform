@@ -20,6 +20,7 @@ package org.xowl.platform.services.webapp.impl;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -38,10 +39,6 @@ import java.net.HttpURLConnection;
  */
 public class XOWLWebModuleDirectory implements HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/webapp";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/api_service_webappmodules.raml", "Web Modules Directory Service - Specification", HttpApiResource.MIME_RAML);
@@ -53,6 +50,18 @@ public class XOWLWebModuleDirectory implements HttpApiService {
      * The resource for the API's schema
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLWebModuleDirectory.class, "/org/xowl/platform/services/webapp/apidoc/schema_platform_webappmodules.json", "Web Modules Directory Service - Schema", HttpConstants.MIME_JSON);
+
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLWebModuleDirectory() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/webapp";
+    }
 
     @Override
     public String getIdentifier() {
@@ -66,14 +75,14 @@ public class XOWLWebModuleDirectory implements HttpApiService {
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/modules")) {
+        if (request.getUri().equals(apiUri + "/modules")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             StringBuilder builder = new StringBuilder("[");

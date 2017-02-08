@@ -28,10 +28,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -56,10 +53,6 @@ import java.util.Map;
  */
 public class XOWLImportationService implements ImportationService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/importation";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLImportationService.class, "/org/xowl/platform/services/importation/api_service_importation.raml", "Importation Service - Specification", HttpApiResource.MIME_RAML);
@@ -81,6 +74,10 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             HttpApiService.ERROR_HELP_PREFIX + "0x00040001.html");
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+    /**
      * The current documents pending importation
      */
     private final Map<String, Document> documents;
@@ -93,6 +90,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * Initializes this service
      */
     public XOWLImportationService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/importation";
         this.documents = new HashMap<>();
     }
 
@@ -169,18 +167,18 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/importers")) {
+        if (request.getUri().equals(apiUri + "/importers")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onGetImporters();
-        } else if (request.getUri().equals(URI_API + "/documents")) {
+        } else if (request.getUri().equals(apiUri + "/documents")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET:
                     return onGetDocuments();
@@ -188,8 +186,8 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                     return onPutDocument(request);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
-        } else if (request.getUri().startsWith(URI_API + "/importers")) {
-            String rest = request.getUri().substring(URI_API.length() + "/importers".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/importers")) {
+            String rest = request.getUri().substring(apiUri.length() + "/importers".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");
@@ -200,8 +198,8 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 return onGetImporter(importerId);
             }
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        } else if (request.getUri().startsWith(URI_API + "/documents")) {
-            String rest = request.getUri().substring(URI_API.length() + "/documents".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/documents")) {
+            String rest = request.getUri().substring(apiUri.length() + "/documents".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

@@ -26,10 +26,7 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.Addon;
@@ -58,10 +55,6 @@ import java.util.Collections;
  */
 public class XOWLMarketplaceService implements MarketplaceService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/marketplace";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(XOWLMarketplaceService.class, "/org/xowl/platform/services/marketplace/api_service_marketplace.raml", "Marketplace Service - Specification", HttpApiResource.MIME_RAML);
@@ -71,9 +64,20 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLMarketplaceService.class, "/org/xowl/platform/services/marketplace/api_service_marketplace.html", "Marketplace Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+    /**
      * The available marketplaces
      */
     private Collection<Marketplace> marketplaces;
+
+    /**
+     * Initializes this service
+     */
+    public XOWLMarketplaceService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/marketplace";
+    }
 
     /**
      * Gets the marketplaces
@@ -125,14 +129,14 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/addons")) {
+        if (request.getUri().equals(apiUri + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             String[] inputs = request.getParameter("input");
@@ -147,8 +151,8 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().startsWith(URI_API + "/addons")) {
-            String rest = request.getUri().substring(URI_API.length() + "/addons".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/addons")) {
+            String rest = request.getUri().substring(apiUri.length() + "/addons".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

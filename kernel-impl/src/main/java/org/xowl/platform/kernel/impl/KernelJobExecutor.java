@@ -111,7 +111,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     /**
      * The URI for the API services
      */
-    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/jobs";
+    private final String apiUri;
     /**
      * The queue to use before the executor is activated
      */
@@ -151,6 +151,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
         int poolMax = EXECUTOR_POOL_MAX;
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/jobs";
         this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
         try {
             String value = configuration.get("queueBound");

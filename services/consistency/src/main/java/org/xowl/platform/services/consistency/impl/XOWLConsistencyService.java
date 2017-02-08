@@ -40,10 +40,7 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
-import org.xowl.platform.kernel.KernelSchema;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -65,10 +62,6 @@ import java.util.*;
  * @author Laurent Wouters
  */
 public class XOWLConsistencyService implements ConsistencyService, HttpApiService {
-    /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/services/consistency";
     /**
      * The resource for the API's specification
      */
@@ -132,9 +125,15 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     private static final String IRI_ANTECEDENT = IRI_SCHEMA + "#antecedent_";
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+
+    /**
      * Initializes this service
      */
     public XOWLConsistencyService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/consistency";
     }
 
     @Override
@@ -154,14 +153,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/inconsistencies")) {
+        if (request.getUri().equals(apiUri + "/inconsistencies")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             XSPReply reply = getInconsistencies();
@@ -179,7 +178,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 
-        if (request.getUri().equals(URI_API + "/rules")) {
+        if (request.getUri().equals(apiUri + "/rules")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
                     XSPReply reply = getRules();
@@ -217,8 +216,8 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        if (request.getUri().startsWith(URI_API + "/rules")) {
-            String rest = request.getUri().substring(URI_API.length() + "/rules".length() + 1);
+        if (request.getUri().startsWith(apiUri + "/rules")) {
+            String rest = request.getUri().substring(apiUri.length() + "/rules".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

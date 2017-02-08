@@ -61,12 +61,13 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
     /**
      * The URI for the API services
      */
-    private static final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/statistics";
+    private final String apiUri;
 
     /**
      * Initializes this provider
      */
     public KernelStatisticsService() {
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/statistics";
     }
 
     @Override

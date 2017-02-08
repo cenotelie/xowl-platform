@@ -85,7 +85,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The URI for the API services
      */
-    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/security";
+    private final String apiUri;
     /**
      * The maximum number of login failure before ban
      */
@@ -134,6 +134,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      */
     public KernelSecurityService(ConfigurationService configurationService) {
         Configuration configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/security";
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));
         this.realmConfiguration = configuration.getSection("realm");

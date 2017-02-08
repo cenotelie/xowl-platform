@@ -21,6 +21,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
@@ -42,10 +43,6 @@ import java.util.Collection;
  */
 public class KernelBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/business";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelBusinessDirectoryService.class, "/org/xowl/platform/kernel/impl/api_business.raml", "Business Directory Service - Specification", HttpApiResource.MIME_RAML);
@@ -53,6 +50,11 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
      * The resource for the API's documentation
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelBusinessDirectoryService.class, "/org/xowl/platform/kernel/impl/api_business.html", "Business Directory Service - Documentation", HttpApiResource.MIME_HTML);
+
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/business";
 
     @Override
     public String getIdentifier() {
@@ -94,7 +96,7 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
@@ -103,17 +105,17 @@ public class KernelBusinessDirectoryService implements BusinessDirectoryService,
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-        if (request.getUri().equals(URI_API + "/archetypes")) {
+        if (request.getUri().equals(apiUri + "/archetypes")) {
             return onGetArchetypes();
-        } else if (request.getUri().equals(URI_API + "/schemas")) {
+        } else if (request.getUri().equals(apiUri + "/schemas")) {
             return onGetSchemas();
-        } else if (request.getUri().startsWith(URI_API + "/archetypes")) {
-            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/archetypes".length() + 1));
+        } else if (request.getUri().startsWith(apiUri + "/archetypes")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(apiUri.length() + "/archetypes".length() + 1));
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             return onGetArchetype(rest);
-        } else if (request.getUri().startsWith(URI_API + "/schemas")) {
-            String rest = URIUtils.decodeComponent(request.getUri().substring(URI_API.length() + "/schemas".length() + 1));
+        } else if (request.getUri().startsWith(apiUri + "/schemas")) {
+            String rest = URIUtils.decodeComponent(request.getUri().substring(apiUri.length() + "/schemas".length() + 1));
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             return onGetSchema(rest);

@@ -31,6 +31,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.LoggingService;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -52,10 +53,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Laurent Wouters
  */
 public class KernelLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
-    /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/log";
     /**
      * The resource for the API's specification
      */
@@ -141,6 +138,10 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     }
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/log";
+    /**
      * The buffer of the last messages
      */
     private final Msg[] messages;
@@ -199,7 +200,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }

@@ -68,10 +68,6 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     private static final String DESCRIPTOR_FILE = "descriptor.json";
 
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/platform";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
@@ -100,6 +96,10 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             ERROR_HELP_PREFIX + "0x0023.html");
 
     /**
+     * The URI for the API services
+     */
+    private final String apiUri;
+    /**
      * The cache of bundles
      */
     private final List<Bundle> bundles;
@@ -124,13 +124,14 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      */
     public KernelPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
         Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/platform";
         this.bundles = new ArrayList<>();
         this.product = loadProductDescriptor();
         this.addons = new ArrayList<>();
         this.addonsCache = new File(System.getenv(Env.ROOT), configuration.get("addonsStorage"));
         if (this.addonsCache.exists())
             loadAddonsCache();
-        enforceHttpConfigFelix(configuration, executionService);
+        enforceHttpConfigFelix(PlatformHttp.instance(), executionService);
     }
 
     /**
@@ -211,29 +212,29 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/product")) {
+        if (request.getUri().equals(apiUri + "/product")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Product product = getPlatformProduct();
             if (product == null)
                 return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
-        } else if (request.getUri().equals(URI_API + "/shutdown")) {
+        } else if (request.getUri().equals(apiUri + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             return XSPReplyUtils.toHttpResponse(shutdown(), null);
-        } else if (request.getUri().equals(URI_API + "/restart")) {
+        } else if (request.getUri().equals(apiUri + "/restart")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             return XSPReplyUtils.toHttpResponse(restart(), null);
-        } else if (request.getUri().equals(URI_API + "/bundles")) {
+        } else if (request.getUri().equals(apiUri + "/bundles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             StringBuilder builder = new StringBuilder("[");
@@ -246,7 +247,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().equals(URI_API + "/addons")) {
+        } else if (request.getUri().equals(apiUri + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             StringBuilder builder = new StringBuilder("[");
@@ -259,8 +260,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().startsWith(URI_API + "/addons")) {
-            String rest = request.getUri().substring(URI_API.length() + "/addons".length() + 1);
+        } else if (request.getUri().startsWith(apiUri + "/addons")) {
+            String rest = request.getUri().substring(apiUri.length() + "/addons".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");
@@ -632,10 +633,10 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     /**
      * Enforces the configuration of the HTTP service provided by Felix when it is the current OSGi framework
      *
-     * @param platformConfiguration The expected configuration for the platform
-     * @param executionService      The job execution service
+     * @param platformHttp     The expected configuration for the platform
+     * @param executionService The job execution service
      */
-    private static void enforceHttpConfigFelix(Configuration platformConfiguration, JobExecutionService executionService) {
+    private static void enforceHttpConfigFelix(PlatformHttp platformHttp, JobExecutionService executionService) {
         File root = new File(System.getProperty(Env.ROOT));
         File confFile = new File(new File(new File(root, "felix"), "conf"), "config.properties");
         Configuration felixConfiguration = new Configuration();
@@ -649,9 +650,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
         // Felix default for org.apache.felix.http.enable is true
         boolean httpEnabled = false;
-        String valueTarget = platformConfiguration.get("httpEnabled");
         String valueReal = felixConfiguration.get("org.apache.felix.http.enable");
-        if ("true".equalsIgnoreCase(valueTarget)) {
+        if (platformHttp.isHttpEnabled()) {
             httpEnabled = true;
             if (valueReal != null && "false".equalsIgnoreCase(valueReal)) {
                 // must enable HTTP
@@ -668,9 +668,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
         // Felix default for org.apache.felix.https.enable is false
         boolean httpsEnabled = false;
-        valueTarget = platformConfiguration.get("httpsEnabled");
         valueReal = felixConfiguration.get("org.apache.felix.https.enable");
-        if ("true".equalsIgnoreCase(valueTarget)) {
+        if (platformHttp.isHttpsEnabled()) {
             httpsEnabled = true;
             if (valueReal == null || "false".equalsIgnoreCase(valueReal)) {
                 // must enable HTTPS
@@ -687,7 +686,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
         if (httpEnabled || httpsEnabled) {
             // Felix default for org.apache.felix.http.host is null
-            valueTarget = platformConfiguration.get("httpHost");
+            String valueTarget = platformHttp.getHttpHost();
             valueReal = felixConfiguration.get("org.apache.felix.http.host");
             if (!Objects.equals(valueReal, valueTarget)) {
                 // must update bound address
@@ -698,28 +697,28 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
         if (httpEnabled) {
             // Felix default for org.osgi.service.http.port is 8080
-            valueTarget = platformConfiguration.get("httpPort");
+            int valueTarget = platformHttp.getHttpPort();
             valueReal = felixConfiguration.get("org.osgi.service.http.port");
-            if ((valueReal == null && !"8080".equals(valueTarget))
-                    || (!Objects.equals(valueReal, valueTarget))) {
+            if ((valueReal == null && valueTarget != 8080)
+                    || (!Objects.equals(valueReal, Integer.toString(valueTarget)))) {
                 // must update port
-                felixConfiguration.set("org.osgi.service.http.port", valueTarget);
+                felixConfiguration.set("org.osgi.service.http.port", Integer.toString(valueTarget));
                 mustReboot = true;
             }
         }
 
         if (httpsEnabled) {
             // Felix default for org.osgi.service.http.port.secure is 8443
-            valueTarget = platformConfiguration.get("httpsPort");
+            int portTarget = platformHttp.getHttpsPort();
             valueReal = felixConfiguration.get("org.osgi.service.http.port.secure");
-            if ((valueReal == null && !"8443".equals(valueTarget))
-                    || (!Objects.equals(valueReal, valueTarget))) {
+            if ((valueReal == null && portTarget != 8443)
+                    || (!Objects.equals(valueReal, Integer.toString(portTarget)))) {
                 // must update port
-                felixConfiguration.set("org.osgi.service.http.port.secure", valueTarget);
+                felixConfiguration.set("org.osgi.service.http.port.secure", Integer.toString(portTarget));
                 mustReboot = true;
             }
 
-            valueTarget = platformConfiguration.get("tlsKeyStore");
+            String valueTarget = platformHttp.getTlsKeyStore();
             valueReal = felixConfiguration.get("org.apache.felix.https.keystore");
             if (valueTarget == null || valueTarget.isEmpty()) {
                 // key store is auto-generated
@@ -742,7 +741,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                     felixConfiguration.set("org.apache.felix.https.keystore", valueTarget);
                     mustReboot = true;
                 }
-                valueTarget = platformConfiguration.get("tlsKeyPassword");
+                valueTarget = platformHttp.getTlsKeyPassword();
                 valueReal = felixConfiguration.get("org.apache.felix.https.keystore.password");
                 if (!Objects.equals(valueReal, valueTarget)) {
                     felixConfiguration.set("org.apache.felix.https.keystore.password", valueTarget);

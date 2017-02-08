@@ -27,6 +27,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformGroup;
@@ -53,10 +54,6 @@ import java.util.*;
  * @author Laurent Wouters
  */
 public class KernelSecurityService implements SecurityService, HttpApiService {
-    /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/security";
     /**
      * The resource for the API's specification
      */
@@ -85,6 +82,10 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * The context of a thread
      */
     private static final ThreadLocal<PlatformUser> CONTEXT = new ThreadLocal<>();
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/security";
     /**
      * The maximum number of login failure before ban
      */
@@ -170,26 +171,26 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/login"))
+        if (request.getUri().equals(apiUri + "/login"))
             return handleRequestLogin(request);
-        if (request.getUri().equals(URI_API + "/logout"))
+        if (request.getUri().equals(apiUri + "/logout"))
             return handleRequestLogout(request);
-        if (request.getUri().equals(URI_API + "/me"))
+        if (request.getUri().equals(apiUri + "/me"))
             return handleRequestMe(request);
-        if (request.getUri().startsWith(URI_API + "/policy"))
+        if (request.getUri().startsWith(apiUri + "/policy"))
             return handleRequestPolicy(request);
-        if (request.getUri().startsWith(URI_API + "/users"))
+        if (request.getUri().startsWith(apiUri + "/users"))
             return handleRequestUsers(request);
-        if (request.getUri().startsWith(URI_API + "/groups"))
+        if (request.getUri().startsWith(apiUri + "/groups"))
             return handleRequestGroups(request);
-        if (request.getUri().startsWith(URI_API + "/roles"))
+        if (request.getUri().startsWith(apiUri + "/roles"))
             return handleRequestRoles(request);
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -403,7 +404,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
         response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "=" + token +
                 "; Max-Age=" + Long.toString(securityTokenTTL) +
-                "; Path=" + HttpApiService.URI_API +
+                "; Path=" + PlatformHttp.getUriPrefixApi() +
                 "; Secure" +
                 "; HttpOnly");
         return response;
@@ -424,7 +425,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
         response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "= " +
                 "; Max-Age=0" +
-                "; Path=" + HttpApiService.URI_API +
+                "; Path=" + PlatformHttp.getUriPrefixApi() +
                 "; Secure" +
                 "; HttpOnly");
         return response;
@@ -449,13 +450,13 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestPolicy(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/policy")) {
+        if (request.getUri().equals(apiUri + "/policy")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return XSPReplyUtils.toHttpResponse(getPolicy().getConfiguration(), null);
         }
-        if (request.getUri().startsWith(URI_API + "/policy/actions/")) {
-            String rest = request.getUri().substring(URI_API.length() + "/policy/actions/".length());
+        if (request.getUri().startsWith(apiUri + "/policy/actions/")) {
+            String rest = request.getUri().substring(apiUri.length() + "/policy/actions/".length());
             String actionId = URIUtils.decodeComponent(rest);
             if (actionId.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -474,7 +475,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestUsers(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/users")) {
+        if (request.getUri().equals(apiUri + "/users")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformUser> users = getRealm().getUsers();
@@ -490,7 +491,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 
-        String rest = request.getUri().substring(URI_API.length() + "/users".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/users".length() + 1);
         if (rest.isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         int index = rest.indexOf("/");
@@ -569,7 +570,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestGroups(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/groups")) {
+        if (request.getUri().equals(apiUri + "/groups")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformGroup> groups = getRealm().getGroups();
@@ -585,7 +586,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 
-        String rest = request.getUri().substring(URI_API.length() + "/groups".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/groups".length() + 1);
         if (rest.isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         int index = rest.indexOf("/");
@@ -683,7 +684,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * @return The HTTP response
      */
     private HttpResponse handleRequestRoles(HttpApiRequest request) {
-        if (request.getUri().equals(URI_API + "/roles")) {
+        if (request.getUri().equals(apiUri + "/roles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Collection<PlatformRole> roles = getRealm().getRoles();
@@ -699,7 +700,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 
-        String rest = request.getUri().substring(URI_API.length() + "/roles".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/roles".length() + 1);
         if (rest.isEmpty())
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         int index = rest.indexOf("/");

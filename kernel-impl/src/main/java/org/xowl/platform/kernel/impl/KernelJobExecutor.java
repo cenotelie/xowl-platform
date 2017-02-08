@@ -79,10 +79,6 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     private static final int COMPLETED_QUEUED_BOUND = EXECUTOR_QUEUE_BOUND;
 
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/jobs";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_jobs.raml", "Jobs Management Service - Specification", HttpApiResource.MIME_RAML);
@@ -112,6 +108,10 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
             ERROR_HELP_PREFIX + "0x0013.html");
 
 
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/jobs";
     /**
      * The queue to use before the executor is activated
      */
@@ -545,21 +545,21 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(URI_API)) {
+        if (request.getUri().equals(apiUri)) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             return onRequestJobs();
         }
 
-        if (request.getUri().startsWith(URI_API)) {
-            String rest = request.getUri().substring(URI_API.length() + 1);
+        if (request.getUri().startsWith(apiUri)) {
+            String rest = request.getUri().substring(apiUri.length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

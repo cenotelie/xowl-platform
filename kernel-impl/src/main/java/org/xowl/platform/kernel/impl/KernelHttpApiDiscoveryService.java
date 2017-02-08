@@ -20,6 +20,7 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -37,10 +38,6 @@ import java.util.Map;
  */
 public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/discovery";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/api_discovery.raml", "API Discovery Service - Specification", HttpApiResource.MIME_RAML);
@@ -56,6 +53,11 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
             new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/schema_infra_utils.json", "Schema - xOWL Infrastructure", HttpConstants.MIME_JSON),
             new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/schema_platform_kernel.json", "Schema - xOWL Platform - Kernel", HttpConstants.MIME_JSON)
     };
+
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/discovery";
 
     /**
      * Initializes this service
@@ -101,7 +103,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
@@ -110,7 +112,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-        if (request.getUri().equals(URI_API + "/services")) {
+        if (request.getUri().equals(apiUri + "/services")) {
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (HttpApiService service : getServices()) {
@@ -121,7 +123,7 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().equals(URI_API + "/resources")) {
+        } else if (request.getUri().equals(apiUri + "/resources")) {
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (HttpApiResource resource : getResources()) {

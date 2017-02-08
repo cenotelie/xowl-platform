@@ -26,6 +26,7 @@ import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricProvider;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -48,10 +49,6 @@ import java.util.Collection;
  */
 public class KernelStatisticsService implements StatisticsService, HttpApiService {
     /**
-     * The URI for the API services
-     */
-    private static final String URI_API = HttpApiService.URI_API + "/kernel/statistics";
-    /**
      * The resource for the API's specification
      */
     private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/impl/api_statistics.raml", "Statistics Service - Specification", HttpApiResource.MIME_RAML);
@@ -60,6 +57,11 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelStatisticsService.class, "/org/xowl/platform/kernel/impl/api_statistics.html", "Statistics Service - Documentation", HttpApiResource.MIME_HTML);
 
+
+    /**
+     * The URI for the API services
+     */
+    private static final String apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/statistics";
 
     /**
      * Initializes this provider
@@ -84,7 +86,7 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(URI_API)
+        return request.getUri().startsWith(apiUri)
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
@@ -94,11 +96,11 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
 
-        if (request.getUri().equals(URI_API + "/metrics"))
+        if (request.getUri().equals(apiUri + "/metrics"))
             return onMessageGetMetricList(securityService);
 
-        if (request.getUri().startsWith(URI_API + "/metrics")) {
-            String rest = request.getUri().substring(URI_API.length() + "/metrics".length() + 1);
+        if (request.getUri().startsWith(apiUri + "/metrics")) {
+            String rest = request.getUri().substring(apiUri.length() + "/metrics".length() + 1);
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             int index = rest.indexOf("/");

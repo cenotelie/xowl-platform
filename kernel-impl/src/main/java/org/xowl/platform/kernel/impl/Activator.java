@@ -22,6 +22,7 @@ import org.osgi.framework.BundleContext;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.LoggingService;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.events.EventService;
@@ -56,6 +57,15 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        // register the configuration service
+        ConfigurationService configurationService = new FileSystemConfigurationService();
+        bundleContext.registerService(Service.class, configurationService, null);
+        bundleContext.registerService(ConfigurationService.class, configurationService, null);
+
+        // register the HTTP configuration
+        PlatformHttp platformHttp = PlatformHttp.initialize(configurationService);
+        bundleContext.registerService(PlatformHttp.class, platformHttp, null);
+
         // register the logging service
         KernelLoggingService loggingService = new KernelLoggingService();
         Logging.setDefault(loggingService);
@@ -65,10 +75,6 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(MeasurableService.class, loggingService, null);
         bundleContext.registerService(LoggingService.class, loggingService, null);
 
-        // register the configuration service
-        ConfigurationService configurationService = new FileSystemConfigurationService();
-        bundleContext.registerService(Service.class, configurationService, null);
-        bundleContext.registerService(ConfigurationService.class, configurationService, null);
 
         // register the security service
         KernelSecurityProvider securityProvider = new KernelSecurityProvider();

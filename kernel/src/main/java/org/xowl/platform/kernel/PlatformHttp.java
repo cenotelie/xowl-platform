@@ -215,7 +215,7 @@ public class PlatformHttp implements Registrable {
         String publicUri = configuration.get("publicUri");
         if (publicUri == null || publicUri.isEmpty()) {
             if (httpsEnabled)
-                publicUri = "https://" + httpHost + ":" + httpPort + httpURIPrefix;
+                publicUri = "https://" + httpHost + ":" + httpsPort + httpURIPrefix;
             else if (httpEnabled)
                 publicUri = "http://" + httpHost + ":" + httpPort + httpURIPrefix;
             else

@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceReference;
  * @param <T> The type of registrable
  * @author Laurent Wouters
  */
-class RegisterListener<T extends Registrable> implements ServiceListener {
+class RegisterListener<T> implements ServiceListener {
     /**
      * The bundle context for the listener
      */
@@ -61,8 +61,10 @@ class RegisterListener<T extends Registrable> implements ServiceListener {
             ServiceReference reference = serviceEvent.getServiceReference();
             if (reference != null) {
                 Object component = context.getService(reference);
-                if (component != null && type.isInstance(component))
-                    listener.onAvailable((T) component);
+                if (component != null && type.isInstance(component)) {
+                    listener.onAvailable(context, (T) component);
+                    context.removeServiceListener(this);
+                }
             }
         }
     }

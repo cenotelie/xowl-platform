@@ -19,6 +19,9 @@ package org.xowl.platform.services.connection;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -35,13 +38,18 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        XOWLConnectionService directory = new XOWLConnectionService();
-        bundleContext.registerService(Service.class, directory, null);
-        bundleContext.registerService(SecuredService.class, directory, null);
-        bundleContext.registerService(HttpApiService.class, directory, null);
-        bundleContext.registerService(ConnectionService.class, directory, null);
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                XOWLConnectionService directory = new XOWLConnectionService();
+                bundleContext.registerService(Service.class, directory, null);
+                bundleContext.registerService(SecuredService.class, directory, null);
+                bundleContext.registerService(HttpApiService.class, directory, null);
+                bundleContext.registerService(ConnectionService.class, directory, null);
 
-        bundleContext.registerService(JobFactory.class, new ConnectorJobFactory(), null);
+                bundleContext.registerService(JobFactory.class, new ConnectorJobFactory(), null);
+            }
+        }, bundleContext);
     }
 
     @Override

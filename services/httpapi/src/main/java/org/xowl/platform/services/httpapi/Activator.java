@@ -19,11 +19,11 @@ package org.xowl.platform.services.httpapi;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
-import org.osgi.util.tracker.ServiceTracker;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.httpapi.impl.XOWLHttpApiDocumentationModule;
@@ -39,44 +39,30 @@ import java.util.Hashtable;
  */
 public class Activator implements BundleActivator {
     /**
-     * The tracker of the HTTP service
-     */
-    private ServiceTracker httpTracker;
-    /**
      * The server
      */
     private XOWLMainHTTPServer server;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        httpTracker = new ServiceTracker<HttpService, HttpService>(bundleContext, HttpService.class, null) {
-            public void removedService(ServiceReference reference, HttpService service) {
-                try {
-                    service.unregister(PlatformHttp.getUriPrefixApi());
-                } catch (IllegalArgumentException exception) {
-                    // ignore this
-                }
-            }
-
-            public HttpService addingService(ServiceReference reference) {
-                HttpService httpService = (HttpService) bundleContext.getService(reference);
-                try {
-                    httpService.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(httpService));
-                } catch (Exception exception) {
-                    Logging.getDefault().error(exception);
-                }
-                return httpService;
-            }
-        };
         server = new XOWLMainHTTPServer();
-        httpTracker.open();
         bundleContext.registerService(Service.class, server, null);
         bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
         bundleContext.registerService(WebUIContribution.class, new XOWLHttpApiDocumentationModule(), null);
+
+        Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, HttpService component) {
+                try {
+                    component.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(component));
+                } catch (Exception exception) {
+                    Logging.getDefault().error(exception);
+                }
+            }
+        }, bundleContext);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        httpTracker.close();
     }
 }

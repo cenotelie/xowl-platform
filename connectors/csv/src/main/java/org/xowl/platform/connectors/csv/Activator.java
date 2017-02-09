@@ -35,17 +35,17 @@ import org.xowl.platform.services.importation.Importer;
  */
 public class Activator implements BundleActivator {
     @Override
-    public void start(final BundleContext bundleContext) throws Exception {
+    public void start(BundleContext bundleContext) throws Exception {
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
-            public void onAvailable(PlatformHttp component) {
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
                 bundleContext.registerService(Importer.class, new CSVImporter(), null);
                 bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
                 bundleContext.registerService(ConnectorDescriptor.class, CSVConnectorDescriptor.INSTANCE, null);
                 bundleContext.registerService(ConnectorServiceFactory.class, CSVConnectorFactory.INSTANCE, null);
                 bundleContext.registerService(WebUIContribution.class, new CSVUIContribution(), null);
             }
-        });
+        }, bundleContext);
     }
 
     @Override

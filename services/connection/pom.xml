@@ -13,12 +13,6 @@
     <description>The connection services for input/output with satellites</description>
     <dependencies>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.tracker</artifactId>
-            <version>1.5.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-kernel</artifactId>
             <version>0.2.4-SNAPSHOT</version>

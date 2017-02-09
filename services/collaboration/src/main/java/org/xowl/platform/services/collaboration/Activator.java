@@ -19,6 +19,9 @@ package org.xowl.platform.services.collaboration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.remote.DeserializerFactory;
@@ -38,23 +41,28 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCollaboration(), null);
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCollaboration(), null);
 
-        bundleContext.registerService(JobFactory.class, new CollaborationJobFactory(), null);
+                bundleContext.registerService(JobFactory.class, new CollaborationJobFactory(), null);
 
-        XOWLCollaborationService collaborationService = new XOWLCollaborationService();
-        bundleContext.registerService(Service.class, collaborationService, null);
-        bundleContext.registerService(SecuredService.class, collaborationService, null);
-        bundleContext.registerService(HttpApiService.class, collaborationService, null);
-        bundleContext.registerService(CollaborationService.class, collaborationService, null);
-        bundleContext.registerService(CollaborationLocalService.class, collaborationService, null);
-        bundleContext.registerService(CollaborationNetworkService.class, collaborationService, null);
+                XOWLCollaborationService collaborationService = new XOWLCollaborationService();
+                bundleContext.registerService(Service.class, collaborationService, null);
+                bundleContext.registerService(SecuredService.class, collaborationService, null);
+                bundleContext.registerService(HttpApiService.class, collaborationService, null);
+                bundleContext.registerService(CollaborationService.class, collaborationService, null);
+                bundleContext.registerService(CollaborationLocalService.class, collaborationService, null);
+                bundleContext.registerService(CollaborationNetworkService.class, collaborationService, null);
 
-        XOWLNetworkProvider networkProvider = new XOWLNetworkProvider();
-        bundleContext.registerService(CollaborationNetworkServiceProvider.class, networkProvider, null);
+                XOWLNetworkProvider networkProvider = new XOWLNetworkProvider();
+                bundleContext.registerService(CollaborationNetworkServiceProvider.class, networkProvider, null);
 
-        XOWLPatternProvider patternProvider = new XOWLPatternProvider();
-        bundleContext.registerService(CollaborationPatternProvider.class, patternProvider, null);
+                XOWLPatternProvider patternProvider = new XOWLPatternProvider();
+                bundleContext.registerService(CollaborationPatternProvider.class, patternProvider, null);
+            }
+        }, bundleContext);
     }
 
     @Override

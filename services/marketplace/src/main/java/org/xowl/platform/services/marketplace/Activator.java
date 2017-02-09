@@ -19,6 +19,9 @@ package org.xowl.platform.services.marketplace;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -36,14 +39,19 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
-        bundleContext.registerService(Service.class, marketplaceService, null);
-        bundleContext.registerService(SecuredService.class, marketplaceService, null);
-        bundleContext.registerService(HttpApiService.class, marketplaceService, null);
-        bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                XOWLMarketplaceService marketplaceService = new XOWLMarketplaceService();
+                bundleContext.registerService(Service.class, marketplaceService, null);
+                bundleContext.registerService(SecuredService.class, marketplaceService, null);
+                bundleContext.registerService(HttpApiService.class, marketplaceService, null);
+                bundleContext.registerService(MarketplaceService.class, marketplaceService, null);
 
-        bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
-        bundleContext.registerService(JobFactory.class, new MarketplaceJobFactory(), null);
+                bundleContext.registerService(MarketplaceProvider.class, new XOWLMarketplaceProvider(), null);
+                bundleContext.registerService(JobFactory.class, new MarketplaceJobFactory(), null);
+            }
+        }, bundleContext);
     }
 
     @Override

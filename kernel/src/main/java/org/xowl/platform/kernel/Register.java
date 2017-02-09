@@ -108,15 +108,15 @@ public class Register {
      *
      * @param componentType The type of component to wait for
      * @param waiter        The listener
+     * @param context       The bundle context for the listener
      * @param <S>           The type of component
      */
-    public static <S extends Registrable> void waitFor(Class<S> componentType, RegisterWaiter<S> waiter) {
-        BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
+    public static <S> void waitFor(Class<S> componentType, RegisterWaiter<S> waiter, BundleContext context) {
         ServiceReference reference = context.getServiceReference(componentType);
         if (reference != null) {
             S component = (S) context.getService(reference);
             context.ungetService(reference);
-            waiter.onAvailable(component);
+            waiter.onAvailable(context, component);
         } else {
             context.addServiceListener(new RegisterListener<S>(context, componentType, waiter));
         }

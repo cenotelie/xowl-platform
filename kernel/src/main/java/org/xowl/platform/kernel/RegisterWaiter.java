@@ -17,17 +17,20 @@
 
 package org.xowl.platform.kernel;
 
+import org.osgi.framework.BundleContext;
+
 /**
  * Represents a structure that waits for a component to become available
  *
  * @param <T> The type of registrable
  * @author Laurent Wouters
  */
-public interface RegisterWaiter<T extends Registrable> {
+public interface RegisterWaiter<T> {
     /**
      * Event when a component become available
      *
+     * @param context   The current context
      * @param component The component
      */
-    void onAvailable(T component);
+    void onAvailable(BundleContext context, T component);
 }

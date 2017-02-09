@@ -19,6 +19,9 @@ package org.xowl.platform.services.storage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
@@ -41,15 +44,20 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        storeService = new XOWLStorageService();
-        bundleContext.registerService(Service.class, storeService, null);
-        bundleContext.registerService(SecuredService.class, storeService, null);
-        bundleContext.registerService(HttpApiService.class, storeService, null);
-        bundleContext.registerService(MeasurableService.class, storeService, null);
-        bundleContext.registerService(StorageService.class, storeService, null);
-        bundleContext.registerService(ArtifactStorageService.class, storeService, null);
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                storeService = new XOWLStorageService();
+                bundleContext.registerService(Service.class, storeService, null);
+                bundleContext.registerService(SecuredService.class, storeService, null);
+                bundleContext.registerService(HttpApiService.class, storeService, null);
+                bundleContext.registerService(MeasurableService.class, storeService, null);
+                bundleContext.registerService(StorageService.class, storeService, null);
+                bundleContext.registerService(ArtifactStorageService.class, storeService, null);
 
-        bundleContext.registerService(JobFactory.class, new StorageJobFactory(), null);
+                bundleContext.registerService(JobFactory.class, new StorageJobFactory(), null);
+            }
+        }, bundleContext);
     }
 
     @Override

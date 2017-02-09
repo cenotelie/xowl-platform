@@ -19,6 +19,9 @@ package org.xowl.platform.connectors.semanticweb;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
@@ -33,11 +36,16 @@ import org.xowl.platform.services.importation.Importer;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(ConnectorDescriptor.class, SemanticWebConnectorDescriptor.INSTANCE, null);
-        bundleContext.registerService(ConnectorServiceFactory.class, new SemanticWebConnectorFactory(), null);
-        bundleContext.registerService(Importer.class, new SemanticWebImporter(), null);
-        bundleContext.registerService(JobFactory.class, new SemanticWebImportJobFactory(), null);
-        bundleContext.registerService(WebUIContribution.class, new SemanticWebUIContribution(), null);
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
+            @Override
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                bundleContext.registerService(ConnectorDescriptor.class, SemanticWebConnectorDescriptor.INSTANCE, null);
+                bundleContext.registerService(ConnectorServiceFactory.class, new SemanticWebConnectorFactory(), null);
+                bundleContext.registerService(Importer.class, new SemanticWebImporter(), null);
+                bundleContext.registerService(JobFactory.class, new SemanticWebImportJobFactory(), null);
+                bundleContext.registerService(WebUIContribution.class, new SemanticWebUIContribution(), null);
+            }
+        }, bundleContext);
     }
 
     @Override

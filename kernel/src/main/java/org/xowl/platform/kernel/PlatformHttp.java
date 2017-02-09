@@ -26,6 +26,15 @@ import org.xowl.infra.utils.config.Configuration;
  */
 public class PlatformHttp implements Registrable {
     /**
+     * The URI suffix for the web API
+     */
+    private static final String URI_API = "/api";
+    /**
+     * The URI suffix for the web resources
+     */
+    private static final String URI_WEB = "/web";
+
+    /**
      * The singleton instance of this structure
      */
     private static PlatformHttp INSTANCE = null;
@@ -57,7 +66,7 @@ public class PlatformHttp implements Registrable {
      * @return The uri prefix for the API endpoint
      */
     public static String getUriPrefixApi() {
-        return INSTANCE.getHttpUriPrefix() + "/api";
+        return INSTANCE.getHttpUriPrefix() + URI_API;
     }
 
     /**
@@ -66,8 +75,9 @@ public class PlatformHttp implements Registrable {
      * @return The uri prefix for the web resources
      */
     public static String getUriPrefixWeb() {
-        return INSTANCE.getHttpUriPrefix() + "/web";
+        return INSTANCE.getHttpUriPrefix() + URI_WEB;
     }
+
 
     /**
      * Whether HTTP shall be enabled
@@ -101,6 +111,10 @@ public class PlatformHttp implements Registrable {
      * The password for the TLS key store (if any)
      */
     private final String tlsKeyPassword;
+    /**
+     * The advertised public URI for the platform
+     */
+    private final String publicUri;
 
     /**
      * Gets whether HTTP shall be enabled
@@ -175,6 +189,15 @@ public class PlatformHttp implements Registrable {
     }
 
     /**
+     * Gets the advertised public URI for the platform
+     *
+     * @return The advertised public URI for the platform
+     */
+    public String getPublicUri() {
+        return publicUri;
+    }
+
+    /**
      * Initializes this structure
      *
      * @param configurationService The configuration service
@@ -189,6 +212,16 @@ public class PlatformHttp implements Registrable {
         this.httpURIPrefix = configuration.get("httpURIPrefix");
         this.tlsKeyStore = configuration.get("tlsKeyStore");
         this.tlsKeyPassword = configuration.get("tlsKeyPassword");
+        String publicUri = configuration.get("publicUri");
+        if (publicUri == null || publicUri.isEmpty()) {
+            if (httpsEnabled)
+                publicUri = "https://" + httpHost + ":" + httpPort + httpURIPrefix;
+            else if (httpEnabled)
+                publicUri = "http://" + httpHost + ":" + httpPort + httpURIPrefix;
+            else
+                publicUri = null;
+        }
+        this.publicUri = publicUri;
     }
 
     @Override

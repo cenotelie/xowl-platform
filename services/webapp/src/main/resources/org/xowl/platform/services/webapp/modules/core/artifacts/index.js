@@ -11,7 +11,7 @@ var DIFF_RIGHT = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Artifacts Management"}], function() {
 		doGetData();
 	});
@@ -106,12 +106,12 @@ function renderConnectors() {
 			var cell1 = document.createElement("td");
 			var cell2 = document.createElement("td");
 			var img = document.createElement("img");
-			img.src = "/web/assets/connector.svg";
+			img.src = ROOT + "/assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
 			img.title = CONNECTORS[i].identifier;
 			var link = document.createElement("a");
-			link.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
+			link.href = ROOT + "/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
 			link.appendChild(document.createTextNode(CONNECTORS[i].name));
 			cell1.appendChild(link);
@@ -131,7 +131,7 @@ function renderConnectors() {
 			var cell1 = document.createElement("td");
 			var cell2 = document.createElement("td");
 			var img = document.createElement("img");
-			img.src = "/web/assets/connector.svg";
+			img.src = ROOT + "/assets/connector.svg";
 			img.width = 32;
 			img.height = 32;
 			img.title = CONNECTORS[i].identifier;
@@ -139,7 +139,7 @@ function renderConnectors() {
 			badge.className = "badge";
 			badge.appendChild(document.createTextNode(CONNECTORS[i].queue.length.toString()));
 			var link = document.createElement("a");
-			link.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
+			link.href = ROOT + "/modules/admin/connectors/connector.html?id=" + encodeURIComponent(CONNECTORS[i].identifier);
 			link.appendChild(img);
 			link.appendChild(document.createTextNode(" "));
 			link.appendChild(document.createTextNode(CONNECTORS[i].name));
@@ -189,7 +189,7 @@ function renderArtifactFamily(family, index) {
 	cells[0].appendChild(button);
 	cells[0].appendChild(document.createTextNode((index + 1).toString()));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/artifact_family.svg";
+	icon.src = ROOT + "/assets/artifact_family.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
@@ -231,7 +231,7 @@ function renderArtifact(artifact) {
 	link.href = "artifact.html?id=" + encodeURIComponent(artifact.identifier);
 	link.appendChild(document.createTextNode(artifact.name));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/artifact.svg";
+	icon.src = ROOT + "/assets/artifact.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

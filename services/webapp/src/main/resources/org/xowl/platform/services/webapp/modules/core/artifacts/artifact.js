@@ -8,8 +8,8 @@ var CONTENT = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Artifacts Management", uri: "/web/modules/core/artifacts/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Artifacts Management", uri: ROOT + "/modules/core/artifacts/"},
 			{name: "Artifact " + artifactId}], function() {
 		if (artifactId === null || artifactId == "")
 			return;
@@ -74,7 +74,7 @@ function renderMetadata(metadata) {
 	document.getElementById("artifact-name").value = metadata.name;
 	document.getElementById("artifact-archetype").value = metadata.archetype;
 	document.getElementById("artifact-origin").appendChild(document.createTextNode(metadata.from));
-	document.getElementById("artifact-origin").href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(metadata.from);
+	document.getElementById("artifact-origin").href = ROOT + "/modules/admin/connectors/connector.html?id=" + encodeURIComponent(metadata.from);
 	document.getElementById("artifact-base").appendChild(document.createTextNode(metadata.base));
 	document.getElementById("artifact-base").href = "base.html?id=" + encodeURIComponent(metadata.base);
 	document.getElementById("artifact-creation").value = metadata.creation;

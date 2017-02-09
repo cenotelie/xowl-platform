@@ -9,9 +9,9 @@ var artifacts = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
-			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
-			{name: "Inputs & Outputs", uri: "/web/modules/collab/local/io.html"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
+			{name: "Local Collaboration", uri: ROOT + "/modules/collab/local/"},
+			{name: "Inputs & Outputs", uri: ROOT + "/modules/collab/local/io.html"},
 			{name: "Input " + specId}], function() {
 		if (!specId || specId === null || specId === "")
 			return;
@@ -107,14 +107,14 @@ function renderArtifact(artifact) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/artifact.svg";
+	image.src = ROOT + "/assets/artifact.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = artifact.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(artifact.name));
-	link.href = "/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifact.identifier);
+	link.href = ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifact.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
@@ -125,7 +125,7 @@ function renderArtifact(artifact) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "UNREGISTER";

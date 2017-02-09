@@ -7,7 +7,7 @@ var HISTORY = [];
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Traceability Exploration"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

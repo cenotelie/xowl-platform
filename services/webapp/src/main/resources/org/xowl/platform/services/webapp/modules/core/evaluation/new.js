@@ -8,8 +8,8 @@ var CRITERIA_SELECTED = [];
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Evaluation Analysis", uri: "/web/modules/core/evaluation/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Evaluation Analysis", uri: ROOT + "/modules/core/evaluation/"},
 			{name: "New Evaluation"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -77,7 +77,7 @@ function renderEvaluables(data) {
 function renderEvaluable(evaluable) {
 	evaluable.selected = false;
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/element.svg";
+	icon.src = ROOT + "/assets/element.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
@@ -169,7 +169,7 @@ function renderCriterion(criterion) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(button);
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/criterion.svg";
+	icon.src = ROOT + "/assets/criterion.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

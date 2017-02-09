@@ -6,8 +6,8 @@ var evalId = getParameterByName("id");
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Evaluation Analysis", uri: "/web/modules/core/evaluation/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Evaluation Analysis", uri: ROOT + "/modules/core/evaluation/"},
 			{name: "Evaluation " + evalId}], function() {
 		if (!evalId || evalId === null || evalId === "")
 			return;
@@ -26,7 +26,7 @@ function renderEval(evaluation) {
 	var heads = document.getElementById("table-heads");
 	for (var i = 0; i != evaluation.evaluables.length; i++) {
 		var icon = document.createElement("img");
-		icon.src = "/web/assets/element.svg";
+		icon.src = ROOT + "/assets/element.svg";
 		icon.width = 40;
 		icon.height = 40;
 		icon.style.marginRight = "20px";
@@ -40,7 +40,7 @@ function renderEval(evaluation) {
 	for (var i = 0; i != evaluation.criteria.length; i++) {
 		var row = document.createElement("tr");
 		var icon = document.createElement("img");
-		icon.src = "/web/assets/criterion.svg";
+		icon.src = ROOT + "/assets/criterion.svg";
 		icon.width = 40;
 		icon.height = 40;
 		icon.style.marginRight = "20px";

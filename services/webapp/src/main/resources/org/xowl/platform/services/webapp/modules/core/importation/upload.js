@@ -5,8 +5,8 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
 			{name: "Upload New Document"}], function() {
 	});
 }

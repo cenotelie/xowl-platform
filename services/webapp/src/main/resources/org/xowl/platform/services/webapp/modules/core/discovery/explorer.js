@@ -15,8 +15,8 @@ var GRAPH = new GraphCanvas(GRAPH_WIDTH, GRAPH_HEIGHT, document.getElementById("
 function init() {
 	var rootId = getParameterByName("id");
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Traceability Exploration", uri: "/web/modules/core/discovery"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Traceability Exploration", uri: ROOT + "/modules/core/discovery"},
 			{name: "Entity " + rootId}], function() {
 		if (typeof (rootId) === "undefined" || rootId === null || rootId === "") {
 			displayMessage("error", "Undefined root entity!");

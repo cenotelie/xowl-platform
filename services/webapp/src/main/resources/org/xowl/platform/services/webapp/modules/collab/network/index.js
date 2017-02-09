@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
 			{name: "Collaborations Network"}], function() {
 		doGetData();
 	});
@@ -36,7 +36,7 @@ function renderNeighbour(neighbour) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/" + renderNeighbourGetIcon(neighbour);
+	image.src = ROOT + "/assets/" + renderNeighbourGetIcon(neighbour);
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";

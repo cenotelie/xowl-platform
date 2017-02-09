@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
 			{name: "Local Collaboration"}], function() {
 		doGetData();
 	});

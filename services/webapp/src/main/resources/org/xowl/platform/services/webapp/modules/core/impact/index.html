@@ -6,10 +6,10 @@
     <title>Impact Analysis</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/web/assets/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/web/vendors/bootstrap-theme.min.css">
-    <link rel="stylesheet" type="text/css" href="/web/app.css">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
 </head>
 
 <body>
@@ -21,13 +21,13 @@
                 <div class="panel panel-warning">
                     <div class="panel-body">
                         <span class="text-warning">The data presented here come from</span>
-                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <img src="../../../assets/db.svg" width="25px" style="display: inline-block;"/>
                         <strong class="text-warning">live</strong>
                         <span class="text-warning">. Data in artifacts not pushed to</span>
-                        <img src="/web/assets/db.svg" width="25px" style="display: inline-block;"/>
+                        <img src="../../../assets/db.svg" width="25px" style="display: inline-block;"/>
                         <strong class="text-warning">live</strong>
                         <span class="text-warning">won't appear here.</span>
-                        <a href="/web/modules/core/artifacts/">Manage artifacts</a>
+                        <a href="../../../modules/core/artifacts/">Manage artifacts</a>
                     </div>
                 </div>
             </div>
@@ -43,21 +43,21 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <img src="/web/assets/schema.svg" width="40" height="40"/>
+                            <img src="../../../assets/schema.svg" width="40" height="40"/>
                             <label for="root-schema">Schema for root's type:</label>
                             <select class="form-control" id="root-schema" onchange="onSchemaChange()"></select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <img src="/web/assets/concept.svg" width="40" height="40"/>
+                            <img src="../../../assets/concept.svg" width="40" height="40"/>
                             <label for="root-type">Root's type:</label>
                             <select class="form-control" id="root-type" onchange="onTypeChange()"></select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <img src="/web/assets/element.svg" width="40" height="40"/>
+                            <img src="../../../assets/element.svg" width="40" height="40"/>
                             <label for="root-element">Root element:</label>
                             <select class="form-control" id="root-element"></select>
                         </div>
@@ -81,7 +81,7 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div>
-                            <img src="/web/assets/relation.svg" width="40" height="40"/>
+                            <img src="../../../assets/relation.svg" width="40" height="40"/>
                             <label>Links to use during the analysis:</label>
                             <select id="filters-links-inclusive">
                                 <option value="inclusive">Inclusive (Only use the selected links)</option>
@@ -103,7 +103,7 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div>
-                            <img src="/web/assets/concept.svg" width="40" height="40"/>
+                            <img src="../../../assets/concept.svg" width="40" height="40"/>
                             <label>Types to look for during the analysis:</label>
                             <select id="filters-types-inclusive">
                                 <option value="inclusive">Inclusive (Only report the selected types)</option>
@@ -163,9 +163,9 @@
 </div>
 <div id="placeholder-footer"></div>
 
-<script src="/web/xowl/xowl-api-platform.js"></script>
-<script src="/web/xowl/xowl-api-nquads.js"></script>
-<script src="/web/xowl/xowl-ui.js"></script>
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-api-nquads.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
 <script src="index.js"></script>
 <script>init();</script>
 </body>

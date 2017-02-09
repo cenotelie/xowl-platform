@@ -17,8 +17,8 @@ var specification = {
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
-			{name: "Collaborations Network", uri: "/web/modules/collab/network/"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
+			{name: "Collaborations Network", uri: ROOT + "/modules/collab/network/"},
 			{name: "New Collaboration"}], function() {
 		setupAutocompleteArchetype("input-archetype");
 		setupAutocompleteArchetype("output-archetype");
@@ -386,7 +386,7 @@ function renderSpecification(specification, toRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/specification.svg";
+	image.src = ROOT + "/assets/specification.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -404,7 +404,7 @@ function renderSpecification(specification, toRemove) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";
@@ -434,7 +434,7 @@ function renderRole(role, toRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/role.svg";
+	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -448,7 +448,7 @@ function renderRole(role, toRemove) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";

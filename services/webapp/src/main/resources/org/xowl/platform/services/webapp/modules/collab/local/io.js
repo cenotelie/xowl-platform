@@ -7,8 +7,8 @@ var archetypes = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
-			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
+			{name: "Local Collaboration", uri: ROOT + "/modules/collab/local/"},
 			{name: "Inputs & Outputs"}], function() {
 		doGetData();
 	});
@@ -69,7 +69,7 @@ function renderIOElement(element, linkName, toRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/specification.svg";
+	image.src = ROOT + "/assets/specification.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -91,7 +91,7 @@ function renderIOElement(element, linkName, toRemove) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";

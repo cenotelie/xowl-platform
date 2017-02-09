@@ -10,7 +10,7 @@ var FILTER_TYPES = [];
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Impact Analysis"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

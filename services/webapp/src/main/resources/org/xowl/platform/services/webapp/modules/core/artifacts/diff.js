@@ -11,8 +11,8 @@ var MARKER = 0;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Artifacts Management", uri: "/web/modules/core/artifacts/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Artifacts Management", uri: ROOT + "/modules/core/artifacts/"},
 			{name: "Diff"}], function() {
 		if (ARTIFACTID_LEFT === null || ARTIFACTID_LEFT == "")
 			return;

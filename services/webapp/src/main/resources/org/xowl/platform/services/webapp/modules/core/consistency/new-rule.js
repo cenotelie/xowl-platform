@@ -5,8 +5,8 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Consistency Management", uri: "/web/modules/core/consistency/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
 			{name: "New Consistency Rule"}], function() {});
 	var prefixes = "";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {

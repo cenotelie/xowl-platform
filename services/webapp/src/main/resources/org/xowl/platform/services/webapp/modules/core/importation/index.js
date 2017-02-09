@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Data Import"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -29,7 +29,7 @@ function renderDocument(index, doc) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(document.createTextNode((index + 1).toString()));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/document.svg";
+	icon.src = ROOT + "/assets/document.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
@@ -43,13 +43,13 @@ function renderDocument(index, doc) {
 	var cell3 = document.createElement("td");
 	cell3.appendChild(document.createTextNode(doc.uploadDate));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/user.svg";
+	icon.src = ROOT + "/assets/user.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
 	icon.title = doc.uploader;
 	link = document.createElement("a");
-	link.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(doc.uploader);
+	link.href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(doc.uploader);
 	link.appendChild(document.createTextNode(doc.uploader));
 	var cell4 = document.createElement("td");
 	cell4.appendChild(icon);

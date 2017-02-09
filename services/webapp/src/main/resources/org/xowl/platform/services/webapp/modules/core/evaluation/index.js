@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Evaluation Analysis"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -29,7 +29,7 @@ function renderEvaluation(index, evaluation) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(document.createTextNode((index + 1).toString()));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/evaluation.svg";
+	icon.src = ROOT + "/assets/evaluation.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

@@ -6,8 +6,8 @@ var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
-			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
+			{name: "Local Collaboration", uri: ROOT + "/modules/collab/local/"},
 			{name: "People and Roles"}], function() {
 		setupAutocomplete();
 		doGetData();
@@ -72,21 +72,21 @@ function renderRole(role) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/role.svg";
+	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
-	link.href = "/web/modules/admin/security/role.html.html?id=" + encodeURIComponent(role.identifier);
+	link.href = ROOT + "/modules/admin/security/role.html.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";

@@ -8,8 +8,8 @@ var SCHEMAS = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Impact Analysis", uri: "/web/modules/core/impact/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Impact Analysis", uri: ROOT + "/modules/core/impact/"},
 			{name: jobName}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;
@@ -100,7 +100,7 @@ function renderResult(job) {
 			table.appendChild(row);
 
 			var icon = document.createElement("img");
-			icon.src = "/web/assets/concept.svg";
+			icon.src = ROOT + "/assets/concept.svg";
 			icon.width = 40;
 			icon.height = 40;
 			icon.style.marginRight = "20px";
@@ -109,7 +109,7 @@ function renderResult(job) {
 			cell1.classList.add("entity" + (i % 2).toString());
 
 			icon = document.createElement("img");
-			icon.src = "/web/assets/element.svg";
+			icon.src = ROOT + "/assets/element.svg";
 			icon.width = 40;
 			icon.height = 40;
 			icon.style.marginRight = "20px";
@@ -135,7 +135,7 @@ function renderPath(path, name) {
 		span_property.classList.add("link");
 
 		var icon_element = document.createElement("img");
-		icon_element.src = "/web/assets/element.svg";
+		icon_element.src = ROOT + "/assets/element.svg";
 		icon_element.width = 20;
 		icon_element.height = 20;
 		icon_element.style.marginRight = "5px";
@@ -143,7 +143,7 @@ function renderPath(path, name) {
 		div.appendChild(span_target);
 
 		var icon_link = document.createElement("img");
-		icon_link.src = "/web/assets/relation.svg";
+		icon_link.src = ROOT + "/assets/relation.svg";
 		icon_link.width = 20;
 		icon_link.height = 20;
 		icon_link.style.marginRight = "5px";
@@ -154,7 +154,7 @@ function renderPath(path, name) {
 	span_node.appendChild(document.createTextNode(name));
 	span_node.classList.add("node");
 	var icon_element = document.createElement("img");
-	icon_element.src = "/web/assets/element.svg";
+	icon_element.src = ROOT + "/assets/element.svg";
 	icon_element.width = 20;
 	icon_element.height = 20;
 	icon_element.style.marginRight = "5px";

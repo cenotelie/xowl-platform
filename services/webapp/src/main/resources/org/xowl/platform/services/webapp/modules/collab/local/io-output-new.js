@@ -6,9 +6,9 @@ var archetypes = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Collaboration", uri: "/web/modules/collab/"},
-			{name: "Local Collaboration", uri: "/web/modules/collab/local/"},
-			{name: "Inputs & Outputs", uri: "/web/modules/collab/local/io.html"},
+			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
+			{name: "Local Collaboration", uri: ROOT + "/modules/collab/local/"},
+			{name: "Inputs & Outputs", uri: ROOT + "/modules/collab/local/io.html"},
 			{name: "New Output Spec ..."}], function() {
 		setupAutocomplete();
 	});

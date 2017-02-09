@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -28,7 +28,7 @@ function renderInconsistency(inconsistency, index) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(document.createTextNode((index + 1).toString()));
 	var icon = document.createElement("img");
-	icon.src = "/web/assets/inconsistency.svg";
+	icon.src = ROOT + "/assets/inconsistency.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
@@ -37,7 +37,7 @@ function renderInconsistency(inconsistency, index) {
 	cell2.appendChild(icon);
 	cell2.appendChild(renderInconsistencyMessage(inconsistency));
 	icon = document.createElement("img");
-	icon.src = "/web/assets/rule.svg";
+	icon.src = ROOT + "/assets/rule.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

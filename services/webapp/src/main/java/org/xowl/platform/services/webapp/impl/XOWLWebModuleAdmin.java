@@ -30,13 +30,13 @@ public class XOWLWebModuleAdmin extends WebModuleBase {
      * Initializes this service
      */
     public XOWLWebModuleAdmin() {
-        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Platform Administration", "admin", "/web/assets/module-admin.svg", 100);
-        this.items.add(new WebModuleItem("Platform Security", "security", "/web/assets/security.svg"));
-        this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/web/assets/connector.svg"));
-        this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/web/assets/jobs.svg"));
-        this.items.add(new WebModuleItem("Platform Statistics", "statistics", "/web/assets/statistics.svg"));
-        this.items.add(new WebModuleItem("Platform Log", "log", "/web/assets/log.svg"));
-        this.items.add(new WebModuleItem("Platform Documentation", "documentation", "/web/assets/documentation.svg"));
-        this.items.add(new WebModuleItem("Platform Management", "platform", "/web/assets/platform.svg"));
+        super(XOWLWebModuleAdmin.class.getCanonicalName(), "Platform Administration", "admin", "/assets/module-admin.svg", 100);
+        this.items.add(new WebModuleItem("Platform Security", "security", "/assets/security.svg"));
+        this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/assets/connector.svg"));
+        this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/assets/jobs.svg"));
+        this.items.add(new WebModuleItem("Platform Statistics", "statistics", "/assets/statistics.svg"));
+        this.items.add(new WebModuleItem("Platform Log", "log", "/assets/log.svg"));
+        this.items.add(new WebModuleItem("Platform Documentation", "documentation", "/assets/documentation.svg"));
+        this.items.add(new WebModuleItem("Platform Management", "platform", "/assets/platform.svg"));
     }
 }

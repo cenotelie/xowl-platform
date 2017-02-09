@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [], function() {
-		loadComponent("/web/widgets/placeholder/index.html", function (node) {
+		loadComponent(ROOT + "/widgets/placeholder/index.html", function (node) {
 			document.getElementById("panel-custom1").appendChild(node.cloneNode(true));
 			document.getElementById("panel-custom2").appendChild(node.cloneNode(true));
 		});
@@ -37,17 +37,17 @@ function renderModule(myModule) {
 	var header = document.createElement("div");
 	header.classList.add("panel-heading");
 	var icon = document.createElement("img");
-	icon.src = myModule.icon;
+	icon.src = ROOT + myModule.icon;
 	icon.width = 30;
 	icon.height = 30;
 	icon.style.marginRight = "20px";
 	icon.title = myModule.identifier;
 	var linkModule = document.createElement("a");
 	linkModule.appendChild(document.createTextNode(myModule.name));
-	linkModule.href = "/web/modules/" + myModule.uri + "/";
+	linkModule.href = ROOT + "/modules/" + myModule.uri + "/";
 	var button = document.createElement("a");
 	var buttonImage = document.createElement("img");
-	buttonImage.src = "/web/assets/action-plus.svg";
+	buttonImage.src = ROOT + "/assets/action-plus.svg";
 	buttonImage.width = 30;
 	buttonImage.height = 30;
 	buttonImage.style.float = "right";
@@ -64,7 +64,7 @@ function renderModule(myModule) {
 		var part = myModule.items[i];
 		var li = document.createElement("div");
 		icon = document.createElement("img");
-		icon.src = part.icon;
+		icon.src = ROOT + part.icon;
 		icon.width = 30;
 		icon.height = 30;
 		icon.style.marginRight = "20px";
@@ -72,7 +72,7 @@ function renderModule(myModule) {
 		var link = document.createElement("a");
 		link.appendChild(document.createTextNode(part.name));
 		link.classList.add("btn");
-		link.href = "/web/modules/" + myModule.uri + "/" + part.uri + "/";
+		link.href = ROOT + "/modules/" + myModule.uri + "/" + part.uri + "/";
 		li.appendChild(icon);
 		li.appendChild(link);
 		body.appendChild(li);
@@ -81,10 +81,10 @@ function renderModule(myModule) {
 	panel.appendChild(body);
 	button.onclick = function() {
 		if (body.style.display === "none") {
-			buttonImage.src = "/web/assets/action-minus.svg";
+			buttonImage.src = ROOT + "/assets/action-minus.svg";
 			body.style.display = "";
 		} else {
-			buttonImage.src = "/web/assets/action-plus.svg";
+			buttonImage.src = ROOT + "/assets/action-plus.svg";
 			body.style.display = "none";
 		}
 	};

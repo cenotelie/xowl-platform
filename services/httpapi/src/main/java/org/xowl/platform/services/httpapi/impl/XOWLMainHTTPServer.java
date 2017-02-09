@@ -25,6 +25,7 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -142,7 +143,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             return true;
 
         // do not perform authentication for the login service
-        if (request.getRequestURI().equals(SecurityService.URI_LOGIN))
+        if (request.getRequestURI().equals(PlatformHttp.getUriPrefixApi() + SecurityService.URI_LOGIN))
             return true;
 
         Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);

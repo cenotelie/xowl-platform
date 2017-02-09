@@ -30,12 +30,12 @@ public class XOWLWebModuleCore extends WebModuleBase {
      * Initializes this service
      */
     public XOWLWebModuleCore() {
-        super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/web/assets/module-core.svg", 0);
-        this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/web/assets/artifact.svg"));
-        this.items.add(new WebModuleItem("Data Import", "importation", "/web/assets/import.svg"));
-        this.items.add(new WebModuleItem("Consistency Management", "consistency", "/web/assets/consistency.svg"));
-        this.items.add(new WebModuleItem("Traceability Exploration", "discovery", "/web/assets/exploration.svg"));
-        this.items.add(new WebModuleItem("Impact Analysis", "impact", "/web/assets/impact.svg"));
-        this.items.add(new WebModuleItem("Evaluation Analysis", "evaluation", "/web/assets/evaluation.svg"));
+        super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/assets/module-core.svg", 0);
+        this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/assets/artifact.svg"));
+        this.items.add(new WebModuleItem("Data Import", "importation", "/assets/import.svg"));
+        this.items.add(new WebModuleItem("Consistency Management", "consistency", "/assets/consistency.svg"));
+        this.items.add(new WebModuleItem("Traceability Exploration", "discovery", "/assets/exploration.svg"));
+        this.items.add(new WebModuleItem("Impact Analysis", "impact", "/assets/impact.svg"));
+        this.items.add(new WebModuleItem("Evaluation Analysis", "evaluation", "/assets/evaluation.svg"));
     }
 }

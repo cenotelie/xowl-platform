@@ -6,7 +6,9 @@
  ****************************************************/
 
 function XOWL() {
-	this.endpoint = '/api/';
+	var url = document.location.href;
+	var index = url.indexOf("/web");
+	this.endpoint = url.substring(0, index) + "/api/";
 	this.userLogin = localStorage.getItem('xowl.user.login');
 	this.userIdentifier = localStorage.getItem('xowl.user.identifier');
 	this.userName = localStorage.getItem('xowl.user.name');
@@ -1461,7 +1463,7 @@ XOWL.prototype.doRequest = function (callback, complement, parameters, method, c
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState == 4) {
 			var ct = xmlHttp.getResponseHeader("Content-Type");
-			callback(xmlHttp.status, ct, xmlHttp.responseText)
+			callback(xmlHttp.status, ct, xmlHttp.responseText);
 		}
 	}
 	var uri = this.endpoint + complement;

@@ -7,6 +7,21 @@
  ****************************************************/
 
 /**
+ * Get the root URI for the web resources of the current platform
+ *
+ * @return The root URI
+ */
+function getUriRoot() {
+	var url = document.location.href;
+	var index = url.indexOf("/web");
+	return url.substring(0, index) + "/web";
+}
+
+/**
+ * The root URI for the web resources of the current platform
+ */
+var ROOT = getUriRoot();
+/**
  * DOM node for the Title component
  */
 var PAGE_COMPONENT_TITLE = null;
@@ -21,7 +36,7 @@ var PAGE_COMPONENT_FOOTER = null;
 /**
  * The current breadcrumbs for the page
  */
-var PAGE_BREADCRUMBS = [{name: "Home", uri: "/web/"}];
+var PAGE_BREADCRUMBS = [{name: "Home", uri: ROOT + "/"}];
 /**
  * The current xOWL platform object (access to the platform API)
  */
@@ -66,22 +81,25 @@ function getParameterByName(name) {
  */
 function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
 	if (mustBeLoggedIn && (platform === null || !platform.isLoggedIn())) {
-		document.location.href = "/web/login.html";
+		document.location.href = ROOT + "/login.html";
 		return;
 	}
 	PLATFORM = platform;
 	PAGE_BREADCRUMBS = PAGE_BREADCRUMBS.concat(breadcrumbs);
 	PAGE_READY_HOOK = onReady;
-	loadComponent("/web/components/title.html", function (node) {
+	loadComponent(ROOT + "/components/title.html", function (node) {
 		PAGE_COMPONENT_TITLE = node;
+		inspectDom(PAGE_COMPONENT_TITLE);
 		doSetupHeader();
 	});
-	loadComponent("/web/components/header.html", function (node) {
+	loadComponent(ROOT + "/components/header.html", function (node) {
 		PAGE_COMPONENT_HEADER = node;
+		inspectDom(PAGE_COMPONENT_HEADER);
 		doSetupHeader();
 	});
-	loadComponent("/web/components/footer.html", function (node) {
+	loadComponent(ROOT + "/components/footer.html", function (node) {
 		PAGE_COMPONENT_FOOTER = node;
+		inspectDom(PAGE_COMPONENT_FOOTER);
 		doSetupFooter();
 	});
 }
@@ -101,6 +119,23 @@ function loadComponent(component, callback) {
 	xmlHttp.open("GET", component, true);
 	xmlHttp.setRequestHeader("Accept", "text/html");
 	xmlHttp.send();
+}
+
+function inspectDom(node) {
+	inspectDomOnNode(node);
+	if (node.nodeType == 1) {
+		for (var i = 0; i != node.childNodes.length; i++) {
+			inspectDom(node.childNodes.item(i));
+		}
+	}
+}
+
+function inspectDomOnNode(node) {
+	if (node.nodeType == 1 && node.nodeName.toLowerCase() == "img") {
+		var source = node.attributes.getNamedItem("src");
+		if (source != null)
+			source.value = ROOT + source.value;
+	}
 }
 
 function doSetupHeader() {
@@ -129,13 +164,13 @@ function doSetupHeader() {
 	if (PLATFORM !== null && PLATFORM.isLoggedIn()) {
 		var userLink = document.getElementById("placeholder-user");
 		var image = document.createElement("img");
-		image.src = "/web/assets/user.svg";
+		image.src = ROOT + "/assets/user.svg";
 		image.width = 25;
 		image.height = 25;
 		image.style.marginRight = "20px";
 		userLink.appendChild(image);
 		userLink.appendChild(document.createTextNode(PLATFORM.getLoggedInUserName()));
-		userLink.href = "/web/me.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
+		userLink.href = ROOT + "/me.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
 	}
 	PAGE_READY_INDEX += 50;
 	if (PAGE_READY_INDEX >= 100)
@@ -156,7 +191,7 @@ function doSetupFooter() {
  */
 function onClickLogout() {
 	PLATFORM.logout();
-	document.location.href = "/web/login.html";
+	document.location.href = ROOT + "/login.html";
 }
 
 
@@ -230,7 +265,7 @@ function onOperationEnded(code, content, customMessage) {
 		else
 			displayMessage("error", customMessage);
 		if (code === 401 || code === 440)
-			waitAndGo("/web/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search));
+			waitAndGo(ROOT + "/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search));
 	}
 	return (code === 200);
 }
@@ -249,7 +284,7 @@ function onOperationEnded(code, content, customMessage) {
  */
 function displayLoader(message) {
 	var image = document.createElement("img");
-	image.src = "/web/assets/spinner.gif";
+	image.src = ROOT + "/assets/spinner.gif";
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("header-message-icon");
@@ -273,7 +308,7 @@ function displayLoader(message) {
  */
 function displayMessage(type, message) {
 	var image = document.createElement("img");
-	image.src = "/web/assets/message-" + type + ".svg";
+	image.src = ROOT + "/assets/message-" + type + ".svg";
 	image.width = 32;
 	image.height = 32;
 	image.classList.add("header-message-icon");
@@ -384,57 +419,57 @@ function renderMessagePart(part) {
 	} else if (part.type === "org.xowl.platform.kernel.jobs.Job") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/jobs/job.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/jobs/job.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.artifacts.Artifact") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformUser") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformGroup") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/security/group.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/security/group.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformRole") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/security/role.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/security/role.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.platform.Addon") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/platform/addon.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/platform/addon.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/admin/connectors/connector.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/admin/connectors/connector.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.consistency.ConsistencyRule") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.evaluation.Evaluation") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.evaluation.EvaluationReference") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/evaluation/eval.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.importation.Document") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/core/importation/document.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/importation/document.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.importation.Importer") {
 		var dom = document.createElement("a");
@@ -444,7 +479,7 @@ function renderMessagePart(part) {
 	} else if (part.type === "org.xowl.platform.services.collaboration.RemoteCollaboration") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = "/web/modules/collab/network/neighbour.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/collab/network/neighbour.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	}
 	return document.createTextNode(JSON.stringify(part));
@@ -554,7 +589,7 @@ AutoComplete.prototype.onInputChange = function () {
 		return;
 	}
 	if (this.indicator != null) {
-		this.indicator.src = "/web/assets/spinner.gif";
+		this.indicator.src = ROOT + "/assets/spinner.gif";
 		this.indicator.style.display = "";
 	}
 	this.lookupItems(this.input.value);
@@ -751,7 +786,7 @@ function rdfToDom(value) {
 	if (value.type === "uri" || value.type === "iri") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(getShortURI(value.value)));
-		dom.href = "/web/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.value);
+		dom.href = ROOT + "/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.value);
 		dom.classList.add("rdfIRI");
 		return dom;
 	} else if (value.type === "bnode") {
@@ -779,7 +814,7 @@ function rdfToDom(value) {
 			dom.appendChild(document.createTextNode("^^<"));
 			var link = document.createElement("a");
 			link.appendChild(document.createTextNode(getShortURI(value.datatype)));
-			link.href = "/web/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.datatype);
+			link.href = ROOT + "/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.datatype);
 			link.classList.add("rdfIRI");
 			dom.appendChild(link);
 			dom.appendChild(document.createTextNode(">"));
@@ -801,7 +836,7 @@ function rdfToDom(value) {
 			dom.appendChild(document.createTextNode("^^<"));
 			var link = document.createElement("a");
 			link.appendChild(document.createTextNode(getShortURI(value.datatype)));
-			link.href = "/web/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.datatype);
+			link.href = ROOT + "/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.datatype);
 			link.classList.add("rdfIRI");
 			dom.appendChild(link);
 			dom.appendChild(document.createTextNode(">"));

@@ -33,7 +33,7 @@ public interface SecurityService extends SecuredService {
     /**
      * The URI of the API for the login service
      */
-    String URI_LOGIN = "/api/kernel/security/login";
+    String URI_LOGIN = "/kernel/security/login";
 
     /**
      * Service action to get the configuration of the security policy

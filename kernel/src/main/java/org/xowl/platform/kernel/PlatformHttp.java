@@ -28,11 +28,11 @@ public class PlatformHttp implements Registrable {
     /**
      * The URI suffix for the web API
      */
-    private static final String URI_API = "/api";
+    public static final String URI_API = "/api";
     /**
      * The URI suffix for the web resources
      */
-    private static final String URI_WEB = "/web";
+    public static final String URI_WEB = "/web";
 
     /**
      * The singleton instance of this structure

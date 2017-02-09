@@ -27,12 +27,8 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
-import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -334,10 +330,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
         String masterPassword = "admin";
         synchronized (collaborations) {
             int port = provisionReservePort();
+            String identifier = UUID.randomUUID().toString();
             RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(
-                    UUID.randomUUID().toString(),
+                    identifier,
                     specification.getName(),
-                    "https://localhost:" + Integer.toString(port) + "/api",
+                    "https://localhost:" + Integer.toString(port) + "/" + identifier + "/api",
                     port,
                     MASTER_LOGIN,
                     masterPassword);
@@ -492,14 +489,16 @@ public class MasterNetworkService implements CollaborationNetworkService {
             return new XSPReplyException(exception);
         }
 
-        // write the platform management service configuration
+        // write the platform HTTP configuration
         File instanceConfigDir = new File(instanceDirectory, "config");
-        File servicePlatformConfigFile = new File(instanceConfigDir, PlatformManagementService.class.getCanonicalName() + ".ini");
+        File platformHttpConfigFile = new File(instanceConfigDir, PlatformHttp.class.getCanonicalName() + ".ini");
         Configuration configuration = new Configuration();
         try {
-            configuration.load(servicePlatformConfigFile);
+            configuration.load(platformHttpConfigFile);
             configuration.set("httpsPort", Integer.toString(instance.getDescriptor().getPort()));
-            configuration.save(servicePlatformConfigFile);
+            configuration.set("httpHost", PlatformHttp.instance().getHttpHost());
+            configuration.set("httpURIPrefix", "/" + instance.getIdentifier());
+            configuration.save(platformHttpConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
@@ -512,7 +511,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.load(serviceCollabConfigFile);
             configuration.set("manifest", "collaboration.json");
             configuration.set("network", "service", SlaveNetworkService.class.getCanonicalName());
-            configuration.set("network", "master", "https://localhost:8443/api");
+            configuration.set("network", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
             configuration.save(serviceCollabConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
@@ -526,7 +525,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.load(serviceSecurityConfigFile);
             configuration.set("realm", "type", "org.xowl.platform.services.security.internal.XOWLSubordinateRealm");
             configuration.set("realm", "location", "users");
-            configuration.set("realm", "master", "https://localhost:8443/api");
+            configuration.set("realm", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
             configuration.save(serviceSecurityConfigFile);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);

@@ -11,8 +11,8 @@ var DOCUMENT = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Core Services", uri: "/web/modules/core/"},
-			{name: "Data Import", uri: "/web/modules/core/importation/"},
+			{name: "Core Services", uri: ROOT + "/modules/core/"},
+			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
 			{name: "Document ", uri: "document.html?id=" + encodeURIComponent(docId)},
 			{name: "Semantic Web Importer"}], function() {
 		if (!docId || docId === null || docId === "")
@@ -79,6 +79,6 @@ function onJobCompleted(job) {
 	} else {
 		var artifactId = job.result.payload;
 		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
-		waitAndGo("/web/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
+		waitAndGo(ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
 	}
 }

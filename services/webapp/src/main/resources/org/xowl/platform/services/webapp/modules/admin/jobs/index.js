@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Job Management"}], function() {
 		refresh();
 	});
@@ -40,11 +40,11 @@ function renderJob(job) {
 		document.createElement("td")];
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(job.name));
-	link.href="job.html?id=" + encodeURIComponent(job.identifier);
+	link.href = "job.html?id=" + encodeURIComponent(job.identifier);
 	cells[0].appendChild(link);
 	link = document.createElement("a");
 	link.appendChild(document.createTextNode(job.owner.name));
-	link.href="/web/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.identifier);
+	link.href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.identifier);
 	cells[1].appendChild(link);
 	cells[2].appendChild(document.createTextNode(job.status));
 	var progress = document.createElement("div");

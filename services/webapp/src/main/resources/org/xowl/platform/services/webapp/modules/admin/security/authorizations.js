@@ -5,8 +5,8 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Security", uri: ROOT + "/modules/admin/security/"},
 			{name: "Authorizations"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -39,7 +39,7 @@ function renderPart(part) {
 function renderAction(row, action) {
 	var cell = document.createElement("div");
 	var image = document.createElement("img");
-	image.src = "/web/assets/secured_action.svg";
+	image.src = ROOT + "/assets/secured_action.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -118,7 +118,7 @@ function renderPolicy(row, action, policy) {
 function renderButton(icon) {
 	var button = document.createElement("span");
 	var image = document.createElement("img");
-	image.src = "/web/assets/" + icon + ".svg";
+	image.src = ROOT + "/assets/" + icon + ".svg";
 	image.width = 20;
 	image.height = 20;
 	button.appendChild(image);
@@ -133,7 +133,7 @@ function serializePolicy(policy) {
 		span.appendChild(document.createTextNode(policy.name + " : "));
 		var link = document.createElement("a");
 		link.appendChild(document.createTextNode(policy.role));
-		link.href = "/web/modules/admin/security/role.html?id=" + encodeURIComponent(policy.role);
+		link.href = ROOT + "/modules/admin/security/role.html?id=" + encodeURIComponent(policy.role);
 		span.appendChild(link);
 		return link;
 	} else {

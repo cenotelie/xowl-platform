@@ -5,8 +5,8 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Documentation", uri: "/web/modules/admin/documentation/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Documentation", uri: ROOT + "/modules/admin/documentation/"},
 			{name: "API Services"}], function() {
 		if (!onOperationRequest("Loading ...", 2))
 			return;
@@ -43,7 +43,7 @@ function renderService(service, number) {
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(service.name));
 	if ((typeof service.documentation.fileName) !== "undefined")
-		link.href="/web/contributions/documentation/" + encodeURIComponent(service.documentation.fileName);
+		link.href= ROOT + "/contributions/documentation/" + encodeURIComponent(service.documentation.fileName);
 	cell.appendChild(link);
 	row.appendChild(cell);
 
@@ -51,7 +51,7 @@ function renderService(service, number) {
 	if ((typeof service.specification.fileName) !== "undefined") {
 		link = document.createElement("a");
 		link.appendChild(document.createTextNode(service.specification.fileName));
-		link.href="/web/contributions/documentation/" + encodeURIComponent(service.specification.fileName);
+		link.href= ROOT + "/contributions/documentation/" + encodeURIComponent(service.specification.fileName);
 		cell.appendChild(link);
 	}
 	row.appendChild(cell);
@@ -73,7 +73,7 @@ function renderResource(resource, number) {
 	var cell = document.createElement("td");
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(resource.name + " (" + resource.fileName + ")"));
-	link.href="/web/contributions/documentation/" + encodeURIComponent(resource.fileName);
+	link.href= ROOT + "/contributions/documentation/" + encodeURIComponent(resource.fileName);
 	cell.appendChild(link);
 	row.appendChild(cell);
 	return row;

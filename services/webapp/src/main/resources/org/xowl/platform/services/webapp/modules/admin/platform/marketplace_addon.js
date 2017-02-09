@@ -6,9 +6,9 @@ var addonId = getParameterByName("id");
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Management", uri: "/web/modules/admin/platform/"},
-			{name: "Platform Marketplace", uri: "/web/modules/admin/platform/marketplace.html"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Management", uri: ROOT + "/modules/admin/platform/"},
+			{name: "Platform Marketplace", uri: ROOT + "/modules/admin/platform/marketplace.html"},
 			{name: addonId}], function() {
 		if (!addonId || addonId === null || addonId === "")
 			return;

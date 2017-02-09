@@ -7,8 +7,8 @@ var oldName = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Security", uri: ROOT + "/modules/admin/security/"},
 			{name: "Role " + roleId}], function() {
 		if (!roleId || roleId === null || roleId === "")
 			return;

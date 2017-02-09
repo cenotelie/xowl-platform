@@ -6,8 +6,8 @@ var connectorId = getParameterByName("id");
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Connectors Management", uri: "/web/modules/admin/connectors/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Connectors Management", uri: ROOT + "/modules/admin/connectors/"},
 			{name: "Connector " + connectorId}], function() {
 		if (!connectorId || connectorId === null || connectorId === "")
 			return;
@@ -26,12 +26,7 @@ function render(connector) {
 	if (connector.uris.length === 0) {
 		url = "not accessible";
 	} else {
-		url = document.URL;
-		var index = url.indexOf("/web/");
-		if (index > 0)
-			url = url.substring(0, index) + "/api/" + connector.uris[0];
-		else
-			url = "failed to retrieved"
+		url = xowl.endpoint + connector.uris[0];
 	}
 
 	document.getElementById("connector-identifier").value = connector.identifier;
@@ -41,7 +36,7 @@ function render(connector) {
 	var rows = document.getElementById("connector-queue");
 	var data = "";
 	for (var i = 0; i != connector.queue.length; i++) {
-		data += "<tr><td>" + i.toString() + "</td><td> <img src=\"/web/assets/artifact.svg\" width=\"40\" height=\"40\" />" + connector.queue[i].name + "</td><td>" + connector.queue[i].version + "</td></tr>";
+		data += "<tr><td>" + i.toString() + "</td><td> <img src=\"" + ROOT + "/assets/artifact.svg\" width=\"40\" height=\"40\" />" + connector.queue[i].name + "</td><td>" + connector.queue[i].version + "</td></tr>";
 	}
 	rows.innerHTML = data;
 }

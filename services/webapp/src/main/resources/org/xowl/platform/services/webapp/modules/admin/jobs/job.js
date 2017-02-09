@@ -6,8 +6,8 @@ var jobId = getParameterByName("id");
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Job Management", uri: "/web/modules/admin/jobs/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Job Management", uri: ROOT + "/modules/admin/jobs/"},
 			{name: "Job " + jobId}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;
@@ -37,7 +37,7 @@ function render(job) {
 	document.getElementById("job-identifier").value = job.identifier;
 	document.getElementById("job-name").value = job.name;
 	document.getElementById("job-type").value = job.jobType;
-	document.getElementById("job-owner").href = "/web/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.identifier);
+	document.getElementById("job-owner").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(job.owner.identifier);
 	document.getElementById("job-owner").appendChild(document.createTextNode(job.owner.name));
 	document.getElementById("job-status").value = job.status;
 	document.getElementById("job-time-scheduled").value = job.timeScheduled;

@@ -14,8 +14,8 @@ var MAX_SAMPLES_COUNT = 60; // maximum number of samples
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Statistics", uri: "/web/admin/statistics/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Statistics", uri: ROOT + "/admin/statistics/"},
 			{name: "DB File " + fileName}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

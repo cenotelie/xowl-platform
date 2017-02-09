@@ -9,8 +9,8 @@ var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Security", uri: ROOT + "/modules/admin/security/"},
 			{name: "Group " + groupId}], function() {
 		if (!groupId || groupId === null || groupId === "")
 			return;
@@ -137,7 +137,7 @@ function renderPlatformUser(user, onClickRemove) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/user.svg";
+	image.src = ROOT + "/assets/user.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -151,7 +151,7 @@ function renderPlatformUser(user, onClickRemove) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";
@@ -169,7 +169,7 @@ function renderPlatformRole(role) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/role.svg";
+	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -183,7 +183,7 @@ function renderPlatformRole(role) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";

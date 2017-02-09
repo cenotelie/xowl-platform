@@ -8,8 +8,8 @@ var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Security", uri: "/web/modules/admin/security/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Security", uri: ROOT + "/modules/admin/security/"},
 			{name: "User " + userId}], function() {
 		if (!userId || userId === null || userId === "")
 			return;
@@ -74,7 +74,7 @@ function renderPlatformRole(role) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/role.svg";
+	image.src = ROOT + "/assets/role.svg";
 	image.width = 30
 	image.height = 30
 	image.style.marginRight = "20px";
@@ -88,7 +88,7 @@ function renderPlatformRole(role) {
 
 	cell = document.createElement("td");
 	image = document.createElement("img");
-	image.src = "/web/assets/action-remove.svg";
+	image.src = ROOT + "/assets/action-remove.svg";
 	image.width = 20;
 	image.height = 20;
 	image.title = "REMOVE";

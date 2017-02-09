@@ -20,14 +20,11 @@ var GRAPH_CONNECTOR_X = 400;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Connectors Management"}], function() {
 			doGetData();
 	});
-	var url = document.URL;
-	var index = url.indexOf("/web/");
-	if (index > 0)
-		document.getElementById("input-uri-addon").innerHTML = url.substring(0, index) + "/api/";
+	document.getElementById("input-uri-addon").innerHTML = xowl.endpoint;
 }
 
 function doGetData() {
@@ -53,13 +50,13 @@ function doGetData() {
 			select.selectedIndex = -1;
 		}
 	});
-	loadComponent("/web/assets/xowl.svg", function (node) {
+	loadComponent(ROOT + "/assets/xowl.svg", function (node) {
 		if (onOperationEnded(200, "")) {
 			SVG_DB = node.children[0];
 			render();
 		}
 	});
-	loadComponent("/web/assets/connector.svg", function (node) {
+	loadComponent(ROOT + "/assets/connector.svg", function (node) {
 		if (onOperationEnded(200, "")) {
 			SVG_CONNECTOR = node.children[0];
 			render();
@@ -102,12 +99,7 @@ function onClickConnector(connector) {
 	if (connector.uris.length === 0) {
 		url = "not accessible";
 	} else {
-		url = document.URL;
-		var index = url.indexOf("/web/");
-		if (index > 0)
-			url = url.substring(0, index) + "/api/" + connector.uris[0];
-		else
-			url = "failed to retrieved"
+		url = xowl.endpoint + connector.uris[0];
 	}
 	document.getElementById("connector-properties").style.display = "";
 	document.getElementById("connector-identifier").value = connector.identifier;

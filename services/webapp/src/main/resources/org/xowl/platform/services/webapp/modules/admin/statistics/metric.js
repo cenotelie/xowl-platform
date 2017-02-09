@@ -8,8 +8,8 @@ var SNAPSHOT = null;
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
-			{name: "Platform Statistics", uri: "/web/modules/admin/statistics/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Statistics", uri: ROOT + "/modules/admin/statistics/"},
 			{name: "Metric " + metricId}], function() {
 		if (!metricId || metricId === null || metricId === "")
 			return;

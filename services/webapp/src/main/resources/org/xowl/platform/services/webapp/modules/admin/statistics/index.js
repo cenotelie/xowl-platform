@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Statistics"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
@@ -32,7 +32,7 @@ function renderMetric(metric) {
 	var cell = document.createElement("td");
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(metric.name));
-	link.href="metric.html?id=" + encodeURIComponent(metric.identifier);
+	link.href = "metric.html?id=" + encodeURIComponent(metric.identifier);
 	cell.appendChild(link);
 	row.appendChild(cell);
 	return row;

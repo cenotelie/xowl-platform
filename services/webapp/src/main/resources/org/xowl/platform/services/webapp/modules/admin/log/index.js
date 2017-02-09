@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Log"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

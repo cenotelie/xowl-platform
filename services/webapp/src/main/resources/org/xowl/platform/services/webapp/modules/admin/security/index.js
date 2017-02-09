@@ -5,7 +5,7 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [
-			{name: "Platform Administration", uri: "/web/modules/admin/"},
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Security"}], function() {
 		doGetData();
 	});
@@ -65,7 +65,7 @@ function renderPlatformUser(user) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/user.svg";
+	image.src = ROOT + "/assets/user.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -83,7 +83,7 @@ function renderPlatformGroup(group) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/group.svg";
+	image.src = ROOT + "/assets/group.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";
@@ -101,7 +101,7 @@ function renderPlatformRole(role) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
-	image.src = "/web/assets/role.svg";
+	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";

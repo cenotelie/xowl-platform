@@ -36,15 +36,15 @@ public class Register {
      * Gets the first component for the specified type of components
      *
      * @param componentType A type of components as the Java class that must be implemented
-     * @param <S>           The type of component
+     * @param <T>           The type of component
      * @return The component, or null if there is none
      */
-    public static <S extends Registrable> S getComponent(Class<S> componentType) {
+    public static <T> T getComponent(Class<T> componentType) {
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
         ServiceReference reference = context.getServiceReference(componentType);
         if (reference == null)
             return null;
-        S result = (S) context.getService(reference);
+        T result = (T) context.getService(reference);
         context.ungetService(reference);
         return result;
     }
@@ -53,11 +53,11 @@ public class Register {
      * Gets the all the components for the specified type of components
      *
      * @param componentType A type of components as the Java class that must be implemented
-     * @param <S>           The type of component
+     * @param <T>           The type of component
      * @return The components
      */
-    public static <S extends Registrable> Collection<S> getComponents(Class<S> componentType) {
-        Collection<S> result = new ArrayList<>();
+    public static <T> Collection<T> getComponents(Class<T> componentType) {
+        Collection<T> result = new ArrayList<>();
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
         try {
             Collection references = context.getServiceReferences(componentType, null);
@@ -65,7 +65,7 @@ public class Register {
                 ServiceReference reference = (ServiceReference) obj;
                 if (reference == null)
                     continue;
-                result.add((S) context.getService(reference));
+                result.add((T) context.getService(reference));
                 context.ungetService(reference);
             }
             return result;
@@ -81,11 +81,11 @@ public class Register {
      * @param componentType A type of components as the Java class that must be implemented
      * @param paramName     The name of the parameter to match
      * @param paramValue    The value of the parameter to match
-     * @param <S>           The type of component
+     * @param <T>           The type of component
      * @return The component, or null if there is none
      */
-    public static <S extends Registrable> S getComponent(Class<S> componentType, String paramName, String paramValue) {
-        S result = null;
+    public static <T> T getComponent(Class<T> componentType, String paramName, String paramValue) {
+        T result = null;
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
         try {
             Collection references = context.getServiceReferences(componentType, "(" + paramName + "=" + paramValue + ")");
@@ -94,7 +94,7 @@ public class Register {
                 if (reference == null)
                     continue;
                 if (result == null)
-                    result = (S) context.getService(reference);
+                    result = (T) context.getService(reference);
                 context.ungetService(reference);
             }
         } catch (InvalidSyntaxException exception) {
@@ -109,16 +109,16 @@ public class Register {
      * @param componentType The type of component to wait for
      * @param waiter        The listener
      * @param context       The bundle context for the listener
-     * @param <S>           The type of component
+     * @param <T>           The type of component
      */
-    public static <S> void waitFor(Class<S> componentType, RegisterWaiter<S> waiter, BundleContext context) {
+    public static <T> void waitFor(Class<T> componentType, RegisterWaiter<T> waiter, BundleContext context) {
         ServiceReference reference = context.getServiceReference(componentType);
         if (reference != null) {
-            S component = (S) context.getService(reference);
+            T component = (T) context.getService(reference);
             context.ungetService(reference);
             waiter.onAvailable(context, component);
         } else {
-            context.addServiceListener(new RegisterListener<S>(context, componentType, waiter));
+            context.addServiceListener(new RegisterListener<T>(context, componentType, waiter));
         }
     }
 }

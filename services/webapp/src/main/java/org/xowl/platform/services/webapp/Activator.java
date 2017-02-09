@@ -57,17 +57,17 @@ public class Activator implements BundleActivator {
                 bundleContext.registerService(WebModule.class, new XOWLWebModuleCore(), null);
                 bundleContext.registerService(WebModule.class, new XOWLWebModuleCollaboration(), null);
                 bundleContext.registerService(WebModule.class, new XOWLWebModuleAdmin(), null);
-            }
-        }, bundleContext);
 
-        Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
-            @Override
-            public void onAvailable(BundleContext bundleContext, HttpService component) {
-                try {
-                    component.registerResources(PlatformHttp.getUriPrefixWeb(), PlatformHttp.getUriPrefixWeb(), new XOWLHttpContext(component, contributionDirectory));
-                } catch (Exception exception) {
-                    Logging.getDefault().error(exception);
-                }
+                Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
+                    @Override
+                    public void onAvailable(BundleContext bundleContext, HttpService component) {
+                        try {
+                            component.registerResources(PlatformHttp.getUriPrefixWeb(), PlatformHttp.getUriPrefixWeb(), new XOWLHttpContext(component, contributionDirectory));
+                        } catch (Exception exception) {
+                            Logging.getDefault().error(exception);
+                        }
+                    }
+                }, bundleContext);
             }
         }, bundleContext);
     }

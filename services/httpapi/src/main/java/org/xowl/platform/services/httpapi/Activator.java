@@ -44,20 +44,25 @@ public class Activator implements BundleActivator {
     private XOWLMainHTTPServer server;
 
     @Override
-    public void start(final BundleContext bundleContext) throws Exception {
+    public void start(BundleContext bundleContext) throws Exception {
         server = new XOWLMainHTTPServer();
         bundleContext.registerService(Service.class, server, null);
         bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
         bundleContext.registerService(WebUIContribution.class, new XOWLHttpApiDocumentationModule(), null);
 
-        Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
-            public void onAvailable(BundleContext bundleContext, HttpService component) {
-                try {
-                    component.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(component));
-                } catch (Exception exception) {
-                    Logging.getDefault().error(exception);
-                }
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
+                Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
+                    @Override
+                    public void onAvailable(BundleContext bundleContext, HttpService component) {
+                        try {
+                            component.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(component));
+                        } catch (Exception exception) {
+                            Logging.getDefault().error(exception);
+                        }
+                    }
+                }, bundleContext);
             }
         }, bundleContext);
     }

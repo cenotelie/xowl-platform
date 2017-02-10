@@ -35,7 +35,7 @@ public class CSVConnectorDescriptor extends ConnectorDescriptorBase {
      */
     private CSVConnectorDescriptor() {
         super(CSVConnectorDescriptor.class.getCanonicalName(),
-                "Generic Domain - CSV Syntax",
-                "A generic domain with a CSV syntax.");
+                "Generic CSV Datasets",
+                "Connection for raw CSV datasets.");
     }
 }

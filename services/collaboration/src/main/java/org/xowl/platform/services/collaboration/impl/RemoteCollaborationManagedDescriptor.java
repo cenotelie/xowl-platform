@@ -163,11 +163,11 @@ class RemoteCollaborationManagedDescriptor implements Identifiable, Serializable
     }
 
     /**
-     * Gets the remote platform instance so that API call can be performed
+     * Gets a new access to the managed collaboration
      *
-     * @return The remote platform
+     * @return An access to the managed collaboration
      */
-    public RemotePlatformAccess createRemotePlatform() {
+    public RemotePlatformAccess newAccess() {
         RemotePlatformAccess platform = new RemotePlatformAccess(endpoint, new DeserializerForOSGi());
         platform.login(masterLogin, masterPassword);
         return platform;

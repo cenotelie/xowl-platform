@@ -28,7 +28,7 @@ public enum CollaborationStatus {
      */
     Invalid,
     /**
-     * The collaboration has not started yet, the platform is being provisioned
+     * An operation is on-going for this collaboration
      */
     Provisioning,
     /**

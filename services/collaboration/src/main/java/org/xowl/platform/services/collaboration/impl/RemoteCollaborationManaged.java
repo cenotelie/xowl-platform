@@ -56,9 +56,9 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
      *
      * @return The remote platform
      */
-    public synchronized RemotePlatformAccess getRemotePlatform() {
+    public synchronized RemotePlatformAccess getAccess() {
         if (remotePlatform == null) {
-            remotePlatform = descriptor.createRemotePlatform();
+            remotePlatform = descriptor.newAccess();
         }
         return remotePlatform;
     }
@@ -82,17 +82,17 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
 
     @Override
     public XSPReply getManifest() {
-        return getRemotePlatform().getCollaborationManifest();
+        return getAccess().getCollaborationManifest();
     }
 
     @Override
     public XSPReply getArtifactsForInput(String specificationId) {
-        return getRemotePlatform().getArtifactsForCollaborationInput(specificationId);
+        return getAccess().getArtifactsForCollaborationInput(specificationId);
     }
 
     @Override
     public XSPReply getArtifactsForOutput(String specificationId) {
-        return getRemotePlatform().getArtifactsForCollaborationOutput(specificationId);
+        return getAccess().getArtifactsForCollaborationOutput(specificationId);
     }
 
     @Override

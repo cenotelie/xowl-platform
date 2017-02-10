@@ -91,21 +91,21 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     /**
      * API error - The job is already cancelled
      */
-    public static final ApiError ERROR_ALREADY_CANCELLED = new ApiError(0x0011,
+    public static final ApiError ERROR_ALREADY_CANCELLED = new ApiError(0x00000011,
             "The job is already cancelled.",
-            ERROR_HELP_PREFIX + "0x0011.html");
+            ERROR_HELP_PREFIX + "0x00000011.html");
     /**
      * API error - The job is already completed
      */
-    public static final ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x0012,
+    public static final ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x00000012,
             "The job is already completed.",
-            ERROR_HELP_PREFIX + "0x0012.html");
+            ERROR_HELP_PREFIX + "0x00000012.html");
     /**
      * API error - Invalid job state
      */
-    public static final ApiError ERROR_INVALID_JOB_STATE = new ApiError(0x0013,
+    public static final ApiError ERROR_INVALID_JOB_STATE = new ApiError(0x00000013,
             "The job is already completed.",
-            ERROR_HELP_PREFIX + "0x0013.html");
+            ERROR_HELP_PREFIX + "0x00000013.html");
 
 
     /**

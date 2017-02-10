@@ -79,21 +79,21 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     /**
      * API error - The addon is already installed
      */
-    public static final ApiError ERROR_ADDON_ALREADY_INSTALLED = new ApiError(0x0021,
+    public static final ApiError ERROR_ADDON_ALREADY_INSTALLED = new ApiError(0x00000021,
             "The addon is already installed.",
-            ERROR_HELP_PREFIX + "0x0021.html");
+            ERROR_HELP_PREFIX + "0x00000021.html");
     /**
      * API error - The addon is not installed
      */
-    public static final ApiError ERROR_ADDON_NOT_INSTALLED = new ApiError(0x0022,
+    public static final ApiError ERROR_ADDON_NOT_INSTALLED = new ApiError(0x00000022,
             "The addon is not installed.",
-            ERROR_HELP_PREFIX + "0x0022.html");
+            ERROR_HELP_PREFIX + "0x00000022.html");
     /**
      * API error - The provided addon package is invalid
      */
-    public static final ApiError ERROR_INVALID_ADDON_PACKAGE = new ApiError(0x0023,
+    public static final ApiError ERROR_INVALID_ADDON_PACKAGE = new ApiError(0x00000023,
             "The provided addon package is invalid.",
-            ERROR_HELP_PREFIX + "0x0023.html");
+            ERROR_HELP_PREFIX + "0x00000023.html");
 
     /**
      * The URI for the API services

@@ -23,7 +23,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
@@ -84,20 +83,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * The resource for the API's schema
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLConnectionService.class, "/org/xowl/platform/services/connection/schema_platform_connection.json", "Connection Service - Schema", HttpConstants.MIME_JSON);
-
-
-    /**
-     * API error - A connector with the same identifier already exists
-     */
-    private static final ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00010001,
-            "A connector with the same identifier already exists.",
-            ERROR_HELP_PREFIX + "0x00010001.html");
-    /**
-     * API error - Could not find a factory for the specified connector descriptor
-     */
-    private static final ApiError ERROR_NO_FACTORY = new ApiError(0x00010002,
-            "Could not find a factory for the specified connector descriptor.",
-            ERROR_HELP_PREFIX + "0x00010002.html");
 
     /**
      * The URI for the API services

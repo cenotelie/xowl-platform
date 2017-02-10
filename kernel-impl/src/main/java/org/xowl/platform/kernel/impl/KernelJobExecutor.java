@@ -20,7 +20,10 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.*;
+import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.RichString;
+import org.xowl.infra.utils.SHA1;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -86,27 +89,6 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
      * The resource for the API's documentation
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_jobs.html", "Jobs Management Service - Documentation", HttpApiResource.MIME_HTML);
-
-
-    /**
-     * API error - The job is already cancelled
-     */
-    public static final ApiError ERROR_ALREADY_CANCELLED = new ApiError(0x00000011,
-            "The job is already cancelled.",
-            ERROR_HELP_PREFIX + "0x00000011.html");
-    /**
-     * API error - The job is already completed
-     */
-    public static final ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x00000012,
-            "The job is already completed.",
-            ERROR_HELP_PREFIX + "0x00000012.html");
-    /**
-     * API error - Invalid job state
-     */
-    public static final ApiError ERROR_INVALID_JOB_STATE = new ApiError(0x00000013,
-            "The job is already completed.",
-            ERROR_HELP_PREFIX + "0x00000013.html");
-
 
     /**
      * The URI for the API services

@@ -17,12 +17,14 @@
 
 package org.xowl.platform.services.storage;
 
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.storage.impl.XOWLStorageService;
 
 /**
@@ -31,6 +33,25 @@ import org.xowl.platform.services.storage.impl.XOWLStorageService;
  * @author Laurent Wouters
  */
 public interface StorageService extends ArtifactStorageService, MeasurableService {
+    /**
+     * The total artifacts count metric
+     */
+    Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStorageService.class.getCanonicalName() + ".TotalArtifactsCount",
+            "Storage Service - Total artifacts count",
+            "artifacts",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+    /**
+     * The total artifacts count metric
+     */
+    Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStorageService.class.getCanonicalName() + ".LiveArtifactsCount",
+            "Storage Service - Live artifacts count",
+            "artifacts",
+            1000000000,
+            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
+            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+
     /**
      * Service action to execute queries on the store
      */
@@ -95,23 +116,17 @@ public interface StorageService extends ArtifactStorageService, MeasurableServic
     };
 
     /**
-     * The total artifacts count metric
+     * API error - The requested operation failed in storage
      */
-    Metric METRIC_TOTAL_ARTIFACTS_COUNT = new MetricBase(XOWLStorageService.class.getCanonicalName() + ".TotalArtifactsCount",
-            "Storage Service - Total artifacts count",
-            "artifacts",
-            1000000000,
-            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
-            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+    ApiError ERROR_OPERATION_FAILED = new ApiError(0x00020001,
+            "The requested operation failed in storage.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00020001.html");
     /**
-     * The total artifacts count metric
+     * API error - The artifact is invalid
      */
-    Metric METRIC_LIVE_ARTIFACTS_COUNT = new MetricBase(XOWLStorageService.class.getCanonicalName() + ".LiveArtifactsCount",
-            "Storage Service - Live artifacts count",
-            "artifacts",
-            1000000000,
-            new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
-            new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+    ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00020002,
+            "The artifact is invalid.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00020002.html");
 
     /**
      * Gets the live store that contains the currently active artifacts

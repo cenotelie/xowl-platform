@@ -573,7 +573,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
@@ -595,10 +595,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> content = artifact.getContent();
         if (content == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact's content"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact's content"), null);
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
@@ -636,20 +636,20 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentLeft = artifact.getContent();
         if (contentLeft == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         reply = retrieve(artifactRight);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentRight = artifact.getContent();
         if (contentRight == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(XOWLFederationStore.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
         BufferedLogger logger = new BufferedLogger();

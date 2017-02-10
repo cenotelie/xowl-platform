@@ -18,12 +18,14 @@
 package org.xowl.platform.kernel.jobs;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.List;
 
@@ -77,6 +79,25 @@ public interface JobExecutionService extends SecuredService, MeasurableService {
             ACTION_GET_JOBS,
             ACTION_CANCEL
     };
+
+    /**
+     * API error - The job is already cancelled
+     */
+    ApiError ERROR_ALREADY_CANCELLED = new ApiError(0x00000011,
+            "The job is already cancelled.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000011.html");
+    /**
+     * API error - The job is already completed
+     */
+    ApiError ERROR_ALREADY_COMPLETED = new ApiError(0x00000012,
+            "The job is already completed.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000012.html");
+    /**
+     * API error - Invalid job state
+     */
+    ApiError ERROR_INVALID_JOB_STATE = new ApiError(0x00000013,
+            "The job is already completed.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000013.html");
 
     /**
      * Schedules a job for execution

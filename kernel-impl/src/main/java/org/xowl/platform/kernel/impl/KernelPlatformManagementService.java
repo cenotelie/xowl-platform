@@ -24,7 +24,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.TextUtils;
@@ -75,25 +74,6 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      * The resource for the API's documentation
      */
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
-
-    /**
-     * API error - The addon is already installed
-     */
-    public static final ApiError ERROR_ADDON_ALREADY_INSTALLED = new ApiError(0x00000021,
-            "The addon is already installed.",
-            ERROR_HELP_PREFIX + "0x00000021.html");
-    /**
-     * API error - The addon is not installed
-     */
-    public static final ApiError ERROR_ADDON_NOT_INSTALLED = new ApiError(0x00000022,
-            "The addon is not installed.",
-            ERROR_HELP_PREFIX + "0x00000022.html");
-    /**
-     * API error - The provided addon package is invalid
-     */
-    public static final ApiError ERROR_INVALID_ADDON_PACKAGE = new ApiError(0x00000023,
-            "The provided addon package is invalid.",
-            ERROR_HELP_PREFIX + "0x00000023.html");
 
     /**
      * The URI for the API services

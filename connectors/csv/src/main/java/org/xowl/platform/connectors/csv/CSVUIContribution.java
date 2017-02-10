@@ -34,15 +34,9 @@ public class CSVUIContribution implements WebUIContribution {
     private static final String RESOURCES = "/org/xowl/platform/connectors/csv";
 
     /**
-     * The URI prefix for this contribution
-     */
-    private final String prefix;
-
-    /**
      * Initializes this contribution
      */
     public CSVUIContribution() {
-        this.prefix = PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/csv";
     }
 
     @Override
@@ -57,7 +51,7 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return prefix;
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/csv";
     }
 
     @Override
@@ -67,6 +61,6 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public URL getResource(String resource) {
-        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(prefix.length()));
+        return CSVUIContribution.class.getResource(RESOURCES + resource.substring(getPrefix().length()));
     }
 }

@@ -33,16 +33,11 @@ public class SemanticWebUIContribution implements WebUIContribution {
      * The root resource for the web app files
      */
     private static final String RESOURCES = "/org/xowl/platform/connectors/semanticweb";
-    /**
-     * The URI prefix for this contribution
-     */
-    private final String prefix;
 
     /**
      * Initializes this contribution
      */
     public SemanticWebUIContribution() {
-        this.prefix = PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/semanticweb";
     }
 
     @Override
@@ -57,7 +52,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return prefix;
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/semanticweb";
     }
 
     @Override
@@ -67,7 +62,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public URL getResource(String resource) {
-        return SemanticWebUIContribution.class.getResource(RESOURCES + resource.substring(prefix.length()));
+        return SemanticWebUIContribution.class.getResource(RESOURCES + resource.substring(getPrefix().length()));
 
     }
 }

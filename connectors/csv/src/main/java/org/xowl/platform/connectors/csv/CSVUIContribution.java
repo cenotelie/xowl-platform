@@ -18,6 +18,7 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 
 import java.net.URL;
@@ -46,7 +47,7 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public String getName() {
-        return "xOWL Collaboration Platform - CSV Importer Contribution";
+        return PlatformUtils.NAME + " - CSV Importer Contribution";
     }
 
     @Override

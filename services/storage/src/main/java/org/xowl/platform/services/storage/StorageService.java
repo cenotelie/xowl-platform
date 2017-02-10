@@ -17,14 +17,12 @@
 
 package org.xowl.platform.services.storage;
 
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.storage.impl.XOWLStorageService;
 
 /**
@@ -114,19 +112,6 @@ public interface StorageService extends ArtifactStorageService, MeasurableServic
             ACTION_EXECUTE_PROCEDURE,
             ACTION_UPLOAD_RAW
     };
-
-    /**
-     * API error - The requested operation failed in storage
-     */
-    ApiError ERROR_OPERATION_FAILED = new ApiError(0x00020001,
-            "The requested operation failed in storage.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00020001.html");
-    /**
-     * API error - The artifact is invalid
-     */
-    ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00020002,
-            "The artifact is invalid.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00020002.html");
 
     /**
      * Gets the live store that contains the currently active artifacts

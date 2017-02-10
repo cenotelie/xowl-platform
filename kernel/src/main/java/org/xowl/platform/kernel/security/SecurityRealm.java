@@ -18,10 +18,12 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
@@ -31,6 +33,37 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public interface SecurityRealm extends Identifiable {
+    /**
+     * API error - The user does not exist
+     */
+    ApiError ERROR_INVALID_USER = new ApiError(0x00030001,
+            "The user does not exist.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00030001.html");
+    /**
+     * API error - The user does not exist
+     */
+    ApiError ERROR_INVALID_GROUP = new ApiError(0x00030002,
+            "The group does not exist.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00030002.html");
+    /**
+     * API error - The user does not exist
+     */
+    ApiError ERROR_INVALID_ROLE = new ApiError(0x00030003,
+            "The role does not exist.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00030003.html");
+    /**
+     * API error - This entity cannot be deleted
+     */
+    ApiError ERROR_CANNOT_DELETE_ENTITY = new ApiError(0x00030004,
+            "This entity cannot be deleted.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00030004.html");
+    /**
+     * API error - This provided identifier does not meet the requirements
+     */
+    ApiError ERROR_INVALID_IDENTIFIER = new ApiError(0x00030005,
+            "This provided identifier does not meet the requirements.",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00030005.html");
+
     /**
      * On a new request, performs the authentication of a user
      *

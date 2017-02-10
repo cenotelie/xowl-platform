@@ -18,8 +18,10 @@
 package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
@@ -46,6 +48,13 @@ public interface EvaluationService extends SecuredService {
             ACTION_GET_EVALUATIONS,
             ACTION_NEW_EVALUATION
     };
+
+    /**
+     * API error - The specified evaluable type is invalid (or unspecified)
+     */
+    ApiError ERROR_INVALID_EVALUABLE_TYPE = new ApiError(0x00050002,
+            "The specified evaluable type is invalid (or unspecified).",
+            HttpApiService.ERROR_HELP_PREFIX + "0x00050002.html");
 
     /**
      * Gets the registered evaluable types

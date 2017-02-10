@@ -34,16 +34,6 @@ import org.xowl.platform.services.storage.StorageService;
  */
 public interface ConsistencyService extends SecuredService, MeasurableService {
     /**
-     * The actions for this service
-     */
-    SecuredAction[] ACTIONS = new SecuredAction[]{
-            StorageService.ACTION_CREATE_RULE,
-            StorageService.ACTION_DELETE_RULE,
-            StorageService.ACTION_ACTIVATE_RULE,
-            StorageService.ACTION_DEACTIVATE_RULE
-    };
-
-    /**
      * The inconsistency count metric
      */
     Metric METRIC_INCONSISTENCY_COUNT = new MetricBase(XOWLConsistencyService.class.getCanonicalName() + ".InconsistencyCount",
@@ -52,6 +42,16 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
             1000000000,
             new Couple<>(Metric.HINT_IS_NUMERIC, "true"),
             new Couple<>(Metric.HINT_MIN_VALUE, "0"));
+
+    /**
+     * The actions for this service
+     */
+    SecuredAction[] ACTIONS = new SecuredAction[]{
+            StorageService.ACTION_CREATE_RULE,
+            StorageService.ACTION_DELETE_RULE,
+            StorageService.ACTION_ACTIVATE_RULE,
+            StorageService.ACTION_DEACTIVATE_RULE
+    };
 
     /**
      * Gets all the consistency rules

@@ -29,7 +29,6 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
@@ -41,6 +40,7 @@ import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -75,13 +75,6 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLConsistencyService.class, "/org/xowl/platform/services/consistency/schema_platform_consistency.json", "Consistency Service - Schema", HttpConstants.MIME_JSON);
 
-
-    /**
-     * API error - The requested operation failed in storage
-     */
-    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00060001,
-            "The requested operation failed in storage.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00060001.html");
 
     /**
      * The URI of the schema for the consistency concepts
@@ -312,7 +305,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
                 "> ?d } }");
         if (!sparqlResult.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         Collection<XOWLConsistencyRule> result = new ArrayList<>();
         for (RDFPatternSolution solution : solutions.getSolutions()) {
@@ -346,7 +339,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
                 "> } }");
         if (!result.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> quads = ((ResultQuads) result).getQuads();
         Map<SubjectNode, Collection<Quad>> map = PlatformUtils.mapBySubject(quads);
         Collection<XOWLInconsistency> inconsistencies = new ArrayList<>();
@@ -420,7 +413,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n . } }");
         if (!sparqlResult.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
             return XSPReplyNotFound.instance();
@@ -486,7 +479,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(definition) + "\" ." +
                 "} }");
         if (!result.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
@@ -581,7 +574,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> ?p ?o } }");
         if (!result.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
@@ -603,7 +596,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) +
                 "> ?p ?o } }");
         if (!result.isSuccess())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));

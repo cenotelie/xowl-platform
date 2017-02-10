@@ -36,7 +36,6 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.sparql.ResultYesNo;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
@@ -48,7 +47,6 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityRealm;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,37 +75,6 @@ class XOWLInternalRealm implements SecurityRealm {
      * The IRI prefix for roles
      */
     public static final String ROLES = "http://xowl.org/platform/security/roles#";
-
-    /**
-     * API error - The user does not exist
-     */
-    ApiError ERROR_INVALID_USER = new ApiError(0x00030001,
-            "The user does not exist.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00030001.html");
-    /**
-     * API error - The user does not exist
-     */
-    ApiError ERROR_INVALID_GROUP = new ApiError(0x00030002,
-            "The group does not exist.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00030002.html");
-    /**
-     * API error - The user does not exist
-     */
-    ApiError ERROR_INVALID_ROLE = new ApiError(0x00030003,
-            "The role does not exist.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00030003.html");
-    /**
-     * API error - This entity cannot be deleted
-     */
-    ApiError ERROR_CANNOT_DELETE_ENTITY = new ApiError(0x00030004,
-            "This entity cannot be deleted.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00030004.html");
-    /**
-     * API error - This provided identifier does not meet the requirements
-     */
-    ApiError ERROR_INVALID_IDENTIFIER = new ApiError(0x00030005,
-            "This provided identifier does not meet the requirements.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00030005.html");
 
     /**
      * A node manager for constant URIs

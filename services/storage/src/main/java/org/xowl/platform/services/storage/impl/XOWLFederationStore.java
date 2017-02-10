@@ -477,10 +477,10 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return reply;
         Collection<Quad> metadata = artifact.getMetadata();
         if (metadata == null || metadata.isEmpty())
-            return new XSPReplyApiError(StorageService.ERROR_INVALID_ARTIFACT, "Empty metadata.");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_INVALID_ARTIFACT, "Empty metadata.");
         Collection<Quad> content = artifact.getContent();
         if (content == null)
-            return new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, "Failed to fetch the artifact's content.");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to fetch the artifact's content.");
         reply = upload(metadata);
         if (!reply.isSuccess())
             return reply;
@@ -497,7 +497,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return reply;
         Result result = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">");
         if (result.isFailure())
-            return new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
         if (metadata.isEmpty())
             return XSPReplyNotFound.instance();
@@ -523,7 +523,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         Result result = sparql(writer.toString());
         if (result.isSuccess())
             return XSPReplySuccess.instance();
-        return new XSPReplyApiError(StorageService.ERROR_OPERATION_FAILED, ((ResultFailure) result).getMessage());
+        return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
     }
 
     /**

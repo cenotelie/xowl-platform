@@ -33,6 +33,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.services.evaluation.*;
 import org.xowl.platform.services.storage.StorageService;
 
@@ -269,7 +270,7 @@ class XOWLEvaluation implements Evaluation {
      */
     public XSPReply store() {
         if (evaluableType == null)
-            return new XSPReplyApiError(XOWLEvaluationService.ERROR_INVALID_EVALUABLE_TYPE);
+            return new XSPReplyApiError(EvaluationService.ERROR_INVALID_EVALUABLE_TYPE);
         NodeManager nodes = new CachedNodes();
         IRINode graphEval = nodes.getIRINode(identifier);
         IRINode registry = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
@@ -325,7 +326,7 @@ class XOWLEvaluation implements Evaluation {
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n } }");
         if (!sparqlResult.isSuccess())
-            return new XSPReplyApiError(XOWLEvaluationService.ERROR_OPERATION_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<EvaluationReference> result = new ArrayList<>();
         for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             result.add(new XOWLEvaluationReference(

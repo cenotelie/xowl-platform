@@ -29,6 +29,7 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -64,14 +65,6 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * The resource for the API's schema
      */
     private static final HttpApiResource RESOURCE_SCHEMA = new HttpApiResourceBase(XOWLImportationService.class, "/org/xowl/platform/services/importation/schema_platform_importation.json", "Importation Service - Schema", HttpConstants.MIME_JSON);
-
-
-    /**
-     * API error - The requested operation failed in storage
-     */
-    public static final ApiError ERROR_OPERATION_FAILED = new ApiError(0x00040001,
-            "The requested operation failed in storage.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00040001.html");
 
     /**
      * The URI for the API services
@@ -411,9 +404,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         if (storage == null)
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         if (!storage.exists() && !storage.mkdirs())
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         Document document = new Document(name, fileName);
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
@@ -423,13 +416,13 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.flush();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to write descriptor in storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
         }
         try (FileOutputStream stream = new FileOutputStream(fileContent)) {
             stream.write(content);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to write document in storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write document in storage");
         }
         documents.put(document.getIdentifier(), document);
         EventService eventService = Register.getComponent(EventService.class);
@@ -448,7 +441,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         if (storage == null)
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         Document document = documents.remove(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
@@ -474,7 +467,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         if (storage == null)
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         Document document = documents.get(documentId);
         if (document == null)
             return XSPReplyNotFound.instance();
@@ -486,7 +479,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return new XSPReplyResult<>(result);
         } catch (FileNotFoundException exception) {
             Logging.getDefault().error(exception);
-            return new XSPReplyApiError(ERROR_OPERATION_FAILED, "Failed to access document storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         }
     }
 

@@ -28,11 +28,9 @@ import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
@@ -170,15 +168,16 @@ public class CSVImporter extends Importer {
         reply = importationService.getStreamFor(documentId);
         if (!reply.isSuccess())
             return reply;
+        String artifactId = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             CSVParser parser = new CSVParser(reader, configuration.getSeparator(), configuration.getTextMarker());
             Iterator<Iterator<String>> content = parser.parse();
             BaseStore store = StoreFactory.create().inMemory().make();
-            CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, documentId, documentId);
+            CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, artifactId, artifactId);
             configuration.getMapping().apply(content, context, configuration.getSkipFirstRow());
             Collection<Quad> quads = context.getQuads();
-            Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(documentId, configuration.getFamily(), configuration.getSuperseded(), document.getName(), configuration.getVersion(), configuration.getArchetype(), CSVImporter.class.getCanonicalName());
+            Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(artifactId, configuration.getFamily(), configuration.getSuperseded(), document.getName(), configuration.getVersion(), configuration.getArchetype(), CSVImporter.class.getCanonicalName());
             Artifact artifact = new ArtifactSimple(metadata, quads);
             reply = storageService.store(artifact);
             if (!reply.isSuccess())

@@ -30,11 +30,9 @@ import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
@@ -151,15 +149,16 @@ public class SemanticWebImporter extends Importer {
         reply = importationService.getStreamFor(documentId);
         if (!reply.isSuccess())
             return reply;
+        String artifactId = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();
-            reply = loader.load(reader, documentId, configuration.getSyntax());
+            reply = loader.load(reader, artifactId, configuration.getSyntax());
             if (!reply.isSuccess())
                 return reply;
             Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
             Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(
-                    documentId,
+                    artifactId,
                     configuration.getFamily(),
                     configuration.getSuperseded(),
                     document.getName(),

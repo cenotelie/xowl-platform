@@ -23,12 +23,12 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Represents a document to be imported
@@ -64,7 +64,7 @@ public class Document implements Identifiable, Serializable {
      * @param fileName The original client's file name
      */
     public Document(String name, String fileName) {
-        this.identifier = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
+        this.identifier = "http://xowl.org/platform/documents#" + UUID.randomUUID().toString();
         this.name = name;
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;

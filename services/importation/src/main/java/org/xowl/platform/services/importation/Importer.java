@@ -17,9 +17,12 @@
 
 package org.xowl.platform.services.importation;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -76,7 +79,20 @@ public abstract class Importer implements SecuredService, Serializable {
      * @param definition The configuration's definition
      * @return The configuration
      */
-    public abstract ImporterConfiguration getConfiguration(String definition);
+    public ImporterConfiguration getConfiguration(String definition) {
+        ASTNode root = JSONLDLoader.parseJSON(Logging.getDefault(), definition);
+        if (root == null)
+            return null;
+        return getConfiguration(root);
+    }
+
+    /**
+     * Gets the configuration from the specified serialized definition
+     *
+     * @param definition The configuration's definition
+     * @return The configuration
+     */
+    public abstract ImporterConfiguration getConfiguration(ASTNode definition);
 
     /**
      * Gets the preview of a document to be imported

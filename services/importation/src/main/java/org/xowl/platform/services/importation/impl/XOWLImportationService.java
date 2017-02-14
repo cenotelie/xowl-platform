@@ -26,7 +26,6 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -129,7 +128,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 } else if (isConfigurationFile(files[i].getName())) {
                     try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
                         String content = Files.read(reader);
-                        reloadConfiguration(files[i].getAbsolutePath(), content);
+                        reloadConfiguration(content);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
@@ -157,17 +156,29 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     /**
      * Tries to reload a stored configuration
      *
-     * @param file    The name of the file
      * @param content The file content
      */
-    private void reloadConfiguration(String file, String content) {
+    private void reloadConfiguration(String content) {
+        ImporterConfiguration configuration = loadConfiguration(content);
+        if (configuration != null)
+            configurations.put(configuration.getIdentifier(), configuration);
+    }
+
+    /**
+     * Loads an importer configuration from the specified serialized definition
+     *
+     * @param content The serialized definition of a configuration
+     * @return The configuration
+     */
+    private ImporterConfiguration loadConfiguration(String content) {
         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-        if (definition == null) {
-            Logging.getDefault().error("Failed to parse the document descriptor " + file);
-            return;
-        }
+        if (definition == null)
+            return null;
         ImporterConfiguration configuration = new ImporterConfiguration(definition);
-        configurations.put(configuration.getIdentifier(), configuration);
+        Importer importer = getImporter(configuration.getImporter());
+        if (importer == null)
+            return null;
+        return importer.getConfiguration(definition);
     }
 
     @Override
@@ -359,34 +370,19 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetPreview(String documentId, HttpApiRequest request) {
-        String[] importerIds = request.getParameter("importer");
-        String[] configurationIds = request.getParameter("configuration"); // the importer to use
-        if (importerIds == null || importerIds.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
+        // should use a stored configuration?
+        String[] configurationIds = request.getParameter("configuration");
+        if (configurationIds != null && configurationIds.length > 0)
+            return XSPReplyUtils.toHttpResponse(getPreview(documentId, configurationIds[0]), null);
 
-        Importer importer = getImporter(importerIds[0]);
-        if (importer == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
-
-        ImporterConfiguration configuration;
-        if (configurationIds != null && configurationIds.length > 0) {
-            XSPReply reply = retrieveConfiguration(configurationIds[0]);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
-            configuration = ((XSPReplyResult<ImporterConfiguration>) reply).getData();
-        } else {
-            String content = new String(request.getContent(), Files.CHARSET);
-            if (content.isEmpty())
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-            BufferedLogger logger = new BufferedLogger();
-            ASTNode root = JSONLDLoader.parseJSON(logger, content);
-            if (root == null)
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-            configuration = importer.getConfiguration(content);
-        }
-
-        XSPReply reply = getPreview(documentId, importerIds[0], configuration);
-        return XSPReplyUtils.toHttpResponse(reply, null);
+        // the configuration is expected to be inline in the body
+        String content = new String(request.getContent(), Files.CHARSET);
+        if (content.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+        ImporterConfiguration configuration = loadConfiguration(content);
+        if (configuration == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+        return XSPReplyUtils.toHttpResponse(getPreview(documentId, configuration), null);
     }
 
     /**
@@ -429,16 +425,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onBeginImport(String documentId, HttpApiRequest request) {
-        String[] importerIds = request.getParameter("importer"); // the importer to use
-        String[] configurationIds = request.getParameter("configuration"); // the importer to use
         String[] names = request.getParameter("name"); // the name of the artifact to produce
         String[] bases = request.getParameter("base"); // the base family URI for the artifact
         String[] versions = request.getParameter("version"); // the version for the artifact
         String[] archetypes = request.getParameter("archetype"); // the archetype for the artifact
         String[] superseded = request.getParameter("superseded"); // the superseded artifacts
-
-        if (importerIds == null || importerIds.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
         if (names == null || names.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
         if (bases == null || bases.length == 0)
@@ -449,30 +440,21 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
         if (superseded == null)
             superseded = new String[0];
-        Artifact skeleton = new ArtifactFuture(names[0], bases[0], versions[0], archetypes[0], superseded);
+        Artifact metadata = new ArtifactFuture(names[0], bases[0], versions[0], archetypes[0], superseded);
 
-        Importer importer = getImporter(importerIds[0]);
-        if (importer == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+        // should use a stored configuration?
+        String[] configurationIds = request.getParameter("configuration");
+        if (configurationIds != null && configurationIds.length > 0)
+            return XSPReplyUtils.toHttpResponse(beginImport(documentId, configurationIds[0], metadata), null);
 
-        ImporterConfiguration configuration;
-        if (configurationIds != null && configurationIds.length > 0) {
-            XSPReply reply = retrieveConfiguration(configurationIds[0]);
-            if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
-            configuration = ((XSPReplyResult<ImporterConfiguration>) reply).getData();
-        } else {
-            String content = new String(request.getContent(), Files.CHARSET);
-            if (content.isEmpty())
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-            BufferedLogger logger = new BufferedLogger();
-            ASTNode root = JSONLDLoader.parseJSON(logger, content);
-            if (root == null)
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-            configuration = importer.getConfiguration(content);
-        }
-        XSPReply reply = beginImport(documentId, importer.getIdentifier(), configuration, skeleton);
-        return XSPReplyUtils.toHttpResponse(reply, null);
+        // the configuration is expected to be inline in the body
+        String content = new String(request.getContent(), Files.CHARSET);
+        if (content.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+        ImporterConfiguration configuration = loadConfiguration(content);
+        if (configuration == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+        return XSPReplyUtils.toHttpResponse(beginImport(documentId, configuration, metadata), null);
     }
 
     /**
@@ -514,16 +496,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String content = new String(request.getContent(), Files.CHARSET);
         if (content.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-        BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JSONLDLoader.parseJSON(logger, content);
-        if (root == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-        ImporterConfiguration configuration = new ImporterConfiguration(root);
-        String importerId = configuration.getImporter();
-        Importer importer = getImporter(importerId);
-        if (importer == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
-        configuration = importer.getConfiguration(content);
+        ImporterConfiguration configuration = loadConfiguration(content);
+        if (configuration == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
         return XSPReplyUtils.toHttpResponse(storeConfiguration(configuration), null);
     }
 
@@ -669,27 +644,24 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
-    public XSPReply getPreview(String documentId, String importerId, ImporterConfiguration configuration) {
-        Importer importer = getImporter(importerId);
+    public XSPReply getPreview(String documentId, ImporterConfiguration configuration) {
+        Importer importer = getImporter(configuration.getImporter());
         if (importer == null)
             return XSPReplyNotFound.instance();
         return importer.getPreview(documentId, configuration);
     }
 
     @Override
-    public XSPReply getPreview(String documentId, String importerId, String configurationId) {
-        Importer importer = getImporter(importerId);
-        if (importer == null)
-            return XSPReplyNotFound.instance();
+    public XSPReply getPreview(String documentId, String configurationId) {
         XSPReply reply = retrieveConfiguration(configurationId);
         if (!reply.isSuccess())
             return reply;
-        return importer.getPreview(documentId, ((XSPReplyResult<ImporterConfiguration>) reply).getData());
+        return getPreview(documentId, ((XSPReplyResult<ImporterConfiguration>) reply).getData());
     }
 
     @Override
-    public XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration, Artifact metadata) {
-        Importer importer = getImporter(importerId);
+    public XSPReply beginImport(String documentId, ImporterConfiguration configuration, Artifact metadata) {
+        Importer importer = getImporter(configuration.getImporter());
         if (importer == null)
             return XSPReplyNotFound.instance();
         JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
@@ -702,21 +674,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
-    public XSPReply beginImport(String documentId, String importerId, String configurationId, Artifact metadata) {
-        Importer importer = getImporter(importerId);
-        if (importer == null)
-            return XSPReplyNotFound.instance();
-        JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
-        if (executionService == null)
-            return XSPReplyServiceUnavailable.instance();
+    public XSPReply beginImport(String documentId, String configurationId, Artifact metadata) {
         XSPReply reply = retrieveConfiguration(configurationId);
         if (!reply.isSuccess())
             return reply;
-        ImporterConfiguration configuration = ((XSPReplyResult<ImporterConfiguration>) reply).getData();
-        reply = importer.getImportJob(documentId, configuration, metadata);
-        if (!reply.isSuccess())
-            return reply;
-        return executionService.schedule(((XSPReplyResult<Job>) reply).getData());
+        return beginImport(documentId, ((XSPReplyResult<ImporterConfiguration>) reply).getData(), metadata);
     }
 
     @Override

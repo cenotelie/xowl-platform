@@ -129,43 +129,39 @@ public interface ImportationService extends SecuredService {
      * Gets the preview of a document
      *
      * @param documentId    The identifier of a document
-     * @param importerId    The identifier of an importer
      * @param configuration The importer's configuration
      * @return The document preview, or null if it cannot be produced
      */
-    XSPReply getPreview(String documentId, String importerId, ImporterConfiguration configuration);
+    XSPReply getPreview(String documentId, ImporterConfiguration configuration);
 
     /**
      * Gets the preview of a document
      *
      * @param documentId      The identifier of a document
-     * @param importerId      The identifier of an importer
      * @param configurationId The identifier of the stored configuration to use
      * @return The document preview, or null if it cannot be produced
      */
-    XSPReply getPreview(String documentId, String importerId, String configurationId);
+    XSPReply getPreview(String documentId, String configurationId);
 
     /**
      * Begins the importation job of a document
      *
      * @param documentId    The identifier of a document
-     * @param importerId    The identifier of an importer
      * @param configuration The importer's configuration
      * @param metadata      The metadata for the artifact to produce
      * @return The job, or null if the job cannot be created
      */
-    XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration, Artifact metadata);
+    XSPReply beginImport(String documentId, ImporterConfiguration configuration, Artifact metadata);
 
     /**
      * Begins the importation job of a document
      *
      * @param documentId      The identifier of a document
-     * @param importerId      The identifier of an importer
      * @param configurationId The identifier of the stored configuration to use
      * @param metadata        The metadata for the artifact to produce
      * @return The job, or null if the job cannot be created
      */
-    XSPReply beginImport(String documentId, String importerId, String configurationId, Artifact metadata);
+    XSPReply beginImport(String documentId, String configurationId, Artifact metadata);
 
     /**
      * Stores an configuration that can be retrieved later

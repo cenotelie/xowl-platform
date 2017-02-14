@@ -21,14 +21,16 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.BaseStore;
 import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.Files;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
@@ -68,11 +70,8 @@ public class CSVImporter extends Importer {
     }
 
     @Override
-    public ImporterConfiguration getConfiguration(String definition) {
-        ASTNode root = JSONLDLoader.parseJSON(Logging.getDefault(), definition);
-        if (root == null)
-            return null;
-        return new CSVConfiguration(root);
+    public ImporterConfiguration getConfiguration(ASTNode definition) {
+        return new CSVConfiguration(definition);
     }
 
     @Override

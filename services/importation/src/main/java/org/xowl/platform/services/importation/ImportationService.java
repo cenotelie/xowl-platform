@@ -18,6 +18,7 @@
 package org.xowl.platform.services.importation;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
@@ -43,6 +44,18 @@ public interface ImportationService extends SecuredService {
      * Service action to drop uploaded documents
      */
     SecuredAction ACTION_DROP_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".DropDocument", "Importation Service - Drop Document");
+    /**
+     * Service action to store a configuration
+     */
+    SecuredAction ACTION_STORE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".StoreConfig", "Importation Service - Store Configuration");
+    /**
+     * Service action to retrieve a configuration
+     */
+    SecuredAction ACTION_RETRIEVE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".RetrieveConfig", "Importation Service - Retrieve Stored Configuration");
+    /**
+     * Service action to delete a configuration
+     */
+    SecuredAction ACTION_DELETE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".DeleteConfig", "Importation Service - Delete Stored Configuration");
 
     /**
      * The actions for this service
@@ -51,7 +64,10 @@ public interface ImportationService extends SecuredService {
             ACTION_GET_DOCUMENT_METADATA,
             ACTION_GET_DOCUMENT_CONTENT,
             ACTION_UPLOAD_DOCUMENT,
-            ACTION_DROP_DOCUMENT
+            ACTION_DROP_DOCUMENT,
+            ACTION_STORE_CONFIG,
+            ACTION_RETRIEVE_CONFIG,
+            ACTION_DELETE_CONFIG
     };
 
     /**
@@ -122,12 +138,12 @@ public interface ImportationService extends SecuredService {
     /**
      * Gets the preview of a document
      *
-     * @param documentId    The identifier of a document
-     * @param importerId    The identifier of an importer
-     * @param configuration The importer's configuration
+     * @param documentId      The identifier of a document
+     * @param importerId      The identifier of an importer
+     * @param configurationId The identifier of the stored configuration to use
      * @return The document preview, or null if it cannot be produced
      */
-    XSPReply getPreview(String documentId, String importerId, String configuration);
+    XSPReply getPreview(String documentId, String importerId, String configurationId);
 
     /**
      * Begins the importation job of a document
@@ -135,17 +151,51 @@ public interface ImportationService extends SecuredService {
      * @param documentId    The identifier of a document
      * @param importerId    The identifier of an importer
      * @param configuration The importer's configuration
+     * @param metadata      The metadata for the artifact to produce
      * @return The job, or null if the job cannot be created
      */
-    XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration);
+    XSPReply beginImport(String documentId, String importerId, ImporterConfiguration configuration, Artifact metadata);
 
     /**
      * Begins the importation job of a document
      *
-     * @param documentId    The identifier of a document
-     * @param importerId    The identifier of an importer
-     * @param configuration The importer's configuration
+     * @param documentId      The identifier of a document
+     * @param importerId      The identifier of an importer
+     * @param configurationId The identifier of the stored configuration to use
+     * @param metadata        The metadata for the artifact to produce
      * @return The job, or null if the job cannot be created
      */
-    XSPReply beginImport(String documentId, String importerId, String configuration);
+    XSPReply beginImport(String documentId, String importerId, String configurationId, Artifact metadata);
+
+    /**
+     * Stores an configuration that can be retrieved later
+     *
+     * @param configuration The configuration to store
+     * @return The protocol reply
+     */
+    XSPReply storeConfiguration(ImporterConfiguration configuration);
+
+    /**
+     * Retrieves a stored configuration
+     *
+     * @param configurationId The identifier of the configuration to retrieve
+     * @return The protocol reply
+     */
+    XSPReply retrieveConfiguration(String configurationId);
+
+    /**
+     * Retrieves all the stored configurations related to the specified importer
+     *
+     * @param importerId The identifier of an importer
+     * @return The protocol reply
+     */
+    XSPReply retrieveConfigurations(String importerId);
+
+    /**
+     * Deletes a stored configuration
+     *
+     * @param configurationId The identifier of the configuration to delete
+     * @return The protocol reply
+     */
+    XSPReply deleteConfiguration(String configurationId);
 }

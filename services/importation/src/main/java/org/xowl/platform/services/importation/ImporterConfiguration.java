@@ -18,45 +18,41 @@
 package org.xowl.platform.services.importation;
 
 import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+
+import java.util.UUID;
 
 /**
  * Represents the basic configuration for an importer
  *
  * @author Laurent Wouters
  */
-public class ImporterConfiguration implements Serializable {
+public class ImporterConfiguration implements Identifiable, Serializable {
     /**
-     * The base URI of the artifact family
+     * The identifier for this configuration
      */
-    private final String family;
+    protected final String identifier;
     /**
-     * The URI of the superseded artifacts
+     * The name of this configuration
      */
-    private final String[] superseded;
+    protected final String name;
     /**
-     * The version number of the artifact
+     * The identifier of the parent importer
      */
-    private final String version;
-    /**
-     * The artifact archetype
-     */
-    private final String archetype;
+    protected final String importer;
 
     /**
      * Initializes this configuration
      *
-     * @param family     The base URI of the artifact family
-     * @param superseded The URI of the superseded artifacts
-     * @param version    The version number of the artifact
-     * @param archetype  The artifact archetype
+     * @param name     The name of this configuration
+     * @param importer The parent importer
      */
-    public ImporterConfiguration(String family, String[] superseded, String version, String archetype) {
-        this.family = family;
-        this.superseded = superseded;
-        this.version = version;
-        this.archetype = archetype;
+    public ImporterConfiguration(String name, Importer importer) {
+        this.identifier = "http://xowl.org/platform/services/importation/ImporterConfiguration#" + UUID.randomUUID().toString();
+        this.name = name;
+        this.importer = importer.getIdentifier();
     }
 
     /**
@@ -65,73 +61,45 @@ public class ImporterConfiguration implements Serializable {
      * @param definition The definition of this configuration
      */
     public ImporterConfiguration(ASTNode definition) {
-        String tFamily = "";
-        String[] tSuperseded = new String[0];
-        String tVersion = "";
-        String tArchetype = "";
-
+        String identifier = "";
+        String name = "";
+        String importer = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("family".equals(head)) {
+            if ("identifier".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                tFamily = value.substring(1, value.length() - 1);
-            } else if ("version".equals(head)) {
+                identifier = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                tVersion = value.substring(1, value.length() - 1);
-            } else if ("archetype".equals(head)) {
+                name = value.substring(1, value.length() - 1);
+            } else if ("importer".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                tArchetype = value.substring(1, value.length() - 1);
-            } else if ("superseded".equals(head)) {
-                ASTNode nodeSuperseded = member.getChildren().get(1);
-                tSuperseded = new String[nodeSuperseded.getChildren().size()];
-                for (int i = 0; i != tSuperseded.length; i++) {
-                    String value = TextUtils.unescape(nodeSuperseded.getChildren().get(i).getValue());
-                    tSuperseded[i] = value.substring(1, value.length() - 1);
-                }
+                importer = value.substring(1, value.length() - 1);
             }
         }
+        this.identifier = identifier;
+        this.name = name;
+        this.importer = importer;
+    }
 
-        this.family = tFamily;
-        this.superseded = tSuperseded;
-        this.version = tVersion;
-        this.archetype = tArchetype;
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     /**
-     * Gets the base URI of the artifact family
+     * Gets the identifier of the parent importer
      *
-     * @return The base URI of the artifact family
+     * @return The identifier of the parent importer
      */
-    public String getFamily() {
-        return family;
-    }
-
-    /**
-     * Gets the URI of the superseded artifacts
-     *
-     * @return The URI of the superseded artifacts
-     */
-    public String[] getSuperseded() {
-        return superseded;
-    }
-
-    /**
-     * Gets the version number of the artifact
-     *
-     * @return The version number of the artifact
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Gets the artifact archetype
-     *
-     * @return The artifact archetype
-     */
-    public String getArchetype() {
-        return archetype;
+    public String getImporter() {
+        return importer;
     }
 
     @Override
@@ -156,20 +124,12 @@ public class ImporterConfiguration implements Serializable {
      * @param builder The string builder to use
      */
     protected void serializeJSON(StringBuilder builder) {
-        builder.append("\"family\": \"");
-        builder.append(TextUtils.escapeStringJSON(family));
-        builder.append("\", \"superseded\": [");
-        for (int i = 0; i != superseded.length; i++) {
-            if (i != 0)
-                builder.append(", ");
-            builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(superseded[i]));
-            builder.append("\"");
-        }
-        builder.append("], \"version\": \"");
-        builder.append(TextUtils.escapeStringJSON(version));
-        builder.append("\", \"archetype\": \"");
-        builder.append(TextUtils.escapeStringJSON(archetype));
+        builder.append("\"identifier\": \"");
+        builder.append(TextUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\": \"");
+        builder.append(TextUtils.escapeStringJSON(name));
+        builder.append("\", \"importer\": \"");
+        builder.append(TextUtils.escapeStringJSON(importer));
         builder.append("\"");
     }
 }

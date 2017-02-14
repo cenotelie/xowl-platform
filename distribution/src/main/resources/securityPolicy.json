@@ -619,6 +619,30 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.StoreConfig"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.RetrieveConfig"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.importation.ImportationService.DeleteConfig"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.services.impact.ImpactAnalysisService.Perform"
       },
       "policy": {

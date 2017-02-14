@@ -22,6 +22,7 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -101,17 +102,6 @@ public abstract class Importer implements SecuredService, Serializable {
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    public XSPReply getPreview(String documentId, String configuration) {
-        return getPreview(documentId, getConfiguration(configuration));
-    }
-
-    /**
-     * Gets the preview of a document to be imported
-     *
-     * @param documentId    The identifier of a document
-     * @param configuration The configuration for this preview
-     * @return The preview, or null if it cannot be produced
-     */
     protected abstract XSPReply doGetPreview(String documentId, ImporterConfiguration configuration);
 
     /**
@@ -119,16 +109,17 @@ public abstract class Importer implements SecuredService, Serializable {
      *
      * @param documentId    The identifier of a document
      * @param configuration The configuration for this import
+     * @param metadata      The metadata for the artifact to produce
      * @return The job for importing the document
      */
-    public XSPReply getImportJob(String documentId, ImporterConfiguration configuration) {
+    public XSPReply getImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
         XSPReply reply = securityService.checkAction(actionImport);
         if (!reply.isSuccess())
             return reply;
-        return doGetImportJob(documentId, configuration);
+        return doGetImportJob(documentId, configuration, metadata);
     }
 
     /**
@@ -136,20 +127,10 @@ public abstract class Importer implements SecuredService, Serializable {
      *
      * @param documentId    The identifier of a document
      * @param configuration The configuration for this import
+     * @param metadata      The metadata for the artifact to produce
      * @return The job for importing the document
      */
-    public XSPReply getImportJob(String documentId, String configuration) {
-        return getImportJob(documentId, getConfiguration(configuration));
-    }
-
-    /**
-     * Gets the job for importing a document
-     *
-     * @param documentId    The identifier of a document
-     * @param configuration The configuration for this import
-     * @return The job for importing the document
-     */
-    protected abstract XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration);
+    protected abstract XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata);
 
     @Override
     public String serializedString() {

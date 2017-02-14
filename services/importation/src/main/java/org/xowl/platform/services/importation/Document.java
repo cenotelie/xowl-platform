@@ -64,7 +64,7 @@ public class Document implements Identifiable, Serializable {
      * @param fileName The original client's file name
      */
     public Document(String name, String fileName) {
-        this.identifier = "http://xowl.org/platform/documents#" + UUID.randomUUID().toString();
+        this.identifier = "http://xowl.org/platform/services/importation/Document#" + UUID.randomUUID().toString();
         this.name = name;
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;

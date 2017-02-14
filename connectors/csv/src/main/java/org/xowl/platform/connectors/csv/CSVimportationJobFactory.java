@@ -46,7 +46,7 @@ public class CSVimportationJobFactory implements JobFactory {
     @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(CSVImportationJob.class.getCanonicalName()))
-            return new CSVImportationJob(definition);
+            return new CSVImportationJob(CSVImporter.INSTANCE, definition);
         return null;
     }
 }

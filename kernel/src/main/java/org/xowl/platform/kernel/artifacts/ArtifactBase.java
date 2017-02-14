@@ -25,10 +25,8 @@ import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  * Base implementation for artifacts
@@ -95,7 +93,7 @@ public abstract class ArtifactBase implements Artifact {
      * @param creation   The artifact's creation time
      * @param superseded The artifacts superseded by this one
      */
-    protected ArtifactBase(String identifier, String name, String base, String version, String archetype, String from, String creation, String[] superseded) {
+    public ArtifactBase(String identifier, String name, String base, String version, String archetype, String from, String creation, String[] superseded) {
         this.identifier = identifier;
         this.name = name;
         this.base = base;
@@ -104,6 +102,23 @@ public abstract class ArtifactBase implements Artifact {
         this.from = from;
         this.creation = creation;
         this.superseded = superseded;
+    }
+
+    /**
+     * Initializes this artifact from the specified skeleton
+     *
+     * @param skeleton The skeleton
+     * @param from     The identifier of the originating connector
+     */
+    public ArtifactBase(Artifact skeleton, String from) {
+        this.identifier = newArtifactID();
+        this.name = skeleton.getName();
+        this.base = skeleton.getBase();
+        this.version = skeleton.getVersion();
+        this.archetype = skeleton.getArchetype();
+        this.from = from;
+        this.creation = DateFormat.getDateTimeInstance().format(new Date());
+        this.superseded = skeleton.getSuperseded();
     }
 
     /**

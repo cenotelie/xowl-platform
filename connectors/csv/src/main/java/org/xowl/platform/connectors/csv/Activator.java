@@ -33,7 +33,7 @@ import org.xowl.platform.services.importation.Importer;
 public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(Importer.class, new CSVImporter(), null);
+        bundleContext.registerService(Importer.class, CSVImporter.INSTANCE, null);
         bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
         bundleContext.registerService(ConnectorDescriptor.class, CSVConnectorDescriptor.INSTANCE, null);
         bundleContext.registerService(ConnectorServiceFactory.class, CSVConnectorFactory.INSTANCE, null);

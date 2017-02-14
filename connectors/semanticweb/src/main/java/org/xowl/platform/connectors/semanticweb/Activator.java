@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext bundleContext) throws Exception {
         bundleContext.registerService(ConnectorDescriptor.class, SemanticWebConnectorDescriptor.INSTANCE, null);
         bundleContext.registerService(ConnectorServiceFactory.class, new SemanticWebConnectorFactory(), null);
-        bundleContext.registerService(Importer.class, new SemanticWebImporter(), null);
+        bundleContext.registerService(Importer.class, SemanticWebImporter.INSTANCE, null);
         bundleContext.registerService(JobFactory.class, new SemanticWebImportJobFactory(), null);
         bundleContext.registerService(WebUIContribution.class, new SemanticWebUIContribution(), null);
     }

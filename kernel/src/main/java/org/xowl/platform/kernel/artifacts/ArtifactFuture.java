@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.Quad;
 
 import java.util.Collection;
@@ -39,6 +40,15 @@ public class ArtifactFuture extends ArtifactBase {
      */
     public ArtifactFuture(String name, String base, String version, String archetype, String[] superseded) {
         super(newArtifactID(), name, base, version, archetype, "", "", superseded);
+    }
+
+    /**
+     * Initializes this artifact
+     *
+     * @param definition The AST root for the serialized definition
+     */
+    public ArtifactFuture(ASTNode definition) {
+        super(definition);
     }
 
     @Override

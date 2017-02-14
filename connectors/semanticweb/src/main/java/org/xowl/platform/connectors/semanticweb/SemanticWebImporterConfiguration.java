@@ -44,24 +44,11 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
     /**
      * Initializes this configuration for a preview
      *
+     * @param name   The configuration's name
      * @param syntax The expected syntax od the document to import
      */
-    public SemanticWebImporterConfiguration(String syntax) {
-        super("", new String[0], null, null);
-        this.syntax = syntax;
-    }
-
-    /**
-     * Initializes this configuration for an importation
-     *
-     * @param family     The base URI of the artifact family
-     * @param superseded The URI of the superseded artifacts
-     * @param version    The version number of the artifact
-     * @param archetype  The artifact archetype
-     * @param syntax     The expected syntax od the document to import
-     */
-    public SemanticWebImporterConfiguration(String family, String[] superseded, String version, String archetype, String syntax) {
-        super(family, superseded, version, archetype);
+    public SemanticWebImporterConfiguration(String name, String syntax) {
+        super(name, SemanticWebImporter.INSTANCE);
         this.syntax = syntax;
     }
 

@@ -35,7 +35,19 @@ public class ArtifactSimple extends ArtifactBase {
     protected final Collection<Quad> content;
 
     /**
-     * Initializes this data package
+     * Initializes this simple artifact
+     *
+     * @param skeleton The skeleton
+     * @param from     The identifier of the originating connector
+     * @param content  The payload quads
+     */
+    public ArtifactSimple(Artifact skeleton, String from, Collection<Quad> content) {
+        super(skeleton, from);
+        this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
+    }
+
+    /**
+     * Initializes this simple artifact
      *
      * @param metadata The metadata quads
      * @param content  The payload quads

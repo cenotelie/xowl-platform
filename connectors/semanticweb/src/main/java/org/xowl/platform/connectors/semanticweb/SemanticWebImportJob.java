@@ -18,83 +18,39 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.jobs.JobBase;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.services.importation.ImportationJob;
+import org.xowl.platform.services.importation.Importer;
 
 /**
  * Represents an import job for a Semantic Web dataset
  *
  * @author Laurent Wouters
  */
-public class SemanticWebImportJob extends JobBase {
-    /**
-     * The identifier of the document to import
-     */
-    private final String documentId;
-    /**
-     * The configuration for the importer
-     */
-    private final SemanticWebImporterConfiguration configuration;
-    /**
-     * The job's result
-     */
-    private XSPReply result;
-
+public class SemanticWebImportJob extends ImportationJob<SemanticWebImporterConfiguration> {
     /**
      * Initializes this job
      *
      * @param documentId    The identifier of the document to import
      * @param configuration The configuration for the importer
+     * @param metadata      The metadata for the artifact to produce
      */
-    public SemanticWebImportJob(String documentId, SemanticWebImporterConfiguration configuration) {
-        super("Importation of Semantic Web dataset " + documentId, SemanticWebImportJob.class.getCanonicalName());
-        this.documentId = documentId;
-        this.configuration = configuration;
+    public SemanticWebImportJob(String documentId, SemanticWebImporterConfiguration configuration, Artifact metadata) {
+        super(SemanticWebImportJob.class.getCanonicalName(), documentId, configuration, metadata);
     }
 
     /**
      * Initializes this job
      *
+     * @param importer   The parent importer
      * @param definition The job definition
      */
-    public SemanticWebImportJob(ASTNode definition) {
-        super(definition);
-        String tDocument = "";
-        SemanticWebImporterConfiguration tConfiguration = null;
-        ASTNode payload = getPayloadNode(definition);
-        if (payload != null) {
-            for (ASTNode member : payload.getChildren()) {
-                String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-                head = head.substring(1, head.length() - 1);
-                if ("document".equals(head)) {
-                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    tDocument = value.substring(1, value.length() - 1);
-                } else if ("configuration".equals(head)) {
-                    tConfiguration = new SemanticWebImporterConfiguration(member.getChildren().get(1));
-                }
-            }
-        }
-        this.documentId = tDocument;
-        this.configuration = tConfiguration;
-    }
-
-    @Override
-    protected String getJSONSerializedPayload() {
-        return "{\"document\": \"" +
-                TextUtils.escapeStringJSON(documentId) +
-                "\", \"configuration\": " +
-                configuration.serializedJSON() +
-                "}";
+    public SemanticWebImportJob(Importer importer, ASTNode definition) {
+        super(importer, definition);
     }
 
     @Override
     public void doRun() {
-        result = SemanticWebImporter.doImport(documentId, configuration);
-    }
-
-    @Override
-    public XSPReply getResult() {
-        return result;
+        result = SemanticWebImporter.doImport(documentId, configuration, metadata);
     }
 }

@@ -46,7 +46,7 @@ public class SemanticWebImportJobFactory implements JobFactory {
     @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(SemanticWebImportJob.class.getCanonicalName()))
-            return new SemanticWebImportJob(definition);
+            return new SemanticWebImportJob(SemanticWebImporter.INSTANCE, definition);
         return null;
     }
 }

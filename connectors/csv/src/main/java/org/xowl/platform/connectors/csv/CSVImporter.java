@@ -37,7 +37,6 @@ import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecurityService;
-import org.xowl.platform.services.connection.ConnectorServiceBase;
 import org.xowl.platform.services.importation.*;
 
 import java.io.IOException;
@@ -54,6 +53,17 @@ import java.util.List;
  * @author Laurent Wouters
  */
 public class CSVImporter extends Importer {
+    /**
+     * The singleton instance of the importer
+     */
+    public static final Importer INSTANCE = new CSVImporter();
+
+    /**
+     * Initializes this importer
+     */
+    private CSVImporter() {
+    }
+
     @Override
     public String getIdentifier() {
         return CSVImporter.class.getCanonicalName();
@@ -132,8 +142,8 @@ public class CSVImporter extends Importer {
     }
 
     @Override
-    public XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration) {
-        return new XSPReplyResult<>(new CSVImportationJob(documentId, (CSVConfiguration) configuration));
+    public XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata) {
+        return new XSPReplyResult<>(new CSVImportationJob(documentId, (CSVConfiguration) configuration, metadata));
     }
 
     /**
@@ -141,9 +151,10 @@ public class CSVImporter extends Importer {
      *
      * @param documentId    The identifier of the document to import
      * @param configuration The configuration for the importation
+     * @param metadata      The metadata for the artifact to produce
      * @return The result
      */
-    public static XSPReply doImport(String documentId, CSVConfiguration configuration) {
+    public static XSPReply doImport(String documentId, CSVConfiguration configuration, Artifact metadata) {
         ImportationService importationService = Register.getComponent(ImportationService.class);
         if (importationService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -176,8 +187,7 @@ public class CSVImporter extends Importer {
             CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, artifactId, artifactId);
             configuration.getMapping().apply(content, context, configuration.getSkipFirstRow());
             Collection<Quad> quads = context.getQuads();
-            Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(artifactId, configuration.getFamily(), configuration.getSuperseded(), document.getName(), configuration.getVersion(), configuration.getArchetype(), CSVImporter.class.getCanonicalName());
-            Artifact artifact = new ArtifactSimple(metadata, quads);
+            Artifact artifact = new ArtifactSimple(metadata, CSVImporter.class.getCanonicalName(), quads);
             reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;

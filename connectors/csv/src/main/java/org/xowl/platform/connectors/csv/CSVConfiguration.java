@@ -107,58 +107,16 @@ public class CSVConfiguration extends ImporterConfiguration {
     }
 
     /**
-     * Initializes this configuration for a preview
-     *
-     * @param rowCount The number or rows
-     */
-    public CSVConfiguration(int rowCount) {
-        this(DEFAULT_SEPARATOR, DEFAULT_TEXT_MARKER, rowCount);
-    }
-
-    /**
-     * Initializes this configuration for a preview
-     *
-     * @param separator  The cell separator
-     * @param textMarker The text delimiter
-     * @param rowCount   The number or rows
-     */
-    public CSVConfiguration(char separator, char textMarker, int rowCount) {
-        super("", new String[0], null, null);
-        this.separator = separator;
-        this.textMarker = textMarker;
-        this.rowCount = rowCount;
-        this.mapping = null;
-        this.skipFirstRow = false;
-    }
-
-    /**
      * Initializes this configuration for an importation
      *
-     * @param family       The base URI of the artifact family
-     * @param superseded   The URI of the superseded artifacts
-     * @param version      The version number of the artifact
-     * @param archetype    The artifact archetype
-     * @param mapping      The mapping
-     * @param skipFirstRow Whether to skip the first row when importing
-     */
-    public CSVConfiguration(String family, String[] superseded, String version, String archetype, CSVMapping mapping, boolean skipFirstRow) {
-        this(family, superseded, version, archetype, DEFAULT_SEPARATOR, DEFAULT_TEXT_MARKER, mapping, skipFirstRow);
-    }
-
-    /**
-     * Initializes this configuration for an importation
-     *
-     * @param family       The base URI of the artifact family
-     * @param superseded   The URI of the superseded artifacts
-     * @param version      The version number of the artifact
-     * @param archetype    The artifact archetype
+     * @param name         The name for the configuration
      * @param separator    The cell separator
      * @param textMarker   The text delimiter
      * @param mapping      The mapping
      * @param skipFirstRow Whether to skip the first row when importing
      */
-    public CSVConfiguration(String family, String[] superseded, String version, String archetype, char separator, char textMarker, CSVMapping mapping, boolean skipFirstRow) {
-        super(family, superseded, version, archetype);
+    public CSVConfiguration(String name, char separator, char textMarker, CSVMapping mapping, boolean skipFirstRow) {
+        super(name, CSVImporter.INSTANCE);
         this.separator = separator;
         this.textMarker = textMarker;
         this.rowCount = DEFAULT_ROW_COUNT;

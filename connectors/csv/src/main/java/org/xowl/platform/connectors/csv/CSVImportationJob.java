@@ -18,83 +18,39 @@
 package org.xowl.platform.connectors.csv;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.jobs.JobBase;
+import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.services.importation.ImportationJob;
+import org.xowl.platform.services.importation.Importer;
 
 /**
  * Represents an importation job for a CSV document
  *
  * @author Laurent Wouters
  */
-public class CSVImportationJob extends JobBase {
-    /**
-     * The identifier of the document to import
-     */
-    private final String documentId;
-    /**
-     * The configuration for the importer
-     */
-    private final CSVConfiguration configuration;
-    /**
-     * The job's result
-     */
-    private XSPReply result;
-
+public class CSVImportationJob extends ImportationJob<CSVConfiguration> {
     /**
      * Initializes this job
      *
      * @param documentId    The identifier of the document to import
      * @param configuration The configuration for the importer
+     * @param metadata      The metadata for the artifact to produce
      */
-    public CSVImportationJob(String documentId, CSVConfiguration configuration) {
-        super("Importation of CSV document " + documentId, CSVImportationJob.class.getCanonicalName());
-        this.documentId = documentId;
-        this.configuration = configuration;
+    public CSVImportationJob(String documentId, CSVConfiguration configuration, Artifact metadata) {
+        super(CSVImportationJob.class.getCanonicalName(), documentId, configuration, metadata);
     }
 
     /**
      * Initializes this job
      *
+     * @param importer   The parent importer
      * @param definition The job definition
      */
-    public CSVImportationJob(ASTNode definition) {
-        super(definition);
-        String tDocument = "";
-        CSVConfiguration tConfiguration = null;
-        ASTNode payload = getPayloadNode(definition);
-        if (payload != null) {
-            for (ASTNode member : payload.getChildren()) {
-                String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-                head = head.substring(1, head.length() - 1);
-                if ("document".equals(head)) {
-                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                    tDocument = value.substring(1, value.length() - 1);
-                } else if ("configuration".equals(head)) {
-                    tConfiguration = new CSVConfiguration(member.getChildren().get(1));
-                }
-            }
-        }
-        this.documentId = tDocument;
-        this.configuration = tConfiguration;
-    }
-
-    @Override
-    protected String getJSONSerializedPayload() {
-        return "{\"document\": \"" +
-                TextUtils.escapeStringJSON(documentId) +
-                "\", \"configuration\": " +
-                configuration.serializedJSON() +
-                "}";
+    public CSVImportationJob(Importer importer, ASTNode definition) {
+        super(importer, definition);
     }
 
     @Override
     public void doRun() {
-        result = CSVImporter.doImport(documentId, configuration);
-    }
-
-    @Override
-    public XSPReply getResult() {
-        return result;
+        result = CSVImporter.doImport(documentId, configuration, metadata);
     }
 }

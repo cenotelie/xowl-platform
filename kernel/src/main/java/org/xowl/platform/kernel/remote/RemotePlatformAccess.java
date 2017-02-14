@@ -31,6 +31,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -1281,6 +1282,87 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Gets the list of the available importers for uploaded documents
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getDocumentImporters() {
+        return doRequest("/services/importation/importers", HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific importer for uploaded documents
+     *
+     * @param importerId The identifier of an importer
+     * @return The protocol reply
+     */
+    public XSPReply getDocumentImporter(String importerId) {
+        return doRequest(
+                "/services/importation/importers/" + URIUtils.encodeComponent(importerId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the stored configurations for a specific importer
+     *
+     * @param importerId The identifier of an importer
+     * @return The protocol reply
+     */
+    public XSPReply getImporterConfigurationsFor(String importerId) {
+        return doRequest(
+                "/services/importation/importers/" + URIUtils.encodeComponent(importerId) + "/configurations",
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets all the stored importer configurations
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getImporterConfigurations() {
+        return doRequest(
+                "/services/importation/configurations",
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets a stored importer configuration
+     *
+     * @param configurationId The identifier of a configuration
+     * @return The protocol reply
+     */
+    public XSPReply getImporterConfiguration(String configurationId) {
+        return doRequest(
+                "/services/importation/configurations/" + URIUtils.encodeComponent(configurationId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Deletes a stored importer configuration
+     *
+     * @param configurationId The identifier of a configuration
+     * @return The protocol reply
+     */
+    public XSPReply deleteImporterConfiguration(String configurationId) {
+        return doRequest(
+                "/services/importation/configurations/" + URIUtils.encodeComponent(configurationId),
+                HttpConstants.METHOD_DELETE);
+    }
+
+    /**
+     * Stores a configuration for an importer
+     *
+     * @param configuration The configuration to store
+     * @return The protocol reply
+     */
+    public XSPReply storeImporterConfiguration(Serializable configuration) {
+        return doRequest(
+                "/services/importation/configurations",
+                HttpConstants.METHOD_PUT,
+                configuration);
+    }
+
+    /**
      * Gets a description of the uploaded documents
      *
      * @return The protocol reply
@@ -1302,42 +1384,6 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
-     * Gets the list of the available importers for uploaded documents
-     *
-     * @return The protocol reply
-     */
-    public XSPReply getDocumentImporters() {
-        return doRequest("/services/importation/importers", HttpConstants.METHOD_GET);
-    }
-
-    /**
-     * Gets the description ofa specific importer for uploaded documents
-     *
-     * @param importerId The identifier of an importer
-     * @return The protocol reply
-     */
-    public XSPReply getDocumentImporter(String importerId) {
-        return doRequest(
-                "/services/importation/importers/" + URIUtils.encodeComponent(importerId),
-                HttpConstants.METHOD_GET);
-    }
-
-    /**
-     * Gets a preview of the result of importing a document
-     *
-     * @param documentId    The identifier of the document to import
-     * @param importerId    The identifier of the importer to user
-     * @param configuration The configuration for the importer
-     * @return The protocol reply
-     */
-    public XSPReply getUploadedDocumentPreview(String documentId, String importerId, Serializable configuration) {
-        return doRequest(
-                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview?importer=" + URIUtils.encodeComponent(importerId),
-                HttpConstants.METHOD_POST,
-                configuration);
-    }
-
-    /**
      * Drops (delete) a previously uploaded document
      *
      * @param documentId The identifier of the document
@@ -1347,21 +1393,6 @@ public class RemotePlatformAccess extends HttpConnection {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId),
                 HttpConstants.METHOD_DELETE);
-    }
-
-    /**
-     * Performs the import of a document
-     *
-     * @param documentId    The identifier of the document to import
-     * @param importerId    The identifier of the importer to user
-     * @param configuration The configuration for the importer
-     * @return The protocol reply
-     */
-    public XSPReply importUploadedDocument(String documentId, String importerId, Serializable configuration) {
-        return doRequest(
-                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import?importer=" + URIUtils.encodeComponent(importerId),
-                HttpConstants.METHOD_POST,
-                configuration);
     }
 
     /**
@@ -1380,6 +1411,72 @@ public class RemotePlatformAccess extends HttpConnection {
                 HttpConstants.MIME_OCTET_STREAM,
                 false,
                 HttpConstants.MIME_JSON);
+    }
+
+    /**
+     * Gets a preview of the result of importing a document
+     *
+     * @param documentId      The identifier of the document to import
+     * @param configurationId The identifier of the stored configuration to use
+     * @return The protocol reply
+     */
+    public XSPReply getUploadedDocumentPreview(String documentId, String configurationId) {
+        return doRequest(
+                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview?configuration=" + URIUtils.encodeComponent(configurationId),
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Gets a preview of the result of importing a document
+     *
+     * @param documentId    The identifier of the document to import
+     * @param configuration The configuration for the importer
+     * @return The protocol reply
+     */
+    public XSPReply getUploadedDocumentPreview(String documentId, Serializable configuration) {
+        return doRequest(
+                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview",
+                HttpConstants.METHOD_POST,
+                configuration);
+    }
+
+    /**
+     * Performs the import of a document
+     *
+     * @param documentId      The identifier of the document to import
+     * @param configurationId The identifier of the stored configuration to use
+     * @param metadata        The metadata for the artifact to produce
+     * @return The protocol reply
+     */
+    public XSPReply importUploadedDocument(String documentId, String configurationId, Artifact metadata) {
+        return doRequest(
+                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
+                        "?configuration=" + URIUtils.encodeComponent(configurationId) +
+                        "&name=" + URIUtils.encodeComponent(metadata.getName()) +
+                        "&base=" + URIUtils.encodeComponent(metadata.getBase()) +
+                        "&version=" + URIUtils.encodeComponent(metadata.getVersion()) +
+                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype())
+                ,
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Performs the import of a document
+     *
+     * @param documentId    The identifier of the document to import
+     * @param configuration The configuration for the importer
+     * @param metadata      The metadata for the artifact to produce
+     * @return The protocol reply
+     */
+    public XSPReply importUploadedDocument(String documentId, Serializable configuration, Artifact metadata) {
+        return doRequest(
+                "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
+                        "?name=" + URIUtils.encodeComponent(metadata.getName()) +
+                        "&base=" + URIUtils.encodeComponent(metadata.getBase()) +
+                        "&version=" + URIUtils.encodeComponent(metadata.getVersion()) +
+                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype())
+                ,
+                HttpConstants.METHOD_POST, configuration);
     }
 
     /**

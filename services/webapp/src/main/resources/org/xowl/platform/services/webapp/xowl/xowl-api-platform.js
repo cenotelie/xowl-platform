@@ -1174,26 +1174,6 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
  * Importation - Importation Service
  ****************************************************/
 
-XOWL.prototype.getUploadedDocuments = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/importation/documents", null, "GET", null, null);
-}
-
-XOWL.prototype.getUploadedDocument = function (callback, docId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/importation/documents/" + encodeURIComponent(docId), null, "GET", null, null);
-}
-
 XOWL.prototype.getDocumentImporters = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
@@ -1214,34 +1194,84 @@ XOWL.prototype.getDocumentImporter = function (callback, importerId) {
 	}, "services/importation/importers/" + encodeURIComponent(importerId), null, "GET", null, null);
 }
 
-XOWL.prototype.getUploadedDocumentPreview = function (callback, docId, importer, configuration) {
+XOWL.prototype.getImporterConfigurationsFor = function (callback, importerId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/importation/documents/" + encodeURIComponent(docId) + "/preview", {importer: importer}, "POST", MIME_JSON, configuration);
+	}, "services/importation/importers/" + encodeURIComponent(importerId) + "/configurations", null, "GET", null, null);
 }
 
-XOWL.prototype.dropUploadedDocument = function (callback, docId) {
+XOWL.prototype.getImporterConfigurations = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/configurations", null, "GET", null, null);
+}
+
+XOWL.prototype.getImporterConfiguration = function (callback, configurationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/configurations/" + encodeURIComponent(configurationId), null, "GET", null, null);
+}
+
+XOWL.prototype.deleteImporterConfiguration = function (callback, configurationId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/importation/documents/" + encodeURIComponent(docId), null, "DELETE", null, null);
+	}, "services/importation/configurations/" + encodeURIComponent(configurationId), null, "DELETE", null, null);
 }
 
-XOWL.prototype.importUploadedDocument = function (callback, docId, importer, configuration) {
+XOWL.prototype.storeImporterConfiguration = function (callback, configuration) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/configurations", null, "PUT", MIME_JSON, configuration);
+}
+
+XOWL.prototype.getUploadedDocuments = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/importation/documents/" + encodeURIComponent(docId) + "/import", {importer: importer}, "POST", MIME_JSON, configuration);
+	}, "services/importation/documents", null, "GET", null, null);
+}
+
+XOWL.prototype.getUploadedDocument = function (callback, documentId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId), null, "GET", null, null);
+}
+
+XOWL.prototype.dropUploadedDocument = function (callback, documentId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId), null, "DELETE", null, null);
 }
 
 XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
@@ -1252,6 +1282,59 @@ XOWL.prototype.uploadDocument = function (callback, name, content, fileName) {
 			callback(code, type, content);
 		}
 	}, "services/importation/documents", {name: name, fileName: fileName}, "PUT", MIME_OCTET_STREAM, content);
+}
+
+XOWL.prototype.getUploadedDocumentPreviewWith = function (callback, documentId, configurationId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId) + "/preview", {configuration: configurationId}, "POST", null, null);
+}
+
+XOWL.prototype.getUploadedDocumentPreview = function (callback, documentId, configuration) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId) + "/preview", null, "POST", MIME_JSON, configuration);
+}
+
+XOWL.prototype.importUploadedDocumentWith = function (callback, documentId, configurationId, metadata) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId) + "/import", {
+		configuration: configurationId,
+		name: metadata.name,
+		base: metadata.base,
+		version: metadata.version,
+		archetype: metadata.archetype,
+		superseded: metadata.superseded
+	}, "POST", null, null);
+}
+
+XOWL.prototype.importUploadedDocument = function (callback, documentId, configuration, metadata) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/importation/documents/" + encodeURIComponent(documentId) + "/import", {
+		name: metadata.name,
+		base: metadata.base,
+		version: metadata.version,
+		archetype: metadata.archetype,
+		superseded: metadata.superseded
+	}, "POST", MIME_JSON, configuration);
 }
 
 

@@ -1449,13 +1449,19 @@ public class RemotePlatformAccess extends HttpConnection {
      * @return The protocol reply
      */
     public XSPReply importUploadedDocument(String documentId, String configurationId, Artifact metadata) {
+        StringBuilder superseded = new StringBuilder();
+        for (String value : metadata.getSuperseded()) {
+            superseded.append("&superseded=");
+            superseded.append(URIUtils.encodeComponent(value));
+        }
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
                         "?configuration=" + URIUtils.encodeComponent(configurationId) +
                         "&name=" + URIUtils.encodeComponent(metadata.getName()) +
                         "&base=" + URIUtils.encodeComponent(metadata.getBase()) +
                         "&version=" + URIUtils.encodeComponent(metadata.getVersion()) +
-                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype())
+                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype()) +
+                        superseded.toString()
                 ,
                 HttpConstants.METHOD_POST);
     }
@@ -1469,12 +1475,18 @@ public class RemotePlatformAccess extends HttpConnection {
      * @return The protocol reply
      */
     public XSPReply importUploadedDocument(String documentId, Serializable configuration, Artifact metadata) {
+        StringBuilder superseded = new StringBuilder();
+        for (String value : metadata.getSuperseded()) {
+            superseded.append("&superseded=");
+            superseded.append(URIUtils.encodeComponent(value));
+        }
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
                         "?name=" + URIUtils.encodeComponent(metadata.getName()) +
                         "&base=" + URIUtils.encodeComponent(metadata.getBase()) +
                         "&version=" + URIUtils.encodeComponent(metadata.getVersion()) +
-                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype())
+                        "&archetype=" + URIUtils.encodeComponent(metadata.getArchetype()) +
+                        superseded.toString()
                 ,
                 HttpConstants.METHOD_POST, configuration);
     }

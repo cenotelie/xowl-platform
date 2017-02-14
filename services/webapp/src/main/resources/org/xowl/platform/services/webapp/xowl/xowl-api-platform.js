@@ -1552,12 +1552,24 @@ XOWL.prototype.doRequest = function (callback, complement, parameters, method, c
 	var uri = this.endpoint + complement;
 	if (parameters != null) {
 		var names = Object.getOwnPropertyNames(parameters);
+		var first = true;
 		for (var p = 0; p != names.length; p++) {
 			var value = parameters[names[p]];
-			uri += (p === 0) ? "?" : "&";
-			uri += names[p];
-			uri += "=";
-			uri += encodeURIComponent(value);
+			if (Array.isArray(value)) {
+				for (var i = 0; i != value.length; i++) {
+					uri += (first) ? "?" : "&";
+					uri += names[p];
+					uri += "=";
+					uri += encodeURIComponent(value[i]);
+					first = false;
+				}
+			} else {
+				uri += (first) ? "?" : "&";
+				uri += names[p];
+				uri += "=";
+				uri += encodeURIComponent(value);
+			}
+			first = false;
 		}
 	}
 	xmlHttp.open(method, uri, true);

@@ -35,25 +35,33 @@
             "org.xowl.platform.services.importation.ImporterConfiguration"
           ]
         },
-        "family": {
+        "identifier": {
           "type": "string"
         },
-        "superseded": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "version": {
+        "name": {
           "type": "string"
         },
-        "archetype": {
+        "importer": {
           "type": "string"
         }
       },
       "required": [
-        "type"
+        "type",
+        "identifier",
+        "name",
+        "importer"
       ]
+    },
+    "ImporterConfigurations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/ImporterConfiguration"
+          }
+        ]
+      }
     },
     "Importers": {
       "type": "array",

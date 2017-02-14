@@ -66,8 +66,8 @@ public class ImporterConfiguration implements Identifiable, Serializable {
      * @param definition The definition of this configuration
      */
     public ImporterConfiguration(ASTNode definition) {
-        String identifier = "";
-        String name = "";
+        String identifier = null;
+        String name = null;
         String importer = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -83,8 +83,8 @@ public class ImporterConfiguration implements Identifiable, Serializable {
                 importer = value.substring(1, value.length() - 1);
             }
         }
-        this.identifier = identifier;
-        this.name = name;
+        this.identifier = (identifier != null ? identifier : URI + UUID.randomUUID().toString());
+        this.name = (name != null ? name : this.identifier);
         this.importer = importer;
     }
 

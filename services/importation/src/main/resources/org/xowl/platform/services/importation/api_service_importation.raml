@@ -8,6 +8,7 @@ types:
   Importer: !include schema_platform_importation.json#/definitions/Importer
   Importers: !include schema_platform_importation.json#/definitions/Importers
   ImporterConfiguration: !include schema_platform_importation.json#/definitions/ImporterConfiguration
+  ImporterConfigurations: !include schema_platform_importation.json#/definitions/ImporterConfigurations
   Document: !include schema_platform_importation.json#/definitions/Document
   Documents: !include schema_platform_importation.json#/definitions/Documents
 traits: !include api_traits.raml
@@ -51,6 +52,86 @@ baseUri: https://localhost:8443/api
                     "name": "CSV Importer",
                     "wizardUri": "contributions/importers/csv"
                   }
+      /configurations:
+        description: The stored configurations for this importer
+        get:
+          description: Gets the stored configurations for this importer
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The stored configurations for this importer
+              body:
+                application/json:
+                  type: ImporterConfigurations
+                  example: |
+                    [
+                      {
+                        "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+                        "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+                        "name": "My Configuration 0001",
+                        "importer": "{importerId}"
+                      }
+                    ]
+  /configurations:
+    description: The collection of stored configurations for importers
+    get:
+      description: Gets the stored configurations for importer
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The collection of stored configurations for importers
+          body:
+            application/json:
+              type: ImporterConfigurations
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+                    "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+                    "name": "My Configuration 0001",
+                    "importer": "{importerId}"
+                  }
+                ]
+    put:
+      description: Stores a new configuration for an importer
+      is: [secured, mayFail, resourceAccess]
+      body:
+        application/json:
+          type: ImporterConfiguration
+          example: |
+            {
+              "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+              "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+              "name": "My Configuration 0001",
+              "importer": "{importerId}"
+            }
+      responses:
+        200:
+          description: The operation succeeded
+    /{configurationId}:
+      description: A specific stored configuration for an importer
+      get:
+        description: Gets the stored configuration
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The stored configuration
+            body:
+              application/json:
+                type: ImporterConfiguration
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.importation.ImporterConfiguration",
+                    "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+                    "name": "My Configuration 0001",
+                    "importer": "{importerId}"
+                  }
+      delete:
+        description: Deletes the stored configuration
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded
   /documents:
     description: The collection of uploaded documents
     get:
@@ -139,12 +220,12 @@ baseUri: https://localhost:8443/api
           description: Requests a preview of the data that would be imported from the document
           is: [secured, mayFail, resourceAccess]
           queryParameters:
-            importer:
-              displayName: Importer
+            configuration:
+              displayName: Configuration
               type: string
-              description: The identifier of the importer to use
-              example: org.xowl.platform.importers.CSVImporter
-              required: true
+              description: The identifier of the the stored configuration to use
+              example: http://xowl.org/platform/services/importation/ImporterConfiguration#0001
+              required: false
           body:
             application/json:
               description: The configuration for the importer
@@ -152,12 +233,9 @@ baseUri: https://localhost:8443/api
               example: |
                 {
                   "type": "org.xowl.platform.services.importation.ImporterConfiguration",
-                  "family": "http://xowl.org/platform/artifacts/artifact0",
-                  "superseded": [
-                    "http://xowl.org/platform/artifacts/artifact0/v0"
-                  ],
-                  "version": "v1",
-                  "archetype": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype"
+                  "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+                  "name": "My Configuration 0001",
+                  "importer": "{importerId}"
                 }
           responses:
             200:
@@ -170,12 +248,42 @@ baseUri: https://localhost:8443/api
           description: Requests to launch the importation of data from the document
           is: [secured, mayFail, resourceAccess]
           queryParameters:
-            importer:
-              displayName: Importer
+            configuration:
+              displayName: Configuration
               type: string
-              description: The identifier of the importer to use
-              example: org.xowl.platform.importers.CSVImporter
+              description: The identifier of the the stored configuration to use
+              example: http://xowl.org/platform/services/importation/ImporterConfiguration#0001
+              required: false
+            name:
+              displayName: Artifact Name
+              type: string
+              description: The name of the artifact to produce
+              example: My Artifact
               required: true
+            base:
+              displayName: Artifact Base URI
+              type: string
+              description: The base family URI for the artifact
+              example: http://xowl.org/artifacts/base
+              required: true
+            version:
+              displayName: Artifact Version
+              type: string
+              description: The version for the artifact
+              example: v1
+              required: true
+            archetype:
+              displayName: Artifact Archetype
+              type: string
+              description: The archetype for the artifact
+              example: org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree
+              required: true
+            superseded:
+              displayName: Superseded Artifacts
+              type: string
+              description: The identifiers of the artifacts superseded by this one
+              example: My Artifact
+              required: false
           body:
             application/json:
               description: The configuration for the importer
@@ -183,12 +291,9 @@ baseUri: https://localhost:8443/api
               example: |
                 {
                   "type": "org.xowl.platform.services.importation.ImporterConfiguration",
-                  "family": "http://xowl.org/platform/artifacts/artifact0",
-                  "superseded": [
-                    "http://xowl.org/platform/artifacts/artifact0/v0"
-                  ],
-                  "version": "v1",
-                  "archetype": "org.xowl.platform.kernel.artifacts.FreeArtifactArchetype"
+                  "identifier": "http://xowl.org/platform/services/importation/ImporterConfiguration#0001",
+                  "name": "My Configuration 0001",
+                  "importer": "{importerId}"
                 }
           responses:
             200:

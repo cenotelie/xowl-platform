@@ -39,11 +39,10 @@ public abstract class ArtifactBase implements Artifact {
     /**
      * Creates a new artifact identifier
      *
-     * @param baseURI The base URI to build from
      * @return The new artifact identifier
      */
-    public static String newArtifactID(String baseURI) {
-        return baseURI + "#" + UUID.randomUUID().toString();
+    public static String newArtifactID() {
+        return KernelSchema.ARTIFACT + "#" + UUID.randomUUID().toString();
     }
 
 
@@ -82,7 +81,30 @@ public abstract class ArtifactBase implements Artifact {
     /**
      * The metadata quads
      */
-    protected final Collection<Quad> metadata;
+    private Collection<Quad> metadata;
+
+    /**
+     * Initializes this artifact
+     *
+     * @param identifier The identifier for this artifact
+     * @param name       The name of this artifact
+     * @param base       The identifier of the base artifact
+     * @param version    The version of this artifact
+     * @param archetype  The archetype of this artifact
+     * @param from       The identifier of the originating connector
+     * @param creation   The artifact's creation time
+     * @param superseded The artifacts superseded by this one
+     */
+    protected ArtifactBase(String identifier, String name, String base, String version, String archetype, String from, String creation, String[] superseded) {
+        this.identifier = identifier;
+        this.name = name;
+        this.base = base;
+        this.version = version;
+        this.archetype = archetype;
+        this.from = from;
+        this.creation = creation;
+        this.superseded = superseded;
+    }
 
     /**
      * Initializes this artifact
@@ -187,20 +209,6 @@ public abstract class ArtifactBase implements Artifact {
         this.creation = creation;
         this.archetype = archetype;
         this.superseded = superseded.toArray(new String[superseded.size()]);
-        this.metadata = new ArrayList<>();
-
-        NodeManager nodes = new CachedNodes();
-        GraphNode graph = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
-        SubjectNode subject = nodes.getIRINode(identifier);
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.NAME), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.BASE), nodes.getIRINode(name)));
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.VERSION), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.FROM), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.CREATED), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
-        this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.ARCHETYPE), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
-        for (String value : superseded) {
-            this.metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.SUPERSEDE), nodes.getIRINode(value)));
-        }
     }
 
     @Override
@@ -279,7 +287,21 @@ public abstract class ArtifactBase implements Artifact {
     }
 
     @Override
-    public Collection<Quad> getMetadata() {
+    public synchronized Collection<Quad> getMetadata() {
+        if (metadata == null) {
+            metadata = new ArrayList<>();
+            NodeManager nodes = new CachedNodes();
+            GraphNode graph = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
+            SubjectNode subject = nodes.getIRINode(identifier);
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.NAME), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.BASE), nodes.getIRINode(base)));
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.VERSION), nodes.getLiteralNode(version, Vocabulary.xsdString, null)));
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.FROM), nodes.getLiteralNode(from, Vocabulary.xsdString, null)));
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.CREATED), nodes.getLiteralNode(creation, Vocabulary.xsdDateTime, null)));
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.ARCHETYPE), nodes.getLiteralNode(archetype, Vocabulary.xsdString, null)));
+            for (String value : superseded)
+                metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.SUPERSEDE), nodes.getIRINode(value)));
+        }
         return metadata;
     }
 }

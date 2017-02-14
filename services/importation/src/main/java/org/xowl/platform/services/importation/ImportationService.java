@@ -176,6 +176,13 @@ public interface ImportationService extends SecuredService {
     XSPReply storeConfiguration(ImporterConfiguration configuration);
 
     /**
+     * Retrieves all the stored configurations
+     *
+     * @return The protocol reply
+     */
+    XSPReply retrieveConfigurations();
+
+    /**
      * Retrieves a stored configuration
      *
      * @param configurationId The identifier of the configuration to retrieve

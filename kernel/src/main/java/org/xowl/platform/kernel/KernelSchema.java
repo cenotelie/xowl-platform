@@ -36,73 +36,73 @@ public interface KernelSchema {
     /**
      * The Resource concept
      */
-    String RESOURCE = URI_KERNEL + "#Resource";
+    String RESOURCE = URI_KERNEL + "/Resource";
     /**
      * The Artifact concept
      */
-    String ARTIFACT = URI_KERNEL + "#Artifact";
+    String ARTIFACT = URI_KERNEL + "/Artifact";
     /**
      * The PlatformUser concept
      */
-    String PLATFORM_USER = URI_KERNEL + "#PlatformUser";
+    String PLATFORM_USER = URI_KERNEL + "/PlatformUser";
     /**
      * The PlatformUserGroup concept
      */
-    String PLATFORM_USER_GROUP = URI_KERNEL + "#PlatformUserGroup";
+    String PLATFORM_USER_GROUP = URI_KERNEL + "/PlatformUserGroup";
     /**
      * The PlatformUserRole concept
      */
-    String PLATFORM_USER_ROLE = URI_KERNEL + "#PlatformUserRole";
+    String PLATFORM_USER_ROLE = URI_KERNEL + "/PlatformUserRole";
 
 
     /**
      * The name property
      */
-    String NAME = URI_KERNEL + "#name";
+    String NAME = URI_KERNEL + "/name";
     /**
      * The creator property
      */
-    String CREATOR = URI_KERNEL + "#creator";
+    String CREATOR = URI_KERNEL + "/creator";
     /**
      * The created property
      */
-    String CREATED = URI_KERNEL + "#created";
+    String CREATED = URI_KERNEL + "/created";
     /**
      * The modified property
      */
-    String MODIFIED = URI_KERNEL + "#modified";
+    String MODIFIED = URI_KERNEL + "/modified";
 
     /**
      * The from property
      */
-    String FROM = URI_KERNEL + "#from";
+    String FROM = URI_KERNEL + "/from";
     /**
      * The base property
      */
-    String BASE = URI_KERNEL + "#base";
+    String BASE = URI_KERNEL + "/base";
     /**
      * The supersede property
      */
-    String SUPERSEDE = URI_KERNEL + "#supersede";
+    String SUPERSEDE = URI_KERNEL + "/supersede";
     /**
      * The version property
      */
-    String VERSION = URI_KERNEL + "#version";
+    String VERSION = URI_KERNEL + "/version";
     /**
      * The archetype property
      */
-    String ARCHETYPE = URI_KERNEL + "#archetype";
+    String ARCHETYPE = URI_KERNEL + "/archetype";
 
     /**
      * The hasMember property
      */
-    String HAS_MEMBER = URI_KERNEL + "#hasMember";
+    String HAS_MEMBER = URI_KERNEL + "/hasMember";
     /**
      * The hasAdmin property
      */
-    String HAS_ADMIN = URI_KERNEL + "#hasAdmin";
+    String HAS_ADMIN = URI_KERNEL + "/hasAdmin";
     /**
      * The hasRole property
      */
-    String HAS_ROLE = URI_KERNEL + "#hasRole";
+    String HAS_ROLE = URI_KERNEL + "/hasRole";
 }

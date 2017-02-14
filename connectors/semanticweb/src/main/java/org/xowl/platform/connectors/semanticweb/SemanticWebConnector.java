@@ -24,7 +24,6 @@ import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree;
@@ -96,7 +95,7 @@ public class SemanticWebConnector extends ConnectorServiceBase {
             contentType = contentType.substring(0, index);
         contentType = contentType.trim();
 
-        String resource = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
+        String resource = ArtifactBase.newArtifactID();
         SemanticWebLoader loader = new SemanticWebLoader();
         XSPReply reply = loader.load(new InputStreamReader(new ByteArrayInputStream(request.getContent())), resource, contentType);
         if (!reply.isSuccess())

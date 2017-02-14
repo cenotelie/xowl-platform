@@ -26,9 +26,11 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactFuture;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
@@ -204,6 +206,14 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                     return onPutDocument(request);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+        } else if (request.getUri().equals(apiUri + "/configurations")) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET:
+                    return onGetConfigurations();
+                case HttpConstants.METHOD_PUT:
+                    return onPutConfiguration(request);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         } else if (request.getUri().startsWith(apiUri + "/importers")) {
             String rest = request.getUri().substring(apiUri.length() + "/importers".length() + 1);
             if (rest.isEmpty())
@@ -214,6 +224,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
                 return onGetImporter(importerId);
+            } else {
+                if ("/configurations".equals(rest.substring(index)))
+                    return onGetConfigurationsFor(importerId);
             }
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         } else if (request.getUri().startsWith(apiUri + "/documents")) {
@@ -234,10 +247,24 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 switch (rest.substring(index)) {
                     case "/preview":
                         return onGetPreview(documentId, request);
-                    case "/import": {
+                    case "/import":
                         return onBeginImport(documentId, request);
-                    }
                 }
+            }
+        } else if (request.getUri().startsWith(apiUri + "/configurations")) {
+            String rest = request.getUri().substring(apiUri.length() + "/configurations".length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String configurationId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                switch (request.getMethod()) {
+                    case HttpConstants.METHOD_GET:
+                        return onGetConfiguration(configurationId);
+                    case HttpConstants.METHOD_DELETE:
+                        return onPostDeleteConfiguration(configurationId);
+                }
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -333,11 +360,31 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      */
     private HttpResponse onGetPreview(String documentId, HttpApiRequest request) {
         String[] importerIds = request.getParameter("importer");
+        String[] configurationIds = request.getParameter("configuration"); // the importer to use
         if (importerIds == null || importerIds.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
-        String configuration = new String(request.getContent(), Files.CHARSET);
-        if (configuration.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
+
+        Importer importer = getImporter(importerIds[0]);
+        if (importer == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+
+        ImporterConfiguration configuration;
+        if (configurationIds != null && configurationIds.length > 0) {
+            XSPReply reply = retrieveConfiguration(configurationIds[0]);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            configuration = ((XSPReplyResult<ImporterConfiguration>) reply).getData();
+        } else {
+            String content = new String(request.getContent(), Files.CHARSET);
+            if (content.isEmpty())
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            BufferedLogger logger = new BufferedLogger();
+            ASTNode root = JSONLDLoader.parseJSON(logger, content);
+            if (root == null)
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            configuration = importer.getConfiguration(content);
+        }
+
         XSPReply reply = getPreview(documentId, importerIds[0], configuration);
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
@@ -382,14 +429,112 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onBeginImport(String documentId, HttpApiRequest request) {
-        String[] importerIds = request.getParameter("importer");
+        String[] importerIds = request.getParameter("importer"); // the importer to use
+        String[] configurationIds = request.getParameter("configuration"); // the importer to use
+        String[] names = request.getParameter("name"); // the name of the artifact to produce
+        String[] bases = request.getParameter("base"); // the base family URI for the artifact
+        String[] versions = request.getParameter("version"); // the version for the artifact
+        String[] archetypes = request.getParameter("archetype"); // the archetype for the artifact
+        String[] superseded = request.getParameter("superseded"); // the superseded artifacts
+
         if (importerIds == null || importerIds.length == 0)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'importer'"), null);
-        String configuration = new String(request.getContent(), Files.CHARSET);
-        if (configuration.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT, "Body is empty"), null);
-        XSPReply reply = beginImport(documentId, importerIds[0], configuration);
+        if (names == null || names.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+        if (bases == null || bases.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
+        if (versions == null || versions.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
+        if (archetypes == null || archetypes.length == 0)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+        if (superseded == null)
+            superseded = new String[0];
+        Artifact skeleton = new ArtifactFuture(names[0], bases[0], versions[0], archetypes[0], superseded);
+
+        Importer importer = getImporter(importerIds[0]);
+        if (importer == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+
+        ImporterConfiguration configuration;
+        if (configurationIds != null && configurationIds.length > 0) {
+            XSPReply reply = retrieveConfiguration(configurationIds[0]);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            configuration = ((XSPReplyResult<ImporterConfiguration>) reply).getData();
+        } else {
+            String content = new String(request.getContent(), Files.CHARSET);
+            if (content.isEmpty())
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            BufferedLogger logger = new BufferedLogger();
+            ASTNode root = JSONLDLoader.parseJSON(logger, content);
+            if (root == null)
+                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            configuration = importer.getConfiguration(content);
+        }
+        XSPReply reply = beginImport(documentId, importer.getIdentifier(), configuration, skeleton);
         return XSPReplyUtils.toHttpResponse(reply, null);
+    }
+
+    /**
+     * When all the configurations are requested
+     *
+     * @return The HTTP response
+     */
+    private HttpResponse onGetConfigurations() {
+        return XSPReplyUtils.toHttpResponse(retrieveConfigurations(), null);
+    }
+
+    /**
+     * When a specific configuration is requested
+     *
+     * @param configurationId The identifier of a configuration
+     * @return The HTTP response
+     */
+    private HttpResponse onGetConfiguration(String configurationId) {
+        return XSPReplyUtils.toHttpResponse(retrieveConfiguration(configurationId), null);
+    }
+
+    /**
+     * When the configurations for an importer are requested
+     *
+     * @param importerId The identifier of an importer
+     * @return The HTTP response
+     */
+    private HttpResponse onGetConfigurationsFor(String importerId) {
+        return XSPReplyUtils.toHttpResponse(retrieveConfigurations(importerId), null);
+    }
+
+    /**
+     * When a new document is uploaded
+     *
+     * @param request The request to handle
+     * @return The document
+     */
+    private HttpResponse onPutConfiguration(HttpApiRequest request) {
+        String content = new String(request.getContent(), Files.CHARSET);
+        if (content.isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+        BufferedLogger logger = new BufferedLogger();
+        ASTNode root = JSONLDLoader.parseJSON(logger, content);
+        if (root == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+        ImporterConfiguration configuration = new ImporterConfiguration(root);
+        String importerId = configuration.getImporter();
+        Importer importer = getImporter(importerId);
+        if (importer == null)
+            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+        configuration = importer.getConfiguration(content);
+        return XSPReplyUtils.toHttpResponse(storeConfiguration(configuration), null);
+    }
+
+    /**
+     * When a drop request for a document is received
+     *
+     * @param configurationId The identifier of a configuration
+     * @return The HTTP response
+     */
+    private HttpResponse onPostDeleteConfiguration(String configurationId) {
+        return XSPReplyUtils.toHttpResponse(deleteConfiguration(configurationId), null);
     }
 
     @Override
@@ -598,6 +743,22 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             configurations.put(configuration.getIdentifier(), configuration);
         }
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public XSPReply retrieveConfigurations() {
+        onActivated();
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_CONFIG);
+        if (!reply.isSuccess())
+            return reply;
+        if (storage == null)
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access configuration storage");
+        synchronized (configurations) {
+            return new XSPReplyResultCollection<>(configurations.values());
+        }
     }
 
     @Override

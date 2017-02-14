@@ -149,7 +149,7 @@ public class SemanticWebImporter extends Importer {
         reply = importationService.getStreamFor(documentId);
         if (!reply.isSuccess())
             return reply;
-        String artifactId = ArtifactBase.newArtifactID(KernelSchema.GRAPH_ARTIFACTS);
+        String artifactId = ArtifactBase.newArtifactID();
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();

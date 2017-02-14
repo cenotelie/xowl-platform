@@ -31,6 +31,11 @@ import java.util.UUID;
  */
 public class ImporterConfiguration implements Identifiable, Serializable {
     /**
+     * The base URI for importer configurations
+     */
+    private static final String URI = "http://xowl.org/platform/services/importation/ImporterConfiguration#";
+
+    /**
      * The identifier for this configuration
      */
     protected final String identifier;
@@ -50,7 +55,7 @@ public class ImporterConfiguration implements Identifiable, Serializable {
      * @param importer The parent importer
      */
     public ImporterConfiguration(String name, Importer importer) {
-        this.identifier = "http://xowl.org/platform/services/importation/ImporterConfiguration#" + UUID.randomUUID().toString();
+        this.identifier = URI + UUID.randomUUID().toString();
         this.name = name;
         this.importer = importer.getIdentifier();
     }
@@ -81,6 +86,15 @@ public class ImporterConfiguration implements Identifiable, Serializable {
         this.identifier = identifier;
         this.name = name;
         this.importer = importer;
+    }
+
+    /**
+     * Gets the storage identifier of this document
+     *
+     * @return The storage identifier of this document
+     */
+    public String getStorageId() {
+        return identifier.substring(URI.length());
     }
 
     @Override

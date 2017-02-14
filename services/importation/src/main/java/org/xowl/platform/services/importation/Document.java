@@ -21,7 +21,6 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -36,6 +35,11 @@ import java.util.UUID;
  * @author Laurent Wouters
  */
 public class Document implements Identifiable, Serializable {
+    /**
+     * The base URI for documents
+     */
+    private static final String URI = "http://xowl.org/platform/services/importation/Document#";
+
     /**
      * The document's identifier
      */
@@ -64,7 +68,7 @@ public class Document implements Identifiable, Serializable {
      * @param fileName The original client's file name
      */
     public Document(String name, String fileName) {
-        this.identifier = "http://xowl.org/platform/services/importation/Document#" + UUID.randomUUID().toString();
+        this.identifier = URI + UUID.randomUUID().toString();
         this.name = name;
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;
@@ -121,7 +125,7 @@ public class Document implements Identifiable, Serializable {
      * @return The storage identifier of this document
      */
     public String getStorageId() {
-        return identifier.substring(KernelSchema.GRAPH_ARTIFACTS.length() + 1);
+        return identifier.substring(URI.length());
     }
 
     /**

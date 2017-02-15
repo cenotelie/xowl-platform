@@ -30,6 +30,7 @@ function doGetData() {
 			doc = content;
 			document.getElementById("document-id").value = doc.identifier;
 			document.getElementById("document-name").value = doc.name;
+			document.getElementById("input-artifact-name").value = doc.name;
 		}
 	}, docId);
 	xowl.getDocumentImporters(function (status, ct, content) {
@@ -67,7 +68,7 @@ function setupAutocompleteArtifacts(component) {
 				artifacts = content;
 				autocomplete.onItems(filterItems(artifacts, value));
 			}
-		}, input.specification.archetype);
+		});
 	};
 	autocomplete.renderItem = function (item) {
 		var result = document.createElement("div");

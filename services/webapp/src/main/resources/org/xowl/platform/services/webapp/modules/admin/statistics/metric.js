@@ -3,8 +3,8 @@
 
 var xowl = new XOWL();
 var metricId = getParameterByName("id");
-var METRIC = null;
-var SNAPSHOT = null;
+var metric = null;
+var snapshot = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -22,27 +22,27 @@ function doGetData() {
 		return;
 	xowl.getMetric(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			METRIC = content;
-			document.getElementById("metric-name").value = METRIC.name;
+			metric = content;
+			document.getElementById("metric-name").value = metric.name;
 			doRender();
 		}
 	}, metricId);
 	xowl.getMetricSnapshot(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			SNAPSHOT = content;
+			snapshot = content;
 			doRender();
 		}
 	}, metricId);
 }
 
 function doRender() {
-	if (METRIC == null || SNAPSHOT == null)
+	if (metric == null || snapshot == null)
 		return;
 	var table = document.getElementById("data");
 	while (table.hasChildNodes()) {
 		table.removeChild(table.lastChild);
 	}
-	renderCouple(table, METRIC, SNAPSHOT, 0);
+	renderCouple(table, metric, snapshot, 0);
 }
 
 function renderCouple(table, metric, value, offset) {

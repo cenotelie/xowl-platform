@@ -3,7 +3,7 @@
 
 var xowl = new XOWL();
 var docId = getParameterByName("id");
-var DOCUMENT = null;
+var doc = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -17,53 +17,37 @@ function init() {
 }
 
 function doGetData() {
-	if (!onOperationRequest("Loading ...", 2))
+	if (!onOperationRequest("Loading ..."))
 		return;
 	xowl.getUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			DOCUMENT = content;
-			document.getElementById("document-name").value = DOCUMENT.name;
-			document.getElementById("document-upload-date").value = DOCUMENT.uploadDate;
-			document.getElementById("document-uploader").value = DOCUMENT.uploader;
-			document.getElementById("document-file-name").value = DOCUMENT.fileName;
+			doc = content;
+			document.getElementById("document-id").value = doc.identifier;
+			document.getElementById("document-name").value = doc.name;
+			document.getElementById("document-upload-date").value = doc.uploadDate;
+			document.getElementById("document-uploader").value = doc.uploader;
+			document.getElementById("document-file-name").value = doc.fileName;
 		}
 	}, docId);
-	xowl.getDocumentImporters(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			renderImporters(content);
-		}
-	});
-}
-
-function renderImporters(importers) {
-	var select = document.getElementById("importers");
-	for (var i = 0; i != importers.length; i++) {
-		var option = document.createElement("option");
-		option.appendChild(document.createTextNode(importers[i].name));
-		option.value = importers[i].identifier;
-		select.appendChild(option);
-	}
 }
 
 function onImportNew() {
-	var importerId = document.getElementById("importers").value;
-	window.location.href = "document-new.html?id=" + encodeURIComponent(docId) + "&importer=" + encodeURIComponent(importerId);
+	window.location.href = "document-import.html?id=" + encodeURIComponent(docId) + "&new=true";
 }
 
 function onImportUpdate() {
-	var importerId = document.getElementById("importers").value;
-	window.location.href = "document-update.html?id=" + encodeURIComponent(docId) + "&importer=" + encodeURIComponent(importerId);
+	window.location.href = "document-import.html?id=" + encodeURIComponent(docId) + "&new=false";
 }
 
 function onDrop() {
-	var result = confirm("Drop document " + DOCUMENT.name + "?");
+	var result = confirm("Drop document " + doc.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Dropping document ", DOCUMENT, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Dropping document ", doc, " ..."]}))
 		return;
 	xowl.dropUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", DOCUMENT, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", doc, "."]});
 			waitAndGo("index.html");
 		}
 	}, docId);

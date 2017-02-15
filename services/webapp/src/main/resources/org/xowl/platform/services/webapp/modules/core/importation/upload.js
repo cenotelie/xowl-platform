@@ -7,7 +7,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
-			{name: "Upload New Document"}], function() {
+			{name: "Upload"}], function() {
 	});
 }
 

@@ -15,39 +15,52 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="form-group">
-                <label for="document-name">Name:</label>
-                <input type="text" class="form-control" id="document-name" readonly>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <img src="../../../assets/artifact.svg" width="30" height="30"/>
+                        <a class="btn" onclick="onImportNew()">Import as new artifact</a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <img src="../../../assets/artifact.svg" width="30" height="30"/>
+                        <a class="btn" onclick="onImportUpdate()">Import as new version of existing
+                            artifact
+                        </a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/action-remove.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onDrop()">Delete document</a>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="document-upload-date">Upload Date:</label>
-                <input type="text" class="form-control" id="document-upload-date" readonly>
-            </div>
-            <div class="form-group">
-                <label for="document-uploader">Uploader:</label>
-                <input type="text" class="form-control" id="document-uploader" readonly>
-            </div>
-            <div class="form-group">
-                <label for="document-file-name">Original File:</label>
-                <input type="text" class="form-control" id="document-file-name" readonly>
-            </div>
-            <div class="form-group">
-                <label for="document-name">Importer:</label>
-                <select class="form-control" id="importers">
-                </select>
-            </div>
-            <div style="margin-top: 10px">
-                <button class="btn btn-primary" onclick="onImportNew()">Import as new artifact</button>
-            </div>
-            <div style="margin-top: 10px">
-                <button class="btn btn-primary" onclick="onImportUpdate()">Import as new version of existing artifact
-                </button>
-            </div>
-            <div style="margin-top: 10px">
-                <button class="btn btn-danger" onclick="onDrop()">Drop document</button>
-            </div>
+        </div>
+        <div class="row">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="document-id">Identifier:</label>
+                    <input type="text" class="form-control" id="document-id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-name">Name:</label>
+                    <input type="text" class="form-control" id="document-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-upload-date">Upload Date:</label>
+                    <input type="text" class="form-control" id="document-upload-date" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-uploader">Uploader:</label>
+                    <input type="text" class="form-control" id="document-uploader" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-file-name">Original File:</label>
+                    <input type="text" class="form-control" id="document-file-name" readonly>
+                </div>
+            </form>
         </div>
     </div>
 </div>

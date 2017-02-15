@@ -31,15 +31,11 @@ function doGetData() {
 	}, docId);
 }
 
-function onImportNew() {
-	window.location.href = "document-import.html?id=" + encodeURIComponent(docId) + "&new=true";
+function onClickImport() {
+	window.location.href = "document-import.html?id=" + encodeURIComponent(doc.identifier);
 }
 
-function onImportUpdate() {
-	window.location.href = "document-import.html?id=" + encodeURIComponent(docId) + "&new=false";
-}
-
-function onDrop() {
+function onClickDelete() {
 	var result = confirm("Drop document " + doc.name + "?");
 	if (!result)
 		return;
@@ -50,5 +46,5 @@ function onDrop() {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", doc, "."]});
 			waitAndGo("index.html");
 		}
-	}, docId);
+	}, doc.identifier);
 }

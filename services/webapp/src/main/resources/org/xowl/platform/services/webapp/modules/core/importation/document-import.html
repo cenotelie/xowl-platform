@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Data Import: Import Document</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="document-id">Identifier:</label>
+                    <input type="text" class="form-control" id="document-id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-name">Name:</label>
+                    <input type="text" class="form-control" id="document-name" readonly>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="input-importer">Importer:</label>
+                    <select class="form-control" id="input-importer"></select>
+                </div>
+                <div class="form-group">
+                    <label for="input-superseded" class="col-sm-2 control-label">Superseded Artifact:</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="input-superseded" placeholder="artifact">
+                            <div class="input-group-addon">
+                                <img src="" width="20" height="20" id="input-superseded-indicator"
+                                     style="display: none;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="input-artifact-name">Artifact Name:</label>
+                    <input class="form-control" id="input-artifact-name">
+                </div>
+                <div class="form-group">
+                    <label for="input-artifact-base">Artifact Family:</label>
+                    <input class="form-control" id="input-artifact-base">
+                </div>
+                <div class="form-group">
+                    <label for="input-artifact-version">Artifact Version:</label>
+                    <input class="form-control" id="input-artifact-version">
+                </div>
+                <div class="form-group">
+                    <label for="input-artifact-archetype" class="col-sm-2 control-label">Artifact Archetype:</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="input-artifact-archetype"
+                                   placeholder="artifact">
+                            <div class="input-group-addon">
+                                <img src="" width="20" height="20" id="input-artifact-archetype-indicator"
+                                     style="display: none;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-primary" onclick="onClickNext()">Next</button>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="document-import.js"></script>
+<script>init();</script>
+</body>
+
+</html>

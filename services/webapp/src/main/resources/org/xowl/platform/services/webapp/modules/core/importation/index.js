@@ -61,5 +61,58 @@ function renderDocument(index, doc) {
 	cell.appendChild(icon);
 	cell.appendChild(link);
 	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "DELETE";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	button.onclick = function() {
+		onClickDelete(doc);
+	};
+	cell.appendChild(button);
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/action-plus.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "IMPORT";
+	button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/artifact.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "IMPORT";
+	button.appendChild(image);
+	button.onclick = function() {
+		onClickImport(doc);
+	};
+	cell.appendChild(button);
+	row.appendChild(cell);
 	return row;
+}
+
+function onClickDelete(doc) {
+	var result = confirm("Drop document " + doc.name + "?");
+	if (!result)
+		return;
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Dropping document ", doc, " ..."]}))
+		return;
+	xowl.dropUploadedDocument(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", doc, "."]});
+			waitAndRefresh();
+		}
+	}, doc.identifier);
+}
+
+function onClickImport(doc) {
+	window.location.href = "document-import.html?id=" + encodeURIComponent(doc.identifier);
 }

@@ -102,8 +102,10 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             return;
         }
 
-        if (!checkAuthentication(securityService, servletRequest, servletResponse))
+        if (!checkAuthentication(securityService, servletRequest, servletResponse)) {
+            servletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
             return;
+        }
 
         HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
         try {
@@ -167,6 +169,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 }
             }
         }
+        response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
         return false;
     }
 

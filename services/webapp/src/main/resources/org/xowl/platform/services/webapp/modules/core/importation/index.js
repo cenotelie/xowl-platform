@@ -18,6 +18,9 @@ function init() {
 }
 
 function renderDocuments(documents) {
+	documents.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
 	var table = document.getElementById("documents");
 	for (var i = 0; i != documents.length; i++) {
 		var row = renderDocument(i, documents[i]);

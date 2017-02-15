@@ -24,7 +24,7 @@ function doGetData() {
 
 function renderAddons(addons) {
 	addons.sort(function (x, y) {
-		return x.identifier.localeCompare(y.name);
+		return x.name.localeCompare(y.name);
 	});
 	var table = document.getElementById("addons");
 	for (var i = 0; i != addons.length; i++) {

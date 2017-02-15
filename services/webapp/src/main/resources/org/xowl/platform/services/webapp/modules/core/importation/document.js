@@ -11,8 +11,8 @@ function init() {
 			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
 			{name: "Document " + docId}], function() {
 		if (!docId || docId === null || docId === "")
-    		return;
-    	doGetData();
+			return;
+		doGetData();
 	});
 }
 

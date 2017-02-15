@@ -79,7 +79,7 @@ function renderRole(role) {
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
-	link.href = ROOT + "/modules/admin/security/role.html.html?id=" + encodeURIComponent(role.identifier);
+	link.href = ROOT + "/modules/admin/security/role.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);

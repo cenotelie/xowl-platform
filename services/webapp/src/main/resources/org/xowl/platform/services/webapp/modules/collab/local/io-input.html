@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Collaboration Input</title>
+    <title>Local Collaboration: Input</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -15,8 +15,8 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="container-fluid">
+        <div class="row">
             <form class="form-horizontal">
                 <div class="form-group">
                     <label for="spec-identifier" class="col-sm-2 control-label">Identifier</label>
@@ -38,9 +38,7 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
+        <div class="row">
             <div class="form-group">
                 <label for="input-artifact" class="col-sm-2 control-label">Artifact</label>
                 <div class="col-sm-8">
@@ -57,15 +55,13 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
+        <div class="row">
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>Artifact</th>
                     <th>Version</th>
-                    <th>Action</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody id="artifacts">

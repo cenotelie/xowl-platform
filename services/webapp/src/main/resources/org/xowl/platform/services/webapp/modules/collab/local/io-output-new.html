@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>New Output ...</title>
+    <title>Local Collaboration: New Output</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -15,37 +15,33 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="input-identifier" class="col-sm-2 control-label">Identifier</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input-identifier" placeholder="requirements">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="input-name" class="col-sm-2 control-label">Name</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="input-name" placeholder="System Requirements">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="input-archetype" class="col-sm-2 control-label">Archetype</label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="input-archetype" placeholder="archetype">
-                            <div class="input-group-addon">
-                                <img src="" width="20" height="20" id="input-archetype-indicator"
-                                     style="display: none;"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="onClickCreate()">Create</button>
-            </form>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="input-identifier" class="col-sm-2 control-label">Identifier</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="input-identifier" placeholder="requirements">
+            </div>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="input-name" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="input-name" placeholder="System Requirements">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input-archetype" class="col-sm-2 control-label">Archetype</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="input-archetype" placeholder="archetype">
+                    <div class="input-group-addon">
+                        <img src="" width="20" height="20" id="input-archetype-indicator"
+                             style="display: none;"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="onClickCreate()">Create</button>
+    </form>
 </div>
 <div id="placeholder-footer"></div>
 

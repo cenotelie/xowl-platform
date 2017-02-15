@@ -154,7 +154,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
                     case HttpConstants.METHOD_PUT:
                         return onMessageCreateConnector(connectorId, request);
                     case HttpConstants.METHOD_DELETE:
-                        onMessageDeleteConnector(connectorId);
+                        return onMessageDeleteConnector(connectorId);
                 }
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
             }

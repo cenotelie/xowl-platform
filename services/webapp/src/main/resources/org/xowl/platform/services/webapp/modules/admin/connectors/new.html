@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Platform Connectors: Spawn New</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="form-group">
+        <label for="input-descriptor">Descriptor:</label>
+        <select class="form-control" id="input-descriptor" onchange="onDescriptorSelect()"></select>
+    </div>
+    <div class="form-group">
+        <label for="input-descriptor-description">Domain description</label>
+        <textarea class="form-control" rows="2" id="input-descriptor-description" readonly></textarea>
+    </div>
+    <div class="form-group">
+        <label for="input-id">Unique identifier</label>
+        <input type="text" class="form-control" id="input-id"
+               placeholder="org.xowl.platform.services.connection.MyConnectorXXX">
+    </div>
+    <div class="form-group">
+        <label for="input-name">Name</label>
+        <input type="text" class="form-control" id="input-name" placeholder="My Connector XXX">
+    </div>
+    <div class="form-group">
+        <label for="input-uri">Access URI</label>
+        <div class="input-group">
+            <span id="input-uri-addon" class="input-group-addon"></span>
+            <input type="text" class="form-control" id="input-uri" placeholder="connectors/myconnectorxxx">
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h5>Parameters:</h5>
+            <form class="form-horizontal" id="input-params">
+            </form>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="onClickNewConnector()">Submit</button>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="new.js"></script>
+<script>init();</script>
+</body>
+
+</html>

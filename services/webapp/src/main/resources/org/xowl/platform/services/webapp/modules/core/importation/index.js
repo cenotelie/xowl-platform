@@ -71,6 +71,7 @@ function renderDocument(index, doc) {
 	var button = document.createElement("span");
 	button.classList.add("btn");
 	button.classList.add("btn-default");
+	button.style.marginRight = "20px";
 	button.appendChild(image);
 	button.onclick = function() {
 		onClickDelete(doc);

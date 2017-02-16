@@ -299,6 +299,7 @@ public abstract class ArtifactBase implements Artifact {
             NodeManager nodes = new CachedNodes();
             GraphNode graph = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
             SubjectNode subject = nodes.getIRINode(identifier);
+            metadata.add(new Quad(graph, subject, nodes.getIRINode(Vocabulary.rdfType), nodes.getIRINode(KernelSchema.ARTIFACT)));
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.NAME), nodes.getLiteralNode(name, Vocabulary.xsdString, null)));
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.BASE), nodes.getIRINode(base)));
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.VERSION), nodes.getLiteralNode(version, Vocabulary.xsdString, null)));

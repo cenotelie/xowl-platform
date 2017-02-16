@@ -18,15 +18,8 @@
 package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.store.storage.NodeManager;
-import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -36,10 +29,7 @@ import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -275,46 +265,5 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
         }
         builder.append("]}");
         return builder.toString();
-    }
-
-    /**
-     * Builds the metadata of an artifact
-     *
-     * @param artifactURI The URI of the artifact
-     * @param baseURI     The URI of the artifact family
-     * @param superseded  The URI of the artifacts superseded by this one
-     * @param name        The artifact's name
-     * @param version     The artifact's version string
-     * @param archetype   The artifact's archetype
-     * @param from        The identifier of the connector that produced the artifact
-     * @return The metadata, or null if some data were invalid
-     */
-    public static Collection<Quad> buildMetadata(String artifactURI, String baseURI, String[] superseded, String name, String version, String archetype, String from) {
-        if (artifactURI == null || artifactURI.isEmpty() || !URIUtils.isAbsolute(artifactURI))
-            return null;
-        NodeManager nodeManager = new CachedNodes();
-        Date artifactCreation = new Date();
-        IRINode artifactNode = nodeManager.getIRINode(artifactURI);
-        IRINode registry = nodeManager.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
-        List<Quad> metadata = new ArrayList<>();
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(Vocabulary.rdfType), nodeManager.getIRINode(KernelSchema.ARTIFACT)));
-        if (name != null && !name.isEmpty())
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.NAME), nodeManager.getLiteralNode(name, Vocabulary.xsdString, null)));
-        if (baseURI != null && !baseURI.isEmpty() && URIUtils.isAbsolute(baseURI))
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.BASE), nodeManager.getIRINode(baseURI)));
-        if (superseded != null) {
-            for (int i = 0; i != superseded.length; i++) {
-                if (superseded[i] != null && !superseded[i].isEmpty() && URIUtils.isAbsolute(superseded[i]))
-                    metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.SUPERSEDE), nodeManager.getIRINode(superseded[0])));
-            }
-        }
-        if (version != null && !version.isEmpty())
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.VERSION), nodeManager.getLiteralNode(version, Vocabulary.xsdString, null)));
-        if (archetype != null && !archetype.isEmpty())
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.ARCHETYPE), nodeManager.getLiteralNode(archetype, Vocabulary.xsdString, null)));
-        if (from != null && !from.isEmpty())
-            metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.FROM), nodeManager.getLiteralNode(from, Vocabulary.xsdString, null)));
-        metadata.add(new Quad(registry, artifactNode, nodeManager.getIRINode(KernelSchema.CREATED), nodeManager.getLiteralNode(DateFormat.getDateTimeInstance().format(artifactCreation), Vocabulary.xsdDateTime, null)));
-        return metadata;
     }
 }

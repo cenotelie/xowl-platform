@@ -52,9 +52,16 @@ function doRender() {
 function renderConfiguration(configuration) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
+	var icon = document.createElement("img");
+	icon.src = ROOT + "/assets/importer_configuration.svg";
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	icon.title = configuration.identifier;
 	var link = document.createElement("a");
 	link.href = "configuration.html?id=" + encodeURIComponent(configuration.identifier);
 	link.appendChild(document.createTextNode(configuration.name));
+	cell.appendChild(icon);
 	cell.appendChild(link);
 	row.appendChild(cell);
 

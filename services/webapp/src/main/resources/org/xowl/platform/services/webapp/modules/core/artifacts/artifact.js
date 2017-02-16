@@ -79,13 +79,13 @@ function renderMetadata(metadata) {
 	document.getElementById("artifact-base").href = "base.html?id=" + encodeURIComponent(metadata.base);
 	document.getElementById("artifact-creation").value = metadata.creation;
 	document.getElementById("artifact-version").value = metadata.version;
-	for (var i = 0; i != metadata.supersede.length; i++) {
+	if (metadata.superseded.length > 0) {
 		var link = document.createElement("a");
-		link.href = "artifact.html?id=" + encodeURIComponent(metadata.supersede[i]);
-		link.appendChild(document.createTextNode(metadata.supersede[i]));
+		link.href = "artifact.html?id=" + encodeURIComponent(metadata.superseded);
+		link.appendChild(document.createTextNode(metadata.superseded));
 		var container = document.createElement("div");
 		container.appendChild(link);
-		document.getElementById("artifact-supersede").appendChild(container);
+		document.getElementById("artifact-superseded").appendChild(container);
 	}
 }
 

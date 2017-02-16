@@ -702,11 +702,8 @@
         "archetype": {
           "type": "string"
         },
-        "supersede": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "superseded": {
+          "type": "string"
         }
       },
       "required": [
@@ -718,7 +715,7 @@
         "from",
         "creation",
         "archetype",
-        "supersede"
+        "superseded"
       ]
     },
     "Artifacts": {

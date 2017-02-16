@@ -216,7 +216,7 @@ function onImport() {
 		family: base,
 		version: version,
 		archetype: archetype,
-		superseded: [],
+		superseded: "",
 		separator: separator,
 		textMarker: textMarker,
 		skipFirstRow: "\"" + document.getElementById("document-has-title-row").checked + "\"",

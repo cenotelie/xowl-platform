@@ -76,7 +76,7 @@ public class CSVImporter extends Importer {
 
     @Override
     protected String getWebWizardURI() {
-        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/csv/wizard.html";
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/importers/csv/wizard.html";
     }
 
     @Override

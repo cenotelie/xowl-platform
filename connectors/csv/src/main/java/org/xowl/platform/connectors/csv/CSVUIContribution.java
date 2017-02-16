@@ -52,7 +52,7 @@ public class CSVUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/csv";
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/importers/csv";
     }
 
     @Override

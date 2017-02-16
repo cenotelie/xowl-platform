@@ -2,12 +2,20 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var docId = getParameterByName("id");
-var base = getParameterByName("base");
-var version = getParameterByName("version");
-var archetype = getParameterByName("archetype");
-var importerId = "org.xowl.platform.connectors.csv.CSVImporter";
-var DOCUMENT = null;
+var storageId = getParameterByName("storageId");
+var importerId = localStorage.getItem(storageId + ".importer.identifier");
+var doc = {
+	type: "org.xowl.platform.services.importation.Document",
+	identifier: localStorage.getItem(storageId + ".document.identifier"),
+	name: localStorage.getItem(storageId + ".document.name")
+};
+var metadata = {
+	name: localStorage.getItem(storageId + ".artifact.name"),
+	base: localStorage.getItem(storageId + ".artifact.base"),
+	version: localStorage.getItem(storageId + ".artifact.version"),
+	archetype: localStorage.getItem(storageId + ".artifact.archetype"),
+	superseded: localStorage.getItem(storageId + ".artifact.superseded")
+};
 var PREVIEW = null;
 var MAPPING = [];
 
@@ -15,41 +23,34 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
-			{name: "Document ", uri: "document.html?id=" + encodeURIComponent(docId)},
+			{name: "Document " + doc.identifier, uri: ROOT + "/modules/core/importation/document.html?id=" + encodeURIComponent(doc.identifier)},
 			{name: "CSV Importer"}], function() {
-		if (!docId || docId === null || docId === "")
+		if (!storageId || storageId === null || storageId === "")
 			return;
-		doGetDocument();
+		document.getElementById("document-id").value = doc.identifier;
+		document.getElementById("document-name").value = doc.name;
 	});
 }
 
-function doGetDocument() {
-	if (!onOperationRequest("Loading ..."))
-		return;
-	xowl.getUploadedDocument(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			DOCUMENT = content;
-			document.getElementById("document-name").value = DOCUMENT.name;
-		}
-	}, docId);
-}
-
 function onPreview() {
-	var separator = document.getElementById("document-separator").value;
-	var textMarker = document.getElementById("document-text-marker").value;
-	var rowCount = document.getElementById("document-row-count").value;
-	if (separator === null || textMarker === null || rowCount <= 0 || separator == "" || textMarker == "")
-		return;
 	if (!onOperationRequest("Loading ..."))
 		return;
 	xowl.getUploadedDocumentPreview(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderPreview(content);
 		}
-	}, docId, importerId, {
-		separator: separator,
-		textMarker: textMarker,
-		rowCount: rowCount
+	}, doc.identifier, {
+		type: "org.xowl.platform.connectors.csv.CSVConfiguration",
+		identifier: "anonymous",
+		name: "Anonymous Configuration",
+		importer: importerId,
+		separator: document.getElementById("input-separator").value,
+		textMarker: document.getElementById("input-text-marker").value,
+		rowCount: document.getElementById("input-row-count").value,
+		skipFirstRow: "\"" + document.getElementById("input-has-title-row").checked + "\"",
+		mapping: {
+			columns: MAPPING
+		}
 	});
 }
 
@@ -198,32 +199,31 @@ function createNewSelectRegexp(index) {
 	return input;
 }
 
-function onImport() {
-	var separator = document.getElementById("document-separator").value;
-	var textMarker = document.getElementById("document-text-marker").value;
-	if (separator === null || textMarker === null || separator == "" || textMarker == "")
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", DOCUMENT, " ..."]}))
+
+
+
+function onClickOk() {
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", doc, " ..."]}))
 		return;
 	xowl.importUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", DOCUMENT, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onJobCompleted(job);
 			});
 		}
-	}, docId, importerId, {
-		family: base,
-		version: version,
-		archetype: archetype,
-		superseded: "",
-		separator: separator,
-		textMarker: textMarker,
+	}, doc.identifier, {
+		type: "org.xowl.platform.connectors.csv.CSVConfiguration",
+		identifier: "anonymous",
+		name: "Anonymous Configuration",
+		importer: importerId,
+		separator: document.getElementById("document-separator").value,
+		textMarker: document.getElementById("document-text-marker").value,
 		skipFirstRow: "\"" + document.getElementById("document-has-title-row").checked + "\"",
 		mapping: {
 			columns: MAPPING
 		}
-	});
+	}, metadata);
 }
 
 function onJobCompleted(job) {
@@ -233,7 +233,7 @@ function onJobCompleted(job) {
 		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
 		var artifactId = job.result.payload;
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", doc, " as artifact " + artifactId]});
 		waitAndGo(ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
 	}
 }

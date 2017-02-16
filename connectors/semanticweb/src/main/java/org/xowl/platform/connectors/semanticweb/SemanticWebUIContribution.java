@@ -52,7 +52,7 @@ public class SemanticWebUIContribution implements WebUIContribution {
 
     @Override
     public String getPrefix() {
-        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/semanticweb";
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/importers/semanticweb";
     }
 
     @Override

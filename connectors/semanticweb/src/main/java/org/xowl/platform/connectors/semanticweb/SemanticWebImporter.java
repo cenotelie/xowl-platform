@@ -76,7 +76,7 @@ public class SemanticWebImporter extends Importer {
 
     @Override
     protected String getWebWizardURI() {
-        return PlatformHttp.getUriPrefixWeb() + "/contributions/connectors/semanticweb/wizard.html";
+        return PlatformHttp.getUriPrefixWeb() + "/contributions/importers/semanticweb/wizard.html";
     }
 
     @Override

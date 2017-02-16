@@ -56,15 +56,15 @@ function onPreview() {
 
 function renderPreview(data) {
 	PREVIEW = data;
-	var tableHead = document.getElementById("document-heads");
+	var tableHead = document.getElementById("preview-heads");
 	while (tableHead.hasChildNodes())
 		tableHead.removeChild(tableHead.lastChild);
-	var tableBody = document.getElementById("document-rows");
+	var tableBody = document.getElementById("preview-rows");
 	while (tableBody.hasChildNodes())
 		tableBody.removeChild(tableBody.lastChild);
 	if (data.rows.length == 0)
 		return;
-	var hasTitle = document.getElementById("document-has-title-row").checked;
+	var hasTitle = document.getElementById("input-has-title-row").checked;
 	if (hasTitle)
 		tableHead.appendChild(renderPreviewRow(data.rows[0]));
 	else

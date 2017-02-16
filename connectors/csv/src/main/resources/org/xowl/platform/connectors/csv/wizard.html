@@ -38,50 +38,61 @@
                     <img src="../../../assets/importer_configuration.svg" width="30" height="30"
                          style="margin-right: 10px;"/>
                     <span style="color: #034091">Configuration:</span>
+                    <select id="input-configuration">
+                        <option value="custom">(Custom)</option>
+                    </select>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label for="input-configuration" class="col-sm-2 control-label">Origin:</label>
-                            <div class="col-sm-10">
-                                <select class="form-control" id="input-configuration">
-                                    <option value="custom">(Custom)</option>
-                                </select>
-                            </div>
+                    <div class="container-fluid" id="config-custom">
+                        <div class="row">
+                            <a class="btn btn-default" onclick="onInitMapping()" style="margin-right: 20px;">
+                                Initialize from preview
+                            </a>
+                            <input type="text" id="input-configuration-name" placeholder="My Configuration">
+                            <a class="btn btn-default" onclick="onConfigSave()">
+                                <img src="../../../assets/action-save.svg" width="20" height="20" title="SAVE"/>
+                            </a>
                         </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label for="input-separator">Cell separator:</label>
-                                <input type="text" class="form-control" id="input-separator" value=",">
-                            </div>
+                        <div class="row">
+                            <form class="form-horizontal">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="input-separator">Cell separator:</label>
+                                        <input type="text" class="form-control" id="input-separator" value=","
+                                               width="50px">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="input-text-marker">Text delimiter:</label>
+                                        <input type="text" class="form-control" id="input-text-marker" value='"'
+                                               width="50px">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="checkbox">
+                                        <label for="input-has-title-row"></label>
+                                        <input type="checkbox" id="input-has-title-row"> First row is title
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label for="input-text-marker">Text delimiter:</label>
-                                <input type="text" class="form-control" id="input-text-marker" value='"'>
-                            </div>
+                        <div class="row">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <td>Column</td>
+                                    <td>Mapping</td>
+                                    <td>Property</td>
+                                    <td>Datatype</td>
+                                    <td>Value matching regexp</td>
+                                </tr>
+                                </thead>
+                                <tbody id="mapping">
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-sm-4">
-                            <div class="checkbox">
-                                <label for="input-has-title-row"></label>
-                                <input type="checkbox" id="input-has-title-row"> First row is title
-                            </div>
-                        </div>
-                    </form>
-                    <a class="btn btn-default" onclick="onInitMapping()">Initialize from preview</a>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                        <tr>
-                            <td>Column</td>
-                            <td>Mapping</td>
-                            <td>Property</td>
-                            <td>Datatype</td>
-                            <td>Value matching regexp</td>
-                        </tr>
-                        </thead>
-                        <tbody id="mapping">
-                        </tbody>
-                    </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,9 +112,9 @@
                     </form>
                     <div class="form-group" style="margin-top: 10px;">
                         <table class="table table-bordered table-hover">
-                            <thead id="document-heads">
+                            <thead id="preview-heads">
                             </thead>
-                            <tbody id="document-rows">
+                            <tbody id="preview-rows">
                             </tbody>
                         </table>
                     </div>

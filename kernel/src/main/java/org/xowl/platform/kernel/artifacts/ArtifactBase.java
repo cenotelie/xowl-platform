@@ -107,11 +107,12 @@ public abstract class ArtifactBase implements Artifact {
     /**
      * Initializes this artifact from the specified skeleton
      *
-     * @param skeleton The skeleton
-     * @param from     The identifier of the originating connector
+     * @param skeleton   The skeleton
+     * @param identifier The identifier for this artifact
+     * @param from       The identifier of the originating connector
      */
-    public ArtifactBase(Artifact skeleton, String from) {
-        this.identifier = newArtifactID();
+    public ArtifactBase(Artifact skeleton, String identifier, String from) {
+        this.identifier = identifier;
         this.name = skeleton.getName();
         this.base = skeleton.getBase();
         this.version = skeleton.getVersion();

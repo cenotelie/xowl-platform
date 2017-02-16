@@ -167,7 +167,7 @@ public class SemanticWebImporter extends Importer {
             if (!reply.isSuccess())
                 return reply;
             Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
-            Artifact artifact = new ArtifactSimple(metadata, SemanticWebImporter.class.getCanonicalName(), quads);
+            Artifact artifact = new ArtifactSimple(metadata, artifactId, SemanticWebImporter.class.getCanonicalName(), quads);
             reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;

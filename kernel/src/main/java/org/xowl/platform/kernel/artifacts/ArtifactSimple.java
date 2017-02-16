@@ -54,12 +54,13 @@ public class ArtifactSimple extends ArtifactBase {
     /**
      * Initializes this simple artifact
      *
-     * @param skeleton The skeleton
-     * @param from     The identifier of the originating connector
-     * @param content  The payload quads
+     * @param skeleton   The skeleton
+     * @param identifier The identifier for this artifact
+     * @param from       The identifier of the originating connector
+     * @param content    The payload quads
      */
-    public ArtifactSimple(Artifact skeleton, String from, Collection<Quad> content) {
-        super(skeleton, from);
+    public ArtifactSimple(Artifact skeleton, String identifier, String from, Collection<Quad> content) {
+        super(skeleton, identifier, from);
         this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
     }
 

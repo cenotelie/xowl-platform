@@ -187,7 +187,7 @@ public class CSVImporter extends Importer {
             CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, artifactId, artifactId);
             configuration.getMapping().apply(content, context, configuration.getSkipFirstRow());
             Collection<Quad> quads = context.getQuads();
-            Artifact artifact = new ArtifactSimple(metadata, CSVImporter.class.getCanonicalName(), quads);
+            Artifact artifact = new ArtifactSimple(metadata, artifactId, CSVImporter.class.getCanonicalName(), quads);
             reply = storageService.store(artifact);
             if (!reply.isSuccess())
                 return reply;

@@ -16,27 +16,37 @@
 <div id="placeholder-header"></div>
 <div class="body">
     <div class="form-group">
-        <label for="input-descriptor">Descriptor:</label>
-        <select class="form-control" id="input-descriptor" onchange="onDescriptorSelect()"></select>
+        <label for="input-descriptor" class="col-sm-2 control-label">Descriptor:</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="input-descriptor" onchange="onDescriptorSelect()"></select>
+        </div>
     </div>
     <div class="form-group">
-        <label for="input-descriptor-description">Domain description</label>
-        <textarea class="form-control" rows="2" id="input-descriptor-description" readonly></textarea>
+        <label for="input-descriptor-description" class="col-sm-2 control-label">Domain description:</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" rows="2" id="input-descriptor-description" readonly></textarea>7
+        </div>
     </div>
     <div class="form-group">
-        <label for="input-id">Unique identifier</label>
-        <input type="text" class="form-control" id="input-id"
-               placeholder="org.xowl.platform.services.connection.MyConnectorXXX">
+        <label for="input-id" class="col-sm-2 control-label">Identifier:</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="input-id"
+                   placeholder="org.xowl.platform.services.connection.MyConnectorXXX">
+        </div>
     </div>
     <div class="form-group">
-        <label for="input-name">Name</label>
-        <input type="text" class="form-control" id="input-name" placeholder="My Connector XXX">
+        <label for="input-name" class="col-sm-2 control-label">Name:</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="input-name" placeholder="My Connector XXX">
+        </div>
     </div>
     <div class="form-group">
-        <label for="input-uri">Access URI</label>
-        <div class="input-group">
-            <span id="input-uri-addon" class="input-group-addon"></span>
-            <input type="text" class="form-control" id="input-uri" placeholder="connectors/myconnectorxxx">
+        <label for="input-uri" class="col-sm-2 control-label">Access URI:</label>
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span id="input-uri-addon" class="input-group-addon"></span>
+                <input type="text" class="form-control" id="input-uri" placeholder="connectors/myconnectorxxx">
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

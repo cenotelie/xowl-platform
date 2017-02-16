@@ -107,13 +107,6 @@ function renderImporters(importers) {
 	var select = document.getElementById("input-importer");
 	for (var i = 0; i != importers.length; i++) {
 		var option = document.createElement("option");
-		var icon = document.createElement("img");
-		icon.src = ROOT + "/assets/importer.svg";
-		icon.width = 40;
-		icon.height = 40;
-		icon.style.marginRight = "20px";
-		icon.title = importers[i].identifier;
-		option.appendChild(icon);
 		option.appendChild(document.createTextNode(importers[i].name));
 		option.value = importers[i].identifier;
 		select.appendChild(option);

@@ -83,7 +83,7 @@ public class ImporterConfiguration implements Identifiable, Serializable {
                 importer = value.substring(1, value.length() - 1);
             }
         }
-        this.identifier = (identifier != null ? identifier : URI + UUID.randomUUID().toString());
+        this.identifier = (identifier != null && !identifier.isEmpty() ? identifier : URI + UUID.randomUUID().toString());
         this.name = (name != null ? name : this.identifier);
         this.importer = importer;
     }

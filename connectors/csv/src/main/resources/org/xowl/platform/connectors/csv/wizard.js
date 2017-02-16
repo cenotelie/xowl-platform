@@ -61,9 +61,9 @@ function renderConfigurations(configurations) {
 function onConfigurationSelected() {
 	var select = document.getElementById("input-configuration");
 	if (select.selectedIndex == 0) {
-		document.getElementById("input-custom").style.display = "";
+		document.getElementById("config-custom").style.display = "";
 	} else {
-		document.getElementById("input-custom").style.display = "none";
+		document.getElementById("config-custom").style.display = "none";
 	}
 }
 
@@ -75,7 +75,7 @@ function onConfigSave() {
 			displayMessage("success", "Configuration is saved.");
 			waitAndRefresh();
 		}
-	}, doc.identifier, {
+	}, {
 		type: "org.xowl.platform.connectors.csv.CSVConfiguration",
 		identifier: "",
 		name: document.getElementById("input-configuration-name").value,

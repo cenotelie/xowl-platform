@@ -2,20 +2,28 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var docId = getParameterByName("id");
-var base = getParameterByName("base");
-var version = getParameterByName("version");
-var archetype = getParameterByName("archetype");
-var importerId = "org.xowl.platform.connectors.semanticweb.SemanticWebImporter";
-var DOCUMENT = null;
+var storageId = getParameterByName("storageId");
+var importerId = localStorage.getItem(storageId + ".importer.identifier");
+var doc = {
+	type: "org.xowl.platform.services.importation.Document",
+	identifier: localStorage.getItem(storageId + ".document.identifier"),
+	name: localStorage.getItem(storageId + ".document.name")
+};
+var metadata = {
+	name: localStorage.getItem(storageId + ".artifact.name"),
+	base: localStorage.getItem(storageId + ".artifact.base"),
+	version: localStorage.getItem(storageId + ".artifact.version"),
+	archetype: localStorage.getItem(storageId + ".artifact.archetype"),
+	superseded: localStorage.getItem(storageId + ".artifact.superseded")
+};
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
-			{name: "Document ", uri: "document.html?id=" + encodeURIComponent(docId)},
+			{name: "Document " + doc.identifier, uri: ROOT + "/modules/core/importation/document.html?id=" + encodeURIComponent(doc.identifier)},
 			{name: "Semantic Web Importer"}], function() {
-		if (!docId || docId === null || docId === "")
+		if (!storageId || storageId === null || storageId === "")
 			return;
 		var typesField = document.getElementById("input-syntax");
 		for (var i = 0; i != MIME_TYPES.length; i++) {
@@ -24,51 +32,28 @@ function init() {
 			option.appendChild(document.createTextNode(MIME_TYPES[i].name));
 			typesField.appendChild(option);
 		}
-		doGetDocument();
+		document.getElementById("document-id").value = doc.identifier;
+		document.getElementById("document-name").value = doc.name;
 	});
 }
 
-function doGetDocument() {
-	if (!onOperationRequest("Loading ..."))
-		return;
-	xowl.getUploadedDocument(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			DOCUMENT = content;
-			document.getElementById("document-name").value = DOCUMENT.name;
-			var fileType = null;
-			for (var i = 0; i != MIME_TYPES.length; i++) {
-				for (var j = 0; j != MIME_TYPES[i].extensions.length; j++) {
-					var suffix = MIME_TYPES[i].extensions[j];
-					if (DOCUMENT.fileName.indexOf(suffix, DOCUMENT.fileName.length - suffix.length) !== -1) {
-						fileType = MIME_TYPES[i];
-						break;
-					}
-				}
-			}
-			if (fileType !== null) {
-				document.getElementById("input-syntax").value = fileType.value;
-			}
-		}
-	}, docId);
-}
-
-function onImport() {
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", DOCUMENT, " ..."]}))
+function onClickOk() {
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", doc, " ..."]}))
 		return;
 	xowl.importUploadedDocument(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", DOCUMENT, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onJobCompleted(job);
 			});
 		}
-	}, docId, importerId, {
-		family: base,
-		version: version,
-		archetype: archetype,
-		superseded: [],
+	}, doc.identifier, {
+		type: "org.xowl.platform.connectors.semanticweb.SemanticWebImporterConfiguration",
+		identifier: "anonymous",
+		name: "Anonymous Configuration",
+		importer: importerId,
 		syntax: document.getElementById("input-syntax").value
-	});
+	}, metadata);
 }
 
 function onJobCompleted(job) {
@@ -78,7 +63,7 @@ function onJobCompleted(job) {
 		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
 		var artifactId = job.result.payload;
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", DOCUMENT, " as artifact " + artifactId]});
+		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", doc, " as artifact " + artifactId]});
 		waitAndGo(ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
 	}
 }

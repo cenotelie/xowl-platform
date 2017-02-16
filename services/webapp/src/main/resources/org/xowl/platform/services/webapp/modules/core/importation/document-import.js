@@ -150,13 +150,14 @@ function onClickNext() {
 		displayMessage("error", "Missing archetype for the artifact.");
 		return;
 	}
-	var id = "xowl.import." + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	localStorage.setItem(id + ".documentId", doc.identifier);
-	localStorage.setItem(id + ".documentName", doc.name);
-	localStorage.setItem(id + ".artifactName", artifactName);
-	localStorage.setItem(id + ".artifactBase", artifactBase);
-	localStorage.setItem(id + ".artifactVersion", artifactVersion);
-	localStorage.setItem(id + ".artifactArchetype", artifactArchetype);
-	localStorage.setItem(id + ".artifactSuperseded", artifactSuperseded);
-	window.location.href = importer.wizardUri + "?storageId=" + encodeURIComponent(id);
+	var storageId = "xowl.import." + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	localStorage.setItem(storageId + ".document.identifier", doc.identifier);
+	localStorage.setItem(storageId + ".document.name", doc.name);
+	localStorage.setItem(storageId + ".importer.identifier", importer.identifier);
+	localStorage.setItem(storageId + ".artifact.name", artifactName);
+	localStorage.setItem(storageId + ".artifact.base", artifactBase);
+	localStorage.setItem(storageId + ".artifact.version", artifactVersion);
+	localStorage.setItem(storageId + ".artifact.archetype", artifactArchetype);
+	localStorage.setItem(storageId + ".artifact.superseded", artifactSuperseded);
+	window.location.href = importer.wizardUri + "?storageId=" + encodeURIComponent(storageId);
 }

@@ -51,11 +51,11 @@ public interface Artifact extends Identifiable, Serializable {
     String getBase();
 
     /**
-     * Gets the identifier of the artifacts superseded by this one
+     * Gets the identifier of the artifact superseded by this one
      *
-     * @return The artifacts superseded by this one
+     * @return The artifact superseded by this one
      */
-    String[] getSuperseded();
+    String getSuperseded();
 
     /**
      * Gets the version string of this artifact

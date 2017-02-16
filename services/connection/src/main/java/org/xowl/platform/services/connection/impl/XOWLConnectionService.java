@@ -450,8 +450,8 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessageCreateConnector(String connectorId, HttpApiRequest request) {
-        String[] descriptorId = request.getParameter("descriptor");
-        if (descriptorId == null || descriptorId.length == 0)
+        String descriptorId = request.getParameter("descriptor");
+        if (descriptorId == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
         String content = new String(request.getContent(), Files.CHARSET);
         if (content.isEmpty())
@@ -464,7 +464,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
 
         ConnectorDescriptor descriptor = null;
         for (ConnectorDescriptor description : getDescriptors()) {
-            if (description.getIdentifier().equals(descriptorId[0])) {
+            if (description.getIdentifier().equals(descriptorId)) {
                 descriptor = description;
                 break;
             }
@@ -516,14 +516,14 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * @return The response
      */
     private HttpResponse onMessagePushToConnector(String connectorId, HttpApiRequest request) {
-        String[] artifacts = request.getParameter("artifact");
-        if (artifacts == null || artifacts.length == 0)
+        String artifact = request.getParameter("artifact");
+        if (artifact == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
 
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
             return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        Job job = new PushArtifactJob(connectorId, artifacts[0]);
+        Job job = new PushArtifactJob(connectorId, artifact);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
     }

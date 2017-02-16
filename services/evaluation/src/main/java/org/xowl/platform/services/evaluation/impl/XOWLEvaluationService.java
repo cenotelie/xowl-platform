@@ -278,10 +278,10 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
      * @return The response
      */
     private HttpResponse onGetEvaluables(HttpApiRequest request) {
-        String[] types = request.getParameter("type");
-        if (types == null || types.length == 0)
+        String type = request.getParameter("type");
+        if (type == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
-        EvaluableType evaluableType = getEvaluableType(types[0]);
+        EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         XSPReply reply = evaluableType.getElements();
@@ -306,10 +306,10 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
      * @return The response
      */
     private HttpResponse onGetCriterionTypes(HttpApiRequest request) {
-        String[] types = request.getParameter("for");
-        if (types == null || types.length == 0)
+        String type = request.getParameter("for");
+        if (type == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
-        EvaluableType evaluableType = getEvaluableType(types[0]);
+        EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         StringBuilder builder = new StringBuilder("[");

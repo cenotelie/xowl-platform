@@ -54,12 +54,20 @@ public interface HttpApiRequest {
     Collection<String> getParameters();
 
     /**
+     * Gets the single value for the specified parameter
+     *
+     * @param name The name of a parameter
+     * @return The associated value
+     */
+    String getParameter(String name);
+
+    /**
      * Gets the values for the specified parameter
      *
      * @param name The name of a parameter
      * @return The associated values
      */
-    String[] getParameter(String name);
+    String[] getParameterAll(String name);
 
     /**
      * Gets the headers for the request

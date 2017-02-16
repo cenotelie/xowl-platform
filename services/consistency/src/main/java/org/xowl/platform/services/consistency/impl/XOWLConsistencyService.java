@@ -189,19 +189,19 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
                 }
                 case HttpConstants.METHOD_PUT: {
-                    String[] names = request.getParameter("name");
-                    if (names == null || names.length == 0)
+                    String name = request.getParameter("name");
+                    if (name == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                    String[] messages = request.getParameter("message");
-                    if (messages == null || messages.length == 0)
+                    String message = request.getParameter("message");
+                    if (message == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"), null);
-                    String[] prefixes = request.getParameter("prefixes");
-                    if (prefixes == null || prefixes.length == 0)
+                    String prefixes = request.getParameter("prefixes");
+                    if (prefixes == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
                     String conditions = new String(request.getContent(), Files.CHARSET);
                     if (conditions.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    XSPReply reply = createRule(names[0], messages[0], prefixes[0], conditions);
+                    XSPReply reply = createRule(name, message, prefixes, conditions);
                     if (!reply.isSuccess())
                         return XSPReplyUtils.toHttpResponse(reply, null);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());

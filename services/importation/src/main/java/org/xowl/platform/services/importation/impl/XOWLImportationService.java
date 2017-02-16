@@ -342,13 +342,13 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The document
      */
     private HttpResponse onPutDocument(HttpApiRequest request) {
-        String[] names = request.getParameter("name");
-        String[] fileNames = request.getParameter("fileName");
-        if (names == null || names.length == 0)
+        String name = request.getParameter("name");
+        String fileName = request.getParameter("fileName");
+        if (name == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-        if (fileNames == null || fileNames.length == 0)
+        if (fileName == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
-        XSPReply reply = upload(names[0], fileNames[0], request.getContent());
+        XSPReply reply = upload(name, fileName, request.getContent());
         return XSPReplyUtils.toHttpResponse(reply, null);
     }
 
@@ -371,9 +371,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      */
     private HttpResponse onGetPreview(String documentId, HttpApiRequest request) {
         // should use a stored configuration?
-        String[] configurationIds = request.getParameter("configuration");
-        if (configurationIds != null && configurationIds.length > 0)
-            return XSPReplyUtils.toHttpResponse(getPreview(documentId, configurationIds[0]), null);
+        String configurationId = request.getParameter("configuration");
+        if (configurationId != null)
+            return XSPReplyUtils.toHttpResponse(getPreview(documentId, configurationId), null);
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), Files.CHARSET);
@@ -425,27 +425,25 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onBeginImport(String documentId, HttpApiRequest request) {
-        String[] names = request.getParameter("name"); // the name of the artifact to produce
-        String[] bases = request.getParameter("base"); // the base family URI for the artifact
-        String[] versions = request.getParameter("version"); // the version for the artifact
-        String[] archetypes = request.getParameter("archetype"); // the archetype for the artifact
-        String[] superseded = request.getParameter("superseded"); // the superseded artifacts
-        if (names == null || names.length == 0)
+        String name = request.getParameter("name"); // the name of the artifact to produce
+        String base = request.getParameter("base"); // the base family URI for the artifact
+        String version = request.getParameter("version"); // the version for the artifact
+        String archetype = request.getParameter("archetype"); // the archetype for the artifact
+        String superseded = request.getParameter("superseded"); // the superseded artifact
+        if (name == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-        if (bases == null || bases.length == 0)
+        if (base == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
-        if (versions == null || versions.length == 0)
+        if (version == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
-        if (archetypes == null || archetypes.length == 0)
+        if (archetype == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
-        if (superseded == null)
-            superseded = new String[0];
-        Artifact metadata = new ArtifactFuture(names[0], bases[0], versions[0], archetypes[0], superseded);
+        Artifact metadata = new ArtifactFuture(name, base, version, archetype, superseded);
 
         // should use a stored configuration?
-        String[] configurationIds = request.getParameter("configuration");
-        if (configurationIds != null && configurationIds.length > 0)
-            return XSPReplyUtils.toHttpResponse(beginImport(documentId, configurationIds[0], metadata), null);
+        String configurationId = request.getParameter("configuration");
+        if (configurationId != null)
+            return XSPReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata), null);
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), Files.CHARSET);

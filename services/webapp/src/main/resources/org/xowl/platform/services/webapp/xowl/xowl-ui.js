@@ -348,7 +348,7 @@ function displayMessageHttpError(code, content) {
 			message =  "You are not authorized to perform this operation.";
 			break;
 		case 404:
-			message =  "Can"t find the requested data.";
+			message =  "Can't find the requested data.";
 			break;
 		case 440:
 			message =  "The session has expired, login again to continue.";
@@ -366,7 +366,7 @@ function displayMessageHttpError(code, content) {
 			message =  "An unknown error error occurred on the server.";
 			break;
 		default:
-			message =  "The connection failed." + "(" + code + ")";
+			message =  "The connection failed. (" + code + ")";
 			break;
 	}
 	if (content != null && (content instanceof String || typeof content === "string")) {

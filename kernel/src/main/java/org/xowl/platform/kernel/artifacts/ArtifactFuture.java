@@ -36,9 +36,9 @@ public class ArtifactFuture extends ArtifactBase {
      * @param base       The identifier of the base artifact
      * @param version    The version of this artifact
      * @param archetype  The archetype of this artifact
-     * @param superseded The artifacts superseded by this one
+     * @param superseded The artifact superseded by this one
      */
-    public ArtifactFuture(String name, String base, String version, String archetype, String[] superseded) {
+    public ArtifactFuture(String name, String base, String version, String archetype, String superseded) {
         super(newArtifactID(), name, base, version, archetype, "", "", superseded);
     }
 

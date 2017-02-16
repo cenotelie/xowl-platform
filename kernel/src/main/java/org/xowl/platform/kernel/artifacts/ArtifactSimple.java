@@ -37,6 +37,23 @@ public class ArtifactSimple extends ArtifactBase {
     /**
      * Initializes this simple artifact
      *
+     * @param identifier The identifier for this artifact
+     * @param name       The name of this artifact
+     * @param base       The identifier of the base artifact
+     * @param version    The version of this artifact
+     * @param archetype  The archetype of this artifact
+     * @param from       The identifier of the originating connector
+     * @param creation   The artifact's creation time
+     * @param superseded The artifact superseded by this one
+     */
+    public ArtifactSimple(String identifier, String name, String base, String version, String archetype, String from, String creation, String superseded, Collection<Quad> content) {
+        super(identifier, name, base, version, archetype, from, creation, superseded);
+        this.content = Collections.unmodifiableCollection(new ArrayList<>(content));
+    }
+
+    /**
+     * Initializes this simple artifact
+     *
      * @param skeleton The skeleton
      * @param from     The identifier of the originating connector
      * @param content  The payload quads

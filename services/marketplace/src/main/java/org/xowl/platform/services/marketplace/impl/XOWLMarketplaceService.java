@@ -139,8 +139,8 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
         if (request.getUri().equals(apiUri + "/addons")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            String[] inputs = request.getParameter("input");
-            Collection<Addon> addons = lookupAddons(inputs != null && inputs.length > 0 ? inputs[0] : null);
+            String input = request.getParameter("input");
+            Collection<Addon> addons = lookupAddons(input);
             StringBuilder builder = new StringBuilder("[");
             boolean first = true;
             for (Addon addon : addons) {

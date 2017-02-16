@@ -26,7 +26,6 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
-import org.xowl.platform.kernel.artifacts.ArtifactArchetypeFree;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.events.EventService;
@@ -39,7 +38,9 @@ import org.xowl.platform.services.connection.events.ConnectorReceivedDataEvent;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * Represents a connector for Semantic Web datasets
@@ -74,20 +75,20 @@ public class SemanticWebConnector extends ConnectorServiceBase {
      * @return The response
      */
     private HttpResponse onMessagePostQuads(HttpApiRequest request) {
-        String[] names = request.getParameter("name");
-        String[] bases = request.getParameter("base");
-        String[] supersedes = request.getParameter("supersede");
-        String[] versions = request.getParameter("version");
-        String[] archetypes = request.getParameter("archetype");
+        String name = request.getParameter("name");
+        String base = request.getParameter("base");
+        String version = request.getParameter("version");
+        String archetype = request.getParameter("archetype");
+        String superseded = request.getParameter("superseded");
         String contentType = request.getContentType();
-        if (names == null || names.length <= 0)
+        if (name == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-        if (bases == null || bases.length <= 0)
-            bases = new String[]{null};
-        if (versions == null || versions.length <= 0)
-            versions = new String[]{null};
-        if (archetypes == null || archetypes.length <= 0)
-            archetypes = new String[]{ArtifactArchetypeFree.INSTANCE.getIdentifier()};
+        if (base == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
+        if (version == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
+        if (archetype == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
         if (contentType == null || contentType.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_HEADER_CONTENT_TYPE), null);
         int index = contentType.indexOf(";");
@@ -102,8 +103,9 @@ public class SemanticWebConnector extends ConnectorServiceBase {
             return XSPReplyUtils.toHttpResponse(reply, null);
 
         Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
-        Collection<Quad> metadata = ConnectorServiceBase.buildMetadata(resource, bases[0], supersedes, names[0], versions[0], archetypes[0], identifier);
-        Artifact artifact = new ArtifactSimple(metadata, quads);
+        Artifact artifact = new ArtifactSimple(
+                resource, name, base, version, archetype, identifier, DateFormat.getDateTimeInstance().format(new Date()), superseded,
+                quads);
         queueInput(artifact);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)

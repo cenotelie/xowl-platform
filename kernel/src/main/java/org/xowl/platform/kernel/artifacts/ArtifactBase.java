@@ -57,9 +57,9 @@ public abstract class ArtifactBase implements Artifact {
      */
     protected final String base;
     /**
-     * The artifacts superseded by this one
+     * The artifact superseded by this one
      */
-    protected final String[] superseded;
+    protected final String superseded;
     /**
      * The version of this artifact
      */
@@ -91,9 +91,9 @@ public abstract class ArtifactBase implements Artifact {
      * @param archetype  The archetype of this artifact
      * @param from       The identifier of the originating connector
      * @param creation   The artifact's creation time
-     * @param superseded The artifacts superseded by this one
+     * @param superseded The artifact superseded by this one
      */
-    public ArtifactBase(String identifier, String name, String base, String version, String archetype, String from, String creation, String[] superseded) {
+    public ArtifactBase(String identifier, String name, String base, String version, String archetype, String from, String creation, String superseded) {
         this.identifier = identifier;
         this.name = name;
         this.base = base;
@@ -134,7 +134,7 @@ public abstract class ArtifactBase implements Artifact {
         String from = "";
         String creation = "";
         String archetype = "";
-        Collection<String> superseded = new ArrayList<>(2);
+        String superseded = null;
 
         for (Quad quad : metadata) {
             if (identifier.isEmpty() && quad.getSubject().getNodeType() == Node.TYPE_IRI)
@@ -147,7 +147,7 @@ public abstract class ArtifactBase implements Artifact {
                 else if (KernelSchema.BASE.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     base = ((IRINode) quad.getObject()).getIRIValue();
                 else if (KernelSchema.SUPERSEDE.equals(((IRINode) quad.getProperty()).getIRIValue()))
-                    superseded.add(((IRINode) quad.getObject()).getIRIValue());
+                    superseded = ((IRINode) quad.getObject()).getIRIValue();
                 else if (KernelSchema.VERSION.equals(((IRINode) quad.getProperty()).getIRIValue()))
                     version = ((LiteralNode) quad.getObject()).getLexicalValue();
                 else if (KernelSchema.ARCHETYPE.equals(((IRINode) quad.getProperty()).getIRIValue()))
@@ -165,7 +165,7 @@ public abstract class ArtifactBase implements Artifact {
         this.from = from;
         this.creation = creation;
         this.archetype = archetype;
-        this.superseded = superseded.toArray(new String[superseded.size()]);
+        this.superseded = superseded;
         this.metadata = Collections.unmodifiableCollection(new ArrayList<>(metadata));
     }
 
@@ -182,7 +182,7 @@ public abstract class ArtifactBase implements Artifact {
         String from = "";
         String creation = "";
         String archetype = "";
-        Collection<String> superseded = new ArrayList<>(2);
+        String superseded = null;
 
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -209,11 +209,10 @@ public abstract class ArtifactBase implements Artifact {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 archetype = value.substring(1, value.length() - 1);
             } else if ("superseded".equals(head)) {
-                for (ASTNode child : member.getChildren().get(1).getChildren()) {
-                    String value = TextUtils.unescape(child.getValue());
-                    value = value.substring(1, value.length() - 1);
-                    superseded.add(value);
-                }
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                value = value.substring(1, value.length() - 1);
+                if (!value.isEmpty())
+                    superseded = value;
             }
         }
         this.identifier = identifier;
@@ -223,7 +222,7 @@ public abstract class ArtifactBase implements Artifact {
         this.from = from;
         this.creation = creation;
         this.archetype = archetype;
-        this.superseded = superseded.toArray(new String[superseded.size()]);
+        this.superseded = superseded;
     }
 
     @Override
@@ -242,7 +241,7 @@ public abstract class ArtifactBase implements Artifact {
     }
 
     @Override
-    public String[] getSuperseded() {
+    public String getSuperseded() {
         return superseded;
     }
 
@@ -273,32 +272,24 @@ public abstract class ArtifactBase implements Artifact {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(Artifact.class.getCanonicalName()));
-        builder.append("\", \"identifier\":\"");
-        builder.append(TextUtils.escapeStringJSON(identifier));
-        builder.append("\", \"name\": \"");
-        builder.append(TextUtils.escapeStringJSON(name));
-        builder.append("\", \"base\": \"");
-        builder.append(TextUtils.escapeStringJSON(base));
-        builder.append("\", \"version\": \"");
-        builder.append(TextUtils.escapeStringJSON(version));
-        builder.append("\", \"from\": \"");
-        builder.append(TextUtils.escapeStringJSON(from));
-        builder.append("\", \"creation\": \"");
-        builder.append(TextUtils.escapeStringJSON(creation));
-        builder.append("\", \"archetype\": \"");
-        builder.append(TextUtils.escapeStringJSON(archetype));
-        builder.append("\", \"supersede\": [");
-        for (int i = 0; i != superseded.length; i++) {
-            if (i != 0)
-                builder.append(", ");
-            builder.append("\"");
-            builder.append(TextUtils.escapeStringJSON(superseded[i]));
-            builder.append("\"");
-        }
-        builder.append("]}");
-        return builder.toString();
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(Artifact.class.getCanonicalName()) +
+                "\", \"identifier\":\"" +
+                TextUtils.escapeStringJSON(identifier) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(name) +
+                "\", \"base\": \"" +
+                TextUtils.escapeStringJSON(base) +
+                "\", \"version\": \"" +
+                TextUtils.escapeStringJSON(version) +
+                "\", \"from\": \"" +
+                TextUtils.escapeStringJSON(from) +
+                "\", \"creation\": \"" +
+                TextUtils.escapeStringJSON(creation) +
+                "\", \"archetype\": \"" +
+                TextUtils.escapeStringJSON(archetype) +
+                "\", \"superseded\": \"" +
+                (superseded != null ? TextUtils.escapeStringJSON(superseded) : "") +
+                "\"}";
     }
 
     @Override
@@ -314,8 +305,8 @@ public abstract class ArtifactBase implements Artifact {
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.FROM), nodes.getLiteralNode(from, Vocabulary.xsdString, null)));
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.CREATED), nodes.getLiteralNode(creation, Vocabulary.xsdDateTime, null)));
             metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.ARCHETYPE), nodes.getLiteralNode(archetype, Vocabulary.xsdString, null)));
-            for (String value : superseded)
-                metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.SUPERSEDE), nodes.getIRINode(value)));
+            if (superseded != null)
+                metadata.add(new Quad(graph, subject, nodes.getIRINode(KernelSchema.SUPERSEDE), nodes.getIRINode(superseded)));
         }
         return metadata;
     }

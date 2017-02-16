@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
+import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 
@@ -89,8 +90,13 @@ class XOWLHttpApiRequest implements HttpApiRequest {
     }
 
     @Override
-    public String[] getParameter(String name) {
-        return request.getParameterValues(name);
+    public String getParameter(String name) {
+        return URIUtils.getSingleParameter(request.getParameterValues(name));
+    }
+
+    @Override
+    public String[] getParameterAll(String name) {
+        return URIUtils.getMultiParameters(request.getParameterValues(name));
     }
 
     @Override

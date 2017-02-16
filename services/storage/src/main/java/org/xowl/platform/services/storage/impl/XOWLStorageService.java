@@ -391,10 +391,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             // get artifacts
-            String[] archetypes = request.getParameter("archetype");
-            if (archetypes != null && archetypes.length > 0) {
+            String archetype = request.getParameter("archetype");
+            if (archetype != null) {
                 // get all artifacts for an archetype
-                XSPReply reply = getArtifactsForArchetype(archetypes[0]);
+                XSPReply reply = getArtifactsForArchetype(archetype);
                 if (!reply.isSuccess())
                     return XSPReplyUtils.toHttpResponse(reply, null);
                 boolean first = true;
@@ -408,10 +408,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
                 builder.append("]");
                 return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
             }
-            String[] bases = request.getParameter("base");
-            if (bases != null && bases.length > 0) {
+            String base = request.getParameter("base");
+            if (base != null) {
                 // get all artifacts for an base
-                XSPReply reply = getArtifactsForBase(bases[0]);
+                XSPReply reply = getArtifactsForBase(base);
                 if (!reply.isSuccess())
                     return XSPReplyUtils.toHttpResponse(reply, null);
                 boolean first = true;
@@ -443,13 +443,13 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
             // diff artifacts left and right
-            String[] lefts = request.getParameter("left");
-            String[] rights = request.getParameter("right");
-            if (lefts == null || lefts.length == 0)
+            String left = request.getParameter("left");
+            String right = request.getParameter("right");
+            if (left == null)
                 return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
-            if (rights == null || rights.length == 0)
+            if (right == null)
                 return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
-            return onMessageDiffArtifacts(lefts[0], rights[0]);
+            return onMessageDiffArtifacts(left, right);
         } else if (request.getUri().equals(apiUri + "/artifacts/live")) {
             XSPReply reply = getLiveArtifacts();
             if (!reply.isSuccess())

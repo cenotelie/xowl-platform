@@ -9,9 +9,9 @@ function XOWL() {
 	var url = document.location.href;
 	var index = url.indexOf("/web");
 	this.endpoint = url.substring(0, index) + "/api/";
-	this.userLogin = localStorage.getItem('xowl.user.login');
-	this.userIdentifier = localStorage.getItem('xowl.user.identifier');
-	this.userName = localStorage.getItem('xowl.user.name');
+	this.userLogin = localStorage.getItem("xowl.user.login");
+	this.userIdentifier = localStorage.getItem("xowl.user.identifier");
+	this.userName = localStorage.getItem("xowl.user.name");
 }
 
 /**
@@ -56,17 +56,17 @@ XOWL.prototype.login = function (callback, login, password) {
 			_self.userLogin = login;
 			_self.userIdentifier = user.identifier;
 			_self.userName = user.name;
-			localStorage.setItem('xowl.user.login', login);
-			localStorage.setItem('xowl.user.identifier', user.identifier);
-			localStorage.setItem('xowl.user.name', user.name);
+			localStorage.setItem("xowl.user.login", login);
+			localStorage.setItem("xowl.user.identifier", user.identifier);
+			localStorage.setItem("xowl.user.name", user.name);
 			callback(code, type, content);
 		} else {
 			_self.userLogin = null;
 			_self.userIdentifier = null;
 			_self.userName = null;
-			localStorage.removeItem('xowl.user.login');
-			localStorage.removeItem('xowl.user.identifier');
-			localStorage.removeItem('xowl.user.name');
+			localStorage.removeItem("xowl.user.login");
+			localStorage.removeItem("xowl.user.identifier");
+			localStorage.removeItem("xowl.user.name");
 			callback(code, type, content);
 		}
 	}, "kernel/security/login", {login: login}, "POST", MIME_PLAIN_TEXT, password);
@@ -78,9 +78,9 @@ XOWL.prototype.logout = function () {
 		_self.userLogin = null;
 		_self.userIdentifier = null;
 		_self.userName = null;
-		localStorage.removeItem('xowl.user.login');
-		localStorage.removeItem('xowl.user.identifier');
-		localStorage.removeItem('xowl.user.name');
+		localStorage.removeItem("xowl.user.login");
+		localStorage.removeItem("xowl.user.identifier");
+		localStorage.removeItem("xowl.user.name");
 		callback(code, type, content);
 	}, "kernel/security/logout", null, "POST", null, null);
 }
@@ -1486,7 +1486,7 @@ XOWL.prototype.getEvaluationCriteria = function (callback, typeId) {
 		} else {
 			callback(code, type, content);
 		}
-	}, "services/evaluation/criterionTypes", {'for': typeId}, "GET", null, null);
+	}, "services/evaluation/criterionTypes", {"for": typeId}, "GET", null, null);
 }
 
 XOWL.prototype.newEvaluation = function (callback, definition) {

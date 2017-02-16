@@ -121,4 +121,42 @@ function renderImporters(importers) {
 }
 
 function onClickNext() {
+	var index = document.getElementById("input-importer").selectedIndex;
+	if (index < 0) {
+		displayMessage("error", "An importer must be selected.");
+		return;
+	}
+	var importer = importers[index];
+	var artifactSuperseded = document.getElementById("input-superseded").value;
+	var artifactName = document.getElementById("input-artifact-name").value;
+	var artifactBase = document.getElementById("input-artifact-base").value;
+	var artifactVersion = document.getElementById("input-artifact-version").value;
+	var artifactArchetype = document.getElementById("input-artifact-archetype").value;
+	if (artifactSuperseded == null)
+		artifactSuperseded = "";
+	if (artifactName == null || artifactName.length == "") {
+		displayMessage("error", "Missing name for the artifact.");
+		return;
+	}
+	if (artifactBase == null || artifactBase.length == "") {
+		displayMessage("error", "Missing family URI for the artifact.");
+		return;
+	}
+	if (artifactVersion == null || artifactVersion.length == "") {
+		displayMessage("error", "Missing version for the artifact.");
+		return;
+	}
+	if (artifactArchetype == null || artifactArchetype.length == "") {
+		displayMessage("error", "Missing archetype for the artifact.");
+		return;
+	}
+	var id = "xowl.import." + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	localStorage.setItem(id + ".documentId", doc.identifier);
+	localStorage.setItem(id + ".documentName", doc.name);
+	localStorage.setItem(id + ".artifactName", artifactName);
+	localStorage.setItem(id + ".artifactBase", artifactBase);
+	localStorage.setItem(id + ".artifactVersion", artifactVersion);
+	localStorage.setItem(id + ".artifactArchetype", artifactArchetype);
+	localStorage.setItem(id + ".artifactSuperseded", artifactSuperseded);
+	window.location.href = importer.wizardUri + "?storageId=" + encodeURIComponent(id);
 }

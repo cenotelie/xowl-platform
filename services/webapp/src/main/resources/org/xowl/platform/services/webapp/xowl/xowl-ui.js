@@ -147,7 +147,7 @@ function doSetupHeader() {
 	for (var i = 0; i != PAGE_BREADCRUMBS.length; i++) {
 		var name = PAGE_BREADCRUMBS[i].name;
 		var uri = PAGE_BREADCRUMBS[i].uri;
-		if (uri instanceof String || typeof uri === 'string') {
+		if (uri instanceof String || typeof uri === "string") {
 			var a = document.createElement("a");
 			a.appendChild(document.createTextNode(name));
 			a.href = uri;
@@ -348,7 +348,7 @@ function displayMessageHttpError(code, content) {
 			message =  "You are not authorized to perform this operation.";
 			break;
 		case 404:
-			message =  "Can't find the requested data.";
+			message =  "Can"t find the requested data.";
 			break;
 		case 440:
 			message =  "The session has expired, login again to continue.";
@@ -369,7 +369,7 @@ function displayMessageHttpError(code, content) {
 			message =  "The connection failed." + "(" + code + ")";
 			break;
 	}
-	if (content != null && (content instanceof String || typeof content === 'string')) {
+	if (content != null && (content instanceof String || typeof content === "string")) {
 		message += "\n" + content;
 	}
 	displayMessage("error", message);
@@ -384,7 +384,7 @@ function displayMessageHttpError(code, content) {
 function renderMessage(message) {
 	var result = document.createElement("p");
 	result.classList.add("header-message-content");
-	if (message instanceof String || typeof message === 'string') {
+	if (message instanceof String || typeof message === "string") {
 		result.appendChild(renderMessagePart(message));
 	} else if (message.type === "org.xowl.infra.utils.RichString") {
 		for (var i = 0; i != message.parts.length; i++) {
@@ -403,7 +403,7 @@ function renderMessage(message) {
  * @return The HTML DOM element corresponding to the rendered message part
  */
 function renderMessagePart(part) {
-	if (part instanceof String || typeof part === 'string') {
+	if (part instanceof String || typeof part === "string") {
 		var parts = part.split("\n");
 		if (parts.length > 0) {
 			var dom = document.createElement("span");
@@ -661,7 +661,7 @@ AutoComplete.prototype.lookupItems = function (value) {
  */
 AutoComplete.prototype.renderItem = function (item) {
 	var result = document.createElement("div");
-	if (item instanceof String || typeof item === 'string') {
+	if (item instanceof String || typeof item === "string") {
 		result.appendChild(document.createTextNode(item));
 	} else {
 		result.appendChild(document.createTextNode(JSON.stringify(item)));
@@ -676,7 +676,7 @@ AutoComplete.prototype.renderItem = function (item) {
  * @return The string representation for the item
  */
 AutoComplete.prototype.getItemString = function (item) {
-	if (item instanceof String || typeof item === 'string') {
+	if (item instanceof String || typeof item === "string") {
 		return item;
 	}
 	return JSON.stringify(item);
@@ -740,16 +740,16 @@ function waitForJob(jobId, jobName, callback) {
  * The known MIME types for the RDF and OWL datasets
  */
 var MIME_TYPES = [
-	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
-	{ name: 'N-Quads', value: 'application/n-quads', extensions: ['.nq'] },
-	{ name: 'Turtle', value: 'text/turtle', extensions: ['.ttl'] },
-	{ name: 'TriG', value: 'application/trig', extensions: ['.trig'] },
-	{ name: 'JSON-LD', value: 'application/ld+json', extensions: ['.jsonld'] },
-	{ name: 'RDF/XML', value: 'application/rdf+xml', extensions: ['.rdf'] },
-	{ name: 'Functional OWL2', value: 'text/owl-functional', extensions: ['.ofn', '.fs'] },
-	{ name: 'OWL/XML', value: 'application/owl+xml', extensions: ['.owx', '.owl'] },
-	{ name: 'xOWL RDF Rules', value: 'application/x-xowl-rdft', extensions: ['.rdft'] },
-	{ name: 'xOWL Ontology', value: 'application/x-xowl', extensions: ['.xowl'] }
+	{ name: "N-Triples", value: "application/n-triples", extensions: [".nt"] },
+	{ name: "N-Quads", value: "application/n-quads", extensions: [".nq"] },
+	{ name: "Turtle", value: "text/turtle", extensions: [".ttl"] },
+	{ name: "TriG", value: "application/trig", extensions: [".trig"] },
+	{ name: "JSON-LD", value: "application/ld+json", extensions: [".jsonld"] },
+	{ name: "RDF/XML", value: "application/rdf+xml", extensions: [".rdf"] },
+	{ name: "Functional OWL2", value: "text/owl-functional", extensions: [".ofn", ".fs"] },
+	{ name: "OWL/XML", value: "application/owl+xml", extensions: [".owx", ".owl"] },
+	{ name: "xOWL RDF Rules", value: "application/x-xowl-rdft", extensions: [".rdft"] },
+	{ name: "xOWL Ontology", value: "application/x-xowl", extensions: [".xowl"] }
 ];
 
 /*
@@ -791,17 +791,17 @@ function rdfToDom(value) {
 		return dom;
 	} else if (value.type === "bnode") {
 		var dom = document.createElement("span");
-		dom.appendChild(document.createTextNode('_:' + value.value));
+		dom.appendChild(document.createTextNode("_:" + value.value));
 		dom.classList.add("rdfBlank");
 		return dom;
 	} else if (value.type === "blank") {
 		var dom = document.createElement("span");
-		dom.appendChild(document.createTextNode('_:' + value.id));
+		dom.appendChild(document.createTextNode("_:" + value.id));
 		dom.classList.add("rdfBlank");
 		return dom;
 	} else if (value.type === "variable") {
 		var dom = document.createElement("span");
-		dom.appendChild(document.createTextNode('?' + value.value));
+		dom.appendChild(document.createTextNode("?" + value.value));
 		dom.classList.add("rdfVariable");
 		return dom;
 	} else if (value.hasOwnProperty("lexical")) {
@@ -821,7 +821,7 @@ function rdfToDom(value) {
 		}
 		if (value.lang !== null) {
 			var span2 = document.createElement("span");
-			span2.appendChild(document.createTextNode('@' + value.lang));
+			span2.appendChild(document.createTextNode("@" + value.lang));
 			span2.classList.add("badge");
 			dom.appendChild(span2);
 		}
@@ -843,7 +843,7 @@ function rdfToDom(value) {
 		}
 		if (value.hasOwnProperty("xml:lang")) {
 			var span2 = document.createElement("span");
-			span2.appendChild(document.createTextNode('@' + value["xml:lang"]));
+			span2.appendChild(document.createTextNode("@" + value["xml:lang"]));
 			span2.classList.add("badge");
 			dom.appendChild(span2);
 		}

@@ -24,6 +24,7 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.BaseStore;
 import org.xowl.infra.store.storage.StoreFactory;
+import org.xowl.infra.utils.AutoReader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
@@ -180,8 +181,7 @@ public class CSVImporter extends Importer {
             return reply;
         String artifactId = ArtifactBase.newArtifactID();
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
-            InputStreamReader reader = new InputStreamReader(stream, IOUtils.CHARSET);
-            CSVParser parser = new CSVParser(reader, configuration.getSeparator(), configuration.getTextMarker());
+            CSVParser parser = new CSVParser(new AutoReader(stream), configuration.getSeparator(), configuration.getTextMarker());
             Iterator<Iterator<String>> content = parser.parse();
             BaseStore store = StoreFactory.create().inMemory().make();
             CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, artifactId, artifactId);

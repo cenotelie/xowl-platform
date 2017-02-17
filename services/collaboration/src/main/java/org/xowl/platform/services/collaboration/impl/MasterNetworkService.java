@@ -22,7 +22,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
@@ -35,6 +35,7 @@ import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.collaboration.*;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -97,7 +98,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (InputStream stream = new FileInputStream(files[i])) {
-                        String content = Files.read(stream, Files.CHARSET);
+                        String content = IOUtils.read(stream, IOUtils.CHARSET);
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         Product product = new ProductBase(definition);
                         platforms.add(product);
@@ -112,7 +113,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (InputStream stream = new FileInputStream(files[i])) {
-                        String content = Files.read(stream, Files.CHARSET);
+                        String content = IOUtils.read(stream, IOUtils.CHARSET);
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
                         collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
@@ -377,7 +378,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      */
     private XSPReply provisionWriteDescriptor(RemoteCollaborationManaged instance) {
         File fileDescriptor = new File(storageInstances, instance.getIdentifier() + ".json");
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileDescriptor), Files.CHARSET)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileDescriptor), IOUtils.CHARSET)) {
             writer.write(instance.getDescriptor().serializedJSON());
             writer.flush();
         } catch (IOException exception) {
@@ -400,7 +401,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             return new XSPReplyFailure("Failed to find the distribution " + productId);
         File extractionDirectory = new File(storageInstances, instanceId + "_provision");
         if (extractionDirectory.exists())
-            Files.deleteFolder(extractionDirectory);
+            IOUtils.deleteFolder(extractionDirectory);
         if (!extractionDirectory.mkdirs()) {
             Logging.getDefault().error("Failed to create directory " + extractionDirectory.getAbsolutePath());
             return XSPReplyNotFound.instance();
@@ -418,14 +419,14 @@ public class MasterNetworkService implements CollaborationNetworkService {
         }
         File target = new File(storageInstances, instanceId);
         if (target.exists())
-            Files.deleteFolder(extractionDirectory);
+            IOUtils.deleteFolder(extractionDirectory);
         try {
-            java.nio.file.Files.move(children[0].toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(children[0].toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);
         }
-        Files.deleteFolder(extractionDirectory);
+        IOUtils.deleteFolder(extractionDirectory);
         return XSPReplySuccess.instance();
     }
 
@@ -481,7 +482,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         // write the collaboration manifest
         File collaborationManifest = new File(instanceDirectory, "collaboration.json");
         CollaborationManifest manifest = new CollaborationManifest(instance.getIdentifier(), specification);
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(collaborationManifest), Files.CHARSET)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(collaborationManifest), IOUtils.CHARSET)) {
             writer.write(manifest.serializedJSON());
             writer.flush();
         } catch (IOException exception) {

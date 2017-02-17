@@ -20,7 +20,7 @@ package org.xowl.platform.services.importation.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -119,15 +119,15 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (files != null) {
             for (int i = 0; i != files.length; i++) {
                 if (isDocDescriptorFile(files[i].getName())) {
-                    try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
-                        String content = Files.read(reader);
+                    try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
+                        String content = IOUtils.read(reader);
                         reloadDocument(files[i].getAbsolutePath(), content);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
                     }
                 } else if (isConfigurationFile(files[i].getName())) {
-                    try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
-                        String content = Files.read(reader);
+                    try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
+                        String content = IOUtils.read(reader);
                         reloadConfiguration(content);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
@@ -376,7 +376,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return XSPReplyUtils.toHttpResponse(getPreview(documentId, configurationId), null);
 
         // the configuration is expected to be inline in the body
-        String content = new String(request.getContent(), Files.CHARSET);
+        String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
@@ -446,7 +446,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return XSPReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata), null);
 
         // the configuration is expected to be inline in the body
-        String content = new String(request.getContent(), Files.CHARSET);
+        String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
@@ -491,7 +491,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The document
      */
     private HttpResponse onPutConfiguration(HttpApiRequest request) {
-        String content = new String(request.getContent(), Files.CHARSET);
+        String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
@@ -554,7 +554,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         try (FileOutputStream stream = new FileOutputStream(fileDescriptor)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
+            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
             writer.write(document.serializedJSON());
             writer.flush();
         } catch (IOException exception) {
@@ -692,7 +692,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access configuration storage");
         File file = new File(storage, getConfigurationFile(configuration));
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
+            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
             writer.write(configuration.serializedJSON());
             writer.flush();
         } catch (IOException exception) {

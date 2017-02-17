@@ -25,7 +25,7 @@ import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
@@ -94,7 +94,7 @@ public class SemanticWebImporter extends Importer {
         if (!reply.isSuccess())
             return reply;
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
-            InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
+            InputStreamReader reader = new InputStreamReader(stream, IOUtils.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();
             reply = loader.load(reader, documentId, swConfig.getSyntax());
             if (!reply.isSuccess())
@@ -161,7 +161,7 @@ public class SemanticWebImporter extends Importer {
             return reply;
         String artifactId = ArtifactBase.newArtifactID();
         try (InputStream stream = ((XSPReplyResult<InputStream>) reply).getData()) {
-            InputStreamReader reader = new InputStreamReader(stream, Files.CHARSET);
+            InputStreamReader reader = new InputStreamReader(stream, IOUtils.CHARSET);
             SemanticWebLoader loader = new SemanticWebLoader();
             reply = loader.load(reader, artifactId, configuration.getSyntax());
             if (!reply.isSuccess())

@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -397,7 +397,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         String login = request.getParameter("login");
         if (login == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'login'"), null);
-        String password = new String(request.getContent(), Files.CHARSET);
+        String password = new String(request.getContent(), IOUtils.CHARSET);
         XSPReply reply = login(request.getClient(), login, password);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -463,7 +463,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
-            String definition = new String(request.getContent(), Files.CHARSET);
+            String definition = new String(request.getContent(), IOUtils.CHARSET);
             return XSPReplyUtils.toHttpResponse(getPolicy().setPolicy(actionId, definition), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -510,7 +510,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     String displayName = request.getParameter("name");
                     if (displayName == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                    String password = new String(request.getContent(), Files.CHARSET);
+                    String password = new String(request.getContent(), IOUtils.CHARSET);
                     return XSPReplyUtils.toHttpResponse(getRealm().createUser(userId, displayName, password), null);
                 }
                 case HttpConstants.METHOD_DELETE: {
@@ -535,13 +535,13 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 String oldKey = request.getParameter("oldKey");
                 if (oldKey == null)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'oldKey'"), null);
-                String password = new String(request.getContent(), Files.CHARSET);
+                String password = new String(request.getContent(), IOUtils.CHARSET);
                 return XSPReplyUtils.toHttpResponse(getRealm().changeUserKey(userId, oldKey, password), null);
             }
             case "/resetKey": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                String password = new String(request.getContent(), Files.CHARSET);
+                String password = new String(request.getContent(), IOUtils.CHARSET);
                 return XSPReplyUtils.toHttpResponse(getRealm().resetUserKey(userId, password), null);
             }
             case "/assign": {
@@ -767,7 +767,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     private String buildTokenFor(String login) {
         long timestamp = System.currentTimeMillis();
         long validUntil = timestamp + securityTokenTTL * 1000;
-        byte[] text = login.getBytes(Files.CHARSET);
+        byte[] text = login.getBytes(IOUtils.CHARSET);
         byte[] tokenData = Arrays.copyOf(text, text.length + 8);
         tokenData[text.length] = (byte) ((validUntil & 0xFF00000000000000L) >>> 56);
         tokenData[text.length + 1] = (byte) ((validUntil & 0x00FF000000000000L) >>> 48);
@@ -839,6 +839,6 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (System.currentTimeMillis() > validUntil)
             // the token expired
             return XSPReplyExpiredSession.instance();
-        return new XSPReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - 32 - 8, Files.CHARSET));
+        return new XSPReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - 32 - 8, IOUtils.CHARSET));
     }
 }

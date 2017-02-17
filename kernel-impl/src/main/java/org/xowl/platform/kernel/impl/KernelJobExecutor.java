@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
@@ -235,8 +235,8 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         if (files != null) {
             for (int i = 0; i != files.length; i++) {
                 if (isJobFile(files[i].getName())) {
-                    try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
-                        String content = Files.read(reader);
+                    try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
+                        String content = IOUtils.read(reader);
                         reloadJob(files[i], content);
                     } catch (IOException exception) {
                         Logging.getDefault().error(exception);
@@ -333,7 +333,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
             exists = storage.mkdirs();
         }
         if (exists) {
-            try (Writer write = Files.getWriter(new File(storage, getFileName(job)).getAbsolutePath())) {
+            try (Writer write = IOUtils.getWriter(new File(storage, getFileName(job)).getAbsolutePath())) {
                 write.write(job.serializedJSON());
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);

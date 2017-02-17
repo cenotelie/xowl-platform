@@ -20,7 +20,7 @@ package org.xowl.platform.services.collaboration.impl;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
@@ -63,7 +63,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
             try (InputStream stream = new FileInputStream(fileManifest)) {
-                String content = Files.read(stream, Files.CHARSET);
+                String content = IOUtils.read(stream, IOUtils.CHARSET);
                 ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                 if (definition != null)
                     manifest = new CollaborationManifest(definition);
@@ -87,7 +87,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
      */
     private XSPReply serializeManifest() {
         try (OutputStream stream = new FileOutputStream(fileManifest)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
+            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
             writer.write(manifest.serializedJSON());
             writer.flush();
             writer.close();

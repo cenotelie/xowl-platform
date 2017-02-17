@@ -19,7 +19,7 @@ package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
@@ -64,7 +64,7 @@ class FSMarketplace extends StaticMarketplace {
         }
         String content = null;
         try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = Files.read(stream, Files.CHARSET);
+            content = IOUtils.read(stream, IOUtils.CHARSET);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
         }
@@ -89,7 +89,7 @@ class FSMarketplace extends StaticMarketplace {
         }
         String content = null;
         try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = Files.read(stream, Files.CHARSET);
+            content = IOUtils.read(stream, IOUtils.CHARSET);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
         }

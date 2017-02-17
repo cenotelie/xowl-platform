@@ -29,7 +29,7 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -198,7 +198,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     String prefixes = request.getParameter("prefixes");
                     if (prefixes == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
-                    String conditions = new String(request.getContent(), Files.CHARSET);
+                    String conditions = new String(request.getContent(), IOUtils.CHARSET);
                     if (conditions.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     XSPReply reply = createRule(name, message, prefixes, conditions);

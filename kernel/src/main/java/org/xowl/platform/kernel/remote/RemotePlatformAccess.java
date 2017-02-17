@@ -23,7 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.sparql.Command;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpConnection;
@@ -1139,7 +1139,7 @@ public class RemotePlatformAccess extends HttpConnection {
     public XSPReply sparql(String query) {
         return doRequest("/services/storage/sparql",
                 HttpConstants.METHOD_POST,
-                query.getBytes(Files.CHARSET),
+                query.getBytes(IOUtils.CHARSET),
                 Command.MIME_SPARQL_QUERY,
                 false,
                 HttpConstants.MIME_JSON);
@@ -1526,7 +1526,7 @@ public class RemotePlatformAccess extends HttpConnection {
                         "&message=" + URIUtils.encodeComponent(message) +
                         "&prefixes=" + URIUtils.encodeComponent(prefixes),
                 HttpConstants.METHOD_PUT,
-                conditions.getBytes(Files.CHARSET),
+                conditions.getBytes(IOUtils.CHARSET),
                 Repository.SYNTAX_RDFT,
                 false,
                 HttpConstants.MIME_JSON);
@@ -1708,10 +1708,10 @@ public class RemotePlatformAccess extends HttpConnection {
         String contentType = HttpConstants.MIME_TEXT_PLAIN;
         if (body != null) {
             if (body instanceof Serializable) {
-                byteBody = ((Serializable) body).serializedJSON().getBytes(Files.CHARSET);
+                byteBody = ((Serializable) body).serializedJSON().getBytes(IOUtils.CHARSET);
                 contentType = HttpConstants.MIME_JSON;
             } else {
-                byteBody = body.toString().getBytes(Files.CHARSET);
+                byteBody = body.toString().getBytes(IOUtils.CHARSET);
             }
         }
         return doRequest(uriComplement, method, byteBody, contentType, false, HttpConstants.MIME_JSON);

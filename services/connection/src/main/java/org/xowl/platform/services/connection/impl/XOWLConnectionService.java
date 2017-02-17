@@ -23,7 +23,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -453,7 +453,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
         String descriptorId = request.getParameter("descriptor");
         if (descriptorId == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
-        String content = new String(request.getContent(), Files.CHARSET);
+        String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 

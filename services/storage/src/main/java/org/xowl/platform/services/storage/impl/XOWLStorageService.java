@@ -31,7 +31,7 @@ import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -557,7 +557,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         if (request.getContent() == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);
-        String sparql = new String(request.getContent(), Files.CHARSET);
+        String sparql = new String(request.getContent(), IOUtils.CHARSET);
         Result result = storeLive.sparql(sparql);
         return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(result), Arrays.asList(accept));
     }
@@ -656,11 +656,11 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         BufferedLogger logger = new BufferedLogger();
         StringWriter writer = new StringWriter();
         RDFSerializer serializer = new NQuadsSerializer(writer);
-        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + Files.LINE_SEPARATOR);
-        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + Files.LINE_SEPARATOR);
+        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + IOUtils.LINE_SEPARATOR);
+        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + IOUtils.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getAdded().iterator());
-        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + Files.LINE_SEPARATOR);
-        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + Files.LINE_SEPARATOR);
+        writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + IOUtils.LINE_SEPARATOR);
+        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + IOUtils.LINE_SEPARATOR);
         serializer.serialize(logger, changeset.getRemoved().iterator());
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY, writer.toString());
     }

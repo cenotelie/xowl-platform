@@ -36,7 +36,7 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.sparql.ResultYesNo;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Env;
@@ -282,7 +282,7 @@ class XOWLInternalRealm implements SecurityRealm {
     private static String readResource(String resource) {
         InputStream stream = XOWLInternalRealm.class.getResourceAsStream(RESOURCES + resource);
         try {
-            return Files.read(stream, Files.CHARSET);
+            return IOUtils.read(stream, IOUtils.CHARSET);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return null;

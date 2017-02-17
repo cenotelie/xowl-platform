@@ -24,7 +24,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
@@ -49,6 +49,7 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -122,7 +123,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     private Product loadProductDescriptor() {
         File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
         try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            String content = Files.read(stream, Files.CHARSET);
+            String content = IOUtils.read(stream, IOUtils.CHARSET);
             ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
             return new ProductBase(definition);
         } catch (IOException exception) {
@@ -139,8 +140,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         if (files != null) {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".descriptor")) {
-                    try (Reader reader = Files.getReader(files[i].getAbsolutePath())) {
-                        String content = Files.read(reader);
+                    try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
+                        String content = IOUtils.read(reader);
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                         if (definition == null) {
                             Logging.getDefault().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
@@ -375,28 +376,28 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             File fileDescriptor = new File(directory, "descriptor.json");
             if (!fileDescriptor.exists()) {
                 // delete the directory
-                Files.deleteFolder(directory);
+                IOUtils.deleteFolder(directory);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
             }
 
             Addon descriptor;
             try (InputStream stream = new FileInputStream(fileDescriptor)) {
-                String content = Files.read(stream, Files.CHARSET);
+                String content = IOUtils.read(stream, IOUtils.CHARSET);
                 ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                 if (definition == null) {
-                    Files.deleteFolder(directory);
+                    IOUtils.deleteFolder(directory);
                     return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
                 }
                 descriptor = new Addon(definition);
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
-                Files.deleteFolder(directory);
+                IOUtils.deleteFolder(directory);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
             }
 
             // check the identifier
             if (!Objects.equals(descriptor.getIdentifier(), identifier)) {
-                Files.deleteFolder(directory);
+                IOUtils.deleteFolder(directory);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
             }
             // check the presence of the bundles
@@ -404,7 +405,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             for (AddonBundle bundle : descriptor.getBundles()) {
                 File fileBundle = new File(directory, bundle.serializedString() + ".jar");
                 if (!fileBundle.exists()) {
-                    Files.deleteFolder(directory);
+                    IOUtils.deleteFolder(directory);
                     return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
                 }
                 fileBundles.add(fileBundle);
@@ -414,17 +415,17 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             // move the content
             try {
                 File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
-                java.nio.file.Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
+                Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
                 for (File file : fileBundles) {
-                    java.nio.file.Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
+                    Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
                 }
             } catch (IOException exception) {
                 Logging.getDefault().error(exception);
-                Files.deleteFolder(directory);
+                IOUtils.deleteFolder(directory);
                 return new XSPReplyException(exception);
             }
             // delete the folder
-            Files.deleteFolder(directory);
+            IOUtils.deleteFolder(directory);
             descriptor.setInstalled();
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)

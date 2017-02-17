@@ -22,7 +22,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
@@ -54,7 +54,7 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
         this.storage = storage;
         if (storage.exists()) {
             try (InputStream stream = new FileInputStream(storage)) {
-                String content = Files.read(stream, Files.CHARSET);
+                String content = IOUtils.read(stream, IOUtils.CHARSET);
                 ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
                 if (definition == null)
                     return;
@@ -72,7 +72,7 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
      */
     private XSPReply writeBack() {
         try (FileOutputStream stream = new FileOutputStream(storage)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, Files.CHARSET);
+            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
             writer.write(serializedJSON());
             writer.flush();
             writer.close();

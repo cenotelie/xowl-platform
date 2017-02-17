@@ -22,7 +22,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.loaders.JSONLDLoader;
-import org.xowl.infra.utils.Files;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -314,7 +314,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
                 }
                 case HttpConstants.METHOD_PUT: {
-                    String content = new String(request.getContent(), Files.CHARSET);
+                    String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
@@ -404,7 +404,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
                 }
                 case HttpConstants.METHOD_PUT: {
-                    String content = new String(request.getContent(), Files.CHARSET);
+                    String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
@@ -495,7 +495,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
                 }
                 case HttpConstants.METHOD_PUT: {
-                    String content = new String(request.getContent(), Files.CHARSET);
+                    String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
@@ -543,7 +543,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
                 }
                 case HttpConstants.METHOD_PUT: {
-                    String content = new String(request.getContent(), Files.CHARSET);
+                    String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();

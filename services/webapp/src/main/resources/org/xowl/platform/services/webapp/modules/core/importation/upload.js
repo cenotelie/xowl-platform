@@ -63,5 +63,5 @@ function onUpload() {
 	}
 	if (!onOperationRequest("Reading ..."))
 		return;
-	reader.readAsBinaryString(file);
+	reader.readAsArrayBuffer(file);
 }

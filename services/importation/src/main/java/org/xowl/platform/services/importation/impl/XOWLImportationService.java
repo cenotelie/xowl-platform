@@ -563,6 +563,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         }
         try (FileOutputStream stream = new FileOutputStream(fileContent)) {
             stream.write(content);
+            stream.flush();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write document in storage");

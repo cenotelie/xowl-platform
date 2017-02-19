@@ -53,9 +53,8 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
     public KernelSecurityPolicyConfiguration(File storage) {
         this.storage = storage;
         if (storage.exists()) {
-            try (InputStream stream = new FileInputStream(storage)) {
-                String content = IOUtils.read(stream, IOUtils.CHARSET);
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            try (Reader reader = IOUtils.getReader(storage)) {
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
                 if (definition == null)
                     return;
                 loadDefinition(definition, SecuredAction.getAll());

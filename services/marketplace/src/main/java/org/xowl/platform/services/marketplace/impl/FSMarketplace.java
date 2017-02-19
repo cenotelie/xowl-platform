@@ -26,10 +26,7 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Implements a static marketplace that is on the local file system
@@ -62,22 +59,17 @@ class FSMarketplace extends StaticMarketplace {
             Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
-        String content = null;
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = IOUtils.read(stream, IOUtils.CHARSET);
+        try (Reader reader = IOUtils.getReader(fileDescriptor)) {
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+            if (definition == null) {
+                Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+                return null;
+            }
+            return new MarketplaceDescriptor(definition);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-        }
-        if (content == null) {
-            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-        if (definition == null) {
-            Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
-            return null;
-        }
-        return new MarketplaceDescriptor(definition);
     }
 
     @Override
@@ -87,22 +79,17 @@ class FSMarketplace extends StaticMarketplace {
             Logging.getDefault().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
-        String content = null;
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            content = IOUtils.read(stream, IOUtils.CHARSET);
+        try (Reader reader = IOUtils.getReader(fileDescriptor)) {
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+            if (definition == null) {
+                Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+                return null;
+            }
+            return new Addon(definition);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
-        }
-        if (content == null) {
-            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
-        if (definition == null) {
-            Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
-            return null;
-        }
-        return new Addon(definition);
     }
 
     @Override

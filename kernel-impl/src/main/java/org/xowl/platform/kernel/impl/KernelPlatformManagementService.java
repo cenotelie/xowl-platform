@@ -122,9 +122,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      */
     private Product loadProductDescriptor() {
         File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
-        try (InputStream stream = new FileInputStream(fileDescriptor)) {
-            String content = IOUtils.read(stream, IOUtils.CHARSET);
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        try (Reader reader = IOUtils.getReader(fileDescriptor)) {
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
             return new ProductBase(definition);
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
@@ -381,9 +380,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             }
 
             Addon descriptor;
-            try (InputStream stream = new FileInputStream(fileDescriptor)) {
-                String content = IOUtils.read(stream, IOUtils.CHARSET);
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            try (Reader reader = IOUtils.getReader(fileDescriptor)) {
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
                 if (definition == null) {
                     IOUtils.deleteFolder(directory);
                     return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");

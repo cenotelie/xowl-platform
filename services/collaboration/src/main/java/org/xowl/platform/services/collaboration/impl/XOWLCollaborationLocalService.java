@@ -62,9 +62,8 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         this.fileManifest = new File(System.getenv(Env.ROOT), configuration.get("manifest"));
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
-            try (InputStream stream = new FileInputStream(fileManifest)) {
-                String content = IOUtils.read(stream, IOUtils.CHARSET);
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+            try (Reader reader = IOUtils.getReader(fileManifest)) {
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
                 if (definition != null)
                     manifest = new CollaborationManifest(definition);
             } catch (IOException exception) {

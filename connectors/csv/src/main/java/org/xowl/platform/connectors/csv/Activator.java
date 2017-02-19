@@ -20,6 +20,7 @@ package org.xowl.platform.connectors.csv;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.jobs.JobFactory;
+import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.services.connection.ConnectorDescriptor;
 import org.xowl.platform.services.connection.ConnectorServiceFactory;
@@ -34,6 +35,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         bundleContext.registerService(Importer.class, CSVImporter.INSTANCE, null);
+        bundleContext.registerService(SecuredService.class, CSVImporter.INSTANCE, null);
         bundleContext.registerService(JobFactory.class, new CSVimportationJobFactory(), null);
         bundleContext.registerService(ConnectorDescriptor.class, CSVConnectorDescriptor.INSTANCE, null);
         bundleContext.registerService(ConnectorServiceFactory.class, CSVConnectorFactory.INSTANCE, null);

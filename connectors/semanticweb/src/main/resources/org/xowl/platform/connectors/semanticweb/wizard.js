@@ -34,6 +34,7 @@ function init() {
 		}
 		document.getElementById("document-id").value = doc.identifier;
 		document.getElementById("document-name").value = doc.name;
+		document.getElementById("input-importer").value = importerId;
 	});
 }
 

@@ -84,8 +84,8 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
         this.name = specification.getName();
         this.uris = specification.getUris();
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
-        this.actionPull = new SecuredAction(identifier + ".Pull", name + " - Pull Artifact");
-        this.actionPush = new SecuredAction(identifier + ".Push", name + " - Push Artifact");
+        this.actionPull = new SecuredAction(identifier + ".Pull", "Connection Service - " + name + " - Pull Artifact");
+        this.actionPush = new SecuredAction(identifier + ".Push", "Connection Service - " + name + " - Push Artifact");
         this.actions = new SecuredAction[]{
                 actionPull,
                 actionPush

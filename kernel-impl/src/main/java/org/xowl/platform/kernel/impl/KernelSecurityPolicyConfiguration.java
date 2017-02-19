@@ -29,7 +29,10 @@ import org.xowl.platform.kernel.security.SecuredActionPolicy;
 import org.xowl.platform.kernel.security.SecuredActionPolicyDenyAll;
 import org.xowl.platform.kernel.security.SecurityPolicyConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -70,11 +73,9 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
      * @return The protocol reply
      */
     private XSPReply writeBack() {
-        try (FileOutputStream stream = new FileOutputStream(storage)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
+        try (Writer writer = IOUtils.getWriter(storage)) {
             writer.write(serializedJSON());
             writer.flush();
-            writer.close();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);
             return new XSPReplyException(exception);

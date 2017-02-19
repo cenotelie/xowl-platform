@@ -376,7 +376,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      */
     private XSPReply provisionWriteDescriptor(RemoteCollaborationManaged instance) {
         File fileDescriptor = new File(storageInstances, instance.getIdentifier() + ".json");
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileDescriptor), IOUtils.CHARSET)) {
+        try (Writer writer = IOUtils.getWriter(fileDescriptor)) {
             writer.write(instance.getDescriptor().serializedJSON());
             writer.flush();
         } catch (IOException exception) {
@@ -480,7 +480,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         // write the collaboration manifest
         File collaborationManifest = new File(instanceDirectory, "collaboration.json");
         CollaborationManifest manifest = new CollaborationManifest(instance.getIdentifier(), specification);
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(collaborationManifest), IOUtils.CHARSET)) {
+        try (Writer writer = IOUtils.getWriter(collaborationManifest)) {
             writer.write(manifest.serializedJSON());
             writer.flush();
         } catch (IOException exception) {

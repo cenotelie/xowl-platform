@@ -553,8 +553,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         Document document = new Document(name, fileName);
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
-        try (FileOutputStream stream = new FileOutputStream(fileDescriptor)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
+        try (Writer writer = IOUtils.getWriter(fileDescriptor)) {
             writer.write(document.serializedJSON());
             writer.flush();
         } catch (IOException exception) {
@@ -692,8 +691,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (storage == null)
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access configuration storage");
         File file = new File(storage, getConfigurationFile(configuration));
-        try (FileOutputStream stream = new FileOutputStream(file)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
+        try (Writer writer = IOUtils.getWriter(file)) {
             writer.write(configuration.serializedJSON());
             writer.flush();
         } catch (IOException exception) {

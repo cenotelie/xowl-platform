@@ -32,7 +32,10 @@ import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.collaboration.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -85,11 +88,9 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
      * @return The protocol reply
      */
     private XSPReply serializeManifest() {
-        try (OutputStream stream = new FileOutputStream(fileManifest)) {
-            OutputStreamWriter writer = new OutputStreamWriter(stream, IOUtils.CHARSET);
+        try (Writer writer = IOUtils.getWriter(fileManifest)) {
             writer.write(manifest.serializedJSON());
             writer.flush();
-            writer.close();
             return XSPReplySuccess.instance();
         } catch (IOException exception) {
             Logging.getDefault().error(exception);

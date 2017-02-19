@@ -51,8 +51,8 @@ public abstract class Importer implements SecuredService, Serializable {
      * Initializes this importer
      */
     protected Importer() {
-        this.actionPreview = new SecuredAction(getIdentifier() + ".Preview", getName() + " - Preview Import");
-        this.actionImport = new SecuredAction(getIdentifier() + ".Import", getName() + " - Do Import");
+        this.actionPreview = new SecuredAction(getIdentifier() + ".Preview", "Importation Service - " + getName() + " - Preview Import");
+        this.actionImport = new SecuredAction(getIdentifier() + ".Import", "Importation Service - " + getName() + " - Do Import");
         this.actions = new SecuredAction[]{
                 actionPreview,
                 actionImport

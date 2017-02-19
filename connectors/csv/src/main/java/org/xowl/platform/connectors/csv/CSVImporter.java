@@ -29,7 +29,6 @@ import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -72,7 +71,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + " - CSV Importer";
+        return "CSV Importer";
     }
 
     @Override

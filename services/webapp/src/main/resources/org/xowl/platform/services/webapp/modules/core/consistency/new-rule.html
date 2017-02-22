@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>New Consistency Rule</title>
+    <title>Consistency Management: New Rule</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -15,29 +15,37 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div>
+    <form class="form-horizontal">
         <div class="form-group">
-            <label for="input-name">Name</label>
-            <input type="text" class="form-control" id="input-name" placeholder="My Consistency Rule">
+            <label for="input-name" class="col-sm-2 control-label">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="input-name" placeholder="My Consistency Rule">
+            </div>
         </div>
         <div class="form-group">
-            <label for="input-message">Message</label>
+            <label for="input-message" class="col-sm-2 control-label">Message:</label>
+            <div class="col-sm-10">
             <textarea class="form-control" rows="2" id="input-message"
                       placeholder="While ?x has property p, it has not property q."
                       aria-describedby="input-message-help"></textarea>
-            <span id="input-message-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
+                <span id="input-message-help" class="help-block">Use string interpolation: if ?x is a variable bound in the conditions, ?x will be replaced by its value in the message.</span>
+            </div>
         </div>
         <div class="form-group">
-            <label for="input-prefixes">Prefixes</label>
-            <textarea class="form-control" rows="10" id="input-prefixes"></textarea>
+            <label for="input-prefixes" class="col-sm-2 control-label">Prefixes:</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10" id="input-prefixes"></textarea>
+            </div>
         </div>
         <div class="form-group">
-            <label for="input-conditions">Conditions</label>
-            <textarea class="form-control" rows="10" id="input-conditions"
-                      placeholder="?x rdf:type kernel:MyStuff"></textarea>
+            <label for="input-conditions" class="col-sm-2 control-label">Conditions:</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10" id="input-conditions"
+                          placeholder="?x rdf:type kernel:MyStuff"></textarea>
+            </div>
         </div>
         <a class="btn btn-primary" onclick="onClickNewRule()">Submit</a>
-    </div>
+    </form>
 </div>
 <div id="placeholder-footer"></div>
 

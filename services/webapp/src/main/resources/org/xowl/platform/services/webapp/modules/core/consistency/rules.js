@@ -7,7 +7,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
-			{name: "Consistency Rules"}], function() {
+			{name: "Rules"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getConsistencyRules(function (status, ct, content) {
@@ -19,6 +19,9 @@ function init() {
 }
 
 function renderRules(rules) {
+	rules.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
 	var table = document.getElementById("rules");
 	for (var i = 0; i != rules.length; i++) {
 		table.appendChild(renderRule(rules[i], i));

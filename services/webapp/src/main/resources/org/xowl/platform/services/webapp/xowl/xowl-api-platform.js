@@ -1390,7 +1390,7 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -1400,7 +1400,7 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -1410,7 +1410,7 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}

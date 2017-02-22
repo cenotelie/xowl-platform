@@ -8,7 +8,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
-			{name: "Consistency Rule " + ruleId}], function() {
+			{name: "Rule " + ruleId}], function() {
 		if (!ruleId || ruleId === null || ruleId === "")
 			return;
 		if (!onOperationRequest("Loading ..."))

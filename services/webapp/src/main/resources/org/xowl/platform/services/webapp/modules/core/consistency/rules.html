@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Consistency Rules</title>
+    <title>Consistency Management: Rules</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -15,19 +15,33 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div><a class="btn" href="new-rule.html">New consistency rule</a></div>
-    <table class="table table-bordered table-hover">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Rule</th>
-            <th>Active</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody id="rules">
-        </tbody>
-    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <img src="../../../assets/rule.svg" width="30" height="30"/>
+                        <a class="btn" href="new-rule.html">New consistency rule</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Rule</th>
+                    <th>Active</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="rules">
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

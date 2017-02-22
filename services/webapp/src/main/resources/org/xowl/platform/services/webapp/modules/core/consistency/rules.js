@@ -26,7 +26,7 @@ function renderRules(rules) {
 	for (var i = 0; i != rules.length; i++) {
 		table.appendChild(renderRule(rules[i], i));
 	}
-	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rules));
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(rules));
 }
 
 function renderRule(rule, index) {
@@ -82,6 +82,7 @@ function renderRule(rule, index) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rule));
+	button.download = rule.name + ".json";
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;

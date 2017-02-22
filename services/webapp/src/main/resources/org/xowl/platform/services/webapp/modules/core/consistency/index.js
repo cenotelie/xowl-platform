@@ -25,7 +25,7 @@ function renderInconsistencies(inconsistencies) {
 	for (var i = 0; i != inconsistencies.length; i++) {
 		table.appendChild(renderInconsistency(inconsistencies[i], i));
 	}
-	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(inconsistencies));
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(inconsistencies));
 }
 
 function renderInconsistency(inconsistency, index) {

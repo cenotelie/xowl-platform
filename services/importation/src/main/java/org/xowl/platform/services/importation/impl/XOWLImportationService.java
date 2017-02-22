@@ -689,7 +689,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         if (storage == null)
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access configuration storage");
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
+        if (!storage.exists() && !storage.mkdirs())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         File file = new File(storage, getConfigurationFile(configuration));
         try (Writer writer = IOUtils.getWriter(file)) {
             writer.write(configuration.serializedJSON());

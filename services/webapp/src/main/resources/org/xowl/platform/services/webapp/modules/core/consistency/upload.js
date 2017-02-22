@@ -60,10 +60,10 @@ function onRead(input) {
 function doImport(definition) {
 	if (!onOperationRequest("Importing rule " + definition.name + " ..."))
 		return false;
-	xowl.newConsistencyRule(function (status, ct, content) {
+	xowl.addConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created rule ", content, "."]});
 			waitAndGo("rules.html");
 		}
-	}, definition.name, message, prefixes, conditions);
+	}, definition);
 }

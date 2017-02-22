@@ -52,18 +52,23 @@ function onRead(input) {
 	if (!Array.isArray(definitions)) {
 		definitions = [definitions];
 	}
-	for (var i = 0; i != definitions.length; i++) {
-		doImport(definitions[i]);
-	}
+	doImport(definitions, 0);
 }
 
-function doImport(definition) {
+function doImport(definitions, index) {
+	if (index >= definitions.length)
+		return;
+	var definition = definitions[index];
 	if (!onOperationRequest("Importing configuration " + definition.name + " ..."))
 		return false;
 	xowl.storeImporterConfiguration(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported configuration " + definition.name + "."]});
-			waitAndGo("configurations.html");
+			if (index < definitions.length) {
+				doImport(definitions, index + 1);
+			} else {
+				waitAndGo("configurations.html");
+			}
 		}
 	}, definition);
 }

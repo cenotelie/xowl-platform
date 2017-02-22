@@ -52,18 +52,23 @@ function onRead(input) {
 	if (!Array.isArray(definitions)) {
 		definitions = [definitions];
 	}
-	for (var i = 0; i != definitions.length; i++) {
-		doImport(definitions[i]);
-	}
+	doImport(definitions, 0);
 }
 
-function doImport(definition) {
+function doImport(definitions, index) {
+	if (index >= definitions.length)
+		return;
+	var definition = definitions[index];
 	if (!onOperationRequest("Importing rule " + definition.name + " ..."))
 		return false;
 	xowl.addConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created rule ", content, "."]});
-			waitAndGo("rules.html");
+			if (index < definitions.length) {
+				doImport(definitions, index + 1);
+			} else {
+				waitAndGo("rules.html");
+			}
 		}
 	}, definition);
 }

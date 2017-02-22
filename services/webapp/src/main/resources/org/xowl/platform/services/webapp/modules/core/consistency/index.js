@@ -18,6 +18,9 @@ function init() {
 }
 
 function renderInconsistencies(inconsistencies) {
+	rules.sort(function (x, y) {
+		return x.ruleName.localeCompare(y.ruleName);
+	});
 	var table = document.getElementById("inconsistencies");
 	for (var i = 0; i != inconsistencies.length; i++) {
 		table.appendChild(renderInconsistency(inconsistencies[i], i));

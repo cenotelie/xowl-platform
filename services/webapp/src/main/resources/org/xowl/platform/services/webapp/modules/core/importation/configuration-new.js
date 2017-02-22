@@ -64,7 +64,7 @@ function doImport(definitions, index) {
 	xowl.storeImporterConfiguration(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported configuration " + definition.name + "."]});
-			if (index < definitions.length) {
+			if (index + 1 < definitions.length) {
 				doImport(definitions, index + 1);
 			} else {
 				waitAndGo("configurations.html");

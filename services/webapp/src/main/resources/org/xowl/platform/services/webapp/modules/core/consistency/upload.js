@@ -64,7 +64,7 @@ function doImport(definitions, index) {
 	xowl.addConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created rule ", content, "."]});
-			if (index < definitions.length) {
+			if (index + 1 < definitions.length) {
 				doImport(definitions, index + 1);
 			} else {
 				waitAndGo("rules.html");

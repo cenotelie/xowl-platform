@@ -8,6 +8,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
+			{name: "Rules", uri: ROOT + "/modules/core/consistency/rules.html"},
 			{name: "Rule " + ruleId}], function() {
 		if (!ruleId || ruleId === null || ruleId === "")
 			return;

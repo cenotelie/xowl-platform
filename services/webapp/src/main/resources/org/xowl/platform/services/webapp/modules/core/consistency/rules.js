@@ -26,6 +26,7 @@ function renderRules(rules) {
 	for (var i = 0; i != rules.length; i++) {
 		table.appendChild(renderRule(rules[i], i));
 	}
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rules));
 }
 
 function renderRule(rule, index) {
@@ -76,11 +77,11 @@ function renderRule(rule, index) {
 	image.width = 20;
 	image.height = 20;
 	image.title = "DOWNLOAD";
-	button = document.createElement("span");
+	button = document.createElement("a");
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(image);
-	button.onclick = function (evt) { onDownloadDefinition(rule); };
+	button.href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rule));
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
@@ -137,10 +138,4 @@ function onDeleteRule(rule) {
 			waitAndRefresh();
 		}
 	}, rule.identifier);
-}
-
-function onDownloadDefinition(rule) {
-}
-
-function onClickDownload() {
 }

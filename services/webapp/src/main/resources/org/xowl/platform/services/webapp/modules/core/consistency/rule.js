@@ -26,4 +26,5 @@ function render(rule) {
 	document.getElementById("rule-name").value = rule.name;
 	document.getElementById("rule-active").value = rule.isActive ? "YES" : "NO";
 	document.getElementById("rule-def").value = rule.definition;
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rule));
 }

@@ -7,6 +7,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
+			{name: "Rules", uri: ROOT + "/modules/core/consistency/rules.html"},
 			{name: "New Rule"}], function() {});
 	var prefixes = "";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {

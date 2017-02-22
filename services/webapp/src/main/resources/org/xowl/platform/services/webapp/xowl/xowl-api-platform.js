@@ -1387,6 +1387,16 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 	}, "PUT", "application/x-xowl-rdft", conditions);
 }
 
+XOWL.prototype.addConsistencyRule = function (callback, rule) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/rules/" + encodeURIComponent(rule.identifier), null, "PUT", MIME_JSON, rule);
+}
+
 XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

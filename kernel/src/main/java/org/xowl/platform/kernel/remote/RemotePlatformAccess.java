@@ -17,6 +17,7 @@
 
 package org.xowl.platform.kernel.remote;
 
+import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyResult;
@@ -1530,6 +1531,18 @@ public class RemotePlatformAccess extends HttpConnection {
                 Repository.SYNTAX_RDFT,
                 false,
                 HttpConstants.MIME_JSON);
+    }
+
+    /**
+     * Adds a new consistency rule
+     *
+     * @param rule The consistency rule to add
+     * @return The protocol reply
+     */
+    public XSPReply addConsistencyRule(XOWLRule rule) {
+        return doRequest("/services/consistency/rules/" + URIUtils.encodeComponent(rule.getName()),
+                HttpConstants.METHOD_PUT,
+                rule);
     }
 
     /**

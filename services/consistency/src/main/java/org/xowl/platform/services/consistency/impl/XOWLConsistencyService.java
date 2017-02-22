@@ -17,10 +17,12 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IRIs;
 import org.xowl.infra.store.Vocabulary;
+import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
 import org.xowl.infra.store.loaders.RDFTLoader;
 import org.xowl.infra.store.rdf.*;
@@ -36,6 +38,7 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
@@ -223,12 +226,24 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                             return XSPReplyUtils.toHttpResponse(reply, null);
                         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());
                     }
+                    case HttpConstants.METHOD_PUT: {
+                        String content = new String(request.getContent(), IOUtils.CHARSET);
+                        if (content.isEmpty())
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+                        if (definition == null)
+                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+                        ConsistencyRule rule = new XOWLConsistencyRule(definition);
+                        if (!ruleId.equals(rule.getIdentifier()))
+                            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+                        return XSPReplyUtils.toHttpResponse(addRule(rule), null);
+                    }
                     case HttpConstants.METHOD_DELETE: {
                         XSPReply reply = deleteRule(ruleId);
                         return XSPReplyUtils.toHttpResponse(reply, null);
                     }
                 }
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
             } else {
                 switch (rest.substring(index)) {
                     case "/activate": {

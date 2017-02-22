@@ -17,7 +17,9 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.server.base.BaseRule;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.consistency.ConsistencyRule;
 
@@ -44,6 +46,51 @@ class XOWLConsistencyRule implements ConsistencyRule {
      */
     public XOWLConsistencyRule(XOWLRule original, String name) {
         this.original = original;
+        this.name = name;
+    }
+
+    /**
+     * Initializes this rule
+     *
+     * @param root The rule's definition
+     */
+    public XOWLConsistencyRule(ASTNode root) {
+        String identifier = null;
+        String name = null;
+        String definition = null;
+        boolean isActive = false;
+        for (ASTNode child : root.getChildren()) {
+            ASTNode nodeMemberName = child.getChildren().get(0);
+            String keyName = TextUtils.unescape(nodeMemberName.getValue());
+            keyName = keyName.substring(1, keyName.length() - 1);
+            switch (keyName) {
+                case "identifier": {
+                    ASTNode nodeValue = child.getChildren().get(1);
+                    String value = TextUtils.unescape(nodeValue.getValue());
+                    identifier = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "name": {
+                    ASTNode nodeValue = child.getChildren().get(1);
+                    String value = TextUtils.unescape(nodeValue.getValue());
+                    name = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "definition": {
+                    ASTNode nodeValue = child.getChildren().get(1);
+                    String value = TextUtils.unescape(nodeValue.getValue());
+                    definition = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "isActive": {
+                    ASTNode nodeValue = child.getChildren().get(1);
+                    String value = TextUtils.unescape(nodeValue.getValue());
+                    isActive = value.equalsIgnoreCase("true");
+                    break;
+                }
+            }
+        }
+        this.original = new BaseRule(identifier, definition, isActive);
         this.name = name;
     }
 

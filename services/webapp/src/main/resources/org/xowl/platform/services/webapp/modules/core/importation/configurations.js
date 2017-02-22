@@ -77,6 +77,7 @@ function renderConfiguration(configuration) {
 	var button = document.createElement("span");
 	button.classList.add("btn");
 	button.classList.add("btn-default");
+	button.style.marginRight = "20px";
 	button.appendChild(image);
 	button.onclick = function() { deleteConfiguration(configuration); };
 	cell.appendChild(button);

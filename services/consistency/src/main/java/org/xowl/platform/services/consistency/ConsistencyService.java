@@ -87,6 +87,14 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
     XSPReply createRule(String name, String message, String prefixes, String conditions);
 
     /**
+     * Adds the specified consistency rule
+     *
+     * @param rule The consistency rule to add
+     * @return The operation's result
+     */
+    XSPReply addRule(ConsistencyRule rule);
+
+    /**
      * Activates a rule
      *
      * @param identifier The identifier of a rule

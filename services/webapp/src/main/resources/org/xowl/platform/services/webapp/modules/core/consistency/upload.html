@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Consistency Management: Upload Rules</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="input-file" class="col-sm-2 control-label">File to upload:</label>
+            <div class="col-sm-10">
+                <input type="file" id="input-file" name="input-file"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="import-progress" class="col-sm-2 control-label">Upload progress:</label>
+            <div class="col-sm-10">
+                <div class="progress">
+                    <div id="import-progress" class="progress-bar" role="progressbar" aria-valuenow="0"
+                         aria-valuemin="0" aria-valuemax="100"
+                         style="min-width: 2em;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" onclick="onUpload()">Submit</button>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="upload.js"></script>
+<script>init();</script>
+</body>
+
+</html>

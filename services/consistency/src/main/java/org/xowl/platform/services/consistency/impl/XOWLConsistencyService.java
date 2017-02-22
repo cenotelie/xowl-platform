@@ -488,6 +488,28 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
+    public XSPReply addRule(ConsistencyRule rule) {
+        StorageService storageService = Register.getComponent(StorageService.class);
+        if (storageService == null)
+            return XSPReplyServiceUnavailable.instance();
+        TripleStore live = storageService.getLiveStore();
+        XSPReply reply = live.addRule(rule.getDefinition(), rule.isActive());
+        if (!reply.isSuccess())
+            return reply;
+        Result result = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
+                "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
+                "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(rule.getUserName()) + "\" ." +
+                "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(rule.getDefinition()) + "\" ." +
+                "} }");
+        if (!result.isSuccess())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
+        return new XSPReplyResult<>(rule);
+    }
+
+    @Override
     public XSPReply activateRule(String identifier) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)

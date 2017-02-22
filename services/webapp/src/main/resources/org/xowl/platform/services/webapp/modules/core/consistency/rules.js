@@ -81,7 +81,7 @@ function renderRule(rule, index) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(image);
-	button.href = "data:" + MIME_JSON + ";charset=utf-8;base64," + btoa(JSON.stringify(rule));
+	button.href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(rule));
 	button.download = rule.name + ".json";
 	cell.appendChild(button);
 	row.appendChild(cell);

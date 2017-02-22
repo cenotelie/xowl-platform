@@ -15,17 +15,36 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <table class="table table-bordered table-hover">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Importer</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="configurations">
-        </tbody>
-    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/import.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" href="configuration-new.html">Upload configuration(s)</a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/action-download.svg" width="30" height="30"
+                             style="margin-left: 20px;"/>
+                        <a class="btn" id="btn-download" download="rules.json">Download all configurations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Importer</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="configurations">
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

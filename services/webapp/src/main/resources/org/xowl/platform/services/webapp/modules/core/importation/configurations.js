@@ -47,6 +47,7 @@ function doRender() {
 		var row = renderConfiguration(configurations[i]);
 		table.appendChild(row);
 	}
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(configurations));
 }
 
 function renderConfiguration(configuration) {
@@ -78,6 +79,18 @@ function renderConfiguration(configuration) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.onclick = function() { deleteConfiguration(configuration); };
+	cell.appendChild(button);
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/action-download.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "DOWNLOAD";
+	button = document.createElement("a");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	button.href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(configuration));
+	button.download = configuration.name + ".json";
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;

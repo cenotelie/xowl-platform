@@ -24,7 +24,7 @@ import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.artifacts.*;
+import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
@@ -111,10 +111,6 @@ public class Activator implements BundleActivator {
 
         // register the directory service
         KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
-        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);
-        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);
-        bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeSchema.INSTANCE, null);
-        bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeFree.INSTANCE, null);
         bundleContext.registerService(Service.class, directoryService, null);
         bundleContext.registerService(HttpApiService.class, directoryService, null);
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);

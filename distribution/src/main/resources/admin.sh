@@ -45,7 +45,7 @@ start () {
 
 doStart () {
   echo "==== xOWL Platform Startup ====" >> "$DISTRIBUTION/platform.log"
-  echo "xOWL Server starting ..."
+  echo "xOWL Platform starting ..."
   sh "$DISTRIBUTION/do-run.sh" "$DISTRIBUTION" &
   PROCESS_ID="$!"
   echo "$PROCESS_ID" > "$DISTRIBUTION/xowl-platform.pid"

@@ -19,6 +19,7 @@ package org.xowl.platform.kernel;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.remote.DeserializerFactory;
 import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
 
@@ -32,6 +33,11 @@ public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
+
+        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);
+        bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);
+        bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeSchema.INSTANCE, null);
+        bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeFree.INSTANCE, null);
     }
 
     @Override

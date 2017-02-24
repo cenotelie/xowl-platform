@@ -34,6 +34,6 @@ public class ArtifactSchemaKernel extends ArtifactSchemaFromResource {
      * Initializes this schema
      */
     private ArtifactSchemaKernel() {
-        super(KernelSchema.class, "/org/xowl/platform/kernel/kernel.fs", KernelSchema.URI_KERNEL);
+        super(KernelSchema.class, "/org/xowl/platform/kernel/schema.fs", KernelSchema.URI_KERNEL);
     }
 }

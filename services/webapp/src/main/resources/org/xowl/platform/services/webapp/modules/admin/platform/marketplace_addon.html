@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Platform Marketplace</title>
+    <title>Platform Marketplace: Addon</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -15,15 +15,19 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <button class="btn btn-success" id="button-shutdown" onclick="onClickInstall()">
-                Install this addon
-            </button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <img src="../../../assets/addon.svg" width="30" height="30"/>
+                        <a class="btn" onclick="onClickInstall()">Install this addon</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
+        <div class="row">
             <form class="form-horizontal">
                 <div class="form-group">
                     <label for="field-identifier" class="col-sm-2 control-label">Identifier:</label>

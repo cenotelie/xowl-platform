@@ -15,15 +15,18 @@
 <body>
 <div id="placeholder-header"></div>
 <div class="body">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <button class="btn btn-danger" id="button-shutdown" onclick="onClickUninstall()">
-                Uninstall this addon
-            </button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-remove.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onClickUninstall()">Uninstall this addon</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body">
+        <div class="row">
             <form class="form-horizontal">
                 <div class="form-group">
                     <label for="field-identifier" class="col-sm-2 control-label">Identifier:</label>

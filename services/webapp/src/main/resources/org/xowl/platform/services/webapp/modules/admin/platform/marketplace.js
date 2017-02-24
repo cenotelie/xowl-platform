@@ -8,25 +8,7 @@ function init() {
 			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Management", uri: ROOT + "/modules/admin/platform/"},
 			{name: "Platform Marketplace"}], function() {
-		doGetData();
 	});
-}
-
-function doGetData() {
-
-}
-
-function renderCategories(categories) {
-	categories.sort(function (x, y) {
-		return x.identifier.localeCompare(y.name);
-	});
-	var table = document.getElementById("input-category");
-	for (var i = 0; i != categories.length; i++) {
-		var option = document.createElement("option");
-		option.value = categories[i].identifier;
-		option.appendChild(document.createTextNode(categories[i].name));
-		table.appendChild(option);
-	}
 }
 
 function onClickSearch() {

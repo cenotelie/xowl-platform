@@ -71,7 +71,7 @@ public class SemanticWebImporter extends Importer {
 
     @Override
     public String getName() {
-        return "Semantic Web Importer";
+        return "xOWL - Semantic Web Importer";
     }
 
     @Override

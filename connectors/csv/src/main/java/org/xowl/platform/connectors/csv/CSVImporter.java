@@ -71,7 +71,7 @@ public class CSVImporter extends Importer {
 
     @Override
     public String getName() {
-        return "CSV Importer";
+        return "xOWL - CSV Importer";
     }
 
     @Override

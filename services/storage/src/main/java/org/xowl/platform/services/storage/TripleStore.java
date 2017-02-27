@@ -19,7 +19,6 @@ package org.xowl.platform.services.storage;
 
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.store.sparql.Result;
 import org.xowl.platform.kernel.artifacts.Artifact;
 
 /**
@@ -28,14 +27,6 @@ import org.xowl.platform.kernel.artifacts.Artifact;
  * @author Laurent Wouters
  */
 public interface TripleStore extends XOWLDatabase {
-    /**
-     * Executes a SPARQL command on the triple store
-     *
-     * @param query The SPARQL command
-     * @return The result
-     */
-    Result sparql(String query);
-
     /**
      * Gets the artifacts in this store
      *

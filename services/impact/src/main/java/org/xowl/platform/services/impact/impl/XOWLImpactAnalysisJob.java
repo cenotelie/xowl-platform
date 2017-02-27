@@ -194,7 +194,12 @@ class XOWLImpactAnalysisJob extends JobBase {
             builder.append(TextUtils.escapeAbsoluteURIW3C(parts.get(i).getNode().getIRIValue()));
             builder.append(">");
         }
-        Result result = live.sparql(builder.toString());
+        XSPReply reply = live.sparql(builder.toString(), null, null);
+        if (!reply.isSuccess()) {
+            Logging.getDefault().error(reply.getMessage());
+            return 0;
+        }
+        Result result = ((XSPReplyResult<Result>) reply).getData();
         if (!result.isSuccess()) {
             Logging.getDefault().error(((ResultFailure) result).getMessage());
             return 0;

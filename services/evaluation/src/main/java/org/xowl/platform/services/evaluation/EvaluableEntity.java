@@ -76,25 +76,30 @@ public class EvaluableEntity implements Evaluable {
             this.name = identifier;
         } else {
             String name = null;
-            Result sparqlResult = storageService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
+            XSPReply reply = storageService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
                     TextUtils.escapeAbsoluteURIW3C(artifactId) +
                     "> { <" +
                     TextUtils.escapeAbsoluteURIW3C(elementURI) +
-                    "> ?p ?o } }");
-            if (!sparqlResult.isSuccess()) {
+                    "> ?p ?o } }", null, null);
+            if (!reply.isSuccess()) {
                 name = elementURI;
             } else {
-                for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
-                    String property = ((IRINode) solution.get("p")).getIRIValue();
-                    if (KernelSchema.NAME.equals("name") || property.equals(Vocabulary.rdfs + "label") || property.endsWith("#name") || property.endsWith("#title")) {
-                        name = ((LiteralNode) solution.get("o")).getLexicalValue();
-                        break;
-                    }
-                }
-                if (name == null)
+                Result result = ((XSPReplyResult<Result>) reply).getData();
+                if (result.isFailure()) {
                     name = elementURI;
+                } else {
+                    for (RDFPatternSolution solution : ((ResultSolutions) result).getSolutions()) {
+                        String property = ((IRINode) solution.get("p")).getIRIValue();
+                        if (KernelSchema.NAME.equals("name") || property.equals(Vocabulary.rdfs + "label") || property.endsWith("#name") || property.endsWith("#title")) {
+                            name = ((LiteralNode) solution.get("o")).getLexicalValue();
+                            break;
+                        }
+                    }
+                    if (name == null)
+                        name = elementURI;
+                }
             }
-            XSPReply reply = artifactStorageService.retrieve(artifactId);
+            reply = artifactStorageService.retrieve(artifactId);
             if (reply.isSuccess()) {
                 Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
                 name += " in " + artifact.getName() + " (" + artifact.getVersion() + ")";

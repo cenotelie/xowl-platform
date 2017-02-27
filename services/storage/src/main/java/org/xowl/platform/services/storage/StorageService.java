@@ -114,6 +114,19 @@ public interface StorageService extends ArtifactStorageService, MeasurableServic
     };
 
     /**
+     * The identifier of the live store
+     */
+    String STORE_ID_LIVE = "live";
+    /**
+     * The identifier of the long-term store
+     */
+    String STORE_ID_LONG_TERM = "longTerm";
+    /**
+     * The identifier of the service store
+     */
+    String STORE_ID_SERVICE = "service";
+
+    /**
      * Gets the live store that contains the currently active artifacts
      * Reasoning is expected to be activated on this store.
      * This store cannot be expected to be persistent.

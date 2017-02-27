@@ -404,23 +404,6 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
     }
 
     @Override
-    public Result sparql(String query) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return new ResultFailure("Service unavailable");
-        XSPReply reply = securityService.checkAction(StorageService.ACTION_UPLOAD_RAW);
-        if (!reply.isSuccess())
-            return new ResultFailure(reply.getMessage());
-        XOWLDatabase connection = getBackend();
-        if (connection == null)
-            return new ResultFailure("The connection to the remote host is not configured");
-        reply = connection.sparql(query, null, null);
-        if (!reply.isSuccess())
-            return new ResultFailure(reply.getMessage());
-        return ((XSPReplyResult<Result>) reply).getData();
-    }
-
-    @Override
     public XSPReply getArtifacts() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
@@ -495,7 +478,10 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         XSPReply reply = securityService.checkAction(ArtifactStorageService.ACTION_RETRIEVE_METADATA);
         if (!reply.isSuccess())
             return reply;
-        Result result = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">");
+        reply = sparql("DESCRIBE <" + TextUtils.escapeAbsoluteURIW3C(identifier) + ">", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result result = ((XSPReplyResult<Result>) reply).getData();
         if (result.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
         Collection<Quad> metadata = ((ResultQuads) result).getQuads();
@@ -520,7 +506,10 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
         writer.write("> ?p ?o } }; DROP SILENT GRAPH <");
         writer.write(TextUtils.escapeAbsoluteURIW3C(identifier));
         writer.write(">");
-        Result result = sparql(writer.toString());
+        reply = sparql(writer.toString(), null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result result = ((XSPReplyResult<Result>) reply).getData();
         if (result.isSuccess())
             return XSPReplySuccess.instance();
         return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());

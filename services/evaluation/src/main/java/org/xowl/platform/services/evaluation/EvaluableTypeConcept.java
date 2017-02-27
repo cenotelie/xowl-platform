@@ -19,6 +19,7 @@ package org.xowl.platform.services.evaluation;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
@@ -82,7 +83,10 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
                 "\" } . GRAPH ?a { ?e a <" +
                 TextUtils.escapeAbsoluteURIW3C(conceptyURI) +
                 "> } }";
-        Result sparqlResult = storageService.getLongTermStore().sparql(query);
+        XSPReply reply = storageService.getLongTermStore().sparql(query, null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<Evaluable> result = new ArrayList<>();

@@ -27,7 +27,6 @@ import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
@@ -113,19 +112,19 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         Configuration configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/storage";
         this.server = resolveServer(configuration);
-        this.storeLive = new XOWLFederationStore(configuration.get("databases", "live")) {
+        this.storeLive = new XOWLFederationStore(configuration.get("databases", STORE_ID_LIVE)) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStorageService.this.resolveRemote(this.getName());
             }
         };
-        this.storeLongTerm = new XOWLFederationStore(configuration.get("databases", "longTerm")) {
+        this.storeLongTerm = new XOWLFederationStore(configuration.get("databases", STORE_ID_LONG_TERM)) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStorageService.this.resolveRemote(this.getName());
             }
         };
-        this.storeService = new XOWLFederationStore(configuration.get("databases", "service")) {
+        this.storeService = new XOWLFederationStore(configuration.get("databases", STORE_ID_SERVICE)) {
             @Override
             protected XOWLDatabase resolveBackend() {
                 return XOWLStorageService.this.resolveRemote(this.getName());
@@ -153,14 +152,14 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             try {
                 String location = (new File(System.getenv(Env.ROOT), configuration.get("embedded", "location"))).getAbsolutePath();
                 XOWLServer server = new EmbeddedServer(Logging.getDefault(), new ServerConfiguration(location));
-                XSPReply reply = server.getDatabase(configuration.get("databases", "live"));
+                XSPReply reply = server.getDatabase(configuration.get("databases", STORE_ID_LIVE));
                 if (!reply.isSuccess()) {
                     // initialize
-                    if (!server.createDatabase(configuration.get("databases", "live")).isSuccess())
+                    if (!server.createDatabase(configuration.get("databases", STORE_ID_LIVE)).isSuccess())
                         return null;
-                    if (!server.createDatabase(configuration.get("databases", "longTerm")).isSuccess())
+                    if (!server.createDatabase(configuration.get("databases", STORE_ID_LONG_TERM)).isSuccess())
                         return null;
-                    if (!server.createDatabase(configuration.get("databases", "service")).isSuccess())
+                    if (!server.createDatabase(configuration.get("databases", STORE_ID_SERVICE)).isSuccess())
                         return null;
                 }
                 return server;
@@ -558,8 +557,21 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);
         String sparql = new String(request.getContent(), IOUtils.CHARSET);
-        Result result = storeLive.sparql(sparql);
-        return XSPReplyUtils.toHttpResponse(new XSPReplyResult<>(result), Arrays.asList(accept));
+
+        String storeId = request.getParameter("store");
+        XOWLFederationStore store = storeLive;
+        if (storeId != null) {
+            if (STORE_ID_LIVE.equals(storeId)) {
+                store = storeLive;
+            } else if (STORE_ID_LONG_TERM.equals(storeId)) {
+                store = storeLongTerm;
+            } else if (STORE_ID_SERVICE.equals(storeId)) {
+                store = storeService;
+            }
+        }
+
+        XSPReply reply = store.sparql(sparql, null, null);
+        return XSPReplyUtils.toHttpResponse(reply, Arrays.asList(accept));
     }
 
     /**

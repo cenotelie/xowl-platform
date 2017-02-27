@@ -318,13 +318,16 @@ class XOWLEvaluation implements Evaluation {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        Result sparqlResult = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
+        XSPReply reply = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
                 TextUtils.escapeAbsoluteURIW3C(EVALUATION) +
                 "> . ?a <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
-                "> ?n } }");
+                "> ?n } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
         if (!sparqlResult.isSuccess())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<EvaluationReference> result = new ArrayList<>();

@@ -310,7 +310,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         Collection<XOWLRule> rules = new ArrayList<>(((XSPReplyResultCollection<XOWLRule>) reply).getData());
-        Result sparqlResult = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
+        reply = live.sparql("SELECT DISTINCT ?r ?n ?d WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { ?r a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_RULE) +
@@ -318,8 +318,11 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
                 "> ?n . ?r <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) +
-                "> ?d } }");
-        if (!sparqlResult.isSuccess())
+                "> ?d } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         Collection<XOWLConsistencyRule> result = new ArrayList<>();
@@ -348,14 +351,17 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
-        Result result = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
+        reply = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
-                "> } }");
-        if (!result.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
-        Collection<Quad> quads = ((ResultQuads) result).getQuads();
+                "> } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+        Collection<Quad> quads = ((ResultQuads) sparqlResult).getQuads();
         Map<SubjectNode, Collection<Quad>> map = PlatformUtils.mapBySubject(quads);
         Collection<XOWLInconsistency> inconsistencies = new ArrayList<>();
         for (Map.Entry<SubjectNode, Collection<Quad>> entry : map.entrySet()) {
@@ -395,14 +401,17 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (storageService == null)
             return -1;
         TripleStore live = storageService.getLiveStore();
-        Result result = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
+        XSPReply reply = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_INCONSISTENCY) +
-                "> } }");
-        if (!result.isSuccess())
+                "> } }", null, null);
+        if (!reply.isSuccess())
             return -1;
-        RDFPatternSolution solution = ((ResultSolutions) result).getSolutions().iterator().next();
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return -1;
+        RDFPatternSolution solution = ((ResultSolutions) sparqlResult).getSolutions().iterator().next();
         return Integer.parseInt(((LiteralNode) solution.get("c")).getLexicalValue());
     }
 
@@ -416,7 +425,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
-        Result sparqlResult = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
+        reply = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { <" +
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
@@ -426,8 +435,11 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
                 "> <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) +
-                "> ?n . } }");
-        if (!sparqlResult.isSuccess())
+                "> ?n . } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
@@ -488,13 +500,16 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (!reply.isSuccess())
             return reply;
         XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
-        Result result = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
+        reply = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
                 "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
                 "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(name) + "\" ." +
                 "<" + TextUtils.escapeAbsoluteURIW3C(id) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(definition) + "\" ." +
-                "} }");
-        if (!result.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
+                "} }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
@@ -511,13 +526,16 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = live.addRule(rule.getDefinition(), rule.isActive());
         if (!reply.isSuccess())
             return reply;
-        Result result = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
+        reply = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
                 "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
                 "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(rule.getUserName()) + "\" ." +
                 "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(rule.getDefinition()) + "\" ." +
-                "} }");
-        if (!result.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
+                "} }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
@@ -605,13 +623,16 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         reply = live.removeRule(rule);
         if (!reply.isSuccess())
             return reply;
-        Result result = live.sparql("DELETE WHERE { GRAPH <" +
+        reply = live.sparql("DELETE WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { <" +
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
-                "> ?p ?o } }");
-        if (!result.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
+                "> ?p ?o } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
@@ -627,13 +648,16 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = live.removeRule(rule);
         if (!reply.isSuccess())
             return reply;
-        Result result = live.sparql("DELETE WHERE { GRAPH <" +
+        reply = live.sparql("DELETE WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) +
                 "> { <" +
                 TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) +
-                "> ?p ?o } }");
-        if (!result.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) result).getMessage());
+                "> ?p ?o } }", null, null);
+        if (!reply.isSuccess())
+            return reply;
+        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        if (sparqlResult.isFailure())
+            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));

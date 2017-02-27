@@ -1051,6 +1051,12 @@ XOWL.prototype.sparql = function (callback, payload) {
 	}, "services/storage/sparql", null, "POST", "application/sparql-query", payload);
 }
 
+XOWL.prototype.sparqlOn = function (callback, payload, store) {
+	this.doRequest(function (code, type, content) {
+		callback(code, type, content);
+	}, "services/storage/sparql", {store: store}, "POST", "application/sparql-query", payload);
+}
+
 XOWL.prototype.getAllArtifacts = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

@@ -1147,6 +1147,22 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Executes a SPARQL query against a RDF store
+     *
+     * @param query The SPARQL query
+     * @param store The identifier of the RDF store
+     * @return The protocol reply
+     */
+    public XSPReply sparql(String query, String store) {
+        return doRequest("/services/storage/sparql?store=" + URIUtils.encodeComponent(store),
+                HttpConstants.METHOD_POST,
+                query.getBytes(IOUtils.CHARSET),
+                Command.MIME_SPARQL_QUERY,
+                false,
+                HttpConstants.MIME_JSON);
+    }
+
+    /**
      * Gets a description of all the stored artifacts
      *
      * @return The protocol reply

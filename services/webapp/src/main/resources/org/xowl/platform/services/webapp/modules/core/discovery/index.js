@@ -27,11 +27,11 @@ function onExecute() {
 	renderHistory(HISTORY.length - 1);
 	if (!onOperationRequest("Working ..."))
 		return;
-	xowl.sparql(function (status, ct, content) {
+	xowl.sparqlOn(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			renderSparqlResults(ct, content);
 		}
-	}, query);
+	}, query, document.getElementById("input-store").value);
 }
 
 function renderHistory(index) {

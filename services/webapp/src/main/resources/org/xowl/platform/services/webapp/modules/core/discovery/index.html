@@ -17,7 +17,7 @@
 <div class="body">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
                 <form>
                     <div class="form-group">
                         <textarea class="form-control" rows="15" id="sparql" placeholder="SPARQL"></textarea>
@@ -25,8 +25,22 @@
                     <a class="btn btn-primary" onclick="onExecute()">Execute</a>
                 </form>
             </div>
-            <div class="col-md-2">
-                <div style="overflow:scroll; height:300px; margin-bottom: 10px;">
+            <div class="col-md-4">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="input-store" class="col-sm-2 control-label">
+                            <img src="../../../assets/db.svg" width="30" height="30" style="margin-right: 10px;"/>
+                            <span style="color: #034091">Target:</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="input-store">
+                                <option value="live">Live Store</option>
+                                <option value="longTerm">Long-Term Store</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                <div style="overflow:scroll; height:250px; margin-bottom: 10px; margin-top: 10px;">
                     <table class="table" id="history">
                     </table>
                 </div>

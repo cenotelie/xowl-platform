@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Traceability Exploration</title>
+    <title>Query and Discovery</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -17,64 +17,28 @@
 <div class="body">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-warning">
-                    <div class="panel-body">
-                        <span class="text-warning">SPARQL queries are resolved against</span>
-                        <img src="../../../assets/db.svg" width="25px" style="display: inline-block;"/>
-                        <strong class="text-warning">live</strong>
-                        <span class="text-warning">. Data in artifacts not pushed to</span>
-                        <img src="../../../assets/db.svg" width="25px" style="display: inline-block;"/>
-                        <strong class="text-warning">live</strong>
-                        <span class="text-warning">won't appear here.</span>
-                        <a href="../../../modules/core/artifacts/">Manage artifacts</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
             <div class="col-md-10">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        SPARQL Query
+                <form>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="15" id="sparql" placeholder="SPARQL"></textarea>
                     </div>
-                    <div class="panel-body">
-                        <form>
-                            <div class="form-group">
-                                <textarea class="form-control" rows="15" id="sparql"></textarea>
-                            </div>
-                            <a class="btn btn-primary" onclick="onExecute()">Execute</a>
-                        </form>
-                    </div>
-                </div>
+                    <a class="btn btn-primary" onclick="onExecute()">Execute</a>
+                </form>
             </div>
             <div class="col-md-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        History
-                    </div>
-                    <div class="panel-body">
-                        <div style="overflow:scroll; height:300px; margin-bottom: 10px;">
-                            <table class="table" id="history">
-                            </table>
-                        </div>
-                    </div>
+                <div style="overflow:scroll; height:300px; margin-bottom: 10px;">
+                    <table class="table" id="history">
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <table class="table table-bordered table-hover">
-                            <thead id="result-heads">
-                            </thead>
-                            <tbody id="result-data">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="row" style="margin-top: 20px;">
+            <table class="table table-bordered table-hover">
+                <thead id="result-heads">
+                </thead>
+                <tbody id="result-data">
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -2,21 +2,13 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var SCHEMAS = null;
 var HISTORY = [];
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Traceability Exploration"}], function() {
-		if (!onOperationRequest("Loading ..."))
-			return;
-		xowl.getArtifactSchemas(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				SCHEMAS = content;
-				renderQuery();
-			}
-		});
+			{name: "Query and Discovery"}], function() {
+		renderQuery();
 	});
 }
 
@@ -25,16 +17,6 @@ function renderQuery() {
 		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
 		"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
 		"PREFIX owl: <http://www.w3.org/2002/07/owl#>\n";
-	for (var i = 0; i != SCHEMAS.length; i++) {
-		var iri = SCHEMAS[i].id;
-		var prefix = null;
-		var index = iri.lastIndexOf("/");
-		if (index < 0)
-			prefix = "schema" + i.toString();
-		else
-			prefix = iri.substring(index + 1);
-		query += "PREFIX " + prefix + ": <" + iri + "#>\n";
-	}
 	query += "\nSELECT DISTINCT ?x ?y WHERE {\n    GRAPH ?g {\n        ?x a ?y\n    }\n}";
 	document.getElementById("sparql").value = query;
 }

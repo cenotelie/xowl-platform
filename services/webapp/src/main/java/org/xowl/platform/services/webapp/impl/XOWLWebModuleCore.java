@@ -34,7 +34,7 @@ public class XOWLWebModuleCore extends WebModuleBase {
         this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/assets/artifact.svg"));
         this.items.add(new WebModuleItem("Data Import", "importation", "/assets/import.svg"));
         this.items.add(new WebModuleItem("Consistency Management", "consistency", "/assets/consistency.svg"));
-        this.items.add(new WebModuleItem("Traceability Exploration", "discovery", "/assets/exploration.svg"));
+        this.items.add(new WebModuleItem("Query and Discovery", "discovery", "/assets/exploration.svg"));
         this.items.add(new WebModuleItem("Impact Analysis", "impact", "/assets/impact.svg"));
         this.items.add(new WebModuleItem("Evaluation Analysis", "evaluation", "/assets/evaluation.svg"));
     }

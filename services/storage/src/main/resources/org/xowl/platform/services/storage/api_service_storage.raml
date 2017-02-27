@@ -21,6 +21,13 @@ baseUri: https://localhost:8443/api
           type: string
           description: The SPARQL query to be executed
           example: SELECT ?c WHERE { GRAPH ?g { ?x a ?c } }
+      queryParameters:
+        store:
+          displayName: Target store
+          type: string
+          description: The target RDf store for the query, default is 'live'
+          example: live
+          required: false
       responses:
         200:
           description: The result for the SPARQL query

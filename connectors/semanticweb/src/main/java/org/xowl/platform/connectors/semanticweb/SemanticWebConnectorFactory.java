@@ -41,6 +41,8 @@ public class SemanticWebConnectorFactory implements ConnectorServiceFactory {
 
     @Override
     public ConnectorService newConnector(ConnectorDescriptor descriptor, ConnectorServiceData specification) {
-        return new SemanticWebConnector(specification);
+        if (descriptor == SemanticWebConnectorDescriptor.INSTANCE)
+            return new SemanticWebConnector(specification);
+        return null;
     }
 }

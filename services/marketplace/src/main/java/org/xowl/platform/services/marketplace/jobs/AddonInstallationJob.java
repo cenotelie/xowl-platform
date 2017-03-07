@@ -112,7 +112,7 @@ public class AddonInstallationJob extends JobBase {
                 return XSPReplyNotFound.instance();
             return platformManagementService.installAddon(addonId, stream);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
     }

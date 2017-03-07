@@ -116,10 +116,10 @@ class XOWLInternalRealm implements SecurityRealm {
         try {
             String location = (new File(System.getenv(Env.ROOT), configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
-            server = new EmbeddedServer(Logging.getDefault(), serverConfiguration);
+            server = new EmbeddedServer(Logging.get(), serverConfiguration);
             database = ((XSPReplyResult<XOWLDatabase>) server.getDatabase(serverConfiguration.getAdminDBName())).getData();
         } catch (Exception exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
         }
         this.nodes = new CachedNodes();
         this.server = server;
@@ -139,14 +139,14 @@ class XOWLInternalRealm implements SecurityRealm {
         // (re-)upload the rules
         XSPReply reply = database.upload(Repository.SYNTAX_RDFT, readResource("rules.rdft"));
         if (!reply.isSuccess()) {
-            Logging.getDefault().error("Failed to initialize the security database");
+            Logging.get().error("Failed to initialize the security database");
             return;
         }
 
         // check for stored procedures
         reply = database.getStoredProcedures();
         if (!reply.isSuccess()) {
-            Logging.getDefault().error("Failed to initialize the security database");
+            Logging.get().error("Failed to initialize the security database");
             return;
         }
 
@@ -201,7 +201,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
             // deploy admin user
             parameters = new HashMap<>();
             parameters.put("user", nodes.getIRINode(USERS + PlatformUtils.DEFAULT_ADMIN_LOGIN));
@@ -209,7 +209,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-create-user"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
             // deploy admin group
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
@@ -218,7 +218,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-create-group"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
             // deploy admin role
             parameters = new HashMap<>();
             parameters.put("role", nodes.getIRINode(ROLES + PlatformRoleAdmin.INSTANCE.getIdentifier()));
@@ -226,7 +226,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-create-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
             // assign platform admin role to admin group
             parameters = new HashMap<>();
             parameters.put("entity", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
@@ -234,7 +234,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-assign-role"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
             // add user admin as administrator of group admin
             parameters = new HashMap<>();
             parameters.put("group", nodes.getIRINode(GROUPS + PlatformUtils.DEFAULT_ADMIN_GROUP));
@@ -242,7 +242,7 @@ class XOWLInternalRealm implements SecurityRealm {
             reply = database.executeStoredProcedure(procedures.get("procedure-add-admin"),
                     new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
             if (!reply.isSuccess())
-                Logging.getDefault().error(reply);
+                Logging.get().error(reply);
         }
     }
 
@@ -266,7 +266,7 @@ class XOWLInternalRealm implements SecurityRealm {
         String content = readResource(name + ".sparql");
         XSPReply reply = database.addStoredProcedure(name, content, Arrays.asList(parameters));
         if (!reply.isSuccess()) {
-            Logging.getDefault().error("Failed to deploy the procedure " + name);
+            Logging.get().error("Failed to deploy the procedure " + name);
             return;
         }
         XOWLStoredProcedure procedure = ((XSPReplyResult<XOWLStoredProcedure>) reply).getData();
@@ -284,7 +284,7 @@ class XOWLInternalRealm implements SecurityRealm {
         try {
             return IOUtils.read(stream, IOUtils.CHARSET);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return null;
         }
     }

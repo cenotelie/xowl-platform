@@ -64,7 +64,7 @@ public class Activator implements BundleActivator {
                         try {
                             component.registerResources(PlatformHttp.getUriPrefixWeb(), PlatformHttp.getUriPrefixWeb(), new XOWLHttpContext(component, contributionDirectory));
                         } catch (Exception exception) {
-                            Logging.getDefault().error(exception);
+                            Logging.get().error(exception);
                         }
                     }
                 }, bundleContext);

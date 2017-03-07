@@ -151,7 +151,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         } else {
             try {
                 String location = (new File(System.getenv(Env.ROOT), configuration.get("embedded", "location"))).getAbsolutePath();
-                XOWLServer server = new EmbeddedServer(Logging.getDefault(), new ServerConfiguration(location));
+                XOWLServer server = new EmbeddedServer(Logging.get(), new ServerConfiguration(location));
                 XSPReply reply = server.getDatabase(configuration.get("databases", STORE_ID_LIVE));
                 if (!reply.isSuccess()) {
                     // initialize
@@ -164,7 +164,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
                 }
                 return server;
             } catch (Exception exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return null;
             }
         }

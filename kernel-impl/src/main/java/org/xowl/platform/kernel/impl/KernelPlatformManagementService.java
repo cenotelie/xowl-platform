@@ -123,10 +123,10 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     private Product loadProductDescriptor() {
         File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
             return new ProductBase(definition);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return null;
         }
     }
@@ -141,16 +141,16 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 if (files[i].getName().endsWith(".descriptor")) {
                     try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
                         String content = IOUtils.read(reader);
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
                         if (definition == null) {
-                            Logging.getDefault().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
+                            Logging.get().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
                             return;
                         }
                         Addon addon = new Addon(definition);
                         addon.setInstalled();
                         addons.add(addon);
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 }
             }
@@ -363,13 +363,13 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
             File directory = new File(addonsCache, UUID.randomUUID().toString());
             if (!directory.mkdirs()) {
-                Logging.getDefault().error("Failed to create directory " + directory.getAbsolutePath());
+                Logging.get().error("Failed to create directory " + directory.getAbsolutePath());
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
             }
             try {
                 unpackAddon(packageStream, directory);
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
             }
             File fileDescriptor = new File(directory, "descriptor.json");
@@ -381,14 +381,14 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
             Addon descriptor;
             try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
                 if (definition == null) {
                     IOUtils.deleteFolder(directory);
                     return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
                 }
                 descriptor = new Addon(definition);
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 IOUtils.deleteFolder(directory);
                 return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
             }
@@ -418,7 +418,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                     Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
                 }
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 IOUtils.deleteFolder(directory);
                 return new XSPReplyException(exception);
             }
@@ -483,12 +483,12 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             for (AddonBundle bundle : descriptor.getBundles()) {
                 File fileBundle = new File(felixBundles, bundle.serializedString() + ".jar");
                 if (!fileBundle.delete())
-                    Logging.getDefault().error("Failed to delete file " + fileBundle.getAbsolutePath());
+                    Logging.get().error("Failed to delete file " + fileBundle.getAbsolutePath());
             }
             // delete the descriptor file
             File fileDescriptor = new File(addonsCache, identifier + ".descriptor");
             if (!fileDescriptor.delete())
-                Logging.getDefault().error("Failed to delete file " + fileDescriptor.getAbsolutePath());
+                Logging.get().error("Failed to delete file " + fileDescriptor.getAbsolutePath());
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new AddonUninstalledEvent(this, descriptor));
@@ -622,7 +622,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         try {
             felixConfiguration.load(confFile);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return;
         }
         boolean mustReboot = false;
@@ -706,7 +706,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                     File keyStoreFile = new File(new File(new File(root, "felix"), "conf"), "keystore.jks");
                     String password = SSLGenerator.generateKeyStore(keyStoreFile, "platform.xowl.org");
                     if (password == null) {
-                        Logging.getDefault().error("Failed to generate the keystore");
+                        Logging.get().error("Failed to generate the keystore");
                     } else {
                         felixConfiguration.set("org.apache.felix.https.keystore", keyStoreFile.getAbsolutePath());
                         felixConfiguration.set("org.apache.felix.https.keystore.password", password);
@@ -734,7 +734,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             try {
                 felixConfiguration.save(confFile);
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return;
             }
             executionService.schedule(new PlatformRebootJob());

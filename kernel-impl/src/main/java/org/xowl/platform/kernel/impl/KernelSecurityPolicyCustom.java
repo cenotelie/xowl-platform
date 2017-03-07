@@ -148,7 +148,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
 
     @Override
     public XSPReply setPolicy(String actionId, String policyDefinition) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), policyDefinition);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), policyDefinition);
         if (definition == null)
             return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
         SecuredActionPolicy policy = SecuredActionPolicyBase.load(definition);

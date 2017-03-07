@@ -65,17 +65,17 @@ class OnlineMarketplace extends StaticMarketplace {
     protected MarketplaceDescriptor loadMarketplaceDescriptor() {
         HttpResponse response = connection.request(MARKETPLACE_DESCRIPTOR, "GET", HttpConstants.MIME_JSON);
         if (response.getCode() != HttpURLConnection.HTTP_OK) {
-            Logging.getDefault().error("Cannot find marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR + " (" + response.getCode() + ")");
+            Logging.get().error("Cannot find marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR + " (" + response.getCode() + ")");
             return null;
         }
         String content = response.getBodyAsString();
         if (content == null) {
-            Logging.getDefault().error("Marketplace descriptor is empty " + location + MARKETPLACE_DESCRIPTOR);
+            Logging.get().error("Marketplace descriptor is empty " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR);
+            Logging.get().error("Failed to parse marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
         return new MarketplaceDescriptor(definition);
@@ -85,17 +85,17 @@ class OnlineMarketplace extends StaticMarketplace {
     protected Addon loadAddonDescriptor(String identifier) {
         HttpResponse response = connection.request(identifier + ".descriptor", "GET", HttpConstants.MIME_JSON);
         if (response.getCode() != HttpURLConnection.HTTP_OK) {
-            Logging.getDefault().error("Cannot find addon descriptor " + location + identifier + ".descriptor (" + response.getCode() + ")");
+            Logging.get().error("Cannot find addon descriptor " + location + identifier + ".descriptor (" + response.getCode() + ")");
             return null;
         }
         String content = response.getBodyAsString();
         if (content == null) {
-            Logging.getDefault().error("Addon descriptor is empty " + location + identifier + ".descriptor");
+            Logging.get().error("Addon descriptor is empty " + location + identifier + ".descriptor");
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse addon descriptor  " + location + identifier + ".descriptor");
+            Logging.get().error("Failed to parse addon descriptor  " + location + identifier + ".descriptor");
             return null;
         }
         return new Addon(definition);
@@ -109,7 +109,7 @@ class OnlineMarketplace extends StaticMarketplace {
             return null;
         HttpResponse response = connection.request(identifier + ".zip", "GET", HttpConstants.MIME_JSON);
         if (response.getCode() != HttpURLConnection.HTTP_OK) {
-            Logging.getDefault().error("Cannot find addon package " + location + identifier + ".zip (" + response.getCode() + ")");
+            Logging.get().error("Cannot find addon package " + location + identifier + ".zip (" + response.getCode() + ")");
             return null;
         }
         byte[] content = response.getBodyAsBytes();

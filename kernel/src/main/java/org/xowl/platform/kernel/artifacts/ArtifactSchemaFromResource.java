@@ -91,12 +91,12 @@ public class ArtifactSchemaFromResource implements ArtifactSchema {
         Ontology ontology = null;
         if (stream != null) {
             try {
-                ontology = this.repository.load(Logging.getDefault(),
+                ontology = this.repository.load(Logging.get(),
                         new InputStreamReader(stream),
                         Repository.SCHEME_RESOURCE + resource,
                         iri, Repository.getSyntax(resource));
             } catch (Exception exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
         ProxyObject proxy = repository.getProxy(iri);

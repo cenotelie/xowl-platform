@@ -1787,7 +1787,7 @@ public class RemotePlatformAccess extends HttpConnection {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return new XSPReplyException(exception);
             }
         }

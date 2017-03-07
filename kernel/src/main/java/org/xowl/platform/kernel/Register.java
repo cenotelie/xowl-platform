@@ -98,7 +98,7 @@ public class Register {
                 context.ungetService(reference);
             }
         } catch (InvalidSyntaxException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
         }
         return result;
     }

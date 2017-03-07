@@ -70,7 +70,7 @@ public class KernelEventService implements EventService {
      * Initializes this service
      */
     public KernelEventService() {
-        this.dispatchThread = new Thread(new SafeRunnable(Logging.getDefault()) {
+        this.dispatchThread = new Thread(new SafeRunnable(Logging.get()) {
             @Override
             public void doRun() {
                 KernelEventService.this.dispatchRun();
@@ -91,7 +91,7 @@ public class KernelEventService implements EventService {
         try {
             dispatchThread.join();
         } catch (InterruptedException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
         }
     }
 
@@ -121,7 +121,7 @@ public class KernelEventService implements EventService {
 
     @Override
     public void onEvent(Event event) {
-        Logging.getDefault().info(event);
+        Logging.get().info(event);
         while (true) {
             try {
                 if (queue.add(event))
@@ -185,7 +185,7 @@ public class KernelEventService implements EventService {
                     try {
                         consumer.onEvent(event);
                     } catch (Throwable throwable) {
-                        Logging.getDefault().error(throwable);
+                        Logging.get().error(throwable);
                     }
                 }
                 totalProcessed++;
@@ -194,7 +194,7 @@ public class KernelEventService implements EventService {
                 if (PlatformShutdownEvent.TYPE.equals(event.getType()))
                     return;
             } catch (InterruptedException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
     }

@@ -146,7 +146,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
             if (value != null)
                 poolMax = Integer.parseInt(value);
         } catch (NumberFormatException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
         }
 
         this.initQueue = new ConcurrentLinkedQueue<>();
@@ -186,7 +186,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         }
         // event before running
         job.onRun();
-        Logging.getDefault().info(new RichString("Begin running job ", job));
+        Logging.get().info(new RichString("Begin running job ", job));
     }
 
     /**
@@ -217,12 +217,12 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         File file = new File(storage, getFileName(job));
         if (file.exists()) {
             if (!file.delete()) {
-                Logging.getDefault().error("Failed to delete " + file.getAbsolutePath());
+                Logging.get().error("Failed to delete " + file.getAbsolutePath());
             }
         }
         // callback on completion
         job.onTerminated(job.getStatus() == JobStatus.Cancelled);
-        Logging.getDefault().info(new RichString("Ended job ", job));
+        Logging.get().info(new RichString("Ended job ", job));
     }
 
     /**
@@ -239,7 +239,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
                         String content = IOUtils.read(reader);
                         reloadJob(files[i], content);
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 }
             }
@@ -253,9 +253,9 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
      * @param content The job's content
      */
     private void reloadJob(File file, String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse the job " + file.getAbsolutePath());
+            Logging.get().error("Failed to parse the job " + file.getAbsolutePath());
             return;
         }
         String type = null;
@@ -273,7 +273,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
             }
         }
         if (type == null) {
-            Logging.getDefault().error("Unknown job type " + file);
+            Logging.get().error("Unknown job type " + file);
             return;
         }
         Collection<JobFactory> factories = Register.getComponents(JobFactory.class);
@@ -285,7 +285,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
                 return;
             }
         }
-        Logging.getDefault().error("Could not find a factory for job " + file.getAbsolutePath());
+        Logging.get().error("Could not find a factory for job " + file.getAbsolutePath());
     }
 
     @Override
@@ -336,10 +336,10 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
             try (Writer write = IOUtils.getWriter(new File(storage, getFileName(job)).getAbsolutePath())) {
                 write.write(job.serializedJSON());
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         } else {
-            Logging.getDefault().error("Cannot serialize the job, storage is inaccessible");
+            Logging.get().error("Cannot serialize the job, storage is inaccessible");
         }
         job.onScheduled();
         synchronized (initQueue) {
@@ -349,7 +349,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
                 initQueue.add(job);
             }
         }
-        Logging.getDefault().info(new RichString("Scheduled job ", job));
+        Logging.get().info(new RichString("Scheduled job ", job));
         return new XSPReplyResult<>(job);
     }
 

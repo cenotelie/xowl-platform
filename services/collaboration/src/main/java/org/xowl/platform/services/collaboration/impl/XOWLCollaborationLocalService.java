@@ -66,11 +66,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
             try (Reader reader = IOUtils.getReader(fileManifest)) {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
                 if (definition != null)
                     manifest = new CollaborationManifest(definition);
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
         if (manifest == null) {
@@ -85,7 +85,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
                 writer.write(manifest.serializedJSON());
                 writer.flush();
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
         this.manifest = manifest;
@@ -102,7 +102,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
             writer.flush();
             return XSPReplySuccess.instance();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
     }

@@ -98,11 +98,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
                         Product product = new ProductBase(definition);
                         platforms.add(product);
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 }
             }
@@ -112,11 +112,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
                         RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
                         collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 }
             }
@@ -380,7 +380,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             writer.write(instance.getDescriptor().serializedJSON());
             writer.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         return XSPReplySuccess.instance();
@@ -401,18 +401,18 @@ public class MasterNetworkService implements CollaborationNetworkService {
         if (extractionDirectory.exists())
             IOUtils.deleteFolder(extractionDirectory);
         if (!extractionDirectory.mkdirs()) {
-            Logging.getDefault().error("Failed to create directory " + extractionDirectory.getAbsolutePath());
+            Logging.get().error("Failed to create directory " + extractionDirectory.getAbsolutePath());
             return XSPReplyNotFound.instance();
         }
         try {
             provisionExtractTarGz(distributionFile, extractionDirectory);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         File[] children = extractionDirectory.listFiles();
         if (children == null || children.length != 1) {
-            Logging.getDefault().error("Unexpected distribution content for " + productId);
+            Logging.get().error("Unexpected distribution content for " + productId);
             return XSPReplyNotFound.instance();
         }
         File target = new File(storageInstances, instanceId);
@@ -421,7 +421,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         try {
             Files.move(children[0].toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         IOUtils.deleteFolder(extractionDirectory);
@@ -484,7 +484,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             writer.write(manifest.serializedJSON());
             writer.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
 
@@ -499,7 +499,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.set("httpURIPrefix", "/" + instance.getIdentifier());
             configuration.save(platformHttpConfigFile);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
 
@@ -513,7 +513,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.set("network", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
             configuration.save(serviceCollabConfigFile);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
 
@@ -527,7 +527,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.set("realm", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
             configuration.save(serviceSecurityConfigFile);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         return XSPReplySuccess.instance();
@@ -548,7 +548,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             Process process = processBuilder.start();
             process.waitFor();
         } catch (IOException | InterruptedException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         return XSPReplySuccess.instance();

@@ -147,7 +147,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             keyGenerator.init(256);
         } catch (NoSuchAlgorithmException exception) {
             // should not happen
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
         }
         this.securityMAC = mac;
         this.securityKey = keyGenerator.generateKey();
@@ -265,7 +265,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return XSPReplyUnauthenticated.instance();
         if (login == null || login.isEmpty() || password == null || password.length() == 0) {
             onLoginFailure(client);
-            Logging.getDefault().info("Authentication failure from " + client + " on initial login with " + login);
+            Logging.get().info("Authentication failure from " + client + " on initial login with " + login);
             return XSPReplyUnauthenticated.instance();
         }
         PlatformUser user = getRealm().authenticate(login, password);
@@ -274,7 +274,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return new XSPReplyResult<>(buildTokenFor(login));
         }
         onLoginFailure(client);
-        Logging.getDefault().info("Authentication failure from " + client + " on initial login with " + login);
+        Logging.get().info("Authentication failure from " + client + " on initial login with " + login);
         return XSPReplyUnauthenticated.instance();
     }
 
@@ -291,11 +291,11 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (reply == XSPReplyUnauthenticated.instance()) {
             // the token is invalid
             onLoginFailure(client);
-            Logging.getDefault().info("Authentication failure from " + client + " with invalid token");
+            Logging.get().info("Authentication failure from " + client + " with invalid token");
             return reply;
         }
         if (!reply.isSuccess()) {
-            Logging.getDefault().info("Authentication failure from " + client + " with invalid token");
+            Logging.get().info("Authentication failure from " + client + " with invalid token");
             return reply;
         }
         PlatformUser user = getRealm().getUser(((XSPReplyResult<String>) reply).getData());
@@ -350,7 +350,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             } else {
                 // not banned anymore
                 clients.remove(client);
-                Logging.getDefault().info("Client " + client + " is no longer banned");
+                Logging.get().info("Client " + client + " is no longer banned");
                 return false;
             }
         }
@@ -376,7 +376,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             }
             if (cl.failedAttempt >= maxLoginFailure) {
                 // too much failure, ban this client for a while
-                Logging.getDefault().info("Banned client " + client + " for " + banLength + " seconds");
+                Logging.get().info("Banned client " + client + " for " + banLength + " seconds");
                 cl.banTimeStamp = Calendar.getInstance().getTime().getTime();
                 return true;
             }
@@ -786,7 +786,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 System.arraycopy(tokenHash, 0, token, tokenData.length, tokenHash.length);
                 return org.xowl.infra.utils.Base64.encodeBase64(token);
             } catch (InvalidKeyException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return null;
             }
         }
@@ -815,7 +815,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     // the token does not checks out ...
                     return XSPReplyUnauthenticated.instance();
             } catch (InvalidKeyException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
                 return new XSPReplyException(exception);
             }
         }

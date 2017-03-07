@@ -136,7 +136,7 @@ public class CSVImporter extends Importer {
             };
             return new XSPReplyResult<>(preview);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
     }
@@ -195,7 +195,7 @@ public class CSVImporter extends Importer {
                 eventService.onEvent(new DocumentImportedEvent(document, artifact, importationService));
             return new XSPReplyResult<>(artifact.getIdentifier());
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
     }

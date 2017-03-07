@@ -140,7 +140,7 @@ class XOWLHttpApiRequest implements HttpApiRequest {
                 }
                 content = output.toByteArray();
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
         return content;

@@ -56,18 +56,18 @@ class FSMarketplace extends StaticMarketplace {
     protected MarketplaceDescriptor loadMarketplaceDescriptor() {
         File fileDescriptor = new File(location, MARKETPLACE_DESCRIPTOR);
         if (!fileDescriptor.exists()) {
-            Logging.getDefault().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.get().error("Cannot find marketplace descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
             if (definition == null) {
-                Logging.getDefault().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
+                Logging.get().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
                 return null;
             }
             return new MarketplaceDescriptor(definition);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return null;
         }
     }
@@ -76,18 +76,18 @@ class FSMarketplace extends StaticMarketplace {
     protected Addon loadAddonDescriptor(String identifier) {
         File fileDescriptor = new File(location, identifier + ".descriptor");
         if (!fileDescriptor.exists()) {
-            Logging.getDefault().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
+            Logging.get().error("Cannot find addon descriptor " + fileDescriptor.getAbsolutePath());
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
             if (definition == null) {
-                Logging.getDefault().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
+                Logging.get().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
                 return null;
             }
             return new Addon(definition);
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return null;
         }
     }
@@ -100,13 +100,13 @@ class FSMarketplace extends StaticMarketplace {
             return null;
         File filePackage = new File(location, identifier + ".zip");
         if (!filePackage.exists()) {
-            Logging.getDefault().error("Cannot find addon package " + filePackage.getAbsolutePath());
+            Logging.get().error("Cannot find addon package " + filePackage.getAbsolutePath());
             return null;
         }
         try {
             return new FileInputStream(filePackage);
         } catch (IOException exception) {
-            Logging.getDefault().error("Cannot open addon package " + filePackage.getAbsolutePath());
+            Logging.get().error("Cannot open addon package " + filePackage.getAbsolutePath());
             return null;
         }
     }

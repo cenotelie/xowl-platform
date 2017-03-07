@@ -124,7 +124,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             else
                 doResponse(servletResponse, service.handle(securityService, apiRequest));
         } catch (Throwable exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
         } finally {
             securityService.onRequestEnd(servletRequest.getRemoteAddr());
@@ -192,7 +192,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 os.write(apiResponse.getBodyAsBytes());
                 os.flush();
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
     }

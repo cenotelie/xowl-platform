@@ -123,14 +123,14 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                         String content = IOUtils.read(reader);
                         reloadDocument(files[i].getAbsolutePath(), content);
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 } else if (isConfigurationFile(files[i].getName())) {
                     try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
                         String content = IOUtils.read(reader);
                         reloadConfiguration(content);
                     } catch (IOException exception) {
-                        Logging.getDefault().error(exception);
+                        Logging.get().error(exception);
                     }
                 }
             }
@@ -144,9 +144,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @param content The descriptor content
      */
     private void reloadDocument(String file, String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
         if (definition == null) {
-            Logging.getDefault().error("Failed to parse the document descriptor " + file);
+            Logging.get().error("Failed to parse the document descriptor " + file);
             return;
         }
         Document document = new Document(definition);
@@ -171,7 +171,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The configuration
      */
     private ImporterConfiguration loadConfiguration(String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
         if (definition == null)
             return null;
         ImporterConfiguration configuration = new ImporterConfiguration(definition);
@@ -557,14 +557,14 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.write(document.serializedJSON());
             writer.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
         }
         try (FileOutputStream stream = new FileOutputStream(fileContent)) {
             stream.write(content);
             stream.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write document in storage");
         }
         documents.put(document.getIdentifier(), document);
@@ -591,9 +591,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         if (!fileDescriptor.delete())
-            Logging.getDefault().error("Failed to delete " + fileDescriptor.getAbsolutePath());
+            Logging.get().error("Failed to delete " + fileDescriptor.getAbsolutePath());
         if (!fileContent.delete())
-            Logging.getDefault().error("Failed to delete " + fileContent.getAbsolutePath());
+            Logging.get().error("Failed to delete " + fileContent.getAbsolutePath());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentDroppedEvent(document, this));
@@ -621,7 +621,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             FileInputStream result = new FileInputStream(fileContent);
             return new XSPReplyResult<>(result);
         } catch (FileNotFoundException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         }
     }
@@ -697,7 +697,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.write(configuration.serializedJSON());
             writer.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write configuration in storage");
         }
         synchronized (configurations) {
@@ -779,7 +779,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 return XSPReplyNotFound.instance();
             File file = new File(storage, getConfigurationFile(configuration));
             if (!file.delete())
-                Logging.getDefault().error("Failed to delete " + file.getAbsolutePath());
+                Logging.get().error("Failed to delete " + file.getAbsolutePath());
         }
         return XSPReplySuccess.instance();
     }

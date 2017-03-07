@@ -57,12 +57,12 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
         this.storage = storage;
         if (storage.exists()) {
             try (Reader reader = IOUtils.getReader(storage)) {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), reader);
+                ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
                 if (definition == null)
                     return;
                 loadDefinition(definition, SecuredAction.getAll());
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
     }
@@ -77,7 +77,7 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
             writer.write(serializedJSON());
             writer.flush();
         } catch (IOException exception) {
-            Logging.getDefault().error(exception);
+            Logging.get().error(exception);
             return new XSPReplyException(exception);
         }
         return XSPReplySuccess.instance();

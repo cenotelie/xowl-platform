@@ -82,7 +82,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param type The job's type
      */
     public JobBase(String name, String type) {
-        super(Logging.getDefault());
+        super(Logging.get());
         PlatformUser owner = null;
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
@@ -104,7 +104,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param definition The JSON definition
      */
     public JobBase(ASTNode definition) {
-        super(Logging.getDefault());
+        super(Logging.get());
         String id = null;
         String name = null;
         String type = null;

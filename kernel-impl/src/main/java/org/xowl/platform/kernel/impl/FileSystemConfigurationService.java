@@ -78,7 +78,7 @@ public class FileSystemConfigurationService implements ConfigurationService {
             try {
                 configuration.load(file);
             } catch (IOException exception) {
-                Logging.getDefault().error(exception);
+                Logging.get().error(exception);
             }
         }
         return configuration;

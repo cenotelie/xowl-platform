@@ -59,7 +59,7 @@ public class Activator implements BundleActivator {
                         try {
                             component.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(component));
                         } catch (Exception exception) {
-                            Logging.getDefault().error(exception);
+                            Logging.get().error(exception);
                         }
                     }
                 }, bundleContext);

@@ -196,12 +196,12 @@ class XOWLImpactAnalysisJob extends JobBase {
         }
         XSPReply reply = live.sparql(builder.toString(), null, null);
         if (!reply.isSuccess()) {
-            Logging.getDefault().error(reply.getMessage());
+            Logging.get().error(reply.getMessage());
             return 0;
         }
         Result result = ((XSPReplyResult<Result>) reply).getData();
         if (!result.isSuccess()) {
-            Logging.getDefault().error(((ResultFailure) result).getMessage());
+            Logging.get().error(((ResultFailure) result).getMessage());
             return 0;
         }
         Collection<Quad> quads = ((ResultQuads) result).getQuads();

@@ -230,7 +230,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.getDefault(), content);
+                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
                         if (definition == null)
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ConsistencyRule rule = new XOWLConsistencyRule(definition);

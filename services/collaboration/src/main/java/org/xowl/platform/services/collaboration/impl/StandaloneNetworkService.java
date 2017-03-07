@@ -146,7 +146,7 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -157,7 +157,7 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 
     @Override
@@ -168,6 +168,6 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        return XSPReplyUnsupported.instance();
     }
 }

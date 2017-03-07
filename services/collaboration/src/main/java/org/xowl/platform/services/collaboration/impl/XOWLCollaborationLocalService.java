@@ -73,12 +73,21 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
                 Logging.getDefault().error(exception);
             }
         }
-        if (manifest == null)
+        if (manifest == null) {
             manifest = new CollaborationManifest(
                     UUID.randomUUID().toString(),
                     "Local collaboration",
                     CollaborationPatternFreeStyle.DESCRIPTOR
             );
+        }
+        if (!fileManifest.exists()) {
+            try (Writer writer = IOUtils.getWriter(fileManifest)) {
+                writer.write(manifest.serializedJSON());
+                writer.flush();
+            } catch (IOException exception) {
+                Logging.getDefault().error(exception);
+            }
+        }
         this.manifest = manifest;
     }
 

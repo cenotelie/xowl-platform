@@ -646,7 +646,7 @@ XOWL.prototype.getWebModules = function (callback) {
 XOWL.prototype.archiveCollaboration = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -656,7 +656,7 @@ XOWL.prototype.archiveCollaboration = function (callback) {
 XOWL.prototype.deleteCollaboration = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}

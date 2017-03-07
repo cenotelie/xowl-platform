@@ -17,7 +17,10 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyNetworkError;
+import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
@@ -121,7 +124,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_MANIFEST);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.getCollaborationNeighbourManifest(collaborationId);
     }
 
     @Override
@@ -132,7 +140,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_INPUTS);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.getCollaborationNeighbourInputs(collaborationId, specificationId);
     }
 
     @Override
@@ -143,7 +156,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_OUTPUTS);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.getCollaborationNeighbourOutputs(collaborationId, specificationId);
     }
 
     @Override
@@ -159,7 +177,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_SPAWN);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyUnsupported.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.spawnCollaboration(specification);
     }
 
     @Override
@@ -170,7 +193,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.archiveCollaborationNeighbour(collaborationId);
     }
 
     @Override
@@ -181,7 +209,12 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.restartCollaborationNeighbour(collaborationId);
     }
 
     @Override
@@ -192,6 +225,11 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         XSPReply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
         if (!reply.isSuccess())
             return reply;
-        return XSPReplyNotFound.instance();
+        if (!(securityService.getRealm() instanceof RemotePlatformAccessProvider))
+            return XSPReplyNetworkError.instance();
+        RemotePlatformAccess remotePlatform = ((RemotePlatformAccessProvider) securityService.getRealm()).getAccess(securityService.getCurrentUser().getIdentifier());
+        if (remotePlatform == null)
+            return XSPReplyNetworkError.instance();
+        return remotePlatform.deleteCollaborationNeighbour(collaborationId);
     }
 }

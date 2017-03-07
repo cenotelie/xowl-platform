@@ -417,7 +417,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
-        String rest = request.getUri().substring(apiUri.length() + "/manifest/inputs".length() + 1);
+        String rest = request.getUri().substring(apiUri.length() + "/manifest/outputs".length() + 1);
         int index = rest.indexOf("/");
         String specId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
         if (specId.isEmpty())

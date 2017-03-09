@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration.bot;
+package org.xowl.platform.kernel.bots;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;

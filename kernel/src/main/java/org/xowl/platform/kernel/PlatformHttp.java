@@ -33,6 +33,10 @@ public class PlatformHttp implements Registrable {
      * The URI suffix for the web resources
      */
     public static final String URI_WEB = "/web";
+    /**
+     * The prefix for the help links
+     */
+    public static final String ERROR_HELP_PREFIX = "/modules/admin/documentation/";
 
     /**
      * The singleton instance of this structure

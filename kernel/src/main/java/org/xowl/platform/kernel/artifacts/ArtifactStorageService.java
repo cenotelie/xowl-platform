@@ -19,9 +19,9 @@ package org.xowl.platform.kernel.artifacts;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 /**
  * Represents a service that stores artifacts
@@ -75,13 +75,13 @@ public interface ArtifactStorageService extends SecuredService {
      */
     ApiError ERROR_STORAGE_FAILED = new ApiError(0x00000051,
             "The requested operation failed in storage.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000051.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000051.html");
     /**
      * API error - The artifact is invalid
      */
     ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00000052,
             "The artifact is invalid.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000052.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000052.html");
 
     /**
      * Stores an artifact in a long-term storage facility

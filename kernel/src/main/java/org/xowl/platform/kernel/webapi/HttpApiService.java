@@ -20,6 +20,7 @@ package org.xowl.platform.kernel.webapi;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -56,39 +57,35 @@ public interface HttpApiService extends Service, Serializable {
     int PRIORITY_HIGHEST = 100;
 
     /**
-     * The prefix for the help links
-     */
-    String ERROR_HELP_PREFIX = "/modules/admin/documentation/";
-    /**
      * API error - Failed to parse the content of the request.
      */
     ApiError ERROR_CONTENT_PARSING_FAILED = new ApiError(0x00000041,
             "Failed to parse the content of the request.",
-            ERROR_HELP_PREFIX + "0x00000041.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000041.html");
     /**
      * API error - Expected query parameters.
      */
     ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x00000042,
             "Expected query parameters.",
-            ERROR_HELP_PREFIX + "0x00000042.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000042.html");
     /**
      * API error - Failed to read the content of the request
      */
     ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x00000043,
             "Failed to read the content of the request.",
-            ERROR_HELP_PREFIX + "0x00000043.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000043.html");
     /**
      * API error - A query parameter is not in the expected range
      */
     ApiError ERROR_PARAMETER_RANGE = new ApiError(0x00000044,
             "A query parameter is not in the expected range.",
-            ERROR_HELP_PREFIX + "0x00000044.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000044.html");
     /**
      * API error - Expected a Content-Type header
      */
     ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x00000045,
             "Expected a Content-Type header.",
-            ERROR_HELP_PREFIX + "0x00000045.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000045.html");
 
     /**
      * Gets whether this server can handle the specified request, and if so with which priority

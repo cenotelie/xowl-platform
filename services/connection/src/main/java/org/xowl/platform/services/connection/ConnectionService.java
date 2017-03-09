@@ -19,9 +19,9 @@ package org.xowl.platform.services.connection;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
 
@@ -53,19 +53,19 @@ public interface ConnectionService extends SecuredService {
      */
     ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00000121,
             "A connector with the same identifier already exists.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000121.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000121.html");
     /**
      * API error - Could not find a factory for the specified connector descriptor
      */
     ApiError ERROR_NO_FACTORY = new ApiError(0x00000122,
             "Could not find a factory for the specified connector descriptor.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000122.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000122.html");
     /**
      * API error - The connector's queue is empty
      */
     ApiError ERROR_EMPTY_QUEUE = new ApiError(0x00000123,
             "The connector's queue is empty.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000123.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000123.html");
 
     /**
      * Gets the available connectors

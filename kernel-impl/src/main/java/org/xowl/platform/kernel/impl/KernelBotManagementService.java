@@ -188,7 +188,7 @@ public class KernelBotManagementService implements BotManagementService, HttpApi
             return null;
         String wakeup = section.get("wakeupOnStartup");
         boolean wakeupOnStartup = wakeup != null && "true".equalsIgnoreCase(wakeup);
-        BotSpecification specification = new BotSpecification(id, name, botType, wakeupOnStartup);
+        BotSpecification specification = new BotSpecification(id, name, botType, section.get("securityUser"), wakeupOnStartup);
 
         for (String property : section.getProperties()) {
             if (property.equals("name") || property.equals("type") || property.equals("wakeupOnStartup"))

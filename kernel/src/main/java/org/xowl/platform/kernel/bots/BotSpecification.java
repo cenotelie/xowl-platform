@@ -46,6 +46,10 @@ public class BotSpecification implements Identifiable, Serializable {
      */
     private final String botType;
     /**
+     * The security user to use to run the bot
+     */
+    private final String securityUser;
+    /**
      * Whether this bot should be woken up when the platform starts
      */
     private final boolean wakeupOnStartup;
@@ -60,12 +64,14 @@ public class BotSpecification implements Identifiable, Serializable {
      * @param identifier      The identifier for this connector
      * @param name            The name for this connector
      * @param botType         The type of bot
+     * @param securityUser    The security user to use to run the bot
      * @param wakeupOnStartup Whether this bot should be woken up when the platform starts
      */
-    public BotSpecification(String identifier, String name, String botType, boolean wakeupOnStartup) {
+    public BotSpecification(String identifier, String name, String botType, String securityUser, boolean wakeupOnStartup) {
         this.identifier = identifier;
         this.name = name;
         this.botType = botType;
+        this.securityUser = securityUser;
         this.wakeupOnStartup = wakeupOnStartup;
         this.parameters = new HashMap<>();
     }
@@ -80,6 +86,7 @@ public class BotSpecification implements Identifiable, Serializable {
         String identifier = "";
         String name = "";
         String botType = "";
+        String securityUser = "";
         boolean wakeupOnStartup = false;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -93,6 +100,9 @@ public class BotSpecification implements Identifiable, Serializable {
             } else if ("botType".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 botType = value.substring(1, value.length() - 1);
+            } else if ("securityUser".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                securityUser = value.substring(1, value.length() - 1);
             } else if ("wakeupOnStartup".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 wakeupOnStartup = Boolean.parseBoolean(value);
@@ -118,6 +128,7 @@ public class BotSpecification implements Identifiable, Serializable {
         this.identifier = identifier;
         this.name = name;
         this.botType = botType;
+        this.securityUser = securityUser;
         this.wakeupOnStartup = wakeupOnStartup;
     }
 
@@ -128,6 +139,15 @@ public class BotSpecification implements Identifiable, Serializable {
      */
     public String getBotType() {
         return botType;
+    }
+
+    /**
+     * Gets the security user to use to run the bot
+     *
+     * @return The security user to use to run the bot
+     */
+    public String getSecurityUser() {
+        return securityUser;
     }
 
     /**
@@ -193,6 +213,8 @@ public class BotSpecification implements Identifiable, Serializable {
         builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"botType\": \"");
         builder.append(TextUtils.escapeStringJSON(botType));
+        builder.append("\", \"securityUser\": \"");
+        builder.append(TextUtils.escapeStringJSON(securityUser));
         builder.append("\", \"wakeupOnStartup\": ");
         builder.append(Boolean.toString(wakeupOnStartup));
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {

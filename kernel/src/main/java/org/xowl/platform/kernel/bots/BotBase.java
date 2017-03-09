@@ -68,9 +68,12 @@ public abstract class BotBase implements Bot {
         this.botType = specification.getBotType();
         this.wakeupOnStartup = specification.getWakeupOnStartup();
         SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService != null)
-            this.platformUser = securityService.getRealm().getUser(identifier);
-        else
+        if (securityService != null) {
+            String userId = specification.getSecurityUser();
+            if (userId == null || userId.isEmpty())
+                userId = identifier;
+            this.platformUser = securityService.getRealm().getUser(userId);
+        } else
             this.platformUser = null;
         this.status = BotStatus.Asleep;
     }

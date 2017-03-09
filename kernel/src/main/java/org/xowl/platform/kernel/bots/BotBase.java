@@ -17,8 +17,10 @@
 
 package org.xowl.platform.kernel.bots;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -29,7 +31,7 @@ import org.xowl.platform.kernel.security.SecurityService;
  *
  * @author Laurent Wouters
  */
-public class BotBase implements Bot {
+public abstract class BotBase implements Bot {
     /**
      * The identifier of the bot
      */
@@ -49,7 +51,7 @@ public class BotBase implements Bot {
     /**
      * The status of the bot
      */
-    protected final BotStatus status;
+    protected BotStatus status;
 
     /**
      * Initializes this bot
@@ -63,7 +65,44 @@ public class BotBase implements Bot {
         this.name = name;
         this.wakeupOnStartup = wakeupOnStartup;
         SecurityService securityService = Register.getComponent(SecurityService.class);
-        this.platformUser = securityService.getRealm().getUser(identifier);
+        if (securityService != null)
+            this.platformUser = securityService.getRealm().getUser(identifier);
+        else
+            this.platformUser = null;
+        this.status = BotStatus.Asleep;
+    }
+
+    /**
+     * Initializes this bot
+     *
+     * @param definition The JSON definition
+     */
+    public BotBase(ASTNode definition) {
+        String identifier = null;
+        String name = null;
+        boolean wakeupOnStartup = false;
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            } else if ("wakeupOnStartup".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                wakeupOnStartup = Boolean.parseBoolean(value);
+            }
+        }
+        PlatformUser platformUser = null;
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null)
+            platformUser = securityService.getRealm().getUser(identifier);
+        this.identifier = identifier;
+        this.name = name;
+        this.wakeupOnStartup = wakeupOnStartup;
+        this.platformUser = platformUser;
         this.status = BotStatus.Asleep;
     }
 
@@ -94,12 +133,26 @@ public class BotBase implements Bot {
 
     @Override
     public XSPReply wakeup() {
-        return XSPReplyUnsupported.instance();
+        synchronized (this) {
+            if (status != BotStatus.Asleep)
+                return new XSPReplyApiError(ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
+            status = BotStatus.WakingUp;
+        }
+        onWakeup();
+        status = BotStatus.Awaken;
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public XSPReply sleep() {
-        return XSPReplyUnsupported.instance();
+        synchronized (this) {
+            if (status != BotStatus.Awaken && status != BotStatus.Working)
+                return new XSPReplyApiError(ERROR_INVALID_STATUS, "Bot is not awake: " + status);
+            status = BotStatus.GoingToSleep;
+        }
+        onGoingToSleep();
+        status = BotStatus.Asleep;
+        return XSPReplySuccess.instance();
     }
 
     @Override
@@ -121,4 +174,14 @@ public class BotBase implements Bot {
                 status.toString() +
                 "\"}";
     }
+
+    /**
+     * Reacts to the bot being woken up
+     */
+    protected abstract void onWakeup();
+
+    /**
+     * Reacts to the bot going to sleep
+     */
+    protected abstract void onGoingToSleep();
 }

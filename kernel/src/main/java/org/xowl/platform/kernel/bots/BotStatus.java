@@ -32,11 +32,19 @@ public enum BotStatus {
      */
     Asleep,
     /**
+     * The bot is currently waking up
+     */
+    WakingUp,
+    /**
      * The bot is awaken, but not currently doing something (may be waiting for inputs)
      */
     Awaken,
     /**
      * The bot is awaken and doing some work (i.e. running and consuming CPU cycles)
      */
-    Working
+    Working,
+    /**
+     * The bot is currently going to sleep
+     */
+    GoingToSleep
 }

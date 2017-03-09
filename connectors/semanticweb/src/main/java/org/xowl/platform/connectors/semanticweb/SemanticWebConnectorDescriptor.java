@@ -35,7 +35,7 @@ public class SemanticWebConnectorDescriptor extends ConnectorDescriptorBase {
      */
     private SemanticWebConnectorDescriptor() {
         super(SemanticWebConnectorDescriptor.class.getCanonicalName(),
-                "Generic Semantic Web Datasets",
+                "xOWL - Semantic Web datasets",
                 "Connection for raw semantic web datasets (RDF and OWL syntaxes)");
     }
 }

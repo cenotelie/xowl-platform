@@ -41,6 +41,10 @@ public abstract class BotBase implements Bot {
      */
     protected final String name;
     /**
+     * The type of this bot
+     */
+    protected final String botType;
+    /**
      * The associated security user
      */
     protected final PlatformUser platformUser;
@@ -58,11 +62,13 @@ public abstract class BotBase implements Bot {
      *
      * @param identifier      The identifier of the bot
      * @param name            The name of the bot
+     * @param botType         The type of this bot
      * @param wakeupOnStartup Whether this bot should be woken up when the platform starts
      */
-    public BotBase(String identifier, String name, boolean wakeupOnStartup) {
+    public BotBase(String identifier, String name, String botType, boolean wakeupOnStartup) {
         this.identifier = identifier;
         this.name = name;
+        this.botType = botType;
         this.wakeupOnStartup = wakeupOnStartup;
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
@@ -80,6 +86,7 @@ public abstract class BotBase implements Bot {
     public BotBase(ASTNode definition) {
         String identifier = null;
         String name = null;
+        String botType = null;
         boolean wakeupOnStartup = false;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -90,6 +97,9 @@ public abstract class BotBase implements Bot {
             } else if ("name".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
+            } else if ("botType".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                botType = value.substring(1, value.length() - 1);
             } else if ("wakeupOnStartup".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 wakeupOnStartup = Boolean.parseBoolean(value);
@@ -101,6 +111,7 @@ public abstract class BotBase implements Bot {
             platformUser = securityService.getRealm().getUser(identifier);
         this.identifier = identifier;
         this.name = name;
+        this.botType = botType;
         this.wakeupOnStartup = wakeupOnStartup;
         this.platformUser = platformUser;
         this.status = BotStatus.Asleep;
@@ -135,7 +146,7 @@ public abstract class BotBase implements Bot {
     public XSPReply wakeup() {
         synchronized (this) {
             if (status != BotStatus.Asleep)
-                return new XSPReplyApiError(ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
+                return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
             status = BotStatus.WakingUp;
         }
         onWakeup();
@@ -147,7 +158,7 @@ public abstract class BotBase implements Bot {
     public XSPReply sleep() {
         synchronized (this) {
             if (status != BotStatus.Awaken && status != BotStatus.Working)
-                return new XSPReplyApiError(ERROR_INVALID_STATUS, "Bot is not awake: " + status);
+                return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not awake: " + status);
             status = BotStatus.GoingToSleep;
         }
         onGoingToSleep();
@@ -168,6 +179,8 @@ public abstract class BotBase implements Bot {
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
+                "\", \"botType\": \"" +
+                TextUtils.escapeStringJSON(botType) +
                 "\", \"wakeupOnStartup\": " +
                 Boolean.toString(wakeupOnStartup) +
                 ", \"status\": \"" +

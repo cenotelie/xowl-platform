@@ -45,10 +45,11 @@ public abstract class BotBaseDaemon extends BotBase {
      *
      * @param identifier      The identifier of the bot
      * @param name            The name of the bot
+     * @param botType         The type of this bot
      * @param wakeupOnStartup Whether this bot should be woken up when the platform starts
      */
-    public BotBaseDaemon(String identifier, String name, boolean wakeupOnStartup) {
-        super(identifier, name, wakeupOnStartup);
+    public BotBaseDaemon(String identifier, String name, String botType, boolean wakeupOnStartup) {
+        super(identifier, name, botType, wakeupOnStartup);
         this.mustStop = new AtomicBoolean(false);
         this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
     }

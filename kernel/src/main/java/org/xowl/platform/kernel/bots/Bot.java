@@ -18,10 +18,8 @@
 package org.xowl.platform.kernel.bots;
 
 import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -31,13 +29,6 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  * @author Laurent Wouters
  */
 public interface Bot extends Identifiable, Serializable {
-    /**
-     * API error - The bot's status is invalid with respect to the requested operation
-     */
-    ApiError ERROR_INVALID_STATUS = new ApiError(0x00000061,
-            "The bot's status is invalid with respect to the requested operation.",
-            PlatformHttp.ERROR_HELP_PREFIX + "0x00000061.html");
-
     /**
      * Gets the security user that is used to run this bot
      *

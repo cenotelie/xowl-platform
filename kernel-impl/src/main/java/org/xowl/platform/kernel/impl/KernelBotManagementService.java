@@ -17,15 +17,14 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.bots.Bot;
 import org.xowl.platform.kernel.bots.BotFactory;
 import org.xowl.platform.kernel.bots.BotManagementService;
@@ -36,7 +35,13 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.webapi.HttpApiRequest;
+import org.xowl.platform.kernel.webapi.HttpApiResource;
+import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
+import org.xowl.platform.kernel.webapi.HttpApiService;
 
+import java.io.Closeable;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +51,20 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class KernelBotManagementService implements BotManagementService, EventConsumer {
+public class KernelBotManagementService implements BotManagementService, HttpApiService, EventConsumer, Closeable {
+    /**
+     * The resource for the API's specification
+     */
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_bots.raml", "Bots Management Service - Specification", HttpApiResource.MIME_RAML);
+    /**
+     * The resource for the API's documentation
+     */
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_bots.html", "Bots Management Service - Documentation", HttpApiResource.MIME_HTML);
+
+    /**
+     * The URI for the API services
+     */
+    private final String apiUri;
     /**
      * The loaded bots
      */
@@ -58,7 +76,8 @@ public class KernelBotManagementService implements BotManagementService, EventCo
      * @param eventService The event service
      */
     public KernelBotManagementService(EventService eventService) {
-        bots = new HashMap<>();
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/bots";
+        this.bots = new HashMap<>();
         eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
     }
 
@@ -69,7 +88,7 @@ public class KernelBotManagementService implements BotManagementService, EventCo
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + " - Bot Management Service";
+        return PlatformUtils.NAME + " - Bots Management Service";
     }
 
     @Override
@@ -86,6 +105,21 @@ public class KernelBotManagementService implements BotManagementService, EventCo
         if (!reply.isSuccess())
             return reply;
         return new XSPReplyResultCollection<>(bots.values());
+    }
+
+    @Override
+    public XSPReply getBot(String botId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_GET_BOTS);
+        if (!reply.isSuccess())
+            return reply;
+
+        Bot bot = bots.get(botId);
+        if (bot == null)
+            return XSPReplyNotFound.instance();
+        return new XSPReplyResult<>(bot);
     }
 
     @Override
@@ -168,9 +202,80 @@ public class KernelBotManagementService implements BotManagementService, EventCo
         return specification;
     }
 
-    /**
-     * When the platform is closing
-     */
+    @Override
+    public int canHandle(HttpApiRequest request) {
+        return request.getUri().startsWith(apiUri)
+                ? HttpApiService.PRIORITY_NORMAL
+                : HttpApiService.CANNOT_HANDLE;
+    }
+
+    @Override
+    public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
+        if (request.getUri().equals(apiUri)) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return XSPReplyUtils.toHttpResponse(getBots(), null);
+        }
+
+        if (request.getUri().startsWith(apiUri)) {
+            String rest = request.getUri().substring(apiUri.length() + 1);
+            if (rest.isEmpty())
+                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+            int index = rest.indexOf("/");
+            String botId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+            if (index < 0) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                return XSPReplyUtils.toHttpResponse(getBot(botId), null);
+            } else if (rest.substring(index).equals("/wakeup")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                return XSPReplyUtils.toHttpResponse(wakeup(botId), null);
+            } else if (rest.substring(index).equals("/putToSleep")) {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                return XSPReplyUtils.toHttpResponse(putToSleep(botId), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Override
+    public HttpApiResource getApiSpecification() {
+        return RESOURCE_SPECIFICATION;
+    }
+
+    @Override
+    public HttpApiResource getApiDocumentation() {
+        return RESOURCE_DOCUMENTATION;
+    }
+
+    @Override
+    public HttpApiResource[] getApiOtherResources() {
+        return null;
+    }
+
+    @Override
+    public String serializedString() {
+        return getIdentifier();
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(HttpApiService.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(getIdentifier()) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(getName()) +
+                "\", \"specification\": " +
+                RESOURCE_SPECIFICATION.serializedJSON() +
+                ", \"documentation\": " +
+                RESOURCE_DOCUMENTATION.serializedJSON() +
+                "}";
+    }
+
+    @Override
     public void close() {
         for (Bot bot : bots.values()) {
             bot.sleep();

@@ -1,0 +1,68 @@
+#%RAML 1.0
+---
+title: Bots Management Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Bot: !include schema_platform_kernel.json#/definitions/Bot
+  Bots: !include schema_platform_kernel.json#/definitions/Bots
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/kernel/bots:
+  description: Collection of the bots on the platform
+  get:
+    description: Gets the list of the bots running on the platform
+    is: [secured, mayFail]
+    responses:
+      200:
+        description: The list of the bots running on the platform
+        body:
+          application/json:
+            type: Bots
+            example: |
+              [
+                {
+                  "type": "org.xowl.platform.kernel.bots.Bot",
+                  "identifier": "bender",
+                  "name": "Bender",
+                  "botType": "org.xowl.platform.kernel.bots.Bender",
+                  "wakeupOnStartup": true,
+                  "status": "Awake"
+                }
+              ]
+  /{botId}:
+    description: Represents a bot running by the platform
+    get:
+      description: Gets the description of the bot
+      is: [secured, mayFail, resourceAccess]
+      responses:
+        200:
+          description: The description of the bot
+          body:
+            application/json:
+              type: Bot
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.bots.Bot",
+                  "identifier": "bender",
+                  "name": "Bender",
+                  "botType": "org.xowl.platform.kernel.bots.Bender",
+                  "wakeupOnStartup": true,
+                  "status": "Awake"
+                }
+    /wakeup:
+      description: Action to wake the bot up
+      post:
+        description: Attemps to wake up the bot
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded
+    /putToSleep:
+      description: Action to put the bot to sleep
+      post:
+        description: Attemps to put the bot to sleep
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded

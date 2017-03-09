@@ -118,6 +118,7 @@ public class Activator implements BundleActivator {
         serviceBots = new KernelBotManagementService(serviceEvents);
         bundleContext.registerService(Service.class, serviceBots, null);
         bundleContext.registerService(SecuredService.class, serviceBots, null);
+        bundleContext.registerService(HttpApiService.class, serviceBots, null);
         bundleContext.registerService(BotManagementService.class, serviceBots, null);
 
         // register the directory service

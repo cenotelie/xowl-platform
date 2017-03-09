@@ -66,6 +66,14 @@ public interface BotManagementService extends SecuredService {
     XSPReply getBots();
 
     /**
+     * Gets the details of a bot
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    XSPReply getBot(String botId);
+
+    /**
      * Wakes a bot up
      *
      * @param botId The identifier of the bot to wake up

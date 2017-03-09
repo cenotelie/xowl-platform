@@ -21,6 +21,9 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.*;
+import org.xowl.platform.kernel.bots.Bot;
+import org.xowl.platform.kernel.bots.BotRemote;
+import org.xowl.platform.kernel.bots.BotSpecification;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobRemote;
 import org.xowl.platform.kernel.platform.*;
@@ -69,6 +72,10 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return new SecurityPolicyConfiguration(definition);
         if (Job.class.getCanonicalName().equals(type))
             return new JobRemote(definition, deserializer);
+        if (Bot.class.getCanonicalName().equals(type))
+            return new BotRemote(definition);
+        if (BotSpecification.class.getCanonicalName().equals(type))
+            return new BotSpecification(definition);
         if (Artifact.class.getCanonicalName().equals(type))
             return new ArtifactRemote(definition);
         if (ArtifactSpecification.class.getCanonicalName().equals(type))

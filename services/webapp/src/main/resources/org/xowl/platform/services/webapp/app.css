@@ -181,3 +181,38 @@
 .autocomplete-item:hover {
   background-color: #D0D0D0;
 }
+
+
+
+
+.private-conversation {
+    color: red;
+}
+
+.public-conversation {
+    color: green;
+}
+
+.nav-conversations {
+   margin: 5px;
+}
+
+table.creation {
+    margin:5px;
+}
+
+table.creation td {
+    padding: 5px;
+}
+
+button.mgmt {
+    margin: auto;
+    max-height: 50px;
+    display: list-item;
+}
+
+ul.scroll {
+    min-height: 150px;
+    max-height:150px;
+    overflow-y:scroll;
+}

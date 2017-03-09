@@ -39,13 +39,6 @@ public class StorageJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(PullArtifactFromLiveJob.class.getCanonicalName()) ||
-                type.equals(PushArtifactToLiveJob.class.getCanonicalName()) ||
-                type.equals(DeleteArtifactJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(PullArtifactFromLiveJob.class.getCanonicalName()))
             return new PullArtifactFromLiveJob(definition);

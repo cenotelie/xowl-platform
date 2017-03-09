@@ -39,11 +39,6 @@ public class MarketplaceJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(AddonInstallationJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(AddonInstallationJob.class.getCanonicalName()))
             return new AddonInstallationJob(definition);

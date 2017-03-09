@@ -39,12 +39,6 @@ public class ConnectorJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(PullArtifactJob.class.getCanonicalName()) ||
-                type.equals(PushArtifactJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(PullArtifactJob.class.getCanonicalName()))
             return new PullArtifactJob(definition);

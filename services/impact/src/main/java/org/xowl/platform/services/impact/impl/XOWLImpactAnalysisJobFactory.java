@@ -38,12 +38,6 @@ public class XOWLImpactAnalysisJobFactory implements JobFactory {
         return PlatformUtils.NAME + " - Impact Analysis Job Factory";
     }
 
-
-    @Override
-    public boolean canDeserialize(String type) {
-        return XOWLImpactAnalysisJob.class.getCanonicalName().equals(type);
-    }
-
     @Override
     public Job newJob(String type, ASTNode definition) {
         if (XOWLImpactAnalysisJob.class.getCanonicalName().equals(type))

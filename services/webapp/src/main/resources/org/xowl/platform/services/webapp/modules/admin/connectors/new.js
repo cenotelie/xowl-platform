@@ -88,10 +88,11 @@ function renderDescriptorParameter(parameter, index) {
 	content.classList.add("input-group");
 	div.appendChild(content);
 
-	var input = document.createElement();
+	var input = document.createElement("input");
 	input.type = (parameter.typeHint === "password" ? "password" : "text");
 	input.id = "input-param-" + index;
 	input.classList.add("form-control");
+	input.placeholder = parameter.placeholder;
 	content.appendChild(input);
 
 	if (parameter.typeHint === "archetype") {
@@ -111,7 +112,16 @@ function renderDescriptorParameter(parameter, index) {
 function setupAutocompleteArchetype(component) {
 	var autocomplete = new AutoComplete(component);
 	autocomplete.lookupItems = function (value) {
-		autocomplete.onItems(filterItems(archetypes, value));
+		if (archetypes !== null) {
+			autocomplete.onItems(filterItems(archetypes, value));
+			return;
+		}
+		xowl.getArtifactArchetypes(function (status, ct, content) {
+			if (status === 200) {
+				archetypes = content;
+				autocomplete.onItems(filterItems(archetypes, value));
+			}
+		});
 	};
 	autocomplete.renderItem = function (item) {
 		var result = document.createElement("div");

@@ -139,7 +139,7 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
                 isRequired +
                 ", \"typeHint\": \"" +
                 TextUtils.escapeStringJSON(typeHint) +
-                ", \"placeholder\": \"" +
+                "\", \"placeholder\": \"" +
                 TextUtils.escapeStringJSON(placeholder) +
                 "\"}";
     }

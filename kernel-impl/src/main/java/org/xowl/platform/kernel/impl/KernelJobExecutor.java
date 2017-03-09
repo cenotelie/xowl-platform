@@ -127,6 +127,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
      * Initializes this service
      *
      * @param configurationService The configuration service to use
+     * @param eventService         The event service
      */
     public KernelJobExecutor(ConfigurationService configurationService, EventService eventService) {
         Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());

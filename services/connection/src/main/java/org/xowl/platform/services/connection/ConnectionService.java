@@ -51,21 +51,21 @@ public interface ConnectionService extends SecuredService {
     /**
      * API error - A connector with the same identifier already exists
      */
-    ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00010001,
+    ApiError ERROR_CONNECTOR_SAME_ID = new ApiError(0x00000121,
             "A connector with the same identifier already exists.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00010001.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000121.html");
     /**
      * API error - Could not find a factory for the specified connector descriptor
      */
-    ApiError ERROR_NO_FACTORY = new ApiError(0x00010002,
+    ApiError ERROR_NO_FACTORY = new ApiError(0x00000122,
             "Could not find a factory for the specified connector descriptor.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00010002.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000122.html");
     /**
      * API error - The connector's queue is empty
      */
-    ApiError ERROR_EMPTY_QUEUE = new ApiError(0x00010003,
+    ApiError ERROR_EMPTY_QUEUE = new ApiError(0x00000123,
             "The connector's queue is empty.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00010003.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000123.html");
 
     /**
      * Gets the available connectors

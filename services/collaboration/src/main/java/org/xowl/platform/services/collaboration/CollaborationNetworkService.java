@@ -82,9 +82,9 @@ public interface CollaborationNetworkService extends SecuredService {
     /**
      * API error - Another operation is already on-going for the collaboration
      */
-    ApiError ERROR_COLLABORATION_BUSY = new ApiError(0x00070001,
+    ApiError ERROR_COLLABORATION_BUSY = new ApiError(0x00000111,
             "Another operation is already on-going for the collaboration.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00070001.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000111.html");
 
     /**
      * Gets the known neighbour collaborations

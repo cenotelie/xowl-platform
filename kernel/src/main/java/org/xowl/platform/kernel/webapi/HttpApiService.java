@@ -62,33 +62,33 @@ public interface HttpApiService extends Service, Serializable {
     /**
      * API error - Failed to parse the content of the request.
      */
-    ApiError ERROR_CONTENT_PARSING_FAILED = new ApiError(0x00000001,
+    ApiError ERROR_CONTENT_PARSING_FAILED = new ApiError(0x00000041,
             "Failed to parse the content of the request.",
-            ERROR_HELP_PREFIX + "0x00000001.html");
+            ERROR_HELP_PREFIX + "0x00000041.html");
     /**
      * API error - Expected query parameters.
      */
-    ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x00000002,
+    ApiError ERROR_EXPECTED_QUERY_PARAMETERS = new ApiError(0x00000042,
             "Expected query parameters.",
-            ERROR_HELP_PREFIX + "0x00000002.html");
+            ERROR_HELP_PREFIX + "0x00000042.html");
     /**
      * API error - Failed to read the content of the request
      */
-    ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x00000003,
+    ApiError ERROR_FAILED_TO_READ_CONTENT = new ApiError(0x00000043,
             "Failed to read the content of the request.",
-            ERROR_HELP_PREFIX + "0x00000003.html");
+            ERROR_HELP_PREFIX + "0x00000043.html");
     /**
      * API error - A query parameter is not in the expected range
      */
-    ApiError ERROR_PARAMETER_RANGE = new ApiError(0x00000004,
+    ApiError ERROR_PARAMETER_RANGE = new ApiError(0x00000044,
             "A query parameter is not in the expected range.",
-            ERROR_HELP_PREFIX + "0x00000004.html");
+            ERROR_HELP_PREFIX + "0x00000044.html");
     /**
      * API error - Expected a Content-Type header
      */
-    ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x00000005,
+    ApiError ERROR_EXPECTED_HEADER_CONTENT_TYPE = new ApiError(0x00000045,
             "Expected a Content-Type header.",
-            ERROR_HELP_PREFIX + "0x00000005.html");
+            ERROR_HELP_PREFIX + "0x00000045.html");
 
     /**
      * Gets whether this server can handle the specified request, and if so with which priority

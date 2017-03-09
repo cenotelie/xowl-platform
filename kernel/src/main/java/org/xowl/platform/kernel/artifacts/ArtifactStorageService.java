@@ -73,15 +73,15 @@ public interface ArtifactStorageService extends SecuredService {
     /**
      * API error - The requested operation failed in storage
      */
-    ApiError ERROR_STORAGE_FAILED = new ApiError(0x00020001,
+    ApiError ERROR_STORAGE_FAILED = new ApiError(0x00000051,
             "The requested operation failed in storage.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00020001.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000051.html");
     /**
      * API error - The artifact is invalid
      */
-    ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00020002,
+    ApiError ERROR_INVALID_ARTIFACT = new ApiError(0x00000052,
             "The artifact is invalid.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00020002.html");
+            HttpApiService.ERROR_HELP_PREFIX + "0x00000052.html");
 
     /**
      * Stores an artifact in a long-term storage facility

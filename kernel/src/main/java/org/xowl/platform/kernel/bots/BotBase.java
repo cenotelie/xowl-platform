@@ -60,16 +60,13 @@ public abstract class BotBase implements Bot {
     /**
      * Initializes this bot
      *
-     * @param identifier      The identifier of the bot
-     * @param name            The name of the bot
-     * @param botType         The type of this bot
-     * @param wakeupOnStartup Whether this bot should be woken up when the platform starts
+     * @param specification The specification for the bot
      */
-    public BotBase(String identifier, String name, String botType, boolean wakeupOnStartup) {
-        this.identifier = identifier;
-        this.name = name;
-        this.botType = botType;
-        this.wakeupOnStartup = wakeupOnStartup;
+    public BotBase(BotSpecification specification) {
+        this.identifier = specification.getIdentifier();
+        this.name = specification.getName();
+        this.botType = specification.getBotType();
+        this.wakeupOnStartup = specification.getWakeupOnStartup();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
             this.platformUser = securityService.getRealm().getUser(identifier);

@@ -46,6 +46,10 @@ public class BotSpecification implements Identifiable, Serializable {
      */
     private final String botType;
     /**
+     * Whether this bot should be woken up when the platform starts
+     */
+    private final boolean wakeupOnStartup;
+    /**
      * The parameters for the bot
      */
     private final Map<String, Object> parameters;
@@ -53,14 +57,16 @@ public class BotSpecification implements Identifiable, Serializable {
     /**
      * Initializes this structure
      *
-     * @param identifier The identifier for this connector
-     * @param name       The name for this connector
-     * @param botType    The type of bot
+     * @param identifier      The identifier for this connector
+     * @param name            The name for this connector
+     * @param botType         The type of bot
+     * @param wakeupOnStartup Whether this bot should be woken up when the platform starts
      */
-    public BotSpecification(String identifier, String name, String botType) {
+    public BotSpecification(String identifier, String name, String botType, boolean wakeupOnStartup) {
         this.identifier = identifier;
         this.name = name;
         this.botType = botType;
+        this.wakeupOnStartup = wakeupOnStartup;
         this.parameters = new HashMap<>();
     }
 
@@ -74,6 +80,7 @@ public class BotSpecification implements Identifiable, Serializable {
         String identifier = "";
         String name = "";
         String botType = "";
+        boolean wakeupOnStartup = false;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -86,6 +93,9 @@ public class BotSpecification implements Identifiable, Serializable {
             } else if ("botType".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 botType = value.substring(1, value.length() - 1);
+            } else if ("wakeupOnStartup".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                wakeupOnStartup = Boolean.parseBoolean(value);
             } else {
                 ASTNode valueNode = member.getChildren().get(1);
                 if (valueNode.getValue() != null) {
@@ -108,6 +118,7 @@ public class BotSpecification implements Identifiable, Serializable {
         this.identifier = identifier;
         this.name = name;
         this.botType = botType;
+        this.wakeupOnStartup = wakeupOnStartup;
     }
 
     /**
@@ -117,6 +128,15 @@ public class BotSpecification implements Identifiable, Serializable {
      */
     public String getBotType() {
         return botType;
+    }
+
+    /**
+     * Gets whether this bot should be woken up when the platform starts
+     *
+     * @return Whether this bot should be woken up when the platform starts
+     */
+    public boolean getWakeupOnStartup() {
+        return wakeupOnStartup;
     }
 
     /**
@@ -173,7 +193,8 @@ public class BotSpecification implements Identifiable, Serializable {
         builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"botType\": \"");
         builder.append(TextUtils.escapeStringJSON(botType));
-        builder.append("\"");
+        builder.append("\", \"wakeupOnStartup\": ");
+        builder.append(Boolean.toString(wakeupOnStartup));
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             builder.append(", \"");
             builder.append(TextUtils.escapeStringJSON(entry.getKey()));

@@ -4,6 +4,7 @@
 var xowl = new XOWL();
 var descriptors = null;
 var selectedDescriptor = null;
+var archetypes = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -56,19 +57,80 @@ function onDescriptorSelect() {
 	document.getElementById("input-descriptor-description").value = selectedDescriptor.description;
 	for (var i = 0; i != selectedDescriptor.parameters.length; i++) {
 		var parameter = selectedDescriptor.parameters[i];
-		var data = "<div class='form-group'>";
-		if (parameter.isRequired)
-			data += "<span class='col-sm-1 glyphicon glyphicon-star text-danger' aria-hidden='true' title='required'></span>";
-		else
-			data += "<span class='col-sm-1' aria-hidden='true'></span>";
-		data += "<label class='col-sm-2 control-label'>";
-		data += parameter.name;
-		data += "</label>";
-		data += "<div class='col-sm-9'>";
-		data += "<input type='" + (parameter.typeHint === "password" ? "password" : "text") + "' class='form-control' id='input-param-" + i + "'>";
-		data += "</div></div>";
-		params.innerHTML += data;
+		params.appendChild(renderDescriptorParameter(parameter, i));
+		if (parameter.typeHint === "archetype")
+			setupAutocompleteArchetype("input-param-" + i);
 	}
+}
+
+function renderDescriptorParameter(parameter, index) {
+	var div = document.createElement("div");
+	div.classList.add("form-group");
+
+	var span = document.createElement("span");
+	span.classList.add("col-sm-1");
+	if (parameter.isRequired) {
+		span.classList.add("glyphicon");
+		span.classList.add("glyphicon-star");
+		span.classList.add("text-danger");
+		span.title = "REQUIRED";
+	}
+	div.appendChild(span);
+
+	var label = document.createElement("label");
+	label.classList.add("col-sm-2");
+	label.classList.add("control-label");
+	label.appendChild(document.createTextNode(parameter.name));
+	div.appendChild(label);
+
+	var content = document.createElement("div");
+	content.classList.add("col-sm-9");
+	content.classList.add("input-group");
+	div.appendChild(content);
+
+	var input = document.createElement();
+	input.type = (parameter.typeHint === "password" ? "password" : "text");
+	input.id = "input-param-" + index;
+	input.classList.add("form-control");
+	content.appendChild(input);
+
+	if (parameter.typeHint === "archetype") {
+		var addon = document.createElement("div");
+		addon.classList.add("input-group-addon");
+		var image = document.createElement("img");
+		image.width = "20";
+		image.height = "20";
+		image.style.display = "none";
+		image.id = "input-param-" + index + "-indicator";
+		addon.appendChild(image);
+		content.appendChild(addon);
+	}
+	return div;
+}
+
+function setupAutocompleteArchetype(component) {
+	var autocomplete = new AutoComplete(component);
+	autocomplete.lookupItems = function (value) {
+		autocomplete.onItems(filterItems(archetypes, value));
+	};
+	autocomplete.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
 }
 
 function onClickNewConnector() {

@@ -43,6 +43,10 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
      * Type hint for an uri parameter
      */
     public static final String TYPE_HINT_URI = "uri";
+    /**
+     * Type hint for an archetype parameter
+     */
+    public static final String TYPE_HINT_ARCHETYPE = "archetype";
 
     /**
      * The parameter's unique identifier
@@ -60,6 +64,10 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
      * The type hint for the parameter
      */
     protected final String typeHint;
+    /**
+     * The placeholder for the parameter
+     */
+    protected final String placeholder;
 
     /**
      * Initializes this parameter
@@ -69,11 +77,12 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
      * @param isRequired Whether the parameter is required
      * @param typeHint   The type hint for the parameter
      */
-    public ConnectorDescriptorParam(String id, String name, boolean isRequired, String typeHint) {
+    public ConnectorDescriptorParam(String id, String name, boolean isRequired, String typeHint, String placeholder) {
         this.identifier = id;
         this.name = name;
         this.isRequired = isRequired;
         this.typeHint = typeHint;
+        this.placeholder = placeholder;
     }
 
     @Override
@@ -104,6 +113,15 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
         return typeHint;
     }
 
+    /**
+     * Gets the placeholder for the parameter
+     *
+     * @return The placeholder for the parameter
+     */
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
     @Override
     public String serializedString() {
         return identifier;
@@ -121,6 +139,8 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
                 isRequired +
                 ", \"typeHint\": \"" +
                 TextUtils.escapeStringJSON(typeHint) +
+                ", \"placeholder\": \"" +
+                TextUtils.escapeStringJSON(placeholder) +
                 "\"}";
     }
 }

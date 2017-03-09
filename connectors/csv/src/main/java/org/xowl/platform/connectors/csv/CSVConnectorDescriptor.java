@@ -35,7 +35,7 @@ public class CSVConnectorDescriptor extends ConnectorDescriptorBase {
      */
     private CSVConnectorDescriptor() {
         super(CSVConnectorDescriptor.class.getCanonicalName(),
-                "Generic CSV Datasets",
+                "xOWL - CSV datasets",
                 "Connection for raw CSV datasets.");
     }
 }

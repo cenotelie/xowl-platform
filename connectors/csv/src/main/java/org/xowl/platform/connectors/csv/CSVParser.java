@@ -31,7 +31,7 @@ import java.util.Iterator;
  *
  * @author Laurent Wouters
  */
-class CSVParser {
+public class CSVParser {
     /**
      * The input lexer
      */

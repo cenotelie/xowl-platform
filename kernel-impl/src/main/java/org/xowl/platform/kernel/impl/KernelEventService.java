@@ -149,6 +149,17 @@ public class KernelEventService implements EventService {
         }
     }
 
+    @Override
+    public void unsubscribe(EventConsumer consumer) {
+        synchronized (routes) {
+            for (Map.Entry<Identifiable, Map<String, List<EventConsumer>>> route : routes.entrySet()) {
+                for (Map.Entry<String, List<EventConsumer>> sub : route.getValue().entrySet()) {
+                    sub.getValue().remove(consumer);
+                }
+            }
+        }
+    }
+
     /**
      * Main function for the dispatching thread
      */

@@ -23,8 +23,8 @@ import java.util.Iterator;
 /**
  * Represents a parser of CSV document
  * This parser implements the following grammar:
- * Document -> Row (LineEnding Row)* EOF
- * Row -> ( Cell (Separator Cell)* )?
+ * Document -&gt; Row (LineEnding Row)* EOF
+ * Row -&gt; ( Cell (Separator Cell)* )?
  * <p>
  * An empty document is matched as having a single row with no cell.
  * A line ending just before the EOF also represents an empty row.

@@ -22,7 +22,6 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;
@@ -82,7 +81,6 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param type The job's type
      */
     public JobBase(String name, String type) {
-        super(Logging.get());
         PlatformUser owner = null;
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
@@ -104,7 +102,6 @@ public abstract class JobBase extends SafeRunnable implements Job {
      * @param definition The JSON definition
      */
     public JobBase(ASTNode definition) {
-        super(Logging.get());
         String id = null;
         String name = null;
         String type = null;

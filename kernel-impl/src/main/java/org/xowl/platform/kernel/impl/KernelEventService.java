@@ -70,7 +70,7 @@ public class KernelEventService implements EventService {
      * Initializes this service
      */
     public KernelEventService() {
-        this.dispatchThread = new Thread(new SafeRunnable(Logging.get()) {
+        this.dispatchThread = new Thread(new SafeRunnable() {
             @Override
             public void doRun() {
                 KernelEventService.this.dispatchRun();

@@ -127,6 +127,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
      * Initializes this service
      *
      * @param configurationService The configuration service to use
+     * @param eventService         The event service
      */
     public KernelJobExecutor(ConfigurationService configurationService, EventService eventService) {
         Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
@@ -278,10 +279,9 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         }
         Collection<JobFactory> factories = Register.getComponents(JobFactory.class);
         for (JobFactory factory : factories) {
-            if (factory.canDeserialize(type)) {
-                Job job = factory.newJob(type, definition);
-                if (job != null)
-                    executorPool.execute(job);
+            Job job = factory.newJob(type, definition);
+            if (job != null) {
+                executorPool.execute(job);
                 return;
             }
         }

@@ -39,11 +39,6 @@ public class CSVimportationJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(CSVImportationJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(CSVImportationJob.class.getCanonicalName()))
             return new CSVImportationJob(CSVImporter.INSTANCE, definition);

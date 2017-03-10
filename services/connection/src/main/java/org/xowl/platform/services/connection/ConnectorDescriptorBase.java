@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
 import java.util.Collection;
@@ -49,6 +50,41 @@ public class ConnectorDescriptorBase implements ConnectorDescriptor {
      * @param description The domain's description
      */
     public ConnectorDescriptorBase(String identifier, String name, String description) {
+        this.identifier = identifier;
+        this.name = name;
+        this.description = description;
+    }
+
+    /**
+     * Initializes this description
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public ConnectorDescriptorBase(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        String description = "";
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            switch (head) {
+                case "identifier": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    identifier = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "name": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    name = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "description": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    description = value.substring(1, value.length() - 1);
+                    break;
+                }
+            }
+        }
         this.identifier = identifier;
         this.name = name;
         this.description = description;

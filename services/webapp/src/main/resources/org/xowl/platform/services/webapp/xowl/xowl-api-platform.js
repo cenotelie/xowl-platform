@@ -532,7 +532,7 @@ XOWL.prototype.getJob = function (callback, jobId) {
 XOWL.prototype.cancelJob = function (callback, jobId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
+			callback(code, null, null);
 		} else {
 			callback(code, type, content);
 		}
@@ -961,6 +961,52 @@ XOWL.prototype.getCollaborationNeighbourOutputs = function (callback, neighbourI
 			callback(code, type, content);
 		}
 	}, "services/collaboration/neighbours/" + encodeURIComponent(neighbourId) + "/manifest/outputs/" + encodeURIComponent(specificationId) + "/artifacts", null, "GET", null, null);
+}
+
+
+
+/*****************************************************
+ * Community - Bots Management Service
+ ****************************************************/
+
+XOWL.prototype.getBots = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/bots", null, "GET", null, null);
+}
+
+XOWL.prototype.getBot = function (callback, botId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/bots/" + encodeURIComponent(botId), null, "GET", null, null);
+}
+
+XOWL.prototype.wakeupBot = function (callback, botId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/bots/" + encodeURIComponent(botId) + "/wakeup", null, "POST", null, null);
+}
+
+XOWL.prototype.putBotToSleep = function (callback, botId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/bots/" + encodeURIComponent(botId) + "/putToSleep", null, "POST", null, null);
 }
 
 

@@ -39,11 +39,6 @@ public class CollaborationJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(CollaborationSpawnJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(CollaborationSpawnJob.class.getCanonicalName()))
             return new CollaborationSpawnJob(definition);

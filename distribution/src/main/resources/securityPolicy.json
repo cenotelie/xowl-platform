@@ -99,6 +99,30 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.kernel.bots.BotManagementService.GetBots"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.bots.BotManagementService.Wakeup"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.bots.BotManagementService.Sleep"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.kernel.security.SecurityService.GetPolicy"
       },
       "policy": {

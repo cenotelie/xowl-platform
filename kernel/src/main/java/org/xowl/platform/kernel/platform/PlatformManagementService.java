@@ -24,10 +24,10 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
 import org.xowl.infra.utils.product.Product;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
-import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -146,19 +146,19 @@ public interface PlatformManagementService extends SecuredService, MeasurableSer
      */
     ApiError ERROR_ADDON_ALREADY_INSTALLED = new ApiError(0x00000021,
             "The addon is already installed.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000021.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000021.html");
     /**
      * API error - The addon is not installed
      */
     ApiError ERROR_ADDON_NOT_INSTALLED = new ApiError(0x00000022,
             "The addon is not installed.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000022.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000022.html");
     /**
      * API error - The provided addon package is invalid
      */
     ApiError ERROR_INVALID_ADDON_PACKAGE = new ApiError(0x00000023,
             "The provided addon package is invalid.",
-            HttpApiService.ERROR_HELP_PREFIX + "0x00000023.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000023.html");
 
     /**
      * Gets the product descriptor for the platform

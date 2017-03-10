@@ -24,6 +24,7 @@ import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.jobs.JobFactory;
+import org.xowl.platform.kernel.remote.DeserializerFactory;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.connection.impl.XOWLConnectionService;
@@ -38,6 +39,8 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForConnection(), null);
+
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
             public void onAvailable(BundleContext bundleContext, PlatformHttp component) {

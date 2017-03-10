@@ -65,4 +65,11 @@ public interface EventService extends Service, MeasurableService {
      * @param eventType  The specific event type to wait for, or null if any event type is acceptable
      */
     void subscribe(EventConsumer consumer, Identifiable originator, String eventType);
+
+    /**
+     * Un-subscribes to all events
+     *
+     * @param consumer The un-subscribing consumer
+     */
+    void unsubscribe(EventConsumer consumer);
 }

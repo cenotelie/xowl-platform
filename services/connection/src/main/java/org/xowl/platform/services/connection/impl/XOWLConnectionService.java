@@ -32,9 +32,12 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
+import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -56,7 +59,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConnectionService implements ConnectionService, HttpApiService {
+public class XOWLConnectionService implements ConnectionService, HttpApiService, EventConsumer {
     /**
      * The data about a spawned connector
      */
@@ -92,14 +95,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
      * The spawned connectors by identifier
      */
     private final Map<String, Registration> connectorsById;
-    /**
-     * The map of statically configured connectors to resolve
-     */
-    private Map<String, List<Section>> toResolve;
-    /**
-     * Flag whether resolving operations are in progress
-     */
-    private boolean isResolving;
 
     /**
      * Initializes this service
@@ -107,6 +102,9 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     public XOWLConnectionService() {
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/connection";
         this.connectorsById = new HashMap<>();
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
     }
 
     @Override
@@ -211,14 +209,25 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     @Override
+    public void onEvent(Event event) {
+        if (event.getType().equals(PlatformStartupEvent.TYPE)) {
+            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
+            if (configurationService == null)
+                return;
+            Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
+            for (Section section : configuration.getSections()) {
+                resolveConfigConnector(section);
+            }
+        }
+    }
+
+    @Override
     public Collection<ConnectorService> getConnectors() {
-        resolveConfigConnectors();
         return Register.getComponents(ConnectorService.class);
     }
 
     @Override
     public ConnectorService getConnector(String identifier) {
-        resolveConfigConnectors();
         Registration registration = connectorsById.get(identifier);
         if (registration != null)
             return registration.service;
@@ -304,76 +313,33 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
     }
 
     /**
-     * Resolve statically configured connectors
-     */
-    private void resolveConfigConnectors() {
-        if (isResolving)
-            return;
-        isResolving = true;
-        if (toResolve == null) {
-            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            if (configurationService == null)
-                return;
-            Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
-            toResolve = new HashMap<>();
-            for (Section section : configuration.getSections()) {
-                String descriptorId = section.get("descriptor");
-                if (descriptorId == null)
-                    continue;
-                List<Section> sections = toResolve.get(descriptorId);
-                if (sections == null) {
-                    sections = new ArrayList<>();
-                    toResolve.put(descriptorId, sections);
-                }
-                sections.add(section);
-            }
-        }
-        List<Map.Entry<String, List<Section>>> entries = new ArrayList<>(toResolve.entrySet());
-        for (Map.Entry<String, List<Section>> entry : entries) {
-            for (ConnectorDescriptor description : Register.getComponents(ConnectorDescriptor.class)) {
-                if (description.getIdentifier().equals(entry.getKey())) {
-                    resolveConfigConnectors(description, entry.getValue());
-                    break;
-                }
-            }
-        }
-        isResolving = false;
-    }
-
-    /**
      * Resolves a statically configured connector
      *
-     * @param description The description
-     * @param sections    The configurations to resolve
+     * @param section The configuration to resolve
      */
-    private void resolveConfigConnectors(ConnectorDescriptor description, List<Section> sections) {
-        for (int i = sections.size() - 1; i != -1; i--) {
-            if (resolveConfigConnector(description, sections.get(i)))
-                sections.remove(i);
-        }
-        if (sections.isEmpty())
-            toResolve.remove(description.getIdentifier());
-    }
-
-    /**
-     * Resolves a statically configured connector
-     *
-     * @param description The description
-     * @param section     The configuration to resolve
-     * @return Whether the operation succeeded
-     */
-    private boolean resolveConfigConnector(ConnectorDescriptor description, Section section) {
+    private void resolveConfigConnector(Section section) {
         String id = section.getName();
         String name = section.get("name");
-        if (id == null || name == null)
-            return false;
+        String descriptorId = section.get("descriptor");
+        if (id == null || name == null || descriptorId == null)
+            return;
+        ConnectorDescriptor descriptor = null;
+        for (ConnectorDescriptor d : Register.getComponents(ConnectorDescriptor.class)) {
+            if (d.getIdentifier().equalsIgnoreCase(descriptorId)) {
+                descriptor = d;
+                break;
+            }
+        }
+        if (descriptor == null)
+            return;
+
         List<String> uris = section.getAll("uris");
         ConnectorServiceData specification = new ConnectorServiceData(id, name, uris.toArray(new String[uris.size()]));
         for (String property : section.getProperties()) {
-            if (property.equals("name") || property.equals("uris"))
+            if (property.equals("name") || property.equals("uris") || property.equals("descriptor"))
                 continue;
             ConnectorDescriptorParam parameter = null;
-            for (ConnectorDescriptorParam p : description.getParameters()) {
+            for (ConnectorDescriptorParam p : descriptor.getParameters()) {
                 if (p.getIdentifier().equals(property)) {
                     parameter = p;
                     break;
@@ -387,8 +353,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService 
             else if (values.size() > 1)
                 specification.addParameter(parameter, values.toArray());
         }
-        XSPReply reply = spawn(description, specification);
-        return reply.isSuccess();
+        spawn(descriptor, specification);
     }
 
     /**

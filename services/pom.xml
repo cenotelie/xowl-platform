@@ -14,6 +14,7 @@
     <modules>
         <module>security-internal</module>
         <module>collaboration</module>
+        <module>community</module>
         <module>marketplace</module>
         <module>storage</module>
         <module>consistency</module>

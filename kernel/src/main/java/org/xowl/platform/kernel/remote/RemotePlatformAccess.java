@@ -1051,6 +1051,51 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Gets the description of the bots on the platform
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getBots() {
+        return doRequest("/services/community/bots", HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific bot on the platform
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    public XSPReply getBot(String botId) {
+        return doRequest(
+                "/services/community/bots/" + URIUtils.encodeComponent(botId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Attempts to wake a bot up on the platform
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    public XSPReply wakeupBot(String botId) {
+        return doRequest(
+                "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/wakeup",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Attempts to put a bot to sleep on the platform
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    public XSPReply putBotToSleep(String botId) {
+        return doRequest(
+                "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/putToSleep",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
      * Gets the descriptors for available connectors
      *
      * @return The protocol reply

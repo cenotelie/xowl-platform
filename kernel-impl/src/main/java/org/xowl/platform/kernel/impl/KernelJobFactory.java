@@ -40,11 +40,6 @@ public class KernelJobFactory implements JobFactory {
     }
 
     @Override
-    public boolean canDeserialize(String type) {
-        return (type.equals(PlatformRebootJob.class.getCanonicalName()));
-    }
-
-    @Override
     public Job newJob(String type, ASTNode definition) {
         if (type.equals(PlatformRebootJob.class.getCanonicalName()))
             return new PlatformRebootJob(definition);

@@ -43,17 +43,17 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
  */
 public class Activator implements BundleActivator {
     /**
+     * The event service
+     */
+    private KernelEventService serviceEvents;
+    /**
      * The job executor service
      */
     private KernelJobExecutor serviceJobExecutor;
     /**
-     * The event service
-     */
-    private KernelEventService eventService;
-    /**
      * The platform management service
      */
-    private KernelPlatformManagementService platformService;
+    private KernelPlatformManagementService servicePlatform;
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
@@ -95,13 +95,13 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
 
         // register the event service
-        eventService = new KernelEventService();
-        bundleContext.registerService(Service.class, eventService, null);
-        bundleContext.registerService(MeasurableService.class, eventService, null);
-        bundleContext.registerService(EventService.class, eventService, null);
+        serviceEvents = new KernelEventService(securityService);
+        bundleContext.registerService(Service.class, serviceEvents, null);
+        bundleContext.registerService(MeasurableService.class, serviceEvents, null);
+        bundleContext.registerService(EventService.class, serviceEvents, null);
 
         // register the job executor service
-        serviceJobExecutor = new KernelJobExecutor(configurationService, eventService);
+        serviceJobExecutor = new KernelJobExecutor(configurationService, serviceEvents);
         bundleContext.registerService(Service.class, serviceJobExecutor, null);
         bundleContext.registerService(SecuredService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
@@ -116,13 +116,13 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
 
         // register the platform management service
-        platformService = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
-        bundleContext.registerService(Service.class, platformService, null);
-        bundleContext.registerService(SecuredService.class, platformService, null);
-        bundleContext.registerService(HttpApiService.class, platformService, null);
-        bundleContext.registerService(MeasurableService.class, platformService, null);
-        bundleContext.registerService(PlatformManagementService.class, platformService, null);
-        bundleContext.addFrameworkListener(platformService);
+        servicePlatform = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
+        bundleContext.registerService(Service.class, servicePlatform, null);
+        bundleContext.registerService(SecuredService.class, servicePlatform, null);
+        bundleContext.registerService(HttpApiService.class, servicePlatform, null);
+        bundleContext.registerService(MeasurableService.class, servicePlatform, null);
+        bundleContext.registerService(PlatformManagementService.class, servicePlatform, null);
+        bundleContext.addFrameworkListener(servicePlatform);
 
         // register the HTTP API discovery service
         KernelHttpApiDiscoveryService discoveryService = new KernelHttpApiDiscoveryService();
@@ -133,10 +133,10 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (eventService != null && platformService != null)
-            eventService.onEvent(new PlatformShutdownEvent(platformService));
-        if (eventService != null)
-            eventService.close();
+        if (serviceEvents != null && servicePlatform != null)
+            serviceEvents.onEvent(new PlatformShutdownEvent(servicePlatform));
+        if (serviceEvents != null)
+            serviceEvents.close();
         if (serviceJobExecutor != null)
             serviceJobExecutor.close();
     }

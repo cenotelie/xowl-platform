@@ -9,13 +9,13 @@ types:
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/jobs:
-  description: Collection of the jobs management by the platform
+  description: Collection of the jobs managed by the platform
   get:
     description: Gets the list of the jobs managed by the platform
     is: [secured, mayFail]
     responses:
       200:
-        description: The list of the jobs amanged by the platform
+        description: The list of the jobs managed by the platform
         body:
           application/json:
             type: Jobs

@@ -129,6 +129,12 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-service-community</artifactId>
+            <version>0.2.4-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-connection</artifactId>
             <version>0.2.4-SNAPSHOT</version>
             <scope>compile</scope>

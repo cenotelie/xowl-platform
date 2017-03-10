@@ -76,7 +76,7 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
      * @param eventService The event service
      */
     public XOWLBotManagementService(EventService eventService) {
-        this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/bots";
+        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/community/bots";
         this.bots = new HashMap<>();
         eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
     }

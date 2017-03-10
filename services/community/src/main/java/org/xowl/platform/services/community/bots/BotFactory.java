@@ -15,36 +15,21 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.bots;
+package org.xowl.platform.services.community.bots;
+
+import org.xowl.platform.kernel.Registrable;
 
 /**
- * Represents the status of a bot
+ * A factory of bots that is used to produce bots from their serialized representation
  *
  * @author Laurent Wouters
  */
-public enum BotStatus {
+public interface BotFactory extends Registrable {
     /**
-     * The bot is invalid, or the request that lead to this result is invalid
+     * Creates a bot from the specified definition
+     *
+     * @param specification The specification for the bot
+     * @return The created bot, or null if it cannot be created
      */
-    Invalid,
-    /**
-     * The bot is asleep (not running)
-     */
-    Asleep,
-    /**
-     * The bot is currently waking up
-     */
-    WakingUp,
-    /**
-     * The bot is awaken, but not currently doing something (may be waiting for inputs)
-     */
-    Awaken,
-    /**
-     * The bot is awaken and doing some work (i.e. running and consuming CPU cycles)
-     */
-    Working,
-    /**
-     * The bot is currently going to sleep
-     */
-    GoingToSleep
+    Bot newBot(BotSpecification specification);
 }

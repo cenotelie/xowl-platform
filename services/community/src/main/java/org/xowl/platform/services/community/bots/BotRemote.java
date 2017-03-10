@@ -15,21 +15,32 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.bots;
+package org.xowl.platform.services.community.bots;
 
-import org.xowl.platform.kernel.Registrable;
+import org.xowl.hime.redist.ASTNode;
 
 /**
- * A factory of bots that is used to produce bots from their serialized representation
+ * Represents a bot on a remote platform
  *
  * @author Laurent Wouters
  */
-public interface BotFactory extends Registrable {
+public class BotRemote extends BotBase {
     /**
-     * Creates a bot from the specified definition
+     * Initializes this bot
      *
-     * @param specification The specification for the bot
-     * @return The created bot, or null if it cannot be created
+     * @param definition The JSON definition
      */
-    Bot newBot(BotSpecification specification);
+    public BotRemote(ASTNode definition) {
+        super(definition);
+    }
+
+    @Override
+    protected void onWakeup() {
+        // do nothing
+    }
+
+    @Override
+    protected void onGoingToSleep() {
+        // do nothing
+    }
 }

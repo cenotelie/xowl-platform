@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.bots;
+package org.xowl.platform.services.community.bots;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;

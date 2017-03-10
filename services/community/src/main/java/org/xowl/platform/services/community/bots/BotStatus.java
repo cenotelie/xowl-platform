@@ -15,32 +15,36 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.bots;
-
-import org.xowl.hime.redist.ASTNode;
+package org.xowl.platform.services.community.bots;
 
 /**
- * Represents a bot on a remote platform
+ * Represents the status of a bot
  *
  * @author Laurent Wouters
  */
-public class BotRemote extends BotBase {
+public enum BotStatus {
     /**
-     * Initializes this bot
-     *
-     * @param definition The JSON definition
+     * The bot is invalid, or the request that lead to this result is invalid
      */
-    public BotRemote(ASTNode definition) {
-        super(definition);
-    }
-
-    @Override
-    protected void onWakeup() {
-        // do nothing
-    }
-
-    @Override
-    protected void onGoingToSleep() {
-        // do nothing
-    }
+    Invalid,
+    /**
+     * The bot is asleep (not running)
+     */
+    Asleep,
+    /**
+     * The bot is currently waking up
+     */
+    WakingUp,
+    /**
+     * The bot is awaken, but not currently doing something (may be waiting for inputs)
+     */
+    Awaken,
+    /**
+     * The bot is awaken and doing some work (i.e. running and consuming CPU cycles)
+     */
+    Working,
+    /**
+     * The bot is currently going to sleep
+     */
+    GoingToSleep
 }

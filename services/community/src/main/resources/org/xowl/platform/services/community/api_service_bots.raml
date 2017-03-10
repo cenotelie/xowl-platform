@@ -4,11 +4,11 @@ title: Bots Management Service
 version: v1
 types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
-  Bot: !include schema_platform_kernel.json#/definitions/Bot
-  Bots: !include schema_platform_kernel.json#/definitions/Bots
+  Bot: !include schema_platform_community.json#/definitions/Bot
+  Bots: !include schema_platform_community.json#/definitions/Bots
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
-/kernel/bots:
+/services/community/bots:
   description: Collection of the bots on the platform
   get:
     description: Gets the list of the bots running on the platform
@@ -22,7 +22,7 @@ baseUri: https://localhost:8443/api
             example: |
               [
                 {
-                  "type": "org.xowl.platform.kernel.bots.Bot",
+                  "type": "org.xowl.platform.services.community.bots.Bot",
                   "identifier": "bender",
                   "name": "Bender",
                   "botType": "org.xowl.platform.kernel.bots.Bender",
@@ -43,7 +43,7 @@ baseUri: https://localhost:8443/api
               type: Bot
               example: |
                 {
-                  "type": "org.xowl.platform.kernel.bots.Bot",
+                  "type": "org.xowl.platform.services.community.bots.Bot",
                   "identifier": "bender",
                   "name": "Bender",
                   "botType": "org.xowl.platform.kernel.bots.Bender",

@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.bots;
+package org.xowl.platform.services.community.bots;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;

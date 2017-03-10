@@ -25,7 +25,6 @@ import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
-import org.xowl.platform.kernel.bots.BotManagementService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
@@ -51,10 +50,6 @@ public class Activator implements BundleActivator {
      * The job executor service
      */
     private KernelJobExecutor serviceJobExecutor;
-    /**
-     * The bot management service
-     */
-    private KernelBotManagementService serviceBots;
     /**
      * The platform management service
      */
@@ -114,13 +109,6 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(JobFactory.class, new KernelJobFactory(), null);
 
-        // register the bots management service
-        serviceBots = new KernelBotManagementService(serviceEvents);
-        bundleContext.registerService(Service.class, serviceBots, null);
-        bundleContext.registerService(SecuredService.class, serviceBots, null);
-        bundleContext.registerService(HttpApiService.class, serviceBots, null);
-        bundleContext.registerService(BotManagementService.class, serviceBots, null);
-
         // register the directory service
         KernelBusinessDirectoryService directoryService = new KernelBusinessDirectoryService();
         bundleContext.registerService(Service.class, directoryService, null);
@@ -151,7 +139,5 @@ public class Activator implements BundleActivator {
             serviceEvents.close();
         if (serviceJobExecutor != null)
             serviceJobExecutor.close();
-        if (serviceBots != null)
-            serviceBots.close();
     }
 }

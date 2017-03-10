@@ -156,7 +156,7 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     public void onEvent(Event event) {
         if (event.getType().equals(PlatformStartupEvent.TYPE)) {
             ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService.getConfigFor(XOWLBotManagementService.class.getCanonicalName());
+            Configuration configuration = configurationService.getConfigFor(BotManagementService.class.getCanonicalName());
             for (Section section : configuration.getSections()) {
                 BotSpecification specification = loadBotSpecification(section);
                 if (specification == null)

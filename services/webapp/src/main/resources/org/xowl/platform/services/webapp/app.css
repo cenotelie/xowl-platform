@@ -195,6 +195,7 @@
 
 .nav-conversations {
    margin: 5px;
+   padding: 5px;
 }
 
 table.creation {
@@ -211,8 +212,12 @@ button.mgmt {
     display: list-item;
 }
 
-ul.scroll {
+select.users {
+    height: 150px;
     min-height: 150px;
-    max-height:150px;
-    overflow-y:scroll;
+    max-height: 150px;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    overflow-x: auto;
 }

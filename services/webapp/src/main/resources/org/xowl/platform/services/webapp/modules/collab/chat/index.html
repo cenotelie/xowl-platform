@@ -8,17 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
-    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Local CSS -->
     <link rel="stylesheet" type="text/css" href="../../../app.css">
-    <script src="../../../vendors/modernizr-2.8.3-respond-1.4.2.min.js"></script>
-    <script src="../../../vendors/jquery-1.11.2.min.js"></script>
-    <script src="../../../vendors/bootstrap.min.js"></script>
 </head>
 
 <body>
-<div id="placeholder-header" class="row">
-</div>
+<div id="placeholder-header" class="row"></div>
 <div class="body">
     <nav class="navbar navbar-default nav-conversations">
         <form class="navbar-form navbar-left">
@@ -45,6 +46,7 @@
         <tr>
             <th>Topic</th>
             <th>Owner</th>
+            <th>Abstract</th>
             <th>Started</th>
             <th>Finished</th>
             <th>Actions</th>
@@ -52,6 +54,7 @@
         <tr class="private-conversation">
             <td>Safety Requirements</td>
             <td>Ali Koudri</td>
+            <td>Discussion about the elicitation of safety requirements of the system</td>
             <td>16/01/2017</td>
             <td>-</td>
             <td>
@@ -79,6 +82,7 @@
         <tr class="public-conversation">
             <td>Software Architecture</td>
             <td>Stephen Creff</td>
+            <td>Discussion about the software choices for implementing software parts of the system</td>
             <td>11/02/2017</td>
             <td>-</td>
             <td>
@@ -90,6 +94,7 @@
         <tr class="public-conversation">
             <td>Network Architecture</td>
             <td>Laurent Wouters</td>
+            <td>Discussion about the deployment of the system over the network</td>
             <td>25/02/2017</td>
             <td>-</td>
             <td>
@@ -108,37 +113,54 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Create New Conversation</h4>
+                    <h4 class="modal-title">Configure Conversation</h4>
                 </div>
-                <div class="modal-header">
+                <div class="modal-body">
                     <table class="creation">
                         <tr>
-                            <td><label>Topic</label></td>
-                            <td><input type="text" placeholder="My topic name" name="topic"/></td>
+                            <td><label for="c_topic">Topic</label></td>
+                            <td colspan="2">
+                                <input type="text" placeholder="My topic name" id="c_topic" class="form-control"/>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label>Keywords</label></td>
-                            <td><input type="text" placeholder="Keyword 1, Keyword 2, ..." name="topic"/></td>
+                            <td><label for="c_keywords">Keywords</label></td>
+                            <td><input type="text" placeholder="Keyword 1, Keyword 2, ..."
+                                       id="c_keywords" class="form-control"/>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label>Visibility</label></td>
-                            <td>
-                                <select name="visibility">
+                            <td colspan="3"><label for="c_abstract">Abstract</label></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <textarea class="form-control" id="c_abstract" rows="5"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="c_Visibility">Visibility</label></td>
+                            <td  colspan="2">
+                                <select id="c_visibility">
                                     <option value="public">public</option>
-                                    <option value="private">private</option>
+                                    <option value="private" selected>private</option>
                                 </select>
                             </td>
                         </tr>
+                        <tr>
+                            <td colspan="3"><label for="c_users">Participants</label></td>
+                        </tr>
                         <tr style="border: 1px #dbdbdb solid; padding: 2px;">
                             <td>
-                                <ul class="list-group scroll">
-                                    <li class="list-group-item">Stephen Creff</li>
-                                    <li class="list-group-item">Laurent Wouters</li>
-                                    <li class="list-group-item">Michel Batteux</li>
-                                    <li class="list-group-item">Sullivan Kuttler</li>
-                                    <li class="list-group-item">Jérôme Le Noir</li>
-                                    <li class="list-group-item">Sébastien Madelénat</li>
-                                </ul>
+                                <div class="form-group">
+                                    <select class="form-control users" id="c_users" multiple>
+                                        <option>Stephen Creff</option>
+                                        <option>Laurent Wouters</option>
+                                        <option>Michel Batteux</option>
+                                        <option>Sullivan Kuttler</option>
+                                        <option>Jérôme Le Noir</option>
+                                        <option>Sébastien Madelénat</option>
+                                    </select>
+                                </div>
                             </td>
                             <td style="text-align: center;">
                                 <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add">
@@ -155,14 +177,12 @@
                                 </button>
                             </td>
                             <td>
-                                <ul class="list-group scroll">
-                                    <li class="list-group-item">Makhlouf Hadj</li>
-                                    <li class="list-group-item">Zeng Li</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                </ul>
+                                <div class="form-group">
+                                    <select class="form-control users" id="c_participants" multiple>
+                                        <option>Makhlouf Hadj</option>
+                                        <option>Zeng Li</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -171,7 +191,7 @@
                     <table class="creation">
                         <tr>
                             <td colspan="2">
-                                <button type="button" class="btn btn-primary">Create</button>
+                                <button type="button" class="btn btn-primary">Save</button>
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                             </td>
                         </tr>
@@ -188,36 +208,52 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Configure Conversation</h4>
                 </div>
-                <div class="modal-header">
+                <div class="modal-body">
                     <table class="creation">
                         <tr>
-                            <td><label>Topic</label></td>
-                            <td><input type="text" placeholder="My topic name" name="topic" value="Safety Requirements"/></td>
+                            <td><label for="m_topic">Topic</label></td>
+                            <td colspan="2">
+                                <input type="text" placeholder="My topic name" id="m_topic" value="Safety Requirements" class="form-control"/>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label>Keywords</label></td>
+                            <td><label for="m_keywords">Keywords</label></td>
                             <td><input type="text" placeholder="Keyword 1, Keyword 2, ..."
-                                       name="topic" value="SysML, OAR"/></td>
+                                       id="m_keywords" value="SysML, OAR" class="form-control"/>
+                            </td>
                         </tr>
                         <tr>
-                            <td><label>Visibility</label></td>
-                            <td>
-                                <select name="visibility">
+                            <td colspan="3"><label for="m_abstract">Abstract</label></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <textarea class="form-control" id="m_abstract" rows="5">Discussion about the elicitation of safety requirements of the system</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="m_Visibility">Visibility</label></td>
+                            <td  colspan="2">
+                                <select id="m_visibility">
                                     <option value="public">public</option>
                                     <option value="private" selected>private</option>
                                 </select>
                             </td>
                         </tr>
+                        <tr>
+                            <td colspan="3"><label for="m_users">Participants</label></td>
+                        </tr>
                         <tr style="border: 1px #dbdbdb solid; padding: 2px;">
                             <td>
-                                <ul class="list-group scroll">
-                                    <li class="list-group-item">Stephen Creff</li>
-                                    <li class="list-group-item">Laurent Wouters</li>
-                                    <li class="list-group-item">Michel Batteux</li>
-                                    <li class="list-group-item">Sullivan Kuttler</li>
-                                    <li class="list-group-item">Jérôme Le Noir</li>
-                                    <li class="list-group-item">Sébastien Madelénat</li>
-                                </ul>
+                                <div class="form-group">
+                                    <select class="form-control users" id="m_users" multiple>
+                                        <option>Stephen Creff</option>
+                                        <option>Laurent Wouters</option>
+                                        <option>Michel Batteux</option>
+                                        <option>Sullivan Kuttler</option>
+                                        <option>Jérôme Le Noir</option>
+                                        <option>Sébastien Madelénat</option>
+                                    </select>
+                                </div>
                             </td>
                             <td style="text-align: center;">
                                 <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add">
@@ -234,14 +270,12 @@
                                 </button>
                             </td>
                             <td>
-                                <ul class="list-group scroll">
-                                    <li class="list-group-item">Makhlouf Hadj</li>
-                                    <li class="list-group-item">Zeng Li</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                    <li class="list-group-item">&nbsp;</li>
-                                </ul>
+                                <div class="form-group">
+                                    <select class="form-control users" id="m_participants" multiple>
+                                        <option>Makhlouf Hadj</option>
+                                        <option>Zeng Li</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -262,6 +296,10 @@
 </div>
 <div id="placeholder-footer"></div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- Support des vieux navigateurs -->
+<script src="../../../vendors/modernizr-2.8.3-respond-1.4.2.min.js"></script>
 <script src="../../../xowl/xowl-api-platform.js"></script>
 <script src="../../../xowl/xowl-ui.js"></script>
 <script src="index.js"></script>

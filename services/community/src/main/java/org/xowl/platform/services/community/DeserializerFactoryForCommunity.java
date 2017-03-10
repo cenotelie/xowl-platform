@@ -25,6 +25,8 @@ import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
 import org.xowl.platform.services.community.bots.Bot;
 import org.xowl.platform.services.community.bots.BotRemote;
 import org.xowl.platform.services.community.bots.BotSpecification;
+import org.xowl.platform.services.community.profiles.Badge;
+import org.xowl.platform.services.community.profiles.PublicProfile;
 
 /**
  * Implements a factory for the community objects
@@ -53,6 +55,10 @@ public class DeserializerFactoryForCommunity implements DeserializerFactory {
             return new BotRemote(definition);
         if (BotSpecification.class.getCanonicalName().equals(type))
             return new BotSpecification(definition);
+        if (PublicProfile.class.getCanonicalName().equals(type))
+            return new PublicProfile(definition);
+        if (Badge.class.getCanonicalName().equals(type))
+            return new Badge(definition);
         return null;
     }
 }

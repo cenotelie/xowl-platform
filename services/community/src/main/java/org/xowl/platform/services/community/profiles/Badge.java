@@ -97,7 +97,7 @@ public class Badge implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(UserProfile.class.getCanonicalName()) +
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(PublicProfile.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

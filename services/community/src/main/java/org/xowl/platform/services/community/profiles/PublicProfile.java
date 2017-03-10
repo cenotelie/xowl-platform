@@ -29,7 +29,7 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  *
  * @author Laurent Wouters
  */
-public class UserProfile implements Identifiable, Serializable {
+public class PublicProfile implements Identifiable, Serializable {
     /**
      * The identifier of this user
      */
@@ -64,7 +64,7 @@ public class UserProfile implements Identifiable, Serializable {
      *
      * @param user The user to initializes the profile from
      */
-    public UserProfile(PlatformUser user) {
+    public PublicProfile(PlatformUser user) {
         this.identifier = user.getIdentifier();
         this.name = user.getName();
         this.email = "";
@@ -79,7 +79,7 @@ public class UserProfile implements Identifiable, Serializable {
      *
      * @param definition The AST node for the serialized definition
      */
-    public UserProfile(ASTNode definition) {
+    public PublicProfile(ASTNode definition) {
         String identifier = "";
         String name = "";
         String email = "";
@@ -140,7 +140,7 @@ public class UserProfile implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(UserProfile.class.getCanonicalName()) +
+        return "{\"type\": \"" + TextUtils.escapeStringJSON(PublicProfile.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +

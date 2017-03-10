@@ -103,7 +103,6 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
         this.status = CollaborationStatus.valueOf(status);
     }
 
-
     @Override
     public String getIdentifier() {
         return identifier;

@@ -17,6 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
+import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
@@ -79,6 +80,55 @@ public class ConnectorDescriptorParam implements Identifiable, Serializable {
      */
     public ConnectorDescriptorParam(String id, String name, boolean isRequired, String typeHint, String placeholder) {
         this.identifier = id;
+        this.name = name;
+        this.isRequired = isRequired;
+        this.typeHint = typeHint;
+        this.placeholder = placeholder;
+    }
+
+    /**
+     * Initializes this parameter
+     *
+     * @param definition The AST node for the serialized definition
+     */
+    public ConnectorDescriptorParam(ASTNode definition) {
+        String identifier = "";
+        String name = "";
+        boolean isRequired = false;
+        String typeHint = "";
+        String placeholder = "";
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            switch (head) {
+                case "identifier": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    identifier = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "name": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    name = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "isRequired": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    isRequired = "true".equalsIgnoreCase(value);
+                    break;
+                }
+                case "typeHint": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    typeHint = value.substring(1, value.length() - 1);
+                    break;
+                }
+                case "placeholder": {
+                    String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                    placeholder = value.substring(1, value.length() - 1);
+                    break;
+                }
+            }
+        }
+        this.identifier = identifier;
         this.name = name;
         this.isRequired = isRequired;
         this.typeHint = typeHint;

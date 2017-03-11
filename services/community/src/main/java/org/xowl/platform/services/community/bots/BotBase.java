@@ -30,9 +30,11 @@ import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformLogBuffer;
+import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
+import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -200,6 +202,11 @@ public class BotBase implements Bot, EventConsumer {
     @Override
     public BotStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public Collection<PlatformLogMessage> getMessages() {
+        return messages.getMessages();
     }
 
     @Override

@@ -61,9 +61,13 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
     private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(XOWLProfileService.class, "/org/xowl/platform/services/community/api_service_profiles.html", "Profile Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
-     * The URI for the API services
+     * The URI for the API services for the profiles
      */
-    private final String apiUri;
+    private final String apiUriProfiles;
+    /**
+     * The URI for the API services for the badges
+     */
+    private final String apiUriBadges;
     /**
      * The configured implementation for this service
      */
@@ -73,7 +77,8 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
      * Initializes this service
      */
     public XOWLProfileService() {
-        this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/community/profiles";
+        this.apiUriProfiles = PlatformHttp.getUriPrefixApi() + "/services/community/profiles";
+        this.apiUriBadges = PlatformHttp.getUriPrefixApi() + "/services/community/badges";
     }
 
     /**
@@ -161,43 +166,102 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
 
     @Override
     public int canHandle(HttpApiRequest request) {
-        return request.getUri().startsWith(apiUri)
+        return (request.getUri().startsWith(apiUriProfiles) || request.getUri().startsWith(apiUriBadges))
                 ? HttpApiService.PRIORITY_NORMAL
                 : HttpApiService.CANNOT_HANDLE;
     }
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        if (request.getUri().equals(apiUri))
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        if (request.getUri().startsWith(apiUriBadges))
+            return handleBadges(request);
+        if (request.getUri().startsWith(apiUriProfiles))
+            return handleProfiles(request);
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
 
-        if (request.getUri().startsWith(apiUri)) {
-            String rest = request.getUri().substring(apiUri.length() + 1);
+    /**
+     * Handles requests for badges
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleBadges(HttpApiRequest request) {
+        if (request.getUri().equals(apiUriBadges)) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (Badge badge : getAllBadges()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(badge.serializedJSON());
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        }
+
+        String rest = request.getUri().substring(apiUriBadges.length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String badgeId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+        if (index >= 0)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+        Badge badge = getBadge(badgeId);
+        if (badge == null)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, badge.serializedJSON());
+    }
+
+    /**
+     * Handles requests for profiles
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleProfiles(HttpApiRequest request) {
+        if (request.getUri().equals(apiUriProfiles))
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        String rest = request.getUri().substring(apiUriProfiles.length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String profileId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+        if (index < 0)
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        rest = rest.substring(index);
+        if (rest.equals("/public")) {
+            if (HttpConstants.METHOD_GET.equals(request.getMethod())) {
+                PublicProfile profile = getPublicProfile(profileId);
+                if (profile == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, profile.serializedJSON());
+            } else if (HttpConstants.METHOD_PUT.equals(request.getMethod())) {
+                String content = new String(request.getContent(), IOUtils.CHARSET);
+                if (content.isEmpty())
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                BufferedLogger logger = new BufferedLogger();
+                ASTNode root = JSONLDLoader.parseJSON(logger, content);
+                if (root == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                PublicProfile profile = new PublicProfile(root);
+                return XSPReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
+        }
+        if (rest.startsWith("/public/badges/")) {
+            rest = rest.substring("/public/badges/".length());
             if (rest.isEmpty())
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            int index = rest.indexOf("/");
-            String profileId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
-            if (index < 0)
-                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            if (rest.substring(index).equals("/public")) {
-                if (HttpConstants.METHOD_GET.equals(request.getMethod())) {
-                    PublicProfile profile = getPublicProfile(profileId);
-                    if (profile == null)
-                        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, profile.serializedJSON());
-                } else if (HttpConstants.METHOD_PUT.equals(request.getMethod())) {
-                    String content = new String(request.getContent(), IOUtils.CHARSET);
-                    if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    BufferedLogger logger = new BufferedLogger();
-                    ASTNode root = JSONLDLoader.parseJSON(logger, content);
-                    if (root == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-                    PublicProfile profile = new PublicProfile(root);
-                    return XSPReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
-                }
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected method: GET, PUT");
-            }
+            String badgeId = URIUtils.decodeComponent(rest);
+            if (HttpConstants.METHOD_PUT.equals(request.getMethod()))
+                return XSPReplyUtils.toHttpResponse(awardBadge(profileId, badgeId), null);
+            if (HttpConstants.METHOD_DELETE.equals(request.getMethod()))
+                return XSPReplyUtils.toHttpResponse(rescindBadge(profileId, badgeId), null);
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }

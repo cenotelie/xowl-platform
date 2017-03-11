@@ -1,0 +1,117 @@
+#%RAML 1.0
+---
+title: Profiles Service
+version: v1
+types:
+  ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  Badge: !include schema_platform_community.json#/definitions/Badge
+  Badges: !include schema_platform_community.json#/definitions/Badges
+  PublicProfile: !include schema_platform_community.json#/definitions/PublicProfile
+traits: !include api_traits.raml
+baseUri: https://localhost:8443/api
+/services/community:
+  /badges:
+    description: Collection of the badges on the platform
+    get:
+      description: Gets the list of the badges available on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the bots running on the platform
+          body:
+            application/json:
+              type: Badges
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.community.profiles.Badge",
+                    "identifier": "award01",
+                    "name": "You Win!",
+                    "imageMime": "image/png",
+                    "imageContent": "Base 64 encoded content",
+                    "description": "You won this collaboration!"
+                  }
+                ]
+    /{badgeId}:
+      description: Represents a specific badge on the platform
+      get:
+        description: Gets the description of the badge
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the bot
+            body:
+              application/json:
+                type: Badge
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.community.profiles.Badge",
+                    "identifier": "award01",
+                    "name": "You Win!",
+                    "imageMime": "image/png",
+                    "imageContent": "Base 64 encoded content",
+                    "description": "You won this collaboration!"
+                  }
+  /profiles:
+    description: The profiles of users on the platform
+    /{profileId}:
+      description: The profile of specific user on the platform
+      /public:
+        description: The public profile of the user
+        get:
+          description: Gets the public profile of the user
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The public profile of the user
+              body:
+                application/json:
+                  type: PublicProfile
+                  example: |
+                    {
+                      "type": "org.xowl.platform.services.community.profiles.PublicProfile",
+                      "identifier": "admin",
+                      "name": "admin",
+                      "email": "admin@company.com",
+                      "avatarMime": "image/png",
+                      "avatarContent": "Base 64 encoded content",
+                      "organization": "Company",
+                      "occupation": "Clerk",
+                      "badges": []
+                    }
+        put:
+          description: Updates the public profile of the user
+          is: [secured, mayFail, resourceAccess]
+          body:
+            application/json:
+              type: PublicProfile
+              example: |
+                {
+                  "type": "org.xowl.platform.services.community.profiles.PublicProfile",
+                  "identifier": "admin",
+                  "name": "admin",
+                  "email": "admin@company.com",
+                  "avatarMime": "image/png",
+                  "avatarContent": "Base 64 encoded content",
+                  "organization": "Company",
+                  "occupation": "Clerk",
+                  "badges": []
+                }
+          responses:
+            200:
+              description: The operation succeeded
+        /badges:
+          /{badgeId}:
+            description: The operations on the badges of the user
+            put:
+              description: Awards the badge to the user
+              is: [secured, mayFail, resourceAccess]
+              responses:
+                200:
+                  description: The operation succeeded
+            delete:
+              description: Rescinds the badge from the user
+              is: [secured, mayFail, resourceAccess]
+              responses:
+                200:
+                  description: The operation succeeded

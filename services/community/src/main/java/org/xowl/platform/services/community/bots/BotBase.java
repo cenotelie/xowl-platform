@@ -30,7 +30,6 @@ import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformLogBuffer;
-import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -254,31 +253,21 @@ public class BotBase implements Bot, EventConsumer {
 
     @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(Bot.class.getCanonicalName()));
-        builder.append("\", \"identifier\": \"");
-        builder.append(TextUtils.escapeStringJSON(identifier));
-        builder.append("\", \"name\": \"");
-        builder.append(TextUtils.escapeStringJSON(name));
-        builder.append("\", \"botType\": \"");
-        builder.append(TextUtils.escapeStringJSON(botType));
-        builder.append("\", \"wakeupOnStartup\": ");
-        builder.append(Boolean.toString(wakeupOnStartup));
-        builder.append(", \"securityUser\": \"");
-        builder.append((securityUser != null ? TextUtils.escapeStringJSON(securityUser.getIdentifier()) : ""));
-        builder.append("\", \"status\": \"");
-        builder.append(status.toString());
-        builder.append("\", \"log\": [");
-        boolean first = true;
-        for (PlatformLogMessage message : messages.getMessages()) {
-            if (!first)
-                builder.append(", ");
-            first = false;
-            builder.append(message.serializedJSON());
-        }
-        builder.append("]}");
-        return builder.toString();
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(Bot.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(identifier) +
+                "\", \"name\": \"" +
+                TextUtils.escapeStringJSON(name) +
+                "\", \"botType\": \"" +
+                TextUtils.escapeStringJSON(botType) +
+                "\", \"wakeupOnStartup\": " +
+                Boolean.toString(wakeupOnStartup) +
+                ", \"securityUser\": \"" +
+                (securityUser != null ? TextUtils.escapeStringJSON(securityUser.getIdentifier()) : "") +
+                "\", \"status\": \"" +
+                status.toString() +
+                "\"}";
     }
 
     /**

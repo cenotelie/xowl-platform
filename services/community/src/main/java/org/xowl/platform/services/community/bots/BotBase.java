@@ -22,17 +22,37 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.concurrent.SafeRunnable;
+import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.DispatchLogger;
+import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Base implementation of a bot
  *
  * @author Laurent Wouters
  */
-public abstract class BotBase implements Bot {
+public class BotBase implements Bot, EventConsumer {
+    /**
+     * The maximum number of queued events
+     */
+    private static final int QUEUE_LENGTH = 128;
+    /**
+     * The time to wait for events, in ms
+     */
+    private static final long WAIT_TIME = 500;
+
     /**
      * The identifier of the bot
      */
@@ -56,7 +76,28 @@ public abstract class BotBase implements Bot {
     /**
      * The status of the bot
      */
-    protected BotStatus status;
+    private BotStatus status;
+    /**
+     * The logger for the messages of this bot
+     */
+    private final BufferedLogger logger;
+
+    /*
+     * Bot's implementation data
+     */
+
+    /**
+     * The thread dispatching events
+     */
+    private final Thread thread;
+    /**
+     * Flag whether the dispatcher thread must stop
+     */
+    private final AtomicBoolean mustStop;
+    /**
+     * The queue of events received by this bot
+     */
+    private final BlockingQueue<Event> queue;
 
     /**
      * Initializes this bot
@@ -77,6 +118,10 @@ public abstract class BotBase implements Bot {
         } else
             this.securityUser = null;
         this.status = BotStatus.Asleep;
+        this.logger = new BufferedLogger();
+        this.mustStop = new AtomicBoolean(false);
+        this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
+        this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
     }
 
     /**
@@ -122,6 +167,10 @@ public abstract class BotBase implements Bot {
         } else
             this.securityUser = null;
         this.status = BotStatus.Asleep;
+        this.logger = new BufferedLogger();
+        this.mustStop = new AtomicBoolean(false);
+        this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
+        this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
     }
 
     @Override
@@ -156,7 +205,8 @@ public abstract class BotBase implements Bot {
                 return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
             status = BotStatus.WakingUp;
         }
-        onWakeup();
+        mustStop.set(false);
+        thread.start();
         status = BotStatus.Awaken;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
@@ -171,12 +221,25 @@ public abstract class BotBase implements Bot {
                 return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not awake: " + status);
             status = BotStatus.GoingToSleep;
         }
-        onGoingToSleep();
+        mustStop.set(true);
+        try {
+            if (thread.isAlive()) {
+                thread.interrupt();
+                thread.join();
+            }
+        } catch (InterruptedException exception) {
+            Logging.get().error(exception);
+        }
         status = BotStatus.Asleep;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new BotHasGoneToSleepEvent(this));
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        queue.offer(event);
     }
 
     @Override
@@ -204,12 +267,100 @@ public abstract class BotBase implements Bot {
     }
 
     /**
-     * Reacts to the bot being woken up
+     * Gets the runnable for the bot
+     *
+     * @return The runnable
      */
-    protected abstract void onWakeup();
+    private Runnable getRunnable() {
+        return new SafeRunnable() {
+            @Override
+            public void doRun() {
+                doBotRun();
+            }
+
+            @Override
+            protected void onRunFailed(Throwable throwable) {
+                onBotStop();
+            }
+        };
+    }
 
     /**
-     * Reacts to the bot going to sleep
+     * Main method for the bot
      */
-    protected abstract void onGoingToSleep();
+    private void doBotRun() {
+        // register the logger for this thread
+        Logging.set(new DispatchLogger(Logging.getDefault(), logger));
+
+        // authenticate the bot on this thread
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null && securityUser != null)
+            securityService.authenticate(securityUser);
+
+        while (!mustStop.get()) {
+            if (hasWorkToDo()) {
+                status = BotStatus.Working;
+                if (doWork()) {
+                    onBotStop();
+                    return;
+                } else {
+                    status = BotStatus.Awaken;
+                    continue;
+                }
+            }
+            try {
+                Event event = queue.poll(WAIT_TIME, TimeUnit.MILLISECONDS);
+                if (event != null) {
+                    status = BotStatus.Working;
+                    if (reactTo(event)) {
+                        onBotStop();
+                        return;
+                    } else {
+                        status = BotStatus.Awaken;
+                    }
+                }
+            } catch (InterruptedException exception) {
+                onBotStop();
+                return;
+            }
+        }
+    }
+
+    /**
+     * When the bot is stopping for a reason other that an external request
+     */
+    private void onBotStop() {
+        status = BotStatus.Asleep;
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BotHasGoneToSleepEvent(BotBase.this));
+    }
+
+    /**
+     * Gets whether this bot has work to do
+     *
+     * @return Whether this bot has work to do
+     */
+    protected boolean hasWorkToDo() {
+        return false;
+    }
+
+    /**
+     * Executes some work
+     *
+     * @return true if the bot must stop, false otherwise
+     */
+    protected boolean doWork() {
+        return false;
+    }
+
+    /**
+     * Reacts to the received event
+     *
+     * @param event The event to react to
+     * @return true if the bot must stop, false otherwise
+     */
+    protected boolean reactTo(Event event) {
+        return false;
+    }
 }

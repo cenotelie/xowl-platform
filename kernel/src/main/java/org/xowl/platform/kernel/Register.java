@@ -41,6 +41,8 @@ public class Register {
      */
     public static <T> T getComponent(Class<T> componentType) {
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
+        if (context == null)
+            return null;
         ServiceReference reference = context.getServiceReference(componentType);
         if (reference == null)
             return null;
@@ -59,6 +61,8 @@ public class Register {
     public static <T> Collection<T> getComponents(Class<T> componentType) {
         Collection<T> result = new ArrayList<>();
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
+        if (context == null)
+            return result;
         try {
             Collection references = context.getServiceReferences(componentType, null);
             for (Object obj : references) {
@@ -87,6 +91,8 @@ public class Register {
     public static <T> T getComponent(Class<T> componentType, String paramName, String paramValue) {
         T result = null;
         BundleContext context = FrameworkUtil.getBundle(componentType).getBundleContext();
+        if (context == null)
+            return null;
         try {
             Collection references = context.getServiceReferences(componentType, "(" + paramName + "=" + paramValue + ")");
             for (Object obj : references) {

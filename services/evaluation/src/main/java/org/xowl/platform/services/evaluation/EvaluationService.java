@@ -52,9 +52,9 @@ public interface EvaluationService extends SecuredService {
     /**
      * API error - The specified evaluable type is invalid (or unspecified)
      */
-    ApiError ERROR_INVALID_EVALUABLE_TYPE = new ApiError(0x00000131,
+    ApiError ERROR_INVALID_EVALUABLE_TYPE = new ApiError(0x00000141,
             "The specified evaluable type is invalid (or unspecified).",
-            PlatformHttp.ERROR_HELP_PREFIX + "0x00000131.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000141.html");
 
     /**
      * Gets the registered evaluable types

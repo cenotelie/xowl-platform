@@ -21,7 +21,6 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin;
 import org.xowl.platform.kernel.security.SecuredService;
 
 /**
@@ -33,15 +32,15 @@ public interface BotManagementService extends SecuredService {
     /**
      * Service action to get the description of bots
      */
-    SecuredAction ACTION_GET_BOTS = new SecuredAction(BotManagementService.class.getCanonicalName() + ".GetBots", "Bots Management Service - Get Bots", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
+    SecuredAction ACTION_GET_BOTS = new SecuredAction(BotManagementService.class.getCanonicalName() + ".GetBots", "Bots Management Service - Get Bots", SecuredAction.DEFAULT_POLICIES);
     /**
      * Service action to wakeup bots
      */
-    SecuredAction ACTION_WAKE_UP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Wakeup", "Bots Management Service - Wake up Bots", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
+    SecuredAction ACTION_WAKE_UP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Wakeup", "Bots Management Service - Wake up Bots", SecuredAction.DEFAULT_POLICIES);
     /**
      * Service action to put bots to sleep
      */
-    SecuredAction ACTION_SLEEP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Sleep", "Bots Management Service - Put Bots to Sleep", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
+    SecuredAction ACTION_SLEEP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Sleep", "Bots Management Service - Put Bots to Sleep", SecuredAction.DEFAULT_POLICIES);
     /**
      * The actions for this service
      */
@@ -54,9 +53,9 @@ public interface BotManagementService extends SecuredService {
     /**
      * API error - The bot's status is invalid with respect to the requested operation
      */
-    ApiError ERROR_INVALID_STATUS = new ApiError(0x00000061,
+    ApiError ERROR_INVALID_STATUS = new ApiError(0x00000121,
             "The bot's status is invalid with respect to the requested operation.",
-            PlatformHttp.ERROR_HELP_PREFIX + "0x00000061.html");
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000121.html");
 
     /**
      * Gets the list of the known bots

@@ -518,7 +518,7 @@
         "identifier": "org.xowl.platform.services.community.profiles.ProfileService.UpdateProfile"
       },
       "policy": {
-        "identifier": "org.xowl.platform.services.community.profiles.SecuredActionPolicyIsJobOwner"
+        "identifier": "org.xowl.platform.services.community.profiles.SecuredActionPolicyIsProfileOwner"
       }
     },
     {

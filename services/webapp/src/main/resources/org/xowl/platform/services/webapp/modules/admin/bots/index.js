@@ -1,0 +1,128 @@
+// Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+// Provided under LGPLv3
+
+var xowl = new XOWL();
+
+function init() {
+	doSetupPage(xowl, true, [
+			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
+			{name: "Platform Bots Management"}], function() {
+		doGetData();
+	});
+}
+
+function doGetData() {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getBots(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			render(content);
+		}
+	});
+}
+
+function render(bots) {
+	bots.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("bots");
+	for (var  i = 0; i != bots.length; i++) {
+		table.appendChild(renderBot(bots[i]));
+	}
+}
+
+function renderBot(bot) {
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
+	var icon = document.createElement("img");
+	icon.src = ROOT + renderBotGetIcon(bot);
+	icon.width = 40;
+	icon.height = 40;
+	icon.style.marginRight = "20px";
+	icon.title = bot.identifier;
+	cell.appendChild(icon);
+	var link = document.createElement("a");
+	link.href = "bot.html?id=" + encodeURIComponent(bot.identifier);
+	link.appendChild(document.createTextNode(bot.name));
+	cell.appendChild(link);
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	var button = renderBotAction(bot);
+	if (button != null)
+		cell.appendChild(button);
+	row.appendChild(cell);
+	return row;
+}
+
+function renderBotGetIcon(bot) {
+	if (bot === "Asleep" || bot === "GoingToSleep")
+		return "/assets/bot_inactive.svg";
+	if (bot === "WakingUp" || bot === "Awaken" || bot === "Working")
+		return "/assets/bot.svg";
+	return "/assets/bot_invalid.svg";
+}
+
+function renderBotAction(bot) {
+	if (bot === "Asleep" || bot === "GoingToSleep")
+		return renderBotActionWakeup(bot);
+	if (bot === "WakingUp" || bot === "Awaken" || bot === "Working")
+		return renderBotActionPutToSleep(bot);
+	return null;
+}
+
+function renderBotActionWakeup(bot) {
+	var icon = document.createElement("img");
+	icon.src = ROOT + "/assets/bot.svg";
+	icon.width = 20;
+	icon.height = 20;
+	icon.title = "WAKEUP";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(icon);
+	button.onclick = function() { doWakeup(bot); };
+	return button;
+}
+
+function renderBotActionPutToSleep(bot) {
+	var icon = document.createElement("img");
+	icon.src = ROOT + "/assets/bot_inactive.svg";
+	icon.width = 20;
+	icon.height = 20;
+	icon.title = "SLEEP";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(icon);
+	button.onclick = function() { doPutToSleep(bot); };
+	return button;
+}
+
+function doWakeup(bot) {
+	var result = confirm("Wake bot " + bot.name + " up?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Waking bot " + bot.name + " up"))
+		return;
+	xowl.wakeupBot(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Awoke bot " + bot.name);
+			waitAndRefresh();
+		}
+	}, bot.identifier);
+}
+
+function doPutToSleep(bot) {
+	var result = confirm("Put bot " + bot.name + " to sleep?");
+	if (!result)
+		return;
+	if (!onOperationRequest("Putting bot " + bot.name + " to sleep"))
+		return;
+	xowl.putBotToSleep(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Put bot " + bot.name + " to sleep");
+			waitAndRefresh();
+		}
+	}, bot.identifier);
+}

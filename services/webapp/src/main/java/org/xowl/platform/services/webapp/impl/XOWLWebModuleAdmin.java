@@ -33,7 +33,8 @@ public class XOWLWebModuleAdmin extends WebModuleBase {
         super(XOWLWebModuleAdmin.class.getCanonicalName(), "Platform Administration", "admin", "/assets/module-admin.svg", 100);
         this.items.add(new WebModuleItem("Platform Security", "security", "/assets/security.svg"));
         this.items.add(new WebModuleItem("Platform Connectors Management", "connectors", "/assets/connector.svg"));
-        this.items.add(new WebModuleItem("Platform Job Management", "jobs", "/assets/jobs.svg"));
+        this.items.add(new WebModuleItem("Platform Bots Management", "bots", "/assets/bot.svg"));
+        this.items.add(new WebModuleItem("Platform Jobs Management", "jobs", "/assets/jobs.svg"));
         this.items.add(new WebModuleItem("Platform Statistics", "statistics", "/assets/statistics.svg"));
         this.items.add(new WebModuleItem("Platform Log", "log", "/assets/log.svg"));
         this.items.add(new WebModuleItem("Platform Documentation", "documentation", "/assets/documentation.svg"));

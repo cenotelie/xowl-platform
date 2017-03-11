@@ -19,7 +19,6 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -34,6 +33,8 @@ import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
+import org.xowl.platform.kernel.platform.PlatformLogBuffer;
+import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -43,8 +44,8 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.File;
 import java.net.HttpURLConnection;
-import java.text.DateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -69,86 +70,13 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     private static final int BUFFER_SIZE = 128;
 
     /**
-     * Represents a message in a log
-     */
-    private static class Msg implements Serializable {
-        /**
-         * The content of the message
-         */
-        public final Object content;
-        /**
-         * The log level for the message
-         */
-        public final String level;
-        /**
-         * The date for the message
-         */
-        public final Date date;
-
-        /**
-         * Initializes this message
-         *
-         * @param content The content of the message
-         * @param level   The log level for the message
-         */
-        public Msg(Object content, String level) {
-            this.content = content;
-            this.level = level;
-            this.date = new Date();
-        }
-
-        @Override
-        public String serializedString() {
-            return serializedJSON();
-        }
-
-        @Override
-        public String serializedJSON() {
-            if (content instanceof Throwable) {
-                return "{\"type\": \"" +
-                        TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
-                        "\", \"level\": \"" +
-                        TextUtils.escapeStringJSON(level) +
-                        "\", \"date\": \"" +
-                        TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
-                        "\", \"content\": \"" +
-                        TextUtils.escapeStringJSON(((Throwable) content).getClass().getCanonicalName()) +
-                        "\"}";
-            } else if (content instanceof Serializable) {
-                return "{\"type\": \"" +
-                        TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
-                        "\", \"level\": \"" +
-                        TextUtils.escapeStringJSON(level) +
-                        "\", \"date\": \"" +
-                        TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
-                        "\", \"content\": " +
-                        ((Serializable) content).serializedJSON() +
-                        "}";
-            }
-            return "{\"type\": \"" +
-                    TextUtils.escapeStringJSON(Msg.class.getCanonicalName()) +
-                    "\", \"level\": \"" +
-                    TextUtils.escapeStringJSON(level) +
-                    "\", \"date\": \"" +
-                    TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(date)) +
-                    "\", \"content\": \"" +
-                    TextUtils.escapeStringJSON(content.toString()) +
-                    "\"}";
-        }
-    }
-
-    /**
      * The URI for the API services
      */
     private final String apiUri;
     /**
      * The buffer of the last messages
      */
-    private final Msg[] messages;
-    /**
-     * The head of the buffer of messages
-     */
-    private final AtomicInteger head;
+    private final PlatformLogBuffer buffer;
     /**
      * The number of errors since the platform started
      */
@@ -164,8 +92,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public KernelLoggingService() {
         super(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/log";
-        this.messages = new Msg[BUFFER_SIZE];
-        this.head = new AtomicInteger(-1);
+        this.buffer = new PlatformLogBuffer(BUFFER_SIZE);
         this.errorsCount = new AtomicInteger(0);
         this.totalMessages = new AtomicInteger(0);
     }
@@ -217,7 +144,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
 
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (Msg message : getMessages()) {
+        for (PlatformLogMessage message : buffer.getMessages()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -266,7 +193,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public void debug(Object message) {
         if (message instanceof Event)
             message = ((Event) message).getDescription();
-        onLogMessage("DEBUG", message, false);
+        buffer.debug(message);
         super.debug(message);
     }
 
@@ -274,7 +201,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public void info(Object message) {
         if (message instanceof Event)
             message = ((Event) message).getDescription();
-        onLogMessage("INFO", message, false);
+        buffer.info(message);
         super.info(message);
     }
 
@@ -282,7 +209,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public void warning(Object message) {
         if (message instanceof Event)
             message = ((Event) message).getDescription();
-        onLogMessage("WARNING", message, false);
+        buffer.warning(message);
         super.warning(message);
     }
 
@@ -290,52 +217,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public void error(Object message) {
         if (message instanceof Event)
             message = ((Event) message).getDescription();
-        onLogMessage("ERROR", message, true);
+        buffer.error(message);
         super.error(message);
-    }
-
-    /**
-     * When a message is received
-     *
-     * @param level   The log level for the message
-     * @param content The message's content
-     * @param isError Whether this is an error message
-     */
-    private void onLogMessage(String level, Object content, boolean isError) {
-        Msg message = new Msg(content, level);
-        while (true) {
-            int headValue = head.get();
-            int insertion = headValue + 1;
-            if (insertion >= BUFFER_SIZE)
-                insertion = 0;
-            if (head.compareAndSet(headValue, insertion)) {
-                messages[insertion] = message;
-                break;
-            }
-        }
-        totalMessages.incrementAndGet();
-        if (isError)
-            errorsCount.incrementAndGet();
-    }
-
-    /**
-     * Gets the current messages
-     *
-     * @return The current messages
-     */
-    private List<Msg> getMessages() {
-        int current = head.get();
-        if (current == -1)
-            return Collections.emptyList();
-        List<Msg> result = new ArrayList<>();
-        for (int i = 0; i != BUFFER_SIZE; i++) {
-            if (messages[current] == null)
-                return result;
-            result.add(messages[current]);
-            current--;
-            if (current == -1)
-                current = BUFFER_SIZE - 1;
-        }
-        return result;
     }
 }

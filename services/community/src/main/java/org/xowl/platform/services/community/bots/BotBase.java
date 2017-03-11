@@ -23,13 +23,14 @@ import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
-import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.platform.PlatformLogBuffer;
+import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -44,6 +45,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Laurent Wouters
  */
 public class BotBase implements Bot, EventConsumer {
+    /**
+     * The maximum number of messages to keep for this bot
+     */
+    private static final int MESSAGES_BOUND = 32;
     /**
      * The maximum number of queued events
      */
@@ -78,9 +83,9 @@ public class BotBase implements Bot, EventConsumer {
      */
     private BotStatus status;
     /**
-     * The logger for the messages of this bot
+     * The messages of this bot
      */
-    private final BufferedLogger logger;
+    private final PlatformLogBuffer messages;
 
     /*
      * Bot's implementation data
@@ -118,7 +123,7 @@ public class BotBase implements Bot, EventConsumer {
         } else
             this.securityUser = null;
         this.status = BotStatus.Asleep;
-        this.logger = new BufferedLogger();
+        this.messages = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
         this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
@@ -167,7 +172,7 @@ public class BotBase implements Bot, EventConsumer {
         } else
             this.securityUser = null;
         this.status = BotStatus.Asleep;
-        this.logger = new BufferedLogger();
+        this.messages = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
         this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
@@ -249,21 +254,31 @@ public class BotBase implements Bot, EventConsumer {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(Bot.class.getCanonicalName()) +
-                "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(identifier) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(name) +
-                "\", \"botType\": \"" +
-                TextUtils.escapeStringJSON(botType) +
-                "\", \"wakeupOnStartup\": " +
-                Boolean.toString(wakeupOnStartup) +
-                ", \"securityUser\": \"" +
-                (securityUser != null ? TextUtils.escapeStringJSON(securityUser.getIdentifier()) : "") +
-                "\", \"status\": \"" +
-                status.toString() +
-                "\"}";
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\"type\": \"");
+        builder.append(TextUtils.escapeStringJSON(Bot.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
+        builder.append(TextUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\": \"");
+        builder.append(TextUtils.escapeStringJSON(name));
+        builder.append("\", \"botType\": \"");
+        builder.append(TextUtils.escapeStringJSON(botType));
+        builder.append("\", \"wakeupOnStartup\": ");
+        builder.append(Boolean.toString(wakeupOnStartup));
+        builder.append(", \"securityUser\": \"");
+        builder.append((securityUser != null ? TextUtils.escapeStringJSON(securityUser.getIdentifier()) : ""));
+        builder.append("\", \"status\": \"");
+        builder.append(status.toString());
+        builder.append("\", \"log\": [");
+        boolean first = true;
+        for (PlatformLogMessage message : messages.getMessages()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(message.serializedJSON());
+        }
+        builder.append("]}");
+        return builder.toString();
     }
 
     /**
@@ -290,7 +305,7 @@ public class BotBase implements Bot, EventConsumer {
      */
     private void doBotRun() {
         // register the logger for this thread
-        Logging.set(new DispatchLogger(Logging.getDefault(), logger));
+        Logging.set(new DispatchLogger(Logging.getDefault(), messages));
 
         // authenticate the bot on this thread
         SecurityService securityService = Register.getComponent(SecurityService.class);

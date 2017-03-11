@@ -24,10 +24,12 @@ import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.remote.DeserializerFactory;
+import org.xowl.platform.kernel.security.SecuredActionPolicyProvider;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.community.bots.BotManagementService;
 import org.xowl.platform.services.community.impl.XOWLBotManagementService;
+import org.xowl.platform.services.community.impl.XOWLProfileSecurityProvider;
 import org.xowl.platform.services.community.impl.XOWLProfileService;
 import org.xowl.platform.services.community.impl.XOWLProfileServiceProvider;
 import org.xowl.platform.services.community.profiles.ProfileService;
@@ -47,6 +49,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCommunity(), null);
+        bundleContext.registerService(SecuredActionPolicyProvider.class, new XOWLProfileSecurityProvider(), null);
         bundleContext.registerService(ProfileServiceProvider.class, new XOWLProfileServiceProvider(), null);
 
         Register.waitFor(EventService.class, new RegisterWaiter<EventService>() {

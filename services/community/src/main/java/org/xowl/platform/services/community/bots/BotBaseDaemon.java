@@ -73,8 +73,8 @@ public abstract class BotBaseDaemon extends BotBase {
             @Override
             public void doRun() {
                 SecurityService securityService = Register.getComponent(SecurityService.class);
-                if (securityService != null && platformUser != null)
-                    securityService.authenticate(platformUser);
+                if (securityService != null && securityUser != null)
+                    securityService.authenticate(securityUser);
                 while (!mustStop.get()) {
                     if (onRun()) {
                         onBotStop();

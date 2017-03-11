@@ -48,7 +48,7 @@ public abstract class BotBase implements Bot {
     /**
      * The associated security user
      */
-    protected final PlatformUser platformUser;
+    protected final PlatformUser securityUser;
     /**
      * Whether this bot should be woken up when the platform starts
      */
@@ -73,9 +73,9 @@ public abstract class BotBase implements Bot {
             String userId = specification.getSecurityUser();
             if (userId == null || userId.isEmpty())
                 userId = identifier;
-            this.platformUser = securityService.getRealm().getUser(userId);
+            this.securityUser = securityService.getRealm().getUser(userId);
         } else
-            this.platformUser = null;
+            this.securityUser = null;
         this.status = BotStatus.Asleep;
     }
 
@@ -89,6 +89,7 @@ public abstract class BotBase implements Bot {
         String name = null;
         String botType = null;
         boolean wakeupOnStartup = false;
+        String securityUser = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -104,17 +105,22 @@ public abstract class BotBase implements Bot {
             } else if ("wakeupOnStartup".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 wakeupOnStartup = Boolean.parseBoolean(value);
+            } else if ("securityUser".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                securityUser = value.substring(1, value.length() - 1);
             }
         }
-        PlatformUser platformUser = null;
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService != null)
-            platformUser = securityService.getRealm().getUser(identifier);
         this.identifier = identifier;
         this.name = name;
         this.botType = botType;
         this.wakeupOnStartup = wakeupOnStartup;
-        this.platformUser = platformUser;
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null) {
+            if (securityUser == null || securityUser.isEmpty())
+                securityUser = identifier;
+            this.securityUser = securityService.getRealm().getUser(securityUser);
+        } else
+            this.securityUser = null;
         this.status = BotStatus.Asleep;
     }
 
@@ -130,7 +136,7 @@ public abstract class BotBase implements Bot {
 
     @Override
     public PlatformUser getSecurity() {
-        return platformUser;
+        return securityUser;
     }
 
     @Override
@@ -190,7 +196,9 @@ public abstract class BotBase implements Bot {
                 TextUtils.escapeStringJSON(botType) +
                 "\", \"wakeupOnStartup\": " +
                 Boolean.toString(wakeupOnStartup) +
-                ", \"status\": \"" +
+                ", \"securityUser\": \"" +
+                (securityUser != null ? TextUtils.escapeStringJSON(securityUser.getIdentifier()) : "") +
+                "\", \"status\": \"" +
                 status.toString() +
                 "\"}";
     }

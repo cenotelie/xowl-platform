@@ -21,6 +21,8 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
+import java.util.Collection;
+
 /**
  * Service for the management of user profiles for the platform
  *
@@ -28,14 +30,24 @@ import org.xowl.platform.kernel.security.SecuredService;
  */
 public interface ProfileService extends SecuredService {
     /**
-     * Service action to get the description of bots
+     * Service action to update the data of a public profile
      */
     SecuredAction ACTION_UPDATE_PROFILE = new SecuredAction(ProfileService.class.getCanonicalName() + ".UpdateProfile", "Profile Service - Update Profile", SecuredActionPolicyIsProfileOwner.DESCRIPTOR);
+    /**
+     * Service action to award a badge to a user
+     */
+    SecuredAction ACTION_AWARD_BADGE = new SecuredAction(ProfileService.class.getCanonicalName() + ".AwardBadge", "Profile Service - Award Badge", SecuredAction.DEFAULT_POLICIES);
+    /**
+     * Service action to rescind a badge from a user
+     */
+    SecuredAction ACTION_RESCIND_BADGE = new SecuredAction(ProfileService.class.getCanonicalName() + ".RescindBadge", "Profile Service - Rescind Badge", SecuredAction.DEFAULT_POLICIES);
     /**
      * The actions for this service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            ACTION_UPDATE_PROFILE
+            ACTION_UPDATE_PROFILE,
+            ACTION_AWARD_BADGE,
+            ACTION_RESCIND_BADGE
     };
 
     /**
@@ -53,4 +65,37 @@ public interface ProfileService extends SecuredService {
      * @return The protocol reply
      */
     XSPReply updatePublicProfile(PublicProfile profile);
+
+    /**
+     * Gets the description of all the badges
+     *
+     * @return The description of all the badges
+     */
+    Collection<Badge> getAllBadges();
+
+    /**
+     * Gets the description of a specific badge
+     *
+     * @param badgeId The identifier of a badge
+     * @return The description of the badge
+     */
+    Badge getBadge(String badgeId);
+
+    /**
+     * Awards a badge to a user
+     *
+     * @param userId  The identifier of the user
+     * @param badgeId The identifier of the badge
+     * @return The protocol reply
+     */
+    XSPReply awardBadge(String userId, String badgeId);
+
+    /**
+     * Rescinds a badge from a user
+     *
+     * @param userId  The identifier of the user
+     * @param badgeId The identifier of the badge
+     * @return The protocol reply
+     */
+    XSPReply rescindBadge(String userId, String badgeId);
 }

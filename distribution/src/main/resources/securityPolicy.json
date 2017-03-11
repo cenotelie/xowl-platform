@@ -523,6 +523,22 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.services.community.profiles.ProfileService.AwardBadge"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.community.profiles.ProfileService.RescindBadge"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.services.connection.ConnectionService.Spawn"
       },
       "policy": {

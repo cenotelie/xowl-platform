@@ -37,11 +37,13 @@ import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.community.profiles.Badge;
 import org.xowl.platform.services.community.profiles.ProfileService;
 import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
 import org.xowl.platform.services.community.profiles.PublicProfile;
 
 import java.net.HttpURLConnection;
+import java.util.Collection;
 
 /**
  * The implementation of the profile service used to delegate to a configured service
@@ -123,6 +125,38 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
         if (!reply.isSuccess())
             return reply;
         return getImplementation().updatePublicProfile(profile);
+    }
+
+    @Override
+    public Collection<Badge> getAllBadges() {
+        return getImplementation().getAllBadges();
+    }
+
+    @Override
+    public Badge getBadge(String badgeId) {
+        return getImplementation().getBadge(badgeId);
+    }
+
+    @Override
+    public XSPReply awardBadge(String userId, String badgeId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_AWARD_BADGE);
+        if (!reply.isSuccess())
+            return reply;
+        return getImplementation().awardBadge(userId, badgeId);
+    }
+
+    @Override
+    public XSPReply rescindBadge(String userId, String badgeId) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(ACTION_RESCIND_BADGE);
+        if (!reply.isSuccess())
+            return reply;
+        return getImplementation().rescindBadge(userId, badgeId);
     }
 
     @Override

@@ -20,9 +20,15 @@ package org.xowl.platform.services.community.impl;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.services.community.profiles.Badge;
+import org.xowl.platform.services.community.profiles.BadgeProvider;
 import org.xowl.platform.services.community.profiles.ProfileService;
 import org.xowl.platform.services.community.profiles.PublicProfile;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * An implementation of the profile service that locally stores the profiles
@@ -53,6 +59,35 @@ public class XOWLProfileServiceLocalImpl implements ProfileService {
 
     @Override
     public XSPReply updatePublicProfile(PublicProfile profile) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public Collection<Badge> getAllBadges() {
+        Collection<Badge> result = new ArrayList<>();
+        for (BadgeProvider provider : Register.getComponents(BadgeProvider.class)) {
+            result.addAll(provider.getBadges());
+        }
+        return result;
+    }
+
+    @Override
+    public Badge getBadge(String badgeId) {
+        for (BadgeProvider provider : Register.getComponents(BadgeProvider.class)) {
+            Badge badge = provider.getBadge(badgeId);
+            if (badge != null)
+                return badge;
+        }
+        return null;
+    }
+
+    @Override
+    public XSPReply awardBadge(String userId, String badgeId) {
+        return XSPReplyUnsupported.instance();
+    }
+
+    @Override
+    public XSPReply rescindBadge(String userId, String badgeId) {
         return XSPReplyUnsupported.instance();
     }
 }

@@ -15,23 +15,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.community.profiles;
 
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.Registrable;
 
 /**
- * A provider of implementations of the collaboration network service
+ * A provider of implementations of the profile service
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkServiceProvider extends Registrable {
+public interface ProfileServiceProvider extends Registrable {
     /**
-     * Tries to instantiate a collaboration network service
+     * Tries to instantiate a profile service
      *
      * @param identifier    The identifier of the service
      * @param configuration The configuration for the service
      * @return The instance, or null if it cannot be created
      */
-    CollaborationNetworkService instantiate(String identifier, Section configuration);
+    ProfileService instantiate(String identifier, Section configuration);
 }

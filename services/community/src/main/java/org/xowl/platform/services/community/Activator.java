@@ -28,6 +28,10 @@ import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.community.bots.BotManagementService;
 import org.xowl.platform.services.community.impl.XOWLBotManagementService;
+import org.xowl.platform.services.community.impl.XOWLProfileService;
+import org.xowl.platform.services.community.impl.XOWLProfileServiceProvider;
+import org.xowl.platform.services.community.profiles.ProfileService;
+import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
 
 /**
  * Activator for this bundle
@@ -43,6 +47,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCommunity(), null);
+        bundleContext.registerService(ProfileServiceProvider.class, new XOWLProfileServiceProvider(), null);
 
         Register.waitFor(EventService.class, new RegisterWaiter<EventService>() {
             @Override
@@ -53,6 +58,13 @@ public class Activator implements BundleActivator {
                 bundleContext.registerService(SecuredService.class, serviceBots, null);
                 bundleContext.registerService(HttpApiService.class, serviceBots, null);
                 bundleContext.registerService(BotManagementService.class, serviceBots, null);
+
+                // register the profile service
+                XOWLProfileService profileService = new XOWLProfileService();
+                bundleContext.registerService(Service.class, profileService, null);
+                bundleContext.registerService(SecuredService.class, profileService, null);
+                bundleContext.registerService(HttpApiService.class, profileService, null);
+                bundleContext.registerService(ProfileService.class, profileService, null);
             }
         }, bundleContext);
     }

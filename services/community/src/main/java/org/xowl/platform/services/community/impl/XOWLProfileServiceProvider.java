@@ -15,23 +15,32 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.collaboration;
+package org.xowl.platform.services.community.impl;
 
 import org.xowl.infra.utils.config.Section;
-import org.xowl.platform.kernel.Registrable;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.services.community.profiles.ProfileService;
+import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
 
 /**
- * A provider of implementations of the collaboration network service
- *
- * @author Laurent Wouters
+ * The provider of profile services for the xOWL platform
  */
-public interface CollaborationNetworkServiceProvider extends Registrable {
-    /**
-     * Tries to instantiate a collaboration network service
-     *
-     * @param identifier    The identifier of the service
-     * @param configuration The configuration for the service
-     * @return The instance, or null if it cannot be created
-     */
-    CollaborationNetworkService instantiate(String identifier, Section configuration);
+public class XOWLProfileServiceProvider implements ProfileServiceProvider {
+
+    @Override
+    public String getIdentifier() {
+        return XOWLProfileServiceProvider.class.getCanonicalName();
+    }
+
+    @Override
+    public String getName() {
+        return PlatformUtils.NAME + " - Profile Service Provider";
+    }
+
+    @Override
+    public ProfileService instantiate(String identifier, Section configuration) {
+        if (XOWLProfileServiceLocalImpl.class.getCanonicalName().equals(identifier))
+            return new XOWLProfileServiceLocalImpl();
+        return null;
+    }
 }

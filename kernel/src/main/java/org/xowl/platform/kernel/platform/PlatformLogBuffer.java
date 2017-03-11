@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.platform;
 
 import org.xowl.infra.utils.logging.Logger;
+import org.xowl.platform.kernel.events.Event;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,22 +57,30 @@ public class PlatformLogBuffer implements Logger {
 
     @Override
     public void debug(Object message) {
-        onLogMessage("DEBUG", message, false);
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
+        onLogMessage("DEBUG", message);
     }
 
     @Override
     public void info(Object message) {
-        onLogMessage("INFO", message, false);
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
+        onLogMessage("INFO", message);
     }
 
     @Override
     public void warning(Object message) {
-        onLogMessage("WARNING", message, false);
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
+        onLogMessage("WARNING", message);
     }
 
     @Override
     public void error(Object message) {
-        onLogMessage("ERROR", message, true);
+        if (message instanceof Event)
+            message = ((Event) message).getDescription();
+        onLogMessage("ERROR", message);
     }
 
     /**
@@ -79,9 +88,8 @@ public class PlatformLogBuffer implements Logger {
      *
      * @param level   The log level for the message
      * @param content The message's content
-     * @param isError Whether this is an error message
      */
-    private void onLogMessage(String level, Object content, boolean isError) {
+    private void onLogMessage(String level, Object content) {
         PlatformLogMessage message = new PlatformLogMessage(content, level);
         while (true) {
             int headValue = head.get();

@@ -27,8 +27,7 @@ function doGetData() {
 	}, botId);
 	xowl.getBotMessages(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			bot = content;
-			renderBotMessages();
+			renderBotMessages(content);
 		}
 	}, botId);
 }

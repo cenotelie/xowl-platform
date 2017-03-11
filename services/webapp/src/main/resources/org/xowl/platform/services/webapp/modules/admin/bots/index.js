@@ -81,6 +81,7 @@ function renderBotActionWakeup(bot) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(icon);
+	button.appendChild(document.createTextNode("Wake up"));
 	button.onclick = function() { doWakeup(bot); };
 	return button;
 }
@@ -95,6 +96,7 @@ function renderBotActionPutToSleep(bot) {
 	button.classList.add("btn");
 	button.classList.add("btn-default");
 	button.appendChild(icon);
+	button.appendChild(document.createTextNode("Put to sleep"));
 	button.onclick = function() { doPutToSleep(bot); };
 	return button;
 }

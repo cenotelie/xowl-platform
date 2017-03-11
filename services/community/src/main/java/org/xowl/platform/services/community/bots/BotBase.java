@@ -93,10 +93,6 @@ public class BotBase implements Bot, EventConsumer {
      */
 
     /**
-     * The thread dispatching events
-     */
-    private final Thread thread;
-    /**
      * Flag whether the dispatcher thread must stop
      */
     private final AtomicBoolean mustStop;
@@ -104,6 +100,10 @@ public class BotBase implements Bot, EventConsumer {
      * The queue of events received by this bot
      */
     private final BlockingQueue<Event> queue;
+    /**
+     * The execution thread for this bot
+     */
+    private Thread thread;
 
     /**
      * Initializes this bot
@@ -126,7 +126,6 @@ public class BotBase implements Bot, EventConsumer {
         this.status = this.securityUser != null ? BotStatus.Asleep : BotStatus.Invalid;
         this.logBuffer = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
-        this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
     }
 
@@ -175,7 +174,6 @@ public class BotBase implements Bot, EventConsumer {
         this.status = this.securityUser != null ? BotStatus.Asleep : BotStatus.Invalid;
         this.logBuffer = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
-        this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
     }
 
@@ -231,6 +229,7 @@ public class BotBase implements Bot, EventConsumer {
             status = BotStatus.WakingUp;
         }
         mustStop.set(false);
+        thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         thread.start();
         status = BotStatus.Awaken;
         EventService eventService = Register.getComponent(EventService.class);
@@ -255,10 +254,11 @@ public class BotBase implements Bot, EventConsumer {
         }
         mustStop.set(true);
         try {
-            if (thread.isAlive()) {
+            if (thread != null && thread.isAlive()) {
                 thread.interrupt();
                 thread.join();
             }
+            thread = null;
         } catch (InterruptedException exception) {
             Logging.get().error(exception);
         }

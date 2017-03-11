@@ -29,11 +29,9 @@ import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecuredAction;
-import org.xowl.platform.services.community.profiles.Badge;
-import org.xowl.platform.services.community.profiles.BadgeProvider;
-import org.xowl.platform.services.community.profiles.ProfileService;
-import org.xowl.platform.services.community.profiles.PublicProfile;
+import org.xowl.platform.services.community.profiles.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,6 +112,9 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
     public XSPReply updatePublicProfile(PublicProfile profile) {
         PublicProfile target = resolveProfile(profile.getIdentifier());
         target.update(profile);
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new PublicProfileUpdatedEvent(profile));
         return writeBack(target);
     }
 
@@ -143,6 +144,9 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
             return XSPReplyNotFound.instance();
         PublicProfile target = resolveProfile(userId);
         target.awardBadge(badge);
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BadgeAwardedEvent(target, badge));
         return writeBack(target);
     }
 
@@ -153,6 +157,9 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
             return XSPReplyNotFound.instance();
         PublicProfile target = resolveProfile(userId);
         target.rescindBadge(badge);
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BadgeRescindedEvent(target, badge));
         return writeBack(target);
     }
 

@@ -45,9 +45,8 @@ public class PublicProfileUpdatedEvent extends EventBase {
      * Initializes this event
      *
      * @param profile The updated profile
-     * @param badge   The rescinded badge
      */
-    public PublicProfileUpdatedEvent(PublicProfile profile, Badge badge) {
+    public PublicProfileUpdatedEvent(PublicProfile profile) {
         super(
                 new RichString("Profile ", profile, " has been updated"),
                 PublicProfileUpdatedEvent.class.getCanonicalName(),

@@ -15,42 +15,57 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.services.community.bots;
+package org.xowl.platform.services.community.profiles;
 
 import org.xowl.infra.utils.RichString;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Event when a bot has gone to sleep
+ * Event when a badge has been rescinded from a user
  *
  * @author Laurent Wouters
  */
-public class BotHasGoneToSleepEvent extends EventBase {
+public class BadgeRescindedEvent extends EventBase {
     /**
-     * The bot that has gone to sleep
+     * The profile that previously received the award
      */
-    private final Bot bot;
+    private final PublicProfile profile;
+    /**
+     * The rescinded badge
+     */
+    private final Badge badge;
 
     /**
-     * Gets the bot that has gone to sleep
+     * Gets the profile that previously received the award
      *
-     * @return The bot that has gone to sleep
+     * @return The profile that previously received the award
      */
-    public Bot getBot() {
-        return bot;
+    public PublicProfile getProfile() {
+        return profile;
+    }
+
+    /**
+     * Gets the rescinded badge
+     *
+     * @return The rescinded badge
+     */
+    public Badge getBadge() {
+        return badge;
     }
 
     /**
      * Initializes this event
      *
-     * @param bot The bot that has gone to sleep
+     * @param profile The profile that previously received the award
+     * @param badge   The rescinded badge
      */
-    public BotHasGoneToSleepEvent(Bot bot) {
+    public BadgeRescindedEvent(PublicProfile profile, Badge badge) {
         super(
-                new RichString(bot, " has gone to sleep"),
-                BotHasGoneToSleepEvent.class.getCanonicalName(),
-                Register.getComponent(BotManagementService.class));
-        this.bot = bot;
+                new RichString("Badge ", badge, " has been rescinded from ", profile),
+                BadgeRescindedEvent.class.getCanonicalName(),
+                Register.getComponent(ProfileService.class));
+        this.profile = profile;
+        this.badge = badge;
     }
 }

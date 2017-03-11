@@ -1012,6 +1012,72 @@ XOWL.prototype.putBotToSleep = function (callback, botId) {
 
 
 /*****************************************************
+ * Community - Profile Service
+ ****************************************************/
+
+XOWL.prototype.getPublicProfile = function (callback, profileId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/profiles/" + encodeURIComponent(profileId) + "/public", null, "GET", null, null);
+}
+
+XOWL.prototype.updatePublicProfile = function (callback, profile) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/profiles/" + encodeURIComponent(profile.identifier) + "/public", null, "PUT", MIME_JSON, profile);
+}
+
+XOWL.prototype.getBadges = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/badges", null, "GET", null, null);
+}
+
+XOWL.prototype.getBadge = function (callback, badgeId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/badges/" + encodeURIComponent(badgeId), null, "GET", null, null);
+}
+
+XOWL.prototype.awardBadge = function (callback, profileId, badgeId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/profiles/" + encodeURIComponent(profileId) + "/public/badges/" + encodeURIComponent(badgeId), null, "PUT", null, null);
+}
+
+XOWL.prototype.rescindBadge = function (callback, profileId, badgeId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/profiles/" + encodeURIComponent(profileId) + "/public/badges/" + encodeURIComponent(badgeId), null, "DELETE", null, null);
+}
+
+
+
+/*****************************************************
  * Connection - Connection Service
  ****************************************************/
 

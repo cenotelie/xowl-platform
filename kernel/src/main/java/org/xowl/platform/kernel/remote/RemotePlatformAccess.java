@@ -1096,6 +1096,76 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Gets the public profile for user corresponding to the specified identifier
+     *
+     * @param profileId The identifier of the the profile
+     * @return The protocol reply
+     */
+    public XSPReply getPublicProfile(String profileId) {
+        return doRequest(
+                "/services/community/profiles/" + URIUtils.encodeComponent(profileId) + "/public",
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Updates the public profile
+     *
+     * @param profile The profile to update
+     * @return The protocol reply
+     */
+    public XSPReply updatePublicProfile(Identifiable profile) {
+        return doRequest(
+                "/services/community/profiles/" + URIUtils.encodeComponent(profile.getIdentifier()) + "/public",
+                HttpConstants.METHOD_PUT,
+                profile);
+    }
+
+    /**
+     * Gets the description of all the badges
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getBadges() {
+        return doRequest("/services/community/badges", HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific badge
+     *
+     * @param badgeId The identifier of a badge
+     * @return The protocol reply
+     */
+    public XSPReply getBadge(String badgeId) {
+        return doRequest("/services/community/badges/" + URIUtils.encodeComponent(badgeId), HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Awards a badge to a user
+     *
+     * @param userId  The identifier of the user
+     * @param badgeId The identifier of the badge
+     * @return The protocol reply
+     */
+    public XSPReply awardBadge(String userId, String badgeId) {
+        return doRequest(
+                "/services/community/profiles/" + URIUtils.encodeComponent(userId) + "/public/badges/" + URIUtils.encodeComponent(badgeId),
+                HttpConstants.METHOD_PUT);
+    }
+
+    /**
+     * Rescinds a badge from a user
+     *
+     * @param userId  The identifier of the user
+     * @param badgeId The identifier of the badge
+     * @return The protocol reply
+     */
+    public XSPReply rescindBadge(String userId, String badgeId) {
+        return doRequest(
+                "/services/community/profiles/" + URIUtils.encodeComponent(userId) + "/public/badges/" + URIUtils.encodeComponent(badgeId),
+                HttpConstants.METHOD_DELETE);
+    }
+
+    /**
      * Gets the descriptors for available connectors
      *
      * @return The protocol reply

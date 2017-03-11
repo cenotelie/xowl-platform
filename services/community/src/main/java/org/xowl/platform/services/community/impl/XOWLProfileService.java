@@ -248,7 +248,7 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 ASTNode root = JSONLDLoader.parseJSON(logger, content);
                 if (root == null)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-                PublicProfile profile = new PublicProfile(root);
+                PublicProfile profile = new PublicProfile(root, null);
                 if (!Objects.equals(profile.getIdentifier(), profileId))
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"), null);
                 return XSPReplyUtils.toHttpResponse(updatePublicProfile(profile), null);

@@ -33,14 +33,4 @@ public class BotRemote extends BotBase {
     public BotRemote(ASTNode definition) {
         super(definition);
     }
-
-    @Override
-    protected void onWakeup() {
-        // do nothing
-    }
-
-    @Override
-    protected void onGoingToSleep() {
-        // do nothing
-    }
 }

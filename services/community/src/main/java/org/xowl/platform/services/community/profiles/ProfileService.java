@@ -71,7 +71,7 @@ public interface ProfileService extends SecuredService {
      *
      * @return The description of all the badges
      */
-    Collection<Badge> getAllBadges();
+    Collection<Badge> getBadges();
 
     /**
      * Gets the description of a specific badge

@@ -22,7 +22,6 @@ import org.xowl.infra.utils.Base64;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,23 +40,23 @@ public class PublicProfile implements Identifiable, Serializable {
     /**
      * The email to reach this user
      */
-    private final String email;
+    private String email;
     /**
      * The MIME type for the avatar
      */
-    private final String avatarMime;
+    private String avatarMime;
     /**
      * The content for the avatar
      */
-    private final byte[] avatarContent;
+    private byte[] avatarContent;
     /**
      * The user's affiliation, if any
      */
-    private final String organization;
+    private String organization;
     /**
      * The user's occupation, if any
      */
-    private final String occupation;
+    private String occupation;
     /**
      * The badges associated to this profile
      */
@@ -66,10 +65,10 @@ public class PublicProfile implements Identifiable, Serializable {
     /**
      * Initializes this user profile
      *
-     * @param user The user to initializes the profile from
+     * @param profileId The identifier of the user identifier to this profile
      */
-    public PublicProfile(PlatformUser user) {
-        this.identifier = user.getIdentifier();
+    public PublicProfile(String profileId) {
+        this.identifier = profileId;
         this.email = "";
         this.avatarMime = "";
         this.avatarContent = new byte[0];
@@ -82,8 +81,9 @@ public class PublicProfile implements Identifiable, Serializable {
      * Initializes this user profile
      *
      * @param definition The AST node for the serialized definition
+     * @param provider   The provider of badges, if any
      */
-    public PublicProfile(ASTNode definition) {
+    public PublicProfile(ASTNode definition, BadgeProvider provider) {
         this.badges = new ArrayList<>();
         String identifier = "";
         String email = "";
@@ -114,8 +114,11 @@ public class PublicProfile implements Identifiable, Serializable {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 occupation = value.substring(1, value.length() - 1);
             } else if ("badges".equals(head)) {
-                for (ASTNode child : member.getChildren().get(1).getChildren())
-                    badges.add(new Badge(child));
+                for (ASTNode child : member.getChildren().get(1).getChildren()) {
+                    Badge badge = getBadgeInstance(child, provider);
+                    if (badge != null)
+                        badges.add(new Badge(child));
+                }
             }
         }
         this.identifier = identifier;
@@ -124,6 +127,31 @@ public class PublicProfile implements Identifiable, Serializable {
         this.avatarContent = (avatarContent == null ? new byte[0] : avatarContent);
         this.organization = organization;
         this.occupation = occupation;
+    }
+
+    /**
+     * Gets the instance of a badge
+     *
+     * @param definition The serialized definition
+     * @param provider   The provider of badges, if any
+     * @return The badge instance
+     */
+    private Badge getBadgeInstance(ASTNode definition, BadgeProvider provider) {
+        String identifier = null;
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("identifier".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                identifier = value.substring(1, value.length() - 1);
+                break;
+            }
+        }
+        if (provider == null)
+            return new Badge(definition);
+        if (identifier == null)
+            return null;
+        return provider.getBadge(identifier);
     }
 
     @Override
@@ -188,6 +216,37 @@ public class PublicProfile implements Identifiable, Serializable {
      */
     public Collection<Badge> getBadges() {
         return Collections.unmodifiableCollection(badges);
+    }
+
+    /**
+     * Updates the content of this profile with the specified data
+     *
+     * @param data The new data for the profile
+     */
+    public void update(PublicProfile data) {
+        this.email = data.email;
+        this.avatarMime = data.avatarMime;
+        this.avatarContent = data.avatarContent;
+        this.organization = data.organization;
+        this.occupation = data.occupation;
+    }
+
+    /**
+     * Awards a badge to this profile
+     *
+     * @param badge The badge to award
+     */
+    public void awardBadge(Badge badge) {
+        badges.add(badge);
+    }
+
+    /**
+     * Rescinds a badge from this profile
+     *
+     * @param badge The badge to rescind
+     */
+    public void rescindBadge(Badge badge) {
+        badges.remove(badge);
     }
 
     @Override

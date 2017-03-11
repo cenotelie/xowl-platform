@@ -56,7 +56,7 @@ public class DeserializerFactoryForCommunity implements DeserializerFactory {
         if (BotSpecification.class.getCanonicalName().equals(type))
             return new BotSpecification(definition);
         if (PublicProfile.class.getCanonicalName().equals(type))
-            return new PublicProfile(definition);
+            return new PublicProfile(definition, null);
         if (Badge.class.getCanonicalName().equals(type))
             return new Badge(definition);
         return null;

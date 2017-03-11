@@ -40,7 +40,7 @@ public class XOWLProfileServiceProvider implements ProfileServiceProvider {
     @Override
     public ProfileService instantiate(String identifier, Section configuration) {
         if (XOWLProfileServiceLocalImpl.class.getCanonicalName().equals(identifier))
-            return new XOWLProfileServiceLocalImpl();
+            return new XOWLProfileServiceLocalImpl(configuration);
         return null;
     }
 }

@@ -17,25 +17,57 @@
 
 package org.xowl.platform.services.community.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.SHA1;
+import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.logging.BufferedLogger;
+import org.xowl.infra.utils.logging.Logging;
+import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.services.community.profiles.Badge;
 import org.xowl.platform.services.community.profiles.BadgeProvider;
 import org.xowl.platform.services.community.profiles.ProfileService;
 import org.xowl.platform.services.community.profiles.PublicProfile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An implementation of the profile service that locally stores the profiles
  *
  * @author Laurent Wouters
  */
-public class XOWLProfileServiceLocalImpl implements ProfileService {
+public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvider {
+    /**
+     * The storage location for the profiles data
+     */
+    private final File storage;
+    /**
+     * The map of the loaded profiles
+     */
+    private final Map<String, PublicProfile> publicProfiles;
+
+    /**
+     * Initializes this service
+     *
+     * @param configuration The configuration for this service
+     */
+    public XOWLProfileServiceLocalImpl(Section configuration) {
+        this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
+        this.publicProfiles = new HashMap<>();
+    }
 
     @Override
     public String getIdentifier() {
@@ -54,16 +86,39 @@ public class XOWLProfileServiceLocalImpl implements ProfileService {
 
     @Override
     public PublicProfile getPublicProfile(String identifier) {
-        return null;
+        synchronized (publicProfiles) {
+            PublicProfile profile = publicProfiles.get(identifier);
+            if (profile != null)
+                return profile;
+            if (!storage.exists())
+                return null;
+            File file = new File(storage, getFileNameFor(identifier));
+            if (!file.exists())
+                return null;
+            try (Reader reader = IOUtils.getReader(file)) {
+                BufferedLogger logger = new BufferedLogger();
+                ASTNode root = JSONLDLoader.parseJSON(logger, reader);
+                if (root == null)
+                    return null;
+                profile = new PublicProfile(root, this);
+                publicProfiles.put(identifier, profile);
+                return profile;
+            } catch (IOException exception) {
+                Logging.get().error(exception);
+                return null;
+            }
+        }
     }
 
     @Override
     public XSPReply updatePublicProfile(PublicProfile profile) {
-        return XSPReplyUnsupported.instance();
+        PublicProfile target = resolveProfile(profile.getIdentifier());
+        target.update(profile);
+        return writeBack(target);
     }
 
     @Override
-    public Collection<Badge> getAllBadges() {
+    public Collection<Badge> getBadges() {
         Collection<Badge> result = new ArrayList<>();
         for (BadgeProvider provider : Register.getComponents(BadgeProvider.class)) {
             result.addAll(provider.getBadges());
@@ -83,11 +138,70 @@ public class XOWLProfileServiceLocalImpl implements ProfileService {
 
     @Override
     public XSPReply awardBadge(String userId, String badgeId) {
-        return XSPReplyUnsupported.instance();
+        Badge badge = getBadge(badgeId);
+        if (badge == null)
+            return XSPReplyNotFound.instance();
+        PublicProfile target = resolveProfile(userId);
+        target.awardBadge(badge);
+        return writeBack(target);
     }
 
     @Override
     public XSPReply rescindBadge(String userId, String badgeId) {
-        return XSPReplyUnsupported.instance();
+        Badge badge = getBadge(badgeId);
+        if (badge == null)
+            return XSPReplyNotFound.instance();
+        PublicProfile target = resolveProfile(userId);
+        target.rescindBadge(badge);
+        return writeBack(target);
+    }
+
+    /**
+     * Resolves a profile for the specified identifier
+     *
+     * @param identifier The identifier of a profile
+     * @return The profile
+     */
+    private PublicProfile resolveProfile(String identifier) {
+        synchronized (publicProfiles) {
+            PublicProfile target = publicProfiles.get(identifier);
+            if (target != null)
+                return target;
+            target = new PublicProfile(identifier);
+            publicProfiles.put(identifier, target);
+            return target;
+        }
+    }
+
+    /**
+     * Writes back the specified profile to disk
+     *
+     * @param profile The profile to write
+     * @return The protocol reply
+     */
+    private XSPReply writeBack(PublicProfile profile) {
+        if (!storage.exists()) {
+            if (!storage.mkdirs())
+                return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED);
+        }
+        File file = new File(storage, getFileNameFor(profile.getIdentifier()));
+        try (Writer writer = IOUtils.getWriter(file)) {
+            writer.write(profile.serializedJSON());
+            writer.flush();
+        } catch (IOException exception) {
+            Logging.get().error(exception);
+            return new XSPReplyException(exception);
+        }
+        return XSPReplySuccess.instance();
+    }
+
+    /**
+     * Gets the name of the file for a profile
+     *
+     * @param profileId The identifier of a profile
+     * @return The associated file name
+     */
+    private static String getFileNameFor(String profileId) {
+        return "profile-" + SHA1.hashSHA1(profileId) + ".json";
     }
 }

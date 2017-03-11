@@ -44,6 +44,7 @@ import org.xowl.platform.services.community.profiles.PublicProfile;
 
 import java.net.HttpURLConnection;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * The implementation of the profile service used to delegate to a configured service
@@ -133,8 +134,8 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
     }
 
     @Override
-    public Collection<Badge> getAllBadges() {
-        return getImplementation().getAllBadges();
+    public Collection<Badge> getBadges() {
+        return getImplementation().getBadges();
     }
 
     @Override
@@ -192,7 +193,7 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Badge badge : getAllBadges()) {
+            for (Badge badge : getBadges()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -248,6 +249,8 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 if (root == null)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                 PublicProfile profile = new PublicProfile(root);
+                if (!Objects.equals(profile.getIdentifier(), profileId))
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"), null);
                 return XSPReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");

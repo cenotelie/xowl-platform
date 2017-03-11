@@ -56,17 +56,17 @@ function renderBot(bot) {
 }
 
 function renderBotGetIcon(bot) {
-	if (bot === "Asleep" || bot === "GoingToSleep")
+	if (bot.status === "Asleep" || bot.status === "GoingToSleep")
 		return "/assets/bot_inactive.svg";
-	if (bot === "WakingUp" || bot === "Awaken" || bot === "Working")
+	if (bot.status === "WakingUp" || bot.status === "Awaken" || bot.status === "Working")
 		return "/assets/bot.svg";
 	return "/assets/bot_invalid.svg";
 }
 
 function renderBotAction(bot) {
-	if (bot === "Asleep" || bot === "GoingToSleep")
+	if (bot.status === "Asleep" || bot.status === "GoingToSleep")
 		return renderBotActionWakeup(bot);
-	if (bot === "WakingUp" || bot === "Awaken" || bot === "Working")
+	if (bot.status === "WakingUp" || bot.status === "Awaken" || bot.status === "Working")
 		return renderBotActionPutToSleep(bot);
 	return null;
 }

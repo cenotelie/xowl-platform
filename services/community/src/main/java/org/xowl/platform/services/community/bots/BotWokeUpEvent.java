@@ -48,7 +48,7 @@ public class BotWokeUpEvent extends EventBase {
      */
     public BotWokeUpEvent(Bot bot) {
         super(
-                new RichString(bot, " just work up"),
+                new RichString(bot, " just woke up"),
                 BotWokeUpEvent.class.getCanonicalName(),
                 Register.getComponent(BotManagementService.class));
         this.bot = bot;

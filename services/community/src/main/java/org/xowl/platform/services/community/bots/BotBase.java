@@ -20,21 +20,21 @@ package org.xowl.platform.services.community.bots;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
+import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformLogBuffer;
-import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
-import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +86,7 @@ public class BotBase implements Bot, EventConsumer {
     /**
      * The messages of this bot
      */
-    private final PlatformLogBuffer messages;
+    private final PlatformLogBuffer logBuffer;
 
     /*
      * Bot's implementation data
@@ -123,8 +123,8 @@ public class BotBase implements Bot, EventConsumer {
             this.securityUser = securityService.getRealm().getUser(userId);
         } else
             this.securityUser = null;
-        this.status = BotStatus.Asleep;
-        this.messages = new PlatformLogBuffer(MESSAGES_BOUND);
+        this.status = this.securityUser != null ? BotStatus.Asleep : BotStatus.Invalid;
+        this.logBuffer = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
         this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
@@ -172,8 +172,8 @@ public class BotBase implements Bot, EventConsumer {
             this.securityUser = securityService.getRealm().getUser(securityUser);
         } else
             this.securityUser = null;
-        this.status = BotStatus.Asleep;
-        this.messages = new PlatformLogBuffer(MESSAGES_BOUND);
+        this.status = this.securityUser != null ? BotStatus.Asleep : BotStatus.Invalid;
+        this.logBuffer = new PlatformLogBuffer(MESSAGES_BOUND);
         this.mustStop = new AtomicBoolean(false);
         this.thread = new Thread(getRunnable(), Bot.class.getName() + " - " + identifier);
         this.queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
@@ -205,12 +205,26 @@ public class BotBase implements Bot, EventConsumer {
     }
 
     @Override
-    public Collection<PlatformLogMessage> getMessages() {
-        return messages.getMessages();
+    public XSPReply getMessages() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_GET_MESSAGES, this);
+        if (!reply.isSuccess())
+            return reply;
+
+        return new XSPReplyResultCollection<>(logBuffer.getMessages());
     }
 
     @Override
     public XSPReply wakeup() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_WAKE_UP, this);
+        if (!reply.isSuccess())
+            return reply;
+
         synchronized (this) {
             if (status != BotStatus.Asleep)
                 return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
@@ -227,6 +241,13 @@ public class BotBase implements Bot, EventConsumer {
 
     @Override
     public XSPReply sleep() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_SLEEP, this);
+        if (!reply.isSuccess())
+            return reply;
+
         synchronized (this) {
             if (status != BotStatus.Awaken && status != BotStatus.Working)
                 return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not awake: " + status);
@@ -301,7 +322,7 @@ public class BotBase implements Bot, EventConsumer {
      */
     private void doBotRun() {
         // register the logger for this thread
-        Logging.set(new DispatchLogger(Logging.getDefault(), messages));
+        Logging.set(new DispatchLogger(Logging.getDefault(), logBuffer));
 
         // authenticate the bot on this thread
         SecurityService securityService = Register.getComponent(SecurityService.class);

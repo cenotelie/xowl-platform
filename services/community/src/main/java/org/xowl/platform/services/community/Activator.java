@@ -47,7 +47,7 @@ public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCommunity(), null);
-        bundleContext.registerService(SecuredActionPolicyProvider.class, new XOWLProfileSecurityProvider(), null);
+        bundleContext.registerService(SecuredActionPolicyProvider.class, new XOWLCommunitySecurityProvider(), null);
         bundleContext.registerService(ProfileServiceProvider.class, new XOWLProfileServiceProvider(), null);
         bundleContext.registerService(BotFactory.class, new XOWLTelemetryBotFactory(), null);
 

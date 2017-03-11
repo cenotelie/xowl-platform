@@ -21,6 +21,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
 import org.xowl.platform.kernel.security.SecuredActionPolicyProvider;
+import org.xowl.platform.services.community.bots.SecuredActionPolicyIsRunningBot;
 import org.xowl.platform.services.community.profiles.SecuredActionPolicyIsProfileOwner;
 
 /**
@@ -28,21 +29,23 @@ import org.xowl.platform.services.community.profiles.SecuredActionPolicyIsProfil
  *
  * @author Laurent Wouters
  */
-public class XOWLProfileSecurityProvider implements SecuredActionPolicyProvider {
+public class XOWLCommunitySecurityProvider implements SecuredActionPolicyProvider {
     @Override
     public String getIdentifier() {
-        return XOWLProfileSecurityProvider.class.getCanonicalName();
+        return XOWLCommunitySecurityProvider.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return PlatformUtils.NAME + " - Profile Security Provider";
+        return PlatformUtils.NAME + " - Community Security Provider";
     }
 
     @Override
     public SecuredActionPolicy newPolicy(String policyId, ASTNode definition) {
         if (SecuredActionPolicyIsProfileOwner.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsProfileOwner.INSTANCE;
+        if (SecuredActionPolicyIsRunningBot.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsRunningBot.INSTANCE;
         return null;
     }
 }

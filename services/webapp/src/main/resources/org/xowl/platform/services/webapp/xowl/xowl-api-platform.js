@@ -989,6 +989,16 @@ XOWL.prototype.getBot = function (callback, botId) {
 	}, "services/community/bots/" + encodeURIComponent(botId), null, "GET", null, null);
 }
 
+XOWL.prototype.getBotMessages = function (callback, botId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/community/bots/" + encodeURIComponent(botId) + "/messages", null, "GET", null, null);
+}
+
 XOWL.prototype.wakeupBot = function (callback, botId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {

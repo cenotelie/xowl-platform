@@ -4,6 +4,7 @@ title: Bots Management Service
 version: v1
 types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
+  LogMessages: !include schema_platform_kernel.json#/definitions/LogMessages
   Bot: !include schema_platform_community.json#/definitions/Bot
   Bots: !include schema_platform_community.json#/definitions/Bots
 traits: !include api_traits.raml
@@ -50,6 +51,26 @@ baseUri: https://localhost:8443/api
                   "wakeupOnStartup": true,
                   "status": "Awake"
                 }
+    /messages:
+      description: The messages from the bot
+      get:
+        description: Gets the messages from the bot
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The messages from the bot
+            body:
+              application/json:
+                type: LogMessages
+                example: |
+                  [
+                    {
+                      "type": "org.xowl.platform.kernel.platform.PlatformLogMessage",
+                      "level": "INFO",
+                      "date": "01/01/2001 10:10",
+                      "content": "This is a message"
+                    }
+                  ]
     /wakeup:
       description: Action to wake the bot up
       post:

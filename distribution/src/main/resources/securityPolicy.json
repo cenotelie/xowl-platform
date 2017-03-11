@@ -491,10 +491,10 @@
     },
     {
       "action": {
-        "identifier": "org.xowl.platform.services.community.bots.BotManagementService.GetBots"
+        "identifier": "org.xowl.platform.services.community.bots.BotManagementService.GetMessages"
       },
       "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+        "identifier": "org.xowl.platform.services.community.bots.SecuredActionPolicyIsRunningBot"
       }
     },
     {
@@ -502,7 +502,7 @@
         "identifier": "org.xowl.platform.services.community.bots.BotManagementService.Wakeup"
       },
       "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+        "identifier": "org.xowl.platform.services.community.bots.SecuredActionPolicyIsRunningBot"
       }
     },
     {
@@ -510,7 +510,7 @@
         "identifier": "org.xowl.platform.services.community.bots.BotManagementService.Sleep"
       },
       "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+        "identifier": "org.xowl.platform.services.community.bots.SecuredActionPolicyIsRunningBot"
       }
     },
     {

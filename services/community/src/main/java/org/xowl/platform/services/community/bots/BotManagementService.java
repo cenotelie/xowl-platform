@@ -23,6 +23,8 @@ import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
+import java.util.Collection;
+
 /**
  * Service for the management of bots on the platform
  *
@@ -30,22 +32,22 @@ import org.xowl.platform.kernel.security.SecuredService;
  */
 public interface BotManagementService extends SecuredService {
     /**
-     * Service action to get the description of bots
+     * Service action to get the messages of a bot
      */
-    SecuredAction ACTION_GET_BOTS = new SecuredAction(BotManagementService.class.getCanonicalName() + ".GetBots", "Bots Management Service - Get Bots", SecuredAction.DEFAULT_POLICIES);
+    SecuredAction ACTION_GET_MESSAGES = new SecuredAction(BotManagementService.class.getCanonicalName() + ".GetMessages", "Bots Management Service - Get Bot Messages", SecuredActionPolicyIsRunningBot.DESCRIPTOR);
     /**
      * Service action to wakeup bots
      */
-    SecuredAction ACTION_WAKE_UP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Wakeup", "Bots Management Service - Wake up Bots", SecuredAction.DEFAULT_POLICIES);
+    SecuredAction ACTION_WAKE_UP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Wakeup", "Bots Management Service - Wake up Bots", SecuredActionPolicyIsRunningBot.DESCRIPTOR);
     /**
      * Service action to put bots to sleep
      */
-    SecuredAction ACTION_SLEEP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Sleep", "Bots Management Service - Put Bots to Sleep", SecuredAction.DEFAULT_POLICIES);
+    SecuredAction ACTION_SLEEP = new SecuredAction(BotManagementService.class.getCanonicalName() + ".Sleep", "Bots Management Service - Put Bots to Sleep", SecuredActionPolicyIsRunningBot.DESCRIPTOR);
     /**
      * The actions for this service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            ACTION_GET_BOTS,
+            ACTION_GET_MESSAGES,
             ACTION_WAKE_UP,
             ACTION_SLEEP
     };
@@ -62,7 +64,7 @@ public interface BotManagementService extends SecuredService {
      *
      * @return The protocol reply
      */
-    XSPReply getBots();
+    Collection<Bot> getBots();
 
     /**
      * Gets the details of a bot
@@ -70,7 +72,15 @@ public interface BotManagementService extends SecuredService {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    XSPReply getBot(String botId);
+    Bot getBot(String botId);
+
+    /**
+     * Gets the messages of a bot
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    XSPReply getBotMessages(String botId);
 
     /**
      * Wakes a bot up

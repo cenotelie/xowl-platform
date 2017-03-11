@@ -20,10 +20,7 @@ package org.xowl.platform.services.community.bots;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
-import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
-
-import java.util.Collection;
 
 /**
  * Represents an automated user (bot) on the platform
@@ -58,7 +55,7 @@ public interface Bot extends Identifiable, Serializable {
      *
      * @return The last messages from this bot
      */
-    Collection<PlatformLogMessage> getMessages();
+    XSPReply getMessages();
 
     /**
      * Wakes this bot up (when asleep)

@@ -1,21 +1,4 @@
-<!DOCTYPE HTML><!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~ Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as
-  ~ published by the Free Software Foundation, either version 3
-  ~ of the License, or (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU Lesser General
-  ~ Public License along with this program.
-  ~ If not, see <http://www.gnu.org/licenses/>.
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
-<html><head><title>Bots Management Service API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 4.0.0-beta12"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script><script type="text/javascript">
+<!DOCTYPE HTML><html><head><title>Bots Management Service API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 4.0.0-beta12"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script><script type="text/javascript">
       $(document).ready(function() {
         $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
           hljs.highlightBlock(block);
@@ -208,6 +191,25 @@
   "wakeupOnStartup": true,
   "status": "Awake"
 }
+</code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+  "$ref": "schema_infra_utils.json#/definitions/ApiError"
+}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
+  "type": "org.xowl.infra.utils.ApiError",
+  "code": 1,
+  "message": "The main description of this error",
+  "helpLink": "http://xowl.org/supports/errors/001.html",
+  "content": "Supplementary information about the error"
+}
+</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots__botid__messages"><span class="parent">/services/community/bots/{botId}</span>/messages</a> <span class="methods"><a href="#services_community_bots__botid__messages_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_services_community_bots__botid__messages" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>The messages from the bot</p></div><div class="list-group"><div onclick="window.location.href = '#services_community_bots__botid__messages_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets the messages from the bot</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots__botid__messages_get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/services/community/bots/{botId}</span>/messages</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets the messages from the bot</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots__botid__messages_get_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots__botid__messages_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots__botid__messages_get_request"><h3>URI Parameters</h3><ul><li><strong>botId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots__botid__messages_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The messages from the bot</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+  "$ref": "schema_platform_kernel.json#/definitions/LogMessages"
+}</code></pre><p><strong>Examples</strong>:</p><pre><code>[
+  {
+    "type": "org.xowl.platform.kernel.platform.PlatformLogMessage",
+    "level": "INFO",
+    "date": "01/01/2001 10:10",
+    "content": "This is a message"
+  }
+]
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{

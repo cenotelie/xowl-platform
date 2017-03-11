@@ -415,7 +415,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.platform.kernel.impl.XOWLLoggingService.Msg"
+            "org.xowl.platform.kernel.platform.PlatformLogMessage"
           ]
         },
         "level": {

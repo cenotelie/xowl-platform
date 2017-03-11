@@ -17,18 +17,19 @@
 
 package org.xowl.platform.services.community.impl;
 
-import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyNotFound;
+import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.platform.kernel.*;
-import org.xowl.platform.services.community.bots.Bot;
-import org.xowl.platform.services.community.bots.BotFactory;
-import org.xowl.platform.services.community.bots.BotManagementService;
-import org.xowl.platform.services.community.bots.BotSpecification;
+import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
@@ -39,9 +40,14 @@ import org.xowl.platform.kernel.webapi.HttpApiRequest;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
+import org.xowl.platform.services.community.bots.Bot;
+import org.xowl.platform.services.community.bots.BotFactory;
+import org.xowl.platform.services.community.bots.BotManagementService;
+import org.xowl.platform.services.community.bots.BotSpecification;
 
 import java.io.Closeable;
 import java.net.HttpURLConnection;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,40 +103,25 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     }
 
     @Override
-    public XSPReply getBots() {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_BOTS);
-        if (!reply.isSuccess())
-            return reply;
-        return new XSPReplyResultCollection<>(bots.values());
+    public Collection<Bot> getBots() {
+        return bots.values();
     }
 
     @Override
-    public XSPReply getBot(String botId) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_BOTS);
-        if (!reply.isSuccess())
-            return reply;
+    public Bot getBot(String botId) {
+        return bots.get(botId);
+    }
 
+    @Override
+    public XSPReply getBotMessages(String botId) {
         Bot bot = bots.get(botId);
         if (bot == null)
             return XSPReplyNotFound.instance();
-        return new XSPReplyResult<>(bot);
+        return bot.getMessages();
     }
 
     @Override
     public XSPReply wakeup(String botId) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_WAKE_UP);
-        if (!reply.isSuccess())
-            return reply;
-
         Bot bot = bots.get(botId);
         if (bot == null)
             return XSPReplyNotFound.instance();
@@ -139,13 +130,6 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
 
     @Override
     public XSPReply putToSleep(String botId) {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_SLEEP);
-        if (!reply.isSuccess())
-            return reply;
-
         Bot bot = bots.get(botId);
         if (bot == null)
             return XSPReplyNotFound.instance();
@@ -214,7 +198,15 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
         if (request.getUri().equals(apiUri)) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            return XSPReplyUtils.toHttpResponse(getBots(), null);
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (Bot bot : getBots()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(bot.serializedJSON());
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 
         if (request.getUri().startsWith(apiUri)) {
@@ -226,7 +218,14 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
             if (index < 0) {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return XSPReplyUtils.toHttpResponse(getBot(botId), null);
+                Bot bot = getBot(botId);
+                if (bot == null)
+                    return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, bot.serializedJSON());
+            } else if (rest.substring(index).equals("/messages")) {
+                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                return XSPReplyUtils.toHttpResponse(getBotMessages(botId), null);
             } else if (rest.substring(index).equals("/wakeup")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");

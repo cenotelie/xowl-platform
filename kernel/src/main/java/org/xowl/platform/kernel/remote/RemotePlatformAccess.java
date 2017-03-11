@@ -1072,6 +1072,18 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Gets the messages of a bot
+     *
+     * @param botId The identifier of the bot
+     * @return The protocol reply
+     */
+    public XSPReply getBotMessages(String botId) {
+        return doRequest(
+                "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/messages",
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
      * Attempts to wake a bot up on the platform
      *
      * @param botId The identifier of the bot

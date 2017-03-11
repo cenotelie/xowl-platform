@@ -21,6 +21,7 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -76,8 +77,7 @@ public abstract class BotBaseDaemon extends BotBase {
                     securityService.authenticate(platformUser);
                 while (!mustStop.get()) {
                     if (onRun()) {
-                        if (!mustStop.get())
-                            status = BotStatus.Asleep;
+                        onBotStop();
                         return;
                     }
                 }
@@ -85,7 +85,7 @@ public abstract class BotBaseDaemon extends BotBase {
 
             @Override
             protected void onRunFailed(Throwable throwable) {
-                status = BotStatus.Asleep;
+                onBotStop();
             }
         };
     }
@@ -113,4 +113,14 @@ public abstract class BotBaseDaemon extends BotBase {
      * @return true if the bot must stop, false otherwise
      */
     protected abstract boolean onRun();
+
+    /**
+     * When the bot is stopping for a reason other that an external request
+     */
+    private void onBotStop() {
+        status = BotStatus.Asleep;
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BotHasGoneToSleepEvent(BotBaseDaemon.this));
+    }
 }

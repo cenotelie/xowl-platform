@@ -23,6 +23,7 @@ import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -151,6 +152,9 @@ public abstract class BotBase implements Bot {
         }
         onWakeup();
         status = BotStatus.Awaken;
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BotWokeUpEvent(this));
         return XSPReplySuccess.instance();
     }
 
@@ -163,6 +167,9 @@ public abstract class BotBase implements Bot {
         }
         onGoingToSleep();
         status = BotStatus.Asleep;
+        EventService eventService = Register.getComponent(EventService.class);
+        if (eventService != null)
+            eventService.onEvent(new BotHasGoneToSleepEvent(this));
         return XSPReplySuccess.instance();
     }
 

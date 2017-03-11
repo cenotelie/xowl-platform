@@ -53,18 +53,29 @@
             </div>
         </div>
     </form>
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Level</th>
+            <th>Date</th>
+            <th>Message</th>
+        </tr>
+        </thead>
+        <tbody id="messages">
+        </tbody>
+    </table>
     <a class="btn btn-default btn-sm header-user-logout" onclick="doWakeup()">
-        <img src="/assets/bot.svg" width="25" height="25" title="WAKEUP">
+        <img src="../../../assets/bot.svg" width="25" height="25" title="WAKEUP">
     </a>
     <a class="btn btn-default btn-sm header-user-logout" onclick="doPutToSleep()">
-        <img src="/assets/bot_inactive.svg" width="25" height="25" title="SLEEP">
+        <img src="../../../assets/bot_inactive.svg" width="25" height="25" title="SLEEP">
     </a>
 </div>
 <div id="placeholder-footer"></div>
 
 <script src="../../../xowl/xowl-api-platform.js"></script>
 <script src="../../../xowl/xowl-ui.js"></script>
-<script src="connector.js"></script>
+<script src="bot.js"></script>
 <script>init();</script>
 </body>
 

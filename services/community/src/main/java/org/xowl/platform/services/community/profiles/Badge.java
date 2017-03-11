@@ -45,6 +45,10 @@ public class Badge implements Identifiable, Serializable {
      * The content of the image
      */
     private final byte[] imageContent;
+    /**
+     * The description of this badge
+     */
+    private final String description;
 
     /**
      * Initializes this user profile
@@ -56,6 +60,7 @@ public class Badge implements Identifiable, Serializable {
         String name = "";
         String imageMime = "";
         byte[] imageContent = null;
+        String description = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
@@ -72,12 +77,16 @@ public class Badge implements Identifiable, Serializable {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 String data = value.substring(1, value.length() - 1);
                 imageContent = Base64.decodeBase64(data);
+            } else if ("description".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                description = value.substring(1, value.length() - 1);
             }
         }
         this.identifier = identifier;
         this.name = name;
         this.imageMime = imageMime;
         this.imageContent = (imageContent == null ? new byte[0] : imageContent);
+        this.description = description;
     }
 
     @Override
@@ -88,6 +97,33 @@ public class Badge implements Identifiable, Serializable {
     @Override
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets the MIME type for the image
+     *
+     * @return The MIME type for the image
+     */
+    public String getImageMime() {
+        return imageMime;
+    }
+
+    /**
+     * Gets the content of the image
+     *
+     * @return The content of the image
+     */
+    public byte[] getImageContent() {
+        return imageContent;
+    }
+
+    /**
+     * Gets the description of this badge
+     *
+     * @return The description of this badge
+     */
+    public String getDescription() {
+        return description;
     }
 
     @Override
@@ -106,6 +142,8 @@ public class Badge implements Identifiable, Serializable {
                 TextUtils.escapeStringJSON(imageMime) +
                 "\", \"imageContent\": \"" +
                 Base64.encodeBase64(imageContent) +
+                "\", \"description\": \"" +
+                TextUtils.escapeStringJSON(description) +
                 "\"}";
     }
 }

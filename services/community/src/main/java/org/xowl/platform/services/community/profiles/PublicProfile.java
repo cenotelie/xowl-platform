@@ -24,6 +24,10 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Represents the profile of a user on the platform
  *
@@ -34,10 +38,6 @@ public class PublicProfile implements Identifiable, Serializable {
      * The identifier of this user
      */
     private final String identifier;
-    /**
-     * The name of this user
-     */
-    private final String name;
     /**
      * The email to reach this user
      */
@@ -58,6 +58,10 @@ public class PublicProfile implements Identifiable, Serializable {
      * The user's occupation, if any
      */
     private final String occupation;
+    /**
+     * The badges associated to this profile
+     */
+    private final Collection<Badge> badges;
 
     /**
      * Initializes this user profile
@@ -66,12 +70,12 @@ public class PublicProfile implements Identifiable, Serializable {
      */
     public PublicProfile(PlatformUser user) {
         this.identifier = user.getIdentifier();
-        this.name = user.getName();
         this.email = "";
         this.avatarMime = "";
         this.avatarContent = new byte[0];
         this.organization = "";
         this.occupation = "";
+        this.badges = new ArrayList<>();
     }
 
     /**
@@ -80,8 +84,8 @@ public class PublicProfile implements Identifiable, Serializable {
      * @param definition The AST node for the serialized definition
      */
     public PublicProfile(ASTNode definition) {
+        this.badges = new ArrayList<>();
         String identifier = "";
-        String name = "";
         String email = "";
         String avatarMime = "";
         byte[] avatarContent = null;
@@ -93,9 +97,6 @@ public class PublicProfile implements Identifiable, Serializable {
             if ("identifier".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 identifier = value.substring(1, value.length() - 1);
-            } else if ("name".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                name = value.substring(1, value.length() - 1);
             } else if ("email".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 email = value.substring(1, value.length() - 1);
@@ -112,10 +113,12 @@ public class PublicProfile implements Identifiable, Serializable {
             } else if ("occupation".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 occupation = value.substring(1, value.length() - 1);
+            } else if ("badges".equals(head)) {
+                for (ASTNode child : member.getChildren().get(1).getChildren())
+                    badges.add(new Badge(child));
             }
         }
         this.identifier = identifier;
-        this.name = name;
         this.email = email;
         this.avatarMime = avatarMime;
         this.avatarContent = (avatarContent == null ? new byte[0] : avatarContent);
@@ -130,7 +133,61 @@ public class PublicProfile implements Identifiable, Serializable {
 
     @Override
     public String getName() {
-        return name;
+        return identifier;
+    }
+
+    /**
+     * Gets the email to reach this user
+     *
+     * @return The email to reach this user
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Gets the MIME type for the avatar
+     *
+     * @return The MIME type for the avatar
+     */
+    public String getAvatarMime() {
+        return avatarMime;
+    }
+
+    /**
+     * Gets the content for the avatar
+     *
+     * @return The content for the avatar
+     */
+    public byte[] getAvatarContent() {
+        return avatarContent;
+    }
+
+    /**
+     * Gets the user's affiliation, if any
+     *
+     * @return The user's affiliation, if any
+     */
+    public String getOrganization() {
+        return organization;
+    }
+
+    /**
+     * Gets the user's occupation, if any
+     *
+     * @return The user's occupation, if any
+     */
+    public String getOccupation() {
+        return occupation;
+    }
+
+    /**
+     * Gets the badges associated to this profile
+     *
+     * @return The badges associated to this profile
+     */
+    public Collection<Badge> getBadges() {
+        return Collections.unmodifiableCollection(badges);
     }
 
     @Override
@@ -140,21 +197,32 @@ public class PublicProfile implements Identifiable, Serializable {
 
     @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(PublicProfile.class.getCanonicalName()) +
-                "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(identifier) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(name) +
-                "\", \"email\": \"" +
-                TextUtils.escapeStringJSON(email) +
-                "\", \"avatarMime\": \"" +
-                TextUtils.escapeStringJSON(avatarMime) +
-                "\", \"avatarContent\": \"" +
-                Base64.encodeBase64(avatarContent) +
-                "\", \"organization\": \"" +
-                TextUtils.escapeStringJSON(organization) +
-                "\", \"occupation\": \"" +
-                TextUtils.escapeStringJSON(occupation) +
-                "\"}";
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\"type\": \"");
+        builder.append(TextUtils.escapeStringJSON(PublicProfile.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
+        builder.append(TextUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\": \"");
+        builder.append(TextUtils.escapeStringJSON(identifier));
+        builder.append("\", \"email\": \"");
+        builder.append(TextUtils.escapeStringJSON(email));
+        builder.append("\", \"avatarMime\": \"");
+        builder.append(TextUtils.escapeStringJSON(avatarMime));
+        builder.append("\", \"avatarContent\": \"");
+        builder.append(Base64.encodeBase64(avatarContent));
+        builder.append("\", \"organization\": \"");
+        builder.append(TextUtils.escapeStringJSON(organization));
+        builder.append("\", \"occupation\": \"");
+        builder.append(TextUtils.escapeStringJSON(occupation));
+        builder.append("\", \"badges\": [");
+        boolean first = true;
+        for (Badge badge : badges) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(badge.serializedJSON());
+        }
+        builder.append("]}");
+        return builder.toString();
     }
 }

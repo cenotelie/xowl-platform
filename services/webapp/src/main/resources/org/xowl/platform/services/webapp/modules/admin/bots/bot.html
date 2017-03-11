@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Platform Bot</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="bot-identifier" class="col-sm-2 control-label">Identifier:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-identifier" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="bot-name" class="col-sm-2 control-label">Name:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-name" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="bot-type" class="col-sm-2 control-label">Bot Type:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-type" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="bot-wakeup-on-startup" class="col-sm-2 control-label">Wake on Startup?</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-wakeup-on-startup" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="bot-security-user" class="col-sm-2 control-label">Run As:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-security-user" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="bot-status" class="col-sm-2 control-label">Status:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="bot-status" readonly>
+            </div>
+        </div>
+    </form>
+    <a class="btn btn-default btn-sm header-user-logout" onclick="doWakeup()">
+        <img src="/assets/bot.svg" width="25" height="25" title="WAKEUP">
+    </a>
+    <a class="btn btn-default btn-sm header-user-logout" onclick="doPutToSleep()">
+        <img src="/assets/bot_inactive.svg" width="25" height="25" title="SLEEP">
+    </a>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="connector.js"></script>
+<script>init();</script>
+</body>
+
+</html>

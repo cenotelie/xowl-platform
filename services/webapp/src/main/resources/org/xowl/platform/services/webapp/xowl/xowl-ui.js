@@ -446,6 +446,11 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = ROOT + "/modules/admin/platform/addon.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
+	} else if (part.type === "org.xowl.platform.services.community.bots.Bot") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = ROOT + "/modules/admin/bots/bot.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
 	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));

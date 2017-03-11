@@ -199,6 +199,7 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 first = false;
                 builder.append(badge.serializedJSON());
             }
+            builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 

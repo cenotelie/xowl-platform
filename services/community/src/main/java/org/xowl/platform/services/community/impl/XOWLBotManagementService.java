@@ -206,6 +206,7 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
                 first = false;
                 builder.append(bot.serializedJSON());
             }
+            builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         }
 

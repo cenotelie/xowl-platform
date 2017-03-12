@@ -54,7 +54,7 @@ function renderConfiguration(configuration) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	var icon = document.createElement("img");
-	icon.src = ROOT + "/assets/importer_configuration.svg";
+	icon.src = ROOT + "/assets/importer-configuration.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";

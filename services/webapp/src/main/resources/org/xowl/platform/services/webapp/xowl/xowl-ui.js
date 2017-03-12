@@ -170,7 +170,7 @@ function doSetupHeader() {
 		image.style.marginRight = "20px";
 		userLink.appendChild(image);
 		userLink.appendChild(document.createTextNode(PLATFORM.getLoggedInUserName()));
-		userLink.href = ROOT + "/me.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
+		userLink.href = ROOT + "/modules/collab/community/profile-view.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
 	}
 	PAGE_READY_INDEX += 50;
 	if (PAGE_READY_INDEX >= 100)
@@ -244,8 +244,8 @@ function onOperationAbort(message) {
 /**
  * When an operation ended
  *
- * @param code		  The HTTP code (other that 200 - OK)
- * @param content	   The content of the HTTP response
+ * @param code		    The HTTP code (other that 200 - OK)
+ * @param content	    The content of the HTTP response
  * @param customMessage A custom message to override the default one (may be undefined)
  * @return Whether the operation was successful
  */
@@ -262,7 +262,7 @@ function onOperationEnded(code, content, customMessage) {
 	if (code != 200) {
 		if ((typeof customMessage) === "undefined")
 			displayMessageHttpError(code, content);
-		else
+		else if (customMessage !== null)
 			displayMessage("error", customMessage);
 		if (code === 401 || code === 440)
 			waitAndGo(ROOT + "/login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search));
@@ -429,7 +429,7 @@ function renderMessagePart(part) {
 	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformUser") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/collab/community/profile-view.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.platform.PlatformGroup") {
 		var dom = document.createElement("a");

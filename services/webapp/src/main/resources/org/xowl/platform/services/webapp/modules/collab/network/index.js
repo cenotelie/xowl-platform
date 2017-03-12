@@ -67,12 +67,12 @@ function renderNeighbour(neighbour) {
 
 function renderNeighbourGetIcon(neighbour) {
 	if (neighbour.status == "Provisioning")
-		return "collaboration_provisioning.svg";
+		return "collaboration-provisioning.svg";
 	if (neighbour.status == "Running")
-		return "collaboration_running.svg";
+		return "collaboration-running.svg";
 	if (neighbour.status == "Stopped")
-		return "collaboration_stopped.svg";
+		return "collaboration-stopped.svg";
 	if (neighbour.status == "Archived")
-		return "collaboration_archived.svg";
+		return "collaboration-archived.svg";
 	return "collaboration.svg";
 }

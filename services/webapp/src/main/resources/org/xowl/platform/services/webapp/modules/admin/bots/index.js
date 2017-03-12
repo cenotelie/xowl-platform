@@ -57,10 +57,10 @@ function renderBot(bot) {
 
 function renderBotGetIcon(bot) {
 	if (bot.status === "Asleep" || bot.status === "GoingToSleep")
-		return "/assets/bot_inactive.svg";
+		return "/assets/bot-inactive.svg";
 	if (bot.status === "WakingUp" || bot.status === "Awaken" || bot.status === "Working")
 		return "/assets/bot.svg";
-	return "/assets/bot_invalid.svg";
+	return "/assets/bot-invalid.svg";
 }
 
 function renderBotAction(bot) {
@@ -88,7 +88,7 @@ function renderBotActionWakeup(bot) {
 
 function renderBotActionPutToSleep(bot) {
 	var icon = document.createElement("img");
-	icon.src = ROOT + "/assets/bot_inactive.svg";
+	icon.src = ROOT + "/assets/bot-inactive.svg";
 	icon.width = 20;
 	icon.height = 20;
 	icon.title = "SLEEP";

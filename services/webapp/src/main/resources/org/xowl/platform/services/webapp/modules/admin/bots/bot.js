@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+// Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
 var xowl = new XOWL();

@@ -39,7 +39,7 @@ function renderPart(part) {
 function renderAction(row, action) {
 	var cell = document.createElement("div");
 	var image = document.createElement("img");
-	image.src = ROOT + "/assets/secured_action.svg";
+	image.src = ROOT + "/assets/secured-action.svg";
 	image.width = 30;
 	image.height = 30;
 	image.style.marginRight = "20px";

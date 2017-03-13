@@ -12,8 +12,6 @@ function init() {
 			{name: "Edit"}], function() {
 		if (!profileId || profileId === null || profileId === "")
 			return;
-		document.getElementById("profile-edit-link").href = "profile-update.html?id=" + encodeURIComponent(profileId);
-		document.getElementById("profile-security-link").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(profileId);
 		doGetData();
 	});
 }
@@ -29,9 +27,6 @@ function doGetData() {
 	xowl.getPublicProfile(function (status, ct, content) {
 		if (onOperationEnded(status, content, null)) {
 			renderProfile(content);
-		} else if (status === 404) {
-			document.getElementById("row-new-profile").style.display = "";
-			document.getElementById("profile-new-link").href= "profile-update.html?id=" + encodeURIComponent(profileId);
 		}
 	}, profileId);
 }
@@ -47,15 +42,15 @@ function renderUser(user) {
 
 function renderRole(role) {
 	var cell = document.createElement("span");
-	cell.style.marginLeft = "5px";
-	cell.style.marginRight = "5px";
-	cell.style.marginTop = "5px";
-	cell.style.marginBottom = "5px";
+	cell.style.marginLeft = "10px";
+	cell.style.marginRight = "10px";
+	cell.style.marginTop = "10px";
+	cell.style.marginBottom = "10px";
 	var image = document.createElement("img");
 	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "20px";
+	image.style.marginRight = "5px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
@@ -83,15 +78,15 @@ function renderProfile(profile) {
 
 function renderBadge(badge) {
 	var cell = document.createElement("span");
-	cell.style.marginLeft = "5px";
-	cell.style.marginRight = "5px";
-	cell.style.marginTop = "5px";
-	cell.style.marginBottom = "5px";
+	cell.style.marginLeft = "10px";
+	cell.style.marginRight = "10px";
+	cell.style.marginTop = "10px";
+	cell.style.marginBottom = "10px";
 	var image = document.createElement("img");
 	image.src = "data:" + badge.imageMime + ";base64," + badge.imageContent;
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "20px";
+	image.style.marginRight = "5px";
 	image.title = badge.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(badge.name));

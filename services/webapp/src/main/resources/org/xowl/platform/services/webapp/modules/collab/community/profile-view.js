@@ -45,15 +45,15 @@ function renderUser(user) {
 
 function renderRole(role) {
 	var cell = document.createElement("span");
-	cell.style.marginLeft = "5px";
-	cell.style.marginRight = "5px";
-	cell.style.marginTop = "5px";
-	cell.style.marginBottom = "5px";
+	cell.style.marginLeft = "10px";
+	cell.style.marginRight = "10px";
+	cell.style.marginTop = "10px";
+	cell.style.marginBottom = "10px";
 	var image = document.createElement("img");
 	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "20px";
+	image.style.marginRight = "5px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
@@ -81,15 +81,15 @@ function renderProfile(profile) {
 
 function renderBadge(badge) {
 	var cell = document.createElement("span");
-	cell.style.marginLeft = "5px";
-	cell.style.marginRight = "5px";
-	cell.style.marginTop = "5px";
-	cell.style.marginBottom = "5px";
+	cell.style.marginLeft = "10px";
+	cell.style.marginRight = "10px";
+	cell.style.marginTop = "10px";
+	cell.style.marginBottom = "10px";
 	var image = document.createElement("img");
 	image.src = "data:" + badge.imageMime + ";base64," + badge.imageContent;
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "20px";
+	image.style.marginRight = "5px";
 	image.title = badge.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(badge.name));

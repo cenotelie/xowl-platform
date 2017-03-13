@@ -25,25 +25,25 @@ function init() {
 }
 
 function setupAutocomplete() {
-	var autocomplete3 = new AutoComplete("input-role");
-	autocomplete3.lookupItems = function (value) {
+	var autocomplete = new AutoComplete("input-role");
+	autocomplete.lookupItems = function (value) {
 		if (roles !== null) {
-			autocomplete3.onItems(filterItems(roles, value));
+			autocomplete.onItems(filterItems(roles, value));
 			return;
 		}
 		xowl.getPlatformRoles(function (status, ct, content) {
 			if (status === 200) {
 				roles = content;
-				autocomplete3.onItems(filterItems(roles, value));
+				autocomplete.onItems(filterItems(roles, value));
 			}
 		});
 	};
-	autocomplete3.renderItem = function (item) {
+	autocomplete.renderItem = function (item) {
 		var result = document.createElement("div");
 		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
 		return result;
 	};
-	autocomplete3.getItemString = function (item) {
+	autocomplete.getItemString = function (item) {
 		return item.identifier;
 	};
 }

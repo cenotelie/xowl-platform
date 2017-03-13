@@ -4,12 +4,13 @@
 var xowl = new XOWL();
 var userId = xowl.getLoggedInUserId();
 var oldName = null;
+var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Platform Administration", uri: ROOT + "/modules/admin/"},
 			{name: "Platform Security", uri: ROOT + "/modules/admin/security/"},
-			{name: "User " + userId}], function() {
+			{name: "My Account Security"}], function() {
 		if (!userId || userId === null || userId === "")
 			return;
 		setupAutocomplete();
@@ -21,6 +22,40 @@ function init() {
 			}
 		}, userId);
 	});
+}
+
+function setupAutocomplete() {
+	var autocomplete = new AutoComplete("input-role");
+	autocomplete.lookupItems = function (value) {
+		if (roles !== null) {
+			autocomplete.onItems(filterItems(roles, value));
+			return;
+		}
+		xowl.getPlatformRoles(function (status, ct, content) {
+			if (status === 200) {
+				roles = content;
+				autocomplete.onItems(filterItems(roles, value));
+			}
+		});
+	};
+	autocomplete.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
 }
 
 function renderUser(user) {

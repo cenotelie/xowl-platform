@@ -170,7 +170,7 @@ function doSetupHeader() {
 		image.style.marginRight = "20px";
 		userLink.appendChild(image);
 		userLink.appendChild(document.createTextNode(PLATFORM.getLoggedInUserName()));
-		userLink.href = ROOT + "/modules/collab/community/profile-view.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
+		userLink.href = ROOT + "/modules/collab/community/profile-update.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
 	}
 	PAGE_READY_INDEX += 50;
 	if (PAGE_READY_INDEX >= 100)

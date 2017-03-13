@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Community Profile: Edit</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    <img id="avatar" src="" width="200px" height="200px"/>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="profile-identifier" class="col-sm-2 control-label">Identifier:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="profile-identifier" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-name" class="col-sm-2 control-label">Name:</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="profile-name" readonly>
+                        </div>
+                        <span class="col-sm-2">
+                            <span id="profile-name-edit" class="btn btn-default" onclick="onClickEditName()">
+                                <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-name-validate" class="btn btn-default" onclick="onClickValidateName()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-name-cancel" class="btn btn-default" onclick="onClickCancelName()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-email" class="col-sm-2 control-label">Email:</label>
+                        <div class="col-sm-8">
+                            <div class="panel panel-default" id="profile-email-display" style="margin-bottom: 0px;">
+                                <div class="panel-body">
+                                    <div style="width: 100%">
+                                        <a id="profile-email"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" id="profile-email-editor" style="display: none;">
+                        </div>
+                        <span class="col-sm-2">
+                            <span id="profile-email-edit" class="btn btn-default" onclick="onClickEditEmail()">
+                                <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-email-validate" class="btn btn-default" onclick="onClickValidateEmail()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-email-cancel" class="btn btn-default" onclick="onClickCancelEmail()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-organization" class="col-sm-2 control-label">Organization:</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="profile-organization" readonly>
+                        </div>
+                        <span class="col-sm-2">
+                            <span id="profile-organization-edit" class="btn btn-default" onclick="onClickEditOrganization()">
+                                <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-organization-validate" class="btn btn-default" onclick="onClickValidateOrganization()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-organization-cancel" class="btn btn-default" onclick="onClickCancelOrganization()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-occupation" class="col-sm-2 control-label">Occupation:</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="profile-occupation" readonly>
+                        </div>
+                        <span class="col-sm-2">
+                            <span id="profile-occupation-edit" class="btn btn-default" onclick="onClickEditOccupation()">
+                                <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-occupation-validate" class="btn btn-default" onclick="onClickValidateOccupation()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                            </span>
+                            <span id="profile-occupation-cancel" class="btn btn-default" onclick="onClickCancelOccupation()"
+                                  style="display: none;">
+                                <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                            </span>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/security.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" href="../../../modules/admin/security/myaccount.html">Security Settings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body" id="panel-roles">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body" id="panel-badges">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="profile-update.js"></script>
+<script>init();</script>
+</body>
+
+</html>

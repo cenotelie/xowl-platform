@@ -8,10 +8,12 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Collaboration", uri: ROOT + "/modules/collab/"},
 			{name: "Community", uri: ROOT + "/modules/collab/community/"},
-			{name: "Profile " + profileId}], function() {
+			{name: "Profile " + profileId, uri: ROOT + "/modules/collab/community/profile-view.html?id=" + encodeURIComponent(profileId)},
+			{name: "Edit"}], function() {
 		if (!profileId || profileId === null || profileId === "")
 			return;
 		document.getElementById("profile-edit-link").href = "profile-update.html?id=" + encodeURIComponent(profileId);
+		document.getElementById("profile-security-link").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(profileId);
 		doGetData();
 	});
 }

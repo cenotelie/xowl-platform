@@ -9,6 +9,8 @@ var oldName = null;
 var oldEmail = null;
 var oldOrganization = null;
 var oldOccupation = null;
+var oldMime = null;
+var oldContent = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -19,6 +21,7 @@ function init() {
 		if (!profileId || profileId === null || profileId === "")
 			return;
 		setupAutocomplete();
+		setupDrop();
 		doGetData();
 		if (profileId === xowl.getLoggedInUserId())
 			document.getElementById("link-security").href = ROOT + "/modules/admin/security/myaccount.html";
@@ -59,6 +62,78 @@ function filterItems(items, value) {
 		}
 	}
 	return result;
+}
+
+function setupDrop() {
+	var drop = document.getElementById("avatar-drop");
+	drop.addEventListener("dragover", onEventCancel, false);
+	drop.addEventListener("dragenter", onEventDragEnter, false);
+	drop.addEventListener("dragexit", onEventDragExit, false);
+	drop.addEventListener("drop", onEventDrop, false);
+}
+
+function onEventCancel(e) {
+	e = e || window.event;
+	if (e.preventDefault) {
+		e.preventDefault();
+	}
+	return false;
+}
+
+function onEventDragEnter(e) {
+	document.getElementById("avatar-drop").style.backgroundColor = "#00914d";
+	return onEventCancel(e);
+}
+
+function onEventDragExit(e) {
+	document.getElementById("avatar-drop").style.backgroundColor = "#DDDDDD";
+	return onEventCancel(e);
+}
+
+function onEventDrop(e) {
+	e = e || window.event;
+	if (e.preventDefault) {
+		e.preventDefault();
+	}
+	if (oldMime !== null || oldContent !== null)
+		return false;
+	var dt = e.dataTransfer;
+	var files = dt.files;
+	if (files.length <= 0)
+		return false;
+	var file = files[0];
+	var reader = new FileReader();
+	reader.onloadend = function (event) {
+		if (reader.error !== null) {
+			alert("Error while reading dropped file.");
+			return;
+		}
+		onEventDropContent(base64ArrayBuffer(reader.result), file.type);
+	}
+	reader.readAsArrayBuffer(file);
+	return false;
+}
+
+function onEventDropContent(content, mimeType) {
+	if (oldMime !== null || oldContent !== null)
+		return;
+	oldMime = profile.avatarMime;
+	oldContent = profile.avatarContent;
+	document.getElementById("avatar-drop").style.backgroundColor = "#DDDDDD";
+	document.getElementById("avatar-commands").style.display = "";
+	document.getElementById("avatar").src = "data:" + mimeType + ";base64," + content;
+	profile.avatarMime = mimeType;
+	profile.avatarContent = content;
+}
+
+function base64ArrayBuffer(buffer) {
+	var result = "";
+	var bytes = new Uint8Array(buffer);
+	var length = bytes.byteLength;
+	for (var i = 0; i < length; i++) {
+		result += String.fromCharCode(bytes[i]);
+	}
+	return window.btoa(result);
 }
 
 function doGetData() {
@@ -321,6 +396,30 @@ function onClickCancelOccupation() {
 	document.getElementById("profile-occupation").readOnly = true;
 	profile.occupation = oldOccupation;
 	oldOccupation = null;
+}
+
+function onClickValidateAvatar() {
+	if (!onOperationRequest("Updating avatar ..."))
+		return;
+	document.getElementById("avatar-commands").style.display = "none";
+	xowl.updatePublicProfile(function (status, ct, content) {
+		if (!onOperationEnded(status, content)) {
+			document.getElementById("avatar").src = "data:" + oldMime + ";base64," + oldContent;
+			profile.avatarMime = oldMime;
+			profile.avatarContent = oldContent;
+		}
+		oldMime = null;
+        oldContent = null;
+	}, profile);
+}
+
+function onClickCancelAvatar() {
+	document.getElementById("avatar-commands").style.display = "none";
+	document.getElementById("avatar").src = "data:" + oldMime + ";base64," + oldContent;
+	profile.avatarMime = oldMime;
+	profile.avatarContent = oldContent;
+	oldMime = null;
+	oldContent = null;
 }
 
 function onClickBadgeAward() {

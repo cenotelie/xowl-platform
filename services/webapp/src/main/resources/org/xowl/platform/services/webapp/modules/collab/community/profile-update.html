@@ -18,8 +18,20 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-4">
-                <div>
-                    <img id="avatar" src="" width="200px" height="200px"/>
+                <div id="avatar-drop" style="background-color: #DDDDDD;">
+                    <div id="avatar-commands" class="arrow-box-bottom"
+                         style="position: fixed; margin-left: 5px; margin-top; 5px; display:none;">
+                        <img src="../../../assets/action-validate.svg" width="20" height="20" title="OK"
+                             style="cursor: pointer;"
+                             onclick="onClickValidateAvatar()"/>
+                        <img src="../../../assets/action-cancel.svg" width="20" height="20" title="CANCEL"
+                             style="cursor: pointer;"
+                             onclick="onClickCancelAvatar()"/>
+                    </div>
+                    <img id="avatar" src="" width="200px" height="200px" style="object-fit: contain;"/>
+                </div>
+                <div class="arrow-box-top" style="margin-top: 10px;">
+                    Drop image to update
                 </div>
                 <div>
                     <img src="../../../assets/security.svg" width="30" height="30"/>
@@ -85,14 +97,17 @@
                             <input type="text" class="form-control" id="profile-organization" readonly>
                         </div>
                         <span class="col-sm-2">
-                            <span id="profile-organization-edit" class="btn btn-default" onclick="onClickEditOrganization()">
+                            <span id="profile-organization-edit" class="btn btn-default"
+                                  onclick="onClickEditOrganization()">
                                 <img src="../../../assets/action-edit.svg" width="20" height="20"/>
                             </span>
-                            <span id="profile-organization-validate" class="btn btn-default" onclick="onClickValidateOrganization()"
+                            <span id="profile-organization-validate" class="btn btn-default"
+                                  onclick="onClickValidateOrganization()"
                                   style="display: none;">
                                 <img src="../../../assets/action-validate.svg" width="20" height="20"/>
                             </span>
-                            <span id="profile-organization-cancel" class="btn btn-default" onclick="onClickCancelOrganization()"
+                            <span id="profile-organization-cancel" class="btn btn-default"
+                                  onclick="onClickCancelOrganization()"
                                   style="display: none;">
                                 <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
                             </span>
@@ -104,14 +119,17 @@
                             <input type="text" class="form-control" id="profile-occupation" readonly>
                         </div>
                         <span class="col-sm-2">
-                            <span id="profile-occupation-edit" class="btn btn-default" onclick="onClickEditOccupation()">
+                            <span id="profile-occupation-edit" class="btn btn-default"
+                                  onclick="onClickEditOccupation()">
                                 <img src="../../../assets/action-edit.svg" width="20" height="20"/>
                             </span>
-                            <span id="profile-occupation-validate" class="btn btn-default" onclick="onClickValidateOccupation()"
+                            <span id="profile-occupation-validate" class="btn btn-default"
+                                  onclick="onClickValidateOccupation()"
                                   style="display: none;">
                                 <img src="../../../assets/action-validate.svg" width="20" height="20"/>
                             </span>
-                            <span id="profile-occupation-cancel" class="btn btn-default" onclick="onClickCancelOccupation()"
+                            <span id="profile-occupation-cancel" class="btn btn-default"
+                                  onclick="onClickCancelOccupation()"
                                   style="display: none;">
                                 <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
                             </span>

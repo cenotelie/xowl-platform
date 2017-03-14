@@ -18,6 +18,10 @@ function init() {
 		if (!profileId || profileId === null || profileId === "")
 			return;
 		doGetData();
+		if (profileId === xowl.getLoggedInUserId())
+			document.getElementById("link-security").href = ROOT + "/modules/admin/security/myaccount.html";
+		else
+			document.getElementById("link-security").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(profileId);
 	});
 }
 

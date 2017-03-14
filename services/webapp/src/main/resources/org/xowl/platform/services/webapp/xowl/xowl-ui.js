@@ -244,8 +244,8 @@ function onOperationAbort(message) {
 /**
  * When an operation ended
  *
- * @param code		    The HTTP code (other that 200 - OK)
- * @param content	    The content of the HTTP response
+ * @param code          The HTTP code (other that 200 - OK)
+ * @param content       The content of the HTTP response
  * @param customMessage A custom message to override the default one (may be undefined)
  * @return Whether the operation was successful
  */
@@ -450,6 +450,11 @@ function renderMessagePart(part) {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = ROOT + "/modules/admin/bots/bot.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.community.profiles.PublicProfile") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = ROOT + "/modules/collab/community/profile-view.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.connection.ConnectorService") {
 		var dom = document.createElement("a");

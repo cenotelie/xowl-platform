@@ -74,6 +74,7 @@ function doGetData() {
 			profile = content;
 			renderProfile(content);
 		} else {
+			document.getElementById("avatar").src = ROOT + "/assets/user-inactive.svg";
 			profile = {
 				identifier: profileId,
 				name: profileId,
@@ -120,6 +121,8 @@ function renderRole(role) {
 function renderProfile(profile) {
 	if (profile.avatarContent.length > 0) {
 		document.getElementById("avatar").src = "data:" + profile.avatarMime + ";base64," + profile.avatarContent;
+	} else {
+		document.getElementById("avatar").src = ROOT + "/assets/user-inactive.svg";
 	}
 	if (profile.email.length > 0) {
 		document.getElementById("profile-email").appendChild(document.createTextNode(profile.email));

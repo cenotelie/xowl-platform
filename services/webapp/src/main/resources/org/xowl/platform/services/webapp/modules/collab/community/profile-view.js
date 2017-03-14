@@ -30,6 +30,7 @@ function doGetData() {
 		} else if (status === 404) {
 			document.getElementById("row-new-profile").style.display = "";
 			document.getElementById("profile-new-link").href= "profile-update.html?id=" + encodeURIComponent(profileId);
+			document.getElementById("avatar").src = ROOT + "/assets/user-inactive.svg";
 		}
 	}, profileId);
 }
@@ -66,6 +67,8 @@ function renderRole(role) {
 function renderProfile(profile) {
 	if (profile.avatarContent.length > 0) {
 		document.getElementById("avatar").src = "data:" + profile.avatarMime + ";base64," + profile.avatarContent;
+	} else {
+		document.getElementById("avatar").src = ROOT + "/assets/user-inactive.svg";
 	}
 	if (profile.email.length > 0) {
 		document.getElementById("profile-email").appendChild(document.createTextNode(profile.email));

@@ -127,7 +127,7 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UPDATE_PROFILE);
+        XSPReply reply = securityService.checkAction(ACTION_UPDATE_PROFILE, profile);
         if (!reply.isSuccess())
             return reply;
         return getImplementation().updatePublicProfile(profile);

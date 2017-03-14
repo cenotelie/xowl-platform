@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class PlatformUserCreatedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformUserCreatedEvent.class.getCanonicalName();
+
     /**
      * The created user
      */
@@ -44,11 +49,11 @@ public class PlatformUserCreatedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param user       The created user
-     * @param originator The originator for this event
+     * @param user    The created user
+     * @param emitter The service that emitted this event
      */
-    public PlatformUserCreatedEvent(PlatformUser user, Identifiable originator) {
-        super(new RichString("Created user ", user), PlatformUserCreatedEvent.class.getCanonicalName(), originator);
+    public PlatformUserCreatedEvent(PlatformUser user, Service emitter) {
+        super(TYPE, emitter, new RichString("Created user ", user));
         this.user = user;
     }
 }

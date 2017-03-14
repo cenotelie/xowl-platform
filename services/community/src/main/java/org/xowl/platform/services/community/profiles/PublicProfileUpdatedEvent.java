@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.events.EventBase;
  */
 public class PublicProfileUpdatedEvent extends EventBase {
     /**
+     * The type for this event
+     */
+    public static final String TYPE = PublicProfileUpdatedEvent.class.getCanonicalName();
+
+    /**
      * The updated profile
      */
     private final PublicProfile profile;
@@ -48,7 +53,9 @@ public class PublicProfileUpdatedEvent extends EventBase {
      */
     public PublicProfileUpdatedEvent(PublicProfile profile) {
         super(
-                PublicProfileUpdatedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Profile ", profile, " has been updated")
+                TYPE,
+                Register.getComponent(ProfileService.class),
+                new RichString("Profile ", profile, " has been updated")
         );
         this.profile = profile;
     }

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;
 
@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class DocumentImportedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = DocumentImportedEvent.class.getCanonicalName();
+
     /**
      * The imported document
      */
@@ -58,12 +63,12 @@ public class DocumentImportedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param document   The imported document
-     * @param artifact   The resulting artifact
-     * @param originator The originator for this event
+     * @param document The imported document
+     * @param artifact The resulting artifact
+     * @param emitter  The service that emitted this event
      */
-    public DocumentImportedEvent(Document document, Artifact artifact, Identifiable originator) {
-        super(new RichString("Imported document ", document, " as artifact ", artifact), DocumentImportedEvent.class.getCanonicalName(), originator);
+    public DocumentImportedEvent(Document document, Artifact artifact, Service emitter) {
+        super(TYPE, emitter, new RichString("Imported document ", document, " as artifact ", artifact));
         this.document = document;
         this.artifact = artifact;
     }

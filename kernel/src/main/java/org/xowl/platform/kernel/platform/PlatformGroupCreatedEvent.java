@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class PlatformGroupCreatedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformGroupCreatedEvent.class.getCanonicalName();
+
     /**
      * The created group
      */
@@ -44,11 +49,11 @@ public class PlatformGroupCreatedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param group      The created group
-     * @param originator The originator for this event
+     * @param group   The created group
+     * @param emitter The service that emitted this event
      */
-    public PlatformGroupCreatedEvent(PlatformGroup group, Identifiable originator) {
-        super(new RichString("Created group ", group), PlatformGroupCreatedEvent.class.getCanonicalName(), originator);
+    public PlatformGroupCreatedEvent(PlatformGroup group, Service emitter) {
+        super(TYPE, emitter, new RichString("Created group ", group));
         this.group = group;
     }
 }

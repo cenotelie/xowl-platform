@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class DocumentUploadedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = DocumentUploadedEvent.class.getCanonicalName();
+
     /**
      * The uploaded document
      */
@@ -44,11 +49,11 @@ public class DocumentUploadedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param document   The uploaded document
-     * @param originator The originator for this event
+     * @param document The uploaded document
+     * @param emitter  The service that emitted this event
      */
-    public DocumentUploadedEvent(Document document, Identifiable originator) {
-        super(new RichString("Uploaded document ", document), DocumentUploadedEvent.class.getCanonicalName(), originator);
+    public DocumentUploadedEvent(Document document, Service emitter) {
+        super(TYPE, emitter, new RichString("Uploaded document ", document));
         this.document = document;
     }
 }

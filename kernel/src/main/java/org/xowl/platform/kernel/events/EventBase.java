@@ -63,7 +63,7 @@ public class EventBase implements Event {
      * Initializes this event
      *
      * @param type        The event type
-     * @param emitter     The originator of this event
+     * @param emitter     The service that emitted this event
      * @param description The human-readable description of this event
      */
     public EventBase(String type, Service emitter, RichString description) {
@@ -80,7 +80,7 @@ public class EventBase implements Event {
      * Initializes this event
      *
      * @param type        The event type
-     * @param emitter     The originator of this event
+     * @param emitter     The service that emitted this event
      * @param description The human-readable description of this event
      */
     public EventBase(String type, Service emitter, String description) {

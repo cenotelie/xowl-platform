@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.events.EventBase;
  */
 public class BotWokeUpEvent extends EventBase {
     /**
+     * The type for this event
+     */
+    public static final String TYPE = BotWokeUpEvent.class.getCanonicalName();
+
+    /**
      * The bot that work up
      */
     private final Bot bot;
@@ -48,7 +53,9 @@ public class BotWokeUpEvent extends EventBase {
      */
     public BotWokeUpEvent(Bot bot) {
         super(
-                BotWokeUpEvent.class.getCanonicalName(), Register.getComponent(BotManagementService.class), new RichString(bot, " just woke up")
+                TYPE,
+                Register.getComponent(BotManagementService.class),
+                new RichString(bot, " just woke up")
         );
         this.bot = bot;
     }

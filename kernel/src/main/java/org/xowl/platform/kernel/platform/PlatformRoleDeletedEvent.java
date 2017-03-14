@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class PlatformRoleDeletedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformRoleDeletedEvent.class.getCanonicalName();
+
     /**
      * The deleted role
      */
@@ -44,11 +49,11 @@ public class PlatformRoleDeletedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param role       The deleted role
-     * @param originator The originator for this event
+     * @param role    The deleted role
+     * @param emitter The service that emitted this event
      */
-    public PlatformRoleDeletedEvent(PlatformRole role, Identifiable originator) {
-        super(new RichString("Deleted role ", role), PlatformRoleDeletedEvent.class.getCanonicalName(), originator);
+    public PlatformRoleDeletedEvent(PlatformRole role, Service emitter) {
+        super(TYPE, emitter, new RichString("Deleted role ", role));
         this.role = role;
     }
 }

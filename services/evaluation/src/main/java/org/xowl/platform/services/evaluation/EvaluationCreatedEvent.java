@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class EvaluationCreatedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = EvaluationCreatedEvent.class.getCanonicalName();
+
     /**
      * The created evaluation
      */
@@ -45,10 +50,10 @@ public class EvaluationCreatedEvent extends EventBase {
      * Initializes this event
      *
      * @param evaluation The created evaluation
-     * @param originator The originator for this event
+     * @param emitter    The service that emitted this event
      */
-    public EvaluationCreatedEvent(Evaluation evaluation, Identifiable originator) {
-        super(new RichString("Created evaluation ", evaluation), EvaluationCreatedEvent.class.getCanonicalName(), originator);
+    public EvaluationCreatedEvent(Evaluation evaluation, Service emitter) {
+        super(TYPE, emitter, new RichString("Created evaluation ", evaluation));
         this.evaluation = evaluation;
     }
 }

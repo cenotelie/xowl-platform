@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.events.EventBase;
  */
 public class BadgeAwardedEvent extends EventBase {
     /**
+     * The type for this event
+     */
+    public static final String TYPE = BadgeAwardedEvent.class.getCanonicalName();
+
+    /**
      * The profile that received the award
      */
     private final PublicProfile profile;
@@ -62,7 +67,9 @@ public class BadgeAwardedEvent extends EventBase {
      */
     public BadgeAwardedEvent(PublicProfile profile, Badge badge) {
         super(
-                BadgeAwardedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Badge ", badge, " has been awarded to ", profile)
+                TYPE,
+                Register.getComponent(ProfileService.class),
+                new RichString("Badge ", badge, " has been awarded to ", profile)
         );
         this.profile = profile;
         this.badge = badge;

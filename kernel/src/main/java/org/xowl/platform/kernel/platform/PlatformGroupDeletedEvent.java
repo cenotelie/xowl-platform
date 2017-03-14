@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class PlatformGroupDeletedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformGroupDeletedEvent.class.getCanonicalName();
+
     /**
      * The deleted group
      */
@@ -44,11 +49,11 @@ public class PlatformGroupDeletedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param group      The deleted group
-     * @param originator The originator for this event
+     * @param group   The deleted group
+     * @param emitter The service that emitted this event
      */
-    public PlatformGroupDeletedEvent(PlatformGroup group, Identifiable originator) {
-        super(new RichString("Deleted group ", group), PlatformGroupDeletedEvent.class.getCanonicalName(), originator);
+    public PlatformGroupDeletedEvent(PlatformGroup group, Service emitter) {
+        super(TYPE, emitter, new RichString("Deleted group ", group));
         this.group = group;
     }
 }

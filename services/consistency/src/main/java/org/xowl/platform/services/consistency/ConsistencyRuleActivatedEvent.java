@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.consistency;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class ConsistencyRuleActivatedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = ConsistencyRuleActivatedEvent.class.getCanonicalName();
+
     /**
      * The activated rule
      */
@@ -44,11 +49,11 @@ public class ConsistencyRuleActivatedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param rule       The activated rule
-     * @param originator The originator for this event
+     * @param rule    The activated rule
+     * @param emitter The service that emitted this event
      */
-    public ConsistencyRuleActivatedEvent(ConsistencyRule rule, Identifiable originator) {
-        super(new RichString("Activated rule ", rule), ConsistencyRuleActivatedEvent.class.getCanonicalName(), originator);
+    public ConsistencyRuleActivatedEvent(ConsistencyRule rule, Service emitter) {
+        super(TYPE, emitter, new RichString("Activated rule ", rule));
         this.rule = rule;
     }
 }

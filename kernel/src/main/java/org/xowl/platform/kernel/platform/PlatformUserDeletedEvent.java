@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class PlatformUserDeletedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = PlatformUserDeletedEvent.class.getCanonicalName();
+
     /**
      * The deleted user
      */
@@ -44,11 +49,11 @@ public class PlatformUserDeletedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param user       The deleted user
-     * @param originator The originator for this event
+     * @param user    The deleted user
+     * @param emitter The service that emitted this event
      */
-    public PlatformUserDeletedEvent(PlatformUser user, Identifiable originator) {
-        super(new RichString("Deleted user ", user), PlatformUserDeletedEvent.class.getCanonicalName(), originator);
+    public PlatformUserDeletedEvent(PlatformUser user, Service emitter) {
+        super(TYPE, emitter, new RichString("Deleted user ", user));
         this.user = user;
     }
 }

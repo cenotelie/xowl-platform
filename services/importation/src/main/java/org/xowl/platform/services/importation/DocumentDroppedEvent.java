@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
@@ -27,6 +27,11 @@ import org.xowl.platform.kernel.events.EventBase;
  * @author Laurent Wouters
  */
 public class DocumentDroppedEvent extends EventBase {
+    /**
+     * The type for this event
+     */
+    public static final String TYPE = DocumentDroppedEvent.class.getCanonicalName();
+
     /**
      * The dropped document
      */
@@ -44,11 +49,11 @@ public class DocumentDroppedEvent extends EventBase {
     /**
      * Initializes this event
      *
-     * @param document   The dropped document
-     * @param originator The originator for this event
+     * @param document The dropped document
+     * @param emitter  The service that emitted this event
      */
-    public DocumentDroppedEvent(Document document, Identifiable originator) {
-        super(new RichString("Dropped document ", document), DocumentDroppedEvent.class.getCanonicalName(), originator);
+    public DocumentDroppedEvent(Document document, Service emitter) {
+        super(TYPE, emitter, new RichString("Dropped document ", document));
         this.document = document;
     }
 }

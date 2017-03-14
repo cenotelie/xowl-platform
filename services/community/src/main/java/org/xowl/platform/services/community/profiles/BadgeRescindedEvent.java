@@ -28,6 +28,11 @@ import org.xowl.platform.kernel.events.EventBase;
  */
 public class BadgeRescindedEvent extends EventBase {
     /**
+     * The type for this event
+     */
+    public static final String TYPE = BadgeRescindedEvent.class.getCanonicalName();
+
+    /**
      * The profile that previously received the award
      */
     private final PublicProfile profile;
@@ -62,7 +67,9 @@ public class BadgeRescindedEvent extends EventBase {
      */
     public BadgeRescindedEvent(PublicProfile profile, Badge badge) {
         super(
-                BadgeRescindedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Badge ", badge, " has been rescinded from ", profile)
+                TYPE,
+                Register.getComponent(ProfileService.class),
+                new RichString("Badge ", badge, " has been rescinded from ", profile)
         );
         this.profile = profile;
         this.badge = badge;

@@ -436,7 +436,7 @@ class XOWLInternalRealm implements SecurityRealm {
         XOWLInternalUser user = getUser(identifier, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new PlatformUserCreatedEvent(user, this));
+            eventService.onEvent(new PlatformUserCreatedEvent(user, securityService));
         return new XSPReplyResult<>(user);
     }
 
@@ -466,7 +466,7 @@ class XOWLInternalRealm implements SecurityRealm {
         XOWLInternalGroup group = getGroup(identifier, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new PlatformGroupCreatedEvent(group, this));
+            eventService.onEvent(new PlatformGroupCreatedEvent(group, securityService));
         return new XSPReplyResult<>(group);
     }
 
@@ -493,7 +493,7 @@ class XOWLInternalRealm implements SecurityRealm {
         PlatformRoleBase role = getRole(identifier, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new PlatformRoleCreatedEvent(role, this));
+            eventService.onEvent(new PlatformRoleCreatedEvent(role, securityService));
         return new XSPReplyResult<>(role);
     }
 
@@ -607,7 +607,7 @@ class XOWLInternalRealm implements SecurityRealm {
             XOWLInternalUser deleted = cacheUsers.remove(identifier);
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
-                eventService.onEvent(new PlatformUserDeletedEvent(deleted, this));
+                eventService.onEvent(new PlatformUserDeletedEvent(deleted, securityService));
             return XSPReplySuccess.instance();
         }
     }
@@ -635,7 +635,7 @@ class XOWLInternalRealm implements SecurityRealm {
             XOWLInternalGroup deleted = cacheGroups.remove(identifier);
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
-                eventService.onEvent(new PlatformGroupDeletedEvent(deleted, this));
+                eventService.onEvent(new PlatformGroupDeletedEvent(deleted, securityService));
             return XSPReplySuccess.instance();
         }
     }
@@ -666,7 +666,7 @@ class XOWLInternalRealm implements SecurityRealm {
             PlatformRoleBase deleted = cacheRoles.remove(identifier);
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
-                eventService.onEvent(new PlatformRoleDeletedEvent(deleted, this));
+                eventService.onEvent(new PlatformRoleDeletedEvent(deleted, securityService));
             return XSPReplySuccess.instance();
         }
     }

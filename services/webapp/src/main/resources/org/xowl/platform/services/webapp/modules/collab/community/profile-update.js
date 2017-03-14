@@ -4,6 +4,7 @@
 var xowl = new XOWL();
 var profileId = getParameterByName("id");
 var profile = null;
+var badges = null;
 var oldName = null;
 var oldEmail = null;
 var oldOrganization = null;
@@ -17,12 +18,47 @@ function init() {
 			{name: "Edit"}], function() {
 		if (!profileId || profileId === null || profileId === "")
 			return;
+		setupAutocomplete();
 		doGetData();
 		if (profileId === xowl.getLoggedInUserId())
 			document.getElementById("link-security").href = ROOT + "/modules/admin/security/myaccount.html";
 		else
 			document.getElementById("link-security").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(profileId);
 	});
+}
+
+function setupAutocomplete() {
+	var autocomplete = new AutoComplete("input-badge");
+	autocomplete.lookupItems = function (value) {
+		if (badges !== null) {
+			autocomplete.onItems(filterItems(badges, value));
+			return;
+		}
+		xowl.getBadges(function (status, ct, content) {
+			if (status === 200) {
+				badges = content;
+				autocomplete.onItems(filterItems(badges, value));
+			}
+		});
+	};
+	autocomplete.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
 }
 
 function doGetData() {
@@ -282,4 +318,18 @@ function onClickCancelOccupation() {
 	document.getElementById("profile-occupation").readOnly = true;
 	profile.occupation = oldOccupation;
 	oldOccupation = null;
+}
+
+function onClickBadgeAward() {
+	var badgeId = document.getElementById("input-badge").value;
+	if (badgeId == null || badgeId.length == "")
+		return;
+	if (!onOperationRequest("Awarding badge ..."))
+		return;
+	xowl.awardBadge(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Awarded badge " + badgeId);
+			waitAndRefresh();
+		}
+	}, profileId, badgeId);
 }

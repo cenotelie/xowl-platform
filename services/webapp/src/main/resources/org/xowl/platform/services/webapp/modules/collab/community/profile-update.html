@@ -117,20 +117,35 @@
             </div>
         </div>
         <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div>
-                        <img src="../../../assets/security.svg" width="30" height="30" style="margin-left: 20px;"/>
-                        <a class="btn" id="link-security" href="">Security Settings</a>
-                    </div>
-                </div>
-            </div>
+            <img src="../../../assets/security.svg" width="30" height="30" style="margin-left: 20px;"/>
+            <a class="btn" id="link-security" href="">Security Settings</a>
         </div>
         <div class="row">
             <div class="panel panel-default">
                 <div class="panel-body" id="panel-roles">
                 </div>
             </div>
+        </div>
+        <div class="row">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="input-badge" class="col-sm-2 control-label">Add Badge:</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="input-badge" placeholder="badgeId">
+                            <div class="input-group-addon">
+                                <img src="" width="20" height="20" id="input-badge-indicator"
+                                     style="display: none;"/>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="col-sm-2">
+                        <span class="btn btn-default" onclick="onClickBadgeAward()">
+                            <img src="../../../assets/action-plus.svg" width="20" height="20" title="AWARD"/>
+                        </span>
+                    </span>
+                </div>
+            </form>
         </div>
         <div class="row">
             <div class="panel panel-default">

@@ -81,7 +81,6 @@ XOWL.prototype.logout = function () {
 		localStorage.removeItem("xowl.user.login");
 		localStorage.removeItem("xowl.user.identifier");
 		localStorage.removeItem("xowl.user.name");
-		callback(code, type, content);
 	}, "kernel/security/logout", null, "POST", null, null);
 }
 

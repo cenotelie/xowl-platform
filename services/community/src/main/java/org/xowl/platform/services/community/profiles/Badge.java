@@ -18,10 +18,11 @@
 package org.xowl.platform.services.community.profiles;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.utils.Base64;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.*;
+import org.xowl.infra.utils.logging.Logging;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Represents a badge for a user on the platform
@@ -49,6 +50,31 @@ public class Badge implements Identifiable, Serializable {
      * The description of this badge
      */
     private final String description;
+
+    /**
+     * Creates a badge from a resource
+     *
+     * @param identifier  The identifier of this badge
+     * @param name        The name of this badge
+     * @param description The description of this badge
+     * @param imageMime   The MIME type for the image
+     * @param parentType  The parent type to access resources
+     * @param resources   The path to the resource
+     */
+    public Badge(String identifier, String name, String description, String imageMime, Class parentType, String resources) {
+        this.identifier = identifier;
+        this.name = name;
+        this.description = description;
+        this.imageMime = imageMime;
+        byte[] buffer;
+        try (InputStream stream = parentType.getResourceAsStream(resources)) {
+            buffer = IOUtils.load(stream);
+        } catch (IOException exception) {
+            Logging.get().error(exception);
+            buffer = new byte[0];
+        }
+        this.imageContent = buffer;
+    }
 
     /**
      * Initializes this user profile

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="badge" version="1.1">
+  <circle
+     style="fill:#ffffff;fill-opacity:1;stroke:#034091;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path4138"
+     cx="50"
+     cy="35"
+     r="25" />
+  <path
+     style="fill:#034091;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+     d="M 30,95 40,60 60,60 70,95 50,85 Z"/>
+  <path
+     style="fill:#00914d;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     d="M 16.32579,43.824546 23.673957,29.14926 12.150523,17.462942 28.378257,19.916551 35.93167,5.345843 38.612795,21.537543 54.804494,24.218668 40.233786,31.77208 42.687395,47.999815 31.001077,36.47638 Z"
+     transform="matrix(0.40578323,0.72663339,-0.70283717,0.41952198,55.899468,0.49426144)" />
+</svg>

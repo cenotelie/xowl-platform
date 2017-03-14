@@ -94,6 +94,7 @@ function renderBadge(badge) {
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(badge.name));
 	link.title = badge.description;
+	link.href = "badge.html?id=" + badge.identifier;
 	cell.appendChild(image);
 	cell.appendChild(link);
 	return cell;

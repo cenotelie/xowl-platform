@@ -28,6 +28,11 @@ import java.util.Collection;
  */
 public interface BadgeProvider extends Registrable {
     /**
+     * The MIME type for SVG images
+     */
+    String MIME_IMAGE_SVG = "image/svg+xml";
+
+    /**
      * Gets the badges defined by this provider
      *
      * @return The definitions of badges

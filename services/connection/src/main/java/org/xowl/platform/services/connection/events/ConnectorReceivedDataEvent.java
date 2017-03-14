@@ -45,7 +45,7 @@ public class ConnectorReceivedDataEvent extends EventBase {
      * @param artifact  The received artifact
      */
     public ConnectorReceivedDataEvent(ConnectorService connector, Artifact artifact) {
-        super(new RichString("Received artifact ", artifact), TYPE, connector);
+        super(TYPE, connector, new RichString("Received artifact ", artifact));
         this.artifact = artifact;
     }
 

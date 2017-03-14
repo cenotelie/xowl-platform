@@ -48,9 +48,8 @@ public class PublicProfileUpdatedEvent extends EventBase {
      */
     public PublicProfileUpdatedEvent(PublicProfile profile) {
         super(
-                new RichString("Profile ", profile, " has been updated"),
-                PublicProfileUpdatedEvent.class.getCanonicalName(),
-                Register.getComponent(ProfileService.class));
+                PublicProfileUpdatedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Profile ", profile, " has been updated")
+        );
         this.profile = profile;
     }
 }

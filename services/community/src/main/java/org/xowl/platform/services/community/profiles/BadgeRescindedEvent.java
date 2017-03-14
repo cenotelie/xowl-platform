@@ -62,9 +62,8 @@ public class BadgeRescindedEvent extends EventBase {
      */
     public BadgeRescindedEvent(PublicProfile profile, Badge badge) {
         super(
-                new RichString("Badge ", badge, " has been rescinded from ", profile),
-                BadgeRescindedEvent.class.getCanonicalName(),
-                Register.getComponent(ProfileService.class));
+                BadgeRescindedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Badge ", badge, " has been rescinded from ", profile)
+        );
         this.profile = profile;
         this.badge = badge;
     }

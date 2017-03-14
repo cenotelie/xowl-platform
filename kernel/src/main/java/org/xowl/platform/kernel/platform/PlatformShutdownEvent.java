@@ -36,6 +36,6 @@ public class PlatformShutdownEvent extends EventBase {
      * @param managementService The platform management service
      */
     public PlatformShutdownEvent(PlatformManagementService managementService) {
-        super("Platform is shutting down", TYPE, managementService);
+        super(TYPE, managementService, "Platform is shutting down");
     }
 }

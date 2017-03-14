@@ -45,7 +45,7 @@ public class ConnectorDeletedEvent extends EventBase {
      * @param connector        The deleted connector
      */
     public ConnectorDeletedEvent(ConnectionService directoryService, ConnectorService connector) {
-        super(new RichString("Deleted connector ", connector), TYPE, directoryService);
+        super(TYPE, directoryService, new RichString("Deleted connector ", connector));
         this.connectorService = connector;
     }
 

@@ -48,9 +48,8 @@ public class BotHasGoneToSleepEvent extends EventBase {
      */
     public BotHasGoneToSleepEvent(Bot bot) {
         super(
-                new RichString(bot, " has gone to sleep"),
-                BotHasGoneToSleepEvent.class.getCanonicalName(),
-                Register.getComponent(BotManagementService.class));
+                BotHasGoneToSleepEvent.class.getCanonicalName(), Register.getComponent(BotManagementService.class), new RichString(bot, " has gone to sleep")
+        );
         this.bot = bot;
     }
 }

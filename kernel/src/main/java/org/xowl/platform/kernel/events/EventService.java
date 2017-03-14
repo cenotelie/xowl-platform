@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
@@ -58,13 +57,12 @@ public interface EventService extends Service, MeasurableService {
     void onEvent(Event event);
 
     /**
-     * Subscribe to a flow of event
+     * Subscribes to a flow of event
      *
-     * @param consumer   The subscribing consumer
-     * @param originator The specific event originator to observe, or null if any origin is acceptable
-     * @param eventType  The specific event type to wait for, or null if any event type is acceptable
+     * @param consumer  The subscribing consumer
+     * @param eventType The specific event type to wait for, or null if any event type is acceptable
      */
-    void subscribe(EventConsumer consumer, Identifiable originator, String eventType);
+    void subscribe(EventConsumer consumer, String eventType);
 
     /**
      * Un-subscribes to all events

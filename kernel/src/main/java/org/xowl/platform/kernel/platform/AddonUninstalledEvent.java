@@ -43,7 +43,7 @@ public class AddonUninstalledEvent extends EventBase {
      * @param addon             The addon that has been uninstalled
      */
     public AddonUninstalledEvent(PlatformManagementService managementService, Addon addon) {
-        super(new RichString("Uninstalled addon ", addon), TYPE, managementService);
+        super(TYPE, managementService, new RichString("Uninstalled addon ", addon));
         this.addon = addon;
     }
 

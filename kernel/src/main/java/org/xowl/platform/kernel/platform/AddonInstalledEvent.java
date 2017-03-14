@@ -43,7 +43,7 @@ public class AddonInstalledEvent extends EventBase {
      * @param addon             The addon that has been installed
      */
     public AddonInstalledEvent(PlatformManagementService managementService, Addon addon) {
-        super(new RichString("Installed addon ", addon), TYPE, managementService);
+        super(TYPE, managementService, new RichString("Installed addon ", addon));
         this.addon = addon;
     }
 

@@ -62,9 +62,8 @@ public class BadgeAwardedEvent extends EventBase {
      */
     public BadgeAwardedEvent(PublicProfile profile, Badge badge) {
         super(
-                new RichString("Badge ", badge, " has been awarded to ", profile),
-                BadgeAwardedEvent.class.getCanonicalName(),
-                Register.getComponent(ProfileService.class));
+                BadgeAwardedEvent.class.getCanonicalName(), Register.getComponent(ProfileService.class), new RichString("Badge ", badge, " has been awarded to ", profile)
+        );
         this.profile = profile;
         this.badge = badge;
     }

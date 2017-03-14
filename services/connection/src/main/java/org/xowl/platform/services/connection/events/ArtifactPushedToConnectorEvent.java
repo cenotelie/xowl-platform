@@ -45,7 +45,7 @@ public class ArtifactPushedToConnectorEvent extends EventBase {
      * @param artifact  The pushed artifact
      */
     public ArtifactPushedToConnectorEvent(ConnectorService connector, Artifact artifact) {
-        super(new RichString("Pushed artifact ", artifact, " to connector ", connector), TYPE, connector);
+        super(TYPE, connector, new RichString("Pushed artifact ", artifact, " to connector ", connector));
         this.artifact = artifact;
     }
 

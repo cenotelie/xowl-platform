@@ -45,7 +45,7 @@ public class ArtifactPulledFromConnectorEvent extends EventBase {
      * @param artifact  The pulled artifact
      */
     public ArtifactPulledFromConnectorEvent(ConnectorService connector, Artifact artifact) {
-        super(new RichString("Pulled artifact ", artifact, " from connector ", connector), TYPE, connector);
+        super(TYPE, connector, new RichString("Pulled artifact ", artifact, " from connector ", connector));
         this.artifact = artifact;
     }
 

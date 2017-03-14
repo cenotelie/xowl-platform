@@ -104,7 +104,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
         this.connectorsById = new HashMap<>();
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
+            eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     @Override

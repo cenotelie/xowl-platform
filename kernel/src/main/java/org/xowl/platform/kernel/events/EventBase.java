@@ -17,9 +17,12 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -36,50 +39,52 @@ public class EventBase implements Event {
      */
     private final String identifier;
     /**
-     * The human-readable description of this event
-     */
-    private final RichString description;
-    /**
      * The event type
      */
     private final String type;
+    /**
+     * The service that emitted this event
+     */
+    private final Service emitter;
+    /**
+     * The platform user that triggered this event
+     */
+    private final PlatformUser creator;
     /**
      * The creation timestamp
      */
     private final Date timestamp;
     /**
-     * The originator of this event
+     * The human-readable description of this event
      */
-    private final Identifiable originator;
+    private final RichString description;
 
     /**
      * Initializes this event
      *
-     * @param description The human-readable description of this event
      * @param type        The event type
-     * @param originator  The originator of this event
+     * @param emitter     The originator of this event
+     * @param description The human-readable description of this event
      */
-    public EventBase(RichString description, String type, Identifiable originator) {
+    public EventBase(String type, Service emitter, RichString description) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
         this.identifier = Event.class.getCanonicalName() + "." + UUID.randomUUID().toString();
-        this.description = description;
         this.type = type;
+        this.emitter = emitter;
+        this.creator = securityService != null ? securityService.getCurrentUser() : null;
         this.timestamp = new Date();
-        this.originator = originator;
+        this.description = description;
     }
 
     /**
      * Initializes this event
      *
-     * @param description The human-readable description of this event
      * @param type        The event type
-     * @param originator  The originator of this event
+     * @param emitter     The originator of this event
+     * @param description The human-readable description of this event
      */
-    public EventBase(String description, String type, Identifiable originator) {
-        this.identifier = Event.class.getCanonicalName() + "." + UUID.randomUUID().toString();
-        this.description = new RichString(description);
-        this.type = type;
-        this.timestamp = new Date();
-        this.originator = originator;
+    public EventBase(String type, Service emitter, String description) {
+        this(type, emitter, new RichString(description));
     }
 
     @Override
@@ -93,13 +98,18 @@ public class EventBase implements Event {
     }
 
     @Override
-    public RichString getDescription() {
-        return description;
+    public String getType() {
+        return type;
     }
 
     @Override
-    public String getType() {
-        return type;
+    public Service getEmitter() {
+        return emitter;
+    }
+
+    @Override
+    public PlatformUser getCreator() {
+        return creator;
     }
 
     @Override
@@ -108,8 +118,8 @@ public class EventBase implements Event {
     }
 
     @Override
-    public Identifiable getOrigin() {
-        return originator;
+    public RichString getDescription() {
+        return description;
     }
 
     @Override
@@ -125,15 +135,17 @@ public class EventBase implements Event {
                 + TextUtils.escapeStringJSON(identifier)
                 + "\", \"name\": \""
                 + TextUtils.escapeStringJSON(description.serializedString())
-                + "\", \"description\": "
-                + description.serializedJSON()
-                + ", \"eventType\": \""
+                + "\", \"eventType\": \""
                 + TextUtils.escapeStringJSON(type)
+                + "\", \"emitter\": \""
+                + (emitter != null ? TextUtils.escapeStringJSON(emitter.getIdentifier()) : "")
+                + "\", \"creator\": \""
+                + (creator != null ? TextUtils.escapeStringJSON(creator.getIdentifier()) : "")
                 + "\", \"timestamp\": \""
                 + TextUtils.escapeStringJSON(DateFormat.getDateTimeInstance().format(timestamp))
-                + "\", \"originator\": \""
-                + TextUtils.escapeStringJSON(originator.getIdentifier())
-                + "\"}";
+                + "\", \"description\": "
+                + description.serializedJSON()
+                + "}";
     }
 
     @Override

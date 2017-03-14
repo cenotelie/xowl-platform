@@ -36,6 +36,6 @@ public class PlatformStartupEvent extends EventBase {
      * @param managementService The platform management service
      */
     public PlatformStartupEvent(PlatformManagementService managementService) {
-        super("Platform startup", TYPE, managementService);
+        super(TYPE, managementService, "Platform startup");
     }
 }

@@ -45,7 +45,7 @@ public class ConnectorSpawnedEvent extends EventBase {
      * @param connector        The spawned connector
      */
     public ConnectorSpawnedEvent(ConnectionService directoryService, ConnectorService connector) {
-        super(new RichString("Spawned connector ", connector), TYPE, directoryService);
+        super(TYPE, directoryService, new RichString("Spawned connector ", connector));
         this.connectorService = connector;
     }
 

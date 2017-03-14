@@ -20,6 +20,8 @@ package org.xowl.platform.kernel.events;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.Date;
 
@@ -30,18 +32,25 @@ import java.util.Date;
  */
 public interface Event extends Identifiable, Serializable {
     /**
-     * Gets a description of this event
-     *
-     * @return The description of this event
-     */
-    RichString getDescription();
-
-    /**
      * Gets the event type
      *
      * @return The event type
      */
     String getType();
+
+    /**
+     * Gets the service that emitted this event
+     *
+     * @return The service that emitted this event
+     */
+    Service getEmitter();
+
+    /**
+     * Gets the platform user that triggered this event
+     *
+     * @return The platform user that triggered this event
+     */
+    PlatformUser getCreator();
 
     /**
      * Gets the timestamp when the event was created
@@ -51,9 +60,9 @@ public interface Event extends Identifiable, Serializable {
     Date getTimestamp();
 
     /**
-     * Gets the entity that emitted this event
+     * Gets a description of this event
      *
-     * @return The entity of origin
+     * @return The description of this event
      */
-    Identifiable getOrigin();
+    RichString getDescription();
 }

@@ -167,7 +167,7 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         this.completedStart = -1;
         this.running = new Job[EXECUTOR_POOL_MAX];
         reloadQueue();
-        eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
+        eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     /**

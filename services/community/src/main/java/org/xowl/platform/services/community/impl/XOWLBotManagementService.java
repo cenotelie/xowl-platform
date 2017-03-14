@@ -84,7 +84,7 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     public XOWLBotManagementService(EventService eventService) {
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/community/bots";
         this.bots = new HashMap<>();
-        eventService.subscribe(this, null, PlatformStartupEvent.TYPE);
+        eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     @Override

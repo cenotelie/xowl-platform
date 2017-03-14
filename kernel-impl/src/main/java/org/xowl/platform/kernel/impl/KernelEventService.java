@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
@@ -62,7 +61,7 @@ public class KernelEventService implements EventService {
     /**
      * The routes for the events
      */
-    private final Map<Identifiable, Map<String, List<EventConsumer>>> routes;
+    private final Map<String, List<EventConsumer>> routes;
     /**
      * The total number of processed events
      */
@@ -138,17 +137,12 @@ public class KernelEventService implements EventService {
     }
 
     @Override
-    public void subscribe(EventConsumer consumer, Identifiable originator, String eventType) {
+    public void subscribe(EventConsumer consumer, String eventType) {
         synchronized (routes) {
-            Map<String, List<EventConsumer>> sub = routes.get(originator);
-            if (sub == null) {
-                sub = new HashMap<>();
-                routes.put(originator, sub);
-            }
-            List<EventConsumer> consumers = sub.get(eventType);
+            List<EventConsumer> consumers = routes.get(eventType);
             if (consumers == null) {
                 consumers = new ArrayList<>();
-                sub.put(eventType, consumers);
+                routes.put(eventType, consumers);
             }
             consumers.add(consumer);
         }
@@ -157,10 +151,8 @@ public class KernelEventService implements EventService {
     @Override
     public void unsubscribe(EventConsumer consumer) {
         synchronized (routes) {
-            for (Map.Entry<Identifiable, Map<String, List<EventConsumer>>> route : routes.entrySet()) {
-                for (Map.Entry<String, List<EventConsumer>> sub : route.getValue().entrySet()) {
-                    sub.getValue().remove(consumer);
-                }
+            for (Map.Entry<String, List<EventConsumer>> sub : routes.entrySet()) {
+                sub.getValue().remove(consumer);
             }
         }
     }
@@ -169,35 +161,23 @@ public class KernelEventService implements EventService {
      * Main function for the dispatching thread
      */
     private void dispatchRun() {
-        List<EventConsumer> consumers = new ArrayList<>(16);
+        List<EventConsumer> dispatchTo = new ArrayList<>(16);
         while (!mustStop.get()) {
             try {
-                consumers.clear();
+                dispatchTo.clear();
                 // get an event
                 Event event = queue.take();
 
                 // build the list of consumers
-                Map<String, List<EventConsumer>> sub = routes.get(event.getOrigin());
-                if (sub != null) {
-                    List<EventConsumer> sub2 = sub.get(event.getType());
-                    if (sub2 != null)
-                        consumers.addAll(sub2);
-                    sub2 = sub.get(null);
-                    if (sub2 != null)
-                        consumers.addAll(sub2);
-                }
-                sub = routes.get(null);
-                if (sub != null) {
-                    List<EventConsumer> sub2 = sub.get(event.getType());
-                    if (sub2 != null)
-                        consumers.addAll(sub2);
-                    sub2 = sub.get(null);
-                    if (sub2 != null)
-                        consumers.addAll(sub2);
-                }
+                List<EventConsumer> consumers = routes.get(event.getType());
+                if (consumers != null)
+                    dispatchTo.addAll(consumers);
+                consumers = routes.get(null);
+                if (consumers != null)
+                    dispatchTo.addAll(consumers);
 
                 // dispatch
-                for (EventConsumer consumer : consumers) {
+                for (EventConsumer consumer : dispatchTo) {
                     try {
                         consumer.onEvent(event);
                     } catch (Throwable throwable) {

@@ -387,70 +387,31 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         if (request.getUri().equals(apiUri + "/sparql")) {
             return onMessageSPARQL(request);
         } else if (request.getUri().equals(apiUri + "/artifacts")) {
-            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            // get artifacts
-            String archetype = request.getParameter("archetype");
-            if (archetype != null) {
-                // get all artifacts for an archetype
-                XSPReply reply = getArtifactsForArchetype(archetype);
-                if (!reply.isSuccess())
-                    return XSPReplyUtils.toHttpResponse(reply, null);
-                boolean first = true;
-                StringBuilder builder = new StringBuilder("[");
-                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
-                    if (!first)
-                        builder.append(", ");
-                    first = false;
-                    builder.append(artifact.serializedJSON());
-                }
-                builder.append("]");
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-            }
-            String base = request.getParameter("base");
-            if (base != null) {
-                // get all artifacts for an base
-                XSPReply reply = getArtifactsForBase(base);
-                if (!reply.isSuccess())
-                    return XSPReplyUtils.toHttpResponse(reply, null);
-                boolean first = true;
-                StringBuilder builder = new StringBuilder("[");
-                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
-                    if (!first)
-                        builder.append(", ");
-                    first = false;
-                    builder.append(artifact.serializedJSON());
-                }
-                builder.append("]");
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-            } else {
-                XSPReply reply = getAllArtifacts();
-                if (!reply.isSuccess())
-                    return XSPReplyUtils.toHttpResponse(reply, null);
-                boolean first = true;
-                StringBuilder builder = new StringBuilder("[");
-                for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
-                    if (!first)
-                        builder.append(", ");
-                    first = false;
-                    builder.append(artifact.serializedJSON());
-                }
-                builder.append("]");
-                return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-            }
+            return handleArtifacts(request);
         } else if (request.getUri().equals(apiUri + "/artifacts/diff")) {
-            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            // diff artifacts left and right
-            String left = request.getParameter("left");
-            String right = request.getParameter("right");
-            if (left == null)
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
-            if (right == null)
-                return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
-            return onMessageDiffArtifacts(left, right);
+            return handleArtifactsDiff(request);
         } else if (request.getUri().equals(apiUri + "/artifacts/live")) {
-            XSPReply reply = getLiveArtifacts();
+            return handleArtifactsLive();
+        } else if (request.getUri().startsWith(apiUri + "/artifacts")) {
+            return handleArtifact(request);
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Handles a request for the /artifacts resource
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleArtifacts(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+        // get artifacts
+        String archetype = request.getParameter("archetype");
+        if (archetype != null) {
+            // get all artifacts for an archetype
+            XSPReply reply = getArtifactsForArchetype(archetype);
             if (!reply.isSuccess())
                 return XSPReplyUtils.toHttpResponse(reply, null);
             boolean first = true;
@@ -463,50 +424,129 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             }
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
-        } else if (request.getUri().startsWith(apiUri + "/artifacts")) {
-            String rest = request.getUri().substring(apiUri.length() + "/artifacts".length() + 1);
-            if (rest.isEmpty())
-                return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-            int index = rest.indexOf("/");
-            String artifactId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
-            if (index < 0) {
-                switch (request.getMethod()) {
-                    case HttpConstants.METHOD_GET: {
-                        XSPReply reply = retrieve(artifactId);
-                        if (!reply.isSuccess())
-                            return XSPReplyUtils.toHttpResponse(reply, null);
-                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Artifact>) reply).getData().serializedJSON());
-                    }
-                    case HttpConstants.METHOD_DELETE:
-                        return onMessageDeleteArtifact(artifactId);
+        }
+        String base = request.getParameter("base");
+        if (base != null) {
+            // get all artifacts for an base
+            XSPReply reply = getArtifactsForBase(base);
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(artifact.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        } else {
+            XSPReply reply = getAllArtifacts();
+            if (!reply.isSuccess())
+                return XSPReplyUtils.toHttpResponse(reply, null);
+            boolean first = true;
+            StringBuilder builder = new StringBuilder("[");
+            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+                if (!first)
+                    builder.append(", ");
+                first = false;
+                builder.append(artifact.serializedJSON());
+            }
+            builder.append("]");
+            return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+        }
+    }
+
+    /**
+     * Handles the request for the /artifacts/live resource
+     *
+     * @return The response
+     */
+    private HttpResponse handleArtifactsLive() {
+        XSPReply reply = getLiveArtifacts();
+        if (!reply.isSuccess())
+            return XSPReplyUtils.toHttpResponse(reply, null);
+        boolean first = true;
+        StringBuilder builder = new StringBuilder("[");
+        for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append(artifact.serializedJSON());
+        }
+        builder.append("]");
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
+    }
+
+    /**
+     * Handles the request for the /artifacts/diff resource
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleArtifactsDiff(HttpApiRequest request) {
+        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+        // diff artifacts left and right
+        String left = request.getParameter("left");
+        String right = request.getParameter("right");
+        if (left == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
+        if (right == null)
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
+        return onMessageDiffArtifacts(left, right);
+    }
+
+    /**
+     * Handles the request for a specific artifact /artifacts/{artifactId}
+     *
+     * @param request The request
+     * @return The response
+     */
+    private HttpResponse handleArtifact(HttpApiRequest request) {
+        String rest = request.getUri().substring(apiUri.length() + "/artifacts".length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String artifactId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+        if (index < 0) {
+            switch (request.getMethod()) {
+                case HttpConstants.METHOD_GET: {
+                    XSPReply reply = retrieve(artifactId);
+                    if (!reply.isSuccess())
+                        return XSPReplyUtils.toHttpResponse(reply, null);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Artifact>) reply).getData().serializedJSON());
                 }
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
-            } else {
-                switch (rest.substring(index)) {
-                    case "/metadata": {
-                        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                        return onMessageGetArtifactMetadata(artifactId);
-                    }
-                    case "/content": {
-                        if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                        return onMessageGetArtifactContent(artifactId);
-                    }
-                    case "/activate": {
-                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
-                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        return onMessagePushToLive(artifactId);
-                    }
-                    case "/deactivate": {
-                        if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
-                            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        return onMessagePullFromLive(artifactId);
-                    }
+                case HttpConstants.METHOD_DELETE:
+                    return onMessageDeleteArtifact(artifactId);
+            }
+            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
+        } else {
+            switch (rest.substring(index)) {
+                case "/metadata": {
+                    if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                    return onMessageGetArtifactMetadata(artifactId);
+                }
+                case "/content": {
+                    if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+                    return onMessageGetArtifactContent(artifactId);
+                }
+                case "/activate": {
+                    if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                    return onMessagePushToLive(artifactId);
+                }
+                case "/deactivate": {
+                    if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                        return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                    return onMessagePullFromLive(artifactId);
                 }
             }
         }
-        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        return null;
     }
 
     @Override

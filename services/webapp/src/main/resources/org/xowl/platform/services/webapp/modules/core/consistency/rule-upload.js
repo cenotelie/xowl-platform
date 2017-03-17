@@ -7,7 +7,7 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
-			{name: "Rules", uri: ROOT + "/modules/core/consistency/rules.html"},
+			{name: "Reasoning Rules", uri: ROOT + "/modules/core/consistency/rules.html"},
 			{name: "Upload"}], function() {
 	});
 }
@@ -59,16 +59,16 @@ function doImport(definitions, index) {
 	if (index >= definitions.length)
 		return;
 	var definition = definitions[index];
-	if (!onOperationRequest("Importing rule " + definition.name + " ..."))
+	if (!onOperationRequest("Importing reasoning rule " + definition.name + " ..."))
 		return false;
-	xowl.addConsistencyRule(function (status, ct, content) {
+	xowl.newReasoningRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created rule ", content, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created reasoning rule ", content, "."]});
 			if (index + 1 < definitions.length) {
 				doImport(definitions, index + 1);
 			} else {
 				waitAndGo("rules.html");
 			}
 		}
-	}, definition);
+	}, definition.definition, definition.isActive);
 }

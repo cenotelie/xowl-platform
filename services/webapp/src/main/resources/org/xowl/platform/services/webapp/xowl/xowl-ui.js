@@ -416,6 +416,11 @@ function renderMessagePart(part) {
 		} else {
 			return document.createTextNode(part);
 		}
+	} else if (part.type === "org.xowl.infra.server.api.XOWLRule") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = ROOT + "/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.name);
+		return dom;
 	} else if (part.type === "org.xowl.platform.kernel.jobs.Job") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
@@ -464,7 +469,7 @@ function renderMessagePart(part) {
 	} else if (part.type === "org.xowl.platform.services.consistency.ConsistencyRule") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
-		dom.href = ROOT + "/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
+		dom.href = ROOT + "/modules/core/consistency/constraint.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
 	} else if (part.type === "org.xowl.platform.services.evaluation.Evaluation") {
 		var dom = document.createElement("a");

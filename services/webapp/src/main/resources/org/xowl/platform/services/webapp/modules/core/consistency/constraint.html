@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Consistency Management: Reasoning Rule</title>
+    <title>Consistency Management: Constraint</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../../../assets/favicon.png">
@@ -36,6 +36,12 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="rule-name" class="col-sm-2 control-label">Name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="rule-name" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="rule-active" class="col-sm-2 control-label">Is Active:</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="rule-active" readonly>
@@ -55,7 +61,7 @@
 
 <script src="../../../xowl/xowl-api-platform.js"></script>
 <script src="../../../xowl/xowl-ui.js"></script>
-<script src="rule.js"></script>
+<script src="constraint.js"></script>
 <script>init();</script>
 </body>
 

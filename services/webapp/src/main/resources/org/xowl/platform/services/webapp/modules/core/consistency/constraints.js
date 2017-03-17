@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+// Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
 var xowl = new XOWL();
@@ -7,10 +7,10 @@ function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
-			{name: "Reasoning Rules"}], function() {
+			{name: "Constraints"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getReasoningRules(function (status, ct, content) {
+		xowl.getConsistencyRules(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				renderRules(content);
 			}
@@ -36,14 +36,14 @@ function renderRule(rule, index) {
 	row.appendChild(cell);
 
 	var icon = document.createElement("img");
-	icon.src = ROOT + "/assets/rule.svg";
+	icon.src = ROOT + "/assets/consistency-constraint.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.title = rule.name;
+	icon.title = rule.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(rule.name));
-	link.href = "rule.html?id=" + encodeURIComponent(rule.name);
+	link.href = "constraint.html?id=" + encodeURIComponent(rule.identifier);
 	cell = document.createElement("td");
 	cell.appendChild(icon);
 	cell.appendChild(link);
@@ -97,46 +97,46 @@ function onToggleRule(toggle, rule) {
 }
 
 function doActivateRule(toggle, rule) {
-	var result = confirm("Activate reasoning rule " + rule.name + "?");
+	var result = confirm("Activate constraint " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating reasoning rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating constraint ", rule, " ..."]}))
 		return;
-	xowl.activateReasoningRule(function (status, ct, content) {
+	xowl.activateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated reasoning rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated constraint ", rule, "."]});
 			rule.isActive = true;
 			toggle.classList.add("toggle-button-selected");
 		}
-	}, rule.name);
+	}, rule.identifier);
 }
 
 function doDeactivateRule(toggle, rule) {
-	var result = confirm("De-activate reasoning rule " + rule.name + "?");
+	var result = confirm("De-activate constraint " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating reasoning rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating constraint ", rule, " ..."]}))
 		return;
-	xowl.deactivateReasoningRule(function (status, ct, content) {
+	xowl.deactivateConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated reasoning rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated constraint ", rule, "."]});
 			rule.isActive = false;
 			toggle.classList.remove("toggle-button-selected");
 		}
-	}, rule.name);
+	}, rule.identifier);
 }
 
 function onDeleteRule(rule) {
-	var result = confirm("Delete reasoning rule " + rule.name + "?");
+	var result = confirm("Delete constraint " + rule.name + "?");
 	if (!result)
 		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting reasoning rule ", rule, " ..."]}))
+	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting constraint ", rule, " ..."]}))
 		return;
-	xowl.deleteReasoningRule(function (status, ct, content) {
+	xowl.deleteConsistencyRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted reasoning rule ", rule, "."]});
+			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted constraint ", rule, "."]});
 			// TODO: do not do a full reload
 			waitAndRefresh();
 		}
-	}, rule.name);
+	}, rule.identifier);
 }

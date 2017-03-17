@@ -1295,6 +1295,68 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/activate", null, "POST", null, null);
 }
 
+XOWL.prototype.getReasoningRules = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules", null, "GET", null, null);
+}
+
+XOWL.prototype.getReasoningRule = function (callback, ruleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules/" + encodeURIComponent(ruleId), null, "GET", null, null);
+}
+
+XOWL.prototype.newReasoningRule = function (callback, definition, active) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules", {
+		active: active
+	}, "PUT", "application/x-xowl-rdft", definition);
+}
+
+XOWL.prototype.activateReasoningRule = function (callback, ruleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules/" + encodeURIComponent(ruleId) + "/activate", null, "POST", null, null);
+}
+
+XOWL.prototype.deactivateReasoningRule = function (callback, ruleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules/" + encodeURIComponent(ruleId) + "/deactivate", null, "POST", null, null);
+}
+
+XOWL.prototype.deleteReasoningRule = function (callback, ruleId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/storage/rules/" + encodeURIComponent(ruleId), null, "DELETE", null, null);
+}
+
 
 
 /*****************************************************

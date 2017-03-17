@@ -1426,6 +1426,80 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
+     * Gets the current reasoning rules deployed on the live database
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getReasoningRules() {
+        return doRequest("/services/storage/rules", HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply getReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Creates a new reasoning rule
+     *
+     * @param definition The rule's RDFT definition
+     * @param active     Whether the rule shall be immediately activated
+     * @return The protocol reply
+     */
+    public XSPReply newReasoningRule(String definition, boolean active) {
+        return doRequest("/services/storage/rules" +
+                        "?active=" + Boolean.toString(active),
+                HttpConstants.METHOD_PUT,
+                definition.getBytes(IOUtils.CHARSET),
+                Repository.SYNTAX_RDFT,
+                false,
+                HttpConstants.MIME_JSON);
+    }
+
+    /**
+     * Activates a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply activateReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Deactivates a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deactivateReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Deletes a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deleteReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_DELETE);
+    }
+
+    /**
      * Gets the list of the available importers for uploaded documents
      *
      * @return The protocol reply

@@ -394,7 +394,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
             return handleArtifactsLive();
         } else if (request.getUri().startsWith(apiUri + "/artifacts")) {
             return handleArtifact(request);
-        } else if (request.getUri().equals(apiUri + "/rules")) {
+        } else if (request.getUri().startsWith(apiUri + "/rules")) {
             return handleRules(request);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

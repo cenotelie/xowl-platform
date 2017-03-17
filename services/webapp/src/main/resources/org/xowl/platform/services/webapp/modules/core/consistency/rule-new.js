@@ -9,7 +9,7 @@ function init() {
 			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
 			{name: "Reasoning Rule", uri: ROOT + "/modules/core/consistency/rules.html"},
 			{name: "New Rule"}], function() {});
-	var content = "BASE <http://xowl.org/platform/schemas/consistency>";
+	var content = "BASE <http://xowl.org/platform/schemas/consistency>\n";
 	for (var i = 0; i != DEFAULT_URI_MAPPINGS.length; i++) {
 		content += "PREFIX " + DEFAULT_URI_MAPPINGS[i][0] + ": <" + DEFAULT_URI_MAPPINGS[i][1] + ">\n";
 	}

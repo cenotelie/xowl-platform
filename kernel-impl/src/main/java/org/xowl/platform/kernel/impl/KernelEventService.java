@@ -31,6 +31,7 @@ import org.xowl.platform.kernel.events.EventService;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -43,6 +44,10 @@ public class KernelEventService implements EventService, ManagedService {
      * The maximum number of queued events
      */
     private static final int QUEUE_LENGTH = 128;
+    /**
+     * The time to wait for events, in ms
+     */
+    private static final long WAIT_TIME = 500;
 
     /**
      * The thread dispatching events
@@ -106,7 +111,10 @@ public class KernelEventService implements EventService, ManagedService {
     public void onLifecycleStop() {
         mustStop.set(true);
         try {
-            dispatchThread.join();
+            if (dispatchThread.isAlive()) {
+                dispatchThread.interrupt();
+                dispatchThread.join();
+            }
         } catch (InterruptedException exception) {
             Logging.get().error(exception);
         }
@@ -166,19 +174,22 @@ public class KernelEventService implements EventService, ManagedService {
     private void dispatchRun() {
         List<EventConsumer> dispatchTo = new ArrayList<>(16);
         while (!mustStop.get()) {
+            // get an event
+            Event event;
             try {
-                dispatchTo.clear();
-                // get an event
-                Event event = queue.take();
-
+                event = queue.poll(WAIT_TIME, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException exception) {
+                return;
+            }
+            if (event != null) {
                 // build the list of consumers
+                dispatchTo.clear();
                 List<EventConsumer> consumers = routes.get(event.getType());
                 if (consumers != null)
                     dispatchTo.addAll(consumers);
                 consumers = routes.get(null);
                 if (consumers != null)
                     dispatchTo.addAll(consumers);
-
                 // dispatch
                 for (EventConsumer consumer : dispatchTo) {
                     try {
@@ -188,8 +199,6 @@ public class KernelEventService implements EventService, ManagedService {
                     }
                 }
                 totalProcessed++;
-            } catch (InterruptedException exception) {
-                Logging.get().error(exception);
             }
         }
     }

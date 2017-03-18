@@ -38,8 +38,22 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The lifecycle observer for this platform
+     */
+    private final PlatformLifecycle lifecycle = new PlatformLifecycle();
+
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        // register the lifecycle component
+        bundleContext.addFrameworkListener(lifecycle);
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                lifecycle.onPlatformShutdown();
+            }
+        }, PlatformLifecycle.class.getCanonicalName() + ".onPlatformShutdown"));
+
         // register the configuration service
         ConfigurationService configurationService = new FileSystemConfigurationService();
         bundleContext.registerService(Service.class, configurationService, null);
@@ -116,5 +130,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
+        lifecycle.onPlatformShutdown();
     }
 }

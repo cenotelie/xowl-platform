@@ -29,11 +29,6 @@ import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The lifecycle observer for this platform
-     */
-    private final PlatformLifecycle lifecycle = new PlatformLifecycle();
-
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
@@ -42,12 +37,9 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeSchema.INSTANCE, null);
         bundleContext.registerService(ArtifactArchetype.class, ArtifactArchetypeFree.INSTANCE, null);
-
-        bundleContext.addFrameworkListener(lifecycle);
     }
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        lifecycle.onPlatformShutdown();
     }
 }

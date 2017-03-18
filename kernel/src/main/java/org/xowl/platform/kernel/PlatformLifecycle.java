@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-class PlatformLifecycle implements FrameworkListener {
+public class PlatformLifecycle implements FrameworkListener {
     /**
      * Whether the startup sequence has been executed
      */

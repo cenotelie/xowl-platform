@@ -27,7 +27,6 @@ import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -189,10 +188,6 @@ public class KernelEventService implements EventService, ManagedService {
                     }
                 }
                 totalProcessed++;
-
-                // stop on platform shutdown
-                if (PlatformShutdownEvent.TYPE.equals(event.getType()))
-                    return;
             } catch (InterruptedException exception) {
                 Logging.get().error(exception);
             }

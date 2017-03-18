@@ -30,7 +30,6 @@ import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
@@ -46,7 +45,6 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.*;
 import org.xowl.platform.services.collaboration.jobs.CollaborationSpawnJob;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,6 +116,21 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     @Override
     public SecuredAction[] getActions() {
         return ACTIONS;
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return getNetworkService().getLifecycleTier();
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        getNetworkService().onLifecycleStart();
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        getNetworkService().onLifecycleStop();
     }
 
     @Override
@@ -205,20 +218,6 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     public XSPReply delete() {
         // authorization is delegated to the network service
         return getNetworkService().delete(getCollaborationIdentifier());
-    }
-
-    @Override
-    public int getShutdownPriority() {
-        return getNetworkService().getShutdownPriority();
-    }
-
-    @Override
-    public void close() {
-        try {
-            getNetworkService().close();
-        } catch (IOException exception) {
-            Logging.get().error(exception);
-        }
     }
 
     @Override

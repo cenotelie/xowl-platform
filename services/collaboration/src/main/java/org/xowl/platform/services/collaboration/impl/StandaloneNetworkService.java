@@ -52,6 +52,21 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public int getLifecycleTier() {
+        return TIER_INTERNAL;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        // do nothing
+    }
+
+    @Override
     public SecuredAction[] getActions() {
         return ACTIONS_NETWORK;
     }
@@ -169,15 +184,5 @@ public class StandaloneNetworkService implements CollaborationNetworkService {
         if (!reply.isSuccess())
             return reply;
         return XSPReplyUnsupported.instance();
-    }
-
-    @Override
-    public int getShutdownPriority() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public void close() {
-        // do nothing
     }
 }

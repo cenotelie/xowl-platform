@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
-import org.xowl.platform.kernel.ClosableService;
+import org.xowl.platform.kernel.ManagedService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -32,7 +32,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface CollaborationNetworkService extends SecuredService, ClosableService {
+public interface CollaborationNetworkService extends SecuredService, ManagedService {
     /**
      * Service action to get the neighbour collaborations
      */

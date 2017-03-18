@@ -19,11 +19,7 @@ package org.xowl.platform.services.community;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.ClosableService;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.RegisterWaiter;
-import org.xowl.platform.kernel.Service;
-import org.xowl.platform.kernel.events.EventService;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.remote.DeserializerFactory;
 import org.xowl.platform.kernel.security.SecuredActionPolicyProvider;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -49,14 +45,14 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(BadgeProvider.class, new XOWLDefaultBadges(), null);
         bundleContext.registerService(BotFactory.class, new XOWLTelemetryBotFactory(), null);
 
-        Register.waitFor(EventService.class, new RegisterWaiter<EventService>() {
+        Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
-            public void onAvailable(BundleContext bundleContext, EventService component) {
+            public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
                 // register the bots management service
-                XOWLBotManagementService serviceBots = new XOWLBotManagementService(component);
+                XOWLBotManagementService serviceBots = new XOWLBotManagementService();
                 bundleContext.registerService(Service.class, serviceBots, null);
                 bundleContext.registerService(SecuredService.class, serviceBots, null);
-                bundleContext.registerService(ClosableService.class, serviceBots, null);
+                bundleContext.registerService(ManagedService.class, serviceBots, null);
                 bundleContext.registerService(HttpApiService.class, serviceBots, null);
                 bundleContext.registerService(BotManagementService.class, serviceBots, null);
 

@@ -63,6 +63,21 @@ public class SlaveNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public int getLifecycleTier() {
+        return TIER_INTERNAL;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        // do nothing
+    }
+
+    @Override
     public SecuredAction[] getActions() {
         return ACTIONS_NETWORK;
     }
@@ -231,15 +246,5 @@ public class SlaveNetworkService implements CollaborationNetworkService {
         if (remotePlatform == null)
             return XSPReplyNetworkError.instance();
         return remotePlatform.deleteCollaborationNeighbour(collaborationId);
-    }
-
-    @Override
-    public int getShutdownPriority() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public void close() {
-        // do nothing
     }
 }

@@ -49,7 +49,7 @@ public class Activator implements BundleActivator {
                 bundleContext.registerService(Service.class, collaborationService, null);
                 bundleContext.registerService(SecuredService.class, collaborationService, null);
                 bundleContext.registerService(HttpApiService.class, collaborationService, null);
-                bundleContext.registerService(ClosableService.class, collaborationService, null);
+                bundleContext.registerService(ManagedService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationLocalService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationNetworkService.class, collaborationService, null);

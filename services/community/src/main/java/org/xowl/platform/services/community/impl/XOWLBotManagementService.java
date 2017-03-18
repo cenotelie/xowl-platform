@@ -26,14 +26,7 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.events.Event;
-import org.xowl.platform.kernel.events.EventConsumer;
-import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.platform.PlatformStartupEvent;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -56,7 +49,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLBotManagementService implements BotManagementService, HttpApiService, EventConsumer {
+public class XOWLBotManagementService implements BotManagementService, HttpApiService, ManagedService {
     /**
      * The resource for the API's specification
      */
@@ -77,13 +70,10 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
 
     /**
      * Initializes this service
-     *
-     * @param eventService The event service
      */
-    public XOWLBotManagementService(EventService eventService) {
+    public XOWLBotManagementService() {
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/community/bots";
         this.bots = new HashMap<>();
-        eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     @Override
@@ -94,6 +84,38 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Bots Management Service";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_ASYNC;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
+        Configuration configuration = configurationService.getConfigFor(BotManagementService.class.getCanonicalName());
+        for (Section section : configuration.getSections()) {
+            BotSpecification specification = loadBotSpecification(section);
+            if (specification == null)
+                continue;
+            for (BotFactory factory : Register.getComponents(BotFactory.class)) {
+                Bot bot = factory.newBot(specification);
+                if (bot != null) {
+                    bots.put(bot.getIdentifier(), bot);
+                    if (bot.getWakeupOnStartup())
+                        bot.wakeup();
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        for (Bot bot : bots.values()) {
+            bot.sleep();
+        }
     }
 
     @Override
@@ -133,40 +155,6 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
         if (bot == null)
             return XSPReplyNotFound.instance();
         return bot.sleep();
-    }
-
-    @Override
-    public int getShutdownPriority() {
-        return 0;
-    }
-
-    @Override
-    public void close() {
-        for (Bot bot : bots.values()) {
-            bot.sleep();
-        }
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        if (event.getType().equals(PlatformStartupEvent.TYPE)) {
-            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService.getConfigFor(BotManagementService.class.getCanonicalName());
-            for (Section section : configuration.getSections()) {
-                BotSpecification specification = loadBotSpecification(section);
-                if (specification == null)
-                    continue;
-                for (BotFactory factory : Register.getComponents(BotFactory.class)) {
-                    Bot bot = factory.newBot(specification);
-                    if (bot != null) {
-                        bots.put(bot.getIdentifier(), bot);
-                        if (bot.getWakeupOnStartup())
-                            bot.wakeup();
-                        break;
-                    }
-                }
-            }
-        }
     }
 
     /**

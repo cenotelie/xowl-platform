@@ -134,6 +134,26 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
+    public int getLifecycleTier() {
+        return TIER_IO;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        // try to shutdown the managed platforms
+        for (RemoteCollaborationManaged remote : collaborations.values()) {
+            if (remote.getStatus() == CollaborationStatus.Running) {
+                remote.getAccess().platformShutdown();
+            }
+        }
+    }
+
+    @Override
     public SecuredAction[] getActions() {
         return ACTIONS_NETWORK;
     }
@@ -272,21 +292,6 @@ public class MasterNetworkService implements CollaborationNetworkService {
         if (neighbour == null)
             return XSPReplyNotFound.instance();
         return XSPReplyUnsupported.instance();
-    }
-
-    @Override
-    public int getShutdownPriority() {
-        return 50;
-    }
-
-    @Override
-    public void close() {
-        // try to shutdown the managed platforms
-        for (RemoteCollaborationManaged remote : collaborations.values()) {
-            if (remote.getStatus() == CollaborationStatus.Running) {
-                remote.getAccess().platformShutdown();
-            }
-        }
     }
 
     /**

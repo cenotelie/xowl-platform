@@ -41,7 +41,7 @@ public class PlatformLifecycle implements FrameworkListener {
      */
     private final AtomicBoolean hasStarted;
     /**
-     * Whether the shutdown sequence has been eecuted
+     * Whether the shutdown sequence has been executed
      */
     private final AtomicBoolean hasShutdown;
 

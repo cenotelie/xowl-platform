@@ -308,11 +308,6 @@ class XOWLInternalRealm implements SecurityRealm {
     }
 
     @Override
-    public void onRequestEnd(String userId) {
-        // do nothing
-    }
-
-    @Override
     public boolean checkHasRole(String userId, String roleId) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("user", nodes.getIRINode(USERS + userId));

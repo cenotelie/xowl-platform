@@ -127,7 +127,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             Logging.get().error(exception);
             doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
         } finally {
-            securityService.onRequestEnd(servletRequest.getRemoteAddr());
+            securityService.logout();
         }
     }
 

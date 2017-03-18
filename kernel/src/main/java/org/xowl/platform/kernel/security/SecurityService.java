@@ -44,6 +44,10 @@ public interface SecurityService extends SecuredService {
      */
     SecuredAction ACTION_SET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".SetPolicy", "Security Service - Set Security Policy", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
+     * Service action to assume the identity of another user
+     */
+    SecuredAction ACTION_CHANGE_ID = new SecuredAction(SecurityService.class.getCanonicalName() + ".ChangeId", "Security Service - Change User Identity", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
+    /**
      * Service action to create a user
      */
     SecuredAction ACTION_CREATE_USER = new SecuredAction(SecurityService.class.getCanonicalName() + ".CreateUser", "Security Service - Create User", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
@@ -134,6 +138,7 @@ public interface SecurityService extends SecuredService {
     SecuredAction[] ACTIONS = new SecuredAction[]{
             ACTION_GET_POLICY,
             ACTION_SET_POLICY,
+            ACTION_CHANGE_ID,
             ACTION_CREATE_USER,
             ACTION_CREATE_GROUP,
             ACTION_CREATE_ROLE,
@@ -184,10 +189,9 @@ public interface SecurityService extends SecuredService {
     /**
      * Performs the logout of a client
      *
-     * @param client The requesting client
      * @return Whether the operation succeed
      */
-    XSPReply logout(String client);
+    XSPReply logout();
 
     /**
      * Performs the authentication of a user on the current thread
@@ -203,7 +207,7 @@ public interface SecurityService extends SecuredService {
      *
      * @param user The user to authenticate
      */
-    void authenticate(PlatformUser user);
+    XSPReply authenticate(PlatformUser user);
 
     /**
      * Gets the currently authenticated user on the current thread, if any
@@ -211,13 +215,6 @@ public interface SecurityService extends SecuredService {
      * @return The currently authenticated user, or null if there is none
      */
     PlatformUser getCurrentUser();
-
-    /**
-     * Event when the request terminated
-     *
-     * @param client The requesting client
-     */
-    void onRequestEnd(String client);
 
     /**
      * Checks the authorization policy for the specified action

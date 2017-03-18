@@ -77,7 +77,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
 
         // register the event service
-        KernelEventService serviceEvents = new KernelEventService(securityService);
+        KernelEventService serviceEvents = new KernelEventService();
         bundleContext.registerService(Service.class, serviceEvents, null);
         bundleContext.registerService(MeasurableService.class, serviceEvents, null);
         bundleContext.registerService(ManagedService.class, serviceEvents, null);

@@ -28,8 +28,6 @@ import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
-import org.xowl.platform.kernel.platform.PlatformUserRoot;
-import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -70,14 +68,11 @@ public class KernelEventService implements EventService, ManagedService {
 
     /**
      * Initializes this service
-     *
-     * @param securityService The security service
      */
-    public KernelEventService(final SecurityService securityService) {
+    public KernelEventService() {
         this.dispatchThread = new Thread(new SafeRunnable() {
             @Override
             public void doRun() {
-                securityService.authenticate(PlatformUserRoot.INSTANCE);
                 KernelEventService.this.dispatchRun();
             }
         }, KernelEventService.class.getCanonicalName() + ".EventDispatcher");

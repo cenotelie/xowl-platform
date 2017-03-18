@@ -115,6 +115,14 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ChangeId"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.kernel.security.SecurityService.CreateUser"
       },
       "policy": {

@@ -279,7 +279,8 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public XSPReply logout(String client) {
+    public XSPReply logout() {
+        CONTEXT.remove();
         return XSPReplySuccess.instance();
     }
 
@@ -304,19 +305,23 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
-    public void authenticate(PlatformUser user) {
+    public XSPReply authenticate(PlatformUser user) {
+        PlatformUser previous = CONTEXT.get();
+        if (previous == null) {
+            // not authenticated yet
+            CONTEXT.set(user);
+            return XSPReplySuccess.instance();
+        }
+        XSPReply reply = checkAction(ACTION_CHANGE_ID);
+        if (!reply.isSuccess())
+            return reply;
         CONTEXT.set(user);
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public PlatformUser getCurrentUser() {
         return CONTEXT.get();
-    }
-
-    @Override
-    public void onRequestEnd(String userId) {
-        CONTEXT.remove();
-        getRealm().onRequestEnd(userId);
     }
 
     @Override
@@ -420,7 +425,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     private HttpResponse handleRequestLogout(HttpApiRequest request) {
         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-        XSPReply reply = logout(request.getClient());
+        XSPReply reply = logout();
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);

@@ -255,7 +255,7 @@ public abstract class JobBase extends SafeRunnable implements Job {
         completionRate = 1.0f;
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService != null)
-            securityService.onRequestEnd(null);
+            securityService.logout();
     }
 
     /**

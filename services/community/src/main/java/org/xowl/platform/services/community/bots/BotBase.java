@@ -362,6 +362,9 @@ public class BotBase implements Bot, EventConsumer {
      * When the bot is stopping for a reason other that an external request
      */
     private void onBotStop() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null)
+            securityService.logout();
         status = BotStatus.Asleep;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)

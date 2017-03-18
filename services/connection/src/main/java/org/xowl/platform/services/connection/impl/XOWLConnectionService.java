@@ -32,12 +32,9 @@ import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
-import org.xowl.platform.kernel.events.Event;
-import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
-import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -59,7 +56,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class XOWLConnectionService implements ConnectionService, HttpApiService, EventConsumer {
+public class XOWLConnectionService implements ConnectionService, HttpApiService, ManagedService {
     /**
      * The data about a spawned connector
      */
@@ -102,9 +99,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     public XOWLConnectionService() {
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/connection";
         this.connectorsById = new HashMap<>();
-        EventService eventService = Register.getComponent(EventService.class);
-        if (eventService != null)
-            eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     @Override
@@ -115,6 +109,34 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Connection Service";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_IO;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
+        if (configurationService == null)
+            return;
+        Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
+        for (Section section : configuration.getSections()) {
+            resolveConfigConnector(section);
+        }
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        // disconnect the connectors
+        synchronized (connectorsById) {
+            for (Registration registration : connectorsById.values()) {
+                for (int i = 0; i != registration.references.length; i++)
+                    registration.references[i].unregister();
+            }
+            connectorsById.clear();
+        }
     }
 
     @Override
@@ -206,19 +228,6 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
                 ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
                 "}";
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        if (event.getType().equals(PlatformStartupEvent.TYPE)) {
-            ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            if (configurationService == null)
-                return;
-            Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
-            for (Section section : configuration.getSections()) {
-                resolveConfigConnector(section);
-            }
-        }
     }
 
     @Override

@@ -76,11 +76,6 @@ public class KernelSecurityNosecRealm implements SecurityRealm {
     }
 
     @Override
-    public void onRequestEnd(String userId) {
-        // do nothing
-    }
-
-    @Override
     public boolean checkHasRole(String userId, String roleId) {
         return true;
     }

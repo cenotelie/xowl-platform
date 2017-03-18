@@ -74,13 +74,6 @@ public interface SecurityRealm extends Identifiable {
     PlatformUser authenticate(String login, String password);
 
     /**
-     * Event when the request terminated
-     *
-     * @param userId The identifier of a user
-     */
-    void onRequestEnd(String userId);
-
-    /**
      * Checks whether a specified user has a role
      *
      * @param userId The identifier of a user

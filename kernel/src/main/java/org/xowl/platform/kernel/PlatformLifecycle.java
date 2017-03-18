@@ -23,6 +23,8 @@ import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 import org.xowl.platform.kernel.platform.PlatformStartupEvent;
+import org.xowl.platform.kernel.platform.PlatformUserRoot;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +67,11 @@ class PlatformLifecycle implements FrameworkListener {
         if (!hasStarted.compareAndSet(false, true))
             return;
 
+        // authenticate as root
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null)
+            securityService.authenticate(PlatformUserRoot.INSTANCE);
+
         // execute sequence
         List<ManagedService> services = (List<ManagedService>) Register.getComponents(ManagedService.class);
         Collections.sort(services, ManagedService.COMPARATOR_STARTUP);
@@ -91,6 +98,11 @@ class PlatformLifecycle implements FrameworkListener {
         PlatformManagementService platformManagementService = Register.getComponent(PlatformManagementService.class);
         if (eventService != null)
             eventService.onEvent(new PlatformShutdownEvent(platformManagementService));
+
+        // authenticate as root
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService != null)
+            securityService.authenticate(PlatformUserRoot.INSTANCE);
 
         // execute sequence
         List<ManagedService> services = (List<ManagedService>) Register.getComponents(ManagedService.class);

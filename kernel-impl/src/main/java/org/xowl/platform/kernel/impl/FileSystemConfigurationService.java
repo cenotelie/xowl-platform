@@ -32,7 +32,7 @@ import java.io.IOException;
  *
  * @author Laurent Wouters
  */
-public class FileSystemConfigurationService implements ConfigurationService {
+class FileSystemConfigurationService implements ConfigurationService {
     /**
      * From the distribution's root, the path to the configuration
      */

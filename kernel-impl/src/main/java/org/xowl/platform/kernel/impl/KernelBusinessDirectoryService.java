@@ -41,7 +41,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public class KernelBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
+class KernelBusinessDirectoryService implements BusinessDirectoryService, HttpApiService {
     /**
      * The resource for the API's specification
      */

@@ -28,7 +28,7 @@ import org.xowl.platform.kernel.platform.PlatformRebootJob;
  *
  * @author Laurent Wouters
  */
-public class KernelJobFactory implements JobFactory {
+class KernelJobFactory implements JobFactory {
     @Override
     public String getIdentifier() {
         return KernelJobFactory.class.getCanonicalName();

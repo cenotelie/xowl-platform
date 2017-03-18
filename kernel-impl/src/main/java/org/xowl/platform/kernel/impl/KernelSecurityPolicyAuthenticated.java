@@ -33,7 +33,7 @@ import org.xowl.platform.kernel.security.SecurityService;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityPolicyAuthenticated implements SecurityPolicy {
+class KernelSecurityPolicyAuthenticated implements SecurityPolicy {
     @Override
     public String getIdentifier() {
         return KernelSecurityPolicyAuthenticated.class.getCanonicalName();

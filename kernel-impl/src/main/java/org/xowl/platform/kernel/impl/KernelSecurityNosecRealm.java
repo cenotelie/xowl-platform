@@ -34,7 +34,7 @@ import java.util.Collections;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityNosecRealm implements SecurityRealm {
+class KernelSecurityNosecRealm implements SecurityRealm {
     /**
      * The internal representation of a user for this realm
      */

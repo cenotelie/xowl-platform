@@ -15,10 +15,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel;
+package org.xowl.platform.kernel.impl;
 
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
+import org.xowl.platform.kernel.ManagedService;
+import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
@@ -35,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class PlatformLifecycle implements FrameworkListener {
+class KernelLifecycle implements FrameworkListener {
     /**
      * Whether the startup sequence has been executed
      */
@@ -48,7 +50,7 @@ public class PlatformLifecycle implements FrameworkListener {
     /**
      * Initializes this structure
      */
-    public PlatformLifecycle() {
+    public KernelLifecycle() {
         this.hasStarted = new AtomicBoolean(false);
         this.hasShutdown = new AtomicBoolean(false);
     }

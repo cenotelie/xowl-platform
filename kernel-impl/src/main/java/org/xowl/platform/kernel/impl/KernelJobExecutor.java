@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class KernelJobExecutor implements JobExecutionService, ManagedService, HttpApiService {
+class KernelJobExecutor implements JobExecutionService, ManagedService, HttpApiService {
     /**
      * The bound of the executor queue
      */

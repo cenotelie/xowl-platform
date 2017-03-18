@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
+class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, HttpApiService {
     /**
      * The resource for the API's specification
      */

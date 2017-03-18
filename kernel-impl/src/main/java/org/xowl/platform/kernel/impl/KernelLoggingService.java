@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Laurent Wouters
  */
-public class KernelLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
+class KernelLoggingService extends DispatchLogger implements LoggingService, HttpApiService {
     /**
      * The resource for the API's specification
      */

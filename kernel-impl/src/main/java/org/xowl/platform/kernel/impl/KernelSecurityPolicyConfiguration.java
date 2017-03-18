@@ -42,7 +42,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfiguration {
+class KernelSecurityPolicyConfiguration extends SecurityPolicyConfiguration {
     /**
      * The file storage for the policy
      */

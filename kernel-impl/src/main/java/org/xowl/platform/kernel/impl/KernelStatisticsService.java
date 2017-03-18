@@ -47,7 +47,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public class KernelStatisticsService implements StatisticsService, HttpApiService {
+class KernelStatisticsService implements StatisticsService, HttpApiService {
     /**
      * The resource for the API's specification
      */

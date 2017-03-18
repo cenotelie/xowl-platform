@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class KernelEventService implements EventService, ManagedService {
+class KernelEventService implements EventService, ManagedService {
     /**
      * The maximum number of queued events
      */

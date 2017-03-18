@@ -59,7 +59,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  *
  * @author Laurent Wouters
  */
-public class KernelPlatformManagementService implements PlatformManagementService, HttpApiService {
+class KernelPlatformManagementService implements PlatformManagementService, HttpApiService {
     /**
      * The name of the descriptor file in a distribution
      */

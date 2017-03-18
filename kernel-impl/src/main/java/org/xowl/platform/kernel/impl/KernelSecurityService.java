@@ -53,7 +53,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityService implements SecurityService, HttpApiService {
+class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The resource for the API's specification
      */

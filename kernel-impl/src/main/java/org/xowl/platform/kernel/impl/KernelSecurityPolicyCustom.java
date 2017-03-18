@@ -42,7 +42,7 @@ import java.io.File;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityPolicyCustom implements SecurityPolicy {
+class KernelSecurityPolicyCustom implements SecurityPolicy {
     /**
      * The storage for the configuration
      */

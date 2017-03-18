@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
     /**
      * The lifecycle observer for this platform
      */
-    private final PlatformLifecycle lifecycle = new PlatformLifecycle();
+    private final KernelLifecycle lifecycle = new KernelLifecycle();
 
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
@@ -52,7 +52,7 @@ public class Activator implements BundleActivator {
             public void run() {
                 lifecycle.onPlatformShutdown();
             }
-        }, PlatformLifecycle.class.getCanonicalName() + ".onPlatformShutdown"));
+        }, KernelLifecycle.class.getCanonicalName() + ".onPlatformShutdown"));
 
         // register the configuration service
         ConfigurationService configurationService = new FileSystemConfigurationService();

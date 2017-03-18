@@ -22,6 +22,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
+import org.xowl.platform.kernel.ManagedService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
@@ -40,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class KernelEventService implements EventService {
+public class KernelEventService implements EventService, ManagedService {
     /**
      * The maximum number of queued events
      */
@@ -87,18 +88,6 @@ public class KernelEventService implements EventService {
         this.dispatchThread.start();
     }
 
-    /**
-     * When the platform is closing
-     */
-    public void close() {
-        mustStop.set(true);
-        try {
-            dispatchThread.join();
-        } catch (InterruptedException exception) {
-            Logging.get().error(exception);
-        }
-    }
-
     @Override
     public String getIdentifier() {
         return KernelEventService.class.getCanonicalName();
@@ -107,6 +96,26 @@ public class KernelEventService implements EventService {
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Event Dispatch Service";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_INTERNAL;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        mustStop.set(true);
+        try {
+            dispatchThread.join();
+        } catch (InterruptedException exception) {
+            Logging.get().error(exception);
+        }
     }
 
     @Override

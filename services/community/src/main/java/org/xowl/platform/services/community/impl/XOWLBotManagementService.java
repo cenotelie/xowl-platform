@@ -45,7 +45,6 @@ import org.xowl.platform.services.community.bots.BotFactory;
 import org.xowl.platform.services.community.bots.BotManagementService;
 import org.xowl.platform.services.community.bots.BotSpecification;
 
-import java.io.Closeable;
 import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,7 +56,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class XOWLBotManagementService implements BotManagementService, HttpApiService, EventConsumer, Closeable {
+public class XOWLBotManagementService implements BotManagementService, HttpApiService, EventConsumer {
     /**
      * The resource for the API's specification
      */
@@ -134,6 +133,18 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
         if (bot == null)
             return XSPReplyNotFound.instance();
         return bot.sleep();
+    }
+
+    @Override
+    public int getShutdownPriority() {
+        return 0;
+    }
+
+    @Override
+    public void close() {
+        for (Bot bot : bots.values()) {
+            bot.sleep();
+        }
     }
 
     @Override
@@ -273,12 +284,5 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
                 ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
                 "}";
-    }
-
-    @Override
-    public void close() {
-        for (Bot bot : bots.values()) {
-            bot.sleep();
-        }
     }
 }

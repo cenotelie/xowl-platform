@@ -34,14 +34,10 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.platform.kernel.*;
-import org.xowl.platform.kernel.events.Event;
-import org.xowl.platform.kernel.events.EventConsumer;
-import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.jobs.JobStatus;
-import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
@@ -63,7 +59,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class KernelJobExecutor implements JobExecutionService, HttpApiService, EventConsumer, Closeable {
+public class KernelJobExecutor implements JobExecutionService, ManagedService, HttpApiService {
     /**
      * The bound of the executor queue
      */
@@ -127,9 +123,8 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
      * Initializes this service
      *
      * @param configurationService The configuration service to use
-     * @param eventService         The event service
      */
-    public KernelJobExecutor(ConfigurationService configurationService, EventService eventService) {
+    public KernelJobExecutor(ConfigurationService configurationService) {
         Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
@@ -167,7 +162,6 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         this.completedStart = -1;
         this.running = new Job[EXECUTOR_POOL_MAX];
         reloadQueue();
-        eventService.subscribe(this, PlatformStartupEvent.TYPE);
     }
 
     /**
@@ -289,13 +283,6 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     }
 
     @Override
-    public void close() {
-        if (executorPool != null) {
-            executorPool.shutdownNow();
-        }
-    }
-
-    @Override
     public String getIdentifier() {
         return KernelJobExecutor.class.getCanonicalName();
     }
@@ -303,6 +290,29 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Jobs Management Service";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_ASYNC;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // activate this executor
+        synchronized (initQueue) {
+            canExecute.set(true);
+            while (!initQueue.isEmpty()) {
+                executorPool.execute(initQueue.poll());
+            }
+        }
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        if (executorPool != null) {
+            executorPool.shutdownNow();
+        }
     }
 
     @Override
@@ -462,70 +472,6 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
         return null;
     }
 
-    /**
-     * Looks for a job in the queue
-     *
-     * @param identifier The identifier of a job
-     * @return The job, or null if it is not found
-     */
-    private Job getJobScheduled(String identifier) {
-        for (Runnable runnable : executorPool.getQueue()) {
-            Job job = (Job) runnable;
-            if (job.getIdentifier().equals(identifier))
-                return job;
-        }
-        return null;
-    }
-
-    /**
-     * Looks for a job in the running buffer
-     *
-     * @param identifier The identifier of a job
-     * @return The job, or null if it is not found
-     */
-    private Job getJobRunning(String identifier) {
-        synchronized (running) {
-            for (int i = 0; i != running.length; i++) {
-                if (running[i] != null && running[i].getIdentifier().equals(identifier))
-                    return running[i];
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Looks for a job in the completed buffer
-     *
-     * @param identifier The identifier of a job
-     * @return The job, or null if it is not found
-     */
-    private Job getJobCompleted(String identifier) {
-        synchronized (completed) {
-            if (completedStart < 0)
-                return null;
-            for (int i = 0; i != completed.length; i++) {
-                if (completed[i] == null)
-                    return null;
-                if (completed[i].getIdentifier().equals(identifier))
-                    return completed[i];
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        if (event.getType().equals(PlatformStartupEvent.TYPE)) {
-            // activate this executor
-            synchronized (initQueue) {
-                canExecute.set(true);
-                while (!initQueue.isEmpty()) {
-                    executorPool.execute(initQueue.poll());
-                }
-            }
-        }
-    }
-
     @Override
     public int canHandle(HttpApiRequest request) {
         return request.getUri().startsWith(apiUri)
@@ -599,6 +545,57 @@ public class KernelJobExecutor implements JobExecutionService, HttpApiService, E
                 ", \"documentation\": " +
                 RESOURCE_DOCUMENTATION.serializedJSON() +
                 "}";
+    }
+
+    /**
+     * Looks for a job in the queue
+     *
+     * @param identifier The identifier of a job
+     * @return The job, or null if it is not found
+     */
+    private Job getJobScheduled(String identifier) {
+        for (Runnable runnable : executorPool.getQueue()) {
+            Job job = (Job) runnable;
+            if (job.getIdentifier().equals(identifier))
+                return job;
+        }
+        return null;
+    }
+
+    /**
+     * Looks for a job in the running buffer
+     *
+     * @param identifier The identifier of a job
+     * @return The job, or null if it is not found
+     */
+    private Job getJobRunning(String identifier) {
+        synchronized (running) {
+            for (int i = 0; i != running.length; i++) {
+                if (running[i] != null && running[i].getIdentifier().equals(identifier))
+                    return running[i];
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Looks for a job in the completed buffer
+     *
+     * @param identifier The identifier of a job
+     * @return The job, or null if it is not found
+     */
+    private Job getJobCompleted(String identifier) {
+        synchronized (completed) {
+            if (completedStart < 0)
+                return null;
+            for (int i = 0; i != completed.length; i++) {
+                if (completed[i] == null)
+                    return null;
+                if (completed[i].getIdentifier().equals(identifier))
+                    return completed[i];
+            }
+        }
+        return null;
     }
 
     /**

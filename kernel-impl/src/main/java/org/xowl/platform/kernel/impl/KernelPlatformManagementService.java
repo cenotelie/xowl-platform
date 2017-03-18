@@ -18,8 +18,6 @@
 package org.xowl.platform.kernel.impl;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
@@ -61,7 +59,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  *
  * @author Laurent Wouters
  */
-public class KernelPlatformManagementService implements PlatformManagementService, HttpApiService, FrameworkListener {
+public class KernelPlatformManagementService implements PlatformManagementService, HttpApiService {
     /**
      * The name of the descriptor file in a distribution
      */
@@ -533,16 +531,6 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         }, KernelPlatformManagementService.class.getCanonicalName() + ".ThreadRestart");
         thread.start();
         return XSPReplySuccess.instance();
-    }
-
-    @Override
-    public void frameworkEvent(FrameworkEvent frameworkEvent) {
-        if (frameworkEvent.getType() == FrameworkEvent.STARTED) {
-            // the framework has started
-            EventService eventService = Register.getComponent(EventService.class);
-            if (eventService != null)
-                eventService.onEvent(new PlatformStartupEvent(this));
-        }
     }
 
     /**

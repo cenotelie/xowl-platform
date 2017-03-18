@@ -19,10 +19,7 @@ package org.xowl.platform.services.collaboration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.RegisterWaiter;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.remote.DeserializerFactory;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -52,6 +49,7 @@ public class Activator implements BundleActivator {
                 bundleContext.registerService(Service.class, collaborationService, null);
                 bundleContext.registerService(SecuredService.class, collaborationService, null);
                 bundleContext.registerService(HttpApiService.class, collaborationService, null);
+                bundleContext.registerService(ClosableService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationLocalService.class, collaborationService, null);
                 bundleContext.registerService(CollaborationNetworkService.class, collaborationService, null);

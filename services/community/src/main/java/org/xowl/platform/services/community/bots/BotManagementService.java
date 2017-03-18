@@ -19,6 +19,7 @@ package org.xowl.platform.services.community.bots;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
+import org.xowl.platform.kernel.ClosableService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -30,7 +31,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface BotManagementService extends SecuredService {
+public interface BotManagementService extends SecuredService, ClosableService {
     /**
      * Service action to get the messages of a bot
      */

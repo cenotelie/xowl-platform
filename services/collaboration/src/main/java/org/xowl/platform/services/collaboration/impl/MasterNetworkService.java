@@ -274,6 +274,21 @@ public class MasterNetworkService implements CollaborationNetworkService {
         return XSPReplyUnsupported.instance();
     }
 
+    @Override
+    public int getShutdownPriority() {
+        return 50;
+    }
+
+    @Override
+    public void close() {
+        // try to shutdown the managed platforms
+        for (RemoteCollaborationManaged remote : collaborations.values()) {
+            if (remote.getStatus() == CollaborationStatus.Running) {
+                remote.getAccess().platformShutdown();
+            }
+        }
+    }
+
     /**
      * Provision o platform instance for a collaboration
      *

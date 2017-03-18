@@ -20,16 +20,12 @@ package org.xowl.platform.kernel.impl;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.LoggingService;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
-import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
 import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
@@ -42,19 +38,6 @@ import org.xowl.platform.kernel.webapi.HttpApiService;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The event service
-     */
-    private KernelEventService serviceEvents;
-    /**
-     * The job executor service
-     */
-    private KernelJobExecutor serviceJobExecutor;
-    /**
-     * The platform management service
-     */
-    private KernelPlatformManagementService servicePlatform;
-
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         // register the configuration service
@@ -75,7 +58,6 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(MeasurableService.class, loggingService, null);
         bundleContext.registerService(LoggingService.class, loggingService, null);
 
-
         // register the security service
         KernelSecurityProvider securityProvider = new KernelSecurityProvider();
         bundleContext.registerService(SecurityRealmProvider.class, securityProvider, null);
@@ -95,17 +77,19 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(StatisticsService.class, statisticsService, null);
 
         // register the event service
-        serviceEvents = new KernelEventService(securityService);
+        KernelEventService serviceEvents = new KernelEventService(securityService);
         bundleContext.registerService(Service.class, serviceEvents, null);
         bundleContext.registerService(MeasurableService.class, serviceEvents, null);
+        bundleContext.registerService(ManagedService.class, serviceEvents, null);
         bundleContext.registerService(EventService.class, serviceEvents, null);
 
         // register the job executor service
-        serviceJobExecutor = new KernelJobExecutor(configurationService, serviceEvents);
+        KernelJobExecutor serviceJobExecutor = new KernelJobExecutor(configurationService);
         bundleContext.registerService(Service.class, serviceJobExecutor, null);
         bundleContext.registerService(SecuredService.class, serviceJobExecutor, null);
         bundleContext.registerService(HttpApiService.class, serviceJobExecutor, null);
         bundleContext.registerService(MeasurableService.class, serviceJobExecutor, null);
+        bundleContext.registerService(ManagedService.class, serviceJobExecutor, null);
         bundleContext.registerService(JobExecutionService.class, serviceJobExecutor, null);
         bundleContext.registerService(JobFactory.class, new KernelJobFactory(), null);
 
@@ -116,13 +100,12 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
 
         // register the platform management service
-        servicePlatform = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
+        KernelPlatformManagementService servicePlatform = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
         bundleContext.registerService(Service.class, servicePlatform, null);
         bundleContext.registerService(SecuredService.class, servicePlatform, null);
         bundleContext.registerService(HttpApiService.class, servicePlatform, null);
         bundleContext.registerService(MeasurableService.class, servicePlatform, null);
         bundleContext.registerService(PlatformManagementService.class, servicePlatform, null);
-        bundleContext.addFrameworkListener(servicePlatform);
 
         // register the HTTP API discovery service
         KernelHttpApiDiscoveryService discoveryService = new KernelHttpApiDiscoveryService();
@@ -133,11 +116,5 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (serviceEvents != null && servicePlatform != null)
-            serviceEvents.onEvent(new PlatformShutdownEvent(servicePlatform));
-        if (serviceEvents != null)
-            serviceEvents.close();
-        if (serviceJobExecutor != null)
-            serviceJobExecutor.close();
     }
 }

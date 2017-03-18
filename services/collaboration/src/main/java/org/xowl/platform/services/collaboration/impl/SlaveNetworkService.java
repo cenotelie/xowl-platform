@@ -232,4 +232,14 @@ public class SlaveNetworkService implements CollaborationNetworkService {
             return XSPReplyNetworkError.instance();
         return remotePlatform.deleteCollaborationNeighbour(collaborationId);
     }
+
+    @Override
+    public int getShutdownPriority() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void close() {
+        // do nothing
+    }
 }

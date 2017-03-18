@@ -19,6 +19,7 @@ package org.xowl.platform.services.community;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xowl.platform.kernel.ClosableService;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.RegisterWaiter;
 import org.xowl.platform.kernel.Service;
@@ -40,11 +41,6 @@ import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The bot management service
-     */
-    private XOWLBotManagementService serviceBots;
-
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCommunity(), null);
@@ -57,9 +53,10 @@ public class Activator implements BundleActivator {
             @Override
             public void onAvailable(BundleContext bundleContext, EventService component) {
                 // register the bots management service
-                serviceBots = new XOWLBotManagementService(component);
+                XOWLBotManagementService serviceBots = new XOWLBotManagementService(component);
                 bundleContext.registerService(Service.class, serviceBots, null);
                 bundleContext.registerService(SecuredService.class, serviceBots, null);
+                bundleContext.registerService(ClosableService.class, serviceBots, null);
                 bundleContext.registerService(HttpApiService.class, serviceBots, null);
                 bundleContext.registerService(BotManagementService.class, serviceBots, null);
 
@@ -75,7 +72,5 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (serviceBots != null)
-            serviceBots.close();
     }
 }

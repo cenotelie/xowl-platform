@@ -107,7 +107,7 @@ class XOWLInconsistency implements Inconsistency {
         builder.append("\", \"ruleId\": \"");
         builder.append(TextUtils.escapeStringJSON(rule.getIdentifier()));
         builder.append("\", \"ruleName\": \"");
-        builder.append(TextUtils.escapeStringJSON(rule.getUserName()));
+        builder.append(TextUtils.escapeStringJSON(rule.getName()));
         builder.append("\", \"antecedents\": {");
         boolean first = true;
         for (Map.Entry<String, Node> antecedent : antecedents.entrySet()) {

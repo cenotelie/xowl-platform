@@ -18,19 +18,11 @@
 package org.xowl.platform.services.consistency;
 
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
 
 /**
  * Represents a consistency rule
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyRule extends Identifiable, Serializable, XOWLRule {
-    /**
-     * Gets the user-friendly name of this rule
-     *
-     * @return The user-friendly name of this rule
-     */
-    String getUserName();
+public interface ConsistencyRule extends XOWLRule {
 }

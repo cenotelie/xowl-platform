@@ -96,12 +96,12 @@ class XOWLConsistencyRule implements ConsistencyRule {
 
     @Override
     public String getIdentifier() {
-        return original.getName();
+        return original.getIdentifier();
     }
 
     @Override
     public String getName() {
-        return original.getName();
+        return name;
     }
 
     @Override
@@ -115,13 +115,8 @@ class XOWLConsistencyRule implements ConsistencyRule {
     }
 
     @Override
-    public String getUserName() {
-        return name;
-    }
-
-    @Override
     public String serializedString() {
-        return original.getName();
+        return original.getIdentifier();
     }
 
     @Override
@@ -129,7 +124,7 @@ class XOWLConsistencyRule implements ConsistencyRule {
         return "{\"type\": \"" +
                 TextUtils.escapeStringJSON(ConsistencyRule.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(original.getName()) +
+                TextUtils.escapeStringJSON(original.getIdentifier()) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +
                 "\", \"definition\": \"" +

@@ -528,7 +528,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return reply;
         reply = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE_METADATA) + "> {" +
                 "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_RULE) + "> ." +
-                "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(rule.getUserName()) + "\" ." +
+                "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(KernelSchema.NAME) + "> \"" + TextUtils.escapeStringW3C(rule.getName()) + "\" ." +
                 "<" + TextUtils.escapeAbsoluteURIW3C(rule.getIdentifier()) + "> <" + TextUtils.escapeAbsoluteURIW3C(IRI_DEFINITION) + "> \"" + TextUtils.escapeStringW3C(rule.getDefinition()) + "\" ." +
                 "} }", null, null);
         if (!reply.isSuccess())

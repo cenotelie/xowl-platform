@@ -97,7 +97,7 @@ abstract class XOWLFederationStore extends BaseDatabase implements TripleStore {
             return XSPReplyNetworkError.instance();
         metricStatistics = new MetricComposite(
                 ((XSPReplyResult<MetricComposite>) connection.getMetric()).getData(),
-                "Storage Service - Database statistics for " + name);
+                "Storage Service - Database statistics for " + identifier);
         return new XSPReplyResult<>(metricStatistics);
     }
 

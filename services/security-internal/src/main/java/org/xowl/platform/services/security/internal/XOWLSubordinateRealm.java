@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.remote.DeserializerForOSGi;
@@ -61,7 +62,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
 
     @Override
     public String getName() {
-        return "xOWL Subordinate Realm";
+        return PlatformUtils.NAME + " - xOWL Subordinate Realm";
     }
 
     @Override

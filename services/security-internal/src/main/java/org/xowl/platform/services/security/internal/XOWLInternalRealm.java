@@ -17,6 +17,8 @@
 
 package org.xowl.platform.services.security.internal;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLServer;
@@ -39,10 +41,7 @@ import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
-import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityRealm;
@@ -58,7 +57,7 @@ import java.util.*;
  *
  * @author Laurent Wouters
  */
-class XOWLInternalRealm implements SecurityRealm {
+class XOWLInternalRealm implements SecurityRealm, ManagedService {
     /**
      * The path to the resources
      */
@@ -129,7 +128,9 @@ class XOWLInternalRealm implements SecurityRealm {
         this.cacheGroups = new HashMap<>();
         this.cacheRoles = new HashMap<>();
         initializeDatabase();
-        Activator.register(this);
+        BundleContext context = FrameworkUtil.getBundle(XOWLInternalRealm.class).getBundleContext();
+        context.registerService(Service.class, this, null);
+        context.registerService(ManagedService.class, this, null);
     }
 
     /**
@@ -296,7 +297,26 @@ class XOWLInternalRealm implements SecurityRealm {
 
     @Override
     public String getName() {
-        return "xOWL Internal Realm";
+        return PlatformUtils.NAME + " - xOWL Internal Realm";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_IO;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        try {
+            server.close();
+        } catch (IOException exception) {
+            Logging.get().error(exception);
+        }
     }
 
     @Override
@@ -931,14 +951,6 @@ class XOWLInternalRealm implements SecurityRealm {
     public XSPReply removeRoleImplication(String sourceRole, String targetRole) {
         return XSPReplyUnsupported.instance();
     }
-
-    /**
-     * When the platform is stopping
-     */
-    public void onStop() {
-        server.serverShutdown();
-    }
-
 
     /**
      * Gets the name of an entity

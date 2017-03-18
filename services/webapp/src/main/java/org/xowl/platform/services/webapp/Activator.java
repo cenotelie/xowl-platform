@@ -35,17 +35,8 @@ import org.xowl.platform.services.webapp.impl.*;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The directory for the UI contributions
-     */
-    private ContributionDirectory contributionDirectory;
-
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        contributionDirectory = new XOWLContributionDirectory();
-        bundleContext.registerService(Service.class, contributionDirectory, null);
-        bundleContext.registerService(ContributionDirectory.class, contributionDirectory, null);
-
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
             public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
@@ -62,7 +53,7 @@ public class Activator implements BundleActivator {
                     @Override
                     public void onAvailable(BundleContext bundleContext, HttpService component) {
                         try {
-                            component.registerResources(PlatformHttp.getUriPrefixWeb(), PlatformHttp.getUriPrefixWeb(), new XOWLHttpContext(component, contributionDirectory));
+                            component.registerResources(PlatformHttp.getUriPrefixWeb(), PlatformHttp.getUriPrefixWeb(), new XOWLHttpContext(component));
                         } catch (Exception exception) {
                             Logging.get().error(exception);
                         }

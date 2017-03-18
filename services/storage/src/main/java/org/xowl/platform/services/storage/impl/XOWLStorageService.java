@@ -58,8 +58,8 @@ import org.xowl.platform.services.storage.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.storage.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.storage.jobs.PushArtifactToLiveJob;
 
-import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ import java.util.List;
  *
  * @author Laurent Wouters
  */
-public class XOWLStorageService implements StorageService, HttpApiService, Closeable {
+public class XOWLStorageService implements StorageService, HttpApiService, ManagedService {
     /**
      * The resource for the API's specification
      */
@@ -193,6 +193,25 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Storage Service";
+    }
+
+    @Override
+    public int getLifecycleTier() {
+        return TIER_IO;
+    }
+
+    @Override
+    public void onLifecycleStart() {
+        // do nothing
+    }
+
+    @Override
+    public void onLifecycleStop() {
+        try {
+            server.close();
+        } catch (IOException exception) {
+            Logging.get().error(exception);
+        }
     }
 
     @Override
@@ -805,10 +824,5 @@ public class XOWLStorageService implements StorageService, HttpApiService, Close
         Job job = new PushArtifactToLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
-    }
-
-    @Override
-    public void close() {
-        server.serverShutdown();
     }
 }

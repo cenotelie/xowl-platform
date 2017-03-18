@@ -19,10 +19,7 @@ package org.xowl.platform.services.storage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.platform.kernel.PlatformHttp;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.RegisterWaiter;
-import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -37,21 +34,17 @@ import org.xowl.platform.services.storage.jobs.StorageJobFactory;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The store service registered by this bundle
-     */
-    private XOWLStorageService storeService;
-
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
             public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
-                storeService = new XOWLStorageService();
+                XOWLStorageService storeService = new XOWLStorageService();
                 bundleContext.registerService(Service.class, storeService, null);
                 bundleContext.registerService(SecuredService.class, storeService, null);
                 bundleContext.registerService(HttpApiService.class, storeService, null);
                 bundleContext.registerService(MeasurableService.class, storeService, null);
+                bundleContext.registerService(ManagedService.class, storeService, null);
                 bundleContext.registerService(StorageService.class, storeService, null);
                 bundleContext.registerService(ArtifactStorageService.class, storeService, null);
 
@@ -62,7 +55,5 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        if (storeService != null)
-            storeService.close();
     }
 }

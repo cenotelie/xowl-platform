@@ -21,29 +21,12 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.security.SecurityRealmProvider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
  * Activator for this bundle
  *
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The created security realms
-     */
-    private static Collection<XOWLInternalRealm> realms = new ArrayList<>();
-
-    /**
-     * Register an internal security realm
-     *
-     * @param realm The realm to register
-     */
-    public static synchronized void register(XOWLInternalRealm realm) {
-        realms.add(realm);
-    }
-
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         bundleContext.registerService(SecurityRealmProvider.class, new XOWLInternalSecurityProvider(), null);
@@ -51,7 +34,5 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
-        for (XOWLInternalRealm realm : realms)
-            realm.onStop();
     }
 }

@@ -20,13 +20,16 @@ package org.xowl.platform.services.webapp.impl;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.xowl.infra.utils.http.HttpConstants;
+import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiResource;
-import org.xowl.platform.services.webapp.ContributionDirectory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
+import java.util.*;
 
 /**
  * Implements a default HTTP context
@@ -35,22 +38,48 @@ import java.net.URL;
  */
 public class XOWLHttpContext implements HttpContext {
     /**
+     * Represents a tree of contributions
+     */
+    private static class Folder {
+        /**
+         * The sub trees
+         */
+        public final Map<String, Folder> subs;
+        /**
+         * The contributions at this stage
+         */
+        public final List<WebUIContribution> contributions;
+
+        /**
+         * Initializes this folder
+         */
+        public Folder() {
+            this.subs = new HashMap<>();
+            this.contributions = new ArrayList<>();
+        }
+    }
+
+    /**
      * The reference default context
      */
     private final HttpContext defaultContext;
     /**
-     * The directory for the web contributions
+     * The root of the tree of contributions
      */
-    private final ContributionDirectory directory;
+    private final Folder root;
+    /**
+     * The registered contributions
+     */
+    private Collection<WebUIContribution> contributions;
 
     /**
      * Initialize this context
      *
      * @param httpService The HTTP service
      */
-    public XOWLHttpContext(HttpService httpService, ContributionDirectory directory) {
+    public XOWLHttpContext(HttpService httpService) {
         this.defaultContext = httpService.createDefaultHttpContext();
-        this.directory = directory;
+        this.root = new Folder();
     }
 
     @Override
@@ -74,15 +103,76 @@ public class XOWLHttpContext implements HttpContext {
     }
 
     /**
-     * Gets the resource URL for the requested name
+     * Gets the resource URL for the requested uri
      *
-     * @param name The name of a resource
+     * @param uri The uri of a resource
      * @return The corresponding URL, or null if there is none
      */
-    private URL doGetResource(String name) {
-        if (name.endsWith("/"))
-            name += "index.html";
-        return directory.resolveResource(name);
+    private URL doGetResource(String uri) {
+        if (uri.endsWith("/"))
+            uri += "index.html";
+        List<String> segments = URIUtils.getSegments(uri);
+        if (contributions == null) {
+            synchronized (this) {
+                if (contributions == null) {
+                    contributions = Register.getComponents(WebUIContribution.class);
+                    for (WebUIContribution contribution : contributions)
+                        register(contribution);
+                }
+            }
+        }
+        return doGetResource(root, segments, 0, uri);
+    }
+
+    /**
+     * Resolves a resource
+     *
+     * @param folder   The current folder
+     * @param segments The segments of the requested URI
+     * @param index    The index of the next segment
+     * @param uri      The requested URI
+     * @return The resolved URL, or null of there is none
+     */
+    private URL doGetResource(Folder folder, List<String> segments, int index, String uri) {
+        if (index < segments.size()) {
+            String segment = segments.get(index);
+            Folder child = folder.subs.get(segment);
+            if (child != null) {
+                URL result = doGetResource(child, segments, index + 1, uri);
+                if (result != null)
+                    return result;
+            }
+        }
+        WebUIContribution top = null;
+        for (int i = 0; i != folder.contributions.size(); i++) {
+            WebUIContribution contribution = folder.contributions.get(i);
+            if (top == null || contribution.getPriority() > top.getPriority())
+                top = contribution;
+        }
+        return top == null ? null : top.getResource(uri);
+    }
+
+    /**
+     * Registers a web contribution
+     *
+     * @param contribution The web contribution to register
+     */
+    private void register(WebUIContribution contribution) {
+        List<String> segments = URIUtils.getSegments(contribution.getPrefix());
+        Folder current = root;
+        for (int i = 0; i != segments.size(); i++) {
+            String name = segments.get(i);
+            if (name.isEmpty() && i == segments.size() - 1)
+                // last segment is empty, break here
+                break;
+            Folder child = current.subs.get(name);
+            if (child == null) {
+                child = new Folder();
+                current.subs.put(name, child);
+            }
+            current = child;
+        }
+        current.contributions.add(contribution);
     }
 
     /**

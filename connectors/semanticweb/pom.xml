@@ -1,33 +1,32 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.xowl.platform</groupId>
         <artifactId>xowl-connectors</artifactId>
-        <version>0.2.4-SNAPSHOT</version>
+        <version>0.3.0</version>
     </parent>
     <artifactId>xowl-connector-semanticweb</artifactId>
     <packaging>bundle</packaging>
-    <version>0.2.4-SNAPSHOT</version>
+    <version>0.3.0</version>
     <name>xOWL Collaboration Platform - Connector Semantic Web</name>
     <description>The connector and importer for Semantic Web datasets</description>
     <dependencies>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-kernel</artifactId>
-            <version>0.2.4-SNAPSHOT</version>
+            <version>0.3.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-connection</artifactId>
-            <version>0.2.4-SNAPSHOT</version>
+            <version>0.3.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-importation</artifactId>
-            <version>0.2.4-SNAPSHOT</version>
+            <version>0.3.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

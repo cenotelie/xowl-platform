@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.xowl.platform</groupId>
     <artifactId>xowl-platform</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.4-SNAPSHOT</version>
+    <version>0.3.0</version>
     <name>xOWL Collaboration Platform</name>
     <description>A platform for the federation of models and data supported by semantic web technologies.</description>
     <url>https://xowl.org/</url>
@@ -30,7 +29,7 @@
         <connection>scm:hg:https://bitbucket.org/xowl/xowl-platform</connection>
         <developerConnection>scm:hg:ssh://hg@bitbucket.org:xowl/xowl-platform</developerConnection>
         <url>https://bitbucket.org/xowl/xowl-platform</url>
-        <tag>HEAD</tag>
+        <tag>v0.3.0</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>

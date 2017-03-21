@@ -3,30 +3,30 @@
     <parent>
         <groupId>org.xowl.platform</groupId>
         <artifactId>xowl-connectors</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>xowl-connector-csv</artifactId>
     <packaging>bundle</packaging>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>xOWL Collaboration Platform - Connector CSV</name>
     <description>The CSV Connector and Importer</description>
     <dependencies>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-kernel</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-connection</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-importation</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

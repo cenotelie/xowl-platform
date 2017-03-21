@@ -3,24 +3,24 @@
     <parent>
         <groupId>org.xowl.platform</groupId>
         <artifactId>xowl-services</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>xowl-service-impact</artifactId>
     <packaging>bundle</packaging>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>xOWL Collaboration Platform - Service Impact</name>
     <description>The impact analysis service</description>
     <dependencies>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-kernel</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-storage</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

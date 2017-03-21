@@ -3,11 +3,11 @@
     <parent>
         <groupId>org.xowl.platform</groupId>
         <artifactId>xowl-platform</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>xowl-connectors</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>xOWL Collaboration Platform - Connectors</name>
     <description>The set of connectors for the xOWL platform</description>
     <modules>

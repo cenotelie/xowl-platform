@@ -3,18 +3,18 @@
     <parent>
         <groupId>org.xowl.platform</groupId>
         <artifactId>xowl-services</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>xowl-service-community</artifactId>
     <packaging>bundle</packaging>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>xOWL Collaboration Platform - Service Community</name>
     <description>The services related to community management on the platform.</description>
     <dependencies>
         <dependency>
             <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-kernel</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -240,8 +240,6 @@
 	margin-left: -11px;
 }
 
-
-
 .private-conversation {
     color: red;
 }
@@ -264,9 +262,14 @@ table.creation td {
 }
 
 button.mgmt {
-    margin: auto;
+    margin: 1px;
+}
+
+button.select {
+    margin: 2px auto 2px auto;
     max-height: 50px;
     display: list-item;
+    list-style-type: none;
 }
 
 select.users {

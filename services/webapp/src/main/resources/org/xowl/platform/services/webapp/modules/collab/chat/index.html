@@ -24,8 +24,7 @@
     <nav class="navbar navbar-default nav-conversations">
         <form class="navbar-form navbar-left">
             <div class="form-group">
-                <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal"
-                        data-target="#conversation-creation">
+                <button type="button" class="btn btn-primary navbar-btn" onclick="openCreationDialog()">
                     <span>New conversation</span>
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
                 </button>
@@ -42,7 +41,7 @@
         </form>
     </nav>
 
-    <table class="table table-hover">
+    <table class="table table-hover" id="conversations_table">
         <tr>
             <th>Topic</th>
             <th>Owner</th>
@@ -51,244 +50,94 @@
             <th>Finished</th>
             <th>Actions</th>
         </tr>
-        <tr class="private-conversation">
-            <td>Safety Requirements</td>
-            <td>Ali Koudri</td>
-            <td>Discussion about the elicitation of safety requirements of the system</td>
-            <td>16/01/2017</td>
-            <td>-</td>
-            <td>
-                <button type="button" class="btn btn-primary" data-toggle="tooltip" title="Enter">
-                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                </button>
-                <!-- FIXME: appears only for owner -->
-                <button type="button" class="btn btn-success"  data-toggle="modal"
-                        data-target="#conversation-configuration">
-                        <span class="glyphicon glyphicon-wrench" aria-hidden="true"
-                              data-toggle="tooltip" title="Configure"></span>
-                </button>
-                <button type="button" class="btn btn-success"  data-toggle="tooltip" title="Archive">
-                    <span class="glyphicon glyphicon-compressed" aria-hidden="true"></span>
-                </button>
-                <!-- Open if closed-->
-                <button type="button" class="btn btn-success"  data-toggle="tooltip" title="Close">
-                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                </button>
-                <button type="button" class="btn btn-danger"  data-toggle="tooltip" title="Remove">
-                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                </button>
-            </td>
-        </tr>
-        <tr class="public-conversation">
-            <td>Software Architecture</td>
-            <td>Stephen Creff</td>
-            <td>Discussion about the software choices for implementing software parts of the system</td>
-            <td>11/02/2017</td>
-            <td>-</td>
-            <td>
-                <button type="button" class="btn btn-primary"  data-toggle="tooltip" title="Enter">
-                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                </button>
-            </td>
-        </tr>
-        <tr class="public-conversation">
-            <td>Network Architecture</td>
-            <td>Laurent Wouters</td>
-            <td>Discussion about the deployment of the system over the network</td>
-            <td>25/02/2017</td>
-            <td>-</td>
-            <td>
-                <button type="button" class="btn btn-primary" data-toggle="tooltip" title="Observe">
-                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                </button>
-                <button type="button" class="btn btn-primary" data-toggle="tooltip" title="Adhere">
-                    <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                </button>
-            </td>
-        </tr>
     </table>
 
-    <div id="conversation-creation" class="modal fade" role="dialog">
+    <div id="conversation-edition" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Configure Conversation</h4>
+                    <h4 class="modal-title"></h4>
                 </div>
                 <div class="modal-body">
-                    <table class="creation">
-                        <tr>
-                            <td><label for="c_topic">Topic</label></td>
-                            <td colspan="2">
-                                <input type="text" placeholder="My topic name" id="c_topic" class="form-control"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="c_keywords">Keywords</label></td>
-                            <td><input type="text" placeholder="Keyword 1, Keyword 2, ..."
-                                       id="c_keywords" class="form-control"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"><label for="c_abstract">Abstract</label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <textarea class="form-control" id="c_abstract" rows="5"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="c_Visibility">Visibility</label></td>
-                            <td  colspan="2">
-                                <select id="c_visibility">
-                                    <option value="public">public</option>
-                                    <option value="private" selected>private</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"><label for="c_users">Participants</label></td>
-                        </tr>
-                        <tr style="border: 1px #dbdbdb solid; padding: 2px;">
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control users" id="c_users" multiple>
-                                        <option>Stephen Creff</option>
-                                        <option>Laurent Wouters</option>
-                                        <option>Michel Batteux</option>
-                                        <option>Sullivan Kuttler</option>
-                                        <option>Jérôme Le Noir</option>
-                                        <option>Sébastien Madelénat</option>
+                    <form><!--FIXME: validate form entries-->
+                        <table class="creation">
+                            <tr>
+                                <td><label for="e_topic">Topic</label></td>
+                                <td colspan="2">
+                                    <input type="text" placeholder="My topic name" id="e_topic" class="form-control" required/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="e_keywords">Keywords</label></td>
+                                <td colspan="2"><input type="text" placeholder="Keyword 1, Keyword 2, ..."
+                                                       id="e_keywords" class="form-control"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><label for="e_abstract">Abstract</label></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <textarea class="form-control" id="e_abstract" rows="5"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="e_Visibility">Visibility</label></td>
+                                <td  colspan="2">
+                                    <select id="e_visibility">
+                                        <option value="public">public</option>
+                                        <option value="private" selected>private</option>
                                     </select>
-                                </div>
-                            </td>
-                            <td style="text-align: center;">
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add">
-                                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add All">
-                                    <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Remove All">
-                                    <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Remove">
-                                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                                </button>
-                            </td>
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control users" id="c_participants" multiple>
-                                        <option>Makhlouf Hadj</option>
-                                        <option>Zeng Li</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><label for="e_non_participants">Participants</label></td>
+                            </tr>
+                            <tr style="border: 1px #dbdbdb solid; padding: 2px;">
+                                <td>
+                                    <div class="form-group">
+                                        <select class="form-control users" id="e_non_participants" multiple>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-default select"
+                                            onclick="addSelectedUsers()" data-toggle="tooltip" title="Add">
+                                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default select"
+                                            onclick="addAllUsers()" data-toggle="tooltip" title="Add All">
+                                        <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default select"
+                                            onclick="removeAllUsers()" data-toggle="tooltip" title="Remove All">
+                                        <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default select"
+                                            onclick="removeSelectedUsers()" data-toggle="tooltip" title="Remove">
+                                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <select class="form-control users" id="e_participants" multiple>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                 </div>
                 <div class="modal-footer">
                     <table class="creation">
                         <tr>
                             <td colspan="2">
-                                <button type="button" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-primary" id="conversation-save">Save</button>
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                             </td>
                         </tr>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="conversation-configuration" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Configure Conversation</h4>
-                </div>
-                <div class="modal-body">
-                    <table class="creation">
-                        <tr>
-                            <td><label for="m_topic">Topic</label></td>
-                            <td colspan="2">
-                                <input type="text" placeholder="My topic name" id="m_topic" value="Safety Requirements" class="form-control"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="m_keywords">Keywords</label></td>
-                            <td><input type="text" placeholder="Keyword 1, Keyword 2, ..."
-                                       id="m_keywords" value="SysML, OAR" class="form-control"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"><label for="m_abstract">Abstract</label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <textarea class="form-control" id="m_abstract" rows="5">Discussion about the elicitation of safety requirements of the system</textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="m_Visibility">Visibility</label></td>
-                            <td  colspan="2">
-                                <select id="m_visibility">
-                                    <option value="public">public</option>
-                                    <option value="private" selected>private</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"><label for="m_users">Participants</label></td>
-                        </tr>
-                        <tr style="border: 1px #dbdbdb solid; padding: 2px;">
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control users" id="m_users" multiple>
-                                        <option>Stephen Creff</option>
-                                        <option>Laurent Wouters</option>
-                                        <option>Michel Batteux</option>
-                                        <option>Sullivan Kuttler</option>
-                                        <option>Jérôme Le Noir</option>
-                                        <option>Sébastien Madelénat</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td style="text-align: center;">
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add">
-                                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Add All">
-                                    <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Remove All">
-                                    <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
-                                </button>
-                                <button type="button" class="btn btn-default mgmt" data-toggle="tooltip" title="Remove">
-                                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                                </button>
-                            </td>
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control users" id="m_participants" multiple>
-                                        <option>Makhlouf Hadj</option>
-                                        <option>Zeng Li</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <table class="creation">
-                        <tr>
-                            <td colspan="2">
-                                <button type="button" class="btn btn-primary">Save</button>
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                            </td>
-                        </tr>
-                    </table>
+                    </form>
                 </div>
             </div>
         </div>
@@ -303,7 +152,6 @@
 <script src="../../../xowl/xowl-api-platform.js"></script>
 <script src="../../../xowl/xowl-ui.js"></script>
 <script src="index.js"></script>
-<script>init();</script>
 </body>
 
 </html>

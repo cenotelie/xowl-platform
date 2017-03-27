@@ -41,14 +41,14 @@ function renderInconsistency(inconsistency, index) {
 	cell2.appendChild(icon);
 	cell2.appendChild(renderInconsistencyMessage(inconsistency));
 	icon = document.createElement("img");
-	icon.src = ROOT + "/assets/rule.svg";
+	icon.src = ROOT + "/assets/consistency-constraint.svg";
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
 	icon.title = inconsistency.ruleId;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(inconsistency.ruleName));
-	link.href = "rule.html?id=" + encodeURIComponent(inconsistency.ruleId);
+	link.href = "constraint.html?id=" + encodeURIComponent(inconsistency.ruleId);
 	var cell3 = document.createElement("td");
 	cell3.appendChild(icon);
 	cell3.appendChild(link);

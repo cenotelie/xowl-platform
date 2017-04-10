@@ -25,12 +25,14 @@ import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.loaders.*;
 import org.xowl.infra.store.owl.TranslationException;
 import org.xowl.infra.store.owl.Translator;
+import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -58,12 +60,20 @@ class SemanticWebLoader {
      * @return The reply
      */
     public XSPReply load(Reader reader, String resourceIRI, String syntax) {
+        IRINode graph = repository.getStore().getIRINode(resourceIRI);
         BufferedLogger bufferedLogger = new BufferedLogger();
         try {
             Collection<Quad> quads = load(bufferedLogger, reader, resourceIRI, syntax);
             if (quads == null || !bufferedLogger.getErrorMessages().isEmpty())
                 return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
-            return new XSPReplyResultCollection<>(quads);
+            Collection<Quad> result = new ArrayList<>(quads.size());
+            for (Quad quad : quads) {
+                if (quad.getGraph() != graph)
+                    result.add(new Quad(graph, quad.getSubject(), quad.getProperty(), quad.getObject()));
+                else
+                    result.add(quad);
+            }
+            return new XSPReplyResultCollection<>(result);
         } catch (TranslationException exception) {
             bufferedLogger.error(exception);
             return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());

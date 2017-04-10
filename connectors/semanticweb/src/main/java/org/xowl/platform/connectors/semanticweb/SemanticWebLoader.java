@@ -21,12 +21,11 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyResultCollection;
 import org.xowl.infra.store.Repository;
+import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.loaders.*;
 import org.xowl.infra.store.owl.TranslationException;
 import org.xowl.infra.store.owl.Translator;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.store.storage.NodeManager;
-import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -41,15 +40,15 @@ import java.util.Collection;
  */
 class SemanticWebLoader {
     /**
-     * The node manager when loading quads
+     * The repository to use for loading
      */
-    private final NodeManager nodeManager;
+    private final RepositoryRDF repository;
 
     /**
      * Initializes this structure
      */
     public SemanticWebLoader() {
-        this.nodeManager = new CachedNodes();
+        this.repository = new RepositoryRDF();
     }
 
     /**
@@ -81,30 +80,30 @@ class SemanticWebLoader {
     private Collection<Quad> load(Logger logger, Reader reader, String resourceIRI, String syntax) throws TranslationException {
         switch (syntax) {
             case Repository.SYNTAX_NTRIPLES:
-                return loadRDF(logger, reader, resourceIRI, new NTriplesLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new NTriplesLoader(repository.getStore()));
             case Repository.SYNTAX_NQUADS:
-                return loadRDF(logger, reader, resourceIRI, new NQuadsLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new NQuadsLoader(repository.getStore()));
             case Repository.SYNTAX_TURTLE:
-                return loadRDF(logger, reader, resourceIRI, new TurtleLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new TurtleLoader(repository.getStore()));
             case Repository.SYNTAX_RDFT:
-                return loadRDF(logger, reader, resourceIRI, new RDFTLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new RDFTLoader(repository.getStore()));
             case Repository.SYNTAX_RDFXML:
-                return loadRDF(logger, reader, resourceIRI, new RDFXMLLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new RDFXMLLoader(repository.getStore()));
             case Repository.SYNTAX_JSON_LD:
-                return loadRDF(logger, reader, resourceIRI, new JSONLDLoader(nodeManager) {
+                return loadRDF(logger, reader, resourceIRI, new JSONLDLoader(repository.getStore()) {
                     @Override
                     protected Reader getReaderFor(Logger logger, String iri) {
                         return null;
                     }
                 });
             case Repository.SYNTAX_TRIG:
-                return loadRDF(logger, reader, resourceIRI, new TriGLoader(nodeManager));
+                return loadRDF(logger, reader, resourceIRI, new TriGLoader(repository.getStore()));
             case Repository.SYNTAX_FUNCTIONAL_OWL2:
                 return loadOWL(logger, reader, resourceIRI, new FunctionalOWL2Loader());
             case Repository.SYNTAX_OWLXML:
                 return loadOWL(logger, reader, resourceIRI, new OWLXMLLoader());
             case Repository.SYNTAX_XOWL:
-                return loadOWL(logger, reader, resourceIRI, new XOWLLoader());
+                return loadOWL(logger, reader, resourceIRI, new XOWLLoader(repository.getExecutionManager()));
             default:
                 throw new IllegalArgumentException("Unsupported syntax: " + syntax);
         }
@@ -135,7 +134,7 @@ class SemanticWebLoader {
      */
     private Collection<Quad> loadOWL(Logger logger, Reader reader, String resourceIRI, Loader loader) throws TranslationException {
         OWLLoaderResult input = loader.loadOWL(logger, reader, resourceIRI);
-        Translator translator = new Translator(null, nodeManager);
+        Translator translator = new Translator(null, repository.getStore());
         return translator.translate(input);
     }
 }

@@ -21,10 +21,11 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IRIs;
+import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.loaders.JSONLDLoader;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
-import org.xowl.infra.store.loaders.RDFTLoader;
+import org.xowl.infra.store.loaders.xRDFLoader;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
@@ -454,7 +455,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         String id = IRI_RULE_BASE + "#" + SHA1.hashSHA1(name);
         String definition = prefixes + " rule distinct <" + TextUtils.escapeAbsoluteURIW3C(id) + "> {\n" + conditions + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
-        RDFTLoader loader = new RDFTLoader(new CachedNodes());
+        xRDFLoader loader = new xRDFLoader(new RepositoryRDF());
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_RULE_METADATA, IRI_RULE_METADATA);
         if (!logger.getErrorMessages().isEmpty())
             return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());

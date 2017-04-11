@@ -95,8 +95,6 @@ class SemanticWebLoader {
                 return loadRDF(logger, reader, resourceIRI, new NQuadsLoader(repository.getStore()));
             case Repository.SYNTAX_TURTLE:
                 return loadRDF(logger, reader, resourceIRI, new TurtleLoader(repository.getStore()));
-            case Repository.SYNTAX_RDFT:
-                return loadRDF(logger, reader, resourceIRI, new RDFTLoader(repository.getStore()));
             case Repository.SYNTAX_RDFXML:
                 return loadRDF(logger, reader, resourceIRI, new RDFXMLLoader(repository.getStore()));
             case Repository.SYNTAX_JSON_LD:
@@ -108,6 +106,8 @@ class SemanticWebLoader {
                 });
             case Repository.SYNTAX_TRIG:
                 return loadRDF(logger, reader, resourceIRI, new TriGLoader(repository.getStore()));
+            case Repository.SYNTAX_XRDF:
+                return loadRDF(logger, reader, resourceIRI, new xRDFLoader(repository));
             case Repository.SYNTAX_FUNCTIONAL_OWL2:
                 return loadOWL(logger, reader, resourceIRI, new FunctionalOWL2Loader());
             case Repository.SYNTAX_OWLXML:

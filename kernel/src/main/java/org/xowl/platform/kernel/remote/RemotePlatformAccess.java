@@ -1449,7 +1449,7 @@ public class RemotePlatformAccess extends HttpConnection {
     /**
      * Creates a new reasoning rule
      *
-     * @param definition The rule's RDFT definition
+     * @param definition The rule's xRDF definition
      * @param active     Whether the rule shall be immediately activated
      * @return The protocol reply
      */
@@ -1458,7 +1458,7 @@ public class RemotePlatformAccess extends HttpConnection {
                         "?active=" + Boolean.toString(active),
                 HttpConstants.METHOD_PUT,
                 definition.getBytes(IOUtils.CHARSET),
-                Repository.SYNTAX_RDFT,
+                Repository.SYNTAX_XRDF,
                 false,
                 HttpConstants.MIME_JSON);
     }
@@ -1745,7 +1745,7 @@ public class RemotePlatformAccess extends HttpConnection {
                         "&prefixes=" + URIUtils.encodeComponent(prefixes),
                 HttpConstants.METHOD_PUT,
                 conditions.getBytes(IOUtils.CHARSET),
-                Repository.SYNTAX_RDFT,
+                Repository.SYNTAX_XRDF,
                 false,
                 HttpConstants.MIME_JSON);
     }

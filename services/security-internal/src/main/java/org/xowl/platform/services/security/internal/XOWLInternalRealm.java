@@ -138,7 +138,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
      */
     private void initializeDatabase() {
         // (re-)upload the rules
-        XSPReply reply = database.upload(Repository.SYNTAX_RDFT, readResource("rules.rdft"));
+        XSPReply reply = database.upload(Repository.SYNTAX_XRDF, readResource("rules.xrdf"));
         if (!reply.isSuccess()) {
             Logging.get().error("Failed to initialize the security database");
             return;

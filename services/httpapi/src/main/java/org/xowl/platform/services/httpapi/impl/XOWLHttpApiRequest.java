@@ -115,8 +115,21 @@ class XOWLHttpApiRequest implements HttpApiRequest {
     public String[] getHeader(String name) {
         ArrayList<String> result = new ArrayList<>();
         Enumeration<String> values = request.getHeaders(name);
-        while (values.hasMoreElements())
-            result.add(values.nextElement());
+        while (values.hasMoreElements()) {
+            String value = values.nextElement();
+            if (value.contains(",")) {
+                String[] parts = value.split(",");
+                for (int i = 0; i != parts.length; i++) {
+                    String part = parts[i].trim();
+                    if (!part.isEmpty())
+                        result.add(part);
+                }
+            } else {
+                value = value.trim();
+                if (!value.isEmpty())
+                    result.add(value);
+            }
+        }
         return result.toArray(new String[result.size()]);
     }
 

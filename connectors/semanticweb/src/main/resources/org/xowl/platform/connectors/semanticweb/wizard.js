@@ -7,7 +7,8 @@ var importerId = localStorage.getItem(storageId + ".importer.identifier");
 var doc = {
 	type: "org.xowl.platform.services.importation.Document",
 	identifier: localStorage.getItem(storageId + ".document.identifier"),
-	name: localStorage.getItem(storageId + ".document.name")
+	name: localStorage.getItem(storageId + ".document.name"),
+	fileName: localStorage.getItem(storageId + ".document.fileName")
 };
 var metadata = {
 	name: localStorage.getItem(storageId + ".artifact.name"),
@@ -32,10 +33,27 @@ function init() {
 			option.appendChild(document.createTextNode(MIME_TYPES[i].name));
 			typesField.appendChild(option);
 		}
+		autoselectSyntax(typesField, doc.fileName);
 		document.getElementById("document-id").value = doc.identifier;
 		document.getElementById("document-name").value = doc.name;
 		document.getElementById("input-importer").value = importerId;
 	});
+}
+
+function autoselectSyntax(typesField, fileName) {
+	var fileType = null;
+	for (var i = 0; i != MIME_TYPES.length; i++) {
+		for (var j = 0; j != MIME_TYPES[i].extensions.length; j++) {
+			var suffix = MIME_TYPES[i].extensions[j];
+			if (fileName.indexOf(suffix, fileName.length - suffix.length) !== -1) {
+				fileType = MIME_TYPES[i];
+				break;
+			}
+		}
+	}
+	if (fileType !== null) {
+		typesField.value = fileType.value;
+	}
 }
 
 function onClickOk() {

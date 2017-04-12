@@ -146,6 +146,7 @@ function onClickNext() {
 	var storageId = "xowl.import." + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	localStorage.setItem(storageId + ".document.identifier", doc.identifier);
 	localStorage.setItem(storageId + ".document.name", doc.name);
+	localStorage.setItem(storageId + ".document.fileName", doc.fileName);
 	localStorage.setItem(storageId + ".importer.identifier", importer.identifier);
 	localStorage.setItem(storageId + ".artifact.name", artifactName);
 	localStorage.setItem(storageId + ".artifact.base", artifactBase);

@@ -113,7 +113,7 @@ class SemanticWebLoader {
             case Repository.SYNTAX_OWLXML:
                 return loadOWL(logger, reader, resourceIRI, new OWLXMLLoader());
             case Repository.SYNTAX_XOWL:
-                return loadOWL(logger, reader, resourceIRI, new XOWLLoader(repository.getExecutionManager()));
+                return loadOWL(logger, reader, resourceIRI, new xOWLLoader(repository.getExecutionManager()));
             default:
                 throw new IllegalArgumentException("Unsupported syntax: " + syntax);
         }

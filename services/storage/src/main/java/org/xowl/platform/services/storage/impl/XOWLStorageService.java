@@ -24,12 +24,9 @@ import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.remote.RemoteServer;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.RDFUtils;
-import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.store.writers.NQuadsSerializer;
-import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
@@ -516,7 +513,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
         if (right == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
-        return onMessageDiffArtifacts(left, right);
+        return onMessageDiffArtifacts(left, right, request.getHeader(HttpConstants.HEADER_ACCEPT));
     }
 
     /**
@@ -705,10 +702,13 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
-        return XSPReplyUtils.toHttpResponse(
-                new XSPReplyResult<>(new ResultQuads(artifact.getMetadata())),
-                Arrays.asList(accept)
-        );
+
+        BufferedLogger logger = new BufferedLogger();
+        String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
+        String content = RDFUtils.serialize(logger, artifact.getMetadata().iterator(), contentType);
+        if (!logger.getErrorMessages().isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
     /**
@@ -725,13 +725,16 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
-        Collection<Quad> content = artifact.getContent();
-        if (content == null)
+        Collection<Quad> quads = artifact.getContent();
+        if (quads == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"), null);
-        return XSPReplyUtils.toHttpResponse(
-                new XSPReplyResult<>(new ResultQuads(content)),
-                Arrays.asList(accept)
-        );
+
+        BufferedLogger logger = new BufferedLogger();
+        String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
+        String content = RDFUtils.serialize(logger, quads.iterator(), contentType);
+        if (!logger.getErrorMessages().isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
     /**
@@ -754,9 +757,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      *
      * @param artifactLeft  The identifier of the artifact on the left
      * @param artifactRight The identifier of the artifact on the right
+     * @param accept        The request's accepted content types
      * @return The artifact
      */
-    private HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight) {
+    private HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight, String[] accept) {
         XSPReply reply = retrieve(artifactLeft);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -778,16 +782,24 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
+
         BufferedLogger logger = new BufferedLogger();
+        String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
         StringWriter writer = new StringWriter();
-        RDFSerializer serializer = new NQuadsSerializer(writer);
         writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + IOUtils.LINE_SEPARATOR);
-        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + IOUtils.LINE_SEPARATOR);
-        serializer.serialize(logger, changeset.getAdded().iterator());
+        writer.write("Content-Type: " + contentType + IOUtils.LINE_SEPARATOR);
+        RDFUtils.serialize(writer, logger, changeset.getAdded().iterator(), contentType);
+        writer.write(IOUtils.LINE_SEPARATOR);
         writer.write("--" + HttpConstants.MULTIPART_BOUNDARY + IOUtils.LINE_SEPARATOR);
-        writer.write("Content-Type: " + Repository.SYNTAX_NQUADS + IOUtils.LINE_SEPARATOR);
-        serializer.serialize(logger, changeset.getRemoved().iterator());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY, writer.toString());
+        writer.write("Content-Type: " + contentType + IOUtils.LINE_SEPARATOR);
+        RDFUtils.serialize(writer, logger, changeset.getRemoved().iterator(), contentType);
+
+        if (!logger.getErrorMessages().isEmpty())
+            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+        return new HttpResponse(
+                HttpURLConnection.HTTP_OK,
+                HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY,
+                writer.toString());
     }
 
     /**

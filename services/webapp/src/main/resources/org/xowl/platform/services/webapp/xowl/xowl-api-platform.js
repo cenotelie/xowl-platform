@@ -1261,13 +1261,13 @@ XOWL.prototype.deleteArtifact = function (callback, artifactId) {
 XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			var leftIndex = content.indexOf("--xowlQuads");
-			var rightIndex = content.lastIndexOf("--xowlQuads");
-			var contentLeft = content.substring(leftIndex + "--xowlQuads".length, rightIndex);
-			var contentRight = content.substring(rightIndex + "--xowlQuads".length);
+			var leftIndex = content.indexOf("--xowl_boundary");
+			var rightIndex = content.lastIndexOf("--xowl_boundary");
+			var contentLeft = content.substring(leftIndex + "--xowl_boundary".length, rightIndex);
+			var contentRight = content.substring(rightIndex + "--xowl_boundary".length);
 			callback(code, MIME_JSON, {
-				left: contentLeft,
-				right: contentRight
+				added: JSON.parse(contentLeft),
+				removed: JSON.parse(contentRight)
 			});
 		} else {
 			callback(code, type, content);

@@ -1263,8 +1263,8 @@ XOWL.prototype.diffArtifacts = function (callback, artifactLeft, artifactRight) 
 		if (code === 200) {
 			var leftIndex = content.indexOf("--xowl_boundary");
 			var rightIndex = content.lastIndexOf("--xowl_boundary");
-			var contentLeft = content.substring(leftIndex + "--xowl_boundary".length, rightIndex);
-			var contentRight = content.substring(rightIndex + "--xowl_boundary".length);
+			var contentLeft = content.substring(leftIndex + "--xowl_boundary".length + 1 + "Content-Type: ".length + MIME_JSON.length, rightIndex);
+			var contentRight = content.substring(rightIndex + "--xowl_boundary".length + 1 + "Content-Type: ".length + MIME_JSON.length);
 			callback(code, MIME_JSON, {
 				added: JSON.parse(contentLeft),
 				removed: JSON.parse(contentRight)

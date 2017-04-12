@@ -49,9 +49,9 @@ function renderMetadataLeft(metadata) {
 	for (var i = 0; i != properties.length; i++) {
 		var name = properties[i].id;
 		if (name === "http://xowl.org/platform/schemas/kernel#name")
-			document.getElementById("artifact-left-name").value = properties[i].value.lexical;
+			document.getElementById("artifact-left-name").value = properties[i].value.value;
 		else if (name === "http://xowl.org/platform/schemas/kernel#version")
-			document.getElementById("artifact-left-version").value = properties[i].value.lexical;
+			document.getElementById("artifact-left-version").value = properties[i].value.value;
 	}
 }
 
@@ -62,9 +62,9 @@ function renderMetadataRight(metadata) {
 	for (var i = 0; i != properties.length; i++) {
 		var name = properties[i].id;
 		if (name === "http://xowl.org/platform/schemas/kernel#name")
-			document.getElementById("artifact-right-name").value = properties[i].value.lexical;
+			document.getElementById("artifact-right-name").value = properties[i].value.value;
 		else if (name === "http://xowl.org/platform/schemas/kernel#version")
-			document.getElementById("artifact-right-version").value = properties[i].value.lexical;
+			document.getElementById("artifact-right-version").value = properties[i].value.value;
 	}
 }
 
@@ -158,7 +158,7 @@ function renderGetRowHeader(name) {
 	row.className = "diff-entity";
 	var cellTitle = document.createElement("td");
 	var title = document.createElement("strong");
-	title.appendChild(rdfToDom({ type: "iri", value: name }));
+	title.appendChild(renderRdfNode({ type: "iri", value: name }));
 	cellTitle.appendChild(title);
 	var cellButton = document.createElement("td");
 	var span = document.createElement("span");
@@ -182,11 +182,11 @@ function renderGetRowDiff(type, property, value) {
 	var cell1 = document.createElement("td");
 	cell1.appendChild(indicator);
 	var cell2 = document.createElement("td");
-	cell2.appendChild(rdfToDom({ type: "iri", value: property }));
+	cell2.appendChild(renderRdfNode({ type: "iri", value: property }));
 	var cell3 = document.createElement("td");
 	cell3.appendChild(document.createTextNode("="));
 	var cell4 = document.createElement("td");
-	cell4.appendChild(rdfToDom(value));
+	cell4.appendChild(renderRdfNode(value));
 	row.appendChild(cell1);
 	row.appendChild(cell2);
 	row.appendChild(cell3);

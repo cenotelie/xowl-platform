@@ -190,8 +190,8 @@ function renderAttributes(entity) {
 		var row = document.createElement("tr");
 		var cell1 = document.createElement("td");
 		var cell2 = document.createElement("td");
-		cell1.appendChild(rdfToDom({ type: "iri", value: pair.id }));
-		cell2.appendChild(rdfToDom(pair.value));
+		cell1.appendChild(renderRdfNode({ type: "uri", value: pair.id }));
+		cell2.appendChild(renderRdfNode(pair.value));
 		row.appendChild(cell1);
 		row.appendChild(cell2);
 		table.appendChild(row);

@@ -78,7 +78,7 @@ function renderInconsistencyMessage(inconsistency) {
 			if (!inconsistency.antecedents.hasOwnProperty(name))
 				continue;
 			span.appendChild(document.createTextNode(buffer));
-			span.appendChild(rdfToDom(inconsistency.antecedents[name]));
+			span.appendChild(renderRdfNode(inconsistency.antecedents[name]));
 			buffer = "";
 			i = j - 1;
 		} else {

@@ -548,12 +548,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
                 case "/metadata": {
                     if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                    return onMessageGetArtifactMetadata(artifactId);
+                    return onMessageGetArtifactMetadata(artifactId, request.getHeader(HttpConstants.HEADER_ACCEPT));
                 }
                 case "/content": {
                     if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                    return onMessageGetArtifactContent(artifactId);
+                    return onMessageGetArtifactContent(artifactId, request.getHeader(HttpConstants.HEADER_ACCEPT));
                 }
                 case "/activate": {
                     if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
@@ -695,31 +695,30 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      * Responds to a request for the header of a specified artifact
      *
      * @param artifactId The identifier of an artifact
+     * @param accept     The request's accepted content types
      * @return The response
      */
-    private HttpResponse onMessageGetArtifactMetadata(String artifactId) {
+    private HttpResponse onMessageGetArtifactMetadata(String artifactId, String[] accept) {
         XSPReply reply = retrieve(artifactId);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
         if (artifact == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
-        BufferedLogger logger = new BufferedLogger();
-        StringWriter writer = new StringWriter();
-        RDFSerializer serializer = new NQuadsSerializer(writer);
-        serializer.serialize(logger, artifact.getMetadata().iterator());
-        if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
+        return XSPReplyUtils.toHttpResponse(
+                new XSPReplyResult<>(new ResultQuads(artifact.getMetadata())),
+                Arrays.asList(accept)
+        );
     }
 
     /**
      * Responds to a request for the content of a specified artifact
      *
      * @param artifactId The identifier of an artifact
+     * @param accept     The request's accepted content types
      * @return The artifact
      */
-    private HttpResponse onMessageGetArtifactContent(String artifactId) {
+    private HttpResponse onMessageGetArtifactContent(String artifactId, String[] accept) {
         XSPReply reply = retrieve(artifactId);
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
@@ -729,13 +728,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         Collection<Quad> content = artifact.getContent();
         if (content == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"), null);
-        BufferedLogger logger = new BufferedLogger();
-        StringWriter writer = new StringWriter();
-        RDFSerializer serializer = new NQuadsSerializer(writer);
-        serializer.serialize(logger, content.iterator());
-        if (!logger.getErrorMessages().isEmpty())
-            return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, HttpConstants.MIME_TEXT_PLAIN, logger.getErrorsAsString());
-        return new HttpResponse(HttpURLConnection.HTTP_OK, Repository.SYNTAX_NQUADS, writer.toString());
+        return XSPReplyUtils.toHttpResponse(
+                new XSPReplyResult<>(new ResultQuads(content)),
+                Arrays.asList(accept)
+        );
     }
 
     /**

@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var artifactId = getParameterByName("id");
 var artifactName = null;
 var CONTENT = null;
+var resultCount = 0;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -90,32 +91,14 @@ function renderMetadata(metadata) {
 }
 
 function renderContent(content) {
-	CONTENT = parseNQuads(content);
-	var table = document.getElementById("content");
-	var names = Object.getOwnPropertyNames(CONTENT);
-	for (var p = 0; p != names.length; p++) {
-		var entity = CONTENT[names[p]];
-		for (var j = 0; j != entity.properties.length; j++) {
-			var property = entity.properties[j];
-			var row = document.createElement("tr");
-			var cell0 = document.createElement("td");
-			var cell1 = document.createElement("td");
-			var cell2 = document.createElement("td");
-			var cell3 = document.createElement("td");
-			cell0.appendChild(document.createTextNode((p + 1).toString() + "." + (j + 1).toString()));
-			cell0.className = "entity" + (p % 2).toString();
-			cell1.appendChild(rdfToDom({ type: "iri", value: entity.id }));
-			cell1.className = "entity" + (p % 2).toString();
-			cell2.appendChild(rdfToDom({ type: "iri", value: property.id }));
-			cell2.className = "entity" + (p % 2).toString();
-			cell3.appendChild(rdfToDom(property.value));
-			cell3.className = "entity" + (p % 2).toString();
-			row.appendChild(cell0);
-			row.appendChild(cell1);
-			row.appendChild(cell2);
-			row.appendChild(cell3);
-			table.appendChild(row);
-		}
-	}
-	document.getElementById("button-retrieve").style.display = "none";
+	renderRdfQuads(content, injectResult);
+}
+
+function injectResult(row) {
+	resultCount++;
+	var data = document.getElementById("content");
+	var cell = document.createElement("td");
+	cell.appendChild(document.createTextNode(resultCount.toString()));
+	row.replaceChild(cell, row.firstChild);
+	data.appendChild(row);
 }

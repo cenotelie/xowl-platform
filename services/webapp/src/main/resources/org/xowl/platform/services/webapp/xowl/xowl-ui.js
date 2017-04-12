@@ -755,16 +755,16 @@ function waitForJob(jobId, jobName, callback) {
  * The known MIME types for the RDF and OWL datasets
  */
 var MIME_TYPES = [
-	{ name: "N-Triples", value: "application/n-triples", extensions: [".nt"] },
-	{ name: "N-Quads", value: "application/n-quads", extensions: [".nq"] },
-	{ name: "Turtle", value: "text/turtle", extensions: [".ttl"] },
-	{ name: "TriG", value: "application/trig", extensions: [".trig"] },
-	{ name: "JSON-LD", value: "application/ld+json", extensions: [".jsonld"] },
-	{ name: "RDF/XML", value: "application/rdf+xml", extensions: [".rdf"] },
-	{ name: "Functional OWL2", value: "text/owl-functional", extensions: [".ofn", ".fs"] },
-	{ name: "OWL/XML", value: "application/owl+xml", extensions: [".owx", ".owl"] },
-	{ name: "xOWL - Executable RDF", value: "application/x-xowl-xrdf", extensions: [".xrdf"] },
-	{ name: "xOWL - Executable OWL", value: "application/x-xowl-xowl", extensions: [".xowl"] }
+	{ name: 'N-Triples', value: 'application/n-triples', extensions: ['.nt'] },
+	{ name: 'N-Quads', value: 'application/n-quads', extensions: ['.nq'] },
+	{ name: 'Turtle', value: 'text/turtle', extensions: ['.ttl'] },
+	{ name: 'TriG', value: 'application/trig', extensions: ['.trig'] },
+	{ name: 'JSON-LD', value: 'application/ld+json', extensions: ['.jsonld'] },
+	{ name: 'RDF/XML', value: 'application/rdf+xml', extensions: ['.rdf'] },
+	{ name: 'Functional OWL2', value: 'text/owl-functional', extensions: ['.ofn', '.fs'] },
+	{ name: 'OWL/XML', value: 'application/owl+xml', extensions: ['.owx', '.owl'] },
+	{ name: 'xOWL - Executable RDF', value: 'application/x-xowl-xrdf', extensions: ['.xrdf'] },
+	{ name: 'xOWL - Executable OWL', value: 'application/x-xowl-xowl', extensions: ['.xowl'] }
 ];
 
 /*
@@ -797,8 +797,8 @@ function getShortURI(value) {
  * @param value An RDF node (represented as a Javascript object)
  * @return The HTML DOM rendering of the node
  */
-function rdfToDom(value) {
-	if (value.type === "uri" || value.type === "iri") {
+function renderRdfNode(value) {
+	if (value.type === "uri") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(getShortURI(value.value)));
 		dom.href = ROOT + "/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.value);
@@ -814,34 +814,7 @@ function rdfToDom(value) {
 		dom.appendChild(document.createTextNode("_:" + value.id));
 		dom.classList.add("rdfBlank");
 		return dom;
-	} else if (value.type === "variable") {
-		var dom = document.createElement("span");
-		dom.appendChild(document.createTextNode("?" + value.value));
-		dom.classList.add("rdfVariable");
-		return dom;
-	} else if (value.hasOwnProperty("lexical")) {
-		var span1 = document.createElement("span");
-		span1.appendChild(document.createTextNode('"' + value.lexical + '"'));
-		var dom = document.createElement("span");
-		dom.classList.add("rdfLiteral");
-		dom.appendChild(span1);
-		if (value.datatype !== null) {
-			dom.appendChild(document.createTextNode("^^<"));
-			var link = document.createElement("a");
-			link.appendChild(document.createTextNode(getShortURI(value.datatype)));
-			link.href = ROOT + "/modules/core/discovery/explorer.html?id=" + encodeURIComponent(value.datatype);
-			link.classList.add("rdfIRI");
-			dom.appendChild(link);
-			dom.appendChild(document.createTextNode(">"));
-		}
-		if (value.lang !== null) {
-			var span2 = document.createElement("span");
-			span2.appendChild(document.createTextNode("@" + value.lang));
-			span2.classList.add("badge");
-			dom.appendChild(span2);
-		}
-		return dom;
-	} else {
+	} else if (value.type === "literal") {
 		var span1 = document.createElement("span");
 		span1.appendChild(document.createTextNode('"' + value.value + '"'));
 		var dom = document.createElement("span");
@@ -863,7 +836,130 @@ function rdfToDom(value) {
 			dom.appendChild(span2);
 		}
 		return dom;
+	} else if (value.type === "variable") {
+		var dom = document.createElement("span");
+		dom.appendChild(document.createTextNode('?' + value.value));
+		dom.classList.add("rdfVariable");
+		return dom;
+	} else if (value.type === "anon") {
+		var dom = document.createElement("span");
+		dom.appendChild(document.createTextNode('_:' + value.value));
+		dom.classList.add("rdfAnonymous");
+		return dom;
+	} else if (value.type === "dynamic") {
+		var dom = document.createElement("span");
+		dom.appendChild(document.createTextNode('$ ' + value.value));
+		dom.classList.add("rdfDynamic");
+		return dom;
 	}
+	return null;
+}
+
+/*
+ * Renders an array of RDF nodes
+ *
+ * @param nodes     The RDF nodes to render
+ * @param injectRow The function to call when injecting a row into the DOM
+ */
+function renderRdfNodes(nodes, injectRow) {
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
+	for (var i = 0; i != nodes.length; i++) {
+		cell = document.createElement("td");
+		if (nodes[i] !== "")
+			cell.appendChild(renderRdfNode(nodes[i]));
+		row.appendChild(cell);
+	}
+	injectRow(row);
+}
+
+/*
+ * Renders RDF quads
+ *
+ * @param data      The object representing the quads
+ * @param injectRow The function to call when injecting a row into the DOM
+ */
+function renderRdfQuads(data, injectRow) {
+	for (var g = 0; g != data.length; g++) {
+		var dataGraph = data[g];
+		var nodeGraph = dataGraph.graph;
+		for (var e = 0; e != dataGraph.entities.length; e++) {
+			var dataEntity = dataGraph.entities[e];
+			var nodeSubject = dataEntity.subject;
+			for (var p = 0; p != dataEntity.properties.length; p++) {
+				var dataProperty = dataEntity.properties[p];
+				var nodeProperty = dataProperty.property;
+				for (var v = 0; v != dataProperty.values.length; v++) {
+					var dataValue = dataProperty.values[v];
+					if (Array.isArray(dataValue)) {
+						var root = renderRdfList(nodeGraph, dataValue, injectRow);
+						renderRdfNodes([nodeGraph, nodeSubject, nodeProperty, root], injectRow);
+					} else {
+						renderRdfNodes([nodeGraph, nodeSubject, nodeProperty, dataValue], injectRow);
+					}
+				}
+			}
+		}
+	}
+}
+
+/*
+ * Renders a RDF list
+ *
+ * @param nodeGraph The node for the graph
+ * @param values    The values in the list
+ * @param injectRow The function to call when injecting a row into the DOM
+ * @return The list's root node
+ */
+function renderRdfList(nodeGraph, values, injectRow) {
+	if (values.length == 0)
+		return {"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"};
+	var current = newRdfBlank();
+	var root = current;
+	for (var i = 0; i != values.length - 1; i++) {
+		var follower = newRdfBlank();
+		renderRdfNodes([
+			nodeGraph,
+			current,
+			{"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#first"},
+			values[i]], injectRow);
+		renderRdfNodes([
+			nodeGraph,
+			current,
+			{"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"},
+			follower], injectRow);
+		current = follower;
+	}
+	renderRdfNodes([
+		nodeGraph,
+		current,
+		{"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#first"},
+		values[values.length - 1]], injectRow);
+	renderRdfNodes([
+		nodeGraph,
+		current,
+		{"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"},
+		{"type": "uri", "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"}], injectRow);
+	return root;
+}
+
+/*
+ * The identifier for the next blank node to be generated
+ */
+var NEXT_BLANK = 0;
+
+/*
+ * Generates a new blank node
+ *
+ * @return The new blank node
+ */
+function newRdfBlank() {
+	var node = {
+		"type": "bnode",
+		"value": "list_" + NEXT_BLANK.toString()
+	};
+	NEXT_BLANK++;
+	return node;
 }
 
 

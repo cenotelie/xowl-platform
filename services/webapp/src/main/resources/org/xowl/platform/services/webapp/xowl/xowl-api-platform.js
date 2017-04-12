@@ -1231,7 +1231,7 @@ XOWL.prototype.getArtifact = function (callback, artifactId) {
 XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/n-quads", content);
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}
@@ -1241,7 +1241,7 @@ XOWL.prototype.getArtifactMetadata = function (callback, artifactId) {
 XOWL.prototype.getArtifactContent = function (callback, artifactId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, "application/n-quads", content);
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}

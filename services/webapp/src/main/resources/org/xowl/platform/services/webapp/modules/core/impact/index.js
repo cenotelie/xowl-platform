@@ -130,7 +130,7 @@ function renderElements(data) {
 			var property = entity.properties[j];
 			if (property.identifier.endsWith("name") || property.identifier.endsWith("label") || property.identifier.endsWith("title")) {
 				var value = property.value;
-				name = value.hasOwnProperty("lexical") ? value.lexical : value.value;
+				name = value.value;
 				name += " (" + entity.id + ")";
 			}
 		}

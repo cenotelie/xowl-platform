@@ -17,6 +17,7 @@
         <module>marketplace</module>
         <module>storage</module>
         <module>consistency</module>
+        <module>execution</module>
         <module>impact</module>
         <module>importation</module>
         <module>evaluation</module>

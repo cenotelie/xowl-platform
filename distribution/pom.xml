@@ -158,6 +158,12 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-service-execution</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-httpapi</artifactId>
             <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>

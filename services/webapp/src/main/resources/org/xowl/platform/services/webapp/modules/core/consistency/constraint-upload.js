@@ -61,7 +61,7 @@ function doImport(definitions, index) {
 	var definition = definitions[index];
 	if (!onOperationRequest("Importing constraint " + definition.name + " ..."))
 		return false;
-	xowl.addConsistencyRule(function (status, ct, content) {
+	xowl.addConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created constraint ", content, "."]});
 			if (index + 1 < definitions.length) {

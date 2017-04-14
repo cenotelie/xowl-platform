@@ -30,8 +30,9 @@ function init() {
 function onClickNewRule() {
 	if (!onOperationRequest("Creating new reasoning rule ..."))
 		return false;
+	var name = document.getElementById("input-name").value;
 	var definition = document.getElementById("input-definition").value;
-	if (definition === null || definition === "") {
+	if (name === null || name === "" || definition === null || definition === "") {
 		onOperationAbort("All fields are mandatory.");
 		return;
 	}
@@ -40,5 +41,5 @@ function onClickNewRule() {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created reasoning rule ", content, "."]});
 			waitAndGo("rules.html");
 		}
-	}, definition, false);
+	}, name, definition);
 }

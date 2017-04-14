@@ -1295,68 +1295,6 @@ XOWL.prototype.pushArtifactToLive = function (callback, artifactId) {
 	}, "services/storage/artifacts/" + encodeURIComponent(artifactId) + "/activate", null, "POST", null, null);
 }
 
-XOWL.prototype.getReasoningRules = function (callback) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules", null, "GET", null, null);
-}
-
-XOWL.prototype.getReasoningRule = function (callback, ruleId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules/" + encodeURIComponent(ruleId), null, "GET", null, null);
-}
-
-XOWL.prototype.newReasoningRule = function (callback, definition, active) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, MIME_JSON, JSON.parse(content));
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules", {
-		active: active
-	}, "PUT", "application/x-xowl-rdft", definition);
-}
-
-XOWL.prototype.activateReasoningRule = function (callback, ruleId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, null, null);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules/" + encodeURIComponent(ruleId) + "/activate", null, "POST", null, null);
-}
-
-XOWL.prototype.deactivateReasoningRule = function (callback, ruleId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, null, null);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules/" + encodeURIComponent(ruleId) + "/deactivate", null, "POST", null, null);
-}
-
-XOWL.prototype.deleteReasoningRule = function (callback, ruleId) {
-	this.doRequest(function (code, type, content) {
-		if (code === 200) {
-			callback(code, null, null);
-		} else {
-			callback(code, type, content);
-		}
-	}, "services/storage/rules/" + encodeURIComponent(ruleId), null, "DELETE", null, null);
-}
-
 
 
 /*****************************************************
@@ -1542,7 +1480,8 @@ XOWL.prototype.getInconsistencies = function (callback) {
 	}, "services/consistency/inconsistencies", null, "GET", null, null);
 }
 
-XOWL.prototype.getConsistencyRules = function (callback) {
+
+XOWL.prototype.getReasoningRules = function (callback) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -1552,7 +1491,7 @@ XOWL.prototype.getConsistencyRules = function (callback) {
 	}, "services/consistency/rules", null, "GET", null, null);
 }
 
-XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
+XOWL.prototype.getReasoningRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -1562,7 +1501,7 @@ XOWL.prototype.getConsistencyRule = function (callback, ruleId) {
 	}, "services/consistency/rules/" + encodeURIComponent(ruleId), null, "GET", null, null);
 }
 
-XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes, conditions) {
+XOWL.prototype.newReasoningRule = function (callback, name, definition) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -1570,13 +1509,11 @@ XOWL.prototype.newConsistencyRule = function (callback, name, message, prefixes,
 			callback(code, type, content);
 		}
 	}, "services/consistency/rules", {
-		name: name,
-		message: message,
-		prefixes: prefixes
-	}, "PUT", "application/x-xowl-rdft", conditions);
+		name: name
+	}, "PUT", "application/x-xowl-rdft", definition);
 }
 
-XOWL.prototype.addConsistencyRule = function (callback, rule) {
+XOWL.prototype.addReasoningRule = function (callback, rule) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -1586,7 +1523,7 @@ XOWL.prototype.addConsistencyRule = function (callback, rule) {
 	}, "services/consistency/rules/" + encodeURIComponent(rule.identifier), null, "PUT", MIME_JSON, rule);
 }
 
-XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
+XOWL.prototype.activateReasoningRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
@@ -1596,7 +1533,7 @@ XOWL.prototype.activateConsistencyRule = function (callback, ruleId) {
 	}, "services/consistency/rules/" + encodeURIComponent(ruleId) + "/activate", null, "POST", null, null);
 }
 
-XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
+XOWL.prototype.deactivateReasoningRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
@@ -1606,7 +1543,7 @@ XOWL.prototype.deactivateConsistencyRule = function (callback, ruleId) {
 	}, "services/consistency/rules/" + encodeURIComponent(ruleId) + "/deactivate", null, "POST", null, null);
 }
 
-XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
+XOWL.prototype.deleteReasoningRule = function (callback, ruleId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, null, null);
@@ -1614,6 +1551,80 @@ XOWL.prototype.deleteConsistencyRule = function (callback, ruleId) {
 			callback(code, type, content);
 		}
 	}, "services/consistency/rules/" + encodeURIComponent(ruleId), null, "DELETE", null, null);
+}
+
+XOWL.prototype.getConsistencyConstraints = function (callback) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints", null, "GET", null, null);
+}
+
+XOWL.prototype.getConsistencyConstraint = function (callback, constraintId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints/" + encodeURIComponent(constraintId), null, "GET", null, null);
+}
+
+XOWL.prototype.newConsistencyConstraint = function (callback, name, message, prefixes, conditions) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints", {
+		name: name,
+		message: message,
+		prefixes: prefixes
+	}, "PUT", "application/x-xowl-rdft", conditions);
+}
+
+XOWL.prototype.addConsistencyConstraint = function (callback, constraint) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, JSON.parse(content));
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints/" + encodeURIComponent(constraint.identifier), null, "PUT", MIME_JSON, constraint);
+}
+
+XOWL.prototype.activateConsistencyConstraint = function (callback, constraintId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints/" + encodeURIComponent(constraintId) + "/activate", null, "POST", null, null);
+}
+
+XOWL.prototype.deactivateConsistencyConstraint = function (callback, constraintId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints/" + encodeURIComponent(constraintId) + "/deactivate", null, "POST", null, null);
+}
+
+XOWL.prototype.deleteConsistencyConstraint = function (callback, constraintId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, null, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "services/consistency/constraints/" + encodeURIComponent(constraintId), null, "DELETE", null, null);
 }
 
 

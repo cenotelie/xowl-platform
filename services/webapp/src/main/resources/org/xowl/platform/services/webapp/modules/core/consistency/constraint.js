@@ -14,7 +14,7 @@ function init() {
 			return;
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getConsistencyRule(function (status, ct, content) {
+		xowl.getConsistencyConstraint(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
 				render(content);
 			}

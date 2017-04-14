@@ -29,7 +29,7 @@ function onClickNewRule() {
 		onOperationAbort("All fields are mandatory.");
 		return;
 	}
-	xowl.newConsistencyRule(function (status, ct, content) {
+	xowl.newConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created constraint ", content, "."]});
 			waitAndGo("constraints.html");

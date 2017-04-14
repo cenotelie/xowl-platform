@@ -61,7 +61,7 @@ function doImport(definitions, index) {
 	var definition = definitions[index];
 	if (!onOperationRequest("Importing reasoning rule " + definition.name + " ..."))
 		return false;
-	xowl.newReasoningRule(function (status, ct, content) {
+	xowl.addReasoningRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created reasoning rule ", content, "."]});
 			if (index + 1 < definitions.length) {
@@ -70,5 +70,5 @@ function doImport(definitions, index) {
 				waitAndGo("rules.html");
 			}
 		}
-	}, definition.definition, definition.isActive);
+	}, definition);
 }

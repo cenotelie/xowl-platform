@@ -10,26 +10,26 @@ function init() {
 			{name: "Constraints"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
-		xowl.getConsistencyRules(function (status, ct, content) {
+		xowl.getConsistencyConstraints(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				renderRules(content);
+				renderConstraints(content);
 			}
 		});
 	});
 }
 
-function renderRules(rules) {
+function renderConstraints(rules) {
 	rules.sort(function (x, y) {
 		return x.name.localeCompare(y.name);
 	});
 	var table = document.getElementById("rules");
 	for (var i = 0; i != rules.length; i++) {
-		table.appendChild(renderRule(rules[i], i));
+		table.appendChild(renderConstraint(rules[i], i));
 	}
 	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(rules));
 }
 
-function renderRule(rule, index) {
+function renderConstraint(rule, index) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 	cell.appendChild(document.createTextNode((index + 1).toString()));
@@ -102,7 +102,7 @@ function doActivateRule(toggle, rule) {
 		return;
 	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating constraint ", rule, " ..."]}))
 		return;
-	xowl.activateConsistencyRule(function (status, ct, content) {
+	xowl.activateConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated constraint ", rule, "."]});
 			rule.isActive = true;
@@ -117,7 +117,7 @@ function doDeactivateRule(toggle, rule) {
 		return;
 	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating constraint ", rule, " ..."]}))
 		return;
-	xowl.deactivateConsistencyRule(function (status, ct, content) {
+	xowl.deactivateConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated constraint ", rule, "."]});
 			rule.isActive = false;
@@ -132,7 +132,7 @@ function onDeleteRule(rule) {
 		return;
 	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting constraint ", rule, " ..."]}))
 		return;
-	xowl.deleteConsistencyRule(function (status, ct, content) {
+	xowl.deleteConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted constraint ", rule, "."]});
 			// TODO: do not do a full reload

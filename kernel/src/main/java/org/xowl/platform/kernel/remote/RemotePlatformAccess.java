@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.remote;
 
-import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyException;
 import org.xowl.infra.server.xsp.XSPReplyResult;
@@ -1426,80 +1425,6 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
-     * Gets the current reasoning rules deployed on the live database
-     *
-     * @return The protocol reply
-     */
-    public XSPReply getReasoningRules() {
-        return doRequest("/services/storage/rules", HttpConstants.METHOD_GET);
-    }
-
-    /**
-     * Gets the description of a specific reasoning rule
-     *
-     * @param ruleId The identifier of the rule
-     * @return The protocol reply
-     */
-    public XSPReply getReasoningRule(String ruleId) {
-        return doRequest(
-                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId),
-                HttpConstants.METHOD_GET);
-    }
-
-    /**
-     * Creates a new reasoning rule
-     *
-     * @param definition The rule's xRDF definition
-     * @param active     Whether the rule shall be immediately activated
-     * @return The protocol reply
-     */
-    public XSPReply newReasoningRule(String definition, boolean active) {
-        return doRequest("/services/storage/rules" +
-                        "?active=" + Boolean.toString(active),
-                HttpConstants.METHOD_PUT,
-                definition.getBytes(IOUtils.CHARSET),
-                Repository.SYNTAX_XRDF,
-                false,
-                HttpConstants.MIME_JSON);
-    }
-
-    /**
-     * Activates a reasoning rule
-     *
-     * @param ruleId The identifier of the rule
-     * @return The protocol reply
-     */
-    public XSPReply activateReasoningRule(String ruleId) {
-        return doRequest(
-                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
-                HttpConstants.METHOD_POST);
-    }
-
-    /**
-     * Deactivates a reasoning rule
-     *
-     * @param ruleId The identifier of the rule
-     * @return The protocol reply
-     */
-    public XSPReply deactivateReasoningRule(String ruleId) {
-        return doRequest(
-                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
-                HttpConstants.METHOD_POST);
-    }
-
-    /**
-     * Deletes a reasoning rule
-     *
-     * @param ruleId The identifier of the rule
-     * @return The protocol reply
-     */
-    public XSPReply deleteReasoningRule(String ruleId) {
-        return doRequest(
-                "/services/storage/rules/" + URIUtils.encodeComponent(ruleId),
-                HttpConstants.METHOD_DELETE);
-    }
-
-    /**
      * Gets the list of the available importers for uploaded documents
      *
      * @return The protocol reply
@@ -1709,28 +1634,102 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
-     * Gets the current consistency rules used to detect inconsistencies in the live data
+     * Gets the current reasoning rules deployed on the live database
      *
      * @return The protocol reply
      */
-    public XSPReply getConsistencyRules() {
+    public XSPReply getReasoningRules() {
         return doRequest("/services/consistency/rules", HttpConstants.METHOD_GET);
     }
 
     /**
-     * Gets the description of a specific consistency rule
+     * Gets the description of a specific reasoning rule
      *
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply getConsistencyRule(String ruleId) {
+    public XSPReply getReasoningRule(String ruleId) {
         return doRequest(
                 "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_GET);
     }
 
     /**
-     * Creates a new consistency rule
+     * Creates a new reasoning rule
+     *
+     * @param name       The name for the new rule
+     * @param definition The rule's xRDF definition
+     * @return The protocol reply
+     */
+    public XSPReply newReasoningRule(String name, String definition) {
+        return doRequest("/services/consistency/rules" +
+                        "?name=" + URIUtils.encodeComponent(name),
+                HttpConstants.METHOD_PUT,
+                definition.getBytes(IOUtils.CHARSET),
+                Repository.SYNTAX_XRDF,
+                false,
+                HttpConstants.MIME_JSON);
+    }
+
+    /**
+     * Activates a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply activateReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Deactivates a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deactivateReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Deletes a reasoning rule
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply deleteReasoningRule(String ruleId) {
+        return doRequest(
+                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_DELETE);
+    }
+
+    /**
+     * Gets the current consistency constraints used to detect inconsistencies in the live data
+     *
+     * @return The protocol reply
+     */
+    public XSPReply getConsistencyConstraints() {
+        return doRequest("/services/consistency/constraints", HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Gets the description of a specific consistency constraint
+     *
+     * @param ruleId The identifier of the rule
+     * @return The protocol reply
+     */
+    public XSPReply getConsistencyConstraint(String ruleId) {
+        return doRequest(
+                "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Creates a new consistency constraint
      *
      * @param name       The rule's name
      * @param message    The message produced by the rule
@@ -1738,8 +1737,8 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param conditions The conditions for matching the rule
      * @return The protocol reply
      */
-    public XSPReply newConsistencyRule(String name, String message, String prefixes, String conditions) {
-        return doRequest("/services/consistency/rules" +
+    public XSPReply newConsistencyConstraint(String name, String message, String prefixes, String conditions) {
+        return doRequest("/services/consistency/constraints" +
                         "?name=" + URIUtils.encodeComponent(name) +
                         "&message=" + URIUtils.encodeComponent(message) +
                         "&prefixes=" + URIUtils.encodeComponent(prefixes),
@@ -1751,50 +1750,38 @@ public class RemotePlatformAccess extends HttpConnection {
     }
 
     /**
-     * Adds a new consistency rule
-     *
-     * @param rule The consistency rule to add
-     * @return The protocol reply
-     */
-    public XSPReply addConsistencyRule(XOWLRule rule) {
-        return doRequest("/services/consistency/rules/" + URIUtils.encodeComponent(rule.getName()),
-                HttpConstants.METHOD_PUT,
-                rule);
-    }
-
-    /**
-     * Activates a consistency rule
+     * Activates a consistency constraint
      *
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply activateConsistencyRule(String ruleId) {
+    public XSPReply activateConsistencyConstraint(String ruleId) {
         return doRequest(
-                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
+                "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId) + "/activate",
                 HttpConstants.METHOD_POST);
     }
 
     /**
-     * Deactivates a consistency rule
+     * Deactivates a consistency constraint
      *
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deactivateConsistencyRule(String ruleId) {
+    public XSPReply deactivateConsistencyConstraint(String ruleId) {
         return doRequest(
-                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
+                "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
                 HttpConstants.METHOD_POST);
     }
 
     /**
-     * Deletes a consistency rule
+     * Deletes a consistency constraint
      *
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deleteConsistencyRule(String ruleId) {
+    public XSPReply deleteConsistencyConstraint(String ruleId) {
         return doRequest(
-                "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
+                "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_DELETE);
     }
 

@@ -2,41 +2,5 @@
   "$schema": "http://json-schema.org/schema",
   "id": "http://xowl.org/platform/services/storage/schema",
   "definitions": {
-    "XOWLRule": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "org.xowl.infra.server.api.XOWLRule"
-          ]
-        },
-        "name": {
-          "type": "string"
-        },
-        "definition": {
-          "type": "string"
-        },
-        "isActive": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "type",
-        "name",
-        "definition",
-        "isActive"
-      ]
-    },
-    "XOWLRules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "oneOf": [
-          {
-            "$ref": "#/definitions/XOWLRule"
-          }
-        ]
-      }
-    }
   }
 }

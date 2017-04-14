@@ -410,8 +410,6 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             return handleArtifactsLive();
         } else if (request.getUri().startsWith(apiUri + "/artifacts")) {
             return handleArtifact(request);
-        } else if (request.getUri().startsWith(apiUri + "/rules")) {
-            return handleRules(request);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -565,62 +563,6 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             }
         }
         return null;
-    }
-
-    /**
-     * Handles a request for the /rules resource
-     *
-     * @param request The request
-     * @return The response
-     */
-    private HttpResponse handleRules(HttpApiRequest request) {
-        String rest = request.getUri().substring(apiUri.length() + "/rules".length());
-        if (rest.isEmpty()) {
-            switch (request.getMethod()) {
-                case HttpConstants.METHOD_GET:
-                    return XSPReplyUtils.toHttpResponse(getLiveStore().getRules(), null);
-                case HttpConstants.METHOD_PUT: {
-                    String active = request.getParameter("active");
-                    if (active == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'active'"), null);
-                    String content = new String(request.getContent(), IOUtils.CHARSET);
-                    if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    return XSPReplyUtils.toHttpResponse(getLiveStore().addRule(content, active.equalsIgnoreCase("true")), null);
-                }
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
-        }
-
-        rest = rest.substring(1);
-        int index = rest.indexOf("/");
-        String ruleId = rest.substring(0, index != -1 ? index : rest.length());
-        ruleId = URIUtils.decodeComponent(ruleId);
-
-        if (index != -1) {
-            rest = rest.substring(index);
-            if (rest.equals("/status")) {
-                if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
-                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return XSPReplyUtils.toHttpResponse(getLiveStore().getRuleStatus(ruleId), null);
-            }
-            if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
-                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            if (rest.equals("/activate"))
-                return XSPReplyUtils.toHttpResponse(getLiveStore().activateRule(ruleId), null);
-            if (rest.equals("/deactivate"))
-                return XSPReplyUtils.toHttpResponse(getLiveStore().deactivateRule(ruleId), null);
-            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        } else {
-            // this is the naked rule
-            switch (request.getMethod()) {
-                case HttpConstants.METHOD_GET:
-                    return XSPReplyUtils.toHttpResponse(getLiveStore().getRule(ruleId), null);
-                case HttpConstants.METHOD_DELETE:
-                    return XSPReplyUtils.toHttpResponse(getLiveStore().removeRule(ruleId), null);
-            }
-            return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET, DELETE method");
-        }
     }
 
     @Override

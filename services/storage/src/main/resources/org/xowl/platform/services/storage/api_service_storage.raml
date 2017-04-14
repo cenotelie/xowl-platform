@@ -7,8 +7,6 @@ types:
   Job: !include schema_platform_kernel.json#/definitions/Job
   Artifact: !include schema_platform_kernel.json#/definitions/Artifact
   Artifacts: !include schema_platform_kernel.json#/definitions/Artifacts
-  XOWLRule: !include schema_platform_storage.json#/definitions/XOWLRule
-  XOWLRules: !include schema_platform_storage.json#/definitions/XOWLRules
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /services/storage:
@@ -280,100 +278,3 @@ baseUri: https://localhost:8443/api
                       "payload": "http://xowl.org/platform/artifacts/artifact1/v1",
                       "result": {}
                     }
-  /rules:
-    description: The collection of rules for the 'live' database
-    is: [secured, mayFail, resourceAccess]
-    get:
-      description: Gets the list of the rules for the 'live' database
-      responses:
-        200:
-          description: Returns the list of rules for the 'live' database
-          body:
-            application/json:
-              type: XOWLRules
-              example: |
-                [
-                  {
-                    "type": "org.xowl.infra.server.api.XOWLRule",
-                    "name": "http://xowl.org/rules/rule1",
-                    "definition": "...",
-                    "isActive": false
-                  }
-                ]
-    put:
-      description: Inserts a new rule in the 'live' database
-      queryParameters:
-        active:
-          displayName: Is Active
-          type: boolean
-          description: Whether the new rule shall be immediately active
-          example: false
-          required: true
-      body:
-        application/x-xowl-rdft:
-          displayName: Rule definition
-          type: string
-          description: The definition of the rule to insert
-      responses:
-        200:
-          description: Returns the new rule for the 'live' database
-          body:
-            application/json:
-              type: XOWLRule
-              example: |
-                {
-                  "type": "org.xowl.infra.server.api.XOWLRule",
-                  "name": "http://xowl.org/rules/rule1",
-                  "definition": "...",
-                  "isActive": false
-                }
-    /{ruleId}:
-      description: A specific rule for the 'live' database
-      is: [secured, mayFail, resourceAccess]
-      get:
-        description: Gets the description of the rule
-        responses:
-          200:
-            description: Returns the description of the rule
-            body:
-              application/json:
-                type: XOWLRule
-                example: |
-                  {
-                    "type": "org.xowl.infra.server.api.XOWLRule",
-                    "name": "http://xowl.org/rules/rule1",
-                    "definition": "...",
-                    "isActive": false
-                  }
-      delete:
-        description: Deletes the rule from the 'live' database
-        responses:
-          200:
-            description: The operation succeeded
-      /status:
-        description: The status of the rule
-        is: [secured, mayFail, resourceAccess]
-        get:
-          description: Gets the current status of the rule
-          responses:
-            200:
-              description: Returns the matching status of the rule
-              body:
-                application/json:
-                  type: object
-      /activate:
-        description: Action to activate the rule
-        is: [secured, mayFail, resourceAccess]
-        post:
-          description: Activates the rule for the 'live' database
-          responses:
-            200:
-              description: The operation succeeded
-      /deactivate:
-        description: Action to de-activate the rule
-        is: [secured, mayFail, resourceAccess]
-        post:
-          description: De-activates the rule for the 'live' database
-          responses:
-            200:
-              description: The operation succeeded

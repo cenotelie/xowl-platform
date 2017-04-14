@@ -466,7 +466,12 @@ function renderMessagePart(part) {
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = ROOT + "/modules/admin/connectors/connector.html?id=" + encodeURIComponent(part.identifier);
 		return dom;
-	} else if (part.type === "org.xowl.platform.services.consistency.ConsistencyRule") {
+	} else if (part.type === "org.xowl.platform.services.consistency.ReasoningRule") {
+		var dom = document.createElement("a");
+		dom.appendChild(document.createTextNode(part.name));
+		dom.href = ROOT + "/modules/core/consistency/rule.html?id=" + encodeURIComponent(part.identifier);
+		return dom;
+	} else if (part.type === "org.xowl.platform.services.consistency.ConsistencyConstraint") {
 		var dom = document.createElement("a");
 		dom.appendChild(document.createTextNode(part.name));
 		dom.href = ROOT + "/modules/core/consistency/constraint.html?id=" + encodeURIComponent(part.identifier);

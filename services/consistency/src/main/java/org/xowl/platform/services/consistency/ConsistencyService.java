@@ -176,7 +176,6 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      */
     XSPReply deleteReasoningRule(ReasoningRule rule);
 
-
     /**
      * Gets all the consistency constraints
      *

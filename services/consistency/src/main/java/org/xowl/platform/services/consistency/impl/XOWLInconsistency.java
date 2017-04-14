@@ -42,9 +42,9 @@ class XOWLInconsistency implements Inconsistency {
      */
     private final String message;
     /**
-     * The consistency rule that produces this inconsistency
+     * The consistency constraint that produces this inconsistency
      */
-    private final ConsistencyConstraint rule;
+    private final ConsistencyConstraint constraint;
     /**
      * The antecedents that matched the rule
      */
@@ -55,13 +55,13 @@ class XOWLInconsistency implements Inconsistency {
      *
      * @param iri         The IRI for the entity that represents the inconsistency
      * @param message     The message for this inconsistency
-     * @param rule        The consistency rule that produces this inconsistency
+     * @param constraint  The consistency constraint that produces this inconsistency
      * @param antecedents The antecedents that matched the rule
      */
-    public XOWLInconsistency(String iri, String message, ConsistencyConstraint rule, Map<String, Node> antecedents) {
+    public XOWLInconsistency(String iri, String message, ConsistencyConstraint constraint, Map<String, Node> antecedents) {
         this.iri = iri;
         this.message = message;
-        this.rule = rule;
+        this.constraint = constraint;
         this.antecedents = antecedents;
     }
 
@@ -82,7 +82,7 @@ class XOWLInconsistency implements Inconsistency {
 
     @Override
     public ConsistencyConstraint getConstraint() {
-        return rule;
+        return constraint;
     }
 
     @Override
@@ -104,10 +104,10 @@ class XOWLInconsistency implements Inconsistency {
         builder.append(TextUtils.escapeStringJSON(iri));
         builder.append("\", \"message\": \"");
         builder.append(TextUtils.escapeStringJSON(message));
-        builder.append("\", \"ruleId\": \"");
-        builder.append(TextUtils.escapeStringJSON(rule.getIdentifier()));
-        builder.append("\", \"ruleName\": \"");
-        builder.append(TextUtils.escapeStringJSON(rule.getName()));
+        builder.append("\", \"constraintId\": \"");
+        builder.append(TextUtils.escapeStringJSON(constraint.getIdentifier()));
+        builder.append("\", \"constraintName\": \"");
+        builder.append(TextUtils.escapeStringJSON(constraint.getName()));
         builder.append("\", \"antecedents\": {");
         boolean first = true;
         for (Map.Entry<String, Node> antecedent : antecedents.entrySet()) {

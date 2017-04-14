@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -21,14 +21,14 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.base.BaseRule;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.consistency.ConsistencyConstraint;
+import org.xowl.platform.services.consistency.ReasoningRule;
 
 /**
- * Implements a consistency rule on the xOWL platform
+ * Implements a reasoning rule for the platform
  *
  * @author Laurent Wouters
  */
-class XOWLConsistencyConstraint implements ConsistencyConstraint {
+public class XOWLReasoningRule implements ReasoningRule {
     /**
      * The original RDF rule
      */
@@ -44,7 +44,7 @@ class XOWLConsistencyConstraint implements ConsistencyConstraint {
      * @param original The original RDF rule
      * @param name     The user-friendly name
      */
-    public XOWLConsistencyConstraint(XOWLRule original, String name) {
+    public XOWLReasoningRule(XOWLRule original, String name) {
         this.original = original;
         this.name = name;
     }
@@ -54,7 +54,7 @@ class XOWLConsistencyConstraint implements ConsistencyConstraint {
      *
      * @param root The rule's definition
      */
-    public XOWLConsistencyConstraint(ASTNode root) {
+    public XOWLReasoningRule(ASTNode root) {
         String identifier = null;
         String name = null;
         String definition = null;
@@ -122,7 +122,7 @@ class XOWLConsistencyConstraint implements ConsistencyConstraint {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ConsistencyConstraint.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ReasoningRule.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(original.getIdentifier()) +
                 "\", \"name\": \"" +

@@ -41,7 +41,7 @@ public interface Inconsistency extends Identifiable, Serializable {
      *
      * @return The rule that produced this inconsistency
      */
-    ConsistencyRule getRule();
+    ConsistencyConstraint getRule();
 
     /**
      * Gets the antecedents that matched the rule

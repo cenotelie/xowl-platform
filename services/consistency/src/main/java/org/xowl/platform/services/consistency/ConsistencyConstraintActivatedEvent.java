@@ -22,38 +22,38 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Event when a consistency rule has been de-activated
+ * Event when a consistency constraint has been activated
  *
  * @author Laurent Wouters
  */
-public class ConsistencyRuleDeactivatedEvent extends EventBase {
+public class ConsistencyConstraintActivatedEvent extends EventBase {
     /**
      * The type for this event
      */
-    public static final String TYPE = ConsistencyRuleDeactivatedEvent.class.getCanonicalName();
+    public static final String TYPE = ConsistencyConstraintActivatedEvent.class.getCanonicalName();
 
     /**
-     * The de-activated rule
+     * The activated constraint
      */
-    private final ConsistencyRule rule;
+    private final ConsistencyConstraint constraint;
 
     /**
-     * Gets the de-activated rule
+     * Gets the activated constraint
      *
-     * @return The de-activated rule
+     * @return The activated constraint
      */
-    public ConsistencyRule getDeactivatedRule() {
-        return rule;
+    public ConsistencyConstraint getActivatedConstraint() {
+        return constraint;
     }
 
     /**
      * Initializes this event
      *
-     * @param rule    The de-activated rule
-     * @param emitter The service that emitted this event
+     * @param constraint The activated constraint
+     * @param emitter    The service that emitted this event
      */
-    public ConsistencyRuleDeactivatedEvent(ConsistencyRule rule, Service emitter) {
-        super(TYPE, emitter, new RichString("De-activated rule ", rule));
-        this.rule = rule;
+    public ConsistencyConstraintActivatedEvent(ConsistencyConstraint constraint, Service emitter) {
+        super(TYPE, emitter, new RichString("Activated constraint ", constraint));
+        this.constraint = constraint;
     }
 }

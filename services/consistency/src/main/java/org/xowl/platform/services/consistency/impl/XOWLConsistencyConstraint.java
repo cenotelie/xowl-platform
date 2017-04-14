@@ -21,14 +21,14 @@ import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.base.BaseRule;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.consistency.ConsistencyRule;
+import org.xowl.platform.services.consistency.ConsistencyConstraint;
 
 /**
  * Implements a consistency rule on the xOWL platform
  *
  * @author Laurent Wouters
  */
-class XOWLConsistencyRule implements ConsistencyRule {
+class XOWLConsistencyConstraint implements ConsistencyConstraint {
     /**
      * The original rule
      */
@@ -44,7 +44,7 @@ class XOWLConsistencyRule implements ConsistencyRule {
      * @param original The original rule
      * @param name     The user-friendly name
      */
-    public XOWLConsistencyRule(XOWLRule original, String name) {
+    public XOWLConsistencyConstraint(XOWLRule original, String name) {
         this.original = original;
         this.name = name;
     }
@@ -54,7 +54,7 @@ class XOWLConsistencyRule implements ConsistencyRule {
      *
      * @param root The rule's definition
      */
-    public XOWLConsistencyRule(ASTNode root) {
+    public XOWLConsistencyConstraint(ASTNode root) {
         String identifier = null;
         String name = null;
         String definition = null;
@@ -122,7 +122,7 @@ class XOWLConsistencyRule implements ConsistencyRule {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ConsistencyRule.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(ConsistencyConstraint.class.getCanonicalName()) +
                 "\", \"identifier\": \"" +
                 TextUtils.escapeStringJSON(original.getIdentifier()) +
                 "\", \"name\": \"" +

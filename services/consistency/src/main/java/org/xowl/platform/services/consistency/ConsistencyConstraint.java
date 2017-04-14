@@ -18,11 +18,24 @@
 package org.xowl.platform.services.consistency;
 
 import org.xowl.infra.server.api.XOWLRule;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 
 /**
- * Represents a consistency rule
+ * Represents a consistency constraint
  *
  * @author Laurent Wouters
  */
-public interface ConsistencyRule extends XOWLRule {
+public interface ConsistencyConstraint extends Identifiable, Serializable {
+    /**
+     * Gets the source definition of this constraint
+     * @return The source definition of this constraint
+     */
+    String getDefinition();
+
+    /**
+     * Gets whether this constraint is active
+     * @return Whether the constraint is active
+     */
+    boolean isActive();
 }

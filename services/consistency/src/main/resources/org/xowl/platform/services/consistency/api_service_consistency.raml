@@ -5,8 +5,8 @@ version: v1
 types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
   Inconsistencies: !include schema_platform_consistency.json#/definitions/Inconsistencies
-  ConsistencyRule: !include schema_platform_consistency.json#/definitions/ConsistencyRule
-  ConsistencyRules: !include schema_platform_consistency.json#/definitions/ConsistencyRules
+  ConsistencyConstraint: !include schema_platform_consistency.json#/definitions/ConsistencyConstraint
+  ConsistencyConstraints: !include schema_platform_consistency.json#/definitions/ConsistencyConstraints
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /services/consistency:
@@ -59,7 +59,7 @@ baseUri: https://localhost:8443/api
               example: |
                 [
                   {
-                    "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                    "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
                     "identifier": "http://xowl.org/rules/rule1",
                     "name": "Rule 1",
                     "definition": "...",
@@ -100,10 +100,10 @@ baseUri: https://localhost:8443/api
           description: The description of the created rule
           body:
             application/json:
-              type: ConsistencyRule
+              type: ConsistencyConstraint
               example: |
                 {
-                  "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                  "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
                   "identifier": "http://xowl.org/rules/rule1",
                   "name": "Rule 1",
                   "definition": "...",
@@ -119,10 +119,10 @@ baseUri: https://localhost:8443/api
             description: The description of the consistency rule
             body:
               application/json:
-                type: ConsistencyRule
+                type: ConsistencyConstraint
                 example: |
                   {
-                    "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                    "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
                     "identifier": "http://xowl.org/rules/rule1",
                     "name": "Rule 1",
                     "definition": "...",
@@ -133,10 +133,10 @@ baseUri: https://localhost:8443/api
         is: [secured, mayFail, resourceAccess]
         body:
           application/json:
-            type: ConsistencyRule
+            type: ConsistencyConstraint
             example: |
               {
-                "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
                 "identifier": "http://xowl.org/rules/rule1",
                 "name": "Rule 1",
                 "definition": "...",
@@ -147,10 +147,10 @@ baseUri: https://localhost:8443/api
             description: The description of the consistency rule
             body:
               application/json:
-                type: ConsistencyRule
+                type: ConsistencyConstraint
                 example: |
                   {
-                    "type": "org.xowl.platform.services.consistency.ConsistencyRule",
+                    "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
                     "identifier": "http://xowl.org/rules/rule1",
                     "name": "Rule 1",
                     "definition": "...",

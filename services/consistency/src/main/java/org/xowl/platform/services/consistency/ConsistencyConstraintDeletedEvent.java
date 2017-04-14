@@ -22,38 +22,38 @@ import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Event when a consistency rule has been created
+ * Event when a consistency constraint has been deleted
  *
  * @author Laurent Wouters
  */
-public class ConsistencyRuleCreatedEvent extends EventBase {
+public class ConsistencyConstraintDeletedEvent extends EventBase {
     /**
      * The type for this event
      */
-    public static final String TYPE = ConsistencyRuleCreatedEvent.class.getCanonicalName();
+    public static final String TYPE = ConsistencyConstraintDeletedEvent.class.getCanonicalName();
 
     /**
-     * The created rule
+     * The deleted rule
      */
-    private final ConsistencyRule rule;
+    private final ConsistencyConstraint constraint;
 
     /**
-     * Gets the created rule
+     * Gets the deleted constraint
      *
-     * @return The created rule
+     * @return The deleted constraint
      */
-    public ConsistencyRule getCreatedRule() {
-        return rule;
+    public ConsistencyConstraint getDeletedRule() {
+        return constraint;
     }
 
     /**
      * Initializes this event
      *
-     * @param rule    The created rule
-     * @param emitter The service that emitted this event
+     * @param constraint The deleted constraint
+     * @param emitter    The service that emitted this event
      */
-    public ConsistencyRuleCreatedEvent(ConsistencyRule rule, Service emitter) {
-        super(TYPE, emitter, new RichString("Created rule ", rule));
-        this.rule = rule;
+    public ConsistencyConstraintDeletedEvent(ConsistencyConstraint constraint, Service emitter) {
+        super(TYPE, emitter, new RichString("Deleted constraint ", constraint));
+        this.constraint = constraint;
     }
 }

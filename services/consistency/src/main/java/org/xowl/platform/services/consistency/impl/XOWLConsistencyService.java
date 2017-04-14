@@ -31,7 +31,6 @@ import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.store.sparql.ResultSolutions;
-import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
@@ -183,7 +182,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         return XSPReplyUtils.toHttpResponse(reply, null);
                     StringBuilder builder = new StringBuilder("[");
                     boolean first = true;
-                    for (ConsistencyRule rule : ((XSPReplyResultCollection<ConsistencyRule>) reply).getData()) {
+                    for (ConsistencyConstraint rule : ((XSPReplyResultCollection<ConsistencyConstraint>) reply).getData()) {
                         if (!first)
                             builder.append(", ");
                         first = false;
@@ -208,7 +207,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     XSPReply reply = createRule(name, message, prefixes, conditions);
                     if (!reply.isSuccess())
                         return XSPReplyUtils.toHttpResponse(reply, null);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -225,7 +224,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         XSPReply reply = getRule(ruleId);
                         if (!reply.isSuccess())
                             return XSPReplyUtils.toHttpResponse(reply, null);
-                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyRule>) reply).getData().serializedJSON());
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                     }
                     case HttpConstants.METHOD_PUT: {
                         String content = new String(request.getContent(), IOUtils.CHARSET);
@@ -234,7 +233,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
                         if (definition == null)
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-                        ConsistencyRule rule = new XOWLConsistencyRule(definition);
+                        ConsistencyConstraint rule = new XOWLConsistencyConstraint(definition);
                         if (!ruleId.equals(rule.getIdentifier()))
                             return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
                         return XSPReplyUtils.toHttpResponse(addRule(rule), null);
@@ -326,13 +325,13 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (sparqlResult.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
-        Collection<XOWLConsistencyRule> result = new ArrayList<>();
+        Collection<XOWLConsistencyConstraint> result = new ArrayList<>();
         for (RDFPatternSolution solution : solutions.getSolutions()) {
             String ruleId = ((IRINode) solution.get("r")).getIRIValue();
             String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
             for (XOWLRule rule : rules) {
                 if (rule.getName().equals(ruleId)) {
-                    result.add(new XOWLConsistencyRule(rule, ruleName));
+                    result.add(new XOWLConsistencyConstraint(rule, ruleName));
                     rules.remove(rule);
                     break;
                 }
@@ -346,7 +345,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = getRules();
         if (!reply.isSuccess())
             return reply;
-        Collection<XOWLConsistencyRule> rules = ((XSPReplyResultCollection<XOWLConsistencyRule>) reply).getData();
+        Collection<XOWLConsistencyConstraint> rules = ((XSPReplyResultCollection<XOWLConsistencyConstraint>) reply).getData();
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
@@ -379,8 +378,8 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     antecedents.put(name, quad.getObject());
                 }
             }
-            XOWLConsistencyRule rule = null;
-            for (XOWLConsistencyRule potential : rules) {
+            XOWLConsistencyConstraint rule = null;
+            for (XOWLConsistencyConstraint potential : rules) {
                 if (potential.getIdentifier().equals(ruleId)) {
                     rule = potential;
                     break;
@@ -447,7 +446,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return XSPReplyNotFound.instance();
         RDFPatternSolution solution = solutions.getSolutions().iterator().next();
         String ruleName = ((LiteralNode) solution.get("n")).getLexicalValue();
-        return new XSPReplyResult<>(new XOWLConsistencyRule(original, ruleName));
+        return new XSPReplyResult<>(new XOWLConsistencyConstraint(original, ruleName));
     }
 
     @Override
@@ -511,15 +510,15 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
-        XOWLConsistencyRule rule = new XOWLConsistencyRule(original, name);
+        XOWLConsistencyConstraint rule = new XOWLConsistencyConstraint(original, name);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintCreatedEvent(rule, this));
         return new XSPReplyResult<>(rule);
     }
 
     @Override
-    public XSPReply addRule(ConsistencyRule rule) {
+    public XSPReply addRule(ConsistencyConstraint rule) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -539,7 +538,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleCreatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintCreatedEvent(rule, this));
         return new XSPReplyResult<>(rule);
     }
 
@@ -552,18 +551,18 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        XOWLConsistencyConstraint rule = ((XSPReplyResult<XOWLConsistencyConstraint>) reply).getData();
         reply = live.activateRule(rule);
         if (!reply.isSuccess())
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintActivatedEvent(rule, this));
         return reply;
     }
 
     @Override
-    public XSPReply activateRule(ConsistencyRule rule) {
+    public XSPReply activateRule(ConsistencyConstraint rule) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -573,7 +572,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleActivatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintActivatedEvent(rule, this));
         return reply;
     }
 
@@ -586,18 +585,18 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        XOWLConsistencyConstraint rule = ((XSPReplyResult<XOWLConsistencyConstraint>) reply).getData();
         reply = live.deactivateRule(rule);
         if (!reply.isSuccess())
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintDeactivatedEvent(rule, this));
         return reply;
     }
 
     @Override
-    public XSPReply deactivateRule(ConsistencyRule rule) {
+    public XSPReply deactivateRule(ConsistencyConstraint rule) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -607,7 +606,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleDeactivatedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintDeactivatedEvent(rule, this));
         return reply;
     }
 
@@ -620,7 +619,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         XSPReply reply = getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLConsistencyRule rule = ((XSPReplyResult<XOWLConsistencyRule>) reply).getData();
+        XOWLConsistencyConstraint rule = ((XSPReplyResult<XOWLConsistencyConstraint>) reply).getData();
         reply = live.removeRule(rule);
         if (!reply.isSuccess())
             return reply;
@@ -636,12 +635,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintDeletedEvent(rule, this));
         return XSPReplySuccess.instance();
     }
 
     @Override
-    public XSPReply deleteRule(ConsistencyRule rule) {
+    public XSPReply deleteRule(ConsistencyConstraint rule) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
@@ -661,7 +660,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
-            eventService.onEvent(new ConsistencyRuleDeletedEvent(rule, this));
+            eventService.onEvent(new ConsistencyConstraintDeletedEvent(rule, this));
         return XSPReplySuccess.instance();
     }
 

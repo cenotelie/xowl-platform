@@ -20,7 +20,7 @@ package org.xowl.platform.services.consistency.impl;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.services.consistency.ConsistencyRule;
+import org.xowl.platform.services.consistency.ConsistencyConstraint;
 import org.xowl.platform.services.consistency.Inconsistency;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ class XOWLInconsistency implements Inconsistency {
     /**
      * The consistency rule that produces this inconsistency
      */
-    private final ConsistencyRule rule;
+    private final ConsistencyConstraint rule;
     /**
      * The antecedents that matched the rule
      */
@@ -58,7 +58,7 @@ class XOWLInconsistency implements Inconsistency {
      * @param rule        The consistency rule that produces this inconsistency
      * @param antecedents The antecedents that matched the rule
      */
-    public XOWLInconsistency(String iri, String message, ConsistencyRule rule, Map<String, Node> antecedents) {
+    public XOWLInconsistency(String iri, String message, ConsistencyConstraint rule, Map<String, Node> antecedents) {
         this.iri = iri;
         this.message = message;
         this.rule = rule;
@@ -81,7 +81,7 @@ class XOWLInconsistency implements Inconsistency {
     }
 
     @Override
-    public ConsistencyRule getRule() {
+    public ConsistencyConstraint getRule() {
         return rule;
     }
 

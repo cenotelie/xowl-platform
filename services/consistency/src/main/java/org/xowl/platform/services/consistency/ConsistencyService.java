@@ -92,7 +92,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The consistency rule to add
      * @return The operation's result
      */
-    XSPReply addRule(ConsistencyRule rule);
+    XSPReply addRule(ConsistencyConstraint rule);
 
     /**
      * Activates a rule
@@ -108,7 +108,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The rule to activate
      * @return The operation's result
      */
-    XSPReply activateRule(ConsistencyRule rule);
+    XSPReply activateRule(ConsistencyConstraint rule);
 
     /**
      * Deactivates a rule
@@ -124,7 +124,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The rule to deactivate
      * @return The operation's result
      */
-    XSPReply deactivateRule(ConsistencyRule rule);
+    XSPReply deactivateRule(ConsistencyConstraint rule);
 
     /**
      * Deletes a rule
@@ -140,5 +140,5 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The rule to delete
      * @return The operation's result
      */
-    XSPReply deleteRule(ConsistencyRule rule);
+    XSPReply deleteRule(ConsistencyConstraint rule);
 }

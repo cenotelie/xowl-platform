@@ -46,12 +46,12 @@
         ]
       }
     },
-    "ConsistencyRule": {
+    "ConsistencyConstraint": {
       "type": "object",
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.platform.services.consistency.ConsistencyRule"
+            "org.xowl.platform.services.consistency.ConsistencyConstraint"
           ]
         },
         "identifier": {
@@ -75,13 +75,13 @@
         "isActive"
       ]
     },
-    "ConsistencyRules": {
+    "ConsistencyConstraints": {
       "type": "array",
       "items": {
         "type": "object",
         "oneOf": [
           {
-            "$ref": "#/definitions/ConsistencyRule"
+            "$ref": "#/definitions/ConsistencyConstraint"
           }
         ]
       }

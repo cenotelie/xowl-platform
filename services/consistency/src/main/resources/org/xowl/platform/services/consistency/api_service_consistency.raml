@@ -5,6 +5,8 @@ version: v1
 types:
   ApiError: !include schema_infra_utils.json#/definitions/ApiError
   Inconsistencies: !include schema_platform_consistency.json#/definitions/Inconsistencies
+  ReasoningRule: !include schema_platform_consistency.json#/definitions/ReasoningRule
+  ReasoningRules: !include schema_platform_consistency.json#/definitions/ReasoningRules
   ConsistencyConstraint: !include schema_platform_consistency.json#/definitions/ConsistencyConstraint
   ConsistencyConstraints: !include schema_platform_consistency.json#/definitions/ConsistencyConstraints
 traits: !include api_traits.raml
@@ -27,8 +29,8 @@ baseUri: https://localhost:8443/api
                     "type": "org.xowl.platform.services.consistency.Inconsistency",
                     "identifier": "http://xowl.org/inconsistency/XXXX",
                     "message": "The object ?x has property ?p but not ?q.",
-                    "ruleId": "http://xowl.org/rules/rule1",
-                    "ruleName": "Rule 1",
+                    "constraintId": "http://xowl.org/constraints/constraint1",
+                    "constraintName": "Consistency Constraint 1",
                     "antecedents": {
                       "x": {
                         "type": "uri",
@@ -46,28 +48,28 @@ baseUri: https://localhost:8443/api
                   }
                 ]
   /rules:
-    description: The collection of consistency rules on the platform
+    description: The collection of reasoning rules on the platform
     get:
-      description: Gets the list of consistency rules on the platform
+      description: Gets the list of reasoning rules on the platform
       is: [secured, mayFail]
       responses:
         200:
-          description: The list of the consistency rules on the platform
+          description: The list of the reasoning rules on the platform
           body:
             application/json:
-              type: ConsistencyRules
+              type: ReasoningRules
               example: |
                 [
                   {
-                    "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
+                    "type": "org.xowl.platform.services.consistency.ReasoningRule",
                     "identifier": "http://xowl.org/rules/rule1",
                     "name": "Rule 1",
-                    "definition": "...",
+                    "definition": "RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }",
                     "isActive": true
                   }
                 ]
     put:
-      description: Creates a new consistency rule
+      description: Creates a new reasoning rule
       is: [secured, mayFail]
       queryParameters:
         name:
@@ -76,60 +78,179 @@ baseUri: https://localhost:8443/api
           description: The human-readable name for the rule
           example: Rule 1
           required: true
+      body:
+        text/plain:
+          description: The definition for the rule
+          example: |
+            RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }
+      responses:
+        200:
+          description: The description of the created rule
+          body:
+            application/json:
+              type: ReasoningRule
+              example: |
+                {
+                  "type": "org.xowl.platform.services.consistency.ReasoningRule",
+                  "identifier": "http://xowl.org/rules/rule1",
+                  "name": "Rule 1",
+                  "definition": "RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }",
+                  "isActive": true
+                }
+    /{ruleId}:
+      description: Represents a specific reasoning rule on the platform
+      get:
+        description: Gets the description of the reasoning rule
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The description of the reasoning rule
+            body:
+              application/json:
+                type: ReasoningRule
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.consistency.ReasoningRule",
+                    "identifier": "http://xowl.org/rules/rule1",
+                    "name": "Rule 1",
+                    "definition": "RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }",
+                    "isActive": true
+                  }
+      put:
+        description: Add the reasoning rule
+        is: [secured, mayFail, resourceAccess]
+        body:
+          application/json:
+            type: ReasoningRule
+            example: |
+              {
+                "type": "org.xowl.platform.services.consistency.ReasoningRule",
+                "identifier": "http://xowl.org/rules/rule1",
+                "name": "Rule 1",
+                "definition": "RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }",
+                "isActive": true
+              }
+        responses:
+          200:
+            description: The description of the reasoning rule
+            body:
+              application/json:
+                type: ReasoningRule
+                example: |
+                  {
+                    "type": "org.xowl.platform.services.consistency.ReasoningRule",
+                    "identifier": "http://xowl.org/rules/rule1",
+                    "name": "Rule 1",
+                    "definition": "RULE xowl:rule1 { ?x ?p ?y . } => { ?x ?q ?y . }",
+                    "isActive": true
+                  }
+      delete:
+        description: Deletes the reasoning rule
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The operation succeeded
+      /activate:
+        description: Action to activate the reasoning rule
+        post:
+          description: Activates the reasoning rule
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The operation succeeded
+      /deactivate:
+        description: Action to de-activate the reasoning rule
+        post:
+          description: De-activates the reasoning rule
+          is: [secured, mayFail, resourceAccess]
+          responses:
+            200:
+              description: The operation succeeded
+  /constraints:
+    description: The collection of consistency constraints on the platform
+    get:
+      description: Gets the list of consistency constraints on the platform
+      is: [secured, mayFail]
+      responses:
+        200:
+          description: The list of the consistency constraints on the platform
+          body:
+            application/json:
+              type: ConsistencyConstraints
+              example: |
+                [
+                  {
+                    "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
+                    "identifier": "http://xowl.org/constraints/constraint1",
+                    "name": "Constraint 1",
+                    "definition": "...",
+                    "isActive": true
+                  }
+                ]
+    put:
+      description: Creates a new consistency constraint
+      is: [secured, mayFail]
+      queryParameters:
+        name:
+          displayName: Rule name
+          type: string
+          description: The human-readable name for the constraint
+          example: Rule 1
+          required: true
         message:
           displayName: Message
           type: string
-          description: The template message that will be displayed for inconsistencies produced by this rule
+          description: The template message that will be displayed for inconsistencies produced by this constraint
           example: The object ?x has property ?p but not ?q.
           required: true
         prefixes:
           displayName: Prefixes
           type: string
-          description: The URI prefixes used for the rule definition
+          description: The URI prefixes used for the constraint definition
           example: |
             PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
           required: true
       body:
         text/plain:
-          description: The conditions for the rule
+          description: The conditions for the constraint
           example: |
             ?x ?p ?y
             NOT (?x ?q ?z)
       responses:
         200:
-          description: The description of the created rule
+          description: The description of the created constraint
           body:
             application/json:
               type: ConsistencyConstraint
               example: |
                 {
                   "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
-                  "identifier": "http://xowl.org/rules/rule1",
-                  "name": "Rule 1",
+                  "identifier": "http://xowl.org/constraints/constraint1",
+                  "name": "Constraint 1",
                   "definition": "...",
                   "isActive": true
                 }
-    /{ruleId}:
-      description: Represents a specific consistency rule on the platform
+    /{constraintId}:
+      description: Represents a specific consistency constraint on the platform
       get:
-        description: Gets the description of the consistency rule
+        description: Gets the description of the consistency constraint
         is: [secured, mayFail, resourceAccess]
         responses:
           200:
-            description: The description of the consistency rule
+            description: The description of the consistency constraint
             body:
               application/json:
                 type: ConsistencyConstraint
                 example: |
                   {
                     "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
-                    "identifier": "http://xowl.org/rules/rule1",
-                    "name": "Rule 1",
+                    "identifier": "http://xowl.org/constraints/constraint1",
+                    "name": "Constraint 1",
                     "definition": "...",
                     "isActive": true
                   }
       put:
-        description: Add the consistency rule
+        description: Add the consistency constraint
         is: [secured, mayFail, resourceAccess]
         body:
           application/json:
@@ -137,43 +258,43 @@ baseUri: https://localhost:8443/api
             example: |
               {
                 "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
-                "identifier": "http://xowl.org/rules/rule1",
-                "name": "Rule 1",
+                "identifier": "http://xowl.org/constraints/constraint1",
+                "name": "Constraint 1",
                 "definition": "...",
                 "isActive": true
               }
         responses:
           200:
-            description: The description of the consistency rule
+            description: The description of the consistency constraint
             body:
               application/json:
                 type: ConsistencyConstraint
                 example: |
                   {
                     "type": "org.xowl.platform.services.consistency.ConsistencyConstraint",
-                    "identifier": "http://xowl.org/rules/rule1",
-                    "name": "Rule 1",
+                    "identifier": "http://xowl.org/constraints/constraint1",
+                    "name": "Constraint 1",
                     "definition": "...",
                     "isActive": true
                   }
       delete:
-        description: Deletes the consistency rule
+        description: Deletes the consistency constraint
         is: [secured, mayFail, resourceAccess]
         responses:
           200:
             description: The operation succeeded
       /activate:
-        description: Action to activate the consistency rule
+        description: Action to activate the consistency constraint
         post:
-          description: Activates the consistency rule
+          description: Activates the consistency constraint
           is: [secured, mayFail, resourceAccess]
           responses:
             200:
               description: The operation succeeded
       /deactivate:
-        description: Action to de-activate the consistency rule
+        description: Action to de-activate the consistency constraint
         post:
-          description: De-activates the consistency rule
+          description: De-activates the consistency constraint
           is: [secured, mayFail, resourceAccess]
           responses:
             200:

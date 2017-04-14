@@ -699,6 +699,70 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.CreateReasoningRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.DeleteReasoningRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.ActivateReasoningRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.DeactivateReasoningRule"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.CreateConsistencyConstraint"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.DeleteConsistencyConstraint"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.ActivateConsistencyConstraint"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.services.consistency.ConsistencyService.DeactivateConsistencyConstraint"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.services.impact.ImpactAnalysisService.Perform"
       },
       "policy": {

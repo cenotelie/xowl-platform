@@ -28,7 +28,7 @@ import org.xowl.platform.services.consistency.ReasoningRule;
  *
  * @author Laurent Wouters
  */
-public class XOWLReasoningRule implements ReasoningRule {
+class XOWLReasoningRule implements ReasoningRule {
     /**
      * The original RDF rule
      */

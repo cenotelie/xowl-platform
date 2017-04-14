@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,36 +17,26 @@
 
 package org.xowl.platform.services.consistency;
 
-import org.xowl.infra.store.rdf.Node;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 
-import java.util.Map;
-
 /**
- * Represents an inconsistency on the platform
+ * Represents a custom reasoning rule
  *
  * @author Laurent Wouters
  */
-public interface Inconsistency extends Identifiable, Serializable {
+public interface ReasoningRule extends Identifiable, Serializable {
     /**
-     * Gets the message for this inconsistency
+     * Gets the source definition of this rule
      *
-     * @return The message for this inconsistency
+     * @return The source definition of this rule
      */
-    String getMessage();
+    String getDefinition();
 
     /**
-     * Gets the constraint that produced this inconsistency
+     * Gets whether this rule is active
      *
-     * @return The constraint that produced this inconsistency
+     * @return Whether the rule is active
      */
-    ConsistencyConstraint getConstraint();
-
-    /**
-     * Gets the antecedents that matched the rule
-     *
-     * @return The antecedents
-     */
-    Map<String, Node> getAntecedents();
+    boolean isActive();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 3
@@ -17,36 +17,43 @@
 
 package org.xowl.platform.services.consistency;
 
-import org.xowl.infra.store.rdf.Node;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-
-import java.util.Map;
+import org.xowl.infra.utils.RichString;
+import org.xowl.platform.kernel.Service;
+import org.xowl.platform.kernel.events.EventBase;
 
 /**
- * Represents an inconsistency on the platform
+ * Event when a reasoning rule has been created
  *
  * @author Laurent Wouters
  */
-public interface Inconsistency extends Identifiable, Serializable {
+public class ReasoningRuleCreatedEvent extends EventBase {
     /**
-     * Gets the message for this inconsistency
-     *
-     * @return The message for this inconsistency
+     * The type for this event
      */
-    String getMessage();
+    public static final String TYPE = ReasoningRuleCreatedEvent.class.getCanonicalName();
 
     /**
-     * Gets the constraint that produced this inconsistency
-     *
-     * @return The constraint that produced this inconsistency
+     * The created rule
      */
-    ConsistencyConstraint getConstraint();
+    private final ReasoningRule rule;
 
     /**
-     * Gets the antecedents that matched the rule
+     * Gets the created rule
      *
-     * @return The antecedents
+     * @return The created rule
      */
-    Map<String, Node> getAntecedents();
+    public ReasoningRule getCreatedRule() {
+        return rule;
+    }
+
+    /**
+     * Initializes this event
+     *
+     * @param rule    The created rule
+     * @param emitter The service that emitted this event
+     */
+    public ReasoningRuleCreatedEvent(ReasoningRule rule, Service emitter) {
+        super(TYPE, emitter, new RichString("Created rule ", rule));
+        this.rule = rule;
+    }
 }

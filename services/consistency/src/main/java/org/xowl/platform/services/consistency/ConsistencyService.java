@@ -25,7 +25,6 @@ import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.services.consistency.impl.XOWLConsistencyService;
-import org.xowl.platform.services.storage.StorageService;
 
 /**
  * Represents a service that manages the consistency on the platform
@@ -44,21 +43,51 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
             new Couple<>(Metric.HINT_MIN_VALUE, "0"));
 
     /**
+     * Service action to create a reasoning rule
+     */
+    SecuredAction ACTION_CREATE_REASONING_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".CreateReasoningRule", "Consistency Service - Create Reasoning Rule");
+    /**
+     * Service action to delete a reasoning rule
+     */
+    SecuredAction ACTION_DELETE_REASONING_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeleteReasoningRule", "Consistency Service - Delete Reasoning Rule");
+    /**
+     * Service action to activate a reasoning rule
+     */
+    SecuredAction ACTION_ACTIVATE_REASONING_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".ActivateReasoningRule", "Consistency Service - Activate Reasoning Rule");
+    /**
+     * Service action to de-activate a reasoning rule
+     */
+    SecuredAction ACTION_DEACTIVATE_REASONING_RULE = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeactivateReasoningRule", "Consistency Service - Deactivate Reasoning Rule");
+    /**
+     * Service action to create a consistency constraint
+     */
+    SecuredAction ACTION_CREATE_CONSISTENCY_CONSTRAINT = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".CreateConsistencyConstraint", "Consistency Service - Create Consistency Constraint");
+    /**
+     * Service action to delete a consistency constraint
+     */
+    SecuredAction ACTION_DELETE_CONSISTENCY_CONSTRAINT = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeleteConsistencyConstraint", "Consistency Service - Delete Consistency Constraint");
+    /**
+     * Service action to activate a consistency constraint
+     */
+    SecuredAction ACTION_ACTIVATE_CONSISTENCY_CONSTRAINT = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".ActivateConsistencyConstraint", "Consistency Service - Activate Consistency Constraint");
+    /**
+     * Service action to de-activate a consistency constraint
+     */
+    SecuredAction ACTION_DEACTIVATE_CONSISTENCY_CONSTRAINT = new SecuredAction(ConsistencyService.class.getCanonicalName() + ".DeactivateConsistencyConstraint", "Consistency Service - Deactivate Consistency Constraint");
+
+    /**
      * The actions for this service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            StorageService.ACTION_CREATE_RULE,
-            StorageService.ACTION_DELETE_RULE,
-            StorageService.ACTION_ACTIVATE_RULE,
-            StorageService.ACTION_DEACTIVATE_RULE
+            ACTION_CREATE_REASONING_RULE,
+            ACTION_DELETE_REASONING_RULE,
+            ACTION_ACTIVATE_REASONING_RULE,
+            ACTION_DEACTIVATE_REASONING_RULE,
+            ACTION_CREATE_CONSISTENCY_CONSTRAINT,
+            ACTION_DELETE_CONSISTENCY_CONSTRAINT,
+            ACTION_ACTIVATE_CONSISTENCY_CONSTRAINT,
+            ACTION_DEACTIVATE_CONSISTENCY_CONSTRAINT
     };
-
-    /**
-     * Gets all the consistency rules
-     *
-     * @return The consistency rules
-     */
-    XSPReply getRules();
 
     /**
      * Gets the current inconsistencies on the platform
@@ -68,77 +97,165 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
     XSPReply getInconsistencies();
 
     /**
-     * Gets the rule for the specified identifier
+     * Gets all the reasoning rules
+     *
+     * @return The reasoning rules
+     */
+    XSPReply getReasoningRules();
+
+    /**
+     * Gets the reasoning rule for the specified identifier
      *
      * @param identifier The identifier of a rule
      * @return The operation's result
      */
-    XSPReply getRule(String identifier);
+    XSPReply getReasoningRule(String identifier);
 
     /**
-     * Creates a new consistency rule
+     * Creates a new reasoning rule
      *
      * @param name       The rule's name
-     * @param message    The rule's user message for inconsistencies
+     * @param definition The rule's definition
+     * @return The operation's result
+     */
+    XSPReply createReasoningRule(String name, String definition);
+
+    /**
+     * Adds the specified reasoning rule
+     *
+     * @param rule The reasoning rule to add
+     * @return The operation's result
+     */
+    XSPReply addReasoningRule(ReasoningRule rule);
+
+    /**
+     * Activates a reasoning rule
+     *
+     * @param identifier The identifier of a reasoning rule
+     * @return The operation's result
+     */
+    XSPReply activateReasoningRule(String identifier);
+
+    /**
+     * Activates a reasoning rule
+     *
+     * @param rule The reasoning rule to activate
+     * @return The operation's result
+     */
+    XSPReply activateReasoningRule(ReasoningRule rule);
+
+    /**
+     * Deactivates a reasoning rule
+     *
+     * @param identifier The identifier of a reasoning rule
+     * @return The operation's result
+     */
+    XSPReply deactivateReasoningRule(String identifier);
+
+    /**
+     * Deactivates a reasoning rule
+     *
+     * @param rule The reasoning rule to deactivate
+     * @return The operation's result
+     */
+    XSPReply deactivateReasoningRule(ReasoningRule rule);
+
+    /**
+     * Deletes a reasoning rule
+     *
+     * @param identifier The identifier of a reasoning rule
+     * @return The operation's result
+     */
+    XSPReply deleteReasoningRule(String identifier);
+
+    /**
+     * Deletes a reasoning rule
+     *
+     * @param rule The reasoning rule to delete
+     * @return The operation's result
+     */
+    XSPReply deleteReasoningRule(ReasoningRule rule);
+
+
+    /**
+     * Gets all the consistency constraints
+     *
+     * @return The consistency constraints
+     */
+    XSPReply getConsistencyConstraints();
+
+    /**
+     * Gets the consistency constraint for the specified identifier
+     *
+     * @param identifier The identifier of a constraint
+     * @return The operation's result
+     */
+    XSPReply getConsistencyConstraint(String identifier);
+
+    /**
+     * Creates a new consistency constraint
+     *
+     * @param name       The constraint's name
+     * @param message    The constraint's user message for inconsistencies
      * @param prefixes   The prefixes for short URIs
-     * @param conditions The rule's conditions for matching
+     * @param conditions The constraint's conditions for matching
      * @return The operation's result
      */
-    XSPReply createRule(String name, String message, String prefixes, String conditions);
+    XSPReply createConsistencyConstraint(String name, String message, String prefixes, String conditions);
 
     /**
-     * Adds the specified consistency rule
+     * Adds the specified consistency constraint
      *
-     * @param rule The consistency rule to add
+     * @param constraint The consistency constraint to add
      * @return The operation's result
      */
-    XSPReply addRule(ConsistencyConstraint rule);
+    XSPReply addConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
-     * Activates a rule
+     * Activates a consistency constraint
      *
-     * @param identifier The identifier of a rule
+     * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply activateRule(String identifier);
+    XSPReply activateConsistencyConstraint(String identifier);
 
     /**
-     * Activates a rule
+     * Activates a consistency constraint
      *
-     * @param rule The rule to activate
+     * @param constraint The consistency constraint to activate
      * @return The operation's result
      */
-    XSPReply activateRule(ConsistencyConstraint rule);
+    XSPReply activateConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
-     * Deactivates a rule
+     * Deactivates a consistency constraint
      *
-     * @param identifier The identifier of a rule
+     * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply deactivateRule(String identifier);
+    XSPReply deactivateConsistencyConstraint(String identifier);
 
     /**
-     * Deactivates a rule
+     * Deactivates a consistency constraint
      *
-     * @param rule The rule to deactivate
+     * @param constraint The consistency constraint to deactivate
      * @return The operation's result
      */
-    XSPReply deactivateRule(ConsistencyConstraint rule);
+    XSPReply deactivateConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
-     * Deletes a rule
+     * Deletes a consistency constraint
      *
-     * @param identifier The identifier of a rule
+     * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply deleteRule(String identifier);
+    XSPReply deleteConsistencyConstraint(String identifier);
 
     /**
-     * Deletes a rule
+     * Deletes a consistency constraint
      *
-     * @param rule The rule to delete
+     * @param constraint The consistency constraint to delete
      * @return The operation's result
      */
-    XSPReply deleteRule(ConsistencyConstraint rule);
+    XSPReply deleteConsistencyConstraint(ConsistencyConstraint constraint);
 }

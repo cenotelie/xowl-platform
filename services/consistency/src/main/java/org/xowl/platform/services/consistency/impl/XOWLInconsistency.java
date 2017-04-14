@@ -81,7 +81,7 @@ class XOWLInconsistency implements Inconsistency {
     }
 
     @Override
-    public ConsistencyConstraint getRule() {
+    public ConsistencyConstraint getConstraint() {
         return rule;
     }
 

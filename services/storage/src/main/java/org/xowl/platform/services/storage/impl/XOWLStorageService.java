@@ -23,6 +23,7 @@ import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.remote.RemoteServer;
 import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.EntailmentRegime;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
@@ -112,7 +113,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         this.storeLive = new XOWLFederationStore(configuration.get("databases", STORE_ID_LIVE)) {
             @Override
             protected XOWLDatabase resolveBackend() {
-                return XOWLStorageService.this.resolveRemote(this.getName());
+                XOWLDatabase database = XOWLStorageService.this.resolveRemote(this.getName());
+                if (database != null)
+                    database.setEntailmentRegime(EntailmentRegime.OWL2_RDF);
+                return database;
             }
         };
         this.storeLongTerm = new XOWLFederationStore(configuration.get("databases", STORE_ID_LONG_TERM)) {

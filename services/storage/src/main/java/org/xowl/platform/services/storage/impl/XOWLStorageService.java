@@ -114,8 +114,13 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             @Override
             protected XOWLDatabase resolveBackend() {
                 XOWLDatabase database = XOWLStorageService.this.resolveRemote(this.getName());
-                if (database != null)
-                    database.setEntailmentRegime(EntailmentRegime.OWL2_RDF);
+                if (database != null) {
+                    XSPReply reply = database.getEntailmentRegime();
+                    if (!reply.isSuccess())
+                        return database;
+                    if (((XSPReplyResult<EntailmentRegime>) reply).getData() == EntailmentRegime.none)
+                        database.setEntailmentRegime(EntailmentRegime.OWL2_RDF);
+                }
                 return database;
             }
         };

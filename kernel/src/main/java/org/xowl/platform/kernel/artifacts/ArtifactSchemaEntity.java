@@ -17,53 +17,32 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.hime.redist.ASTNode;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 
 /**
- * Represents an artifact schema from a remote platform
+ * Represents an entity in a schema
  *
  * @author Laurent Wouters
  */
-public class ArtifactSchemaRemote implements ArtifactSchema {
+public class ArtifactSchemaEntity implements Identifiable, Serializable {
     /**
-     * The schema's identifier
+     * The identifier for this entity
      */
-    protected final String identifier;
+    private final String identifier;
     /**
-     * The schema's name
+     * The name of this entity
      */
-    protected final String name;
+    private final String name;
 
     /**
-     * Initializes this schema
+     * Initializes this entity
      *
-     * @param iri The schema's iri
+     * @param identifier The identifier for this entity
+     * @param name       The name of this entity
      */
-    public ArtifactSchemaRemote(String iri) {
-        this.identifier = iri;
-        this.name = iri;
-    }
-
-    /**
-     * Initializes this archetype
-     *
-     * @param definition The JSON definition
-     */
-    public ArtifactSchemaRemote(ASTNode definition) {
-        String identifier = null;
-        String name = null;
-        for (ASTNode member : definition.getChildren()) {
-            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("identifier".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                identifier = value.substring(1, value.length() - 1);
-            } else if ("name".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                name = value.substring(1, value.length() - 1);
-            }
-        }
+    public ArtifactSchemaEntity(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
     }
@@ -86,8 +65,8 @@ public class ArtifactSchemaRemote implements ArtifactSchema {
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ArtifactSchema.class.getCanonicalName()) +
-                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(ArtifactSchemaEntity.class.getCanonicalName()) +
+                "\", \"identifier\":\"" +
                 TextUtils.escapeStringJSON(identifier) +
                 "\", \"name\": \"" +
                 TextUtils.escapeStringJSON(name) +

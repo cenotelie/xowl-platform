@@ -34,6 +34,6 @@ public class ArtifactSchemaRDFS extends ArtifactSchemaFromResource {
      * Initializes this schema
      */
     private ArtifactSchemaRDFS() {
-        super(IRIs.class, "/org/w3c/www/2000/01/rdf-schema.ttl", IRIs.RDFS + "#");
+        super(IRIs.class, "/org/w3c/www/2000/01/rdf-schema.ttl", IRIs.RDFS + "#", "xOWL - RDFS");
     }
 }

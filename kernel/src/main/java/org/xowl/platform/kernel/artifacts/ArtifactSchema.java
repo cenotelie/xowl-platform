@@ -17,11 +17,8 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.store.ProxyObject;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Registrable;
-
-import java.util.Collection;
 
 /**
  * Represents the schema of a domain or artifact
@@ -29,46 +26,4 @@ import java.util.Collection;
  * @author Laurent Wouters
  */
 public interface ArtifactSchema extends Registrable, Serializable {
-    /**
-     * Gets the classes in this schema
-     *
-     * @return The classes in this schema
-     */
-    Collection<ProxyObject> getClasses();
-
-    /**
-     * Gets the datatypes in this schema
-     *
-     * @return The datatypes in this schema
-     */
-    Collection<ProxyObject> getDatatypes();
-
-    /**
-     * Gets the object properties in this schema
-     *
-     * @return The object properties in this schema
-     */
-    Collection<ProxyObject> getObjectProperties();
-
-    /**
-     * Gets the data properties in this schema
-     *
-     * @return The data properties in this schema
-     */
-    Collection<ProxyObject> getDataProperties();
-
-    /**
-     * Gets the individuals in this schema
-     *
-     * @return The individuals in this schema
-     */
-    Collection<ProxyObject> getIndividuals();
-
-    /**
-     * Gets the entity for the specified URI
-     *
-     * @param uri The URI of an entity
-     * @return The associated entity
-     */
-    ProxyObject getEntity(String uri);
 }

@@ -17,31 +17,22 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.store.Repository;
+import org.xowl.infra.store.RepositoryRDF;
+import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.utils.logging.Logging;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Implements a business schema that is backed by a resource file
  *
  * @author Laurent Wouters
  */
-public class ArtifactSchemaFromResource implements ArtifactSchema {
-    /**
-     * The rdfs:label property
-     */
-    private static final String RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
-
-    /**
-     * The schema's IRI
-     */
-    private final String iri;
-    /**
-     * The schema's name
-     */
-    private final String name;
-    /**
-     * A class that is in the same bundle as the resource
-     */
-    private final Class<?> loaderType;
+public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
     /**
      * The resource URI, e.g. /com/business/serious/schema.fs
      */
@@ -50,41 +41,29 @@ public class ArtifactSchemaFromResource implements ArtifactSchema {
     /**
      * Initializes this schema
      *
-     * @param type     A class that is in the same bundle as the resource
-     * @param resource The resource URI, e.g. /com/business/serious/schema.fs
      * @param iri      The iri for this schema
      * @param name     The name for this schema
+     * @param resource The resource URI, e.g. /com/business/serious/schema.fs
      */
-    public ArtifactSchemaFromResource(Class<?> type, String resource, String iri, String name) {
-        this.iri = iri;
-        this.name = name;
-        this.loaderType = type;
+    public ArtifactSchemaFromResource(String iri, String name, String resource) {
+        super(iri, name);
         this.loaderResource = resource;
     }
 
     @Override
-    public String getIdentifier() {
-        return iri;
-    }
-
-    @Override
-    public String getName() {
-        return iri;
-    }
-
-    @Override
-    public String serializedString() {
-        return iri;
-    }
-
-    @Override
-    public String serializedJSON() {
-        return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(ArtifactSchema.class.getCanonicalName()) +
-                "\", \"identifier\": \"" +
-                TextUtils.escapeStringJSON(iri) +
-                "\", \"name\": \"" +
-                TextUtils.escapeStringJSON(name) +
-                "\"}";
+    public Collection<Quad> getDefinition() {
+        RepositoryRDF repository = new RepositoryRDF();
+        repository.getIRIMapper().addSimpleMap(identifier, Repository.SCHEME_RESOURCE + loaderResource);
+        try {
+            repository.load(Logging.get(), identifier, identifier, false);
+        } catch (Exception exception) {
+            Logging.get().error(exception);
+            return Collections.emptyList();
+        }
+        Collection<Quad> result = new ArrayList<>();
+        Iterator<Quad> iterator = repository.getStore().getAll();
+        while (iterator.hasNext())
+            result.add(iterator.next());
+        return result;
     }
 }

@@ -45,7 +45,7 @@ public class ArtifactArchetypeRemote extends ArtifactArchetypeBase {
                 schema = value.substring(1, value.length() - 1);
             }
         }
-        this.schema = schema != null && !schema.isEmpty() ? new ArtifactSchemaRemote(schema) : null;
+        this.schema = schema != null && !schema.isEmpty() ? new ArtifactSchemaStub(schema, schema) : null;
     }
 
     @Override

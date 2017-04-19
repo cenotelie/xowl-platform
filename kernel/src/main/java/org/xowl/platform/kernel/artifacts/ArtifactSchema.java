@@ -17,8 +17,11 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Registrable;
+
+import java.util.Collection;
 
 /**
  * Represents the schema of a domain or artifact
@@ -26,4 +29,10 @@ import org.xowl.platform.kernel.Registrable;
  * @author Laurent Wouters
  */
 public interface ArtifactSchema extends Registrable, Serializable {
+    /**
+     * Gets the schema's definition
+     *
+     * @return The schema's definition
+     */
+    Collection<Quad> getDefinition();
 }

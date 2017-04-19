@@ -17,46 +17,28 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.utils.TextUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
- * Represents an artifact schema from a remote platform
+ * Implements a stub description of a schema
  *
  * @author Laurent Wouters
  */
-public class ArtifactSchemaRemote extends ArtifactSchemaBase {
+public class ArtifactSchemaStub extends ArtifactSchemaBase {
     /**
-     * The schema definition
-     */
-    private final Collection<Quad> quads;
-
-    /**
-     * Initializes this archetype
+     * Initializes this schema
      *
-     * @param definition The JSON definition
+     * @param identifier The schema's identifier
+     * @param name       The schema's name
      */
-    public ArtifactSchemaRemote(ASTNode definition) {
-        super(definition);
-        this.quads = new ArrayList<>();
-        for (ASTNode member : definition.getChildren()) {
-            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("definition".equals(head)) {
-                JsonLoader loader = new JsonLoader();
-                loader.loadGraphs(member.getChildren().get(1), quads);
-            }
-        }
+    public ArtifactSchemaStub(String identifier, String name) {
+        super(identifier, name);
     }
 
     @Override
     public Collection<Quad> getDefinition() {
-        return Collections.unmodifiableCollection(quads);
+        return null;
     }
 }

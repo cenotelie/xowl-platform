@@ -20,8 +20,11 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.utils.AutoReader;
 import org.xowl.infra.utils.logging.Logging;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +36,10 @@ import java.util.Iterator;
  * @author Laurent Wouters
  */
 public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
+    /**
+     * A type in the same package as the resource
+     */
+    private final Class<?> loaderType;
     /**
      * The resource URI, e.g. /com/business/serious/schema.fs
      */
@@ -48,10 +55,12 @@ public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
      * @param iri        The iri for this schema
      * @param name       The name for this schema
      * @param deployable Whether this schema can be deployed in a triple store
+     * @param loaderType A type in the same package as the resource
      * @param resource   The resource URI, e.g. /com/business/serious/schema.fs
      */
-    public ArtifactSchemaFromResource(String iri, String name, boolean deployable, String resource) {
+    public ArtifactSchemaFromResource(String iri, String name, boolean deployable, Class<?> loaderType, String resource) {
         super(iri, name, deployable);
+        this.loaderType = loaderType;
         this.loaderResource = resource;
     }
 
@@ -67,9 +76,9 @@ public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
             return Collections.unmodifiableCollection(quads);
 
         RepositoryRDF repository = new RepositoryRDF();
-        repository.getIRIMapper().addSimpleMap(identifier, Repository.SCHEME_RESOURCE + loaderResource);
-        try {
-            repository.load(Logging.get(), identifier, identifier, false);
+        try (InputStream stream = loaderType.getResourceAsStream(loaderResource)) {
+            Reader reader = new AutoReader(stream);
+            repository.load(Logging.get(), reader, identifier, identifier, Repository.getSyntax(loaderResource));
         } catch (Exception exception) {
             Logging.get().error(exception);
             return Collections.emptyList();

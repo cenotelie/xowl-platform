@@ -20,6 +20,7 @@ package org.xowl.platform.kernel.artifacts;
 import org.xowl.infra.store.rdf.Quad;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Implements a stub description of a schema
@@ -34,11 +35,11 @@ public class ArtifactSchemaStub extends ArtifactSchemaBase {
      * @param name       The schema's name
      */
     public ArtifactSchemaStub(String identifier, String name) {
-        super(identifier, name);
+        super(identifier, name, false);
     }
 
     @Override
-    public Collection<Quad> getDefinition() {
-        return null;
+    public Collection<Quad> getDefinition(boolean deployable) {
+        return Collections.emptyList();
     }
 }

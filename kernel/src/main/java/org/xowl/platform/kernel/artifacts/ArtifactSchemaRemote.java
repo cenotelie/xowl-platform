@@ -56,7 +56,9 @@ public class ArtifactSchemaRemote extends ArtifactSchemaBase {
     }
 
     @Override
-    public Collection<Quad> getDefinition() {
-        return Collections.unmodifiableCollection(quads);
+    public Collection<Quad> getDefinition(boolean deployable) {
+        if (!deployable)
+            return Collections.unmodifiableCollection(quads);
+        return toDeployable(quads);
     }
 }

@@ -37,21 +37,35 @@ public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
      * The resource URI, e.g. /com/business/serious/schema.fs
      */
     private final String loaderResource;
+    /**
+     * The original quads for the definition
+     */
+    private Collection<Quad> quads;
 
     /**
      * Initializes this schema
      *
-     * @param iri      The iri for this schema
-     * @param name     The name for this schema
-     * @param resource The resource URI, e.g. /com/business/serious/schema.fs
+     * @param iri        The iri for this schema
+     * @param name       The name for this schema
+     * @param deployable Whether this schema can be deployed in a triple store
+     * @param resource   The resource URI, e.g. /com/business/serious/schema.fs
      */
-    public ArtifactSchemaFromResource(String iri, String name, String resource) {
-        super(iri, name);
+    public ArtifactSchemaFromResource(String iri, String name, boolean deployable, String resource) {
+        super(iri, name, deployable);
         this.loaderResource = resource;
     }
 
     @Override
-    public Collection<Quad> getDefinition() {
+    public Collection<Quad> getDefinition(boolean deployable) {
+        if (!deployable)
+            return doGetDefinition();
+        return toDeployable(doGetDefinition());
+    }
+
+    private synchronized Collection<Quad> doGetDefinition() {
+        if (quads != null)
+            return Collections.unmodifiableCollection(quads);
+
         RepositoryRDF repository = new RepositoryRDF();
         repository.getIRIMapper().addSimpleMap(identifier, Repository.SCHEME_RESOURCE + loaderResource);
         try {
@@ -60,10 +74,10 @@ public class ArtifactSchemaFromResource extends ArtifactSchemaBase {
             Logging.get().error(exception);
             return Collections.emptyList();
         }
-        Collection<Quad> result = new ArrayList<>();
+        quads = new ArrayList<>();
         Iterator<Quad> iterator = repository.getStore().getAll();
         while (iterator.hasNext())
-            result.add(iterator.next());
-        return result;
+            quads.add(iterator.next());
+        return Collections.unmodifiableCollection(quads);
     }
 }

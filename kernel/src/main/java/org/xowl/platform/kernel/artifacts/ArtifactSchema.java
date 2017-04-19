@@ -30,9 +30,24 @@ import java.util.Collection;
  */
 public interface ArtifactSchema extends Registrable, Serializable {
     /**
+     * Gets whether this schema can be deployed in a triple store
+     *
+     * @return Whether this schema can be deployed in a triple store
+     */
+    boolean isDeployable();
+
+    /**
      * Gets the schema's definition
      *
      * @return The schema's definition
      */
     Collection<Quad> getDefinition();
+
+    /**
+     * Gets the schema's definition
+     *
+     * @param deployable Whether the definition shall be deployable
+     * @return The schema's definition
+     */
+    Collection<Quad> getDefinition(boolean deployable);
 }

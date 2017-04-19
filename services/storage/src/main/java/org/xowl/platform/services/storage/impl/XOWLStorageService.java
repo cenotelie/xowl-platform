@@ -41,6 +41,7 @@ import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
+import org.xowl.platform.kernel.artifacts.ArtifactSchema;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -120,6 +121,13 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
                         return database;
                     if (((XSPReplyResult<EntailmentRegime>) reply).getData() == EntailmentRegime.none)
                         database.setEntailmentRegime(EntailmentRegime.OWL2_RDF);
+                    for (ArtifactSchema schema : Register.getComponents(ArtifactSchema.class)) {
+                        if (schema.isDeployable()) {
+                            reply = database.upload(schema.getDefinition(true));
+                            if (!reply.isSuccess())
+                                Logging.get().warning(reply.getMessage());
+                        }
+                    }
                 }
                 return database;
             }

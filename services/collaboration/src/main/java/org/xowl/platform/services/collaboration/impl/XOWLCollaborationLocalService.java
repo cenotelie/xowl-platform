@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
@@ -66,7 +66,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
             try (Reader reader = IOUtils.getReader(fileManifest)) {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+                ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
                 if (definition != null)
                     manifest = new CollaborationManifest(definition);
             } catch (IOException exception) {

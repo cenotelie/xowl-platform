@@ -19,7 +19,7 @@ package org.xowl.platform.services.importation.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
@@ -144,7 +144,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @param content The descriptor content
      */
     private void reloadDocument(String file, String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse the document descriptor " + file);
             return;
@@ -171,7 +171,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The configuration
      */
     private ImporterConfiguration loadConfiguration(String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
         if (definition == null)
             return null;
         ImporterConfiguration configuration = new ImporterConfiguration(definition);

@@ -22,7 +22,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -106,7 +106,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, IOUtils.CHARSET));
+        ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         return XSPReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);

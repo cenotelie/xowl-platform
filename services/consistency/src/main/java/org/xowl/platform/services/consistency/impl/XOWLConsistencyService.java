@@ -22,7 +22,7 @@ import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IRIs;
 import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
 import org.xowl.infra.store.loaders.xRDFLoader;
 import org.xowl.infra.store.rdf.*;
@@ -246,7 +246,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
                         if (definition == null)
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ReasoningRule rule = new XOWLReasoningRule(definition);
@@ -344,7 +344,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
                         if (definition == null)
                             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ConsistencyConstraint constraint = new XOWLConsistencyConstraint(definition);

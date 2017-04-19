@@ -98,12 +98,14 @@ class SemanticWebLoader {
             case Repository.SYNTAX_RDFXML:
                 return loadRDF(logger, reader, resourceIRI, new RDFXMLLoader(repository.getStore()));
             case Repository.SYNTAX_JSON_LD:
-                return loadRDF(logger, reader, resourceIRI, new JSONLDLoader(repository.getStore()) {
+                return loadRDF(logger, reader, resourceIRI, new JsonLdLoader(repository.getStore()) {
                     @Override
                     protected Reader getReaderFor(Logger logger, String iri) {
                         return null;
                     }
                 });
+            case Repository.SYNTAX_JSON:
+                return loadRDF(logger, reader, resourceIRI, new JsonLoader(repository));
             case Repository.SYNTAX_TRIG:
                 return loadRDF(logger, reader, resourceIRI, new TriGLoader(repository.getStore()));
             case Repository.SYNTAX_XRDF:

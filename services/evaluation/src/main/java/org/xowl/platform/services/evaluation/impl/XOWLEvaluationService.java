@@ -19,7 +19,7 @@ package org.xowl.platform.services.evaluation.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -370,7 +370,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JSONLDLoader.parseJSON(logger, new String(content, IOUtils.CHARSET));
+        ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
             return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         SecurityService securityService = Register.getComponent(SecurityService.class);

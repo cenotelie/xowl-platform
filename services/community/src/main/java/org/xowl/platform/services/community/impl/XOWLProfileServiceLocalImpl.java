@@ -19,7 +19,7 @@ package org.xowl.platform.services.community.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.config.Section;
@@ -95,7 +95,7 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
                 return null;
             try (Reader reader = IOUtils.getReader(file)) {
                 BufferedLogger logger = new BufferedLogger();
-                ASTNode root = JSONLDLoader.parseJSON(logger, reader);
+                ASTNode root = JsonLoader.parseJson(logger, reader);
                 if (root == null)
                     return null;
                 profile = new PublicProfile(root, this);

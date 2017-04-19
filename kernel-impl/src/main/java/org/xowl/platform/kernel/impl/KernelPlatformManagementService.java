@@ -21,7 +21,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.TextUtils;
@@ -121,7 +121,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
     private Product loadProductDescriptor() {
         File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
             return new ProductBase(definition);
         } catch (IOException exception) {
             Logging.get().error(exception);
@@ -139,7 +139,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
                 if (files[i].getName().endsWith(".descriptor")) {
                     try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
                         String content = IOUtils.read(reader);
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
                         if (definition == null) {
                             Logging.get().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
                             return;
@@ -379,7 +379,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
 
             Addon descriptor;
             try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-                ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+                ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
                 if (definition == null) {
                     IOUtils.deleteFolder(directory);
                     return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");

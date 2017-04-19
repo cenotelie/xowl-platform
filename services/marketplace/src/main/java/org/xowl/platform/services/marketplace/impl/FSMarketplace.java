@@ -18,7 +18,7 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
@@ -60,7 +60,7 @@ class FSMarketplace extends StaticMarketplace {
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
             if (definition == null) {
                 Logging.get().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
                 return null;
@@ -80,7 +80,7 @@ class FSMarketplace extends StaticMarketplace {
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
             if (definition == null) {
                 Logging.get().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
                 return null;

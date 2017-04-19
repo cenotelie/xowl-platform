@@ -21,7 +21,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -98,7 +98,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+                        ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
                         Product product = new ProductBase(definition);
                         platforms.add(product);
                     } catch (IOException exception) {
@@ -112,7 +112,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), reader);
+                        ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
                         RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
                         collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
                     } catch (IOException exception) {

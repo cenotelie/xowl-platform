@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.xowl.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.SHA1;
@@ -248,7 +248,7 @@ class KernelJobExecutor implements JobExecutionService, ManagedService, HttpApiS
      * @param content The job's content
      */
     private void reloadJob(File file, String content) {
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse the job " + file.getAbsolutePath());
             return;

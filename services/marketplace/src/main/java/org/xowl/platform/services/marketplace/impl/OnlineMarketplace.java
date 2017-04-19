@@ -18,7 +18,7 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import org.xowl.hime.redist.ASTNode;
-import org.xowl.infra.store.loaders.JSONLDLoader;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -73,7 +73,7 @@ class OnlineMarketplace extends StaticMarketplace {
             Logging.get().error("Marketplace descriptor is empty " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR);
             return null;
@@ -93,7 +93,7 @@ class OnlineMarketplace extends StaticMarketplace {
             Logging.get().error("Addon descriptor is empty " + location + identifier + ".descriptor");
             return null;
         }
-        ASTNode definition = JSONLDLoader.parseJSON(Logging.get(), content);
+        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse addon descriptor  " + location + identifier + ".descriptor");
             return null;

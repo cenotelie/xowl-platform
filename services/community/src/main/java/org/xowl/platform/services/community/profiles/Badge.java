@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.profiles;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.*;
 import org.xowl.infra.utils.logging.Logging;
 

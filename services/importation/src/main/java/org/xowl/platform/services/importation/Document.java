@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;

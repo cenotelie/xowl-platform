@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.impl;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner;

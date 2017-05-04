@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.impl;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;

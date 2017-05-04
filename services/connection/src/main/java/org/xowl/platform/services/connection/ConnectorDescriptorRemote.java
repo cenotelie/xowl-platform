@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;

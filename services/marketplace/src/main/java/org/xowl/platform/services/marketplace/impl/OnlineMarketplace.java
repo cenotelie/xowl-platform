@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConnection;

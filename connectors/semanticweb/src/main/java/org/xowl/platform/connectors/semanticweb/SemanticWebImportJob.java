@@ -17,7 +17,7 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.services.importation.ImportationJob;
 import org.xowl.platform.services.importation.Importer;

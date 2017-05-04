@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.storage.jobs;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyResult;
 import org.xowl.infra.utils.TextUtils;

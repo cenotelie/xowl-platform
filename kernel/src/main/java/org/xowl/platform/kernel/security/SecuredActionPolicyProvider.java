@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.Registrable;
 
 /**

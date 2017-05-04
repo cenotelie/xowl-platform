@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.impl;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
 import org.xowl.platform.kernel.security.SecuredActionPolicyProvider;

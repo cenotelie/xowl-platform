@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.remote;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLFactory;
 
 import java.util.Collection;

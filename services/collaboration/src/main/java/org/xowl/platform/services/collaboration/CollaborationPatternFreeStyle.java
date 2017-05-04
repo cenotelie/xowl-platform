@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 
 /**
  * Represents a free-style collaboration pattern

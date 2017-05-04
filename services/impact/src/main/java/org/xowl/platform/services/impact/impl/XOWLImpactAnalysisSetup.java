@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.impact.impl;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;

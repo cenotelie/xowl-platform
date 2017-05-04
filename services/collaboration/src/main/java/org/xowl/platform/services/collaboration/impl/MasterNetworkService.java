@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;

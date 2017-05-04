@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.bots;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 
 /**
  * Represents a bot on a remote platform

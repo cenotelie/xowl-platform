@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.product.LicensePlain;
 import org.xowl.infra.utils.product.Product;

@@ -20,7 +20,7 @@ package org.xowl.platform.services.connection.impl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import org.xowl.hime.redist.ASTNode;
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;

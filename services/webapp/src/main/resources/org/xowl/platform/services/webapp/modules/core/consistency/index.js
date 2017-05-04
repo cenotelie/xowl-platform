@@ -19,7 +19,7 @@ function init() {
 
 function renderInconsistencies(inconsistencies) {
 	inconsistencies.sort(function (x, y) {
-		return x.ruleName.localeCompare(y.ruleName);
+		return x.constraintName.localeCompare(y.constraintName);
 	});
 	var table = document.getElementById("inconsistencies");
 	for (var i = 0; i != inconsistencies.length; i++) {
@@ -45,10 +45,10 @@ function renderInconsistency(inconsistency, index) {
 	icon.width = 40;
 	icon.height = 40;
 	icon.style.marginRight = "20px";
-	icon.title = inconsistency.ruleId;
+	icon.title = inconsistency.constraintId;
 	var link = document.createElement("a");
-	link.appendChild(document.createTextNode(inconsistency.ruleName));
-	link.href = "constraint.html?id=" + encodeURIComponent(inconsistency.ruleId);
+	link.appendChild(document.createTextNode(inconsistency.constraintName));
+	link.href = "constraint.html?id=" + encodeURIComponent(inconsistency.constraintId);
 	var cell3 = document.createElement("td");
 	cell3.appendChild(icon);
 	cell3.appendChild(link);

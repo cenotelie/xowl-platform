@@ -28,7 +28,7 @@ import org.xowl.platform.kernel.security.*;
  *
  * @author Laurent Wouters
  */
-class KernelSecurityProvider implements SecuredActionPolicyProvider, SecurityPolicyProvider, SecurityRealmProvider {
+class KernelSecurityProvider implements SecuredActionPolicyProvider, SecurityPolicyProvider, SecurityRealmProvider, SecurityTokenServiceProvider {
     @Override
     public String getIdentifier() {
         return KernelSecurityProvider.class.getCanonicalName();
@@ -71,6 +71,13 @@ class KernelSecurityProvider implements SecuredActionPolicyProvider, SecurityPol
             return new KernelSecurityPolicyAuthenticated();
         if (KernelSecurityPolicyCustom.class.getCanonicalName().equals(identifier))
             return new KernelSecurityPolicyCustom(configuration);
+        return null;
+    }
+
+    @Override
+    public SecurityTokenService newService(String identifier, Section configuration) {
+        if (KernelSecurityTokenService.class.getCanonicalName().equals(identifier))
+            return new KernelSecurityTokenService(configuration);
         return null;
     }
 }

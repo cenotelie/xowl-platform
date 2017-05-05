@@ -39,14 +39,12 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages the security on the platform
@@ -103,13 +101,9 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      */
     private final Section policyConfiguration;
     /**
-     * The Message Authentication Code algorithm to use for securing user tokens
+     * The configuration section for the token service
      */
-    private final Mac securityMAC;
-    /**
-     * The private security key for the Message Authentication Code
-     */
-    private final Key securityKey;
+    private final Section tokenServiceConfiguration;
     /**
      * The time to live in seconds of an authentication token
      */
@@ -126,6 +120,10 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      * The authorization policy
      */
     private SecurityPolicy policy;
+    /**
+     * The token service
+     */
+    private SecurityTokenService tokenService;
 
     /**
      * Initializes this service
@@ -139,19 +137,8 @@ class KernelSecurityService implements SecurityService, HttpApiService {
         this.banLength = Integer.parseInt(configuration.get("banLength"));
         this.realmConfiguration = configuration.getSection("realm");
         this.policyConfiguration = configuration.getSection("policy");
-        Mac mac = null;
-        KeyGenerator keyGenerator = null;
-        try {
-            mac = Mac.getInstance("HmacSHA256");
-            keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-            keyGenerator.init(256);
-        } catch (NoSuchAlgorithmException exception) {
-            // should not happen
-            Logging.get().error(exception);
-        }
-        this.securityMAC = mac;
-        this.securityKey = keyGenerator.generateKey();
-        this.securityTokenTTL = Integer.parseInt(configuration.get("tokenTTL"));
+        this.tokenServiceConfiguration = configuration.getSection("tokens");
+        this.securityTokenTTL = Integer.parseInt(tokenServiceConfiguration.get("tokenTTL"));
         this.clients = new HashMap<>();
     }
 
@@ -271,7 +258,7 @@ class KernelSecurityService implements SecurityService, HttpApiService {
         PlatformUser user = getRealm().authenticate(login, password);
         if (user != null) {
             CONTEXT.set(user);
-            return new XSPReplyResult<>(buildTokenFor(login));
+            return new XSPReplyResult<>(getTokenService().newTokenFor(login));
         }
         onLoginFailure(client);
         Logging.get().info("Authentication failure from " + client + " on initial login with " + login);
@@ -288,7 +275,7 @@ class KernelSecurityService implements SecurityService, HttpApiService {
     public XSPReply authenticate(String client, String token) {
         if (isBanned(client))
             return XSPReplyUnauthenticated.instance();
-        XSPReply reply = checkToken(token);
+        XSPReply reply = getTokenService().checkToken(token);
         if (reply == XSPReplyUnauthenticated.instance()) {
             // the token is invalid
             onLoginFailure(client);
@@ -335,6 +322,24 @@ class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     /**
+     * Gets the token service
+     *
+     * @return The token service
+     */
+    private synchronized SecurityTokenService getTokenService() {
+        if (tokenService != null)
+            return tokenService;
+        String identifier = tokenServiceConfiguration.get("type");
+        for (SecurityTokenServiceProvider provider : Register.getComponents(SecurityTokenServiceProvider.class)) {
+            tokenService = provider.newService(identifier, policyConfiguration);
+            if (tokenService != null)
+                return tokenService;
+        }
+        tokenService = new KernelSecurityTokenService(tokenServiceConfiguration);
+        return tokenService;
+    }
+
+    /**
      * Gets whether a client is banned
      *
      * @param client A client
@@ -367,7 +372,7 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      * @param client The client trying to login
      * @return Whether the failure resulted in the client being banned
      */
-    private boolean onLoginFailure(String client) {
+    private void onLoginFailure(String client) {
         synchronized (clients) {
             ClientLogin cl = clients.get(client);
             if (cl == null) {
@@ -377,15 +382,15 @@ class KernelSecurityService implements SecurityService, HttpApiService {
             cl.failedAttempt++;
             if (InetAddress.getLoopbackAddress().getHostAddress().equals(client)) {
                 // the loopback client cannot be banned
-                return false;
+                return;
             }
             if (cl.failedAttempt >= maxLoginFailure) {
                 // too much failure, ban this client for a while
                 Logging.get().info("Banned client " + client + " for " + banLength + " seconds");
                 cl.banTimeStamp = Calendar.getInstance().getTime().getTime();
-                return true;
+                return;
             }
-            return false;
+            return;
         }
     }
 
@@ -760,90 +765,5 @@ class KernelSecurityService implements SecurityService, HttpApiService {
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-
-    /**
-     * Builds an authentication token for the specified login
-     *
-     * @param login The user login
-     * @return The new authentication token
-     */
-    private String buildTokenFor(String login) {
-        long timestamp = System.currentTimeMillis();
-        long validUntil = timestamp + securityTokenTTL * 1000;
-        byte[] text = login.getBytes(IOUtils.CHARSET);
-        byte[] tokenData = Arrays.copyOf(text, text.length + 8);
-        tokenData[text.length] = (byte) ((validUntil & 0xFF00000000000000L) >>> 56);
-        tokenData[text.length + 1] = (byte) ((validUntil & 0x00FF000000000000L) >>> 48);
-        tokenData[text.length + 2] = (byte) ((validUntil & 0x0000FF0000000000L) >>> 40);
-        tokenData[text.length + 3] = (byte) ((validUntil & 0x000000FF00000000L) >>> 32);
-        tokenData[text.length + 4] = (byte) ((validUntil & 0x00000000FF000000L) >>> 24);
-        tokenData[text.length + 5] = (byte) ((validUntil & 0x0000000000FF0000L) >>> 16);
-        tokenData[text.length + 6] = (byte) ((validUntil & 0x000000000000FF00L) >>> 8);
-        tokenData[text.length + 7] = (byte) ((validUntil & 0x00000000000000FFL));
-
-        synchronized (securityMAC) {
-            try {
-                securityMAC.init(securityKey);
-                byte[] tokenHash = securityMAC.doFinal(tokenData);
-                byte[] token = Arrays.copyOf(tokenData, tokenData.length + tokenHash.length);
-                System.arraycopy(tokenHash, 0, token, tokenData.length, tokenHash.length);
-                return org.xowl.infra.utils.Base64.encodeBase64(token);
-            } catch (InvalidKeyException exception) {
-                Logging.get().error(exception);
-                return null;
-            }
-        }
-    }
-
-    /**
-     * Checks whether the token is valid
-     *
-     * @param token The authentication token to check
-     * @return The protocol reply, or null if the token is invalid
-     */
-    private XSPReply checkToken(String token) {
-        byte[] tokenBytes = org.xowl.infra.utils.Base64.decodeBase64(token);
-        if (tokenBytes.length <= 32 + 8)
-            return XSPReplyUnauthenticated.instance();
-        byte[] tokenData = Arrays.copyOf(tokenBytes, tokenBytes.length - 32);
-        byte[] hashProvided = new byte[32];
-        System.arraycopy(tokenBytes, tokenBytes.length - 32, hashProvided, 0, 32);
-
-        // checks the hash
-        synchronized (securityMAC) {
-            try {
-                securityMAC.init(securityKey);
-                byte[] computedHash = securityMAC.doFinal(tokenData);
-                if (!Arrays.equals(hashProvided, computedHash))
-                    // the token does not checks out ...
-                    return XSPReplyUnauthenticated.instance();
-            } catch (InvalidKeyException exception) {
-                Logging.get().error(exception);
-                return new XSPReplyException(exception);
-            }
-        }
-
-        byte b0 = tokenBytes[tokenBytes.length - 32 - 8];
-        byte b1 = tokenBytes[tokenBytes.length - 32 - 7];
-        byte b2 = tokenBytes[tokenBytes.length - 32 - 6];
-        byte b3 = tokenBytes[tokenBytes.length - 32 - 5];
-        byte b4 = tokenBytes[tokenBytes.length - 32 - 4];
-        byte b5 = tokenBytes[tokenBytes.length - 32 - 3];
-        byte b6 = tokenBytes[tokenBytes.length - 32 - 2];
-        byte b7 = tokenBytes[tokenBytes.length - 32 - 1];
-        long validUntil = ((long) b0 & 0xFFL) << 56
-                | ((long) b1 & 0xFFL) << 48
-                | ((long) b2 & 0xFFL) << 40
-                | ((long) b3 & 0xFFL) << 32
-                | ((long) b4 & 0xFFL) << 24
-                | ((long) b5 & 0xFFL) << 16
-                | ((long) b6 & 0xFFL) << 8
-                | ((long) b7 & 0xFFL);
-        if (System.currentTimeMillis() > validUntil)
-            // the token expired
-            return XSPReplyExpiredSession.instance();
-        return new XSPReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - 32 - 8, IOUtils.CHARSET));
     }
 }

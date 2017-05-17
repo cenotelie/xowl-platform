@@ -20,6 +20,7 @@ package org.xowl.platform.services.connection;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -82,7 +83,9 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     protected ConnectorServiceBase(ConnectorServiceData specification) {
         this.identifier = specification.getIdentifier();
         this.name = specification.getName();
-        this.uris = specification.getUris();
+        this.uris = new String[specification.getUris().length];
+        for (int i = 0; i != this.uris.length; i++)
+            this.uris[i] = PlatformHttp.getUriPrefixApi() + "/" + specification.getUris()[i];
         this.input = new ArrayBlockingQueue<>(INPUT_QUEUE_MAX_CAPACITY);
         this.actionPull = new SecuredAction(identifier + ".Pull", "Connection Service - " + name + " - Pull Artifact");
         this.actionPush = new SecuredAction(identifier + ".Push", "Connection Service - " + name + " - Push Artifact");

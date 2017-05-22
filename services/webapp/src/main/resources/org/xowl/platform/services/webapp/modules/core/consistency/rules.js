@@ -43,7 +43,7 @@ function renderRule(rule, index) {
 	icon.title = rule.name;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(rule.name));
-	link.href = "rule.html?id=" + encodeURIComponent(rule.name);
+	link.href = "rule.html?id=" + encodeURIComponent(rule.identifier);
 	cell = document.createElement("td");
 	cell.appendChild(icon);
 	cell.appendChild(link);

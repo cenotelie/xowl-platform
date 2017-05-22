@@ -87,7 +87,7 @@ function renderSparqlResults(ct, content) {
 	} else if (ct === "application/json") {
 		var data = JSON.parse(content);
 		renderClear();
-		renderSparqlHeader(['s', 'p', 'o', 'g']);
+		renderSparqlHeader(['graph', 'subject', 'predicate', 'object']);
 		renderRdfQuads(data, injectResult);
 	}
 }

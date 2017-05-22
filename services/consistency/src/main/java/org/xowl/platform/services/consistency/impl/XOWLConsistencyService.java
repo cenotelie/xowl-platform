@@ -616,7 +616,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
-        return live.activateRule(identifier);
+        return live.deactivateRule(identifier);
     }
 
     @Override
@@ -872,7 +872,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
-        return live.activateRule(identifier);
+        return live.deactivateRule(identifier);
     }
 
     @Override

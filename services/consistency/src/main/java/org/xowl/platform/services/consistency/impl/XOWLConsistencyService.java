@@ -315,10 +315,11 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     String prefixes = request.getParameter("prefixes");
                     if (prefixes == null)
                         return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
-                    String conditions = new String(request.getContent(), IOUtils.CHARSET);
-                    if (conditions.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    XSPReply reply = createConsistencyConstraint(name, message, prefixes, conditions);
+                    String antecedents = request.getParameter("antecedents");
+                    if (antecedents == null)
+                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'antecedents'"), null);
+                    String guard = request.getParameter("guard");
+                    XSPReply reply = createConsistencyConstraint(name, message, prefixes, antecedents, guard);
                     if (!reply.isSuccess())
                         return XSPReplyUtils.toHttpResponse(reply, null);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
@@ -727,10 +728,10 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
-    public XSPReply createConsistencyConstraint(String name, String message, String prefixes, String conditions) {
+    public XSPReply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
         // find the antecedents in the specified conditions
         String constraintIRI = IRI_PREFIX_CONSISTENCY_CONSTRAINT + "#" + SHA1.hashSHA1(name);
-        String definition = prefixes + "\nRULE <" + TextUtils.escapeAbsoluteURIW3C(constraintIRI) + "> {\n" + conditions + "\n} => {}";
+        String definition = prefixes + "\nRULE <" + TextUtils.escapeAbsoluteURIW3C(constraintIRI) + "> {\n" + antecedents + "\n} => {}";
         BufferedLogger logger = new BufferedLogger();
         xRDFLoader loader = new xRDFLoader();
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_GRAPH_METADATA, IRI_GRAPH_METADATA);
@@ -740,6 +741,8 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
         Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
 
+        if (guard != null)
+            guard = guard.trim();
         // build the full definition of the constraint
         StringBuilder builder = new StringBuilder(prefixes);
         builder.append(IOUtils.LINE_SEPARATOR);
@@ -747,9 +750,18 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         builder.append(TextUtils.escapeAbsoluteURIW3C(constraintIRI));
         builder.append("> {");
         builder.append(IOUtils.LINE_SEPARATOR);
-        builder.append(conditions);
+        builder.append(antecedents);
         builder.append(IOUtils.LINE_SEPARATOR);
-        builder.append("} => {");
+        builder.append("}");
+        if (guard != null && !guard.isEmpty()) {
+            builder.append(IOUtils.LINE_SEPARATOR);
+            builder.append("WITH ");
+            builder.append(guard);
+            builder.append(IOUtils.LINE_SEPARATOR);
+        } else {
+            builder.append(" ");
+        }
+        builder.append("=> {");
         builder.append(IOUtils.LINE_SEPARATOR);
         builder.append("    ?e <");
         builder.append(TextUtils.escapeAbsoluteURIW3C(Vocabulary.rdfType));

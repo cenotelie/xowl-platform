@@ -24,8 +24,11 @@ function onClickNewRule() {
 	var name = document.getElementById("input-name").value;
 	var message = document.getElementById("input-message").value;
 	var prefixes = document.getElementById("input-prefixes").value;
-	var conditions = document.getElementById("input-conditions").value;
-	if (name === null || name === "" || message === null || message === "" || conditions === null || conditions === "") {
+	var antecedents = document.getElementById("input-antecedents").value;
+	var guard = document.getElementById("input-guard").value;
+	if (guard === null)
+		guard = "";
+	if (name === null || name === "" || message === null || message === "" || antecedents === null || antecedents === "") {
 		onOperationAbort("All fields are mandatory.");
 		return;
 	}
@@ -34,5 +37,5 @@ function onClickNewRule() {
 			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created constraint ", content, "."]});
 			waitAndGo("constraints.html");
 		}
-	}, name, message, prefixes, conditions);
+	}, name, message, prefixes, antecedents, guard);
 }

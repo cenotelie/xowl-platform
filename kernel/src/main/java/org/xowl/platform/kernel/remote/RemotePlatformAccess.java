@@ -1731,22 +1731,21 @@ public class RemotePlatformAccess extends HttpConnection {
     /**
      * Creates a new consistency constraint
      *
-     * @param name       The rule's name
-     * @param message    The message produced by the rule
-     * @param prefixes   The prefixes for the rule definition
-     * @param conditions The conditions for matching the rule
+     * @param name        The rule's name
+     * @param message     The message produced by the rule
+     * @param prefixes    The prefixes for short URIs
+     * @param antecedents The constraint's antecedents for matching
+     * @param guard       The constraint's guard (if any)
      * @return The protocol reply
      */
-    public XSPReply newConsistencyConstraint(String name, String message, String prefixes, String conditions) {
+    public XSPReply newConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
         return doRequest("/services/consistency/constraints" +
                         "?name=" + URIUtils.encodeComponent(name) +
                         "&message=" + URIUtils.encodeComponent(message) +
-                        "&prefixes=" + URIUtils.encodeComponent(prefixes),
-                HttpConstants.METHOD_PUT,
-                conditions.getBytes(IOUtils.CHARSET),
-                Repository.SYNTAX_XRDF,
-                false,
-                HttpConstants.MIME_JSON);
+                        "&prefixes=" + URIUtils.encodeComponent(prefixes) +
+                        "&antecedents=" + URIUtils.encodeComponent(antecedents) +
+                        (guard != null && !guard.isEmpty() ? "&guard=" + URIUtils.encodeComponent(guard) : ""),
+                HttpConstants.METHOD_PUT);
     }
 
     /**

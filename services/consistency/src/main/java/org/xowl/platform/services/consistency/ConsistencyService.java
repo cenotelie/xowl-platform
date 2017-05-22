@@ -194,13 +194,14 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
     /**
      * Creates a new consistency constraint
      *
-     * @param name       The constraint's name
-     * @param message    The constraint's user message for inconsistencies
-     * @param prefixes   The prefixes for short URIs
-     * @param conditions The constraint's conditions for matching
+     * @param name        The constraint's name
+     * @param message     The constraint's user message for inconsistencies
+     * @param prefixes    The prefixes for short URIs
+     * @param antecedents The constraint's antecedents for matching
+     * @param guard       The constraint's guard (if any)
      * @return The operation's result
      */
-    XSPReply createConsistencyConstraint(String name, String message, String prefixes, String conditions);
+    XSPReply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard);
 
     /**
      * Adds the specified consistency constraint

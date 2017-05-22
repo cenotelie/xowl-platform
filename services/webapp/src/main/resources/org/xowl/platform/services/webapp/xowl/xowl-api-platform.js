@@ -1573,7 +1573,7 @@ XOWL.prototype.getConsistencyConstraint = function (callback, constraintId) {
 	}, "services/consistency/constraints/" + encodeURIComponent(constraintId), null, "GET", null, null);
 }
 
-XOWL.prototype.newConsistencyConstraint = function (callback, name, message, prefixes, conditions) {
+XOWL.prototype.newConsistencyConstraint = function (callback, name, message, prefixes, antecedents, guard) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
 			callback(code, MIME_JSON, JSON.parse(content));
@@ -1583,8 +1583,10 @@ XOWL.prototype.newConsistencyConstraint = function (callback, name, message, pre
 	}, "services/consistency/constraints", {
 		name: name,
 		message: message,
-		prefixes: prefixes
-	}, "PUT", "application/x-xowl-rdft", conditions);
+		prefixes: prefixes,
+		antecedents: antecedents,
+		guard: guard
+	}, "PUT", null, null);
 }
 
 XOWL.prototype.addConsistencyConstraint = function (callback, constraint) {

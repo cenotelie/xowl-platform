@@ -210,12 +210,21 @@ baseUri: https://localhost:8443/api
           example: |
             PREFIX kernel: <http://xowl.org/platform/schemas/kernel#>
           required: true
-      body:
-        text/plain:
+        antecedents:
+          displayName: Antecedents
+          type: string
           description: The conditions for the constraint
           example: |
             ?x ?p ?y
             NOT (?x ?q ?z)
+          required: true
+        guard:
+          displayName: Guard
+          type: string
+          description: An optional guard as a Clojure expression for the constraint
+          example: |
+            (nil? (myOperation stuff))
+          required: false
       responses:
         200:
           description: The description of the created constraint

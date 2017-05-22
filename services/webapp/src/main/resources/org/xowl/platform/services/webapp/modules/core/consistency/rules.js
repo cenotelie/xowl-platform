@@ -108,7 +108,7 @@ function doActivateRule(toggle, rule) {
 			rule.isActive = true;
 			toggle.classList.add("toggle-button-selected");
 		}
-	}, rule.name);
+	}, rule.identifier);
 }
 
 function doDeactivateRule(toggle, rule) {
@@ -123,7 +123,7 @@ function doDeactivateRule(toggle, rule) {
 			rule.isActive = false;
 			toggle.classList.remove("toggle-button-selected");
 		}
-	}, rule.name);
+	}, rule.identifier);
 }
 
 function onDeleteRule(rule) {
@@ -138,5 +138,5 @@ function onDeleteRule(rule) {
 			// TODO: do not do a full reload
 			waitAndRefresh();
 		}
-	}, rule.name);
+	}, rule.identifier);
 }

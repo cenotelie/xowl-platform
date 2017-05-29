@@ -11,18 +11,19 @@
     <name>xOWL Collaboration Platform - Services</name>
     <description>The set of services for the xOWL platform</description>
     <modules>
-        <module>security-internal</module>
         <module>collaboration</module>
         <module>community</module>
-        <module>marketplace</module>
-        <module>storage</module>
+        <module>connection</module>
         <module>consistency</module>
+        <module>denotation</module>
+        <module>evaluation</module>
         <module>execution</module>
+        <module>httpapi</module>
         <module>impact</module>
         <module>importation</module>
-        <module>evaluation</module>
-        <module>connection</module>
-        <module>httpapi</module>
+        <module>marketplace</module>
+        <module>security-internal</module>
+        <module>storage</module>
         <module>webapp</module>
     </modules>
 </project>

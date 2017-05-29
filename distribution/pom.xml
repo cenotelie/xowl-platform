@@ -152,6 +152,12 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-service-denotation</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
             <artifactId>xowl-service-evaluation</artifactId>
             <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>

@@ -1632,7 +1632,7 @@ XOWL.prototype.deleteConsistencyConstraint = function (callback, constraintId) {
 
 
 /*****************************************************
- * Impact - Impact Analysis Service
+ * Impact - Analysis: Impact Service
  ****************************************************/
 
 XOWL.prototype.newImpactAnalysis = function (callback, definition) {

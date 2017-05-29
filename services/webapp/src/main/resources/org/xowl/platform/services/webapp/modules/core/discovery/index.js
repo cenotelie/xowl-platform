@@ -8,7 +8,7 @@ var resultCount = 0;
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Query and Discovery"}], function() {
+			{name: "Query and Explore"}], function() {
 		renderQuery();
 	});
 }

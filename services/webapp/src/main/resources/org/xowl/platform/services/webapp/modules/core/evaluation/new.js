@@ -9,7 +9,7 @@ var CRITERIA_SELECTED = [];
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Evaluation Analysis", uri: ROOT + "/modules/core/evaluation/"},
+			{name: "Analysis: Evaluation", uri: ROOT + "/modules/core/evaluation/"},
 			{name: "New Evaluation"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

@@ -11,7 +11,7 @@ var FILTER_TYPES = [];
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Impact Analysis"}], function() {
+			{name: "Analysis: Impact"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getArtifactSchemas(function (status, ct, content) {

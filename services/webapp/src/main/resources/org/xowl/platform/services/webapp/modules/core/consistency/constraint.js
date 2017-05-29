@@ -7,7 +7,7 @@ var ruleId = getParameterByName("id");
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
+			{name: "Manage Consistency", uri: ROOT + "/modules/core/consistency/"},
 			{name: "Constraints", uri: ROOT + "/modules/core/consistency/constraints.html"},
 			{name: "Constraint " + ruleId}], function() {
 		if (!ruleId || ruleId === null || ruleId === "")

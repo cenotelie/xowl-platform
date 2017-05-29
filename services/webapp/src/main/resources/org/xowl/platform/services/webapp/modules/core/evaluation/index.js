@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Evaluation Analysis"}], function() {
+			{name: "Analysis: Evaluation"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getEvaluations(function (status, ct, content) {

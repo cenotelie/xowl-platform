@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Consistency Management"}], function() {
+			{name: "Manage Consistency"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getInconsistencies(function (status, ct, content) {

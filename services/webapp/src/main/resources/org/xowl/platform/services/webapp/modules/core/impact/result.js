@@ -9,7 +9,7 @@ var SCHEMAS = null;
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Impact Analysis", uri: ROOT + "/modules/core/impact/"},
+			{name: "Analysis: Impact", uri: ROOT + "/modules/core/impact/"},
 			{name: jobName}], function() {
 		if (!jobId || jobId === null || jobId === "")
 			return;

@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Consistency Management", uri: ROOT + "/modules/core/consistency/"},
+			{name: "Manage Consistency", uri: ROOT + "/modules/core/consistency/"},
 			{name: "Reasoning Rules"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;

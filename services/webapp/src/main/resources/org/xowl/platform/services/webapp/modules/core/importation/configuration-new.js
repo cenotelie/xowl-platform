@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
+			{name: "Import Data", uri: ROOT + "/modules/core/importation/"},
 			{name: "Stored Configurations", uri: ROOT + "/modules/core/importation/configurations.html"},
 			{name: "Upload Configuration"}], function() {
 	});

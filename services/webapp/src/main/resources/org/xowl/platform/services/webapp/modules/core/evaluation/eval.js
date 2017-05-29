@@ -7,7 +7,7 @@ var evalId = getParameterByName("id");
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Evaluation Analysis", uri: ROOT + "/modules/core/evaluation/"},
+			{name: "Analysis: Evaluation", uri: ROOT + "/modules/core/evaluation/"},
 			{name: "Evaluation " + evalId}], function() {
 		if (!evalId || evalId === null || evalId === "")
 			return;

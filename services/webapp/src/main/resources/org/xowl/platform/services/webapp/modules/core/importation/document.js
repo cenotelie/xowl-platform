@@ -8,7 +8,7 @@ var doc = null;
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Data Import", uri: ROOT + "/modules/core/importation/"},
+			{name: "Import Data", uri: ROOT + "/modules/core/importation/"},
 			{name: "Document " + docId}], function() {
 		if (!docId || docId === null || docId === "")
 			return;

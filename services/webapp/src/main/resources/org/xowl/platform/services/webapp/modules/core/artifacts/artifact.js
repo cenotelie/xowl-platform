@@ -10,7 +10,7 @@ var resultCount = 0;
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Artifacts Management", uri: ROOT + "/modules/core/artifacts/"},
+			{name: "Manage Artifacts", uri: ROOT + "/modules/core/artifacts/"},
 			{name: "Artifact " + artifactId}], function() {
 		if (artifactId === null || artifactId == "")
 			return;

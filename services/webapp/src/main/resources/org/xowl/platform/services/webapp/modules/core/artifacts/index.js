@@ -12,7 +12,7 @@ var DIFF_RIGHT = null;
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Artifacts Management"}], function() {
+			{name: "Manage Artifacts"}], function() {
 		doGetData();
 	});
 }

@@ -31,11 +31,13 @@ public class XOWLWebModuleCore extends WebModuleBase {
      */
     public XOWLWebModuleCore() {
         super(XOWLWebModuleCore.class.getCanonicalName(), "Core Services", "core", "/assets/module-core.svg", 0);
-        this.items.add(new WebModuleItem("Artifacts Management", "artifacts", "/assets/artifact.svg"));
-        this.items.add(new WebModuleItem("Data Import", "importation", "/assets/import.svg"));
-        this.items.add(new WebModuleItem("Consistency Management", "consistency", "/assets/consistency.svg"));
-        this.items.add(new WebModuleItem("Query and Discovery", "discovery", "/assets/exploration.svg"));
-        this.items.add(new WebModuleItem("Impact Analysis", "impact", "/assets/impact.svg"));
-        this.items.add(new WebModuleItem("Evaluation Analysis", "evaluation", "/assets/evaluation.svg"));
+        this.items.add(new WebModuleItem("Manage Artifacts", "artifacts", "/assets/artifact.svg"));
+        this.items.add(new WebModuleItem("Share Meaning", "denotation", "/assets/denotation.svg"));
+        this.items.add(new WebModuleItem("Import Data", "importation", "/assets/import.svg"));
+        this.items.add(new WebModuleItem("Manage Consistency", "consistency", "/assets/consistency.svg"));
+        this.items.add(new WebModuleItem("Simulate / Execute", "execution", "/assets/execution.svg"));
+        this.items.add(new WebModuleItem("Query and Explore", "discovery", "/assets/exploration.svg"));
+        this.items.add(new WebModuleItem("Analysis: Impact", "impact", "/assets/impact.svg"));
+        this.items.add(new WebModuleItem("Analysis: Evaluation", "evaluation", "/assets/evaluation.svg"));
     }
 }

@@ -6,7 +6,7 @@ var xowl = new XOWL();
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
-			{name: "Data Import"}], function() {
+			{name: "Import Data"}], function() {
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getUploadedDocuments(function (status, ct, content) {

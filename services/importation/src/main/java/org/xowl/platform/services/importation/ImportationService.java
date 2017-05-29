@@ -26,6 +26,8 @@ import java.util.Collection;
 
 /**
  * Represents the importation service
+ *
+ * @author Laurent Wouters
  */
 public interface ImportationService extends SecuredService {
     /**

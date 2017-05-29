@@ -28,6 +28,7 @@ import org.xowl.platform.kernel.jobs.JobBase;
  * Implements a base importation job
  *
  * @param <T> The type of the importer configuration
+ * @author Laurent Wouters
  */
 public abstract class ImportationJob<T extends ImporterConfiguration> extends JobBase {
     /**

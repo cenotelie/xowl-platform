@@ -20,14 +20,14 @@ package org.xowl.platform.services.denotation;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.security.SecuredService;
 
+import java.util.Collection;
+
 /**
  * Represents the denotation service for the capture of meaning
  *
  * @author Laurent Wouters
  */
 public interface DenotationService extends SecuredService {
-
-
     /**
      * Gets the uploaded documents not yet completely imported
      *
@@ -75,4 +75,18 @@ public interface DenotationService extends SecuredService {
      * @param documentId The identifier of a document
      */
     XSPReply drop(String documentId);
+
+    /**
+     * Gets the known document parsers
+     *
+     * @return The parsers
+     */
+    Collection<DocumentParser> getParsers();
+
+    /***
+     * Gets a specific document parser
+     * @param identifier The identifier of a parser
+     * @return The corresponding parser
+     */
+    DocumentParser getParser(String identifier);
 }

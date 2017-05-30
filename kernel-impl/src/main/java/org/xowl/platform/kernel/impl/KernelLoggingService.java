@@ -28,7 +28,6 @@ import org.xowl.infra.utils.logging.FileLogger;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
 import org.xowl.infra.utils.metrics.MetricSnapshotInt;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -42,7 +41,6 @@ import org.xowl.platform.kernel.webapi.HttpApiResource;
 import org.xowl.platform.kernel.webapi.HttpApiResourceBase;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
-import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,7 +88,7 @@ class KernelLoggingService extends DispatchLogger implements LoggingService, Htt
      * Initializes this service
      */
     public KernelLoggingService() {
-        super(new FileLogger(new File(System.getenv(Env.ROOT), "platform.log")), new ConsoleLogger());
+        super(new FileLogger(PlatformUtils.resolve("platform.log")), new ConsoleLogger());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/log";
         this.buffer = new PlatformLogBuffer(BUFFER_SIZE);
         this.errorsCount = new AtomicInteger(0);

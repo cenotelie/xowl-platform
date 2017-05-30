@@ -113,7 +113,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
         XOWLServer server = null;
         XOWLDatabase database = null;
         try {
-            String location = (new File(System.getenv(Env.ROOT), configuration.get("location"))).getAbsolutePath();
+            String location = (PlatformUtils.resolve(configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
             server = new EmbeddedServer(Logging.get(), serverConfiguration);
             database = ((XSPReplyResult<XOWLDatabase>) server.getDatabase(serverConfiguration.getAdminDBName())).getData();

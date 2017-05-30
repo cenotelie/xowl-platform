@@ -22,7 +22,7 @@ import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
+import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 
@@ -45,11 +45,7 @@ class FSMarketplace extends StaticMarketplace {
      * @param configuration The configuration for this marketplace
      */
     public FSMarketplace(Section configuration) {
-        File target = new File(configuration.get("location"));
-        if (!target.isAbsolute())
-            // path is relative, make it relative to the distribution's root
-            target = new File(new File(System.getProperty(Env.ROOT)), configuration.get("location"));
-        this.location = target;
+        this.location = PlatformUtils.resolve(configuration.get("location"));
     }
 
     @Override

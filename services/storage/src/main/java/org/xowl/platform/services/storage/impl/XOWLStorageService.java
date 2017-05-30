@@ -57,7 +57,6 @@ import org.xowl.platform.services.storage.jobs.DeleteArtifactJob;
 import org.xowl.platform.services.storage.jobs.PullArtifactFromLiveJob;
 import org.xowl.platform.services.storage.jobs.PushArtifactToLiveJob;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -164,7 +163,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             return server;
         } else {
             try {
-                String location = (new File(System.getenv(Env.ROOT), configuration.get("embedded", "location"))).getAbsolutePath();
+                String location = (PlatformUtils.resolve(configuration.get("embedded", "location"))).getAbsolutePath();
                 XOWLServer server = new EmbeddedServer(Logging.get(), new ServerConfiguration(location));
                 XSPReply reply = server.getDatabase(configuration.get("databases", STORE_ID_LIVE));
                 if (!reply.isSuccess()) {

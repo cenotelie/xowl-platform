@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.impl;
 
+import fr.cenotelie.hime.redist.ASTNode;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
@@ -107,7 +107,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
         this.bundles = new ArrayList<>();
         this.product = loadProductDescriptor();
         this.addons = new ArrayList<>();
-        this.addonsCache = new File(System.getenv(Env.ROOT), configuration.get("addonsStorage"));
+        this.addonsCache = PlatformUtils.resolve(configuration.get("addonsStorage"));
         if (this.addonsCache.exists())
             loadAddonsCache();
         enforceHttpConfigFelix(PlatformHttp.instance(), executionService);
@@ -119,7 +119,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
      * @return The descriptor
      */
     private Product loadProductDescriptor() {
-        File fileDescriptor = new File(System.getenv(Env.ROOT), DESCRIPTOR_FILE);
+        File fileDescriptor = PlatformUtils.resolve(DESCRIPTOR_FILE);
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
             ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
             return new ProductBase(definition);
@@ -410,7 +410,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
             addons.add(descriptor);
             // move the content
             try {
-                File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
+                File felixBundles = PlatformUtils.resolve("felix/bundle");
                 Files.move(fileDescriptor.toPath(), (new File(addonsCache, identifier + ".descriptor")).toPath(), REPLACE_EXISTING);
                 for (File file : fileBundles) {
                     Files.move(file.toPath(), (new File(felixBundles, file.getName())).toPath(), REPLACE_EXISTING);
@@ -477,7 +477,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
             if (descriptor == null)
                 return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
 
-            File felixBundles = new File(new File(System.getenv(Env.ROOT), "felix"), "bundle");
+            File felixBundles = PlatformUtils.resolve("felix/bundle");
             for (AddonBundle bundle : descriptor.getBundles()) {
                 File fileBundle = new File(felixBundles, bundle.serializedString() + ".jar");
                 if (!fileBundle.delete())
@@ -604,8 +604,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
      * @param executionService The job execution service
      */
     private static void enforceHttpConfigFelix(PlatformHttp platformHttp, JobExecutionService executionService) {
-        File root = new File(System.getProperty(Env.ROOT));
-        File confFile = new File(new File(new File(root, "felix"), "conf"), "config.properties");
+        File confFile = PlatformUtils.resolve("felix/conf/config.properties");
         Configuration felixConfiguration = new Configuration();
         try {
             felixConfiguration.load(confFile);
@@ -691,7 +690,7 @@ class KernelPlatformManagementService implements PlatformManagementService, Http
                 // key store is auto-generated
                 if (valueReal == null || valueReal.isEmpty()) {
                     // not generated yet
-                    File keyStoreFile = new File(new File(new File(root, "felix"), "conf"), "keystore.jks");
+                    File keyStoreFile = PlatformUtils.resolve("felix/conf/keystore.jks");
                     String password = SSLGenerator.generateKeyStore(keyStoreFile, "platform.xowl.org");
                     if (password == null) {
                         Logging.get().error("Failed to generate the keystore");

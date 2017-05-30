@@ -97,14 +97,8 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     private void onActivated() {
         if (storage == null) {
             ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService != null ? configurationService.getConfigFor(ImportationService.class.getCanonicalName()) : null;
-            if (configuration != null) {
-                String value = configuration.get("storage");
-                if (value != null)
-                    storage = new File(value);
-                else
-                    storage = new File(System.getProperty("user.dir"));
-            }
+            Configuration configuration = configurationService.getConfigFor(ImportationService.class.getCanonicalName());
+            storage = PlatformUtils.resolve(configuration.get("storage"));
             reloadDocuments();
         }
     }

@@ -25,7 +25,6 @@ import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -63,7 +62,7 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
      * @param configuration The configuration for this service
      */
     public XOWLProfileServiceLocalImpl(Section configuration) {
-        this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
+        this.storage = PlatformUtils.resolve(configuration.get("storage"));
         this.publicProfiles = new HashMap<>();
     }
 

@@ -21,7 +21,6 @@ import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 
 import java.io.File;
@@ -51,8 +50,7 @@ class FileSystemConfigurationService implements ConfigurationService {
      * Initializes this service
      */
     public FileSystemConfigurationService() {
-        File root = new File(System.getProperty(Env.ROOT));
-        directory = new File(root, CONFIG_DIR);
+        this.directory = PlatformUtils.resolve(CONFIG_DIR);
     }
 
     @Override

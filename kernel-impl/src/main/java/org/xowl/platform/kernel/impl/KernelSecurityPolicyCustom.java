@@ -22,7 +22,6 @@ import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.Env;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -58,7 +57,7 @@ class KernelSecurityPolicyCustom implements SecurityPolicy {
      * @param configuration The configuration for the policy
      */
     public KernelSecurityPolicyCustom(Section configuration) {
-        this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
+        this.storage = PlatformUtils.resolve(configuration.get("storage"));
     }
 
     /**

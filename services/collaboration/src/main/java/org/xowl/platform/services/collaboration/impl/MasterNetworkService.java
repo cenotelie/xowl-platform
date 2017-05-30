@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import fr.cenotelie.hime.redist.ASTNode;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
@@ -27,7 +27,10 @@ import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.product.Product;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -86,7 +89,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param configuration The configuration for this service
      */
     public MasterNetworkService(Section configuration) {
-        File storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
+        File storage = PlatformUtils.resolve(configuration.get("storage"));
         this.storageDistributions = new File(storage, "platforms");
         this.storageInstances = new File(storage, "instances");
         this.platforms = new ArrayList<>();
@@ -107,16 +110,18 @@ public class MasterNetworkService implements CollaborationNetworkService {
                 }
             }
         }
-        files = storageInstances.listFiles();
-        if (files != null) {
-            for (int i = 0; i != files.length; i++) {
-                if (files[i].getName().endsWith(".json")) {
-                    try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
-                        RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
-                        collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
-                    } catch (IOException exception) {
-                        Logging.get().error(exception);
+        if (storageInstances.exists()) {
+            files = storageInstances.listFiles();
+            if (files != null) {
+                for (int i = 0; i != files.length; i++) {
+                    if (files[i].getName().endsWith(".json")) {
+                        try (Reader reader = IOUtils.getReader(files[i])) {
+                            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                            RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
+                            collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
+                        } catch (IOException exception) {
+                            Logging.get().error(exception);
+                        }
                     }
                 }
             }

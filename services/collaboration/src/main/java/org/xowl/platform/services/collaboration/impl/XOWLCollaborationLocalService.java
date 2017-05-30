@@ -23,7 +23,10 @@ import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.*;
+import org.xowl.platform.kernel.ConfigurationService;
+import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -62,7 +65,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     public XOWLCollaborationLocalService() {
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-        this.fileManifest = new File(System.getenv(Env.ROOT), configuration.get("manifest"));
+        this.fileManifest = PlatformUtils.resolve(configuration.get("manifest"));
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
             try (Reader reader = IOUtils.getReader(fileManifest)) {

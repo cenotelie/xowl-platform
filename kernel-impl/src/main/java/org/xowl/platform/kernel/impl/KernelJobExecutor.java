@@ -130,7 +130,7 @@ class KernelJobExecutor implements JobExecutionService, ManagedService, HttpApiS
         int poolMin = EXECUTOR_POOL_MIN;
         int poolMax = EXECUTOR_POOL_MAX;
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/jobs";
-        this.storage = new File(System.getenv(Env.ROOT), configuration.get("storage"));
+        this.storage = PlatformUtils.resolve(configuration.get("storage"));
         try {
             String value = configuration.get("queueBound");
             if (value != null)

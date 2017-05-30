@@ -60,6 +60,10 @@ public class Document implements Identifiable, Serializable {
      * The original client's file name
      */
     private final String fileName;
+    /**
+     * Whether this document is shared to others in the collaboration
+     */
+    private boolean isShared;
 
     /**
      * Initializes this document
@@ -75,6 +79,7 @@ public class Document implements Identifiable, Serializable {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
         this.uploader = currentUser == null ? null : currentUser.getIdentifier();
+        this.isShared = false;
     }
 
     /**
@@ -83,11 +88,11 @@ public class Document implements Identifiable, Serializable {
      * @param node The descriptor node to load from
      */
     public Document(ASTNode node) {
-        String tIdentifier = "";
-        String tName = "";
-        String tUploadDate = "";
-        String tUploader = null;
-        String tOriginalFileName = "";
+        String identifier = "";
+        String name = "";
+        String uploadDate = "";
+        String uploader = null;
+        String fileName = "";
         for (ASTNode pair : node.getChildren()) {
             String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
@@ -95,28 +100,31 @@ public class Document implements Identifiable, Serializable {
             value = value.substring(1, value.length() - 1);
             switch (key) {
                 case "identifier":
-                    tIdentifier = value;
+                    identifier = value;
                     break;
                 case "name":
-                    tName = value;
+                    name = value;
                     break;
                 case "uploadDate":
-                    tUploadDate = value;
+                    uploadDate = value;
                     break;
                 case "uploader":
                     if (!value.isEmpty())
-                        tUploader = value;
+                        uploader = value;
                     break;
                 case "fileName":
-                    tOriginalFileName = value;
+                    fileName = value;
+                    break;
+                case "isShared":
+                    isShared = (value.equalsIgnoreCase("true"));
                     break;
             }
         }
-        this.identifier = tIdentifier;
-        this.name = tName;
-        this.uploadDate = tUploadDate;
-        this.uploader = tUploader;
-        this.fileName = tOriginalFileName;
+        this.identifier = identifier;
+        this.name = name;
+        this.uploadDate = uploadDate;
+        this.uploader = uploader;
+        this.fileName = fileName;
     }
 
     /**
@@ -155,6 +163,15 @@ public class Document implements Identifiable, Serializable {
         return fileName;
     }
 
+    /**
+     * Gets whether this document is shared with others in the collaboration
+     *
+     * @return Whether this document is shared with others in the collaboration
+     */
+    public boolean isShared() {
+        return isShared;
+    }
+
     @Override
     public String getIdentifier() {
         return identifier;
@@ -178,6 +195,7 @@ public class Document implements Identifiable, Serializable {
                 "\", \"uploadDate\":\"" + TextUtils.escapeStringJSON(uploadDate) +
                 "\", \"uploader\":\"" + TextUtils.escapeStringJSON(uploader != null ? uploader : "") +
                 "\", \"fileName\":\"" + TextUtils.escapeStringJSON(fileName) +
+                "\", \"isShared\":\"" + Boolean.toString(isShared) +
                 "\"}";
     }
 }

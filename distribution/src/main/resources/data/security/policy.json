@@ -3,6 +3,30 @@
   "parts": [
     {
       "action": {
+        "identifier": "org.xowl.platform.kernel.security.OwnedResource.ChangeOwner"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.OwnedResource.ManageSharing"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.OwnedResource.Access"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsAllowedAccessToResource"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.kernel.LoggingService.GetLog"
       },
       "policy": {

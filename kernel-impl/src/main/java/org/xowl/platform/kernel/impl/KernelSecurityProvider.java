@@ -53,6 +53,10 @@ class KernelSecurityProvider implements SecuredActionPolicyProvider, SecurityPol
             return SecuredActionPolicyIsGroupAdmin.INSTANCE;
         else if (SecuredActionPolicyIsSelf.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsSelf.INSTANCE;
+        else if (SecuredActionPolicyIsResourceOwner.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsResourceOwner.INSTANCE;
+        else if (SecuredActionPolicyIsAllowedAccessToResource.class.getCanonicalName().equals(policyId))
+            return SecuredActionPolicyIsAllowedAccessToResource.INSTANCE;
         else if (SecuredActionPolicyIsJobOwner.class.getCanonicalName().equals(policyId))
             return SecuredActionPolicyIsJobOwner.INSTANCE;
         return null;

@@ -57,7 +57,7 @@ public class Document extends SecuredResourceBase {
      */
     public Document(String name, String fileName) {
         super(URI + UUID.randomUUID().toString(), name);
-        this.uploader = getOwner();
+        this.uploader = getOwners().iterator().next();
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;
     }

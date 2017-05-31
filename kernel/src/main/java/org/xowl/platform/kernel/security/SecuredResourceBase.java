@@ -19,6 +19,7 @@ package org.xowl.platform.kernel.security;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.TextUtils;
@@ -46,9 +47,9 @@ public class SecuredResourceBase implements SecuredResource {
      */
     protected final String name;
     /**
-     * The resource's current owner
+     * The resource's current owners
      */
-    private String owner;
+    private final Collection<String> owners;
     /**
      * The sharing of the resource
      */
@@ -63,10 +64,13 @@ public class SecuredResourceBase implements SecuredResource {
     protected SecuredResourceBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
+        this.owners = new ArrayList<>();
         this.sharings = new ArrayList<>();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
-        this.owner = currentUser == null ? PlatformUserRoot.INSTANCE.getIdentifier() : currentUser.getIdentifier();
+        if (currentUser == null)
+            currentUser = PlatformUserRoot.INSTANCE;
+        this.owners.add(currentUser.getIdentifier());
     }
 
     /**
@@ -77,7 +81,7 @@ public class SecuredResourceBase implements SecuredResource {
     public SecuredResourceBase(ASTNode node) {
         String identifier = "";
         String name = "";
-        String owner = "";
+        this.owners = new ArrayList<>();
         this.sharings = new ArrayList<>();
         for (ASTNode pair : node.getChildren()) {
             String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
@@ -95,10 +99,12 @@ public class SecuredResourceBase implements SecuredResource {
                     name = value;
                     break;
                 }
-                case "owner": {
-                    String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
-                    value = value.substring(1, value.length() - 1);
-                    owner = value;
+                case "owners": {
+                    for (ASTNode child : pair.getChildren().get(1).getChildren()) {
+                        String value = TextUtils.unescape(child.getValue());
+                        value = value.substring(1, value.length() - 1);
+                        owners.add(value);
+                    }
                     break;
                 }
                 case "sharing": {
@@ -113,7 +119,6 @@ public class SecuredResourceBase implements SecuredResource {
         }
         this.identifier = identifier;
         this.name = name;
-        this.owner = owner;
     }
 
     /**
@@ -168,31 +173,53 @@ public class SecuredResourceBase implements SecuredResource {
     }
 
     @Override
-    public String getOwner() {
-        return owner;
+    public final Collection<String> getOwners() {
+        return Collections.unmodifiableCollection(owners);
     }
 
     @Override
-    public final synchronized XSPReply setOwner(PlatformUser user) {
+    public final XSPReply addOwner(PlatformUser user) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_CHANGE_OWNER, this);
+        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_OWNERSHIP, this);
         if (!reply.isSuccess())
             return reply;
-        String oldOwned = this.owner;
-        this.owner = user.getIdentifier();
-        onOwnedChanged(oldOwned, user);
+        synchronized (owners) {
+            if (owners.contains(user.getIdentifier()))
+                return new XSPReplyApiError(SecuredResource.ERROR_ALREADY_OWNER);
+            owners.add(user.getIdentifier());
+            onOwnedChanged(user, true);
+        }
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public final XSPReply removeOwner(PlatformUser user) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_OWNERSHIP, this);
+        if (!reply.isSuccess())
+            return reply;
+        synchronized (owners) {
+            if (owners.size() == 1)
+                return new XSPReplyApiError(SecuredResource.ERROR_LAST_OWNER);
+            boolean removed = owners.remove(user.getIdentifier());
+            if (!removed)
+                return XSPReplyNotFound.instance();
+            onOwnedChanged(user, false);
+        }
+        return XSPReplyNotFound.instance();
     }
 
     /**
      * Event when the owner has changed
      *
-     * @param oldOwner The old owner
-     * @param newOwned The new owner
+     * @param user  The changed owner
+     * @param added Whether the owner was added
      */
-    protected void onOwnedChanged(String oldOwner, PlatformUser newOwned) {
+    protected void onOwnedChanged(PlatformUser user, boolean added) {
         // by default do nothing
     }
 
@@ -211,7 +238,7 @@ public class SecuredResourceBase implements SecuredResource {
             return reply;
         synchronized (sharings) {
             sharings.add(sharing);
-            onSharingChanged();
+            onSharingChanged(sharing, true);
         }
         return XSPReplySuccess.instance();
     }
@@ -228,7 +255,7 @@ public class SecuredResourceBase implements SecuredResource {
             for (SecuredResourceSharing candidate : sharings) {
                 if (candidate.equals(sharing)) {
                     sharings.remove(candidate);
-                    onSharingChanged();
+                    onSharingChanged(sharing, false);
                     return XSPReplySuccess.instance();
                 }
             }
@@ -238,8 +265,11 @@ public class SecuredResourceBase implements SecuredResource {
 
     /**
      * Event when the sharing specification changed
+     *
+     * @param sharing The changed sharing
+     * @param added   Whether the sharing was added
      */
-    protected void onSharingChanged() {
+    protected void onSharingChanged(SecuredResourceSharing sharing, boolean added) {
         // by default, do nothing
     }
 
@@ -269,10 +299,19 @@ public class SecuredResourceBase implements SecuredResource {
         builder.append(TextUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(getName()));
-        builder.append("\", \"owner\": \"");
-        builder.append(TextUtils.escapeStringJSON(getOwner()));
-        builder.append("\", \"sharing\": [");
+        builder.append("\", \"owner\": [");
         boolean first = true;
+        for (String owner : getOwners()) {
+            if (!first)
+                builder.append(", ");
+            first = false;
+            builder.append("\"");
+            builder.append(TextUtils.escapeStringJSON(owner));
+            builder.append("\"");
+        }
+
+        builder.append("], \"sharing\": [");
+        first = true;
         for (SecuredResourceSharing sharing : getSharings()) {
             if (!first)
                 builder.append(", ");

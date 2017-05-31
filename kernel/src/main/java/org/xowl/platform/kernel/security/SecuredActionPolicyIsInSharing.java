@@ -57,7 +57,7 @@ public class SecuredActionPolicyIsInSharing extends SecuredActionPolicyBase {
         if (!(data instanceof SecuredResource))
             return false;
         SecuredResource resource = (SecuredResource) data;
-        if (resource.getOwner().equals(user.getIdentifier()))
+        if (resource.getOwners().contains(user.getIdentifier()))
             // resource owner can access the resource
             return true;
         // look for a sharing of the resource matching the requesting user

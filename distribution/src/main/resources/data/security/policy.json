@@ -3,7 +3,7 @@
   "parts": [
     {
       "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredResource.ChangeOwner"
+        "identifier": "org.xowl.platform.kernel.security.SecuredResource.ManageOwnership"
       },
       "policy": {
         "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"

@@ -18,8 +18,10 @@
 package org.xowl.platform.kernel.security;
 
 import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 import java.util.Collection;
@@ -31,9 +33,9 @@ import java.util.Collection;
  */
 public interface SecuredResource extends Identifiable, Serializable {
     /**
-     * Action to change the owner of the resource
+     * Action to change the ownership of the resource
      */
-    SecuredAction ACTION_CHANGE_OWNER = new SecuredAction(SecuredResource.class.getCanonicalName() + ".ChangeOwner", "Secured Resource - Change Ownership", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    SecuredAction ACTION_MANAGE_OWNERSHIP = new SecuredAction(SecuredResource.class.getCanonicalName() + ".ManageOwnership", "Secured Resource - Manage Ownership", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
     /**
      * Action to manage the sharing of the resource
      */
@@ -44,19 +46,40 @@ public interface SecuredResource extends Identifiable, Serializable {
     SecuredAction ACTION_ACCESS = new SecuredAction(SecuredResource.class.getCanonicalName() + ".Access", "Secured Resource - Access", SecuredActionPolicyIsInSharing.DESCRIPTOR);
 
     /**
-     * Gets the owner of this resource
-     *
-     * @return The owner of this resource
+     * API error - The provided user is already an owner of the resource
      */
-    String getOwner();
+    ApiError ERROR_ALREADY_OWNER = new ApiError(0x00000036,
+            "The provided user is already an owner of the resource.",
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000036.html");
+    /**
+     * API error - Impossible to remove the last owner of the resource
+     */
+    ApiError ERROR_LAST_OWNER = new ApiError(0x00000037,
+            "Impossible to remove the last owner of the resource.",
+            PlatformHttp.ERROR_HELP_PREFIX + "0x00000037.html");
 
     /**
-     * Changes the owner of this resource
+     * Gets the owners of this resource
+     *
+     * @return The owners of this resource
+     */
+    Collection<String> getOwners();
+
+    /**
+     * Adds an owner of this resource
      *
      * @param user The new owner for this resource
      * @return The protocol reply
      */
-    XSPReply setOwner(PlatformUser user);
+    XSPReply addOwner(PlatformUser user);
+
+    /**
+     * Removes an owner of this resource
+     *
+     * @param user The previous owner for this resource
+     * @return The protocol reply
+     */
+    XSPReply removeOwner(PlatformUser user);
 
     /**
      * Gets the specifications of how this resource is shared

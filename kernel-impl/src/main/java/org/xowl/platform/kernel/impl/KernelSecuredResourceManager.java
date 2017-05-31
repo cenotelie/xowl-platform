@@ -27,12 +27,11 @@ import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.SecuredResource;
-import org.xowl.platform.kernel.security.SecuredResourceDescriptor;
-import org.xowl.platform.kernel.security.SecuredResourceManager;
-import org.xowl.platform.kernel.security.SecuredResourceSharing;
+import org.xowl.platform.kernel.security.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +45,7 @@ import java.util.Map;
  *
  * @author Laurent Wouters
  */
-public class KernelSecuredResourceManager implements SecuredResourceManager {
+class KernelSecuredResourceManager implements SecuredResourceManager {
     /**
      * The storage for the configuration
      */
@@ -193,6 +192,13 @@ public class KernelSecuredResourceManager implements SecuredResourceManager {
 
     @Override
     public XSPReply deleteDescriptor(SecuredResource resource) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_DESCRIPTOR, resource);
+        if (!reply.isSuccess())
+            return reply;
+
         KernelDescriptor descriptor = getDescriptors().remove(resource.getIdentifier());
         if (descriptor == null)
             return XSPReplySuccess.instance();

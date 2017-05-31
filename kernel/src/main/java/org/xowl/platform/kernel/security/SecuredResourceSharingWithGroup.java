@@ -19,28 +19,27 @@ package org.xowl.platform.kernel.security;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
-import java.util.Objects;
-
 /**
- * Represents the sharing of an owned resource with a particular user
+ * Represents the sharing of an secured resource with a particular group
  *
  * @author Laurent Wouters
  */
-public class OwnedResourceSharingWithUser implements OwnedResourceSharing {
+public class SecuredResourceSharingWithGroup implements SecuredResourceSharing {
     /**
-     * The identifier of the allowed user
+     * The identifier of the allowed group
      */
-    private final String user;
+    private final String group;
 
     /**
      * Initializes this sharing
      *
-     * @param user The identifier of the allowed user
+     * @param group The identifier of the allowed group
      */
-    public OwnedResourceSharingWithUser(String user) {
-        this.user = user;
+    public SecuredResourceSharingWithGroup(String group) {
+        this.group = group;
     }
 
     /**
@@ -48,42 +47,43 @@ public class OwnedResourceSharingWithUser implements OwnedResourceSharing {
      *
      * @param definition The serialized definition
      */
-    public OwnedResourceSharingWithUser(ASTNode definition) {
-        String user = "";
+    public SecuredResourceSharingWithGroup(ASTNode definition) {
+        String group = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("user".equals(head)) {
+            if ("group".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                user = value.substring(1, value.length() - 1);
+                group = value.substring(1, value.length() - 1);
             }
         }
-        this.user = user;
+        this.group = group;
     }
 
     @Override
     public boolean isAllowedAccess(SecurityService securityService, PlatformUser user) {
-        return Objects.equals(user.getIdentifier(), this.user);
+        PlatformGroup group = securityService.getRealm().getGroup(this.group);
+        return group != null && (group.getUsers().contains(user) || group.getAdmins().contains(user));
     }
 
     @Override
     public String serializedString() {
-        return user;
+        return group;
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(OwnedResourceSharingWithUser.class.getCanonicalName()) +
-                "\", \"user\": \"" +
-                TextUtils.escapeStringJSON(user) +
+                TextUtils.escapeStringJSON(SecuredResourceSharingWithGroup.class.getCanonicalName()) +
+                "\", \"group\": \"" +
+                TextUtils.escapeStringJSON(group) +
                 "\"}";
     }
 
     @Override
     public boolean equals(Object object) {
         return (object != null
-                && object instanceof OwnedResourceSharingWithUser
-                && ((OwnedResourceSharingWithUser) object).user.equals(this.user));
+                && object instanceof SecuredResourceSharingWithGroup
+                && ((SecuredResourceSharingWithGroup) object).group.equals(this.group));
     }
 }

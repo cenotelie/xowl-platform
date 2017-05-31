@@ -29,19 +29,19 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface OwnedResource extends Identifiable, Serializable {
+public interface SecuredResource extends Identifiable, Serializable {
     /**
      * Action to change the owner of the resource
      */
-    SecuredAction ACTION_CHANGE_OWNER = new SecuredAction(OwnedResource.class.getCanonicalName() + ".ChangeOwner", "Owned Resource - Change Owner", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    SecuredAction ACTION_CHANGE_OWNER = new SecuredAction(SecuredResource.class.getCanonicalName() + ".ChangeOwner", "Secured Resource - Change Ownership", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
     /**
      * Action to manage the sharing of the resource
      */
-    SecuredAction ACTION_MANAGE_SHARING = new SecuredAction(OwnedResource.class.getCanonicalName() + ".ManageSharing", "Owned Resource - Manage Sharing", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    SecuredAction ACTION_MANAGE_SHARING = new SecuredAction(SecuredResource.class.getCanonicalName() + ".ManageSharing", "Secured Resource - Manage Sharing", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
     /**
      * Action to access the resource
      */
-    SecuredAction ACTION_ACCESS = new SecuredAction(OwnedResource.class.getCanonicalName() + ".Access", "Owned Resource - Access", SecuredActionPolicyIsAllowedAccessToResource.DESCRIPTOR);
+    SecuredAction ACTION_ACCESS = new SecuredAction(SecuredResource.class.getCanonicalName() + ".Access", "Secured Resource - Access", SecuredActionPolicyIsInSharing.DESCRIPTOR);
 
     /**
      * Gets the owner of this resource
@@ -63,7 +63,7 @@ public interface OwnedResource extends Identifiable, Serializable {
      *
      * @return The specifications of how this resource is shared
      */
-    Collection<OwnedResourceSharing> getSharings();
+    Collection<SecuredResourceSharing> getSharings();
 
     /**
      * Adds a sharing for this resource
@@ -71,7 +71,7 @@ public interface OwnedResource extends Identifiable, Serializable {
      * @param sharing The sharing to add
      * @return The protocol reply
      */
-    XSPReply addSharing(OwnedResourceSharing sharing);
+    XSPReply addSharing(SecuredResourceSharing sharing);
 
     /**
      * Remove a sharing for this resource
@@ -79,5 +79,5 @@ public interface OwnedResource extends Identifiable, Serializable {
      * @param sharing The sharing to remove
      * @return The protocol reply
      */
-    XSPReply removeSharing(OwnedResourceSharing sharing);
+    XSPReply removeSharing(SecuredResourceSharing sharing);
 }

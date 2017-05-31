@@ -19,7 +19,7 @@ package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.security.OwnedResourceBase;
+import org.xowl.platform.kernel.security.SecuredResourceBase;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -30,7 +30,7 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class Document extends OwnedResourceBase {
+public class Document extends SecuredResourceBase {
     /**
      * The base URI for documents
      */

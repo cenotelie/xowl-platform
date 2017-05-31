@@ -21,16 +21,26 @@ import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
+import java.util.Objects;
+
 /**
- * Represents the sharing of an owned resource with everybody in the collaboration
+ * Represents the sharing of an secured resource with a particular user
  *
  * @author Laurent Wouters
  */
-public class OwnedResourceSharingWithEverybody implements OwnedResourceSharing {
+public class SecuredResourceSharingWithUser implements SecuredResourceSharing {
+    /**
+     * The identifier of the allowed user
+     */
+    private final String user;
+
     /**
      * Initializes this sharing
+     *
+     * @param user The identifier of the allowed user
      */
-    public OwnedResourceSharingWithEverybody() {
+    public SecuredResourceSharingWithUser(String user) {
+        this.user = user;
     }
 
     /**
@@ -38,28 +48,42 @@ public class OwnedResourceSharingWithEverybody implements OwnedResourceSharing {
      *
      * @param definition The serialized definition
      */
-    public OwnedResourceSharingWithEverybody(ASTNode definition) {
+    public SecuredResourceSharingWithUser(ASTNode definition) {
+        String user = "";
+        for (ASTNode member : definition.getChildren()) {
+            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
+            head = head.substring(1, head.length() - 1);
+            if ("user".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                user = value.substring(1, value.length() - 1);
+            }
+        }
+        this.user = user;
     }
 
     @Override
     public boolean isAllowedAccess(SecurityService securityService, PlatformUser user) {
-        return true;
+        return Objects.equals(user.getIdentifier(), this.user);
     }
 
     @Override
     public String serializedString() {
-        return "everybody";
+        return user;
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(OwnedResourceSharingWithEverybody.class.getCanonicalName()) +
+                TextUtils.escapeStringJSON(SecuredResourceSharingWithUser.class.getCanonicalName()) +
+                "\", \"user\": \"" +
+                TextUtils.escapeStringJSON(user) +
                 "\"}";
     }
 
     @Override
     public boolean equals(Object object) {
-        return (object != null && object instanceof OwnedResourceSharingWithEverybody);
+        return (object != null
+                && object instanceof SecuredResourceSharingWithUser
+                && ((SecuredResourceSharingWithUser) object).user.equals(this.user));
     }
 }

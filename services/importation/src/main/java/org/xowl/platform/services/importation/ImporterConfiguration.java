@@ -19,7 +19,7 @@ package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.security.OwnedResourceBase;
+import org.xowl.platform.kernel.security.SecuredResourceBase;
 
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class ImporterConfiguration extends OwnedResourceBase {
+public class ImporterConfiguration extends SecuredResourceBase {
     /**
      * The base URI for importer configurations
      */

@@ -136,6 +136,9 @@ public interface SecurityService extends SecuredService {
      * The actions for the security service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
+            SecuredResource.ACTION_CHANGE_OWNER,
+            SecuredResource.ACTION_MANAGE_SHARING,
+            SecuredResource.ACTION_ACCESS,
             ACTION_GET_POLICY,
             ACTION_SET_POLICY,
             ACTION_CHANGE_ID,

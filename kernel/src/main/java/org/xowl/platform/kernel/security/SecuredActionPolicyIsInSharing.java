@@ -20,25 +20,25 @@ package org.xowl.platform.kernel.security;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to have been shared the owned resource
+ * Represents an authorization policy that requires the user to have been shared the secured resource
  *
  * @author Laurent Wouters
  */
-public class SecuredActionPolicyIsAllowedAccessToResource extends SecuredActionPolicyBase {
+public class SecuredActionPolicyIsInSharing extends SecuredActionPolicyBase {
     /**
      * The descriptor for this policy
      */
-    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsAllowedAccessToResource.class.getCanonicalName(), "User is allowed access to resource");
+    public static final SecuredActionPolicyDescriptor DESCRIPTOR = new SecuredActionPolicyDescriptor(SecuredActionPolicyIsInSharing.class.getCanonicalName(), "User is allowed access to resource");
 
     /**
      * The singleton instance for this policy
      */
-    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsAllowedAccessToResource();
+    public static final SecuredActionPolicy INSTANCE = new SecuredActionPolicyIsInSharing();
 
     /**
      * Initializes this policy
      */
-    private SecuredActionPolicyIsAllowedAccessToResource() {
+    private SecuredActionPolicyIsInSharing() {
         super(DESCRIPTOR.getIdentifier(), DESCRIPTOR.getName());
     }
 
@@ -54,14 +54,14 @@ public class SecuredActionPolicyIsAllowedAccessToResource extends SecuredActionP
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        if (!(data instanceof OwnedResource))
+        if (!(data instanceof SecuredResource))
             return false;
-        OwnedResource resource = (OwnedResource) data;
+        SecuredResource resource = (SecuredResource) data;
         if (resource.getOwner().equals(user.getIdentifier()))
             // resource owner can access the resource
             return true;
         // look for a sharing of the resource matching the requesting user
-        for (OwnedResourceSharing sharing : ((OwnedResource) data).getSharings()) {
+        for (SecuredResourceSharing sharing : ((SecuredResource) data).getSharings()) {
             if (sharing.isAllowedAccess(securityService, user))
                 return true;
         }

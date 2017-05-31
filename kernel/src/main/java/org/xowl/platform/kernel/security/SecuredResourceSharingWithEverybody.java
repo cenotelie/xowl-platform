@@ -22,23 +22,15 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents the sharing of an owned resource with a particular role
+ * Represents the sharing of an secured resource with everybody in the collaboration
  *
  * @author Laurent Wouters
  */
-public class OwnedResourceSharingWithRole implements OwnedResourceSharing {
-    /**
-     * The identifier of the allowed role
-     */
-    private final String role;
-
+public class SecuredResourceSharingWithEverybody implements SecuredResourceSharing {
     /**
      * Initializes this sharing
-     *
-     * @param role The identifier of the allowed role
      */
-    public OwnedResourceSharingWithRole(String role) {
-        this.role = role;
+    public SecuredResourceSharingWithEverybody() {
     }
 
     /**
@@ -46,42 +38,28 @@ public class OwnedResourceSharingWithRole implements OwnedResourceSharing {
      *
      * @param definition The serialized definition
      */
-    public OwnedResourceSharingWithRole(ASTNode definition) {
-        String role = "";
-        for (ASTNode member : definition.getChildren()) {
-            String head = TextUtils.unescape(member.getChildren().get(0).getValue());
-            head = head.substring(1, head.length() - 1);
-            if ("role".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                role = value.substring(1, value.length() - 1);
-            }
-        }
-        this.role = role;
+    public SecuredResourceSharingWithEverybody(ASTNode definition) {
     }
 
     @Override
     public boolean isAllowedAccess(SecurityService securityService, PlatformUser user) {
-        return securityService.getRealm().checkHasRole(user.getIdentifier(), role);
+        return true;
     }
 
     @Override
     public String serializedString() {
-        return role;
+        return "everybody";
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(OwnedResourceSharingWithRole.class.getCanonicalName()) +
-                "\", \"role\": \"" +
-                TextUtils.escapeStringJSON(role) +
+                TextUtils.escapeStringJSON(SecuredResourceSharingWithEverybody.class.getCanonicalName()) +
                 "\"}";
     }
 
     @Override
     public boolean equals(Object object) {
-        return (object != null
-                && object instanceof OwnedResourceSharingWithRole
-                && ((OwnedResourceSharingWithRole) object).role.equals(this.role));
+        return (object != null && object instanceof SecuredResourceSharingWithEverybody);
     }
 }

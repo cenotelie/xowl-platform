@@ -32,11 +32,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Base implementation of an owned resource
+ * Base implementation of an secured resource
  *
  * @author Laurent Wouters
  */
-public class OwnedResourceBase implements OwnedResource {
+public class SecuredResourceBase implements SecuredResource {
     /**
      * The resource's identifier
      */
@@ -52,7 +52,7 @@ public class OwnedResourceBase implements OwnedResource {
     /**
      * The sharing of the resource
      */
-    private final Collection<OwnedResourceSharing> sharings;
+    private final Collection<SecuredResourceSharing> sharings;
 
     /**
      * Initializes this resource
@@ -60,7 +60,7 @@ public class OwnedResourceBase implements OwnedResource {
      * @param identifier The resource's identifier
      * @param name       he resource's name
      */
-    protected OwnedResourceBase(String identifier, String name) {
+    protected SecuredResourceBase(String identifier, String name) {
         this.identifier = identifier;
         this.name = name;
         this.sharings = new ArrayList<>();
@@ -74,7 +74,7 @@ public class OwnedResourceBase implements OwnedResource {
      *
      * @param node The descriptor node to load from
      */
-    public OwnedResourceBase(ASTNode node) {
+    public SecuredResourceBase(ASTNode node) {
         String identifier = "";
         String name = "";
         String owner = "";
@@ -103,7 +103,7 @@ public class OwnedResourceBase implements OwnedResource {
                 }
                 case "sharing": {
                     for (ASTNode child : pair.getChildren().get(1).getChildren()) {
-                        OwnedResourceSharing sharing = loadSharing(child);
+                        SecuredResourceSharing sharing = loadSharing(child);
                         if (sharing != null)
                             sharings.add(sharing);
                     }
@@ -122,18 +122,18 @@ public class OwnedResourceBase implements OwnedResource {
      * @param node A serialized definition
      * @return The sharing
      */
-    private static OwnedResourceSharing loadSharing(ASTNode node) {
+    private static SecuredResourceSharing loadSharing(ASTNode node) {
         String type = getObjectType(node);
         if (type == null)
             return null;
-        if (OwnedResourceSharingWithEverybody.class.getCanonicalName().equals(type))
-            return new OwnedResourceSharingWithEverybody(node);
-        if (OwnedResourceSharingWithUser.class.getCanonicalName().equals(type))
-            return new OwnedResourceSharingWithUser(node);
-        if (OwnedResourceSharingWithGroup.class.getCanonicalName().equals(type))
-            return new OwnedResourceSharingWithGroup(node);
-        if (OwnedResourceSharingWithRole.class.getCanonicalName().equals(type))
-            return new OwnedResourceSharingWithRole(node);
+        if (SecuredResourceSharingWithEverybody.class.getCanonicalName().equals(type))
+            return new SecuredResourceSharingWithEverybody(node);
+        if (SecuredResourceSharingWithUser.class.getCanonicalName().equals(type))
+            return new SecuredResourceSharingWithUser(node);
+        if (SecuredResourceSharingWithGroup.class.getCanonicalName().equals(type))
+            return new SecuredResourceSharingWithGroup(node);
+        if (SecuredResourceSharingWithRole.class.getCanonicalName().equals(type))
+            return new SecuredResourceSharingWithRole(node);
         return null;
     }
 
@@ -177,7 +177,7 @@ public class OwnedResourceBase implements OwnedResource {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(OwnedResource.ACTION_CHANGE_OWNER, this);
+        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_CHANGE_OWNER, this);
         if (!reply.isSuccess())
             return reply;
         String oldOwned = this.owner;
@@ -197,16 +197,16 @@ public class OwnedResourceBase implements OwnedResource {
     }
 
     @Override
-    public final Collection<OwnedResourceSharing> getSharings() {
+    public final Collection<SecuredResourceSharing> getSharings() {
         return Collections.unmodifiableCollection(sharings);
     }
 
     @Override
-    public final XSPReply addSharing(OwnedResourceSharing sharing) {
+    public final XSPReply addSharing(SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(OwnedResource.ACTION_MANAGE_SHARING, this);
+        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_SHARING, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (sharings) {
@@ -217,15 +217,15 @@ public class OwnedResourceBase implements OwnedResource {
     }
 
     @Override
-    public final XSPReply removeSharing(OwnedResourceSharing sharing) {
+    public final XSPReply removeSharing(SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(OwnedResource.ACTION_MANAGE_SHARING, this);
+        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_SHARING, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (sharings) {
-            for (OwnedResourceSharing candidate : sharings) {
+            for (SecuredResourceSharing candidate : sharings) {
                 if (candidate.equals(sharing)) {
                     sharings.remove(candidate);
                     onSharingChanged();
@@ -273,7 +273,7 @@ public class OwnedResourceBase implements OwnedResource {
         builder.append(TextUtils.escapeStringJSON(getOwner()));
         builder.append("\", \"sharing\": [");
         boolean first = true;
-        for (OwnedResourceSharing sharing : getSharings()) {
+        for (SecuredResourceSharing sharing : getSharings()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -291,6 +291,6 @@ public class OwnedResourceBase implements OwnedResource {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        return securityService.checkAction(OwnedResource.ACTION_ACCESS, this);
+        return securityService.checkAction(SecuredResource.ACTION_ACCESS, this);
     }
 }

@@ -19,27 +19,26 @@ package org.xowl.platform.kernel.security;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents the sharing of an owned resource with a particular group
+ * Represents the sharing of an secured resource with a particular role
  *
  * @author Laurent Wouters
  */
-public class OwnedResourceSharingWithGroup implements OwnedResourceSharing {
+public class SecuredResourceSharingWithRole implements SecuredResourceSharing {
     /**
-     * The identifier of the allowed group
+     * The identifier of the allowed role
      */
-    private final String group;
+    private final String role;
 
     /**
      * Initializes this sharing
      *
-     * @param group The identifier of the allowed group
+     * @param role The identifier of the allowed role
      */
-    public OwnedResourceSharingWithGroup(String group) {
-        this.group = group;
+    public SecuredResourceSharingWithRole(String role) {
+        this.role = role;
     }
 
     /**
@@ -47,43 +46,42 @@ public class OwnedResourceSharingWithGroup implements OwnedResourceSharing {
      *
      * @param definition The serialized definition
      */
-    public OwnedResourceSharingWithGroup(ASTNode definition) {
-        String group = "";
+    public SecuredResourceSharingWithRole(ASTNode definition) {
+        String role = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("group".equals(head)) {
+            if ("role".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                group = value.substring(1, value.length() - 1);
+                role = value.substring(1, value.length() - 1);
             }
         }
-        this.group = group;
+        this.role = role;
     }
 
     @Override
     public boolean isAllowedAccess(SecurityService securityService, PlatformUser user) {
-        PlatformGroup group = securityService.getRealm().getGroup(this.group);
-        return group != null && (group.getUsers().contains(user) || group.getAdmins().contains(user));
+        return securityService.getRealm().checkHasRole(user.getIdentifier(), role);
     }
 
     @Override
     public String serializedString() {
-        return group;
+        return role;
     }
 
     @Override
     public String serializedJSON() {
         return "{\"type\": \"" +
-                TextUtils.escapeStringJSON(OwnedResourceSharingWithGroup.class.getCanonicalName()) +
-                "\", \"group\": \"" +
-                TextUtils.escapeStringJSON(group) +
+                TextUtils.escapeStringJSON(SecuredResourceSharingWithRole.class.getCanonicalName()) +
+                "\", \"role\": \"" +
+                TextUtils.escapeStringJSON(role) +
                 "\"}";
     }
 
     @Override
     public boolean equals(Object object) {
         return (object != null
-                && object instanceof OwnedResourceSharingWithGroup
-                && ((OwnedResourceSharingWithGroup) object).group.equals(this.group));
+                && object instanceof SecuredResourceSharingWithRole
+                && ((SecuredResourceSharingWithRole) object).role.equals(this.role));
     }
 }

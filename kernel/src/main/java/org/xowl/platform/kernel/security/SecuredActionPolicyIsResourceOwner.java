@@ -20,7 +20,7 @@ package org.xowl.platform.kernel.security;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents an authorization policy that requires the user to be the owner of the owned resource
+ * Represents an authorization policy that requires the user to be the owner of the secured resource
  *
  * @author Laurent Wouters
  */
@@ -54,7 +54,7 @@ public class SecuredActionPolicyIsResourceOwner extends SecuredActionPolicyBase 
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        return (data instanceof OwnedResource
-                && ((OwnedResource) data).getOwner().equals(user.getIdentifier()));
+        return (data instanceof SecuredResource
+                && ((SecuredResource) data).getOwner().equals(user.getIdentifier()));
     }
 }

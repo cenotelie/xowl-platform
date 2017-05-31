@@ -21,11 +21,11 @@ import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
- * Represents the sharing of an owned resource with others
+ * Represents the sharing of an secured resource with others
  *
  * @author Laurent Wouters
  */
-public interface OwnedResourceSharing extends Serializable {
+public interface SecuredResourceSharing extends Serializable {
     /**
      * Gets whether the specified platform user is allowed access to the resource
      *

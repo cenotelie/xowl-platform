@@ -18,8 +18,14 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.security.SecuredResourceBase;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.security.SecuredResource;
+import org.xowl.platform.kernel.security.SecuredResourceDescriptor;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.UUID;
 
@@ -28,12 +34,20 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class ImporterConfiguration extends SecuredResourceBase {
+public class ImporterConfiguration implements SecuredResource, Serializable {
     /**
      * The base URI for importer configurations
      */
     private static final String URI = "http://xowl.org/platform/services/importation/ImporterConfiguration#";
 
+    /**
+     * The configuration's identifier
+     */
+    protected final String identifier;
+    /**
+     * The configuration's name
+     */
+    protected final String name;
     /**
      * The identifier of the parent importer
      */
@@ -46,7 +60,8 @@ public class ImporterConfiguration extends SecuredResourceBase {
      * @param importer The parent importer
      */
     public ImporterConfiguration(String name, Importer importer) {
-        super(URI + UUID.randomUUID().toString(), name);
+        this.identifier = URI + UUID.randomUUID().toString();
+        this.name = name;
         this.importer = importer.getIdentifier();
     }
 
@@ -56,7 +71,8 @@ public class ImporterConfiguration extends SecuredResourceBase {
      * @param definition The definition of this configuration
      */
     public ImporterConfiguration(ASTNode definition) {
-        super(definition);
+        String identifier = "";
+        String name = "";
         String importer = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
@@ -64,9 +80,27 @@ public class ImporterConfiguration extends SecuredResourceBase {
             if ("importer".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 importer = value.substring(1, value.length() - 1);
+            } else if ("name".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                name = value.substring(1, value.length() - 1);
+            } else if ("importer".equals(head)) {
+                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
+                importer = value.substring(1, value.length() - 1);
             }
         }
+        this.identifier = identifier;
+        this.name = name;
         this.importer = importer;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     /**
@@ -88,6 +122,27 @@ public class ImporterConfiguration extends SecuredResourceBase {
     }
 
     @Override
+    public SecuredResourceDescriptor getSecurityDescriptor() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        return securityService.getSecuredResources().getDescriptorFor(this);
+    }
+
+    @Override
+    public XSPReply checkAccess() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        return securityService.checkAction(SecurityService.ACTION_RESOURCE_ACCESS, this);
+    }
+
+    @Override
+    public String serializedString() {
+        return identifier;
+    }
+
+    @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
@@ -98,9 +153,16 @@ public class ImporterConfiguration extends SecuredResourceBase {
         return builder.toString();
     }
 
-    @Override
+    /**
+     * Serialization of the basic attributes
+     *
+     * @param builder The build to sue
+     */
     protected void serializedJsonBase(StringBuilder builder) {
-        super.serializedJsonBase(builder);
+        builder.append("\"identifier\": \"");
+        builder.append(TextUtils.escapeStringJSON(identifier));
+        builder.append("\", \"name\": \"");
+        builder.append(TextUtils.escapeStringJSON(name));
         builder.append("\", \"importer\": \"");
         builder.append(TextUtils.escapeStringJSON(importer));
         builder.append("\"");

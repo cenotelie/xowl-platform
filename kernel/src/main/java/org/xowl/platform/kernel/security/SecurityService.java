@@ -131,14 +131,27 @@ public interface SecurityService extends SecuredService {
      * Service action to remove a role implication
      */
     SecuredAction ACTION_REMOVE_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
+    /**
+     * Action to change the ownership of a secured resource
+     */
+    SecuredAction ACTION_MANAGE_RESOURCE_OWNERSHIP = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceOwnership", "Security Service - Manage Secured Resource Ownership", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    /**
+     * Action to manage the sharing of a secured resource
+     */
+    SecuredAction ACTION_MANAGE_RESOURCE_SHARING = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceSharing", "Security Service - Manage Secured Resource Sharing", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    /**
+     * Action to manage the security descriptor of a secured resource
+     */
+    SecuredAction ACTION_MANAGE_RESOURCE_DESCRIPTOR = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceDescriptor", "Security Service - Manage Secured Resource Descriptor", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
+    /**
+     * Action to access to a secured resource
+     */
+    SecuredAction ACTION_RESOURCE_ACCESS = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResourceAccess", "Security Service - Secured Resource Access", SecuredActionPolicyIsInSharing.DESCRIPTOR);
 
     /**
      * The actions for the security service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            SecuredResource.ACTION_MANAGE_OWNERSHIP,
-            SecuredResource.ACTION_MANAGE_SHARING,
-            SecuredResource.ACTION_ACCESS,
             ACTION_GET_POLICY,
             ACTION_SET_POLICY,
             ACTION_CHANGE_ID,
@@ -162,7 +175,11 @@ public interface SecurityService extends SecuredService {
             ACTION_ASSIGN_ROLE_TO_GROUP,
             ACTION_UNASSIGN_ROLE_TO_GROUP,
             ACTION_ADD_ROLE_IMPLICATION,
-            ACTION_REMOVE_ROLE_IMPLICATION
+            ACTION_REMOVE_ROLE_IMPLICATION,
+            ACTION_MANAGE_RESOURCE_OWNERSHIP,
+            ACTION_MANAGE_RESOURCE_SHARING,
+            ACTION_MANAGE_RESOURCE_DESCRIPTOR,
+            ACTION_RESOURCE_ACCESS
     };
 
     /**
@@ -178,6 +195,13 @@ public interface SecurityService extends SecuredService {
      * @return The current authorization policy for this platform
      */
     SecurityPolicy getPolicy();
+
+    /**
+     * Gets the manager for the secured resources
+     *
+     * @return The manager for the secured resources
+     */
+    SecuredResourceManager getSecuredResources();
 
     /**
      * Performs the initial authentication of a client

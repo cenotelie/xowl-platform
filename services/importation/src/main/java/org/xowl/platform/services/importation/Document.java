@@ -18,8 +18,16 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.security.SecuredResourceBase;
+import org.xowl.platform.kernel.Register;
+import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserRoot;
+import org.xowl.platform.kernel.security.SecuredResource;
+import org.xowl.platform.kernel.security.SecuredResourceDescriptor;
+import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -30,12 +38,20 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class Document extends SecuredResourceBase {
+public class Document implements SecuredResource, Serializable {
     /**
      * The base URI for documents
      */
-    private static final String URI = "http://xowl.org/platform/services/importation/Document#";
+    protected static final String URI = "http://xowl.org/platform/services/importation/Document#";
 
+    /**
+     * The document's identifier
+     */
+    private final String identifier;
+    /**
+     * The document's name
+     */
+    private final String name;
     /**
      * The identifier of the platform user that performed the upload
      */
@@ -56,8 +72,11 @@ public class Document extends SecuredResourceBase {
      * @param fileName The original client's file name
      */
     public Document(String name, String fileName) {
-        super(URI + UUID.randomUUID().toString(), name);
-        this.uploader = getOwners().iterator().next();
+        this.identifier = URI + UUID.randomUUID().toString();
+        this.name = name;
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
+        this.uploader = currentUser == null ? PlatformUserRoot.INSTANCE.getIdentifier() : currentUser.getIdentifier();
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;
     }
@@ -68,7 +87,8 @@ public class Document extends SecuredResourceBase {
      * @param node The descriptor node to load from
      */
     public Document(ASTNode node) {
-        super(node);
+        String identifier = "";
+        String name = "";
         String uploader = "";
         String uploadDate = "";
         String originalName = "";
@@ -78,6 +98,12 @@ public class Document extends SecuredResourceBase {
             String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
             value = value.substring(1, value.length() - 1);
             switch (key) {
+                case "identifier":
+                    identifier = value;
+                    break;
+                case "name":
+                    name = value;
+                    break;
                 case "uploader":
                     uploader = value;
                     break;
@@ -89,9 +115,21 @@ public class Document extends SecuredResourceBase {
                     break;
             }
         }
+        this.identifier = identifier;
+        this.name = name;
         this.uploader = uploader;
         this.uploadDate = uploadDate;
         this.fileName = originalName;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     /**
@@ -131,19 +169,40 @@ public class Document extends SecuredResourceBase {
     }
 
     @Override
+    public SecuredResourceDescriptor getSecurityDescriptor() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return null;
+        return securityService.getSecuredResources().getDescriptorFor(this);
+    }
+
+    @Override
+    public XSPReply checkAccess() {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        return securityService.checkAction(SecurityService.ACTION_RESOURCE_ACCESS, this);
+    }
+
+    @Override
+    public String serializedString() {
+        return identifier;
+    }
+
+    @Override
     public String serializedJSON() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(Document.class.getCanonicalName()));
-        builder.append("\"");
-        serializedJsonBase(builder);
-        builder.append(", \"uploader\": \"");
-        builder.append(TextUtils.escapeStringJSON(uploader));
-        builder.append("\", \"uploadDate\": \"");
-        builder.append(TextUtils.escapeStringJSON(uploadDate));
-        builder.append("\", \"fileName\": \"");
-        builder.append(TextUtils.escapeStringJSON(fileName));
-        builder.append("\"}");
-        return builder.toString();
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(Document.class.getCanonicalName()) +
+                "\", \"identifier\": \"" +
+                TextUtils.escapeStringJSON(identifier) +
+                "\", \"name\":\"" +
+                TextUtils.escapeStringJSON(name) +
+                "\", \"uploadDate\":\"" +
+                TextUtils.escapeStringJSON(uploadDate) +
+                "\", \"uploader\":\"" +
+                TextUtils.escapeStringJSON(uploader != null ? uploader : "") +
+                "\", \"fileName\":\"" +
+                TextUtils.escapeStringJSON(fileName) +
+                "\"}";
     }
 }

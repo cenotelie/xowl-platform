@@ -76,11 +76,6 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
     }
 
     @Override
-    public String serializedString() {
-        return serializedJSON();
-    }
-
-    @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");

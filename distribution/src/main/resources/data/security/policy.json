@@ -3,30 +3,6 @@
   "parts": [
     {
       "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredResource.ManageOwnership"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
-      }
-    },
-    {
-      "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredResource.ManageSharing"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
-      }
-    },
-    {
-      "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredResource.Access"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsInSharing"
-      }
-    },
-    {
-      "action": {
         "identifier": "org.xowl.platform.kernel.LoggingService.GetLog"
       },
       "policy": {
@@ -311,6 +287,38 @@
       },
       "policy": {
         "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsPlatformAdmin"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceOwnership"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceSharing"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceDescriptor"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ResourceAccess"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsInSharing"
       }
     },
     {

@@ -105,6 +105,10 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      */
     private final Section tokenServiceConfiguration;
     /**
+     * The configuration section for the descriptors of secured resources
+     */
+    private final Section descriptorsConfiguration;
+    /**
      * The time to live in seconds of an authentication token
      */
     private final long securityTokenTTL;
@@ -124,6 +128,10 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      * The token service
      */
     private SecurityTokenService tokenService;
+    /**
+     * The manager of secured resources
+     */
+    private SecuredResourceManager resourceManager;
 
     /**
      * Initializes this service
@@ -138,6 +146,7 @@ class KernelSecurityService implements SecurityService, HttpApiService {
         this.realmConfiguration = configuration.getSection("realm");
         this.policyConfiguration = configuration.getSection("policy");
         this.tokenServiceConfiguration = configuration.getSection("tokens");
+        this.descriptorsConfiguration = configuration.getSection("descriptors");
         this.securityTokenTTL = Integer.parseInt(tokenServiceConfiguration.get("tokenTTL"));
         this.clients = new HashMap<>();
     }
@@ -244,6 +253,14 @@ class KernelSecurityService implements SecurityService, HttpApiService {
         }
         policy = new KernelSecurityPolicyAuthenticated();
         return policy;
+    }
+
+    @Override
+    public synchronized SecuredResourceManager getSecuredResources() {
+        if (resourceManager != null)
+            return resourceManager;
+        resourceManager = new KernelSecuredResourceManager(descriptorsConfiguration);
+        return resourceManager;
     }
 
     @Override

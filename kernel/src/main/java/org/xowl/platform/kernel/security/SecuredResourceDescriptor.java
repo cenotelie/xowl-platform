@@ -22,6 +22,8 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyApiError;
 import org.xowl.infra.server.xsp.XSPReplyNotFound;
 import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
@@ -33,19 +35,19 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Base implementation of an secured resource
+ * Represents the security descriptor of a secured resource
  *
  * @author Laurent Wouters
  */
-public class SecuredResourceBase implements SecuredResource {
+public class SecuredResourceDescriptor implements Identifiable, Serializable {
     /**
      * The resource's identifier
      */
-    protected final String identifier;
+    private final String identifier;
     /**
      * The resource's name
      */
-    protected final String name;
+    private final String name;
     /**
      * The resource's current owners
      */
@@ -56,14 +58,13 @@ public class SecuredResourceBase implements SecuredResource {
     private final Collection<SecuredResourceSharing> sharings;
 
     /**
-     * Initializes this resource
+     * Initializes this descriptor
      *
-     * @param identifier The resource's identifier
-     * @param name       he resource's name
+     * @param resource The associated secured resource
      */
-    protected SecuredResourceBase(String identifier, String name) {
-        this.identifier = identifier;
-        this.name = name;
+    public SecuredResourceDescriptor(SecuredResource resource) {
+        this.identifier = resource.getIdentifier();
+        this.name = resource.getName();
         this.owners = new ArrayList<>();
         this.sharings = new ArrayList<>();
         SecurityService securityService = Register.getComponent(SecurityService.class);
@@ -78,7 +79,7 @@ public class SecuredResourceBase implements SecuredResource {
      *
      * @param node The descriptor node to load from
      */
-    public SecuredResourceBase(ASTNode node) {
+    public SecuredResourceDescriptor(ASTNode node) {
         String identifier = "";
         String name = "";
         this.owners = new ArrayList<>();
@@ -172,45 +173,63 @@ public class SecuredResourceBase implements SecuredResource {
         return name;
     }
 
-    @Override
-    public final Collection<String> getOwners() {
+    /**
+     * Gets the owners of this resource
+     *
+     * @return The owners of this resource
+     */
+    public Collection<String> getOwners() {
         return Collections.unmodifiableCollection(owners);
     }
 
-    @Override
-    public final XSPReply addOwner(PlatformUser user) {
+    /**
+     * Adds an owner of this resource
+     *
+     * @param user The new owner for this resource
+     * @return The protocol reply
+     */
+    public XSPReply addOwner(PlatformUser user) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_OWNERSHIP, this);
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_OWNERSHIP, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (owners) {
             if (owners.contains(user.getIdentifier()))
-                return new XSPReplyApiError(SecuredResource.ERROR_ALREADY_OWNER);
+                return new XSPReplyApiError(SecuredResourceManager.ERROR_ALREADY_OWNER);
             owners.add(user.getIdentifier());
-            onOwnedChanged(user, true);
+            reply = onOwnedChanged(user, true);
+            if (!reply.isSuccess())
+                owners.remove(user.getIdentifier());
+            return reply;
         }
-        return XSPReplySuccess.instance();
     }
 
-    @Override
-    public final XSPReply removeOwner(PlatformUser user) {
+    /**
+     * Removes an owner of this resource
+     *
+     * @param user The previous owner for this resource
+     * @return The protocol reply
+     */
+    public XSPReply removeOwner(PlatformUser user) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_OWNERSHIP, this);
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_OWNERSHIP, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (owners) {
             if (owners.size() == 1)
-                return new XSPReplyApiError(SecuredResource.ERROR_LAST_OWNER);
+                return new XSPReplyApiError(SecuredResourceManager.ERROR_LAST_OWNER);
             boolean removed = owners.remove(user.getIdentifier());
             if (!removed)
                 return XSPReplyNotFound.instance();
-            onOwnedChanged(user, false);
+            reply = onOwnedChanged(user, false);
+            if (!reply.isSuccess())
+                owners.add(user.getIdentifier());
+            return reply;
         }
-        return XSPReplyNotFound.instance();
     }
 
     /**
@@ -218,45 +237,64 @@ public class SecuredResourceBase implements SecuredResource {
      *
      * @param user  The changed owner
      * @param added Whether the owner was added
+     * @return The to accept the change
      */
-    protected void onOwnedChanged(PlatformUser user, boolean added) {
-        // by default do nothing
+    protected XSPReply onOwnedChanged(PlatformUser user, boolean added) {
+        return XSPReplySuccess.instance();
     }
 
-    @Override
-    public final Collection<SecuredResourceSharing> getSharings() {
+    /**
+     * Gets the specifications of how this resource is shared
+     *
+     * @return The specifications of how this resource is shared
+     */
+    public Collection<SecuredResourceSharing> getSharings() {
         return Collections.unmodifiableCollection(sharings);
     }
 
-    @Override
-    public final XSPReply addSharing(SecuredResourceSharing sharing) {
+    /**
+     * Adds a sharing for this resource
+     *
+     * @param sharing The sharing to add
+     * @return The protocol reply
+     */
+    public XSPReply addSharing(SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_SHARING, this);
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_SHARING, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (sharings) {
             sharings.add(sharing);
-            onSharingChanged(sharing, true);
+            reply = onSharingChanged(sharing, true);
+            if (!reply.isSuccess())
+                sharings.remove(sharing);
+            return reply;
         }
-        return XSPReplySuccess.instance();
     }
 
-    @Override
-    public final XSPReply removeSharing(SecuredResourceSharing sharing) {
+    /**
+     * Remove a sharing for this resource
+     *
+     * @param sharing The sharing to remove
+     * @return The protocol reply
+     */
+    public XSPReply removeSharing(SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecuredResource.ACTION_MANAGE_SHARING, this);
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_SHARING, this);
         if (!reply.isSuccess())
             return reply;
         synchronized (sharings) {
             for (SecuredResourceSharing candidate : sharings) {
                 if (candidate.equals(sharing)) {
                     sharings.remove(candidate);
-                    onSharingChanged(sharing, false);
-                    return XSPReplySuccess.instance();
+                    reply = onSharingChanged(sharing, false);
+                    if (!reply.isSuccess())
+                        sharings.add(candidate);
+                    return reply;
                 }
             }
         }
@@ -268,34 +306,23 @@ public class SecuredResourceBase implements SecuredResource {
      *
      * @param sharing The changed sharing
      * @param added   Whether the sharing was added
+     * @return The to accept the change
      */
-    protected void onSharingChanged(SecuredResourceSharing sharing, boolean added) {
-        // by default, do nothing
+    protected XSPReply onSharingChanged(SecuredResourceSharing sharing, boolean added) {
+        return XSPReplySuccess.instance();
     }
 
     @Override
     public String serializedString() {
-        return getIdentifier();
+        return serializedJSON();
     }
 
     @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
-        builder.append(TextUtils.escapeStringJSON(this.getClass().getCanonicalName()));
-        builder.append("\"");
-        serializedJsonBase(builder);
-        builder.append("}");
-        return builder.toString();
-    }
-
-    /**
-     * Serialized the base attributes of this resource
-     *
-     * @param builder The string builder to use
-     */
-    protected void serializedJsonBase(StringBuilder builder) {
-        builder.append(", \"identifier\": \"");
+        builder.append(TextUtils.escapeStringJSON(SecuredResourceDescriptor.class.getCanonicalName()));
+        builder.append("\", \"identifier\": \"");
         builder.append(TextUtils.escapeStringJSON(getIdentifier()));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(getName()));
@@ -318,7 +345,8 @@ public class SecuredResourceBase implements SecuredResource {
             first = false;
             builder.append(sharing.serializedJSON());
         }
-        builder.append("]");
+        builder.append("]}");
+        return builder.toString();
     }
 
     /**
@@ -330,6 +358,6 @@ public class SecuredResourceBase implements SecuredResource {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        return securityService.checkAction(SecuredResource.ACTION_ACCESS, this);
+        return securityService.checkAction(SecurityService.ACTION_RESOURCE_ACCESS, this);
     }
 }

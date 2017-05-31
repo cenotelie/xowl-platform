@@ -67,6 +67,8 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
             return SecuredActionPolicyBase.load(definition);
         if (SecurityPolicyConfiguration.class.getCanonicalName().equals(type))
             return new SecurityPolicyConfiguration(definition);
+        if (SecuredResourceDescriptor.class.getCanonicalName().equals(type))
+            return new SecuredResourceDescriptor(definition);
         if (Job.class.getCanonicalName().equals(type))
             return new JobRemote(definition, deserializer);
         if (Artifact.class.getCanonicalName().equals(type))

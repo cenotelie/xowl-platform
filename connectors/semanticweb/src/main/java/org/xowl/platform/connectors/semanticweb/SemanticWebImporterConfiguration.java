@@ -86,7 +86,7 @@ public class SemanticWebImporterConfiguration extends ImporterConfiguration {
         builder.append("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(SemanticWebImporterConfiguration.class.getName()));
         builder.append("\", ");
-        serializeJSON(builder);
+        serializedJsonBase(builder);
         builder.append(", \"syntax\": \"");
         builder.append(TextUtils.escapeStringJSON(syntax));
         builder.append("\"}");

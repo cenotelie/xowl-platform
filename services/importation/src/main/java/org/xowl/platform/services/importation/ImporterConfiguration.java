@@ -18,9 +18,8 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.platform.kernel.security.OwnedResourceBase;
 
 import java.util.UUID;
 
@@ -29,20 +28,12 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class ImporterConfiguration implements Identifiable, Serializable {
+public class ImporterConfiguration extends OwnedResourceBase {
     /**
      * The base URI for importer configurations
      */
     private static final String URI = "http://xowl.org/platform/services/importation/ImporterConfiguration#";
 
-    /**
-     * The identifier for this configuration
-     */
-    protected final String identifier;
-    /**
-     * The name of this configuration
-     */
-    protected final String name;
     /**
      * The identifier of the parent importer
      */
@@ -55,8 +46,7 @@ public class ImporterConfiguration implements Identifiable, Serializable {
      * @param importer The parent importer
      */
     public ImporterConfiguration(String name, Importer importer) {
-        this.identifier = URI + UUID.randomUUID().toString();
-        this.name = name;
+        super(URI + UUID.randomUUID().toString(), name);
         this.importer = importer.getIdentifier();
     }
 
@@ -66,25 +56,16 @@ public class ImporterConfiguration implements Identifiable, Serializable {
      * @param definition The definition of this configuration
      */
     public ImporterConfiguration(ASTNode definition) {
-        String identifier = null;
-        String name = null;
+        super(definition);
         String importer = "";
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("identifier".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                identifier = value.substring(1, value.length() - 1);
-            } else if ("name".equals(head)) {
-                String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                name = value.substring(1, value.length() - 1);
-            } else if ("importer".equals(head)) {
+            if ("importer".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 importer = value.substring(1, value.length() - 1);
             }
         }
-        this.identifier = (identifier != null && !identifier.isEmpty() ? identifier : URI + UUID.randomUUID().toString());
-        this.name = (name != null ? name : this.identifier);
         this.importer = importer;
     }
 
@@ -97,16 +78,6 @@ public class ImporterConfiguration implements Identifiable, Serializable {
         return identifier.substring(URI.length());
     }
 
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
     /**
      * Gets the identifier of the parent importer
      *
@@ -117,31 +88,19 @@ public class ImporterConfiguration implements Identifiable, Serializable {
     }
 
     @Override
-    public String serializedString() {
-        return serializedJSON();
-    }
-
-    @Override
     public String serializedJSON() {
         StringBuilder builder = new StringBuilder();
         builder.append("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(ImporterConfiguration.class.getCanonicalName()));
         builder.append("\", ");
-        serializeJSON(builder);
+        serializedJsonBase(builder);
         builder.append("}");
         return builder.toString();
     }
 
-    /**
-     * Serialize the base data in JSON
-     *
-     * @param builder The string builder to use
-     */
-    protected void serializeJSON(StringBuilder builder) {
-        builder.append("\"identifier\": \"");
-        builder.append(TextUtils.escapeStringJSON(identifier));
-        builder.append("\", \"name\": \"");
-        builder.append(TextUtils.escapeStringJSON(name));
+    @Override
+    protected void serializedJsonBase(StringBuilder builder) {
+        super.serializedJsonBase(builder);
         builder.append("\", \"importer\": \"");
         builder.append(TextUtils.escapeStringJSON(importer));
         builder.append("\"");

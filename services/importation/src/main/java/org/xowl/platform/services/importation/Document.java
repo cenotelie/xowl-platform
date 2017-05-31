@@ -18,12 +18,8 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.security.SecurityService;
+import org.xowl.platform.kernel.security.OwnedResourceBase;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -34,28 +30,20 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public class Document implements Identifiable, Serializable {
+public class Document extends OwnedResourceBase {
     /**
      * The base URI for documents
      */
     private static final String URI = "http://xowl.org/platform/services/importation/Document#";
 
     /**
-     * The document's identifier
+     * The identifier of the platform user that performed the upload
      */
-    private final String identifier;
-    /**
-     * The document's name
-     */
-    private final String name;
+    private final String uploader;
     /**
      * The date and time at which this document was initially uploaded
      */
     private final String uploadDate;
-    /**
-     * The identifier of the platform user that performed the upload (may be null)
-     */
-    private final String uploader;
     /**
      * The original client's file name
      */
@@ -68,13 +56,10 @@ public class Document implements Identifiable, Serializable {
      * @param fileName The original client's file name
      */
     public Document(String name, String fileName) {
-        this.identifier = URI + UUID.randomUUID().toString();
-        this.name = name;
+        super(URI + UUID.randomUUID().toString(), name);
+        this.uploader = getOwner();
         this.uploadDate = DateFormat.getDateTimeInstance().format(new Date());
         this.fileName = fileName;
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
-        this.uploader = currentUser == null ? null : currentUser.getIdentifier();
     }
 
     /**
@@ -83,40 +68,30 @@ public class Document implements Identifiable, Serializable {
      * @param node The descriptor node to load from
      */
     public Document(ASTNode node) {
-        String tIdentifier = "";
-        String tName = "";
-        String tUploadDate = "";
-        String tUploader = null;
-        String tOriginalFileName = "";
+        super(node);
+        String uploader = "";
+        String uploadDate = "";
+        String originalName = "";
         for (ASTNode pair : node.getChildren()) {
             String key = TextUtils.unescape(pair.getChildren().get(0).getValue());
             key = key.substring(1, key.length() - 1);
             String value = TextUtils.unescape(pair.getChildren().get(1).getValue());
             value = value.substring(1, value.length() - 1);
             switch (key) {
-                case "identifier":
-                    tIdentifier = value;
-                    break;
-                case "name":
-                    tName = value;
+                case "uploader":
+                    uploader = value;
                     break;
                 case "uploadDate":
-                    tUploadDate = value;
-                    break;
-                case "uploader":
-                    if (!value.isEmpty())
-                        tUploader = value;
+                    uploadDate = value;
                     break;
                 case "fileName":
-                    tOriginalFileName = value;
+                    originalName = value;
                     break;
             }
         }
-        this.identifier = tIdentifier;
-        this.name = tName;
-        this.uploadDate = tUploadDate;
-        this.uploader = tUploader;
-        this.fileName = tOriginalFileName;
+        this.uploader = uploader;
+        this.uploadDate = uploadDate;
+        this.fileName = originalName;
     }
 
     /**
@@ -138,9 +113,9 @@ public class Document implements Identifiable, Serializable {
     }
 
     /**
-     * Gets the identifier of the platform user that performed the upload (may be null)
+     * Gets the identifier of the platform user that performed the upload
      *
-     * @return The identifier of the platform user that performed the upload (may be null)
+     * @return The identifier of the platform user that performed the upload
      */
     public String getUploader() {
         return uploader;
@@ -156,28 +131,19 @@ public class Document implements Identifiable, Serializable {
     }
 
     @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String serializedString() {
-        return identifier;
-    }
-
-    @Override
     public String serializedJSON() {
-        return "{\"type\": \"" + TextUtils.escapeStringJSON(Document.class.getCanonicalName()) +
-                "\", \"identifier\": \"" + TextUtils.escapeStringJSON(identifier) +
-                "\", \"name\":\"" + TextUtils.escapeStringJSON(name) +
-                "\", \"uploadDate\":\"" + TextUtils.escapeStringJSON(uploadDate) +
-                "\", \"uploader\":\"" + TextUtils.escapeStringJSON(uploader != null ? uploader : "") +
-                "\", \"fileName\":\"" + TextUtils.escapeStringJSON(fileName) +
-                "\"}";
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\"type\": \"");
+        builder.append(TextUtils.escapeStringJSON(Document.class.getCanonicalName()));
+        builder.append("\"");
+        serializedJsonBase(builder);
+        builder.append(", \"uploader\": \"");
+        builder.append(TextUtils.escapeStringJSON(uploader));
+        builder.append("\", \"uploadDate\": \"");
+        builder.append(TextUtils.escapeStringJSON(uploadDate));
+        builder.append("\", \"fileName\": \"");
+        builder.append(TextUtils.escapeStringJSON(fileName));
+        builder.append("\"}");
+        return builder.toString();
     }
 }

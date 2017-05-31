@@ -667,22 +667,6 @@
     },
     {
       "action": {
-        "identifier": "org.xowl.platform.services.importation.ImportationService.GetMetadata"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-      }
-    },
-    {
-      "action": {
-        "identifier": "org.xowl.platform.services.importation.ImportationService.GetContent"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-      }
-    },
-    {
-      "action": {
         "identifier": "org.xowl.platform.services.importation.ImportationService.Upload"
       },
       "policy": {
@@ -694,7 +678,7 @@
         "identifier": "org.xowl.platform.services.importation.ImportationService.DropDocument"
       },
       "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
       }
     },
     {
@@ -707,18 +691,10 @@
     },
     {
       "action": {
-        "identifier": "org.xowl.platform.services.importation.ImportationService.RetrieveConfig"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
-      }
-    },
-    {
-      "action": {
         "identifier": "org.xowl.platform.services.importation.ImportationService.DeleteConfig"
       },
       "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyAllowAll"
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
       }
     },
     {

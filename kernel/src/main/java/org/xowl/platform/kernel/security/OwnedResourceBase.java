@@ -25,6 +25,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformUser;
+import org.xowl.platform.kernel.platform.PlatformUserRoot;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +66,7 @@ public class OwnedResourceBase implements OwnedResource {
         this.sharings = new ArrayList<>();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         PlatformUser currentUser = securityService == null ? null : securityService.getCurrentUser();
-        this.owner = currentUser == null ? null : currentUser.getIdentifier();
+        this.owner = currentUser == null ? PlatformUserRoot.INSTANCE.getIdentifier() : currentUser.getIdentifier();
     }
 
     /**

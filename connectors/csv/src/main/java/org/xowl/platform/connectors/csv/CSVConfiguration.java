@@ -189,7 +189,7 @@ public class CSVConfiguration extends ImporterConfiguration {
         builder.append("{\"type\": \"");
         builder.append(TextUtils.escapeStringJSON(CSVConfiguration.class.getName()));
         builder.append("\", ");
-        serializeJSON(builder);
+        serializedJsonBase(builder);
         builder.append(", \"separator\": \"");
         builder.append(TextUtils.escapeStringJSON(Character.toString(separator)));
         builder.append("\", \"textMarker\": \"");

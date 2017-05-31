@@ -36,7 +36,6 @@ import org.xowl.platform.kernel.artifacts.ArtifactBase;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.importation.*;
 
 import java.io.IOException;
@@ -85,7 +84,7 @@ public class CSVImporter extends Importer {
     }
 
     @Override
-    public XSPReply doGetPreview(String documentId, ImporterConfiguration configuration) {
+    public XSPReply getPreview(String documentId, ImporterConfiguration configuration) {
         ImportationService service = Register.getComponent(ImportationService.class);
         if (service == null)
             return XSPReplyServiceUnavailable.instance();
@@ -142,7 +141,7 @@ public class CSVImporter extends Importer {
     }
 
     @Override
-    public XSPReply doGetImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata) {
+    public XSPReply getImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata) {
         return new XSPReplyResult<>(new CSVImportationJob(documentId, (CSVConfiguration) configuration, metadata));
     }
 
@@ -164,14 +163,8 @@ public class CSVImporter extends Importer {
         ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
             return XSPReplyServiceUnavailable.instance();
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(importer.actionImport);
-        if (!reply.isSuccess())
-            return reply;
 
-        reply = importationService.getDocument(documentId);
+        XSPReply reply = importationService.getDocument(documentId);
         if (!reply.isSuccess())
             return reply;
         Document document = ((XSPReplyResult<Document>) reply).getData();

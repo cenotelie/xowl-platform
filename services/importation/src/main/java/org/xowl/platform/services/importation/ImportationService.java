@@ -20,6 +20,7 @@ package org.xowl.platform.services.importation;
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredAction;
+import org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner;
 import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
@@ -31,44 +32,29 @@ import java.util.Collection;
  */
 public interface ImportationService extends SecuredService {
     /**
-     * Service action to get the metadata of uploaded documents
-     */
-    SecuredAction ACTION_GET_DOCUMENT_METADATA = new SecuredAction(ImportationService.class.getCanonicalName() + ".GetMetadata", "Importation Service - Get Document Metadata");
-    /**
-     * Service action to get the content of uploaded documents
-     */
-    SecuredAction ACTION_GET_DOCUMENT_CONTENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".GetContent", "Importation Service - Get Document Content");
-    /**
      * Service action to upload documents
      */
     SecuredAction ACTION_UPLOAD_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".Upload", "Importation Service - Upload Document");
     /**
      * Service action to drop uploaded documents
      */
-    SecuredAction ACTION_DROP_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".DropDocument", "Importation Service - Drop Document");
+    SecuredAction ACTION_DROP_DOCUMENT = new SecuredAction(ImportationService.class.getCanonicalName() + ".DropDocument", "Importation Service - Drop Document", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
     /**
      * Service action to store a configuration
      */
     SecuredAction ACTION_STORE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".StoreConfig", "Importation Service - Store Configuration");
     /**
-     * Service action to retrieve a configuration
-     */
-    SecuredAction ACTION_RETRIEVE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".RetrieveConfig", "Importation Service - Retrieve Stored Configuration");
-    /**
      * Service action to delete a configuration
      */
-    SecuredAction ACTION_DELETE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".DeleteConfig", "Importation Service - Delete Stored Configuration");
+    SecuredAction ACTION_DELETE_CONFIG = new SecuredAction(ImportationService.class.getCanonicalName() + ".DeleteConfig", "Importation Service - Delete Stored Configuration", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
 
     /**
      * The actions for this service
      */
     SecuredAction[] ACTIONS = new SecuredAction[]{
-            ACTION_GET_DOCUMENT_METADATA,
-            ACTION_GET_DOCUMENT_CONTENT,
             ACTION_UPLOAD_DOCUMENT,
             ACTION_DROP_DOCUMENT,
             ACTION_STORE_CONFIG,
-            ACTION_RETRIEVE_CONFIG,
             ACTION_DELETE_CONFIG
     };
 

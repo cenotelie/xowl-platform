@@ -54,18 +54,7 @@ public class SecuredActionPolicyIsInSharing extends SecuredActionPolicyBase {
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        if (!(data instanceof SecuredResource))
-            return false;
-        SecuredResource resource = ((SecuredResource) data);
-        SecuredResourceDescriptor descriptor = securityService.getSecuredResources().getDescriptorFor(resource);
-        if (descriptor.getOwners().contains(user.getIdentifier()))
-            // resource owner can access the resource
-            return true;
-        // look for a sharing of the resource matching the requesting user
-        for (SecuredResourceSharing sharing : descriptor.getSharings()) {
-            if (sharing.isAllowedAccess(securityService, user))
-                return true;
-        }
-        return false;
+        return data instanceof SecuredResource
+                && securityService.getSecuredResources().checkIsInSharing(((SecuredResource) data)).isSuccess();
     }
 }

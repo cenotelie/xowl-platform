@@ -31,7 +31,7 @@ public interface SecuredResource extends Identifiable {
      *
      * @return The security descriptor for this resource
      */
-    SecuredResourceDescriptor getSecurityDescriptor();
+    XSPReply getSecurityDescriptor();
 
     /**
      * Checks whether the current user has access to this resource

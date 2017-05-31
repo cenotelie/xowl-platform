@@ -24,7 +24,6 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.security.SecuredResource;
-import org.xowl.platform.kernel.security.SecuredResourceDescriptor;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.util.UUID;
@@ -122,7 +121,7 @@ public class ImporterConfiguration implements SecuredResource, Serializable {
     }
 
     @Override
-    public SecuredResourceDescriptor getSecurityDescriptor() {
+    public XSPReply getSecurityDescriptor() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;

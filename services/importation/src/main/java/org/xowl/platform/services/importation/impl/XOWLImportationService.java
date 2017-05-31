@@ -544,6 +544,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         if (!storage.exists() && !storage.mkdirs())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         Document document = new Document(name, fileName);
+        reply = securityService.getSecuredResources().createDescriptorFor(document);
+        if (!reply.isSuccess())
+            return reply;
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
         File fileContent = new File(storage, getDocContentFile(document));
         try (Writer writer = IOUtils.getWriter(fileDescriptor)) {
@@ -582,6 +585,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                 return XSPReplyNotFound.instance();
         }
         XSPReply reply = securityService.checkAction(ACTION_DROP_DOCUMENT, document);
+        if (!reply.isSuccess())
+            return reply;
+        reply = securityService.getSecuredResources().deleteDescriptorFor(document);
         if (!reply.isSuccess())
             return reply;
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
@@ -684,6 +690,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             return reply;
         if (!storage.exists() && !storage.mkdirs())
             return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
+        reply = securityService.getSecuredResources().createDescriptorFor(configuration);
+        if (!reply.isSuccess())
+            return reply;
         File file = new File(storage, getConfigurationFile(configuration));
         try (Writer writer = IOUtils.getWriter(file)) {
             writer.write(configuration.serializedJSON());
@@ -751,6 +760,9 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             if (configuration == null)
                 return XSPReplyNotFound.instance();
             XSPReply reply = securityService.checkAction(ACTION_DELETE_CONFIG, configuration);
+            if (!reply.isSuccess())
+                return reply;
+            reply = securityService.getSecuredResources().deleteDescriptorFor(configuration);
             if (!reply.isSuccess())
                 return reply;
             configurations.remove(configurationId);

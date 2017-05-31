@@ -18,9 +18,7 @@
 package org.xowl.platform.kernel.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
@@ -106,7 +104,7 @@ class KernelSecuredResourceManager implements SecuredResourceManager {
         }
 
         @Override
-        protected XSPReply onOwnedChanged(PlatformUser user, boolean added) {
+        protected XSPReply onOwnerChanged(PlatformUser user, boolean added) {
             return writeDescriptor();
         }
 
@@ -181,30 +179,77 @@ class KernelSecuredResourceManager implements SecuredResourceManager {
     }
 
     @Override
-    public SecuredResourceDescriptor getDescriptorFor(SecuredResource resource) {
+    public XSPReply createDescriptorFor(SecuredResource resource) {
         KernelDescriptor descriptor = getDescriptors().get(resource.getIdentifier());
         if (descriptor != null)
-            return descriptor;
+            return XSPReplyNotFound.instance();
+
         descriptor = new KernelDescriptor(resource);
+        XSPReply reply = descriptor.writeDescriptor();
+        if (!reply.isSuccess())
+            return reply;
         getDescriptors().put(resource.getIdentifier(), descriptor);
-        return descriptor;
+        return new XSPReplyResult<>(reply);
     }
 
     @Override
-    public XSPReply deleteDescriptor(SecuredResource resource) {
+    public XSPReply getDescriptorFor(SecuredResource resource) {
+        return checkIsResourceOwner(resource);
+    }
+
+    @Override
+    public XSPReply deleteDescriptorFor(SecuredResource resource) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_DESCRIPTOR, resource);
+        PlatformUser user = securityService.getCurrentUser();
+        if (user == null)
+            return XSPReplyUnauthenticated.instance();
+        XSPReply reply = securityService.checkAction(SecurityService.ACTION_MANAGE_RESOURCE_DESCRIPTOR, this);
         if (!reply.isSuccess())
             return reply;
-
-        KernelDescriptor descriptor = getDescriptors().remove(resource.getIdentifier());
-        if (descriptor == null)
-            return XSPReplySuccess.instance();
+        KernelDescriptor descriptor = getDescriptors().get(resource.getIdentifier());
         File fileDescriptor = new File(storage, descriptor.getFileName());
         if (fileDescriptor.exists() && !fileDescriptor.delete())
             Logging.get().error("Failed to delete file " + fileDescriptor.getAbsolutePath());
         return XSPReplySuccess.instance();
+    }
+
+    @Override
+    public XSPReply checkIsResourceOwner(SecuredResource resource) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser user = securityService.getCurrentUser();
+        if (user == null)
+            return XSPReplyUnauthenticated.instance();
+        KernelDescriptor descriptor = getDescriptors().get(resource.getIdentifier());
+        if (descriptor == null)
+            return XSPReplyNotFound.instance();
+        if (descriptor.getOwners().contains(user.getIdentifier()))
+            return new XSPReplyResult<>(descriptor);
+        return XSPReplyUnauthorized.instance();
+    }
+
+    @Override
+    public XSPReply checkIsInSharing(SecuredResource resource) {
+        SecurityService securityService = Register.getComponent(SecurityService.class);
+        if (securityService == null)
+            return XSPReplyServiceUnavailable.instance();
+        PlatformUser user = securityService.getCurrentUser();
+        if (user == null)
+            return XSPReplyUnauthenticated.instance();
+        KernelDescriptor descriptor = getDescriptors().get(resource.getIdentifier());
+        if (descriptor == null)
+            return XSPReplyNotFound.instance();
+        if (descriptor.getOwners().contains(user.getIdentifier()))
+            // resource owner can access the resource
+            return XSPReplySuccess.instance();
+        // look for a sharing of the resource matching the requesting user
+        for (SecuredResourceSharing sharing : descriptor.getSharings()) {
+            if (sharing.isAllowedAccess(securityService, user))
+                return XSPReplySuccess.instance();
+        }
+        return XSPReplyUnauthorized.instance();
     }
 }

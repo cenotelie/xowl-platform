@@ -42,12 +42,20 @@ public interface SecuredResourceManager extends Identifiable {
             PlatformHttp.ERROR_HELP_PREFIX + "0x00000037.html");
 
     /**
+     * Creates a security descriptor for the specified resource
+     *
+     * @param resource A secured resource
+     * @return The protocol reply
+     */
+    XSPReply createDescriptorFor(SecuredResource resource);
+
+    /**
      * Gets the security descriptor for the specified resource
      *
      * @param resource A secured resource
-     * @return The descriptor for the specified resource
+     * @return The protocol reply
      */
-    SecuredResourceDescriptor getDescriptorFor(SecuredResource resource);
+    XSPReply getDescriptorFor(SecuredResource resource);
 
     /**
      * Deletes the security descriptor for the specified resource
@@ -55,5 +63,20 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply deleteDescriptor(SecuredResource resource);
+    XSPReply deleteDescriptorFor(SecuredResource resource);
+
+    /**
+     * Checks whether the current user is an owner of the specified resource
+     *
+     * @return The protocol reply
+     */
+    XSPReply checkIsResourceOwner(SecuredResource resource);
+
+    /**
+     * Checks whether the current user is either an owner of is part of the sharing of the specified resource
+     *
+     * @param resource The secured resource
+     * @return The protocol reply
+     */
+    XSPReply checkIsInSharing(SecuredResource resource);
 }

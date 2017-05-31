@@ -199,7 +199,7 @@ public class SecuredResourceDescriptor implements Identifiable, Serializable {
             if (owners.contains(user.getIdentifier()))
                 return new XSPReplyApiError(SecuredResourceManager.ERROR_ALREADY_OWNER);
             owners.add(user.getIdentifier());
-            reply = onOwnedChanged(user, true);
+            reply = onOwnerChanged(user, true);
             if (!reply.isSuccess())
                 owners.remove(user.getIdentifier());
             return reply;
@@ -225,7 +225,7 @@ public class SecuredResourceDescriptor implements Identifiable, Serializable {
             boolean removed = owners.remove(user.getIdentifier());
             if (!removed)
                 return XSPReplyNotFound.instance();
-            reply = onOwnedChanged(user, false);
+            reply = onOwnerChanged(user, false);
             if (!reply.isSuccess())
                 owners.add(user.getIdentifier());
             return reply;
@@ -239,7 +239,7 @@ public class SecuredResourceDescriptor implements Identifiable, Serializable {
      * @param added Whether the owner was added
      * @return The to accept the change
      */
-    protected XSPReply onOwnedChanged(PlatformUser user, boolean added) {
+    protected XSPReply onOwnerChanged(PlatformUser user, boolean added) {
         return XSPReplySuccess.instance();
     }
 
@@ -347,17 +347,5 @@ public class SecuredResourceDescriptor implements Identifiable, Serializable {
         }
         builder.append("]}");
         return builder.toString();
-    }
-
-    /**
-     * Checks whether the current user has access to this resource
-     *
-     * @return Whether the current user has access to this resource
-     */
-    public XSPReply checkAccess() {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        return securityService.checkAction(SecurityService.ACTION_RESOURCE_ACCESS, this);
     }
 }

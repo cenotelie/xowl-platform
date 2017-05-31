@@ -26,7 +26,6 @@ import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;
 import org.xowl.platform.kernel.security.SecuredResource;
-import org.xowl.platform.kernel.security.SecuredResourceDescriptor;
 import org.xowl.platform.kernel.security.SecurityService;
 
 import java.text.DateFormat;
@@ -169,7 +168,7 @@ public class Document implements SecuredResource, Serializable {
     }
 
     @Override
-    public SecuredResourceDescriptor getSecurityDescriptor() {
+    public XSPReply getSecurityDescriptor() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;

@@ -38,6 +38,21 @@ import java.util.*;
  */
 public class XOWLHttpContext implements HttpContext {
     /**
+     * The comparator for contributions
+     */
+    private static class ContributionComparator implements Comparator<WebUIContribution> {
+        @Override
+        public int compare(WebUIContribution c1, WebUIContribution c2) {
+            return Integer.compare(c2.getPriority(), c1.getPriority());
+        }
+    }
+
+    /**
+     * The comparator instance of contributions
+     */
+    private static final ContributionComparator COMPARATOR = new ContributionComparator();
+
+    /**
      * Represents a tree of contributions
      */
     private static class Folder {
@@ -56,6 +71,15 @@ public class XOWLHttpContext implements HttpContext {
         public Folder() {
             this.subs = new HashMap<>();
             this.contributions = new ArrayList<>();
+        }
+
+        /**
+         * Prepares this folder
+         */
+        public void prepare() {
+            Collections.sort(contributions, COMPARATOR);
+            for (Folder child : subs.values())
+                child.prepare();
         }
     }
 
@@ -118,6 +142,7 @@ public class XOWLHttpContext implements HttpContext {
                     contributions = Register.getComponents(WebUIContribution.class);
                     for (WebUIContribution contribution : contributions)
                         register(contribution);
+                    root.prepare();
                 }
             }
         }
@@ -143,13 +168,13 @@ public class XOWLHttpContext implements HttpContext {
                     return result;
             }
         }
-        WebUIContribution top = null;
         for (int i = 0; i != folder.contributions.size(); i++) {
             WebUIContribution contribution = folder.contributions.get(i);
-            if (top == null || contribution.getPriority() > top.getPriority())
-                top = contribution;
+            URL result = contribution.getResource(uri);
+            if (result != null)
+                return result;
         }
-        return top == null ? null : top.getResource(uri);
+        return null;
     }
 
     /**

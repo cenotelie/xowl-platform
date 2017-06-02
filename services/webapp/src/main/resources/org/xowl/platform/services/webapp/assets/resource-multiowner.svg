@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" id="resource-multiowner" version="1.1">
+  <rect
+     style="fill:#fc4d4d;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     width="54.054001" height="54.054047" x="24" y="35.945953"/>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#fc4d4d;stroke-width:8.64864731;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 34.810803,35.945939 0,-21.621618 32.432395,0 0,21.621618"/>
+  <ellipse
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     cx="50.756737" cy="49.459461" rx="8.1080999" ry="8.1081066" />
+  <path
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 40.216197,79.189175 21.621599,0 L 51.027,46.756751 Z"/>
+</svg>

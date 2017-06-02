@@ -404,6 +404,27 @@ XOWL.prototype.removeSecuredResourceOwner = function (callback, resourceId, user
 	}, "kernel/security/resources/" + encodeURIComponent(resourceId) + "/removeOwner", {user: userId}, "POST", null, null);
 }
 
+XOWL.prototype.addSecuredResourceSharing = function (callback, resourceId, sharing) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/resources/" + encodeURIComponent(resourceId) + "/addSharing", null, "POST", MIME_JSON, sharing);
+}
+
+XOWL.prototype.removeSecuredResourceSharing = function (callback, resourceId, sharing) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/resources/" + encodeURIComponent(resourceId) + "/removeSharing", null, "POST", MIME_JSON, sharing);
+}
+
+
 
 /*****************************************************
  * Kernel - API Discovery Service

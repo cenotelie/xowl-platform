@@ -36,6 +36,7 @@ import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobStatus;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
+import org.xowl.platform.kernel.security.SecuredResourceSharing;
 
 /**
  * The base API for accessing a remote platform
@@ -450,6 +451,72 @@ public class RemotePlatformAccess extends HttpConnection {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/unimply?target=" + URIUtils.encodeComponent(impliedRoleId),
                 HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Gets the security descriptor of a secured resource
+     *
+     * @param resourceId The identifier of a secured resource
+     * @return The protocol reply
+     */
+    public XSPReply getSecuredResourceDescriptor(String resourceId) {
+        return doRequest(
+                "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId),
+                HttpConstants.METHOD_GET);
+    }
+
+    /**
+     * Adds a new owner to a secured resource
+     *
+     * @param resourceId The identifier of a secured resource
+     * @param userId     The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply addSecuredResourceOwner(String resourceId, String userId) {
+        return doRequest(
+                "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/addOwner?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Removes an owner from a secured resource
+     *
+     * @param resourceId The identifier of a secured resource
+     * @param userId     The identifier of the user
+     * @return The protocol reply
+     */
+    public XSPReply removeSecuredResourceOwner(String resourceId, String userId) {
+        return doRequest(
+                "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/removeOwner?user=" + URIUtils.encodeComponent(userId),
+                HttpConstants.METHOD_POST);
+    }
+
+    /**
+     * Adds a new sharing to a secured resource
+     *
+     * @param resourceId The identifier of a secured resource
+     * @param sharing    The sharing to add
+     * @return The protocol reply
+     */
+    public XSPReply addSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
+        return doRequest(
+                "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/addSharing",
+                HttpConstants.METHOD_POST,
+                sharing);
+    }
+
+    /**
+     * Removes a sharing from a secured resource
+     *
+     * @param resourceId The identifier of a secured resource
+     * @param sharing    The sharing to remove
+     * @return The protocol reply
+     */
+    public XSPReply removeSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
+        return doRequest(
+                "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/removeSharing",
+                HttpConstants.METHOD_POST,
+                sharing);
     }
 
     /**

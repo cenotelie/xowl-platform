@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Laurent Wouters
  */
-public class KernelSecurityTokenService implements SecurityTokenService {
+class KernelSecurityTokenService implements SecurityTokenService {
     /**
      * The size of the key to use
      */

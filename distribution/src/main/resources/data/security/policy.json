@@ -291,30 +291,6 @@
     },
     {
       "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceOwnership"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
-      }
-    },
-    {
-      "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceSharing"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
-      }
-    },
-    {
-      "action": {
-        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResourceDescriptor"
-      },
-      "policy": {
-        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
-      }
-    },
-    {
-      "action": {
         "identifier": "org.xowl.platform.kernel.security.SecurityService.ResourceAccess"
       },
       "policy": {

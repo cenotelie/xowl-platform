@@ -55,7 +55,43 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply getDescriptorFor(SecuredResource resource);
+    XSPReply getDescriptorFor(String resource);
+
+    /**
+     * Adds an owner of a resource
+     *
+     * @param resource A secured resource
+     * @param user     The new owner for this resource
+     * @return The protocol reply
+     */
+    XSPReply addOwner(String resource, String user);
+
+    /**
+     * Removes an owner of a resource
+     *
+     * @param resource A secured resource
+     * @param user     The previous owner for this resource
+     * @return The protocol reply
+     */
+    XSPReply removeOwner(String resource, String user);
+
+    /**
+     * Adds a sharing for a resource
+     *
+     * @param resource A secured resource
+     * @param sharing  The sharing to add
+     * @return The protocol reply
+     */
+    XSPReply addSharing(String resource, SecuredResourceSharing sharing);
+
+    /**
+     * Remove a sharing for a resource
+     *
+     * @param resource A secured resource
+     * @param sharing  The sharing to remove
+     * @return The protocol reply
+     */
+    XSPReply removeSharing(String resource, SecuredResourceSharing sharing);
 
     /**
      * Deletes the security descriptor for the specified resource
@@ -63,14 +99,14 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply deleteDescriptorFor(SecuredResource resource);
+    XSPReply deleteDescriptorFor(String resource);
 
     /**
      * Checks whether the current user is an owner of the specified resource
      *
      * @return The protocol reply
      */
-    XSPReply checkIsResourceOwner(SecuredResource resource);
+    XSPReply checkIsResourceOwner(String resource);
 
     /**
      * Checks whether the current user is either an owner of is part of the sharing of the specified resource
@@ -78,5 +114,5 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource The secured resource
      * @return The protocol reply
      */
-    XSPReply checkIsInSharing(SecuredResource resource);
+    XSPReply checkIsInSharing(String resource);
 }

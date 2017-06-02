@@ -55,6 +55,6 @@ public class SecuredActionPolicyIsResourceOwner extends SecuredActionPolicyBase 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
         return data instanceof SecuredResource
-                && securityService.getSecuredResources().checkIsResourceOwner(((SecuredResource) data)).isSuccess();
+                && securityService.getSecuredResources().checkIsResourceOwner(((SecuredResource) data).getIdentifier()).isSuccess();
     }
 }

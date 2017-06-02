@@ -587,7 +587,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         XSPReply reply = securityService.checkAction(ACTION_DROP_DOCUMENT, document);
         if (!reply.isSuccess())
             return reply;
-        reply = securityService.getSecuredResources().deleteDescriptorFor(document);
+        reply = securityService.getSecuredResources().deleteDescriptorFor(document.getIdentifier());
         if (!reply.isSuccess())
             return reply;
         File fileDescriptor = new File(storage, getDocDescriptorFile(document));
@@ -762,7 +762,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             XSPReply reply = securityService.checkAction(ACTION_DELETE_CONFIG, configuration);
             if (!reply.isSuccess())
                 return reply;
-            reply = securityService.getSecuredResources().deleteDescriptorFor(configuration);
+            reply = securityService.getSecuredResources().deleteDescriptorFor(configuration.getIdentifier());
             if (!reply.isSuccess())
                 return reply;
             configurations.remove(configurationId);

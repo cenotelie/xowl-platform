@@ -132,18 +132,6 @@ public interface SecurityService extends SecuredService {
      */
     SecuredAction ACTION_REMOVE_ROLE_IMPLICATION = new SecuredAction(SecurityService.class.getCanonicalName() + ".RemoveRoleImplication", "Security Service - Remove Role Implication", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
     /**
-     * Action to change the ownership of a secured resource
-     */
-    SecuredAction ACTION_MANAGE_RESOURCE_OWNERSHIP = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceOwnership", "Security Service - Manage Secured Resource Ownership", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
-    /**
-     * Action to manage the sharing of a secured resource
-     */
-    SecuredAction ACTION_MANAGE_RESOURCE_SHARING = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceSharing", "Security Service - Manage Secured Resource Sharing", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
-    /**
-     * Action to manage the security descriptor of a secured resource
-     */
-    SecuredAction ACTION_MANAGE_RESOURCE_DESCRIPTOR = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResourceDescriptor", "Security Service - Manage Secured Resource Descriptor", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
-    /**
      * Action to access to a secured resource
      */
     SecuredAction ACTION_RESOURCE_ACCESS = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResourceAccess", "Security Service - Secured Resource Access", SecuredActionPolicyIsInSharing.DESCRIPTOR);
@@ -176,9 +164,6 @@ public interface SecurityService extends SecuredService {
             ACTION_UNASSIGN_ROLE_TO_GROUP,
             ACTION_ADD_ROLE_IMPLICATION,
             ACTION_REMOVE_ROLE_IMPLICATION,
-            ACTION_MANAGE_RESOURCE_OWNERSHIP,
-            ACTION_MANAGE_RESOURCE_SHARING,
-            ACTION_MANAGE_RESOURCE_DESCRIPTOR,
             ACTION_RESOURCE_ACCESS
     };
 

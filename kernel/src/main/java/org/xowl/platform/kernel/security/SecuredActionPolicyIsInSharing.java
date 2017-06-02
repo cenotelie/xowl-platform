@@ -55,6 +55,6 @@ public class SecuredActionPolicyIsInSharing extends SecuredActionPolicyBase {
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
         return data instanceof SecuredResource
-                && securityService.getSecuredResources().checkIsInSharing(((SecuredResource) data)).isSuccess();
+                && securityService.getSecuredResources().checkIsInSharing(((SecuredResource) data).getIdentifier()).isSuccess();
     }
 }

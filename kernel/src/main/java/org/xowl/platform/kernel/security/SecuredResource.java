@@ -27,13 +27,6 @@ import org.xowl.infra.utils.Identifiable;
  */
 public interface SecuredResource extends Identifiable {
     /**
-     * Gets the security descriptor for this resource
-     *
-     * @return The security descriptor for this resource
-     */
-    XSPReply getSecurityDescriptor();
-
-    /**
      * Checks whether the current user has access to this resource
      *
      * @return Whether the current user has access to this resource

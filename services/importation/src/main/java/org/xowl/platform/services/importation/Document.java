@@ -168,14 +168,6 @@ public class Document implements SecuredResource, Serializable {
     }
 
     @Override
-    public XSPReply getSecurityDescriptor() {
-        SecurityService securityService = Register.getComponent(SecurityService.class);
-        if (securityService == null)
-            return null;
-        return securityService.getSecuredResources().getDescriptorFor(this);
-    }
-
-    @Override
     public XSPReply checkAccess() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)

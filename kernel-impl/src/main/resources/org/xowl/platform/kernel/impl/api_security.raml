@@ -12,6 +12,8 @@ types:
   PlatformRoles: !include schema_platform_kernel.json#/definitions/PlatformRoles
   SecurityPolicyConfiguration: !include schema_platform_kernel.json#/definitions/SecurityPolicyConfiguration
   SecuredActionPolicy: !include schema_platform_kernel.json#/definitions/SecuredActionPolicy
+  SecuredResourceDescriptor: !include schema_platform_kernel.json#/definitions/SecuredResourceDescriptor
+  SecuredResourceSharing: !include schema_platform_kernel.json#/definitions/SecuredResourceSharing
 traits: !include api_traits.raml
 baseUri: https://localhost:8443/api
 /kernel/security:
@@ -99,7 +101,7 @@ baseUri: https://localhost:8443/api
   /policy:
     description: The security authorization policy
     get:
-      description: Gets the configuration of the current security authoriation policy
+      description: Gets the configuration of the current security authorization policy
       is: [secured, mayFail]
       responses:
         200:
@@ -654,6 +656,93 @@ baseUri: https://localhost:8443/api
               description: The identifier of the implied role
               example: role1
               required: true
+          responses:
+            200:
+              description: The operation succeeded
+  /resources:
+    description: The collection of the secured resources on the platform
+    /{resourceId}:
+      description: The security descriptor for the specific secured resource
+      get:
+        description: Gets the security descriptor for the identified secured resource
+        is: [secured, mayFail, resourceAccess]
+        responses:
+          200:
+            description: The security descriptor for the identified secured resource
+            body:
+              application/json:
+                type: SecuredResourceDescriptor
+                example: |
+                  {
+                    "type": "org.xowl.platform.kernel.security.SecuredResourceDescriptor",
+                    "identifier": "{resourceId}",
+                    "name": "The resource's name",
+                    "owners": [
+                      "user1"
+                    ],
+                    "sharing": [
+                      {
+                        "type": "org.xowl.platform.kernel.security.SecuredResourceSharingWithEverybody"
+                      }
+                    ]
+                  }
+      /addOwner:
+        description: Action to add a new owner to the secured resource
+        post:
+          description: Adds a new owner to the secured resource
+          is: [secured, mayFail, resourceAccess]
+          queryParameters:
+            user:
+              displayName: User
+              type: string
+              description: The identifier of the user
+              example: user1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
+      /removeOwner:
+        description: Action to remove an owner from the secured resource
+        post:
+          description: Removes an owner form the secured resource
+          is: [secured, mayFail, resourceAccess]
+          queryParameters:
+            user:
+              displayName: User
+              type: string
+              description: The identifier of the user
+              example: user1
+              required: true
+          responses:
+            200:
+              description: The operation succeeded
+      /addSharing:
+        description: Action to add a new sharing to the secured resource
+        post:
+          description: Adds a new sharing to the secured resource
+          is: [secured, mayFail, resourceAccess]
+          body:
+            application/json:
+              type: SecuredResourceSharing
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.security.SecuredResourceSharingWithEverybody"
+                }
+          responses:
+            200:
+              description: The operation succeeded
+      /removeSharing:
+        description: Action to remove a sharing from the secured resource
+        post:
+          description: Removes a sharing from the secured resource
+          is: [secured, mayFail, resourceAccess]
+          body:
+            application/json:
+              type: SecuredResourceSharing
+              example: |
+                {
+                  "type": "org.xowl.platform.kernel.security.SecuredResourceSharingWithEverybody"
+                }
           responses:
             200:
               description: The operation succeeded

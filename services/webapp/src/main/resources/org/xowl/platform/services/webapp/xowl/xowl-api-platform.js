@@ -374,6 +374,35 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 	}, "kernel/security/roles/" + encodeURIComponent(roleId) + "/unimply", {target: impliedRoleId}, "POST", null, null);
 }
 
+XOWL.prototype.getSecuredResourceDescriptor = function (callback, resourceId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/resources/" + encodeURIComponent(resourceId), null, "GET", null, null);
+}
+
+XOWL.prototype.addSecuredResourceOwner = function (callback, resourceId, userId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/resources/" + encodeURIComponent(resourceId) + "/addOwner", {user: userId}, "POST", null, null);
+}
+
+XOWL.prototype.removeSecuredResourceOwner = function (callback, resourceId, userId) {
+	this.doRequest(function (code, type, content) {
+		if (code === 200) {
+			callback(code, MIME_JSON, null);
+		} else {
+			callback(code, type, content);
+		}
+	}, "kernel/security/resources/" + encodeURIComponent(resourceId) + "/removeOwner", {user: userId}, "POST", null, null);
+}
 
 
 /*****************************************************

@@ -17,7 +17,9 @@
 
 package org.xowl.platform.kernel.impl;
 
+import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
+import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
@@ -25,6 +27,7 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformHttp;
@@ -189,6 +192,8 @@ class KernelSecurityService implements SecurityService, HttpApiService {
             return handleRequestGroups(request);
         if (request.getUri().startsWith(apiUri + "/roles"))
             return handleRequestRoles(request);
+        if (request.getUri().startsWith(apiUri + "/resources"))
+            return handleRequestResources(request);
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -387,7 +392,6 @@ class KernelSecurityService implements SecurityService, HttpApiService {
      * Handles a login failure from a client
      *
      * @param client The client trying to login
-     * @return Whether the failure resulted in the client being banned
      */
     private void onLoginFailure(String client) {
         synchronized (clients) {
@@ -405,9 +409,7 @@ class KernelSecurityService implements SecurityService, HttpApiService {
                 // too much failure, ban this client for a while
                 Logging.get().info("Banned client " + client + " for " + banLength + " seconds");
                 cl.banTimeStamp = Calendar.getInstance().getTime().getTime();
-                return;
             }
-            return;
         }
     }
 
@@ -779,6 +781,79 @@ class KernelSecurityService implements SecurityService, HttpApiService {
                 if (target == null)
                     return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
                 return XSPReplyUtils.toHttpResponse(getRealm().removeRoleImplication(roleId, target), null);
+            }
+        }
+        return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Responds to a request for the resources resource
+     *
+     * @param request The web API request to handle
+     * @return The HTTP response
+     */
+    private HttpResponse handleRequestResources(HttpApiRequest request) {
+        if (request.getUri().equals(apiUri + "/resources"))
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+
+        String rest = request.getUri().substring(apiUri.length() + "/resources".length() + 1);
+        if (rest.isEmpty())
+            return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        int index = rest.indexOf("/");
+        String resourceId = URIUtils.decodeComponent(index > 0 ? rest.substring(0, index) : rest);
+
+        if (index < 0) {
+            if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
+                return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
+            return XSPReplyUtils.toHttpResponse(getSecuredResources().getDescriptorFor(resourceId), null);
+        }
+
+        switch (rest.substring(index)) {
+            case "/addOwner": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String user = request.getParameter("user");
+                if (user == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(getSecuredResources().addOwner(resourceId, user), null);
+            }
+            case "/removeOwner": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String user = request.getParameter("user");
+                if (user == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
+                return XSPReplyUtils.toHttpResponse(getSecuredResources().removeOwner(resourceId, user), null);
+            }
+            case "/addSharing": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String content = new String(request.getContent(), IOUtils.CHARSET);
+                if (content.isEmpty())
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                BufferedLogger logger = new BufferedLogger();
+                ASTNode root = JsonLoader.parseJson(logger, content);
+                if (root == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                SecuredResourceSharing sharing = SecuredResourceDescriptorBase.loadSharing(root);
+                if (sharing == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"), null);
+                return XSPReplyUtils.toHttpResponse(getSecuredResources().addSharing(resourceId, sharing), null);
+            }
+            case "/removeSharing": {
+                if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
+                    return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
+                String content = new String(request.getContent(), IOUtils.CHARSET);
+                if (content.isEmpty())
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                BufferedLogger logger = new BufferedLogger();
+                ASTNode root = JsonLoader.parseJson(logger, content);
+                if (root == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                SecuredResourceSharing sharing = SecuredResourceDescriptorBase.loadSharing(root);
+                if (sharing == null)
+                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"), null);
+                return XSPReplyUtils.toHttpResponse(getSecuredResources().removeSharing(resourceId, sharing), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

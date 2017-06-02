@@ -121,7 +121,7 @@ public class SecuredResourceDescriptorBase implements SecuredResourceDescriptor 
      * @param node A serialized definition
      * @return The sharing
      */
-    private static SecuredResourceSharing loadSharing(ASTNode node) {
+    public static SecuredResourceSharing loadSharing(ASTNode node) {
         String type = getObjectType(node);
         if (type == null)
             return null;

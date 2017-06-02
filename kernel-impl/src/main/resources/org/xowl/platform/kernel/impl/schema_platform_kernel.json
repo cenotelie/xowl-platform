@@ -880,6 +880,136 @@
         "type",
         "parts"
       ]
+    },
+    "SecuredResourceSharingWithEverybody": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredResourceSharingWithEverybody"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "SecuredResourceSharingWithGroup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredResourceSharingWithGroup"
+          ]
+        },
+        "group": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "group"
+      ]
+    },
+    "SecuredResourceSharingWithRole": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredResourceSharingWithRole"
+          ]
+        },
+        "group": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "role"
+      ]
+    },
+    "SecuredResourceSharingWithUser": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredResourceSharingWithUser"
+          ]
+        },
+        "group": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "user"
+      ]
+    },
+    "SecuredResourceSharing": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/SecuredResourceSharingWithEverybody"
+        },
+        {
+          "$ref": "#/definitions/SecuredResourceSharingWithGroup"
+        },
+        {
+          "$ref": "#/definitions/SecuredResourceSharingWithRole"
+        },
+        {
+          "$ref": "#/definitions/SecuredResourceSharingWithUser"
+        }
+      ]
+    },
+    "SecuredResourceDescriptor": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "org.xowl.platform.kernel.security.SecuredResourceDescriptor"
+          ]
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sharing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/SecuredResourceSharingWithEverybody"
+              },
+              {
+                "$ref": "#/definitions/SecuredResourceSharingWithGroup"
+              },
+              {
+                "$ref": "#/definitions/SecuredResourceSharingWithRole"
+              },
+              {
+                "$ref": "#/definitions/SecuredResourceSharingWithUser"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "identifier",
+        "name",
+        "owners",
+        "sharing"
+      ]
     }
   }
 }

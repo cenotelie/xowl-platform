@@ -1,0 +1,35 @@
+<body>
+
+<div id="popups">
+    <div class="popup" id="popup-new-owner">
+        <div class="popup-background" id="popup-new-owner-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Add new owner
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="input-owner" placeholder="jdoe">
+                                    <div class="input-group-addon">
+                                        <img src="" width="20" height="20" id="input-owner-indicator"
+                                             style="display: none;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupNewOwnerAdd()">Add</button>
+                            <button type="button" class="btn btn-default" onclick="onPopupNewOwnerCancel()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>

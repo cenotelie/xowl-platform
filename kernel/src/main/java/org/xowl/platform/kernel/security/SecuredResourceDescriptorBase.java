@@ -190,7 +190,7 @@ public class SecuredResourceDescriptorBase implements SecuredResourceDescriptor 
         builder.append(TextUtils.escapeStringJSON(identifier));
         builder.append("\", \"name\": \"");
         builder.append(TextUtils.escapeStringJSON(name));
-        builder.append("\", \"owner\": [");
+        builder.append("\", \"owners\": [");
         boolean first = true;
         for (String owner : owners) {
             if (!first)

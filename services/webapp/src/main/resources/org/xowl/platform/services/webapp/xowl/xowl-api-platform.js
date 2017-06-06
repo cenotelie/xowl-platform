@@ -377,7 +377,7 @@ XOWL.prototype.removePlatformRoleImplication = function (callback, roleId, impli
 XOWL.prototype.getSecuredResourceDescriptor = function (callback, resourceId) {
 	this.doRequest(function (code, type, content) {
 		if (code === 200) {
-			callback(code, MIME_JSON, null);
+			callback(code, MIME_JSON, JSON.parse(content));
 		} else {
 			callback(code, type, content);
 		}

@@ -42,7 +42,7 @@ var PAGE_BREADCRUMBS = [{name: "Home", uri: ROOT + "/"}];
  */
 var PLATFORM = null;
 /**
- * The index to know whether the page is ready (ready on 100)
+ * The index to know whether the page is ready (ready on 0)
  */
 var PAGE_READY_INDEX = 0;
 /**
@@ -74,12 +74,13 @@ function getParameterByName(name) {
 /**
  * Performs the initial setup of the current page
  *
- * @param platform	   The current xOWL platform object (access to the platform API)
+ * @param platform	     The current xOWL platform object (access to the platform API)
  * @param mustBeLoggedIn Whether a user must be logged-in to see the page
- * @param breadcrumbs	The current breadcrumbs for the page
- * @param onReady		The hook to call when the page is ready
+ * @param breadcrumbs	 The current breadcrumbs for the page
+ * @param onReady		 The hook to call when the page is ready
+ * @param components     The supplementary components to load for the page
  */
-function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
+function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady, components) {
 	if (mustBeLoggedIn && (platform === null || !platform.isLoggedIn())) {
 		document.location.href = ROOT + "/login.html";
 		return;
@@ -87,6 +88,11 @@ function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady) {
 	PLATFORM = platform;
 	PAGE_BREADCRUMBS = PAGE_BREADCRUMBS.concat(breadcrumbs);
 	PAGE_READY_HOOK = onReady;
+	PAGE_READY_INDEX = 3;
+	if ((typeof components) !== "undefined") {
+		PAGE_READY_INDEX += components.length;
+
+	}
 	loadComponent(ROOT + "/components/title.html", function (node) {
 		PAGE_COMPONENT_TITLE = node;
 		inspectDom(PAGE_COMPONENT_TITLE);
@@ -708,6 +714,23 @@ AutoComplete.prototype.getItemString = function (item) {
  * @param item The selected item
  */
 AutoComplete.prototype.onItemSelected = function (item) {
+}
+
+
+
+/*****************************************************
+ * Popup management
+ ****************************************************/
+
+function showPopup(identifier) {
+	document.getElementById(identifier).style.display = "block";
+	document.getElementById(identifier + "-background").onclick = function() {
+		hidePopup(identifier);
+	}
+}
+
+function hidePopup(identifier) {
+	document.getElementById(identifier).style.display = "none";
 }
 
 

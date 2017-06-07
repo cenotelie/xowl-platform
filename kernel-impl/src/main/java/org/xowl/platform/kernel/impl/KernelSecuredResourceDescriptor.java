@@ -26,7 +26,6 @@ import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
-import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredResource;
 import org.xowl.platform.kernel.security.SecuredResourceDescriptorBase;
 import org.xowl.platform.kernel.security.SecuredResourceManager;
@@ -75,14 +74,14 @@ class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBase {
      * @param user The new owner for this resource
      * @return The protocol reply
      */
-    public XSPReply addOwner(PlatformUser user) {
+    public XSPReply addOwner(String user) {
         synchronized (owners) {
-            if (owners.contains(user.getIdentifier()))
+            if (owners.contains(user))
                 return new XSPReplyApiError(SecuredResourceManager.ERROR_ALREADY_OWNER);
-            owners.add(user.getIdentifier());
+            owners.add(user);
             XSPReply reply = writeDescriptor();
             if (!reply.isSuccess())
-                owners.remove(user.getIdentifier());
+                owners.remove(user);
             return reply;
         }
     }
@@ -93,16 +92,16 @@ class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBase {
      * @param user The previous owner for this resource
      * @return The protocol reply
      */
-    public XSPReply removeOwner(PlatformUser user) {
+    public XSPReply removeOwner(String user) {
         synchronized (owners) {
             if (owners.size() == 1)
                 return new XSPReplyApiError(SecuredResourceManager.ERROR_LAST_OWNER);
-            boolean removed = owners.remove(user.getIdentifier());
+            boolean removed = owners.remove(user);
             if (!removed)
                 return XSPReplyNotFound.instance();
             XSPReply reply = writeDescriptor();
             if (!reply.isSuccess())
-                owners.add(user.getIdentifier());
+                owners.add(user);
             return reply;
         }
     }

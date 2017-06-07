@@ -21,6 +21,7 @@ import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.platform.kernel.PlatformHttp;
+import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
  * Represents a manager of secured resources
@@ -104,15 +105,20 @@ public interface SecuredResourceManager extends Identifiable {
     /**
      * Checks whether the current user is an owner of the specified resource
      *
+     * @param securityService The current security service
+     * @param user            The user
+     * @param resource        The identifier of the resource
      * @return The protocol reply
      */
-    XSPReply checkIsResourceOwner(String resource);
+    XSPReply checkIsResourceOwner(SecurityService securityService, PlatformUser user, String resource);
 
     /**
      * Checks whether the current user is either an owner of is part of the sharing of the specified resource
      *
-     * @param resource The secured resource
+     * @param securityService The current security service
+     * @param user            The user
+     * @param resource        The identifier of the resource
      * @return The protocol reply
      */
-    XSPReply checkIsInSharing(String resource);
+    XSPReply checkIsInSharing(SecurityService securityService, PlatformUser user, String resource);
 }

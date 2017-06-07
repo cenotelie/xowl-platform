@@ -299,6 +299,22 @@
     },
     {
       "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.GetResourceDescriptor"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsInSharing"
+      }
+    },
+    {
+      "action": {
+        "identifier": "org.xowl.platform.kernel.security.SecurityService.ManageResource"
+      },
+      "policy": {
+        "identifier": "org.xowl.platform.kernel.security.SecuredActionPolicyIsResourceOwner"
+      }
+    },
+    {
+      "action": {
         "identifier": "org.xowl.platform.kernel.artifacts.ArtifactStorageService.StoreArtifact"
       },
       "policy": {

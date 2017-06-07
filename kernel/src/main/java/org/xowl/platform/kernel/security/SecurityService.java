@@ -135,6 +135,14 @@ public interface SecurityService extends SecuredService {
      * Action to access to a secured resource
      */
     SecuredAction ACTION_RESOURCE_ACCESS = new SecuredAction(SecurityService.class.getCanonicalName() + ".ResourceAccess", "Security Service - Secured Resource Access", SecuredActionPolicyIsInSharing.DESCRIPTOR);
+    /**
+     * Action to get the security descriptor of a secured resource
+     */
+    SecuredAction ACTION_RESOURCE_GET_DESCRIPTOR = new SecuredAction(SecurityService.class.getCanonicalName() + ".GetResourceDescriptor", "Security Service - Secured Resource Get Descriptor", SecuredActionPolicyIsInSharing.DESCRIPTOR);
+    /**
+     * Action to manage the ownership and sharing of a secured resource
+     */
+    SecuredAction ACTION_RESOURCE_MANAGE = new SecuredAction(SecurityService.class.getCanonicalName() + ".ManageResource", "Security Service - Secured Resource Management", SecuredActionPolicyIsResourceOwner.DESCRIPTOR);
 
     /**
      * The actions for the security service
@@ -164,7 +172,9 @@ public interface SecurityService extends SecuredService {
             ACTION_UNASSIGN_ROLE_TO_GROUP,
             ACTION_ADD_ROLE_IMPLICATION,
             ACTION_REMOVE_ROLE_IMPLICATION,
-            ACTION_RESOURCE_ACCESS
+            ACTION_RESOURCE_ACCESS,
+            ACTION_RESOURCE_GET_DESCRIPTOR,
+            ACTION_RESOURCE_MANAGE
     };
 
     /**

@@ -30,10 +30,6 @@ var PAGE_COMPONENT_TITLE = null;
  */
 var PAGE_COMPONENT_HEADER = null;
 /**
- * DOM node for the Footer component
- */
-var PAGE_COMPONENT_FOOTER = null;
-/**
  * The current breadcrumbs for the page
  */
 var PAGE_BREADCRUMBS = [{name: "Home", uri: ROOT + "/"}];
@@ -91,26 +87,43 @@ function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady, components)
 	PAGE_READY_INDEX = 3;
 	if ((typeof components) !== "undefined") {
 		PAGE_READY_INDEX += components.length;
-
+		for (var i = 0; i != components.length; i++) {
+			loadComponent(components[i]);
+		}
 	}
-	loadComponent(ROOT + "/components/title.html", function (node) {
+	loadComponent("footer");
+	doLoadComponent(ROOT + "/components/title.html", function (node) {
 		PAGE_COMPONENT_TITLE = node;
 		inspectDom(PAGE_COMPONENT_TITLE);
 		doSetupHeader();
 	});
-	loadComponent(ROOT + "/components/header.html", function (node) {
+	doLoadComponent(ROOT + "/components/header.html", function (node) {
 		PAGE_COMPONENT_HEADER = node;
 		inspectDom(PAGE_COMPONENT_HEADER);
 		doSetupHeader();
 	});
-	loadComponent(ROOT + "/components/footer.html", function (node) {
-		PAGE_COMPONENT_FOOTER = node;
-		inspectDom(PAGE_COMPONENT_FOOTER);
-		doSetupFooter();
+}
+
+/*
+ * Loads a page component and insert it into the page
+ *
+ * @param component The identifier of the component to load
+ */
+function loadComponent(component) {
+	doLoadComponent(ROOT + "/components/" + component + ".html", function (node) {
+		inspectDom(node);
+		document.getElementById("placeholder-" + component).appendChild(node);
+		onComponentLoaded();
 	});
 }
 
-function loadComponent(component, callback) {
+/*
+ * Performs the request for a component to load
+ *
+ * @param component The URI of the component to load
+ * @param callback  The callback when the request ends
+ */
+function doLoadComponent(component, callback) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState == 4) {
@@ -127,6 +140,11 @@ function loadComponent(component, callback) {
 	xmlHttp.send();
 }
 
+/*
+ * Inspects the DOM of a loaded component
+ *
+ * @param node The node to inspect
+ */
 function inspectDom(node) {
 	inspectDomOnNode(node);
 	if (node.nodeType == 1) {
@@ -136,6 +154,11 @@ function inspectDom(node) {
 	}
 }
 
+/*
+ * Inspects the DOM of a loaded component
+ *
+ * @param node The node to inspect
+ */
 function inspectDomOnNode(node) {
 	if (node.nodeType == 1 && node.nodeName.toLowerCase() == "img") {
 		var source = node.attributes.getNamedItem("src");
@@ -144,6 +167,9 @@ function inspectDomOnNode(node) {
 	}
 }
 
+/*
+ * Performs the setup of the page header
+ */
 function doSetupHeader() {
 	if (PAGE_COMPONENT_TITLE === null || PAGE_COMPONENT_HEADER === null)
 		return;
@@ -178,17 +204,16 @@ function doSetupHeader() {
 		userLink.appendChild(document.createTextNode(PLATFORM.getLoggedInUserName()));
 		userLink.href = ROOT + "/modules/collab/community/profile-update.html?id=" + encodeURIComponent(PLATFORM.getLoggedInUserId());
 	}
-	PAGE_READY_INDEX += 50;
-	if (PAGE_READY_INDEX >= 100)
-		PAGE_READY_HOOK();
+	onComponentLoaded();
+	onComponentLoaded();
 }
 
-function doSetupFooter() {
-	if (PAGE_COMPONENT_FOOTER === null)
-		return;
-	document.getElementById("placeholder-footer").appendChild(PAGE_COMPONENT_FOOTER);
-	PAGE_READY_INDEX += 50;
-	if (PAGE_READY_INDEX >= 100)
+/*
+ * Reacts to a component being loaded
+ */
+function onComponentLoaded() {
+	PAGE_READY_INDEX--;
+	if (PAGE_READY_INDEX <= 0)
 		PAGE_READY_HOOK();
 }
 

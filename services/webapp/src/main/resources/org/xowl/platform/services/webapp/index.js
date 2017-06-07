@@ -5,9 +5,13 @@ var xowl = new XOWL();
 
 function init() {
 	doSetupPage(xowl, true, [], function() {
-		loadComponent(ROOT + "/widgets/placeholder/index.html", function (node) {
-			document.getElementById("panel-custom1").appendChild(node.cloneNode(true));
-			document.getElementById("panel-custom2").appendChild(node.cloneNode(true));
+		doLoadComponent(ROOT + "/components/widgets/welcome.html", function (node) {
+			inspectDom(node);
+			document.getElementById("panel-custom1").appendChild(node);
+		});
+		doLoadComponent(ROOT + "/components/widgets/placeholder.html", function (node) {
+			inspectDom(node);
+			document.getElementById("panel-custom2").appendChild(node);
 		});
 		if (!onOperationRequest("Loading ..."))
 			return;

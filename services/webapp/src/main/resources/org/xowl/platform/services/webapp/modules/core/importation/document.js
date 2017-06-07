@@ -15,7 +15,7 @@ function init() {
 			return;
 		doGetData();
 		setupAutocomplete();
-	});
+	}, ["secured-resource-popups", "secured-resource-descriptor"]);
 }
 
 function doGetData() {

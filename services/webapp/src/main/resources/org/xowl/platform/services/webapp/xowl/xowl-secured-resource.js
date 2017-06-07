@@ -1,13 +1,40 @@
-// Copyright (c) 2016 Association Cénotélie (cenotelie.fr)
+// Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
 // Provided under LGPLv3
 
-function prepareSecuredResource() {
-	loadComponent(ROOT + "/components/secured-resource-popups.html", function (node) {
-		document.getElementById("placeholder-secured-resource-popups").appendChild(node);
-	});
-	loadComponent(ROOT + "/components/secured-resource-descriptor.html", function (node) {
-		document.getElementById("placeholder-secured-resource-descriptor").appendChild(node);
-	});
+var USERS = null;
+
+function setupSRAutocomplete() {
+	var autocomplete1 = new AutoComplete("input-owner");
+	autocomplete1.lookupItems = function (value) {
+		if (USERS !== null) {
+			autocomplete1.onItems(filterItems(USERS, value));
+			return;
+		}
+		xowl.getPlatformUsers(function (status, ct, content) {
+			if (status === 200) {
+				USERS = content;
+				autocomplete1.onItems(filterItems(USERS, value));
+			}
+		});
+	};
+	autocomplete1.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete1.getItemString = function (item) {
+		return item.identifier;
+	};
+}
+
+function filterItems(items, value) {
+	var result = [];
+	for (var i = 0; i != items.length; i++) {
+		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
+			result.push(items[i]);
+		}
+	}
+	return result;
 }
 
 function renderDescriptorIcon(descriptor) {

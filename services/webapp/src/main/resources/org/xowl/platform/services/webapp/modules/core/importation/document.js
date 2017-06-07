@@ -4,7 +4,6 @@
 var xowl = new XOWL();
 var docId = getParameterByName("id");
 var doc = null;
-var USERS = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -14,7 +13,7 @@ function init() {
 		if (!docId || docId === null || docId === "")
 			return;
 		doGetData();
-		setupAutocomplete();
+		setupSRAutocomplete();
 	}, ["secured-resource-popups", "secured-resource-descriptor"]);
 }
 
@@ -37,40 +36,6 @@ function doGetData() {
 			renderDescriptor(content);
 		}
 	}, docId);
-}
-
-function setupAutocomplete() {
-	var autocomplete1 = new AutoComplete("input-owner");
-	autocomplete1.lookupItems = function (value) {
-		if (USERS !== null) {
-			autocomplete1.onItems(filterItems(USERS, value));
-			return;
-		}
-		xowl.getPlatformUsers(function (status, ct, content) {
-			if (status === 200) {
-				USERS = content;
-				autocomplete1.onItems(filterItems(USERS, value));
-			}
-		});
-	};
-	autocomplete1.renderItem = function (item) {
-		var result = document.createElement("div");
-		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
-		return result;
-	};
-	autocomplete1.getItemString = function (item) {
-		return item.identifier;
-	};
-}
-
-function filterItems(items, value) {
-	var result = [];
-	for (var i = 0; i != items.length; i++) {
-		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
-			result.push(items[i]);
-		}
-	}
-	return result;
 }
 
 function onClickImport() {

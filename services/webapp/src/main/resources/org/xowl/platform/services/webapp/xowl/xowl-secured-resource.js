@@ -2,6 +2,7 @@
 // Provided under LGPLv3
 
 var USERS = null;
+var RESOURCE = null;
 
 function setupSRAutocomplete() {
 	var autocomplete1 = new AutoComplete("input-owner");
@@ -64,7 +65,7 @@ function renderDescriptorIcon(descriptor) {
 
 function renderDescriptor(descriptor) {
 	descriptor.owners.sort(function (x, y) {
-		return x.name.localeCompare(y.name);
+		return x.localeCompare(y);
 	});
 	var table = document.getElementById("descriptor-owners");
 	for (var  i = 0; i != descriptor.owners.length; i++) {
@@ -87,14 +88,25 @@ function renderPlatformUser(user) {
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	icon = document.createElement("img");
+	icon.src = ROOT + "/assets/action-remove.svg";
+	icon.width = 20;
+	icon.height = 20;
+	icon.title = "REMOVE";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.style.marginRight = "20px";
+	button.appendChild(icon);
+	button.onclick = function() {
+		onPopupRemoveOwnerOpen(user);
+	};
+	cell.appendChild(button);
+	row.appendChild(cell);
 	return row;
 }
-
-
-
-
-
-
 
 
 
@@ -120,5 +132,29 @@ function onPopupNewOwnerAdd() {
 			displayMessage("success", "Added user " + userId + " as new owner.");
 			waitAndRefresh();
 		}
-	}, doc.identifier, userId);
+	}, RESOURCE, userId);
+}
+
+var USER_TO_REMOVE = null;
+
+function onPopupRemoveOwnerOpen(user) {
+	USER_TO_REMOVE = user;
+	document.getElementById("popup-remove-owner-name").appendChild(document.createTextNode(user));
+	showPopup("popup-remove-owner");
+}
+
+function onPopupRemoveOwnerCancel() {
+	hidePopup("popup-remove-owner");
+}
+
+function onPopupRemoveOwnerOK() {
+	hidePopup("popup-remove-owner");
+	if (!onOperationRequest("Removing user " + USER_TO_REMOVE + " as owner ..."))
+		return;
+	xowl.removeSecuredResourceOwner(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Removed user " + USER_TO_REMOVE + " as owner.");
+			waitAndRefresh();
+		}
+	}, RESOURCE, USER_TO_REMOVE);
 }

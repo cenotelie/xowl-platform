@@ -14,6 +14,7 @@ function init() {
 			return;
 		doGetData();
 		setupSRAutocomplete();
+		RESOURCE = docId;
 	}, ["secured-resource-popups", "secured-resource-descriptor"]);
 }
 

@@ -2,58 +2,89 @@
 // Provided under LGPLv3
 
 var xowl = new XOWL();
-var importers = null;
-var configurations = null;
+var IMPORTERS = null;
+var CONFIGURATIONS = null;
+var DESCRIPTORS = null;
 
 function init() {
 	doSetupPage(xowl, true, [
 			{name: "Core Services", uri: ROOT + "/modules/core/"},
 			{name: "Import Data", uri: ROOT + "/modules/core/importation/"},
 			{name: "Stored Configurations"}], function() {
-		doGetData();
+		doGetData1();
 	});
 }
 
-function doGetData() {
-	if (!onOperationRequest("Loading ...", 2))
+function doGetData1() {
+	if (!onOperationRequest("Loading ..."))
+		return;
+	xowl.getDocumentImporters(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			IMPORTERS = content;
+			doGetData2();
+		}
+	});
+}
+
+function doGetData2() {
+	if (!onOperationRequest("Loading ..."))
 		return;
 	xowl.getImporterConfigurations(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			configurations = content;
-			render();
+			CONFIGURATIONS = content;
+			CONFIGURATIONS.sort(function (x, y) {
+				var left = x.importer + x.name;
+				var right = y.importer + y.name;
+				return left.localeCompare(right);
+			});
+			DESCRIPTORS = new Array(CONFIGURATIONS.length);
+			doGetData3();
 		}
 	});
-	xowl.getDocumentImporters(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			importers = content;
-			render();
+}
+
+function doGetData3() {
+	if (CONFIGURATIONS.length == 0) {
+		render();
+		return;
+	}
+	if (!onOperationRequest("Loading ...", CONFIGURATIONS.length))
+		return;
+	for (var i = 0; i != CONFIGURATIONS.length; i++) {
+		loadSecurityDescriptor(CONFIGURATIONS[i], i);
+	}
+}
+
+function loadSecurityDescriptor(configuration, index) {
+	xowl.getSecuredResourceDescriptor(function (status, ct, content) {
+		onOperationEnded(200, content);
+		if (status === 200) {
+			DESCRIPTORS[index] = content;
+		} else {
+			DESCRIPTORS[index] = null;
 		}
-	});
+		if (PAGE_BUSY === null)
+			render();
+	}, configuration.identifier);
 }
 
 function render() {
-	if (configurations != null && importers != null)
-		doRender();
-}
-
-function doRender() {
-	configurations.sort(function (x, y) {
-		var left = x.importer + x.name;
-		var right = y.importer + y.name;
-		return left.localeCompare(right);
-	});
 	var table = document.getElementById("configurations");
-	for (var i = 0; i != configurations.length; i++) {
-		var row = renderConfiguration(configurations[i]);
+	for (var i = 0; i != CONFIGURATIONS.length; i++) {
+		var row = renderConfiguration(CONFIGURATIONS[i]);
 		table.appendChild(row);
 	}
-	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(configurations));
+	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(CONFIGURATIONS));
 }
 
 function renderConfiguration(configuration) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
-	var icon = document.createElement("img");
+
+	var icon = renderDescriptorIcon(descriptor);
+	cell.appendChild(icon);
+
+	icon = document.createElement("img");
 	icon.src = ROOT + "/assets/importer-configuration.svg";
 	icon.width = 40;
 	icon.height = 40;
@@ -106,9 +137,9 @@ function renderImporter(importerId) {
 	icon.style.marginRight = "20px";
 	icon.title = importerId;
 	cell.appendChild(icon);
-	for (var i = 0; i != importers.length; i++) {
-		if (importers[i].identifier == importerId) {
-			cell.appendChild(document.createTextNode(importers[i].name));
+	for (var i = 0; i != IMPORTERS.length; i++) {
+		if (IMPORTERS[i].identifier == importerId) {
+			cell.appendChild(document.createTextNode(IMPORTERS[i].name));
 			break;
 		}
 	}

@@ -76,9 +76,9 @@ public class ImporterConfiguration implements SecuredResource, Serializable {
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
-            if ("importer".equals(head)) {
+            if ("identifier".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
-                importer = value.substring(1, value.length() - 1);
+                identifier = value.substring(1, value.length() - 1);
             } else if ("name".equals(head)) {
                 String value = TextUtils.unescape(member.getChildren().get(1).getValue());
                 name = value.substring(1, value.length() - 1);
@@ -87,7 +87,7 @@ public class ImporterConfiguration implements SecuredResource, Serializable {
                 importer = value.substring(1, value.length() - 1);
             }
         }
-        this.identifier = identifier;
+        this.identifier = !identifier.isEmpty() ? identifier : URI + UUID.randomUUID().toString();
         this.name = name;
         this.importer = importer;
     }

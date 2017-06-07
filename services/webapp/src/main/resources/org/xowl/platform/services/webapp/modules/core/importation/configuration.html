@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Import Data: Configuration</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../../../assets/favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../vendors/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../../../app.css">
+</head>
+
+<body>
+<div id="placeholder-header"></div>
+<div id="placeholder-secured-resource-popups"></div>
+<div class="body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-download.svg" width="30" height="30"
+                             style="margin-left: 20px;"/>
+                        <a class="btn" id="btn-download">Download definition</a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/action-remove.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onClickDelete()">Delete configuration</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="configuration-id" class="col-sm-2 control-label">Identifier:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="configuration-id" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="configuration-name" class="col-sm-2 control-label">Name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="configuration-name" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="configuration-importer" class="col-sm-2 control-label">
+                        <img src="../../../assets/importer.svg" width="30" height="30" style="margin-right: 10px;"/>
+                        <span style="color: #034091">Importer:</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="configuration-importer" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="placeholder-secured-resource-descriptor"></div>
+    </div>
+</div>
+<div id="placeholder-footer"></div>
+
+<script src="../../../xowl/xowl-api-platform.js"></script>
+<script src="../../../xowl/xowl-ui.js"></script>
+<script src="../../../xowl/xowl-secured-resource.js"></script>
+<script src="configuration.js"></script>
+<script>init();</script>
+</body>
+
+</html>

@@ -50,6 +50,144 @@
             </div>
         </div>
     </div>
+    <div class="popup" id="popup-new-sharing-everybody">
+        <div class="popup-background" id="popup-new-sharing-everybody-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Add a sharing with everybody
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithEverybodyAdd()">
+                                Add
+                            </button>
+                            <button type="button" class="btn btn-default"
+                                    onclick="onPopupNewSharingWithEverybodyCancel()">Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-new-sharing-user">
+        <div class="popup-background" id="popup-new-sharing-user-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Add a sharing with a user
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="input-sharing-user" placeholder="jdoe">
+                                    <div class="input-group-addon">
+                                        <img src="" width="20" height="20" id="input-sharing-user-indicator"
+                                             style="display: none;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithUserAdd()">Add
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithUserCancel()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-new-sharing-group">
+        <div class="popup-background" id="popup-new-sharing-group-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Add a sharing with a group
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="input-sharing-group"
+                                           placeholder="reviewers">
+                                    <div class="input-group-addon">
+                                        <img src="" width="20" height="20" id="input-sharing-group-indicator"
+                                             style="display: none;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithGroupAdd()">Add
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithGroupCancel()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-new-sharing-role">
+        <div class="popup-background" id="popup-new-sharing-role-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Add a sharing with a role
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="input-sharing-role" placeholder="reviewer">
+                                    <div class="input-group-addon">
+                                        <img src="" width="20" height="20" id="input-sharing-role-indicator"
+                                             style="display: none;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithRoleAdd()">Add
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithRoleCancel()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-remove-sharing">
+        <div class="popup-background" id="popup-remove-sharing-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    Remove <b id="popup-remove-sharing-description"></b>?
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" onclick="onPopupRemoveSharingOK()">OK</button>
+                            <button type="button" class="btn btn-default" onclick="onPopupRemoveSharingCancel()">Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>

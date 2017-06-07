@@ -5,10 +5,10 @@
         <table class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>
+                <th style="width: 50%">
                     <span class="margin-right: 20px;">Owner</span>
                 </th>
-                <th>
+                <th style="width: 50%">
                     <span class="btn btn-default" onclick="onPopupNewOwnerOpen()">
                             <img src="/assets/action-plus.svg" width="20" height="20" title="ADD OWNER"/>
                             <img src="/assets/user.svg" width="20" height="20" title="ADD OWNER"/>
@@ -24,8 +24,26 @@
         <table class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>Sharing</th>
-                <th>
+                <th style="width: 50%">Sharing</th>
+                <th style="width: 50%">
+                    <span class="btn btn-default" onclick="onPopupNewSharingWithEverybodyOpen()"
+                          style="margin-right: 10px;">
+                            <img src="/assets/action-plus.svg" width="20" height="20"
+                                 title="ADD SHARING WITH EVERYBODY"/>
+                        </span>
+                    <span class="btn btn-default" onclick="onPopupNewSharingWithUserOpen()" style="margin-right: 10px;">
+                            <img src="/assets/action-plus.svg" width="20" height="20" title="ADD SHARING WITH USER"/>
+                            <img src="/assets/user.svg" width="20" height="20" title="ADD SHARING WITH USER"/>
+                        </span>
+                    <span class="btn btn-default" onclick="onPopupNewSharingWithGroupOpen()"
+                          style="margin-right: 10px;">
+                            <img src="/assets/action-plus.svg" width="20" height="20" title="ADD SHARING WITH GROUP"/>
+                            <img src="/assets/group.svg" width="20" height="20" title="ADD SHARING WITH GROUP"/>
+                        </span>
+                    <span class="btn btn-default" onclick="onPopupNewSharingWithRoleOpen()">
+                            <img src="/assets/action-plus.svg" width="20" height="20" title="ADD SHARING WITH ROLE"/>
+                            <img src="/assets/role.svg" width="20" height="20" title="ADD SHARING WITH ROLE"/>
+                        </span>
                 </th>
             </tr>
             </thead>

@@ -71,13 +71,13 @@ function loadSecurityDescriptor(configuration, index) {
 function render() {
 	var table = document.getElementById("configurations");
 	for (var i = 0; i != CONFIGURATIONS.length; i++) {
-		var row = renderConfiguration(CONFIGURATIONS[i]);
+		var row = renderConfiguration(CONFIGURATIONS[i], DESCRIPTORS[i]);
 		table.appendChild(row);
 	}
 	document.getElementById("btn-download").href = "data:" + MIME_JSON + ";base64," + btoa(JSON.stringify(CONFIGURATIONS));
 }
 
-function renderConfiguration(configuration) {
+function renderConfiguration(configuration, descriptor) {
 	var row = document.createElement("tr");
 	var cell = document.createElement("td");
 

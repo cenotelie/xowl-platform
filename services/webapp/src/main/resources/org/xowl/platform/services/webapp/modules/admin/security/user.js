@@ -60,7 +60,7 @@ function filterItems(items, value) {
 	return result;
 }
 
-function renderUser(user) {
+function renderUser() {
 	document.getElementById("user-identifier").value = user.identifier;
 	document.getElementById("user-name").value = user.name;
 	user.roles.sort(function (x, y) {

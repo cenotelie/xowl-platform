@@ -24,7 +24,7 @@ function init() {
 	});
 }
 
-function render(role) {
+function render() {
 	document.getElementById("role-identifier").value = role.identifier;
 	document.getElementById("role-name").value = role.name;
 }

@@ -97,46 +97,43 @@ function onToggleRule(toggle, rule) {
 }
 
 function doActivateRule(toggle, rule) {
-	var result = confirm("Activate reasoning rule " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating reasoning rule ", rule, " ..."]}))
-		return;
-	xowl.activateReasoningRule(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated reasoning rule ", rule, "."]});
-			rule.isActive = true;
-			toggle.classList.add("toggle-button-selected");
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["Activate reasoning rule ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["Activating reasoning rule ", rule, " ..."])))
+			return;
+		xowl.activateReasoningRule(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Activated reasoning rule ", rule, "."]));
+				rule.isActive = true;
+				toggle.classList.add("toggle-button-selected");
+			}
+		}, rule.identifier);
+	});
 }
 
 function doDeactivateRule(toggle, rule) {
-	var result = confirm("De-activate reasoning rule " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating reasoning rule ", rule, " ..."]}))
-		return;
-	xowl.deactivateReasoningRule(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated reasoning rule ", rule, "."]});
-			rule.isActive = false;
-			toggle.classList.remove("toggle-button-selected");
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["De-activate reasoning rule ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["De-activating reasoning rule ", rule, " ..."])))
+			return;
+		xowl.deactivateReasoningRule(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["De-activated reasoning rule ", rule, "."]));
+				rule.isActive = false;
+				toggle.classList.remove("toggle-button-selected");
+			}
+		}, rule.identifier);
+	});
 }
 
 function onDeleteRule(rule) {
-	var result = confirm("Delete reasoning rule " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting reasoning rule ", rule, " ..."]}))
-		return;
-	xowl.deleteReasoningRule(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted reasoning rule ", rule, "."]});
-			// TODO: do not do a full reload
-			waitAndRefresh();
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["Delete reasoning rule ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting reasoning rule ", rule, " ..."])))
+			return;
+		xowl.deleteReasoningRule(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Deleted reasoning rule ", rule, "."]));
+				// TODO: do not do a full reload
+				waitAndRefresh();
+			}
+		}, rule.identifier);
+	});
 }

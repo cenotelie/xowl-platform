@@ -147,15 +147,14 @@ function renderImporter(importerId) {
 }
 
 function deleteConfiguration(configuration) {
-	var result = confirm("Delete configuration " + configuration.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Deleting configuration " + configuration.name))
-		return;
-	xowl.deleteImporterConfiguration(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Deleted configuration " + configuration.name);
-			waitAndRefresh();
-		}
-	}, configuration.identifier);
+	popupConfirm("Import Data", richString(["Delete configuration ", configuration, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting configuration ", configuration, " ..."])))
+			return;
+		xowl.deleteImporterConfiguration(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage(richString(["Deleted configuration ", configuration, "."]));
+				waitAndRefresh();
+			}
+		}, configuration.identifier);
+	});
 }

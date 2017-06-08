@@ -41,15 +41,14 @@ function doGetData() {
 }
 
 function onClickDelete() {
-	var result = confirm("Delete configuration " + configuration.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Deleting configuration " + configuration.name + " ..."))
-		return;
-	xowl.dropUploadedDocument(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("Deleted configuration " + configuration.name + ".");
-			waitAndGo("configurations.html");
-		}
-	}, configuration.identifier);
+	popupConfirm("Import Data", richString(["Delete configuration ", configuration, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting configuration ", configuration, " ..."])))
+			return;
+		xowl.deleteImporterConfiguration(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage(richString(["Deleted configuration ", configuration, "."]));
+				waitAndGo("configurations.html");
+			}
+		}, configuration.identifier);
+	});
 }

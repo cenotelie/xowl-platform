@@ -44,15 +44,14 @@ function onClickImport() {
 }
 
 function onClickDelete() {
-	var result = confirm("Drop document " + doc.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Dropping document ", doc, " ..."]}))
-		return;
-	xowl.dropUploadedDocument(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Dropped document ", doc, "."]});
-			waitAndGo("index.html");
-		}
-	}, doc.identifier);
+	popupConfirm("Import Data", richString(["Delete document ", doc, "?"]), function () {
+		if (!onOperationRequest(richString(["Dropping document ", doc, " ..."])))
+			return;
+		xowl.dropUploadedDocument(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Dropped document ", doc, "."]));
+				waitAndGo("index.html");
+			}
+		}, doc.identifier);
+	});
 }

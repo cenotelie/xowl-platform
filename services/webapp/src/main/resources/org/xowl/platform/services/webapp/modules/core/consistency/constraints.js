@@ -97,46 +97,43 @@ function onToggleRule(toggle, rule) {
 }
 
 function doActivateRule(toggle, rule) {
-	var result = confirm("Activate constraint " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Activating constraint ", rule, " ..."]}))
-		return;
-	xowl.activateConsistencyConstraint(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Activated constraint ", rule, "."]});
-			rule.isActive = true;
-			toggle.classList.add("toggle-button-selected");
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["Activate constraint ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["Activating constraint ", rule, " ..."])))
+			return;
+		xowl.activateConsistencyConstraint(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Activated constraint ", rule, "."]));
+				rule.isActive = true;
+				toggle.classList.add("toggle-button-selected");
+			}
+		}, rule.identifier);
+	});
 }
 
 function doDeactivateRule(toggle, rule) {
-	var result = confirm("De-activate constraint " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["De-activating constraint ", rule, " ..."]}))
-		return;
-	xowl.deactivateConsistencyConstraint(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["De-activated constraint ", rule, "."]});
-			rule.isActive = false;
-			toggle.classList.remove("toggle-button-selected");
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["De-activate constraint ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["De-activating constraint ", rule, " ..."])))
+			return;
+		xowl.deactivateConsistencyConstraint(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["De-activated constraint ", rule, "."]));
+				rule.isActive = false;
+				toggle.classList.remove("toggle-button-selected");
+			}
+		}, rule.identifier);
+	});
 }
 
 function onDeleteRule(rule) {
-	var result = confirm("Delete constraint " + rule.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Deleting constraint ", rule, " ..."]}))
-		return;
-	xowl.deleteConsistencyConstraint(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Deleted constraint ", rule, "."]});
-			// TODO: do not do a full reload
-			waitAndRefresh();
-		}
-	}, rule.identifier);
+	popupConfirm("Manage Consistency", richString(["Delete constraint ", rule, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting constraint ", rule, " ..."])))
+			return;
+		xowl.deleteConsistencyConstraint(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Deleted constraint ", rule, "."]));
+				// TODO: do not do a full reload
+				waitAndRefresh();
+			}
+		}, rule.identifier);
+	});
 }

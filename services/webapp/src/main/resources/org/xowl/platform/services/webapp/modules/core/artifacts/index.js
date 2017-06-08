@@ -264,19 +264,18 @@ function onClickShowMore(button, childRows) {
 }
 
 function onClickPull(connector) {
-	var result = confirm("Pull from connector " + connector.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching a pull artifact operation from " + connector.name + " ..."))
-		return;
-	xowl.pullFromConnector(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onPullJobComplete(job.result);
-			});
-		}
-	}, connector.identifier);
+	popupConfirm("Manage Artifacts", richString(["Pull from connector ", connector, "?"]), function () {
+		if (!onOperationRequest(richString(["Pulling from connector ", connector, " ..."])))
+			return;
+		xowl.pullFromConnector(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched job ", content]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onPullJobComplete(job.result);
+				});
+			}
+		}, connector.identifier);
+	});
 }
 
 function onPullJobComplete(xsp) {
@@ -285,9 +284,9 @@ function onPullJobComplete(xsp) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
+		displayMessage("success", richString([
 			"Pulled artifact ",
-			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
+			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]));
 		// TODO: do not do a full reload
 		waitAndRefresh();
 	}
@@ -302,19 +301,18 @@ function onClickToggleLive(artifact) {
 }
 
 function doPushToLive(artifact) {
-	var result = confirm("Activate " + artifact.name + " for live reasoning?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching an activation job for artifact " + artifact.name + " ..."))
-		return;
-	xowl.pushArtifactToLive(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onPushToLiveCompleted(job.result, artifact);
-			});
-		}
-	}, artifact.identifier);
+	popupConfirm("Manage Artifacts", richString(["Activate ", artifact, " for live reasoning?"]), function () {
+		if (!onOperationRequest(richString(["Activating artifact ", artifact, " ..."])))
+			return;
+		xowl.pushArtifactToLive(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched job ", content]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onPushToLiveCompleted(job.result, artifact);
+				});
+			}
+		}, artifact.identifier);
+	});
 }
 
 function onPushToLiveCompleted(xsp, artifact) {
@@ -323,29 +321,28 @@ function onPushToLiveCompleted(xsp, artifact) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
+		displayMessage("success", richString([
 			"Activated artifact ",
 			artifact,
-			" for live reasoning."]});
+			" for live reasoning."]));
 		// TODO: do not do a full reload
 		waitAndRefresh();
 	}
 }
 
 function doPullFromLive(artifact) {
-	var result = confirm("De-activate " + artifact.name + " for live reasoning?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching an de-activation job for artifact " + artifact.name + " ..."))
-		return;
-	xowl.pullArtifactFromLive(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onPullFromLiveCompleted(job.result, artifact);
-			});
-		}
-	}, artifact.identifier);
+	popupConfirm("Manage Artifacts", richString(["De-activate ", artifact, " for live reasoning?"]), function () {
+		if (!onOperationRequest(richString(["De-activating artifact ", artifact, " ..."])))
+			return;
+		xowl.pullArtifactFromLive(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched job ", content]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onPullFromLiveCompleted(job.result, artifact);
+				});
+			}
+		}, artifact.identifier);
+	});
 }
 
 function onPullFromLiveCompleted(xsp, artifact) {
@@ -354,10 +351,10 @@ function onPullFromLiveCompleted(xsp, artifact) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
+		displayMessage("success", richString([
 			"De-activated artifact ",
 			artifact,
-			" for live reasoning."]});
+			" for live reasoning."]));
 		// TODO: do not do a full reload
 		waitAndRefresh();
 	}

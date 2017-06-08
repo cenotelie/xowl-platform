@@ -3,7 +3,7 @@
 
 var xowl = new XOWL();
 var artifactId = getParameterByName("id");
-var artifactName = null;
+var artifact = null;
 var CONTENT = null;
 var resultCount = 0;
 
@@ -23,6 +23,7 @@ function doGetData() {
 		return;
 	xowl.getArtifact(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
+			artifact = content;
 			renderMetadata(content);
 		}
 	}, artifactId);
@@ -44,19 +45,18 @@ function onClickRetrieveContent() {
 function onClickDelete() {
 	if (artifactId === null || artifactId == "")
 		return;
-	var result = confirm("Delete artifact " + artifactName + " ?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching job for deletion of artifact " + artifactName + " ..."))
-		return;
-	xowl.deleteArtifact(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched deletion as job ", content, "."]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onJobCompleted(job);
-			});
-		}
-	}, artifactId);
+	popupConfirm("Manage Artifacts", richString(["Delete artifact ", artifact, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting artifact ", artifact, " ..."])))
+			return;
+		xowl.deleteArtifact(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched deletion as job ", content, "."]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onJobCompleted(job);
+				});
+			}
+		}, artifactId);
+	});
 }
 
 function onJobCompleted(job) {
@@ -65,7 +65,7 @@ function onJobCompleted(job) {
 	} else if (!job.result.isSuccess) {
 		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
-		displayMessage("success", "Deleted artifact " + artifactName + ".");
+		displayMessage("success", richString(["Deleted artifact ", artifact, "."]));
 		waitAndGo("index.html");
 	}
 }

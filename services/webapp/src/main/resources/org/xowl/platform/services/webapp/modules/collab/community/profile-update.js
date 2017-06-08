@@ -105,7 +105,7 @@ function onEventDrop(e) {
 	var reader = new FileReader();
 	reader.onloadend = function (event) {
 		if (reader.error !== null) {
-			alert("Error while reading dropped file.");
+			popupMessage("Profile", "Error while reading dropped file.");
 			return;
 		}
 		onEventDropContent(base64ArrayBuffer(reader.result), file.type);

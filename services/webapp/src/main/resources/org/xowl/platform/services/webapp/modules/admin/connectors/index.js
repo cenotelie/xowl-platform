@@ -64,7 +64,7 @@ function renderConnector(connector) {
 }
 
 function deleteConnector(connector) {
-	popupConfirm(richString(["Delete connector ", connector, "?"]), function () {
+	popupConfirm("Connectors Management", richString(["Delete connector ", connector, "?"]), function () {
 		if (!onOperationRequest(richString(["Deleting connector ", connector, " ..."])))
 			return;
 		xowl.deleteConnector(function (status, ct, content) {

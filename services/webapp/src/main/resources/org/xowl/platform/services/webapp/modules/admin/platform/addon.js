@@ -46,7 +46,7 @@ function renderAddon() {
 }
 
 function onClickUninstall() {
-	popupConfirm(richString(["Uninstall addon ", addon, "?"]), function() {
+	popupConfirm("Platform Management", richString(["Uninstall addon ", addon, "?"]), function() {
 		if (!onOperationRequest(richString(["Uninstalling addon ", addon, " ..."])))
 			return;
 		xowl.uninstallPlatformAddon(function (status, ct, content) {

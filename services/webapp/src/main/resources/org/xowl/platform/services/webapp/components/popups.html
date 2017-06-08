@@ -1,21 +1,44 @@
 <body>
 
 <div id="popups">
+    <div class="popup" id="popup-message">
+        <div class="popup-background" id="popup-message-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <b id="popup-message-title"></b>
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <span id="popup-message-message"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupMessageOK()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="popup" id="popup-confirm">
         <div class="popup-background" id="popup-confirm-background"></div>
         <div class="popup-container">
             <div class="panel panel-warning">
                 <div class="panel-heading">
-                    <b id="popup-confirm-description"></b>
+                    <b id="popup-confirm-title"></b>
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupConfirmOK()">OK</button>
-                            <button type="button" class="btn btn-default" onclick="onPopupConfirmCancel()">Cancel
-                            </button>
+                            <span id="popup-confirm-message"></span>
                         </div>
                     </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupConfirmOK()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupConfirmCancel()">Cancel
+                    </button>
                 </div>
             </div>
         </div>

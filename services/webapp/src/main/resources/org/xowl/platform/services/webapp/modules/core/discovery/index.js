@@ -63,9 +63,9 @@ function renderSparqlResults(ct, content) {
 		if (data.hasOwnProperty("boolean")) {
 			var isSuccess = data.boolean;
 			if (isSuccess)
-				alert("OK");
+				popupMessage("SPARQL", "OK");
 			else
-				alert(data.error);
+				popupMessage("SPARQL", data.error);
 			return;
 		}
 		renderClear();

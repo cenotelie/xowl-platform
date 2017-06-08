@@ -784,19 +784,50 @@ function hidePopup(identifier) {
 	document.getElementById(identifier).style.display = "none";
 }
 
+/*
+ * Sets the content of a placeholder in a popup
+ *
+ * @param location The location in the popup
+ * @param content  The content to set at the location
+ */
+function setPopupContent(location, content) {
+	var placeholder = document.getElementById(location);
+	while (placeholder.hasChildNodes()) {
+		placeholder.removeChild(placeholder.lastChild);
+	}
+	placeholder.appendChild(renderMessage(content));
+}
+
+/**
+ * Shows a popup for a message
+ *
+ * @param title   The title for the popup
+ * @param message The message
+ */
+function popupMessage(title, message) {
+	setPopupContent("popup-message-title", title);
+	setPopupContent("popup-message-message", message);
+	showPopup("popup-message");
+}
+
+/*
+ * When the user clicks OK on the message popup
+ */
+function onPopupMessageOK() {
+	hidePopup("popup-message");
+}
+
 /**
  * Shows a popup asking for a confirmation
  *
+ * @param title    The title for the popup
  * @param message  The confirmation message
  * @param onOk     The callback when the user accepts
  * @param onCancel The callback when the user refuses
  */
-function popupConfirm(message, onOk, onCancel) {
-	var placeholder = document.getElementById("popup-confirm-description");
-	while (placeholder.hasChildNodes()) {
-		placeholder.removeChild(placeholder.lastChild);
-	}
-	placeholder.appendChild(renderMessage(message));
+function popupConfirm(title, message, onOk, onCancel) {
+	setPopupContent("popup-confirm-title", title);
+	setPopupContent("popup-confirm-message", message);
 	POPUP_CONFIRM_ON_OK = ((typeof onOk) !== "undefined") ? onOk : null;
 	POPUP_CONFIRM_ON_CANCEL = ((typeof onCancel) !== "undefined") ? onCancel : null;
 	showPopup("popup-confirm");
@@ -811,12 +842,18 @@ var POPUP_CONFIRM_ON_OK = null;
  */
 var POPUP_CONFIRM_ON_CANCEL = null;
 
+/*
+ * When the user clicks OK on the confirmation popup
+ */
 function onPopupConfirmOK() {
 	hidePopup("popup-confirm");
 	if (POPUP_CONFIRM_ON_OK != null)
 		POPUP_CONFIRM_ON_OK();
 }
 
+/*
+ * When the user clicks Cancel on the confirmation popup
+ */
 function onPopupConfirmCancel() {
 	hidePopup("popup-confirm");
 	if (POPUP_CONFIRM_ON_CANCEL != null)

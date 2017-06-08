@@ -44,7 +44,7 @@ function render() {
 }
 
 function onClickPull() {
-	popupConfirm(richString(["Pull from connector ", connector, "?"]), function() {
+	popupConfirm("Connectors Management", richString(["Pull from connector ", connector, "?"]), function() {
 		if (!onOperationRequest(richString(["Pulling from connector ", connector, " ..."])))
 			return;
 		xowl.pullFromConnector(function (status, ct, content) {

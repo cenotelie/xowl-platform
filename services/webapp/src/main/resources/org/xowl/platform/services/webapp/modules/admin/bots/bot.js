@@ -63,7 +63,7 @@ function renderBotMessage(message) {
 }
 
 function doWakeup() {
-	popupConfirm(richString(["Wake bot ", bot, " up?"]), function() {
+	popupConfirm("Bots Management", richString(["Wake bot ", bot, " up?"]), function() {
 		if (!onOperationRequest(richString(["Waking bot ", bot, " up ..."])))
 			return;
 		xowl.wakeupBot(function (status, ct, content) {
@@ -76,7 +76,7 @@ function doWakeup() {
 }
 
 function doPutToSleep() {
-	popupConfirm(richString(["Put bot ", bot, " to sleep?"]), function() {
+	popupConfirm("Bots Management", richString(["Put bot ", bot, " to sleep?"]), function() {
 		if (!onOperationRequest(richString(["Putting bot ", bot, " to sleep ..."])))
 			return;
 		xowl.putBotToSleep(function (status, ct, content) {

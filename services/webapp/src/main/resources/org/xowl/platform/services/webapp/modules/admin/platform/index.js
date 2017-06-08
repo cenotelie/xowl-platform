@@ -11,7 +11,7 @@ function init() {
 }
 
 function onClickShutdown() {
-	popupConfirm("Shutdown the platform?", function() {
+	popupConfirm("Platform Management", "Shutdown the platform?", function() {
 		if (!onOperationRequest("Shutting down the platform ..."))
 			return;
 		xowl.platformShutdown(function (status, ct, content) {
@@ -25,7 +25,7 @@ function onClickShutdown() {
 }
 
 function onClickRestart() {
-	popupConfirm("Restart the platform?", function() {
+	popupConfirm("Platform Management", "Restart the platform?", function() {
 		if (!onOperationRequest("Restarting the platform ..."))
 			return;
 		xowl.platformRestart(function (status, ct, content) {

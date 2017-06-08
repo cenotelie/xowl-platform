@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var connectorId = getParameterByName("id");
+var connector = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -15,13 +16,14 @@ function init() {
 			return;
 		xowl.getConnector(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				render(content);
+				connector = content;
+				render();
 			}
 		}, connectorId);
 	});
 }
 
-function render(connector) {
+function render() {
 	var url = null;
 	if (connector.uris.length === 0) {
 		url = "not accessible";
@@ -42,19 +44,18 @@ function render(connector) {
 }
 
 function onClickPull() {
-	var result = confirm("Pull from connector " + document.getElementById("connector-name").value + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching a pull artifact operation from " + document.getElementById("connector-name").value + " ..."))
-		return;
-	xowl.pullFromConnector(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onPullJobComplete(job.result);
-			});
-		}
-	}, connectorId);
+	popupConfirm(richString(["Pull from connector ", connector, "?"]), function() {
+		if (!onOperationRequest(richString(["Pulling from connector ", connector, " ..."])))
+			return;
+		xowl.pullFromConnector(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched job ", content]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onPullJobComplete(job.result);
+				});
+			}
+		}, connectorId);
+	});
 }
 
 function onPullJobComplete(xsp) {
@@ -63,8 +64,8 @@ function onPullJobComplete(xsp) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
+		displayMessage("success", richString([
 			"Pulled artifact ",
-			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]});
+			{type: "org.xowl.platform.kernel.artifacts.Artifact", identifier: xsp.payload, name: xsp.payload}]));
 	}
 }

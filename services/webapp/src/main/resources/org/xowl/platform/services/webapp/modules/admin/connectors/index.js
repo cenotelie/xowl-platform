@@ -64,15 +64,14 @@ function renderConnector(connector) {
 }
 
 function deleteConnector(connector) {
-	var result = confirm("Delete connector " + connector.name + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Deleting connector " + connector.name))
-		return;
-	xowl.deleteConnector(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Deleted connector " + connector.name);
-			waitAndRefresh();
-		}
-	}, connector.identifier);
+	popupConfirm(richString(["Delete connector ", connector, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting connector ", connector, " ..."])))
+			return;
+		xowl.deleteConnector(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Deleted connector ", connector]));
+				waitAndRefresh();
+			}
+		}, connector.identifier);
+	});
 }

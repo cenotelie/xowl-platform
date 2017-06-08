@@ -84,7 +84,7 @@ function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady, components)
 	PLATFORM = platform;
 	PAGE_BREADCRUMBS = PAGE_BREADCRUMBS.concat(breadcrumbs);
 	PAGE_READY_HOOK = onReady;
-	PAGE_READY_INDEX = 3;
+	PAGE_READY_INDEX = 4;
 	if ((typeof components) !== "undefined") {
 		PAGE_READY_INDEX += components.length;
 		for (var i = 0; i != components.length; i++) {
@@ -92,6 +92,7 @@ function doSetupPage(platform, mustBeLoggedIn, breadcrumbs, onReady, components)
 		}
 	}
 	loadComponent("footer");
+	loadComponent("popups");
 	doLoadComponent(ROOT + "/components/title.html", function (node) {
 		PAGE_COMPONENT_TITLE = node;
 		inspectDom(PAGE_COMPONENT_TITLE);
@@ -541,6 +542,16 @@ function renderMessagePart(part) {
 	return document.createTextNode(JSON.stringify(part));
 }
 
+/*
+ * Creates a rich string
+ *
+ * @param parts An array of the parts of the string
+ * @return The rich string
+ */
+function richString(parts) {
+	return {"type": "org.xowl.infra.utils.RichString", parts: parts};
+}
+
 /**
  * Waits for a small time (1.5s) and then refreshes the current page
  */
@@ -752,6 +763,11 @@ AutoComplete.prototype.onItemSelected = function (item) {
  * Popup management
  ****************************************************/
 
+/**
+ * Shows the specified popup
+ *
+ * @param identifier The identifier of the popup
+ */
 function showPopup(identifier) {
 	document.getElementById(identifier).style.display = "block";
 	document.getElementById(identifier + "-background").onclick = function() {
@@ -759,8 +775,52 @@ function showPopup(identifier) {
 	}
 }
 
+/**
+ * Hides the specified popup
+ *
+ * @param identifier The identifier of the popup
+ */
 function hidePopup(identifier) {
 	document.getElementById(identifier).style.display = "none";
+}
+
+/**
+ * Shows a popup asking for a confirmation
+ *
+ * @param message  The confirmation message
+ * @param onOk     The callback when the user accepts
+ * @param onCancel The callback when the user refuses
+ */
+function popupConfirm(message, onOk, onCancel) {
+	var placeholder = document.getElementById("popup-confirm-description");
+	while (placeholder.hasChildNodes()) {
+		placeholder.removeChild(placeholder.lastChild);
+	}
+	placeholder.appendChild(renderMessage(message));
+	POPUP_CONFIRM_ON_OK = ((typeof onOk) !== "undefined") ? onOk : null;
+	POPUP_CONFIRM_ON_CANCEL = ((typeof onCancel) !== "undefined") ? onCancel : null;
+	showPopup("popup-confirm");
+}
+
+/**
+ * The callback when the user accepts
+ */
+var POPUP_CONFIRM_ON_OK = null;
+/**
+ * The callback when the user refuses
+ */
+var POPUP_CONFIRM_ON_CANCEL = null;
+
+function onPopupConfirmOK() {
+	hidePopup("popup-confirm");
+	if (POPUP_CONFIRM_ON_OK != null)
+		POPUP_CONFIRM_ON_OK();
+}
+
+function onPopupConfirmCancel() {
+	hidePopup("popup-confirm");
+	if (POPUP_CONFIRM_ON_CANCEL != null)
+		POPUP_CONFIRM_ON_CANCEL();
 }
 
 

@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var addonId = getParameterByName("id");
+var addon = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -21,12 +22,13 @@ function doGetData() {
 		return;
 	xowl.getPlatformAddon(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			renderAddon(content);
+			addon = content;
+			renderAddon();
 		}
 	}, addonId);
 }
 
-function renderAddon(addon) {
+function renderAddon() {
 	document.getElementById("field-identifier").value = addon.identifier;
 	document.getElementById("field-name").value = addon.name;
 	document.getElementById("field-description").value = addon.description;
@@ -44,15 +46,14 @@ function renderAddon(addon) {
 }
 
 function onClickUninstall() {
-	var result = confirm("Uninstall addon " + document.getElementById("field-name").value + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Uninstalling addon " + document.getElementById("field-name").value + " ..."))
-		return;
-	xowl.uninstallPlatformAddon(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Uninstalled addon " + document.getElementById("field-name").value + ", restart the platform to complete the update.");
-			waitAndGo("addons.html");
-		}
-	}, addonId);
+	popupConfirm(richString(["Uninstall addon ", addon, "?"]), function() {
+		if (!onOperationRequest(richString(["Uninstalling addon ", addon, " ..."])))
+			return;
+		xowl.uninstallPlatformAddon(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Uninstalled addon ",addon, ", restart the platform to complete the update."]));
+				waitAndGo("addons.html");
+			}
+		}, addonId);
+	});
 }

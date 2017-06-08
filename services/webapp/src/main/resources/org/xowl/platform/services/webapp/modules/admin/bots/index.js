@@ -102,29 +102,27 @@ function renderBotActionPutToSleep(bot) {
 }
 
 function doWakeup(bot) {
-	var result = confirm("Wake bot " + bot.name + " up?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Waking bot " + bot.name + " up"))
-		return;
-	xowl.wakeupBot(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Awoke bot " + bot.name);
-			waitAndRefresh();
-		}
-	}, bot.identifier);
+	popupConfirm(richString(["Wake bot ", bot, " up?"]), function() {
+		if (!onOperationRequest(richString(["Waking bot ", bot, " up ..."])))
+			return;
+		xowl.wakeupBot(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Awoke bot ", bot, "."]));
+				waitAndRefresh();
+			}
+		}, bot.identifier);
+	});
 }
 
 function doPutToSleep(bot) {
-	var result = confirm("Put bot " + bot.name + " to sleep?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Putting bot " + bot.name + " to sleep"))
-		return;
-	xowl.putBotToSleep(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Put bot " + bot.name + " to sleep");
-			waitAndRefresh();
-		}
-	}, bot.identifier);
+	popupConfirm(richString(["Put bot ", bot, " to sleep?"]), function() {
+		if (!onOperationRequest(richString(["Putting bot ", bot, " to sleep ..."])))
+			return;
+		xowl.putBotToSleep(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Put bot ", bot, " to sleep."]));
+				waitAndRefresh();
+			}
+		}, bot.identifier);
+	});
 }

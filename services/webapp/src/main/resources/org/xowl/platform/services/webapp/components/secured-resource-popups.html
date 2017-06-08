@@ -6,10 +6,13 @@
         <div class="popup-container">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Add new owner
+                    Secured Resource Management
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
+                        <div class="row">
+                            <p>Add a new owner:</p>
+                        </div>
                         <div class="row">
                             <div class="form-group">
                                 <div class="input-group">
@@ -21,31 +24,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupNewOwnerAdd()">Add</button>
-                            <button type="button" class="btn btn-default" onclick="onPopupNewOwnerCancel()">Cancel
-                            </button>
-                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="popup" id="popup-remove-owner">
-        <div class="popup-background" id="popup-remove-owner-background"></div>
-        <div class="popup-container">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    Remove owner <b id="popup-remove-owner-name"></b>?
-                </div>
-                <div class="panel-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupRemoveOwnerOK()">OK</button>
-                            <button type="button" class="btn btn-default" onclick="onPopupRemoveOwnerCancel()">Cancel
-                            </button>
-                        </div>
-                    </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewOwnerAdd()">Add</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewOwnerCancel()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -55,19 +38,22 @@
         <div class="popup-container">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Add a sharing with everybody
+                    Secured Resource Management
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithEverybodyAdd()">
-                                Add
-                            </button>
-                            <button type="button" class="btn btn-default"
-                                    onclick="onPopupNewSharingWithEverybodyCancel()">Cancel
-                            </button>
+                            <p>Add a sharing with everybody</p>
                         </div>
                     </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithEverybodyAdd()">
+                        Add
+                    </button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithEverybodyCancel()">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
@@ -77,10 +63,13 @@
         <div class="popup-container">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Add a sharing with a user
+                    Secured Resource Management
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
+                        <div class="row">
+                            <p>Add a sharing with a user</p>
+                        </div>
                         <div class="row">
                             <div class="form-group">
                                 <div class="input-group">
@@ -92,14 +81,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithUserAdd()">Add
-                            </button>
-                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithUserCancel()">
-                                Cancel
-                            </button>
-                        </div>
                     </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithUserAdd()">Add</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithUserCancel()"> Cancel
+                    </button>
                 </div>
             </div>
         </div>
@@ -109,10 +96,13 @@
         <div class="popup-container">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Add a sharing with a group
+                    Secured Resource Management
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
+                        <div class="row">
+                            <p>Add a sharing with a group</p>
+                        </div>
                         <div class="row">
                             <div class="form-group">
                                 <div class="input-group">
@@ -125,14 +115,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithGroupAdd()">Add
-                            </button>
-                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithGroupCancel()">
-                                Cancel
-                            </button>
-                        </div>
                     </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithGroupAdd()">Add</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithGroupCancel()">Cancel
+                    </button>
                 </div>
             </div>
         </div>
@@ -142,14 +130,18 @@
         <div class="popup-container">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Add a sharing with a role
+                    Secured Resource Management
                 </div>
                 <div class="panel-body">
                     <div class="container-fluid">
                         <div class="row">
+                            <p>Add a sharing with a role</p>
+                        </div>
+                        <div class="row">
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="input-sharing-role" placeholder="reviewer">
+                                    <input type="text" class="form-control" id="input-sharing-role"
+                                           placeholder="reviewer">
                                     <div class="input-group-addon">
                                         <img src="" width="20" height="20" id="input-sharing-role-indicator"
                                              style="display: none;"/>
@@ -157,33 +149,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithRoleAdd()">Add
-                            </button>
-                            <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithRoleCancel()">
-                                Cancel
-                            </button>
-                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="popup" id="popup-remove-sharing">
-        <div class="popup-background" id="popup-remove-sharing-background"></div>
-        <div class="popup-container">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    Remove <b id="popup-remove-sharing-description"></b>?
-                </div>
-                <div class="panel-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" onclick="onPopupRemoveSharingOK()">OK</button>
-                            <button type="button" class="btn btn-default" onclick="onPopupRemoveSharingCancel()">Cancel
-                            </button>
-                        </div>
-                    </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewSharingWithRoleAdd()">Add</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewSharingWithRoleCancel()">Cancel
+                    </button>
                 </div>
             </div>
         </div>

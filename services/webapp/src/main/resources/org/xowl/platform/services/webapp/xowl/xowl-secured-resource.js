@@ -269,32 +269,17 @@ function onPopupNewOwnerAdd() {
 	}, RESOURCE, userId);
 }
 
-var USER_TO_REMOVE = null;
-
 function onPopupRemoveOwnerOpen(user) {
-	USER_TO_REMOVE = user;
-	var placeholder = document.getElementById("popup-remove-owner-name");
-	while (placeholder.hasChildNodes()) {
-		placeholder.removeChild(placeholder.lastChild);
-	}
-	placeholder.appendChild(document.createTextNode(user));
-	showPopup("popup-remove-owner");
-}
-
-function onPopupRemoveOwnerCancel() {
-	hidePopup("popup-remove-owner");
-}
-
-function onPopupRemoveOwnerOK() {
-	hidePopup("popup-remove-owner");
-	if (!onOperationRequest("Removing user " + USER_TO_REMOVE + " as owner ..."))
-		return;
-	xowl.removeSecuredResourceOwner(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Removed user " + USER_TO_REMOVE + " as owner.");
-			waitAndRefresh();
-		}
-	}, RESOURCE, USER_TO_REMOVE);
+	popupConfirm("Secured Resource Management", "Remove " + user + " as owner?", function() {
+		if (!onOperationRequest("Removing user " + user + " as owner ..."))
+			return;
+		xowl.removeSecuredResourceOwner(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Removed user " + user + " as owner.");
+				waitAndRefresh();
+			}
+		}, RESOURCE, user);
+	});
 }
 
 function onPopupNewSharingWithEverybodyOpen() {
@@ -398,30 +383,15 @@ function onPopupNewSharingWithRoleAdd() {
 	});
 }
 
-var SHARING_TO_REMOVE = null;
-
 function onPopupRemoveSharingOpen(sharing) {
-	SHARING_TO_REMOVE = sharing;
-	var placeholder = document.getElementById("popup-remove-sharing-description");
-	while (placeholder.hasChildNodes()) {
-		placeholder.removeChild(placeholder.lastChild);
-	}
-	placeholder.appendChild(document.createTextNode(renderSharingString(sharing)));
-	showPopup("popup-remove-sharing");
-}
-
-function onPopupRemoveSharingCancel() {
-	hidePopup("popup-remove-sharing");
-}
-
-function onPopupRemoveSharingOK() {
-	hidePopup("popup-remove-sharing");
-	if (!onOperationRequest("Removing " + renderSharingString(SHARING_TO_REMOVE) + " ..."))
-		return;
-	xowl.removeSecuredResourceSharing(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Removed " + renderSharingString(SHARING_TO_REMOVE) + ".");
-			waitAndRefresh();
-		}
-	}, RESOURCE, SHARING_TO_REMOVE);
+	popupConfirm("Secured Resource Management", "Remove " + renderSharingString(sharing) + "?", function() {
+		if (!onOperationRequest("Removing " + renderSharingString(sharing) + " ..."))
+			return;
+		xowl.removeSecuredResourceSharing(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Removed " + renderSharingString(sharing) + ".");
+				waitAndRefresh();
+			}
+		}, RESOURCE, sharing);
+	});
 }

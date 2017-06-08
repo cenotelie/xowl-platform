@@ -118,31 +118,29 @@ function renderArchetype(archetypeId) {
 }
 
 function onClickRemoveInput(specId) {
-	var result = confirm("Remove input specification " + specId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Removing input specification ..."))
-		return;
-	xowl.removeCollaborationInputSpecification(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Removed input specification " + specId);
-			waitAndRefresh();
-		}
-	}, specId);
+	popupConfirm("Local Collaboration", "Remove input specification " + specId + "?", function () {
+		if (!onOperationRequest("Removing input specification ..."))
+			return;
+		xowl.removeCollaborationInputSpecification(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Removed input specification " + specId);
+				waitAndRefresh();
+			}
+		}, specId);
+	});
 	return;
 }
 
 function onClickRemoveOutput(specId) {
-	var result = confirm("Remove output specification " + specId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Removing input specification ..."))
-		return;
-	xowl.removeCollaborationOutputSpecification(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Removed output specification " + specId);
-			waitAndRefresh();
-		}
-	}, specId);
+	popupConfirm("Local Collaboration", "Remove output specification " + specId + "?", function () {
+		if (!onOperationRequest("Removing output specification ..."))
+			return;
+		xowl.removeCollaborationOutputSpecification(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Removed output specification " + specId);
+				waitAndRefresh();
+			}
+		}, specId);
+	});
 	return;
 }

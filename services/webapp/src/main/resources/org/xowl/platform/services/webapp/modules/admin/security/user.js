@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var userId = getParameterByName("id");
+var user = null;
 var oldName = null;
 var roles = null;
 
@@ -18,7 +19,8 @@ function init() {
 			return;
 		xowl.getPlatformUser(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				renderUser(content);
+				user = content;
+				renderUser();
 			}
 		}, userId);
 	});
@@ -141,32 +143,30 @@ function onClickCancel() {
 }
 
 function onClickDelete() {
-	var result = confirm("Delete the user " + userId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Deleting this user ..."))
-		return;
-	xowl.deletePlatformUser(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Deleted user " + userId + ".");
-			waitAndGo("index.html");
-		}
-	}, userId);
+	popupConfirm("Platform Security", richString(["Delete user ", user, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting user ", user, " ..."])))
+			return;
+		xowl.deletePlatformUser(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Deleted user ", user, "."]));
+				waitAndGo("index.html");
+			}
+		}, userId);
+	});
 }
 
 function onClickResetPassword() {
-	var result = confirm("Reset password for user " + userId + "?");
-	if (!result)
-		return;
-	var newPassword = document.getElementById("user-new-password").value;
-	if (!onOperationRequest("Resetting password ..."))
-		return;
-	xowl.resetPlatformUserPassword(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Password has been reset.");
-			waitAndRefresh();
-		}
-	}, userId, newPassword);
+	popupConfirm("Platform Security", richString(["Reset password for user ", user, "?"]), function () {
+		var newPassword = document.getElementById("user-new-password").value;
+		if (!onOperationRequest("Resetting password ..."))
+			return;
+		xowl.resetPlatformUserPassword(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Password has been reset.");
+				waitAndRefresh();
+			}
+		}, userId, newPassword);
+	});
 }
 
 function onAddRole() {
@@ -184,15 +184,14 @@ function onAddRole() {
 }
 
 function onRemoveRole(roleId) {
-	var result = confirm("Un-assign role " + roleId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
-		return;
-	xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Un-assigned role " + roleId + ".");
-			waitAndRefresh();
-		}
-	}, roleId, userId);
+	popupConfirm("Platform Security", "Un-assign role " + roleId + "?", function () {
+		if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
+			return;
+		xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", "Un-assigned role " + roleId + ".");
+				waitAndRefresh();
+			}
+		}, roleId, userId);
+	});
 }

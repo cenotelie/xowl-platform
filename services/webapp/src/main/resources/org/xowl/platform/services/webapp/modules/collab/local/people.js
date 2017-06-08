@@ -95,25 +95,24 @@ function renderRole(role) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.onclick = function() {
-		onClickRemoveRole(role.identifier);
+		onClickRemoveRole(role);
 	};
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }
 
-function onClickRemoveRole(roleId) {
-	var result = confirm("Remove role " + roleId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Removing role ..."))
-		return;
-	xowl.removeCollaborationRole(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Removed role " + roleId);
-			waitAndRefresh();
-		}
-	}, roleId);
+function onClickRemoveRole(role) {
+	popupConfirm("Local Collaboration", richString(["Remove role ", role, "?"]), function () {
+		if (!onOperationRequest(richString(["Removing role ", role, " ..."])))
+			return;
+		xowl.removeCollaborationRole(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Removed role ", role, "."]));
+				waitAndRefresh();
+			}
+		}, role.identifier);
+	});
 	return;
 }
 

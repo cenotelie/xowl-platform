@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var addonId = getParameterByName("id");
+var addon = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -21,12 +22,13 @@ function doGetData() {
 		return;
 	xowl.marketplaceGetAddon(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			renderAddon(content);
+			addon = content;
+			renderAddon();
 		}
 	}, addonId);
 }
 
-function renderAddon(addon) {
+function renderAddon() {
 	document.getElementById("field-identifier").value = addon.identifier;
 	document.getElementById("field-name").value = addon.name;
 	document.getElementById("field-description").value = addon.description;
@@ -44,19 +46,18 @@ function renderAddon(addon) {
 }
 
 function onClickInstall() {
-	var result = confirm("Install addon " + document.getElementById("field-name").value + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Launching installation of " + document.getElementById("field-name").value + " ..."))
-		return;
-	xowl.marketplaceInstallAddon(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
-			waitForJob(content.identifier, content.name, function (job) {
-				onInstallJobComplete(job.result);
-			});
-		}
-	}, addonId);
+	popupConfirm("Platform Management", richString(["Install addon ", addon, "?"]), function() {
+		if (!onOperationRequest(richString(["Launching installation of ", addon, " ..."])))
+			return;
+		xowl.marketplaceInstallAddon(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Launched job ", content]));
+				waitForJob(content.identifier, content.name, function (job) {
+					onInstallJobComplete(job.result);
+				});
+			}
+		}, addonId);
+	});
 }
 
 function onInstallJobComplete(xsp) {
@@ -65,10 +66,10 @@ function onInstallJobComplete(xsp) {
 	} else if (!xsp.isSuccess) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: [
+		displayMessage("success", richString([
 			"Installed addon ",
 			xsp.payload,
-			", restart the platform to complete the update."]});
-		waitAndGo("marketplace.html")
+			", restart the platform to complete the update."]));
+		waitAndGo("marketplace.html");
 	}
 }

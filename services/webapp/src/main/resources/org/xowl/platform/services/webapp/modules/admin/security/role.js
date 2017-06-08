@@ -3,6 +3,7 @@
 
 var xowl = new XOWL();
 var roleId = getParameterByName("id");
+var role = null;
 var oldName = null;
 
 function init() {
@@ -16,7 +17,8 @@ function init() {
 			return;
 		xowl.getPlatformRole(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				render(content);
+				role = content;
+				render();
 			}
 		}, roleId);
 	});
@@ -64,15 +66,14 @@ function onClickCancel() {
 }
 
 function onClickDelete() {
-	var result = confirm("Delete the role " + roleId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Deleting this role ..."))
-		return;
-	xowl.deletePlatformRole(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Deleted role " + roleId + ".");
-			waitAndGo("index.html");
-		}
-	}, roleId);
+	popupConfirm("Platform Security", richString(["Delete role ", role, "?"]), function () {
+		if (!onOperationRequest(richString(["Deleting role ", role, " ..."])))
+			return;
+		xowl.deletePlatformRole(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Deleted role ", role, "."]));
+				waitAndGo("index.html");
+			}
+		}, roleId);
+	});
 }

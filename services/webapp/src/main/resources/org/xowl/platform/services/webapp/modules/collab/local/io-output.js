@@ -134,7 +134,7 @@ function renderArtifact(artifact) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.onclick = function() {
-		onClickUnregister(artifact.identifier);
+		onClickUnregister(artifact);
 	};
 	cell.appendChild(button);
 	row.appendChild(cell);
@@ -171,17 +171,16 @@ function onClickRegister() {
 	return false;
 }
 
-function onClickUnregister(artifactId) {
-	var result = confirm("Unregister artifact " + artifactId + "?");
-	if (!result)
-		return;
-	if (!onOperationRequest("Un-registering artifact ..."))
-		return;
-	xowl.unregisterArtifactForCollaborationOutput(function (status, ct, content) {
-		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Un-registered artifact " + artifactId);
-			waitAndRefresh();
-		}
-	}, specId, artifactId);
+function onClickUnregister(artifact) {
+	popupConfirm("Local Collaboration", richString(["Unregister artifact ", artifact, "?"]), function () {
+		if (!onOperationRequest(richString(["Un-registering artifact ", artifact, " ..."])))
+			return;
+		xowl.unregisterArtifactForCollaborationOutput(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Un-registered artifact ", artifact]));
+				waitAndRefresh();
+			}
+		}, specId, artifact.identifier);
+	});
 	return;
 }

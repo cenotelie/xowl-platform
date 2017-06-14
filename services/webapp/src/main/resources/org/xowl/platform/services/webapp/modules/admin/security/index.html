@@ -15,29 +15,165 @@
 <body>
 <div id="placeholder-header"></div>
 <div id="placeholder-popups"></div>
+<div id="security-popups">
+    <div class="popup" id="popup-new-user">
+        <div class="popup-background" id="popup-new-user-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Platform Security
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>Create a new user:</p>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="popup-new-user-identifier"
+                                           class="col-sm-2 control-label">Identifier:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-user-identifier"
+                                               placeholder="jdoe">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-user-name" class="col-sm-2 control-label">Name:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-user-name"
+                                               placeholder="Jane Doe">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-user-password1"
+                                           class="col-sm-2 control-label">Password:</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" id="popup-new-user-password1">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-user-password2" class="col-sm-2 control-label">Password
+                                        (again):</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" id="popup-new-user-password2">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewUserOk()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewUserCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-new-group">
+        <div class="popup-background" id="popup-new-group-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Platform Security
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>Create a new group:</p>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="popup-new-group-identifier"
+                                           class="col-sm-2 control-label">Identifier:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-group-identifier"
+                                               placeholder="reviewers">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-group-name" class="col-sm-2 control-label">Name:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-group-name"
+                                               placeholder="Reviewers">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-group-admin" class="col-sm-2 control-label">Initial
+                                        administrator:</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="popup-new-group-admin"
+                                                   placeholder="jdoe">
+                                            <div class="input-group-addon">
+                                                <img src="" width="20" height="20" id="popup-new-group-admin-indicator"
+                                                     style="display: none;"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewGroupOk()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewGroupCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-new-role">
+        <div class="popup-background" id="popup-new-role-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Platform Security
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>Create a new role:</p>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="popup-new-role-identifier"
+                                           class="col-sm-2 control-label">Identifier:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-role-identifier"
+                                               placeholder="reviewer">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="popup-new-role-name" class="col-sm-2 control-label">Name:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="popup-new-role-name"
+                                               placeholder="Reviewer">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupNewRoleOk()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupNewRoleCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="body">
     <div class="container-fluid">
         <div class="row">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div>
-                        <img src="../../../assets/secured-action.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <img src="../../../assets/secured-action.svg" width="30" height="30"
+                             style="margin-left: 20px;"/>
                         <a class="btn" href="authorizations.html">Authorization Policy</a>
-                    </div>
-                    <div>
-                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
-                        <img src="../../../assets/user.svg" width="30" height="30"/>
-                        <a class="btn" href="user-new.html">Create new user</a>
-                    </div>
-                    <div>
-                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
-                        <img src="../../../assets/group.svg" width="30" height="30"/>
-                        <a class="btn" href="group-new.html">Create new group</a>
-                    </div>
-                    <div>
-                        <img src="../../../assets/action-plus.svg" width="30" height="30" style="margin-left: 20px;"/>
-                        <img src="../../../assets/role.svg" width="30" height="30"/>
-                        <a class="btn" href="role-new.html">Create new role</a>
                     </div>
                 </div>
             </div>
@@ -49,6 +185,12 @@
                         <thead>
                         <tr>
                             <th>User</th>
+                            <th>
+                                <span class="btn btn-default" onclick="onPopupNewUserOpen()">
+                                    <img src="../../../assets/action-plus.svg" width="20" height="20" title="ADD USER"/>
+                                    <img src="../../../assets/user.svg" width="20" height="20" title="ADD USER"/>
+                                </span>
+                            </th>
                         </tr>
                         </thead>
                         <tbody id="users">
@@ -62,6 +204,13 @@
                         <thead>
                         <tr>
                             <th>Group</th>
+                            <th>
+                                <span class="btn btn-default" onclick="onPopupNewGroupOpen()">
+                                    <img src="../../../assets/action-plus.svg" width="20" height="20"
+                                         title="ADD GROUP"/>
+                                    <img src="../../../assets/group.svg" width="20" height="20" title="ADD GROUP"/>
+                                </span>
+                            </th>
                         </tr>
                         </thead>
                         <tbody id="groups">
@@ -75,6 +224,12 @@
                         <thead>
                         <tr>
                             <th>Role</th>
+                            <th>
+                                <span class="btn btn-default" onclick="onPopupNewRoleOpen()">
+                                    <img src="../../../assets/action-plus.svg" width="20" height="20" title="ADD ROLE"/>
+                                    <img src="../../../assets/role.svg" width="20" height="20" title="ADD ROLE"/>
+                                </span>
+                            </th>
                         </tr>
                         </thead>
                         <tbody id="roles">

@@ -222,8 +222,10 @@ function onComponentLoaded() {
  * Reacts to the user clicking on the logout button
  */
 function onClickLogout() {
-	PLATFORM.logout();
-	document.location.href = ROOT + "/login.html";
+	popupConfirm("Platform Security", "Logout from this platform?", function() {
+		PLATFORM.logout();
+		document.location.href = ROOT + "/login.html";
+	});
 }
 
 

@@ -5,7 +5,6 @@ var xowl = new XOWL();
 var userId = xowl.getLoggedInUserId();
 var user = null;
 var oldName = null;
-var roles = null;
 
 function init() {
 	doSetupPage(xowl, true, [
@@ -14,7 +13,6 @@ function init() {
 			{name: "My Account Security"}], function() {
 		if (!userId || userId === null || userId === "")
 			return;
-		setupAutocomplete();
 		if (!onOperationRequest("Loading ..."))
 			return;
 		xowl.getPlatformUser(function (status, ct, content) {
@@ -24,40 +22,6 @@ function init() {
 			}
 		}, userId);
 	});
-}
-
-function setupAutocomplete() {
-	var autocomplete = new AutoComplete("input-role");
-	autocomplete.lookupItems = function (value) {
-		if (roles !== null) {
-			autocomplete.onItems(filterItems(roles, value));
-			return;
-		}
-		xowl.getPlatformRoles(function (status, ct, content) {
-			if (status === 200) {
-				roles = content;
-				autocomplete.onItems(filterItems(roles, value));
-			}
-		});
-	};
-	autocomplete.renderItem = function (item) {
-		var result = document.createElement("div");
-		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
-		return result;
-	};
-	autocomplete.getItemString = function (item) {
-		return item.identifier;
-	};
-}
-
-function filterItems(items, value) {
-	var result = [];
-	for (var i = 0; i != items.length; i++) {
-		if (items[i].identifier.indexOf(value) >= 0 || items[i].name.indexOf(value) >= 0) {
-			result.push(items[i]);
-		}
-	}
-	return result;
 }
 
 function renderUser() {
@@ -87,26 +51,10 @@ function renderPlatformRole(role) {
 	cell.appendChild(image);
 	cell.appendChild(link);
 	row.appendChild(cell);
-
-	cell = document.createElement("td");
-	image = document.createElement("img");
-	image.src = ROOT + "/assets/action-remove.svg";
-	image.width = 20;
-	image.height = 20;
-	image.title = "REMOVE";
-	var button = document.createElement("span");
-	button.classList.add("btn");
-	button.classList.add("btn-default");
-	button.appendChild(image);
-	button.onclick = function () {
-		onRemoveRole(role.identifier);
-	};
-	cell.appendChild(button);
-	row.appendChild(cell);
 	return row;
 }
 
-function onClickEdit() {
+function onClickNameEdit() {
 	if (oldName !== null)
 		return;
 	document.getElementById("user-name-edit").style.display = "none";
@@ -118,7 +66,7 @@ function onClickEdit() {
 	oldName = document.getElementById("user-name").value;
 }
 
-function onClickValidate() {
+function onClickNameValidate() {
 	document.getElementById("user-name-edit").style.display = "inline-block";
 	document.getElementById("user-name-validate").style.display = "none";
 	document.getElementById("user-name-cancel").style.display = "none";
@@ -133,7 +81,7 @@ function onClickValidate() {
 	}, userId, document.getElementById("user-name").value);
 }
 
-function onClickCancel() {
+function onClickNameCancel() {
 	document.getElementById("user-name-edit").style.display = "inline-block";
 	document.getElementById("user-name-validate").style.display = "none";
 	document.getElementById("user-name-cancel").style.display = "none";
@@ -142,62 +90,36 @@ function onClickCancel() {
 	oldName = null;
 }
 
-function onClickDelete() {
-	popupConfirm("Platform Security", richString(["Delete user ", user, "?"]), function () {
-		if (!onOperationRequest(richString(["Deleting user ", user, " ..."])))
-			return;
-		xowl.deletePlatformUser(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", richString(["Deleted user ", user, "."]));
-				waitAndGo("index.html");
-			}
-		}, userId);
-	});
+function onPopupChangePasswordOpen() {
+	showPopup("popup-change-password");
 }
 
-function onClickChangePassword() {
-	popupConfirm("Platform Security", "Change password?", function () {
-		var oldPassword = document.getElementById("user-old-password").value;
-		var newPassword1 = document.getElementById("user-new-password1").value;
-		var newPassword2 = document.getElementById("user-new-password2").value;
-		if (newPassword1 !== newPassword2) {
-			displayMessage("error", "The two passwords are different.");
-			return;
-		}
-		if (!onOperationRequest("Changing password ..."))
-			return;
-		xowl.changePlatformUserPassword(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Password has been changed.");
-				waitAndRefresh();
-			}
-		}, userId, oldPassword, newPassword);
-	});
-}
-
-function onAddRole() {
-	var roleId = document.getElementById("input-role").value;
-	if (roleId == null || roleId == "")
+function onPopupChangePasswordOk() {
+	if (!onOperationRequest("Changing password ..."))
 		return;
-	if (!onOperationRequest("Assigning role " + roleId + " ..."))
-		return;
-	xowl.assignRoleToPlatformUser(function (status, ct, content) {
+	var oldPassword = document.getElementById("user-old-password").value;
+	var newPassword1 = document.getElementById("user-new-password1").value;
+	var newPassword2 = document.getElementById("user-new-password2").value;
+	if (oldPassword == null || oldPassword == "" || newPassword1 == null || newPassword1 == "" || newPassword2 == null || newPassword2 == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	if (newPassword1 !== newPassword2) {
+		onOperationAbort("The two passwords are different.");
+		return false;
+	}
+	hidePopup("popup-change-password");
+	xowl.changePlatformUserPassword(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Assigned role " + roleId + ".");
+			displayMessage("success", "Password has been reset.");
 			waitAndRefresh();
 		}
-	}, roleId, userId);
+	}, userId, oldPassword, newPassword2);
 }
 
-function onRemoveRole(roleId) {
-	popupConfirm("Platform Security", "Un-assign role " + roleId + "?", function () {
-		if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
-			return;
-		xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Un-assigned role " + roleId + ".");
-				waitAndRefresh();
-			}
-		}, roleId, userId);
-	});
+function onPopupChangePasswordCancel() {
+	hidePopup("popup-change-password");
+	document.getElementById("user-old-password").value = "";
+	document.getElementById("user-new-password1").value = "";
+	document.getElementById("user-new-password2").value = "";
 }

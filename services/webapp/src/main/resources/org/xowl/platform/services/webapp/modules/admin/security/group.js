@@ -118,14 +118,14 @@ function renderGroup() {
 	var table = document.getElementById("admins");
 	for (var  i = 0; i != group.admins.length; i++) {
 		(function(user) {
-			var onClickRemove = function() { onRemoveAdmin(user.identifier); };
+			var onClickRemove = function() { onRemoveAdmin(user); };
 			table.appendChild(renderPlatformUser(user, onClickRemove));
 		})(group.admins[i]);
 	}
 	table = document.getElementById("members");
 	for (var  i = 0; i != group.members.length; i++) {
 		(function(user) {
-			var onClickRemove = function() { onRemoveMember(user.identifier); };
+			var onClickRemove = function() { onRemoveMember(user); };
 			table.appendChild(renderPlatformUser(user, onClickRemove));
 		})(group.members[i]);
 	}
@@ -194,14 +194,14 @@ function renderPlatformRole(role) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.onclick = function () {
-		onRemoveRole(role.identifier);
+		onRemoveRole(role);
 	};
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }
 
-function onClickEdit() {
+function onClickNameEdit() {
 	if (oldName !== null)
 		return;
 	document.getElementById("group-name-edit").style.display = "none";
@@ -213,7 +213,7 @@ function onClickEdit() {
 	oldName = document.getElementById("group-name").value;
 }
 
-function onClickValidate() {
+function onClickNameValidate() {
 	document.getElementById("group-name-edit").style.display = "inline-block";
 	document.getElementById("group-name-validate").style.display = "none";
 	document.getElementById("group-name-cancel").style.display = "none";
@@ -228,7 +228,7 @@ function onClickValidate() {
 	}, groupId, document.getElementById("group-name").value);
 }
 
-function onClickCancel() {
+function onClickNameCancel() {
 	document.getElementById("group-name-edit").style.display = "inline-block";
 	document.getElementById("group-name-validate").style.display = "none";
 	document.getElementById("group-name-cancel").style.display = "none";
@@ -250,40 +250,97 @@ function onClickDelete() {
 	});
 }
 
-function onAddAdmin() {
-	var userId = document.getElementById("input-admin").value;
-	if (userId == null || userId == "")
+function onPopupAddAdminOpen() {
+	showPopup("popup-add-admin");
+}
+
+function onPopupAddAdminOk() {
+	if (!onOperationRequest("Adding group admin ..."))
 		return;
-	if (!onOperationRequest("Adding group administrator" + userId + " ..."))
-		return;
+	var adminId = document.getElementById("input-admin").value;
+	if (adminId == null || adminId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-add-admin");
 	xowl.addAdminToPlatformGroup(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Added group administrator " + userId + ".");
+			displayMessage("success", "Added group admin " + adminId + ".");
 			waitAndRefresh();
 		}
-	}, groupId, userId);
+	}, groupId, adminId);
 }
 
-function onAddMember() {
-	var userId = document.getElementById("input-member").value;
-	if (userId == null || userId == "")
+function onPopupAddAdminCancel() {
+	hidePopup("popup-add-admin");
+	document.getElementById("input-admin").value = "";
+}
+
+function onRemoveAdmin(member) {
+	popupConfirm("Platform Security", richString(["Remove " , member, " as group admin?"]), function () {
+		if (!onOperationRequest(richString(["Removing " , member, " as group admin ..."])))
+			return;
+		xowl.removeAdminFromPlatformGroup(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Removed " , member, " as group admin."]));
+				waitAndRefresh();
+			}
+		}, groupId, member.identifier);
+	});
+}
+
+function onPopupAddMemberOpen() {
+	showPopup("popup-add-member");
+}
+
+function onPopupAddMemberOk() {
+	if (!onOperationRequest("Adding member ..."))
 		return;
-	if (!onOperationRequest("Adding group member" + userId + " ..."))
-		return;
+	var memberId = document.getElementById("input-member").value;
+	if (memberId == null || memberId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-add-member");
 	xowl.addMemberToPlatformGroup(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", "Added group member " + userId + ".");
+			displayMessage("success", "Added member " + memberId + ".");
 			waitAndRefresh();
 		}
-	}, groupId, userId);
+	}, groupId, memberId);
 }
 
-function onAddRole() {
+function onPopupAddMemberCancel() {
+	hidePopup("popup-add-member");
+	document.getElementById("input-member").value = "";
+}
+
+function onRemoveMember(member) {
+	popupConfirm("Platform Security", richString(["Remove " , member, " as group member?"]), function () {
+		if (!onOperationRequest(richString(["Removing " , member, " as group member ..."])))
+			return;
+		xowl.removeMemberFromPlatformGroup(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Removed " , member, " as group member."]));
+				waitAndRefresh();
+			}
+		}, groupId, member.identifier);
+	});
+}
+
+function onPopupAssignRoleOpen() {
+	showPopup("popup-assign-role");
+}
+
+function onPopupAssignRoleOk() {
+	if (!onOperationRequest("Assigning role ..."))
+		return;
 	var roleId = document.getElementById("input-role").value;
-	if (roleId == null || roleId == "")
-		return;
-	if (!onOperationRequest("Assigning role " + roleId + " ..."))
-		return;
+	if (roleId == null || roleId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-assign-role");
 	xowl.assignRoleToPlatformGroup(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", "Assigned role " + roleId + ".");
@@ -292,41 +349,20 @@ function onAddRole() {
 	}, roleId, groupId);
 }
 
-function onRemoveAdmin(userId) {
-	popupConfirm("Platform Security", "Remove group administrator " + userId + "?", function () {
-		if (!onOperationRequest("Removing group administrator " + userId + " ..."))
-			return;
-		xowl.removeAdminFromPlatformGroup(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Removed group administrator " + userId + ".");
-				waitAndRefresh();
-			}
-		}, groupId, userId);
-	});
+function onPopupAssignRoleCancel() {
+	hidePopup("popup-assign-role");
+	document.getElementById("input-role").value = "";
 }
 
-function onRemoveMember(userId) {
-	popupConfirm("Platform Security", "Remove group member " + userId + "?", function () {
-		if (!onOperationRequest("Removing group member " + userId + " ..."))
-			return;
-		xowl.removeMemberFromPlatformGroup(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Removed group member " + userId + ".");
-				waitAndRefresh();
-			}
-		}, groupId, userId);
-	});
-}
-
-function onRemoveRole(roleId) {
-	popupConfirm("Platform Security", "Un-assign role " + roleId + "?", function () {
-		if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
+function onRemoveRole(role) {
+	popupConfirm("Platform Security", richString(["Un-assign role " , role, "?"]), function () {
+		if (!onOperationRequest(richString(["Un-assigning role " , role, " ..."])))
 			return;
 		xowl.unassignRoleFromPlatformGroup(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Un-assigned role " + roleId + ".");
+				displayMessage("success", richString(["Un-assigned role " , role, "."]));
 				waitAndRefresh();
 			}
-		}, roleId, groupId);
+		}, role.identifier, groupId);
 	});
 }

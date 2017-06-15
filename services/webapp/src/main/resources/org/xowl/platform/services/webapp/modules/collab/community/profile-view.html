@@ -17,11 +17,16 @@
 <div id="placeholder-popups"></div>
 <div class="body">
     <div class="container-fluid">
-        <div class="row" id="row-new-profile" style="display: none;">
-            <div class="col-md-12">
-                <div class="panel panel-warning">
-                    <div class="panel-body">
-                        <span class="text-warning">This profile does not exist yet, <a id="profile-new-link" href="">create it</a>?</span>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-edit.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" href="" id="profile-edit-link">Edit this profile</a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/security.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" href="" id="link-security">Account security</a>
                     </div>
                 </div>
             </div>
@@ -30,12 +35,6 @@
             <div class="col-md-4">
                 <div>
                     <img id="avatar" src="" width="200px" height="200px" style="object-fit: contain;"/>
-                </div>
-                <div>
-                    <span>
-                        <img src="../../../assets/action-edit.svg" width="30" height="30"/>
-                        <a class="btn" id="profile-edit-link" href="">Edit this profile</a>
-                    </span>
                 </div>
             </div>
             <div class="col-md-8">
@@ -80,16 +79,26 @@
             </div>
         </div>
         <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-body" id="panel-roles">
-                </div>
-            </div>
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Roles</th>
+                </tr>
+                </thead>
+                <tbody id="roles">
+                </tbody>
+            </table>
         </div>
         <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-body" id="panel-badges">
-                </div>
-            </div>
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Badges</th>
+                </tr>
+                </thead>
+                <tbody id="badges">
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

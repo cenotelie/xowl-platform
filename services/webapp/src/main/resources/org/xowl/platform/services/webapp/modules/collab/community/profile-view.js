@@ -13,6 +13,10 @@ function init() {
 			return;
 		document.getElementById("profile-edit-link").href = "profile-update.html?id=" + encodeURIComponent(profileId);
 		doGetData();
+		if (profileId === xowl.getLoggedInUserId())
+			document.getElementById("link-security").href = ROOT + "/modules/admin/security/myaccount.html";
+		else
+			document.getElementById("link-security").href = ROOT + "/modules/admin/security/user.html?id=" + encodeURIComponent(profileId);
 	});
 }
 
@@ -27,9 +31,7 @@ function doGetData() {
 	xowl.getPublicProfile(function (status, ct, content) {
 		if (onOperationEnded(status, content, null)) {
 			renderProfile(content);
-		} else if (status === 404) {
-			document.getElementById("row-new-profile").style.display = "";
-			document.getElementById("profile-new-link").href= "profile-update.html?id=" + encodeURIComponent(profileId);
+		} else {
 			document.getElementById("avatar").src = ROOT + "/assets/user-inactive.svg";
 		}
 	}, profileId);
@@ -38,30 +40,31 @@ function doGetData() {
 function renderUser(user) {
 	document.getElementById("profile-identifier").value = user.identifier;
 	document.getElementById("profile-name").value = user.name;
-	var panel = document.getElementById("panel-roles");
-	for (var i = 0; i != user.roles.length; i++) {
-		panel.appendChild(renderRole(user.roles[i]));
+	user.roles.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("roles");
+	for (var  i = 0; i != user.roles.length; i++) {
+		table.appendChild(renderPlatformRole(user.roles[i]));
 	}
 }
 
-function renderRole(role) {
-	var cell = document.createElement("span");
-	cell.style.marginLeft = "10px";
-	cell.style.marginRight = "10px";
-	cell.style.marginTop = "10px";
-	cell.style.marginBottom = "10px";
+function renderPlatformRole(role) {
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "5px";
+	image.style.marginRight = "20px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
 	link.href = ROOT + "/modules/admin/security/role.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
-	return cell;
+	row.appendChild(cell);
+	return row;
 }
 
 function renderProfile(profile) {
@@ -76,18 +79,18 @@ function renderProfile(profile) {
 	}
 	document.getElementById("profile-organization").value = profile.organization;
 	document.getElementById("profile-occupation").value = profile.occupation;
-	var panel = document.getElementById("panel-badges");
+	profile.badges.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("badges");
 	for (var i = 0; i != profile.badges.length; i++) {
-		panel.appendChild(renderBadge(profile.badges[i]));
+		table.appendChild(renderBadge(profile.badges[i]));
 	}
 }
 
 function renderBadge(badge) {
-	var cell = document.createElement("span");
-	cell.style.marginLeft = "10px";
-	cell.style.marginRight = "10px";
-	cell.style.marginTop = "10px";
-	cell.style.marginBottom = "10px";
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "data:" + badge.imageMime + ";base64," + badge.imageContent;
 	image.width = 30;
@@ -96,9 +99,9 @@ function renderBadge(badge) {
 	image.title = badge.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(badge.name));
-	link.title = badge.description;
-	link.href = "badge.html?id=" + badge.identifier;
+	link.href = "badge.html?id=" + encodeURIComponent(badge.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
-	return cell;
+	row.appendChild(cell);
+	return row;
 }

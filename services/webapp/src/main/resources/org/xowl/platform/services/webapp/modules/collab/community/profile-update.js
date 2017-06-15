@@ -5,6 +5,7 @@ var xowl = new XOWL();
 var profileId = getParameterByName("id");
 var profile = null;
 var badges = null;
+var roles = null;
 var oldName = null;
 var oldEmail = null;
 var oldOrganization = null;
@@ -31,25 +32,47 @@ function init() {
 }
 
 function setupAutocomplete() {
-	var autocomplete = new AutoComplete("input-badge");
-	autocomplete.lookupItems = function (value) {
+	var autocomplete1 = new AutoComplete("input-badge");
+	autocomplete1.lookupItems = function (value) {
 		if (badges !== null) {
-			autocomplete.onItems(filterItems(badges, value));
+			autocomplete1.onItems(filterItems(badges, value));
 			return;
 		}
 		xowl.getBadges(function (status, ct, content) {
 			if (status === 200) {
 				badges = content;
-				autocomplete.onItems(filterItems(badges, value));
+				autocomplete1.onItems(filterItems(badges, value));
 			}
 		});
 	};
-	autocomplete.renderItem = function (item) {
+	autocomplete1.renderItem = function (item) {
 		var result = document.createElement("div");
 		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
 		return result;
 	};
-	autocomplete.getItemString = function (item) {
+	autocomplete1.getItemString = function (item) {
+		return item.identifier;
+	};
+
+	var autocomplete2 = new AutoComplete("input-role");
+	autocomplete2.lookupItems = function (value) {
+		if (roles !== null) {
+			autocomplete2.onItems(filterItems(roles, value));
+			return;
+		}
+		xowl.getPlatformRoles(function (status, ct, content) {
+			if (status === 200) {
+				roles = content;
+				autocomplete2.onItems(filterItems(roles, value));
+			}
+		});
+	};
+	autocomplete2.renderItem = function (item) {
+		var result = document.createElement("div");
+		result.appendChild(document.createTextNode(item.name + " (" + item.identifier + ")"));
+		return result;
+	};
+	autocomplete2.getItemString = function (item) {
 		return item.identifier;
 	};
 }
@@ -167,30 +190,47 @@ function doGetData() {
 function renderUser(user) {
 	document.getElementById("profile-identifier").value = user.identifier;
 	document.getElementById("profile-name").value = user.name;
-	var panel = document.getElementById("panel-roles");
-	for (var i = 0; i != user.roles.length; i++) {
-		panel.appendChild(renderRole(user.roles[i]));
+	user.roles.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("roles");
+	for (var  i = 0; i != user.roles.length; i++) {
+		table.appendChild(renderPlatformRole(user.roles[i]));
 	}
 }
 
-function renderRole(role) {
-	var cell = document.createElement("span");
-	cell.style.marginLeft = "10px";
-	cell.style.marginRight = "10px";
-	cell.style.marginTop = "10px";
-	cell.style.marginBottom = "10px";
+function renderPlatformRole(role) {
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = ROOT + "/assets/role.svg";
 	image.width = 30;
 	image.height = 30;
-	image.style.marginRight = "5px";
+	image.style.marginRight = "20px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(role.name));
 	link.href = ROOT + "/modules/admin/security/role.html?id=" + encodeURIComponent(role.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
-	return cell;
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "REMOVE";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	button.onclick = function () {
+		onRemoveRole(role);
+	};
+	cell.appendChild(button);
+	row.appendChild(cell);
+	return row;
 }
 
 function renderProfile(profile) {
@@ -206,18 +246,18 @@ function renderProfile(profile) {
 	}
 	document.getElementById("profile-organization").value = profile.organization;
 	document.getElementById("profile-occupation").value = profile.occupation;
-	var panel = document.getElementById("panel-badges");
+	profile.badges.sort(function (x, y) {
+		return x.name.localeCompare(y.name);
+	});
+	var table = document.getElementById("badges");
 	for (var i = 0; i != profile.badges.length; i++) {
-		panel.appendChild(renderBadge(profile.badges[i]));
+		table.appendChild(renderBadge(profile.badges[i]));
 	}
 }
 
 function renderBadge(badge) {
-	var cell = document.createElement("span");
-	cell.style.marginLeft = "10px";
-	cell.style.marginRight = "10px";
-	cell.style.marginTop = "10px";
-	cell.style.marginBottom = "10px";
+	var row = document.createElement("tr");
+	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = "data:" + badge.imageMime + ";base64," + badge.imageContent;
 	image.width = 30;
@@ -226,11 +266,27 @@ function renderBadge(badge) {
 	image.title = badge.identifier;
 	var link = document.createElement("a");
 	link.appendChild(document.createTextNode(badge.name));
-	link.title = badge.description;
-	link.href = "badge.html?id=" + badge.identifier;
+	link.href = "badge.html?id=" + encodeURIComponent(badge.identifier);
 	cell.appendChild(image);
 	cell.appendChild(link);
-	return cell;
+	row.appendChild(cell);
+
+	cell = document.createElement("td");
+	image = document.createElement("img");
+	image.src = ROOT + "/assets/action-remove.svg";
+	image.width = 20;
+	image.height = 20;
+	image.title = "REMOVE";
+	var button = document.createElement("span");
+	button.classList.add("btn");
+	button.classList.add("btn-default");
+	button.appendChild(image);
+	button.onclick = function () {
+		onRemoveBadge(badge);
+	};
+	cell.appendChild(button);
+	row.appendChild(cell);
+	return row;
 }
 
 function onClickEditName() {
@@ -422,16 +478,80 @@ function onClickCancelAvatar() {
 	oldContent = null;
 }
 
-function onClickBadgeAward() {
-	var badgeId = document.getElementById("input-badge").value;
-	if (badgeId == null || badgeId.length == "")
+function onPopupAssignRoleOpen() {
+	showPopup("popup-assign-role");
+}
+
+function onPopupAssignRoleOk() {
+	if (!onOperationRequest("Assigning role ..."))
 		return;
+	var roleId = document.getElementById("input-role").value;
+	if (roleId == null || roleId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-assign-role");
+	xowl.assignRoleToPlatformUser(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Assigned role " + roleId + ".");
+			waitAndRefresh();
+		}
+	}, roleId, profileId);
+}
+
+function onPopupAssignRoleCancel() {
+	hidePopup("popup-assign-role");
+	document.getElementById("input-role").value = "";
+}
+
+function onRemoveRole(role) {
+	popupConfirm("Platform Security", richString(["Un-assign role " , role, "?"]), function () {
+		if (!onOperationRequest(richString(["Un-assigning role " , role, " ..."])))
+			return;
+		xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Un-assigned role " , role, "."]));
+				waitAndRefresh();
+			}
+		}, role.identifier, profileId);
+	});
+}
+
+function onPopupAwardBadgeOpen() {
+	showPopup("popup-award-badge");
+}
+
+function onPopupAwardBadgeOk() {
 	if (!onOperationRequest("Awarding badge ..."))
 		return;
+	var badgeId = document.getElementById("input-badge").value;
+	if (badgeId == null || badgeId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-award-badge");
 	xowl.awardBadge(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", "Awarded badge " + badgeId);
 			waitAndRefresh();
 		}
 	}, profileId, badgeId);
+}
+
+function onPopupAwardBadgeCancel() {
+	hidePopup("popup-award-badge");
+	document.getElementById("input-badge").value = "";
+}
+
+function onRemoveBadge(badge) {
+	popupConfirm("Community", richString(["Rescind badge " , badge, "?"]), function () {
+		if (!onOperationRequest(richString(["Rescinding badge " , badge, " ..."])))
+			return;
+		xowl.rescindBadge(function (status, ct, content) {
+			if (onOperationEnded(status, content)) {
+				displayMessage("success", richString(["Rescinded badge " , badge, "."]));
+				waitAndRefresh();
+			}
+		}, profileId, badge.identifier);
+	});
 }

@@ -77,8 +77,8 @@ function renderPlatformRole(role) {
 	var cell = document.createElement("td");
 	var image = document.createElement("img");
 	image.src = ROOT + "/assets/role.svg";
-	image.width = 30
-	image.height = 30
+	image.width = 30;
+	image.height = 30;
 	image.style.marginRight = "20px";
 	image.title = role.identifier;
 	var link = document.createElement("a");
@@ -187,7 +187,7 @@ function onPopupAssignRoleOpen() {
 }
 
 function onPopupAssignRoleOk() {
-	if (!onOperationRequest("Assigning role " + roleId + " ..."))
+	if (!onOperationRequest("Assigning role ..."))
 		return;
 	var roleId = document.getElementById("input-role").value;
 	if (roleId == null || roleId == "") {

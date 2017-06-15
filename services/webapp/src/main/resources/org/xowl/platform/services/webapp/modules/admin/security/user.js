@@ -99,48 +99,13 @@ function renderPlatformRole(role) {
 	button.classList.add("btn-default");
 	button.appendChild(image);
 	button.onclick = function () {
-		onRemoveRole(role.identifier);
+		onRemoveRole(role);
 	};
 	cell.appendChild(button);
 	row.appendChild(cell);
 	return row;
 }
 
-function onClickEdit() {
-	if (oldName !== null)
-		return;
-	document.getElementById("user-name-edit").style.display = "none";
-	document.getElementById("user-name-validate").style.display = "inline-block";
-	document.getElementById("user-name-cancel").style.display = "inline-block";
-	document.getElementById("user-name").readOnly = false;
-	document.getElementById("user-name").focus();
-	document.getElementById("user-name").select();
-	oldName = document.getElementById("user-name").value;
-}
-
-function onClickValidate() {
-	document.getElementById("user-name-edit").style.display = "inline-block";
-	document.getElementById("user-name-validate").style.display = "none";
-	document.getElementById("user-name-cancel").style.display = "none";
-	document.getElementById("user-name").readOnly = true;
-	if (!onOperationRequest("Renaming ..."))
-		return;
-	xowl.renamePlatformUser(function (status, ct, content) {
-		if (!onOperationEnded(status, content)) {
-			document.getElementById("user-name").value = oldName;
-		}
-		oldName = null;
-	}, userId, document.getElementById("user-name").value);
-}
-
-function onClickCancel() {
-	document.getElementById("user-name-edit").style.display = "inline-block";
-	document.getElementById("user-name-validate").style.display = "none";
-	document.getElementById("user-name-cancel").style.display = "none";
-	document.getElementById("user-name").value = oldName;
-	document.getElementById("user-name").readOnly = true;
-	oldName = null;
-}
 
 function onClickDelete() {
 	popupConfirm("Platform Security", richString(["Delete user ", user, "?"]), function () {
@@ -155,26 +120,81 @@ function onClickDelete() {
 	});
 }
 
-function onClickResetPassword() {
-	popupConfirm("Platform Security", richString(["Reset password for user ", user, "?"]), function () {
-		var newPassword = document.getElementById("user-new-password").value;
-		if (!onOperationRequest("Resetting password ..."))
-			return;
-		xowl.resetPlatformUserPassword(function (status, ct, content) {
-			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Password has been reset.");
-				waitAndRefresh();
-			}
-		}, userId, newPassword);
-	});
+function onClickNameEdit() {
+	if (oldName !== null)
+		return;
+	document.getElementById("user-name-edit").style.display = "none";
+	document.getElementById("user-name-validate").style.display = "inline-block";
+	document.getElementById("user-name-cancel").style.display = "inline-block";
+	document.getElementById("user-name").readOnly = false;
+	document.getElementById("user-name").focus();
+	document.getElementById("user-name").select();
+	oldName = document.getElementById("user-name").value;
 }
 
-function onAddRole() {
-	var roleId = document.getElementById("input-role").value;
-	if (roleId == null || roleId == "")
+function onClickNameValidate() {
+	document.getElementById("user-name-edit").style.display = "inline-block";
+	document.getElementById("user-name-validate").style.display = "none";
+	document.getElementById("user-name-cancel").style.display = "none";
+	document.getElementById("user-name").readOnly = true;
+	if (!onOperationRequest("Renaming ..."))
 		return;
+	xowl.renamePlatformUser(function (status, ct, content) {
+		if (!onOperationEnded(status, content)) {
+			document.getElementById("user-name").value = oldName;
+		}
+		oldName = null;
+	}, userId, document.getElementById("user-name").value);
+}
+
+function onClickNameCancel() {
+	document.getElementById("user-name-edit").style.display = "inline-block";
+	document.getElementById("user-name-validate").style.display = "none";
+	document.getElementById("user-name-cancel").style.display = "none";
+	document.getElementById("user-name").value = oldName;
+	document.getElementById("user-name").readOnly = true;
+	oldName = null;
+}
+
+function onPopupResetPasswordOpen() {
+	showPopup("popup-reset-password");
+}
+
+function onPopupResetPasswordOk() {
+	if (!onOperationRequest("Resetting password ..."))
+		return;
+	var newPassword = document.getElementById("user-new-password").value;
+	if (newPassword == null || newPassword == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-reset-password");
+	xowl.resetPlatformUserPassword(function (status, ct, content) {
+		if (onOperationEnded(status, content)) {
+			displayMessage("success", "Password has been reset.");
+			waitAndRefresh();
+		}
+	}, userId, newPassword);
+}
+
+function onPopupResetPasswordCancel() {
+	hidePopup("popup-reset-password");
+	document.getElementById("user-new-password").value = "";
+}
+
+function onPopupAssignRoleOpen() {
+	showPopup("popup-assign-role");
+}
+
+function onPopupAssignRoleOk() {
 	if (!onOperationRequest("Assigning role " + roleId + " ..."))
 		return;
+	var roleId = document.getElementById("input-role").value;
+	if (roleId == null || roleId == "") {
+		onOperationAbort("All fields are mandatory.");
+		return false;
+	}
+	hidePopup("popup-assign-role");
 	xowl.assignRoleToPlatformUser(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
 			displayMessage("success", "Assigned role " + roleId + ".");
@@ -183,15 +203,20 @@ function onAddRole() {
 	}, roleId, userId);
 }
 
-function onRemoveRole(roleId) {
-	popupConfirm("Platform Security", "Un-assign role " + roleId + "?", function () {
-		if (!onOperationRequest("Un-assigning role " + roleId + " ..."))
+function onPopupAssignRoleCancel() {
+	hidePopup("popup-assign-role");
+	document.getElementById("input-role").value = "";
+}
+
+function onRemoveRole(role) {
+	popupConfirm("Platform Security", richString(["Un-assign role " , role, "?"]), function () {
+		if (!onOperationRequest(richString(["Un-assigning role " , role, " ..."])))
 			return;
 		xowl.unassignRoleFromPlatformUser(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				displayMessage("success", "Un-assigned role " + roleId + ".");
+				displayMessage("success", richString(["Un-assigned role " , role, "."]));
 				waitAndRefresh();
 			}
-		}, roleId, userId);
+		}, role.identifier, userId);
 	});
 }

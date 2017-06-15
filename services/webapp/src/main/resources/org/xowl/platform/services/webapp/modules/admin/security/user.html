@@ -15,77 +15,140 @@
 <body>
 <div id="placeholder-header"></div>
 <div id="placeholder-popups"></div>
+<div id="security-popups">
+    <div class="popup" id="popup-assign-role">
+        <div class="popup-background" id="popup-assign-role-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Platform Security
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>Assign new role:</p>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="input-role" class="col-sm-2 control-label">Role:</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="input-role" placeholder="role">
+                                            <div class="input-group-addon">
+                                                <img src="" width="20" height="20" id="input-role-indicator"
+                                                     style="display: none;"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupAssignRoleOk()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupAssignRoleCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="popup-reset-password">
+        <div class="popup-background" id="popup-reset-password-background"></div>
+        <div class="popup-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Platform Security
+                </div>
+                <div class="panel-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>Reset user password:</p>
+                        </div>
+                        <div class="row">
+                            <form class="form-horizontal" action="" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="user-new-password" class="col-sm-2 control-label">New Password:</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" id="user-new-password">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="onPopupResetPasswordOk()">OK</button>
+                    <button type="button" class="btn btn-default" onclick="onPopupResetPasswordCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="body">
-    <form class="form-horizontal" action="" onsubmit="return false;">
-        <div class="form-group">
-            <label for="user-identifier" class="col-sm-2 control-label">Identifier:</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="user-identifier" readonly>
-            </div>
-            <span class="col-sm-2">
-                <span id="user-delete" class="btn btn-danger" onclick="onClickDelete()">
-                    Delete this user
-                </span>
-            </span>
-        </div>
-        <div class="form-group">
-            <label for="user-name" class="col-sm-2 control-label">Name:</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="user-name" readonly>
-            </div>
-            <span class="col-sm-2">
-                <span id="user-name-edit" class="btn btn-default" onclick="onClickEdit()">
-                    <img src="../../../assets/action-edit.svg" width="20" height="20"/>
-                </span>
-                <span id="user-name-validate" class="btn btn-default" onclick="onClickValidate()"
-                      style="display: none;">
-                    <img src="../../../assets/action-validate.svg" width="20" height="20"/>
-                </span>
-                <span id="user-name-cancel" class="btn btn-default" onclick="onClickCancel()"
-                      style="display: none;">
-                    <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
-                </span>
-            </span>
-        </div>
-        <div class="form-group">
-            <label for="user-new-password" class="col-sm-2 control-label">New Password:</label>
-            <div class="col-sm-8">
-                <input type="password" class="form-control" id="user-new-password">
-            </div>
-            <span class="col-sm-2">
-                <span id="user-change-password" class="btn btn-danger" onclick="onClickResetPassword()">
-                    Reset
-                </span>
-            </span>
-        </div>
-        <div class="form-group">
-            <label for="input-role" class="col-sm-2 control-label">Assign Role:</label>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="input-role" placeholder="role">
-                    <div class="input-group-addon">
-                        <img src="" width="20" height="20" id="input-role-indicator"
-                             style="display: none;"/>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-remove.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onClickDelete()">Delete this user</a>
+                    </div>
+                    <div>
+                        <img src="../../../assets/security.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onPopupResetPasswordOpen()">Reset password</a>
                     </div>
                 </div>
             </div>
-            <span class="col-sm-2">
-                <span class="btn btn-primary" onclick="onAddRole()">Assign</span>
-            </span>
         </div>
-        <div>
+        <div class="row">
+            <form class="form-horizontal" action="" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="user-identifier" class="col-sm-2 control-label">Identifier:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="user-identifier" readonly>
+                    </div>
+                    <span class="col-sm-2"></span>
+                </div>
+                <div class="form-group">
+                    <label for="user-name" class="col-sm-2 control-label">Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="user-name" readonly>
+                    </div>
+                    <span class="col-sm-2">
+                        <span id="user-name-edit" class="btn btn-default" onclick="onClickNameEdit()">
+                            <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                        </span>
+                        <span id="user-name-validate" class="btn btn-default" onclick="onClickNameValidate()"
+                              style="display: none;">
+                            <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                        </span>
+                        <span id="user-name-cancel" class="btn btn-default" onclick="onClickNameCancel()"
+                              style="display: none;">
+                            <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                        </span>
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div class="row">
             <table class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th>Role</th>
-                    <th></th>
+                    <th style="width: 80%">Role</th>
+                    <th style="width: 20%">
+                        <span class="btn btn-default" onclick="onPopupAssignRoleOpen()">
+                            <img src="../../../assets/action-plus.svg" width="20" height="20" title="ADD ROLE"/>
+                            <img src="../../../assets/role.svg" width="20" height="20" title="ADD ROLE"/>
+                        </span>
+                    </th>
                 </tr>
                 </thead>
                 <tbody id="roles">
                 </tbody>
             </table>
         </div>
-    </form>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

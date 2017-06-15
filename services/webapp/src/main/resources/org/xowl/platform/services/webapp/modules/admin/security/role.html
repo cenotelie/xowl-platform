@@ -16,38 +16,48 @@
 <div id="placeholder-header"></div>
 <div id="placeholder-popups"></div>
 <div class="body">
-    <form class="form-horizontal" action="" onsubmit="return false;">
-        <div class="form-group">
-            <label for="role-identifier" class="col-sm-2 control-label">Identifier:</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="role-identifier" readonly>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <img src="../../../assets/action-remove.svg" width="30" height="30" style="margin-left: 20px;"/>
+                        <a class="btn" onclick="onClickDelete()">Delete this role</a>
+                    </div>
+                </div>
             </div>
-            <span class="col-sm-2">
-                <span id="user-delete" class="btn btn-danger" onclick="onClickDelete()">
-                    Delete this role
-                </span>
-            </span>
         </div>
-        <div class="form-group">
-            <label for="role-name" class="col-sm-2 control-label">Name:</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="role-name" readonly>
-            </div>
-            <span class="col-sm-2">
-                <span id="role-name-edit" class="btn btn-default" onclick="onClickEdit()">
-                    <img src="../../../assets/action-edit.svg" width="20" height="20"/>
-                </span>
-                <span id="role-name-validate" class="btn btn-default" onclick="onClickValidate()"
-                      style="display: none;">
-                    <img src="../../../assets/action-validate.svg" width="20" height="20"/>
-                </span>
-                <span id="role-name-cancel" class="btn btn-default" onclick="onClickCancel()"
-                      style="display: none;">
-                    <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
-                </span>
-            </span>
+        <div class="row">
+            <form class="form-horizontal" action="" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="role-identifier" class="col-sm-2 control-label">Identifier:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="role-identifier" readonly>
+                    </div>
+                    <span class="col-sm-2"></span>
+                </div>
+                <div class="form-group">
+                    <label for="role-name" class="col-sm-2 control-label">Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="role-name" readonly>
+                    </div>
+                    <span class="col-sm-2">
+                        <span id="role-name-edit" class="btn btn-default" onclick="onClickEdit()">
+                            <img src="../../../assets/action-edit.svg" width="20" height="20"/>
+                        </span>
+                        <span id="role-name-validate" class="btn btn-default" onclick="onClickValidate()"
+                              style="display: none;">
+                            <img src="../../../assets/action-validate.svg" width="20" height="20"/>
+                        </span>
+                        <span id="role-name-cancel" class="btn btn-default" onclick="onClickCancel()"
+                              style="display: none;">
+                            <img src="../../../assets/action-cancel.svg" width="20" height="20"/>
+                        </span>
+                    </span>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 <div id="placeholder-footer"></div>
 

@@ -36,7 +36,6 @@ import org.xowl.infra.utils.metrics.MetricSnapshotLong;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -99,9 +98,8 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      * Initializes this service
      *
      * @param configurationService The current configuration service
-     * @param executionService     The current execution service
      */
-    public KernelPlatformManagementService(ConfigurationService configurationService, JobExecutionService executionService) {
+    public KernelPlatformManagementService(ConfigurationService configurationService) {
         Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/platform";
         this.bundles = new ArrayList<>();
@@ -110,7 +108,6 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         this.addonsCache = PlatformUtils.resolve(configuration.get("addonsStorage"));
         if (this.addonsCache.exists())
             loadAddonsCache();
-        enforceHttpConfigFelix(PlatformHttp.instance(), executionService);
     }
 
     /**
@@ -600,17 +597,17 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     /**
      * Enforces the configuration of the HTTP service provided by Felix when it is the current OSGi framework
      *
-     * @param platformHttp     The expected configuration for the platform
-     * @param executionService The job execution service
+     * @param platformHttp The expected configuration for the platform
+     * @return Whether the platform should reboot
      */
-    private static void enforceHttpConfigFelix(PlatformHttp platformHttp, JobExecutionService executionService) {
+    public static boolean enforceHttpConfigFelix(PlatformHttp platformHttp) {
         File confFile = PlatformUtils.resolve("felix/conf/config.properties");
         Configuration felixConfiguration = new Configuration();
         try {
             felixConfiguration.load(confFile);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return;
+            return false;
         }
         boolean mustReboot = false;
 
@@ -722,9 +719,9 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 felixConfiguration.save(confFile);
             } catch (IOException exception) {
                 Logging.get().error(exception);
-                return;
+                return true;
             }
-            executionService.schedule(new PlatformRebootJob());
         }
+        return mustReboot;
     }
 }

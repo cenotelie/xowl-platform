@@ -23,13 +23,14 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.stdimpl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
+import org.xowl.platform.kernel.platform.PlatformRebootJob;
 import org.xowl.platform.kernel.security.*;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 import org.xowl.platform.kernel.statistics.StatisticsService;
+import org.xowl.platform.kernel.stdimpl.*;
 import org.xowl.platform.kernel.webapi.HttpApiDiscoveryService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
@@ -115,7 +116,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(BusinessDirectoryService.class, directoryService, null);
 
         // register the platform management service
-        KernelPlatformManagementService servicePlatform = new KernelPlatformManagementService(configurationService, serviceJobExecutor);
+        KernelPlatformManagementService servicePlatform = new KernelPlatformManagementService(configurationService);
         bundleContext.registerService(Service.class, servicePlatform, null);
         bundleContext.registerService(SecuredService.class, servicePlatform, null);
         bundleContext.registerService(HttpApiService.class, servicePlatform, null);
@@ -127,6 +128,10 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(Service.class, discoveryService, null);
         bundleContext.registerService(HttpApiService.class, discoveryService, null);
         bundleContext.registerService(HttpApiDiscoveryService.class, discoveryService, null);
+
+        boolean mustReboot = KernelPlatformManagementService.enforceHttpConfigFelix(platformHttp);
+        if (mustReboot)
+            serviceJobExecutor.schedule(new PlatformRebootJob());
     }
 
     @Override

@@ -8,7 +8,7 @@
     <artifactId>xowl-kernel-activator</artifactId>
     <packaging>bundle</packaging>
     <version>0.3.1-SNAPSHOT</version>
-    <name>xOWL Collaboration Platform - Kernel Impl</name>
+    <name>xOWL Collaboration Platform - Kernel Activator</name>
     <description>Activator of the standard implementation of kernel APIs</description>
     <dependencies>
         <dependency>

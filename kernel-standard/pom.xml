@@ -8,7 +8,7 @@
     <artifactId>xowl-kernel-standard</artifactId>
     <packaging>bundle</packaging>
     <version>0.3.1-SNAPSHOT</version>
-    <name>xOWL Collaboration Platform - Kernel Impl</name>
+    <name>xOWL Collaboration Platform - Kernel Implementation</name>
     <description>Standard implementations of the kernel APIs for the xOWL collaboration platform</description>
     <dependencies>
         <dependency>

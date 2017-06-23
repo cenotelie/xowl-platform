@@ -23,7 +23,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.events.EventService;
-import org.xowl.platform.kernel.impl.*;
+import org.xowl.platform.kernel.stdimpl.*;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.jobs.JobFactory;
 import org.xowl.platform.kernel.platform.PlatformManagementService;

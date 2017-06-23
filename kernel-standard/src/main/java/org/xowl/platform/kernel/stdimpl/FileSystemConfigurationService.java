@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.config.Configuration;

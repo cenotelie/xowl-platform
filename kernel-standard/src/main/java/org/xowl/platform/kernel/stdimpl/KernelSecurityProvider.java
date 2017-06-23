@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.config.Section;

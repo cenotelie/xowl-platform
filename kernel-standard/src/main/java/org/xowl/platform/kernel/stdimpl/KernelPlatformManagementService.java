@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.osgi.framework.Bundle;
@@ -68,11 +68,11 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/stdimpl/api_platform.raml", "Platform Management Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/impl/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelPlatformManagementService.class, "/org/xowl/platform/kernel/stdimpl/api_platform.html", "Platform Management Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * The URI for the API services

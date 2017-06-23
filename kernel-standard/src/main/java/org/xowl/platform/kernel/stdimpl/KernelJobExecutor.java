@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
@@ -80,11 +80,11 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_jobs.raml", "Jobs Management Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/stdimpl/api_jobs.raml", "Jobs Management Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/impl/api_jobs.html", "Jobs Management Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelJobExecutor.class, "/org/xowl/platform/kernel/stdimpl/api_jobs.html", "Jobs Management Service - Documentation", HttpApiResource.MIME_HTML);
 
     /**
      * The URI for the API services

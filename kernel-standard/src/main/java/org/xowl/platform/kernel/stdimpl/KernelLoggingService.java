@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.server.xsp.XSPReplyUtils;
@@ -55,11 +55,11 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelLoggingService.class, "/org/xowl/platform/kernel/impl/api_log.raml", "Logging Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelLoggingService.class, "/org/xowl/platform/kernel/stdimpl/api_log.raml", "Logging Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelLoggingService.class, "/org/xowl/platform/kernel/impl/api_log.html", "Logging Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelLoggingService.class, "/org/xowl/platform/kernel/stdimpl/api_log.html", "Logging Service - Documentation", HttpApiResource.MIME_HTML);
 
 
     /**

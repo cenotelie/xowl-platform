@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.impl;
+package org.xowl.platform.kernel.stdimpl;
 
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -40,18 +40,18 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
     /**
      * The resource for the API's specification
      */
-    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/api_discovery.raml", "API Discovery Service - Specification", HttpApiResource.MIME_RAML);
+    private static final HttpApiResource RESOURCE_SPECIFICATION = new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/stdimpl/api_discovery.raml", "API Discovery Service - Specification", HttpApiResource.MIME_RAML);
     /**
      * The resource for the API's documentation
      */
-    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/api_discovery.html", "API Discovery Service - Documentation", HttpApiResource.MIME_HTML);
+    private static final HttpApiResource RESOURCE_DOCUMENTATION = new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/stdimpl/api_discovery.html", "API Discovery Service - Documentation", HttpApiResource.MIME_HTML);
     /**
      * The default API resources for the platform
      */
     private static final HttpApiResource[] RESOURCE_DEFAULTS = new HttpApiResource[]{
-            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/api_traits.raml", "Standard Traits", HttpApiResource.MIME_RAML),
-            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/schema_infra_utils.json", "Schema - xOWL Infrastructure", HttpConstants.MIME_JSON),
-            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/impl/schema_platform_kernel.json", "Schema - xOWL Platform - Kernel", HttpConstants.MIME_JSON)
+            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/stdimpl/api_traits.raml", "Standard Traits", HttpApiResource.MIME_RAML),
+            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/stdimpl/schema_infra_utils.json", "Schema - xOWL Infrastructure", HttpConstants.MIME_JSON),
+            new HttpApiResourceBase(KernelHttpApiDiscoveryService.class, "/org/xowl/platform/kernel/stdimpl/schema_platform_kernel.json", "Schema - xOWL Platform - Kernel", HttpConstants.MIME_JSON)
     };
 
     /**

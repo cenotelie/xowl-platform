@@ -42,7 +42,8 @@
     </properties>
     <modules>
         <module>kernel</module>
-        <module>kernel-impl</module>
+        <module>kernel-standard</module>
+        <module>kernel-activator</module>
         <module>services</module>
         <module>connectors</module>
         <module>distribution</module>

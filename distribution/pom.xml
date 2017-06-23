@@ -122,7 +122,13 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.platform</groupId>
-            <artifactId>xowl-kernel-impl</artifactId>
+            <artifactId>xowl-kernel-standard</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.platform</groupId>
+            <artifactId>xowl-kernel-activator</artifactId>
             <version>0.3.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

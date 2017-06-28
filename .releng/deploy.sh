@@ -10,4 +10,4 @@ rm -rf "$1/xowl-distribution"
 tar -C "$1" -xf "$ROOT/distribution/target/xowl-distribution-$VERSION.tar.gz"
 # first run to enforce the HTTP configuration
 cd "$1/xowl-distribution"
-java "-Dgosh.args=--noi" "-Dxowl.root=$1/xowl-distribution" -jar "$1/xowl-distribution/felix/bin/felix.jar" -b "$1/xowl-distribution/felix/bundle" || true
+java "-Dgosh.args=--noi" -jar "$1/xowl-distribution/felix/bin/felix.jar" -b "$1/xowl-distribution/felix/bundle" || true

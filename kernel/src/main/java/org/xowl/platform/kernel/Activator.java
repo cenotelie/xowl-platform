@@ -29,8 +29,15 @@ import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
+    /**
+     * The location of this bundle
+     */
+    static String bundleLocation = null;
+
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        bundleLocation = bundleContext.getBundle().getLocation();
+
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
 
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);

@@ -51,10 +51,6 @@ public class PlatformUtils {
     public static final String DEFAULT_ADMIN_GROUP = "admins";
 
     /**
-     * Environment variable for the distribution's root
-     */
-    private static final String DISTRIBUTION_ROOT_ENV = "xowl.root";
-    /**
      * The file for the distribution's root
      */
     private static File DISTRIBUTION_ROOT = null;
@@ -65,8 +61,18 @@ public class PlatformUtils {
      * @return The file for the distribution's root
      */
     public static synchronized File getDistributionRoot() {
-        if (DISTRIBUTION_ROOT == null)
-            DISTRIBUTION_ROOT = new File(System.getProperty(DISTRIBUTION_ROOT_ENV));
+        if (DISTRIBUTION_ROOT == null) {
+            if (Activator.bundleLocation == null) {
+                Logging.get().error("The bundle has not been activated, not running with OSGi?");
+                DISTRIBUTION_ROOT = new File(".");
+            } else {
+                String location = Activator.bundleLocation;
+                if (location.startsWith("file:"))
+                    location = location.substring("file:".length());
+                DISTRIBUTION_ROOT = new File(location);
+                DISTRIBUTION_ROOT = DISTRIBUTION_ROOT.getParentFile().getParentFile().getParentFile();
+            }
+        }
         return DISTRIBUTION_ROOT;
     }
 

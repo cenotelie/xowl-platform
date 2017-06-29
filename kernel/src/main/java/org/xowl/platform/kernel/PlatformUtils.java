@@ -60,17 +60,14 @@ public class PlatformUtils {
      *
      * @return The file for the distribution's root
      */
-    public static synchronized File getDistributionRoot() {
+    private static synchronized File getDistributionRoot() {
         if (DISTRIBUTION_ROOT == null) {
-            if (Activator.bundleLocation == null) {
+            PlatformLocator locator = Register.getComponent(PlatformLocator.class);
+            if (locator == null) {
                 Logging.get().error("The bundle has not been activated, not running with OSGi?");
                 DISTRIBUTION_ROOT = new File(".");
             } else {
-                String location = Activator.bundleLocation;
-                if (location.startsWith("file:"))
-                    location = location.substring("file:".length());
-                DISTRIBUTION_ROOT = new File(location);
-                DISTRIBUTION_ROOT = DISTRIBUTION_ROOT.getParentFile().getParentFile().getParentFile();
+                DISTRIBUTION_ROOT = locator.getLocation();
             }
         }
         return DISTRIBUTION_ROOT;

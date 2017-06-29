@@ -29,14 +29,11 @@ import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
  * @author Laurent Wouters
  */
 public class Activator implements BundleActivator {
-    /**
-     * The location of this bundle
-     */
-    static String bundleLocation = null;
-
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        bundleLocation = bundleContext.getBundle().getLocation();
+        PlatformLocator locator = new PlatformLocatorImpl(bundleContext.getBundle().getLocation());
+        bundleContext.registerService(Service.class, locator, null);
+        bundleContext.registerService(PlatformLocator.class, locator, null);
 
         bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
 

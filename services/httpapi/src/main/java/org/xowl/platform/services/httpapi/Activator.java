@@ -46,9 +46,6 @@ public class Activator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) throws Exception {
         server = new XOWLMainHTTPServer();
-        bundleContext.registerService(Service.class, server, null);
-        bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
-        bundleContext.registerService(WebUIContribution.class, new XOWLHttpApiDocumentationModule(), null);
 
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
@@ -56,6 +53,9 @@ public class Activator implements BundleActivator {
                 Register.waitFor(HttpService.class, new RegisterWaiter<HttpService>() {
                     @Override
                     public void onAvailable(BundleContext bundleContext, HttpService component) {
+                        bundleContext.registerService(Service.class, server, null);
+                        bundleContext.registerService(HTTPServerService.class, server, new Hashtable<String, Object>());
+                        bundleContext.registerService(WebUIContribution.class, new XOWLHttpApiDocumentationModule(), null);
                         try {
                             component.registerServlet(PlatformHttp.getUriPrefixApi(), server, null, new XOWLMainHTTPContext(component));
                         } catch (Exception exception) {

@@ -41,6 +41,10 @@ class RegisterListener<T> implements ServiceListener {
      * The listener
      */
     private final RegisterWaiter<T> listener;
+    /**
+     * The component instance, when available
+     */
+    private T component;
 
     /**
      * Initializes this listener
@@ -62,10 +66,18 @@ class RegisterListener<T> implements ServiceListener {
             if (reference != null) {
                 Object component = context.getService(reference);
                 if (component != null && type.isInstance(component)) {
-                    listener.onAvailable(context, (T) component);
+                    this.component = (T) component;
+                    PlatformLifecycle.getInstance().onComponentAvailable(this);
                     context.removeServiceListener(this);
                 }
             }
         }
+    }
+
+    /**
+     * Broadcast to the listener
+     */
+    public void broadcast() {
+        listener.onAvailable(context, component);
     }
 }

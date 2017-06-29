@@ -31,6 +31,15 @@ import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
 public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
+        // register the lifecycle component
+        bundleContext.addFrameworkListener(PlatformLifecycle.getInstance());
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PlatformLifecycle.getInstance().onPlatformShutdown();
+            }
+        }, PlatformLifecycle.class.getCanonicalName() + ".onPlatformShutdown"));
+
         PlatformLocator locator = new PlatformLocatorImpl(bundleContext.getBundle().getLocation());
         bundleContext.registerService(Service.class, locator, null);
         bundleContext.registerService(PlatformLocator.class, locator, null);
@@ -45,5 +54,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext bundleContext) throws Exception {
+        PlatformLifecycle.getInstance().onPlatformShutdown();
     }
 }

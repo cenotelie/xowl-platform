@@ -15,12 +15,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package org.xowl.platform.kernel.stdimpl;
+package org.xowl.platform.kernel;
 
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
-import org.xowl.platform.kernel.ManagedService;
-import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.platform.PlatformShutdownEvent;
@@ -28,6 +26,8 @@ import org.xowl.platform.kernel.platform.PlatformStartupEvent;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;
 import org.xowl.platform.kernel.security.SecurityService;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,7 +37,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author Laurent Wouters
  */
-public class KernelLifecycle implements FrameworkListener {
+public class PlatformLifecycle implements FrameworkListener {
+    /**
+     * The singleton instance
+     */
+    private static final PlatformLifecycle INSTANCE = new PlatformLifecycle();
+
+    /**
+     * Gets the instance of this structure
+     *
+     * @return The singleton instance
+     */
+    public static PlatformLifecycle getInstance() {
+        return INSTANCE;
+    }
+
     /**
      * Whether the startup sequence has been executed
      */
@@ -46,13 +60,18 @@ public class KernelLifecycle implements FrameworkListener {
      * Whether the shutdown sequence has been executed
      */
     private final AtomicBoolean hasShutdown;
+    /**
+     * The register listeners that have been activated so far
+     */
+    private final Collection<RegisterListener> activatedListeners;
 
     /**
      * Initializes this structure
      */
-    public KernelLifecycle() {
+    private PlatformLifecycle() {
         this.hasStarted = new AtomicBoolean(false);
         this.hasShutdown = new AtomicBoolean(false);
+        this.activatedListeners = new ArrayList<>();
     }
 
     @Override
@@ -63,11 +82,28 @@ public class KernelLifecycle implements FrameworkListener {
     }
 
     /**
+     * When a component have been waited for and is now available
+     *
+     * @param listener The corresponding listener
+     */
+    void onComponentAvailable(RegisterListener listener) {
+        activatedListeners.add(listener);
+    }
+
+    /**
      * Executes the startup sequence of the platform
      */
     public void onPlatformStartup() {
         if (!hasStarted.compareAndSet(false, true))
             return;
+
+        // finishes delayed activations
+        while (!activatedListeners.isEmpty()) {
+            Collection<RegisterListener> buffer = new ArrayList<>(activatedListeners);
+            activatedListeners.clear();
+            for (RegisterListener listener : buffer)
+                listener.broadcast();
+        }
 
         // authenticate as root
         SecurityService securityService = Register.getComponent(SecurityService.class);

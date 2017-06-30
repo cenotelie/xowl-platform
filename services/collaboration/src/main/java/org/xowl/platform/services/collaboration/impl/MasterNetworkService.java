@@ -535,7 +535,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.load(serviceCollabConfigFile);
             configuration.set("manifest", "collaboration.json");
             configuration.set("network", "service", SlaveNetworkService.class.getCanonicalName());
-            configuration.set("network", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
+            configuration.set("network", "master", PlatformHttp.getFullUriApi());
             configuration.save(serviceCollabConfigFile);
         } catch (IOException exception) {
             Logging.get().error(exception);
@@ -549,7 +549,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.load(serviceSecurityConfigFile);
             configuration.set("realm", "type", "org.xowl.platform.services.security.internal.XOWLSubordinateRealm");
             configuration.set("realm", "location", "users");
-            configuration.set("realm", "master", PlatformHttp.instance().getPublicUri() + PlatformHttp.URI_API);
+            configuration.set("realm", "master", PlatformHttp.getFullUriApi());
             configuration.save(serviceSecurityConfigFile);
         } catch (IOException exception) {
             Logging.get().error(exception);

@@ -26,14 +26,6 @@ import org.xowl.infra.utils.config.Configuration;
  */
 public class PlatformHttp implements Registrable {
     /**
-     * The URI suffix for the web API
-     */
-    public static final String URI_API = "/api";
-    /**
-     * The URI suffix for the web resources
-     */
-    public static final String URI_WEB = "/web";
-    /**
      * The prefix for the help links
      */
     public static final String ERROR_HELP_PREFIX = "/modules/admin/documentation/";
@@ -70,7 +62,7 @@ public class PlatformHttp implements Registrable {
      * @return The uri prefix for the API endpoint
      */
     public static String getUriPrefixApi() {
-        return INSTANCE.getHttpUriPrefix() + URI_API;
+        return INSTANCE.getHttpUriPrefix() + INSTANCE.getHttpUriPathApi();
     }
 
     /**
@@ -79,7 +71,25 @@ public class PlatformHttp implements Registrable {
      * @return The uri prefix for the web resources
      */
     public static String getUriPrefixWeb() {
-        return INSTANCE.getHttpUriPrefix() + URI_WEB;
+        return INSTANCE.getHttpUriPrefix() + INSTANCE.getHttpUriPathWeb();
+    }
+
+    /**
+     * Gets the full public URI for the API connections
+     *
+     * @return The full public URI for the API connections
+     */
+    public static String getFullUriApi() {
+        return INSTANCE.getPublicUri() + INSTANCE.getHttpUriPathApi();
+    }
+
+    /**
+     * Gets the full public URI for the web connections
+     *
+     * @return The full public URI for the web connections
+     */
+    public static String getFullUriWeb() {
+        return INSTANCE.getPublicUri() + INSTANCE.getHttpUriPathWeb();
     }
 
 
@@ -107,6 +117,14 @@ public class PlatformHttp implements Registrable {
      * The HTTP URI prefix for all connections to this instance
      */
     private final String httpURIPrefix;
+    /**
+     * The prefix of the URI path for all API connections to this instance
+     */
+    private final String httpURIPathApi;
+    /**
+     * The prefix of the URI path for all web connections to this instance
+     */
+    private final String httpURIPathWeb;
     /**
      * The path from the distribution's root to the TLS key store (if any)
      */
@@ -175,6 +193,24 @@ public class PlatformHttp implements Registrable {
     }
 
     /**
+     * Gets the prefix of the URI path for all API connections to this instance
+     *
+     * @return The prefix of the URI path for all API connections to this instance
+     */
+    public String getHttpUriPathApi() {
+        return httpURIPathApi;
+    }
+
+    /**
+     * Gets the prefix of the URI path for all web connections to this instance
+     *
+     * @return The prefix of the URI path for all web connections to this instance
+     */
+    public String getHttpUriPathWeb() {
+        return httpURIPathWeb;
+    }
+
+    /**
      * Gets the path from the distribution's root to the TLS key store (if any)
      *
      * @return The path from the distribution's root to the TLS key store (if any)
@@ -214,6 +250,8 @@ public class PlatformHttp implements Registrable {
         this.httpPort = Integer.parseInt(configuration.get("httpPort"));
         this.httpsPort = Integer.parseInt(configuration.get("httpsPort"));
         this.httpURIPrefix = configuration.get("httpURIPrefix");
+        this.httpURIPathApi = configuration.get("httpURIPathApi");
+        this.httpURIPathWeb = configuration.get("httpURIPathWeb");
         this.tlsKeyStore = configuration.get("tlsKeyStore");
         this.tlsKeyPassword = configuration.get("tlsKeyPassword");
         String publicUri = configuration.get("publicUri");

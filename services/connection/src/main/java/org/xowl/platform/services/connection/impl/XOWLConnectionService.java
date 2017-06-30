@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.connection.impl;
 
+import fr.cenotelie.hime.redist.ASTNode;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
@@ -132,8 +132,14 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
         // disconnect the connectors
         synchronized (connectorsById) {
             for (Registration registration : connectorsById.values()) {
-                for (int i = 0; i != registration.references.length; i++)
-                    registration.references[i].unregister();
+                for (int i = 0; i != registration.references.length; i++) {
+                    try {
+                        registration.references[i].unregister();
+                    } catch (IllegalStateException exception) {
+                        // service already unregistered
+                        // do nothing
+                    }
+                }
             }
             connectorsById.clear();
         }

@@ -81,6 +81,11 @@ public class XOWLWebModuleDirectory implements HttpApiService {
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return false;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri + "/modules")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))

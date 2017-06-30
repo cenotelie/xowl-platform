@@ -480,6 +480,11 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri)) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))

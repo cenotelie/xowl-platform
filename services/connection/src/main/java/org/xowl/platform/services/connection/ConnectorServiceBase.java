@@ -203,6 +203,11 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securedService, HttpApiRequest request) {
         return XSPReplyUtils.toHttpResponse(XSPReplyUnsupported.instance(), null);
     }

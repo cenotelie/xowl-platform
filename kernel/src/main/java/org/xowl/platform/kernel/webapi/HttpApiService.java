@@ -96,6 +96,14 @@ public interface HttpApiService extends Service, Serializable {
     int canHandle(HttpApiRequest request);
 
     /**
+     * Checks whether the request to be handled requires the user to be authenticated
+     *
+     * @param request The request to handle
+     * @return Whether the request requires the user to be authenticated
+     */
+    boolean requireAuth(HttpApiRequest request);
+
+    /**
      * Handles an HTTP API request
      *
      * @param securityService The current security service

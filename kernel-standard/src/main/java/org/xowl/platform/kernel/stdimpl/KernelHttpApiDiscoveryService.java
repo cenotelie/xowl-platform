@@ -110,6 +110,11 @@ public class KernelHttpApiDiscoveryService implements HttpApiDiscoveryService, H
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");

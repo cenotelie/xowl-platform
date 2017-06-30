@@ -173,6 +173,11 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().startsWith(apiUriBadges))
             return handleBadges(request);

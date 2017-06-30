@@ -132,6 +132,11 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         XSPReply reply = securityService.checkAction(ACTION_GET_LOG);
         if (!reply.isSuccess())

@@ -25,7 +25,6 @@ import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.Logging;
-import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -102,11 +101,6 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             return;
         }
 
-        if (!checkAuthentication(securityService, servletRequest, servletResponse)) {
-            servletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
-            return;
-        }
-
         HttpApiRequest apiRequest = new XOWLHttpApiRequest(servletRequest);
         try {
             Collection<HttpApiService> services = Register.getComponents(HttpApiService.class);
@@ -119,10 +113,15 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                     priority = result;
                 }
             }
-            if (service == null)
+            if (service == null) {
                 servletResponse.setStatus(HttpURLConnection.HTTP_NOT_FOUND);
-            else
-                doResponse(servletResponse, service.handle(securityService, apiRequest));
+                return;
+            }
+            if (service.requireAuth(apiRequest) && !checkAuthentication(securityService, servletRequest, servletResponse)) {
+                servletResponse.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
+                return;
+            }
+            doResponse(servletResponse, service.handle(securityService, apiRequest));
         } catch (Throwable exception) {
             Logging.get().error(exception);
             doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
@@ -140,14 +139,6 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
      * @return Whether a user is authenticated for the request
      */
     private boolean checkAuthentication(SecurityService securityService, HttpServletRequest request, HttpServletResponse response) {
-        // do not perform authentication for pre-flight requests
-        if (request.getMethod().equals(HttpConstants.METHOD_OPTIONS))
-            return true;
-
-        // do not perform authentication for the login service
-        if (request.getRequestURI().equals(PlatformHttp.getUriPrefixApi() + SecurityService.URI_LOGIN))
-            return true;
-
         Enumeration<String> values = request.getHeaders(HttpConstants.HEADER_COOKIE);
         if (values != null) {
             while (values.hasMoreElements()) {

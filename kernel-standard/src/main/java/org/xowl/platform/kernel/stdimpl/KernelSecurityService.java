@@ -177,6 +177,11 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return !(request.getUri().equals(apiUri + "/login"));
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri + "/login"))
             return handleRequestLogin(request);

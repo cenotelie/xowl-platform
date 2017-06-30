@@ -237,6 +237,11 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri + "/archive")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))

@@ -98,6 +98,11 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");

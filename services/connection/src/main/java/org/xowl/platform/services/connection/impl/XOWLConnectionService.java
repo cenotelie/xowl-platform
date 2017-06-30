@@ -152,6 +152,11 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri + "/descriptors")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))

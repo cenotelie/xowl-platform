@@ -415,6 +415,11 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     }
 
     @Override
+    public boolean requireAuth(HttpApiRequest request) {
+        return true;
+    }
+
+    @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         if (request.getUri().equals(apiUri + "/sparql")) {
             return onMessageSPARQL(request);

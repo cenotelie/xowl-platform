@@ -54,6 +54,7 @@ public class SecuredActionPolicyIsSelf extends SecuredActionPolicyBase {
 
     @Override
     public boolean isAuthorized(SecurityService securityService, PlatformUser user, SecuredAction action, Object data) {
-        return data instanceof PlatformUser && data == user;
+        return (data instanceof PlatformUser && data == user)
+                || (data instanceof String && user.getIdentifier().equals(data));
     }
 }

@@ -26,7 +26,7 @@ tar -C "$RELENG/docker" -xf "$ROOT/distribution/target/xowl-distribution-$VERSIO
 
 # Build the docker image
 docker rmi "xowl/xowl-platform:$VERSION" || true
-docker build --tag "xowl/xowl-platform:$VERSION" --rm "$RELENG/docker"
+docker build --tag "xowl/xowl-platform:$VERSION" --rm --label version="$VERSION" --label changeset="$HASH" "$RELENG/docker"
 
 # Cleanup
 rm -rf "$RELENG/docker/xowl-distribution"

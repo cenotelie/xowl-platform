@@ -328,6 +328,8 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return reply;
         }
         PlatformUser user = getRealm().getUser(((XSPReplyResult<String>) reply).getData());
+        if (user == null)
+            return XSPReplyUnauthenticated.instance();
         CONTEXT.set(user);
         return new XSPReplyResult<>(user);
     }

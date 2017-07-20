@@ -27,15 +27,6 @@ import org.xowl.platform.kernel.platform.PlatformUser;
  */
 public interface SecurityService extends SecuredService {
     /**
-     * The name of the cookie for the authentication token
-     */
-    String AUTH_TOKEN = "__Secure-xOWL-Platform";
-    /**
-     * The URI of the API for the login service
-     */
-    String URI_LOGIN = "/kernel/security/login";
-
-    /**
      * Service action to get the configuration of the security policy
      */
     SecuredAction ACTION_GET_POLICY = new SecuredAction(SecurityService.class.getCanonicalName() + ".GetPolicy", "Security Service - Get Security Policy", SecuredActionPolicyIsPlatformAdmin.DESCRIPTOR);
@@ -190,6 +181,13 @@ public interface SecurityService extends SecuredService {
      * @return The current authorization policy for this platform
      */
     SecurityPolicy getPolicy();
+
+    /**
+     * Gets the security tokens management service for this platform
+     *
+     * @return The security tokens management service for this platform
+     */
+    SecurityTokenService getTokens();
 
     /**
      * Gets the manager for the secured resources

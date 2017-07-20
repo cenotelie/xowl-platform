@@ -266,6 +266,20 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     }
 
     @Override
+    public synchronized SecurityTokenService getTokens() {
+        if (tokenService != null)
+            return tokenService;
+        String identifier = tokenServiceConfiguration.get("type");
+        for (SecurityTokenServiceProvider provider : Register.getComponents(SecurityTokenServiceProvider.class)) {
+            tokenService = provider.newService(identifier, policyConfiguration);
+            if (tokenService != null)
+                return tokenService;
+        }
+        tokenService = new KernelSecurityTokenService(tokenServiceConfiguration);
+        return tokenService;
+    }
+
+    @Override
     public synchronized SecuredResourceManager getSecuredResources() {
         if (resourceManager != null)
             return resourceManager;
@@ -285,7 +299,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         PlatformUser user = getRealm().authenticate(login, password);
         if (user != null) {
             CONTEXT.set(user);
-            return new XSPReplyResult<>(getTokenService().newTokenFor(login));
+            return new XSPReplyResult<>(getTokens().newTokenFor(login));
         }
         onLoginFailure(client);
         Logging.get().info("Authentication failure from " + client + " on initial login with " + login);
@@ -302,7 +316,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     public XSPReply authenticate(String client, String token) {
         if (isBanned(client))
             return XSPReplyUnauthenticated.instance();
-        XSPReply reply = getTokenService().checkToken(token);
+        XSPReply reply = getTokens().checkToken(token);
         if (reply == XSPReplyUnauthenticated.instance()) {
             // the token is invalid
             onLoginFailure(client);
@@ -346,24 +360,6 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     @Override
     public XSPReply checkAction(SecuredAction action, Object data) {
         return getPolicy().checkAction(this, action, data);
-    }
-
-    /**
-     * Gets the token service
-     *
-     * @return The token service
-     */
-    private synchronized SecurityTokenService getTokenService() {
-        if (tokenService != null)
-            return tokenService;
-        String identifier = tokenServiceConfiguration.get("type");
-        for (SecurityTokenServiceProvider provider : Register.getComponents(SecurityTokenServiceProvider.class)) {
-            tokenService = provider.newService(identifier, policyConfiguration);
-            if (tokenService != null)
-                return tokenService;
-        }
-        tokenService = new KernelSecurityTokenService(tokenServiceConfiguration);
-        return tokenService;
     }
 
     /**
@@ -437,7 +433,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return XSPReplyUtils.toHttpResponse(reply, null);
         String token = ((XSPReplyResult<String>) reply).getData();
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
-        response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "=" + token +
+        response.addHeader(HttpConstants.HEADER_SET_COOKIE, getTokens().getTokenName() + "=" + token +
                 "; Max-Age=" + Long.toString(securityTokenTTL) +
                 "; Path=" + PlatformHttp.getUriPrefixApi() +
                 "; Secure" +
@@ -458,7 +454,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (!reply.isSuccess())
             return XSPReplyUtils.toHttpResponse(reply, null);
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
-        response.addHeader(HttpConstants.HEADER_SET_COOKIE, AUTH_TOKEN + "= " +
+        response.addHeader(HttpConstants.HEADER_SET_COOKIE, getTokens().getTokenName() + "= " +
                 "; Max-Age=0" +
                 "; Path=" + PlatformHttp.getUriPrefixApi() +
                 "; Secure" +

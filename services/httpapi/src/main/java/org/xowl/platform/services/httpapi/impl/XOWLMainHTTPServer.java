@@ -146,8 +146,8 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                 String[] parts = content.split(";");
                 for (String cookie : parts) {
                     cookie = cookie.trim();
-                    if (cookie.startsWith(SecurityService.AUTH_TOKEN + "=")) {
-                        String token = cookie.substring(SecurityService.AUTH_TOKEN.length() + 1);
+                    if (cookie.startsWith(securityService.getTokens().getTokenName() + "=")) {
+                        String token = cookie.substring(securityService.getTokens().getTokenName().length() + 1);
                         XSPReply reply = securityService.authenticate(request.getRemoteAddr(), token);
                         if (reply.isSuccess())
                             return true;

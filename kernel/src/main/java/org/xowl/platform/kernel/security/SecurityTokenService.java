@@ -27,6 +27,13 @@ import org.xowl.platform.kernel.Service;
  */
 public interface SecurityTokenService extends Service {
     /**
+     * Gets the name to use for security tokens
+     *
+     * @return The name to use for security tokens
+     */
+    String getTokenName();
+
+    /**
      * Builds an authentication token for the specified user login
      *
      * @param login The user login

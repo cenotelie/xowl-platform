@@ -59,6 +59,10 @@ public class KernelSecurityTokenService implements SecurityTokenService {
      */
     private final Key securityKey;
     /**
+     * The name to use for security tokens
+     */
+    private final String securityTokenName;
+    /**
      * The time to live in seconds of an authentication token
      */
     private final long securityTokenTTL;
@@ -82,6 +86,7 @@ public class KernelSecurityTokenService implements SecurityTokenService {
         }
         this.securityMAC = mac;
         this.securityKey = key;
+        this.securityTokenName = configuration.get("tokenName");
         this.securityTokenTTL = Integer.parseInt(configuration.get("tokenTTL"));
     }
 
@@ -93,6 +98,11 @@ public class KernelSecurityTokenService implements SecurityTokenService {
     @Override
     public String getName() {
         return PlatformUtils.NAME + " - Security Token Service";
+    }
+
+    @Override
+    public String getTokenName() {
+        return securityTokenName;
     }
 
     @Override

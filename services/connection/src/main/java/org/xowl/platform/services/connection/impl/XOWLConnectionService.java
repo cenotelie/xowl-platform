@@ -443,7 +443,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JsonLoader.parseJson(logger, content);
+        ASTNode root = Json.parse(logger, content);
         if (root == null)
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
 

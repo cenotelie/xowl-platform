@@ -111,7 +111,7 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
+        ASTNode root = Json.parse(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         return ReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);

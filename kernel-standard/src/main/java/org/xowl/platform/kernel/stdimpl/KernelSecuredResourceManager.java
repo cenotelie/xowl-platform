@@ -18,10 +18,10 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
@@ -95,7 +95,7 @@ public class KernelSecuredResourceManager implements SecuredResourceManager {
     private KernelSecuredResourceDescriptor loadDescriptor(File file) {
         try (Reader reader = IOUtils.getReader(file.getAbsolutePath())) {
             String content = IOUtils.read(reader);
-            ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+            ASTNode definition = Json.parse(Logging.get(), content);
             if (definition == null) {
                 Logging.get().error("Failed to parse the descriptor " + file);
                 return null;

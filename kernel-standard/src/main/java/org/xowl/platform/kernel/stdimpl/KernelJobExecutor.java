@@ -18,16 +18,16 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.RichString;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -248,7 +248,7 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
      * @param content The job's content
      */
     private void reloadJob(File file, String content) {
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+        ASTNode definition = Json.parse(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse the job " + file.getAbsolutePath());
             return;
@@ -511,7 +511,7 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
                 Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return ReplyUtils.toHttpResponse(cancel(job), null);
+                return ReplyUtils.toHttpResponse(cancel(job));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

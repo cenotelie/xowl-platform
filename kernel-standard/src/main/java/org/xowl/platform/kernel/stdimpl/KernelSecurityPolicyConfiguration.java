@@ -18,11 +18,11 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyException;
 import org.xowl.infra.utils.api.ReplySuccess;
-import org.xowl.infra.store.loaders.JsonLoader;
-import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredActionPolicy;
@@ -57,7 +57,7 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
         this.storage = storage;
         if (storage.exists()) {
             try (Reader reader = IOUtils.getReader(storage)) {
-                ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                ASTNode definition = Json.parse(Logging.get(), reader);
                 if (definition == null)
                     return;
                 loadDefinition(definition, SecuredAction.getAll());

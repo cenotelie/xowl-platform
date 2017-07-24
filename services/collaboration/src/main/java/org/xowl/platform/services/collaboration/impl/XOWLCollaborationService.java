@@ -338,7 +338,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     if (content.isEmpty())
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
-                    ASTNode root = JsonLoader.parseJson(logger, content);
+                    ASTNode root = Json.parse(logger, content);
                     if (root == null)
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     ArtifactSpecification specification = new ArtifactSpecification(root);
@@ -428,7 +428,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     if (content.isEmpty())
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
-                    ASTNode root = JsonLoader.parseJson(logger, content);
+                    ASTNode root = Json.parse(logger, content);
                     if (root == null)
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     ArtifactSpecification specification = new ArtifactSpecification(root);
@@ -519,7 +519,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     if (content.isEmpty())
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
-                    ASTNode root = JsonLoader.parseJson(logger, content);
+                    ASTNode root = Json.parse(logger, content);
                     if (root == null)
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     PlatformRoleBase role = new PlatformRoleBase(root);
@@ -567,7 +567,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     if (content.isEmpty())
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
-                    ASTNode root = JsonLoader.parseJson(logger, content);
+                    ASTNode root = Json.parse(logger, content);
                     if (root == null)
                         return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     CollaborationSpecification specification = new CollaborationSpecification(root);

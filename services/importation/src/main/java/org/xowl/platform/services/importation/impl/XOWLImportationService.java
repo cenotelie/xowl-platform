@@ -138,7 +138,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @param content The descriptor content
      */
     private void reloadDocument(String file, String content) {
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+        ASTNode definition = Json.parse(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse the document descriptor " + file);
             return;
@@ -165,7 +165,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The configuration
      */
     private ImporterConfiguration loadConfiguration(String content) {
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+        ASTNode definition = Json.parse(Logging.get(), content);
         if (definition == null)
             return null;
         ImporterConfiguration configuration = new ImporterConfiguration(definition);

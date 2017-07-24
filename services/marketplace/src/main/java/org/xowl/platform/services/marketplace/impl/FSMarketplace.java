@@ -56,7 +56,7 @@ class FSMarketplace extends StaticMarketplace {
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+            ASTNode definition = Json.parse(Logging.get(), reader);
             if (definition == null) {
                 Logging.get().error("Failed to parse marketplace descriptor " + fileDescriptor.getAbsolutePath());
                 return null;
@@ -76,7 +76,7 @@ class FSMarketplace extends StaticMarketplace {
             return null;
         }
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+            ASTNode definition = Json.parse(Logging.get(), reader);
             if (definition == null) {
                 Logging.get().error("Failed to parse addon descriptor " + fileDescriptor.getAbsolutePath());
                 return null;

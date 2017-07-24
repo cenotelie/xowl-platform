@@ -375,7 +375,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
-        ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
+        ASTNode root = Json.parse(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         SecurityService securityService = Register.getComponent(SecurityService.class);

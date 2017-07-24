@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.logging.ConsoleLogger;
@@ -140,7 +140,7 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
         Reply reply = securityService.checkAction(ACTION_GET_LOG);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
 
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");

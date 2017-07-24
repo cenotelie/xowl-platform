@@ -18,15 +18,15 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
@@ -428,11 +428,11 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
 
         String login = request.getParameter("login");
         if (login == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'login'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'login'"));
         String password = new String(request.getContent(), IOUtils.CHARSET);
         Reply reply = login(request.getClient(), login, password);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         String token = ((ReplyResult<String>) reply).getData();
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, getCurrentUser().serializedJSON());
         response.addHeader(HttpConstants.HEADER_SET_COOKIE, getTokens().getTokenName() + "=" + token +
@@ -454,7 +454,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         Reply reply = logout();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_OK);
         response.addHeader(HttpConstants.HEADER_SET_COOKIE, getTokens().getTokenName() + "= " +
                 "; Max-Age=0" +
@@ -486,7 +486,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (request.getUri().equals(apiUri + "/policy")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            return ReplyUtils.toHttpResponse(getPolicy().getConfiguration(), null);
+            return ReplyUtils.toHttpResponse(getPolicy().getConfiguration());
         }
         if (request.getUri().startsWith(apiUri + "/policy/actions/")) {
             String rest = request.getUri().substring(apiUri.length() + "/policy/actions/".length());
@@ -496,7 +496,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
             if (!HttpConstants.METHOD_PUT.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected PUT method");
             String definition = new String(request.getContent(), IOUtils.CHARSET);
-            return ReplyUtils.toHttpResponse(getPolicy().setPolicy(actionId, definition), null);
+            return ReplyUtils.toHttpResponse(getPolicy().setPolicy(actionId, definition));
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }
@@ -541,12 +541,12 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 case HttpConstants.METHOD_PUT: {
                     String displayName = request.getParameter("name");
                     if (displayName == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
                     String password = new String(request.getContent(), IOUtils.CHARSET);
-                    return ReplyUtils.toHttpResponse(getRealm().createUser(userId, displayName, password), null);
+                    return ReplyUtils.toHttpResponse(getRealm().createUser(userId, displayName, password));
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return ReplyUtils.toHttpResponse(getRealm().deleteUser(userId), null);
+                    return ReplyUtils.toHttpResponse(getRealm().deleteUser(userId));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -558,39 +558,39 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String displayName = request.getParameter("name");
                 if (displayName == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().renameUser(userId, displayName), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
+                return ReplyUtils.toHttpResponse(getRealm().renameUser(userId, displayName));
             }
             case "/updateKey": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String oldKey = request.getParameter("oldKey");
                 if (oldKey == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'oldKey'"), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'oldKey'"));
                 String password = new String(request.getContent(), IOUtils.CHARSET);
-                return ReplyUtils.toHttpResponse(getRealm().changeUserKey(userId, oldKey, password), null);
+                return ReplyUtils.toHttpResponse(getRealm().changeUserKey(userId, oldKey, password));
             }
             case "/resetKey": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String password = new String(request.getContent(), IOUtils.CHARSET);
-                return ReplyUtils.toHttpResponse(getRealm().resetUserKey(userId, password), null);
+                return ReplyUtils.toHttpResponse(getRealm().resetUserKey(userId, password));
             }
             case "/assign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String role = request.getParameter("role");
                 if (role == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().assignRoleToUser(userId, role), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"));
+                return ReplyUtils.toHttpResponse(getRealm().assignRoleToUser(userId, role));
             }
             case "/unassign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String role = request.getParameter("role");
                 if (role == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().unassignRoleToUser(userId, role), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"));
+                return ReplyUtils.toHttpResponse(getRealm().unassignRoleToUser(userId, role));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -636,14 +636,14 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 case HttpConstants.METHOD_PUT: {
                     String displayName = request.getParameter("name");
                     if (displayName == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
                     String admin = request.getParameter("admin");
                     if (admin == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'admin'"), null);
-                    return ReplyUtils.toHttpResponse(getRealm().createGroup(groupId, displayName, admin), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'admin'"));
+                    return ReplyUtils.toHttpResponse(getRealm().createGroup(groupId, displayName, admin));
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return ReplyUtils.toHttpResponse(getRealm().deleteGroup(groupId), null);
+                    return ReplyUtils.toHttpResponse(getRealm().deleteGroup(groupId));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -655,56 +655,56 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String displayName = request.getParameter("name");
                 if (displayName == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().renameGroup(groupId, displayName), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
+                return ReplyUtils.toHttpResponse(getRealm().renameGroup(groupId, displayName));
             }
             case "/addMember": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().addUserToGroup(user, groupId), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getRealm().addUserToGroup(user, groupId));
             }
             case "/removeMember": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().removeUserFromGroup(user, groupId), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getRealm().removeUserFromGroup(user, groupId));
             }
             case "/addAdmin": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().addAdminToGroup(user, groupId), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getRealm().addAdminToGroup(user, groupId));
             }
             case "/removeAdmin": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().removeAdminFromGroup(user, groupId), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getRealm().removeAdminFromGroup(user, groupId));
             }
             case "/assign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String role = request.getParameter("role");
                 if (role == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().assignRoleToGroup(groupId, role), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"));
+                return ReplyUtils.toHttpResponse(getRealm().assignRoleToGroup(groupId, role));
             }
             case "/unassign": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String role = request.getParameter("role");
                 if (role == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().unassignRoleToGroup(groupId, role), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'role'"));
+                return ReplyUtils.toHttpResponse(getRealm().unassignRoleToGroup(groupId, role));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -750,11 +750,11 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                 case HttpConstants.METHOD_PUT: {
                     String displayName = request.getParameter("name");
                     if (displayName == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                    return ReplyUtils.toHttpResponse(getRealm().createRole(roleId, displayName), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
+                    return ReplyUtils.toHttpResponse(getRealm().createRole(roleId, displayName));
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return ReplyUtils.toHttpResponse(getRealm().deleteRole(roleId), null);
+                    return ReplyUtils.toHttpResponse(getRealm().deleteRole(roleId));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -766,24 +766,24 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String displayName = request.getParameter("name");
                 if (displayName == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().renameRole(roleId, displayName), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
+                return ReplyUtils.toHttpResponse(getRealm().renameRole(roleId, displayName));
             }
             case "/imply": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String target = request.getParameter("target");
                 if (target == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().addRoleImplication(roleId, target), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"));
+                return ReplyUtils.toHttpResponse(getRealm().addRoleImplication(roleId, target));
             }
             case "/unimply": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String target = request.getParameter("target");
                 if (target == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"), null);
-                return ReplyUtils.toHttpResponse(getRealm().removeRoleImplication(roleId, target), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'target'"));
+                return ReplyUtils.toHttpResponse(getRealm().removeRoleImplication(roleId, target));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -808,7 +808,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
         if (index < 0) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-            return ReplyUtils.toHttpResponse(getSecuredResources().getDescriptorFor(resourceId), null);
+            return ReplyUtils.toHttpResponse(getSecuredResources().getDescriptorFor(resourceId));
         }
 
         switch (rest.substring(index)) {
@@ -817,46 +817,46 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getSecuredResources().addOwner(resourceId, user), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getSecuredResources().addOwner(resourceId, user));
             }
             case "/removeOwner": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String user = request.getParameter("user");
                 if (user == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"), null);
-                return ReplyUtils.toHttpResponse(getSecuredResources().removeOwner(resourceId, user), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'user'"));
+                return ReplyUtils.toHttpResponse(getSecuredResources().removeOwner(resourceId, user));
             }
             case "/addSharing": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String content = new String(request.getContent(), IOUtils.CHARSET);
                 if (content.isEmpty())
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                 BufferedLogger logger = new BufferedLogger();
-                ASTNode root = JsonLoader.parseJson(logger, content);
+                ASTNode root = Json.parse(logger, content);
                 if (root == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                 SecuredResourceSharing sharing = SecuredResourceDescriptorBase.loadSharing(root);
                 if (sharing == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"), null);
-                return ReplyUtils.toHttpResponse(getSecuredResources().addSharing(resourceId, sharing), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"));
+                return ReplyUtils.toHttpResponse(getSecuredResources().addSharing(resourceId, sharing));
             }
             case "/removeSharing": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                 String content = new String(request.getContent(), IOUtils.CHARSET);
                 if (content.isEmpty())
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                 BufferedLogger logger = new BufferedLogger();
-                ASTNode root = JsonLoader.parseJson(logger, content);
+                ASTNode root = Json.parse(logger, content);
                 if (root == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                 SecuredResourceSharing sharing = SecuredResourceDescriptorBase.loadSharing(root);
                 if (sharing == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"), null);
-                return ReplyUtils.toHttpResponse(getSecuredResources().removeSharing(resourceId, sharing), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "JSON object is not a sharing definition"));
+                return ReplyUtils.toHttpResponse(getSecuredResources().removeSharing(resourceId, sharing));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

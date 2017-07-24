@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;

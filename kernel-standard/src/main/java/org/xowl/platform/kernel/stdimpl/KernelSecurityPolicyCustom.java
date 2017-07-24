@@ -18,9 +18,9 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
@@ -147,7 +147,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
 
     @Override
     public Reply setPolicy(String actionId, String policyDefinition) {
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), policyDefinition);
+        ASTNode definition = Json.parse(Logging.get(), policyDefinition);
         if (definition == null)
             return new ReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
         SecuredActionPolicy policy = SecuredActionPolicyBase.load(definition);

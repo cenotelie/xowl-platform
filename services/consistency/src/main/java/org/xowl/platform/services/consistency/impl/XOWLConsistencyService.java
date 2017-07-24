@@ -251,7 +251,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
                             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+                        ASTNode definition = Json.parse(Logging.get(), content);
                         if (definition == null)
                             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ReasoningRule rule = new XOWLReasoningRule(definition);
@@ -350,7 +350,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
                             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+                        ASTNode definition = Json.parse(Logging.get(), content);
                         if (definition == null)
                             return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ConsistencyConstraint constraint = new XOWLConsistencyConstraint(definition);

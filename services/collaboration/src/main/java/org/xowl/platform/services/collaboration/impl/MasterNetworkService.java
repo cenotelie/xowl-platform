@@ -101,7 +101,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             for (int i = 0; i != files.length; i++) {
                 if (files[i].getName().endsWith(".json")) {
                     try (Reader reader = IOUtils.getReader(files[i])) {
-                        ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                        ASTNode definition = Json.parse(Logging.get(), reader);
                         Product product = new ProductBase(definition);
                         platforms.add(product);
                     } catch (IOException exception) {
@@ -116,7 +116,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
                 for (int i = 0; i != files.length; i++) {
                     if (files[i].getName().endsWith(".json")) {
                         try (Reader reader = IOUtils.getReader(files[i])) {
-                            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                            ASTNode definition = Json.parse(Logging.get(), reader);
                             RemoteCollaborationManagedDescriptor descriptor = new RemoteCollaborationManagedDescriptor(definition);
                             collaborations.put(descriptor.getIdentifier(), new RemoteCollaborationManaged(this, descriptor));
                         } catch (IOException exception) {

@@ -73,7 +73,7 @@ class OnlineMarketplace extends StaticMarketplace {
             Logging.get().error("Marketplace descriptor is empty " + location + MARKETPLACE_DESCRIPTOR);
             return null;
         }
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+        ASTNode definition = Json.parse(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse marketplace descriptor " + location + MARKETPLACE_DESCRIPTOR);
             return null;
@@ -93,7 +93,7 @@ class OnlineMarketplace extends StaticMarketplace {
             Logging.get().error("Addon descriptor is empty " + location + identifier + ".descriptor");
             return null;
         }
-        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+        ASTNode definition = Json.parse(Logging.get(), content);
         if (definition == null) {
             Logging.get().error("Failed to parse addon descriptor  " + location + identifier + ".descriptor");
             return null;

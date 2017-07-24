@@ -69,7 +69,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {
             try (Reader reader = IOUtils.getReader(fileManifest)) {
-                ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                ASTNode definition = Json.parse(Logging.get(), reader);
                 if (definition != null)
                     manifest = new CollaborationManifest(definition);
             } catch (IOException exception) {

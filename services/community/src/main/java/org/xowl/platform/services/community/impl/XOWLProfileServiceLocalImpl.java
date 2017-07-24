@@ -94,7 +94,7 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
                 return null;
             try (Reader reader = IOUtils.getReader(file)) {
                 BufferedLogger logger = new BufferedLogger();
-                ASTNode root = JsonLoader.parseJson(logger, reader);
+                ASTNode root = Json.parse(logger, reader);
                 if (root == null)
                     return null;
                 profile = new PublicProfile(root, this);

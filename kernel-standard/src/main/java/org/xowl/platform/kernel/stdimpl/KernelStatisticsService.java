@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
@@ -163,7 +163,7 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
     private HttpResponse onMessageGetMetricList(SecurityService securityService) {
         Reply reply = securityService.checkAction(ACTION_GET_METRICS);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
 
         // get all the metrics
         boolean first = true;
@@ -188,7 +188,7 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
     private HttpResponse onMessageGetMetric(SecurityService securityService, String identifier) {
         Reply reply = securityService.checkAction(ACTION_GET_METRICS);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
 
         for (MetricProvider provider : Register.getComponents(MeasurableService.class)) {
             for (Metric metric : provider.getMetrics()) {
@@ -209,7 +209,7 @@ public class KernelStatisticsService implements StatisticsService, HttpApiServic
     private HttpResponse onMessageGetMetricValue(SecurityService securityService, String identifier) {
         Reply reply = securityService.checkAction(ACTION_POLL);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
 
         MetricSnapshot value = pollMetric(identifier);
         if (value == null)

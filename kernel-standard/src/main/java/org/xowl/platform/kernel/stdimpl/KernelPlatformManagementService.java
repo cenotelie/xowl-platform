@@ -20,15 +20,15 @@ package org.xowl.platform.kernel.stdimpl;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SSLGenerator;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricSnapshot;
@@ -118,7 +118,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     private Product loadProductDescriptor() {
         File fileDescriptor = PlatformUtils.resolve(DESCRIPTOR_FILE);
         try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-            ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+            ASTNode definition = Json.parse(Logging.get(), reader);
             return new ProductBase(definition);
         } catch (IOException exception) {
             Logging.get().error(exception);
@@ -136,7 +136,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 if (files[i].getName().endsWith(".descriptor")) {
                     try (Reader reader = IOUtils.getReader(files[i].getAbsolutePath())) {
                         String content = IOUtils.read(reader);
-                        ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
+                        ASTNode definition = Json.parse(Logging.get(), content);
                         if (definition == null) {
                             Logging.get().error("Failed to parse the descriptor " + files[i].getAbsolutePath());
                             return;
@@ -204,16 +204,16 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Product product = getPlatformProduct();
             if (product == null)
-                return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
+                return ReplyUtils.toHttpResponse(ReplyNotFound.instance());
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
         } else if (request.getUri().equals(apiUri + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return ReplyUtils.toHttpResponse(shutdown(), null);
+            return ReplyUtils.toHttpResponse(shutdown());
         } else if (request.getUri().equals(apiUri + "/restart")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return ReplyUtils.toHttpResponse(restart(), null);
+            return ReplyUtils.toHttpResponse(restart());
         } else if (request.getUri().equals(apiUri + "/bundles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -257,13 +257,13 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return ReplyUtils.toHttpResponse(uninstallAddon(addonId), null);
+                    return ReplyUtils.toHttpResponse(uninstallAddon(addonId));
                 }
                 case HttpConstants.METHOD_PUT: {
                     byte[] content = request.getContent();
                     if (content == null || content.length == 0)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    return ReplyUtils.toHttpResponse(installAddon(addonId, new ByteArrayInputStream(content)), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
+                    return ReplyUtils.toHttpResponse(installAddon(addonId, new ByteArrayInputStream(content)));
                 }
                 default:
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -381,7 +381,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
 
             Addon descriptor;
             try (Reader reader = IOUtils.getReader(fileDescriptor)) {
-                ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
+                ASTNode definition = Json.parse(Logging.get(), reader);
                 if (definition == null) {
                     IOUtils.deleteFolder(directory);
                     return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");

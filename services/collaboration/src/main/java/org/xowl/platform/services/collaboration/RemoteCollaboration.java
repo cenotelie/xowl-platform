@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.Reply;
 
 /**
  * Represents a remote collaboration in a network of collaboration

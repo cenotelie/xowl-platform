@@ -28,7 +28,7 @@ import java.util.Collection;
  *
  * @author Laurent Wouters
  */
-public interface ProfileService extends SecuredService {
+public interface ProfileService extends SecuredService, BadgeProvider {
     /**
      * Service action to update the data of a public profile
      */

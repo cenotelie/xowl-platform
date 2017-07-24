@@ -18,11 +18,11 @@
 package org.xowl.platform.services.community.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Section;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;

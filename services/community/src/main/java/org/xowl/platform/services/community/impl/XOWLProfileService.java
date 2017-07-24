@@ -18,17 +18,17 @@
 package org.xowl.platform.services.community.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyApiError;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.store.loaders.JsonLoader;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -249,15 +249,15 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
             } else if (HttpConstants.METHOD_PUT.equals(request.getMethod())) {
                 String content = new String(request.getContent(), IOUtils.CHARSET);
                 if (content.isEmpty())
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                 BufferedLogger logger = new BufferedLogger();
                 ASTNode root = Json.parse(logger, content);
                 if (root == null)
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-                PublicProfile profile = new PublicProfile(root, null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
+                PublicProfile profile = new PublicProfile(root, this);
                 if (!Objects.equals(profile.getIdentifier(), profileId))
-                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"), null);
-                return ReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"));
+                return ReplyUtils.toHttpResponse(updatePublicProfile(profile));
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
@@ -267,9 +267,9 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             String badgeId = URIUtils.decodeComponent(rest);
             if (HttpConstants.METHOD_PUT.equals(request.getMethod()))
-                return ReplyUtils.toHttpResponse(awardBadge(profileId, badgeId), null);
+                return ReplyUtils.toHttpResponse(awardBadge(profileId, badgeId));
             if (HttpConstants.METHOD_DELETE.equals(request.getMethod()))
-                return ReplyUtils.toHttpResponse(rescindBadge(profileId, badgeId), null);
+                return ReplyUtils.toHttpResponse(rescindBadge(profileId, badgeId));
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

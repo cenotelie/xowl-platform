@@ -21,6 +21,7 @@ import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.json.Json;
 
 import java.util.ArrayList;
 import java.util.Collection;

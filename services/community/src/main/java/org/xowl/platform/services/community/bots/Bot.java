@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.community.bots;
 
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**

@@ -18,8 +18,8 @@
 package org.xowl.platform.services.collaboration;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.api.ApiDeserializer;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.remote.PlatformApiDeserializer;
 import org.xowl.platform.kernel.remote.PlatformApiFactory;
 import org.xowl.platform.kernel.remote.PlatformApiFactoryForKernel;
 import org.xowl.platform.services.collaboration.impl.RemoteCollaborationBase;
@@ -41,7 +41,7 @@ public class PlatformApiFactoryForCollaboration implements PlatformApiFactory {
     }
 
     @Override
-    public Object newObject(PlatformApiDeserializer parent, String type, ASTNode definition) {
+    public Object newObject(ApiDeserializer deserializer, String type, ASTNode definition) {
         if (CollaborationManifest.class.getCanonicalName().equals(type))
             return new CollaborationManifest(definition);
         if (CollaborationPatternDescriptor.class.getCanonicalName().equals(type))

@@ -18,17 +18,17 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyApiError;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.store.loaders.JsonLoader;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -246,11 +246,11 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (request.getUri().equals(apiUri + "/archive")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return ReplyUtils.toHttpResponse(archive(), null);
+            return ReplyUtils.toHttpResponse(archive());
         } else if (request.getUri().equals(apiUri + "/delete")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return ReplyUtils.toHttpResponse(delete(), null);
+            return ReplyUtils.toHttpResponse(delete());
         } else if (request.getUri().startsWith(apiUri + "/manifest")) {
             return handleManifest(request);
         } else if (request.getUri().startsWith(apiUri + "/neighbours")) {
@@ -336,13 +336,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = Json.parse(logger, content);
                     if (root == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                     ArtifactSpecification specification = new ArtifactSpecification(root);
-                    return ReplyUtils.toHttpResponse(addInputSpecification(specification), null);
+                    return ReplyUtils.toHttpResponse(addInputSpecification(specification));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -355,7 +355,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (index < 0) {
             if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
-            return ReplyUtils.toHttpResponse(removeInputSpecification(specId), null);
+            return ReplyUtils.toHttpResponse(removeInputSpecification(specId));
         }
         rest = rest.substring(index + 1);
         if (!rest.startsWith("artifacts"))
@@ -395,9 +395,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
         switch (request.getMethod()) {
             case HttpConstants.METHOD_PUT:
-                return ReplyUtils.toHttpResponse(registerInput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(registerInput(specId, artifactId));
             case HttpConstants.METHOD_DELETE:
-                return ReplyUtils.toHttpResponse(unregisterInput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(unregisterInput(specId, artifactId));
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -426,13 +426,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = Json.parse(logger, content);
                     if (root == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                     ArtifactSpecification specification = new ArtifactSpecification(root);
-                    return ReplyUtils.toHttpResponse(addOutputSpecification(specification), null);
+                    return ReplyUtils.toHttpResponse(addOutputSpecification(specification));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -445,7 +445,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (index < 0) {
             if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
-            return ReplyUtils.toHttpResponse(removeOutputSpecification(specId), null);
+            return ReplyUtils.toHttpResponse(removeOutputSpecification(specId));
         }
         rest = rest.substring(index + 1);
         if (!rest.startsWith("artifacts"))
@@ -485,9 +485,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
         switch (request.getMethod()) {
             case HttpConstants.METHOD_PUT:
-                return ReplyUtils.toHttpResponse(registerOutput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(registerOutput(specId, artifactId));
             case HttpConstants.METHOD_DELETE:
-                return ReplyUtils.toHttpResponse(unregisterOutput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(unregisterOutput(specId, artifactId));
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -517,13 +517,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = Json.parse(logger, content);
                     if (root == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                     PlatformRoleBase role = new PlatformRoleBase(root);
-                    return ReplyUtils.toHttpResponse(createRole(role.getIdentifier(), role.getName()), null);
+                    return ReplyUtils.toHttpResponse(createRole(role.getIdentifier(), role.getName()));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -533,9 +533,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         String roleId = URIUtils.decodeComponent(rest.substring(1));
         switch (request.getMethod()) {
             case HttpConstants.METHOD_DELETE:
-                return ReplyUtils.toHttpResponse(removeRole(roleId), null);
+                return ReplyUtils.toHttpResponse(removeRole(roleId));
             case HttpConstants.METHOD_PUT:
-                return ReplyUtils.toHttpResponse(addRole(roleId), null);
+                return ReplyUtils.toHttpResponse(addRole(roleId));
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -565,16 +565,16 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = Json.parse(logger, content);
                     if (root == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
                     CollaborationSpecification specification = new CollaborationSpecification(root);
                     JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
                     if (executionService == null)
-                        return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
-                    return ReplyUtils.toHttpResponse(executionService.schedule(new CollaborationSpawnJob(specification)), null);
+                        return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
+                    return ReplyUtils.toHttpResponse(executionService.schedule(new CollaborationSpawnJob(specification)));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -603,7 +603,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, remoteCollaboration.serializedJSON());
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return ReplyUtils.toHttpResponse(delete(neighbourId), null);
+                    return ReplyUtils.toHttpResponse(delete(neighbourId));
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
@@ -612,7 +612,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             case "manifest": {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return ReplyUtils.toHttpResponse(getNeighbourManifest(neighbourId), null);
+                return ReplyUtils.toHttpResponse(getNeighbourManifest(neighbourId));
             }
             case "status": {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
@@ -622,23 +622,23 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             case "archive": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return ReplyUtils.toHttpResponse(archive(neighbourId), null);
+                return ReplyUtils.toHttpResponse(archive(neighbourId));
             }
             case "restart": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return ReplyUtils.toHttpResponse(restart(neighbourId), null);
+                return ReplyUtils.toHttpResponse(restart(neighbourId));
             }
         }
         if (rest.startsWith("manifest/inputs/") && rest.endsWith("/artifacts")) {
             rest = rest.substring("manifest/inputs/".length(), rest.length() - "/artifacts".length());
             String specId = URIUtils.decodeComponent(rest);
-            return ReplyUtils.toHttpResponse(getNeighbourInputsFor(neighbourId, specId), null);
+            return ReplyUtils.toHttpResponse(getNeighbourInputsFor(neighbourId, specId));
         }
         if (rest.startsWith("manifest/outputs/") && rest.endsWith("/artifacts")) {
             rest = rest.substring("manifest/outputs/".length(), rest.length() - "/artifacts".length());
             String specId = URIUtils.decodeComponent(rest);
-            return ReplyUtils.toHttpResponse(getNeighbourOutputsFor(neighbourId, specId), null);
+            return ReplyUtils.toHttpResponse(getNeighbourOutputsFor(neighbourId, specId));
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }

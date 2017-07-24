@@ -18,11 +18,11 @@
 package org.xowl.platform.services.community.bots;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyApiError;
 import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.utils.api.ReplySuccess;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.Logging;

@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.community.impl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyNotFound;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -230,15 +230,15 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
             } else if (rest.substring(index).equals("/messages")) {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return ReplyUtils.toHttpResponse(getBotMessages(botId), null);
+                return ReplyUtils.toHttpResponse(getBotMessages(botId));
             } else if (rest.substring(index).equals("/wakeup")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return ReplyUtils.toHttpResponse(wakeup(botId), null);
+                return ReplyUtils.toHttpResponse(wakeup(botId));
             } else if (rest.substring(index).equals("/putToSleep")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return ReplyUtils.toHttpResponse(putToSleep(botId), null);
+                return ReplyUtils.toHttpResponse(putToSleep(botId));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

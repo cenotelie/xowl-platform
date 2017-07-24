@@ -18,16 +18,16 @@
 package org.xowl.platform.connectors.semanticweb;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyResult;
-import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
 import org.xowl.infra.utils.AutoReader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;

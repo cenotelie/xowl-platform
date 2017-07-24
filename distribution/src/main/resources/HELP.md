@@ -63,7 +63,7 @@ $ sh install-daemon.sh
 The service can then be managed with the usual commands:
 
 ```
-$ service xowl-server start|stop|status|restart
+$ service xowl-platform start|stop|status|restart
 ```
 
 The service can be uninstalled with:

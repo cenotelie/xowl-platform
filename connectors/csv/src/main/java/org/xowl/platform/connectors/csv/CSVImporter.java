@@ -18,15 +18,15 @@
 package org.xowl.platform.connectors.csv;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.BaseStore;
 import org.xowl.infra.store.storage.StoreFactory;
 import org.xowl.infra.utils.AutoReader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;

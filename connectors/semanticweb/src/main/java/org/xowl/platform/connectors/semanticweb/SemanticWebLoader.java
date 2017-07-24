@@ -17,9 +17,6 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyApiError;
-import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.loaders.*;
@@ -27,6 +24,9 @@ import org.xowl.infra.store.owl.TranslationException;
 import org.xowl.infra.store.owl.Translator;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.Quad;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logger;
 import org.xowl.platform.kernel.webapi.HttpApiService;

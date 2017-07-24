@@ -18,9 +18,9 @@
 package org.xowl.platform.kernel.platform;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 
 /**
@@ -32,7 +32,7 @@ public class PlatformRebootJob extends JobBase {
     /**
      * The job's result
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -56,7 +56,7 @@ public class PlatformRebootJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 
@@ -64,7 +64,7 @@ public class PlatformRebootJob extends JobBase {
     public void doRun() {
         PlatformManagementService managementService = Register.getComponent(PlatformManagementService.class);
         if (managementService == null) {
-            result = XSPReplyServiceUnavailable.instance();
+            result = ReplyServiceUnavailable.instance();
             return;
         }
         result = managementService.restart();

@@ -18,11 +18,11 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.security.SecuredResource;
 import org.xowl.platform.kernel.security.SecurityService;
 
@@ -121,10 +121,10 @@ public class ImporterConfiguration implements SecuredResource, Serializable {
     }
 
     @Override
-    public XSPReply checkAccess() {
+    public Reply checkAccess() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         return securityService.checkAction(SecurityService.ACTION_RESOURCE_ACCESS, this);
     }
 

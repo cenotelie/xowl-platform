@@ -30,7 +30,7 @@ import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.ProductBase;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -168,7 +168,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return Collections.emptyList();
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return Collections.emptyList();
         return Collections.unmodifiableCollection((Collection) collaborations.values());
@@ -179,7 +179,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return null;
         return collaborations.get(collaborationId);
@@ -190,7 +190,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return CollaborationStatus.Invalid;
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOURS);
         if (!reply.isSuccess())
             return CollaborationStatus.Invalid;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
@@ -200,44 +200,44 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply getNeighbourManifest(String collaborationId) {
+    public Reply getNeighbourManifest(String collaborationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_MANIFEST);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_MANIFEST);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return neighbour.getManifest();
     }
 
     @Override
-    public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+    public Reply getNeighbourInputsFor(String collaborationId, String specificationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_INPUTS);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_INPUTS);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return neighbour.getArtifactsForInput(specificationId);
     }
 
     @Override
-    public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+    public Reply getNeighbourOutputsFor(String collaborationId, String specificationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_OUTPUTS);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_GET_NEIGHBOUR_OUTPUTS);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return neighbour.getArtifactsForOutput(specificationId);
     }
 
@@ -247,56 +247,56 @@ public class MasterNetworkService implements CollaborationNetworkService {
     }
 
     @Override
-    public XSPReply spawn(CollaborationSpecification specification) {
+    public Reply spawn(CollaborationSpecification specification) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_NETWORK_SPAWN);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_NETWORK_SPAWN);
         if (!reply.isSuccess())
             return reply;
         return provision(specification);
     }
 
     @Override
-    public XSPReply archive(String collaborationId) {
+    public Reply archive(String collaborationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_NETWORK_ARCHIVE);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
-        return XSPReplyUnsupported.instance();
+            return ReplyNotFound.instance();
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply restart(String collaborationId) {
+    public Reply restart(String collaborationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_NETWORK_RESTART);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
-        return XSPReplyUnsupported.instance();
+            return ReplyNotFound.instance();
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply delete(String collaborationId) {
+    public Reply delete(String collaborationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_NETWORK_DELETE);
         if (!reply.isSuccess())
             return reply;
         RemoteCollaborationManaged neighbour = collaborations.get(collaborationId);
         if (neighbour == null)
-            return XSPReplyNotFound.instance();
-        return XSPReplyUnsupported.instance();
+            return ReplyNotFound.instance();
+        return ReplyUnsupported.instance();
     }
 
     /**
@@ -305,11 +305,11 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    public XSPReply provision(CollaborationSpecification specification) {
-        XSPReply reply = provisionChooseProductFor(specification);
+    public Reply provision(CollaborationSpecification specification) {
+        Reply reply = provisionChooseProductFor(specification);
         if (!reply.isSuccess())
             return reply;
-        Product product = ((XSPReplyResult<Product>) reply).getData();
+        Product product = ((ReplyResult<Product>) reply).getData();
         // provision the instance objects
         RemoteCollaborationManaged collaboration = provisionCreateInstance(specification);
         // extract the distribution
@@ -329,7 +329,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         reply = provisionWriteDescriptor(collaboration);
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(collaboration);
+        return new ReplyResult<>(collaboration);
     }
 
     /**
@@ -338,10 +338,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    private XSPReply provisionChooseProductFor(CollaborationSpecification specification) {
+    private Reply provisionChooseProductFor(CollaborationSpecification specification) {
         if (platforms.isEmpty())
-            return XSPReplyNotFound.instance();
-        return new XSPReplyResult<>(platforms.iterator().next());
+            return ReplyNotFound.instance();
+        return new ReplyResult<>(platforms.iterator().next());
     }
 
     /**
@@ -399,16 +399,16 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instance The platform instance
      * @return The protocol reply
      */
-    private XSPReply provisionWriteDescriptor(RemoteCollaborationManaged instance) {
+    private Reply provisionWriteDescriptor(RemoteCollaborationManaged instance) {
         File fileDescriptor = new File(storageInstances, instance.getIdentifier() + ".json");
         try (Writer writer = IOUtils.getWriter(fileDescriptor)) {
             writer.write(instance.getDescriptor().serializedJSON());
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**
@@ -418,27 +418,27 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instanceId The identifier of the instance being provisioned
      * @return The protocol reply
      */
-    private XSPReply provisionExtractDistribution(String productId, String instanceId) {
+    private Reply provisionExtractDistribution(String productId, String instanceId) {
         File distributionFile = new File(storageDistributions, productId + ".tar.gz");
         if (!distributionFile.exists())
-            return new XSPReplyFailure("Failed to find the distribution " + productId);
+            return new ReplyFailure("Failed to find the distribution " + productId);
         File extractionDirectory = new File(storageInstances, instanceId + "_provision");
         if (extractionDirectory.exists())
             IOUtils.deleteFolder(extractionDirectory);
         if (!extractionDirectory.mkdirs()) {
             Logging.get().error("Failed to create directory " + extractionDirectory.getAbsolutePath());
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         }
         try {
             provisionExtractTarGz(distributionFile, extractionDirectory);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
         File[] children = extractionDirectory.listFiles();
         if (children == null || children.length != 1) {
             Logging.get().error("Unexpected distribution content for " + productId);
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         }
         File target = new File(storageInstances, instanceId);
         if (target.exists())
@@ -447,10 +447,10 @@ public class MasterNetworkService implements CollaborationNetworkService {
             Files.move(children[0].toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
         IOUtils.deleteFolder(extractionDirectory);
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**
@@ -499,7 +499,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    private XSPReply provisionDeployConfiguration(RemoteCollaborationManaged instance, CollaborationSpecification specification) {
+    private Reply provisionDeployConfiguration(RemoteCollaborationManaged instance, CollaborationSpecification specification) {
         File instanceDirectory = new File(storageInstances, instance.getIdentifier());
 
         // write the collaboration manifest
@@ -510,7 +510,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
 
         // write the platform HTTP configuration
@@ -525,7 +525,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.save(platformHttpConfigFile);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
 
         // write the collaboration service configuration
@@ -539,7 +539,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.save(serviceCollabConfigFile);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
 
         // write the security service configuration
@@ -553,9 +553,9 @@ public class MasterNetworkService implements CollaborationNetworkService {
             configuration.save(serviceSecurityConfigFile);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**
@@ -564,7 +564,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      * @param instance The instance being provisioned
      * @return The protocol reply
      */
-    private XSPReply provisionLaunchPlatform(RemoteCollaborationManaged instance) {
+    private Reply provisionLaunchPlatform(RemoteCollaborationManaged instance) {
         File instanceDirectory = new File(storageInstances, instance.getIdentifier());
         File adminScript = new File(instanceDirectory, "admin.sh");
         ProcessBuilder processBuilder = new ProcessBuilder("sh", adminScript.getAbsolutePath(), "start");
@@ -574,8 +574,8 @@ public class MasterNetworkService implements CollaborationNetworkService {
             process.waitFor();
         } catch (IOException | InterruptedException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 }

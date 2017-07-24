@@ -18,8 +18,8 @@
 package org.xowl.platform.services.impact.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
@@ -30,7 +30,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.kernel.security.SecurityService;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
@@ -58,7 +58,7 @@ class XOWLImpactAnalysisJob extends JobBase {
     /**
      * The result, if any
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -86,7 +86,7 @@ class XOWLImpactAnalysisJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 
@@ -94,22 +94,22 @@ class XOWLImpactAnalysisJob extends JobBase {
     public void doRun() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null) {
-            result = XSPReplyServiceUnavailable.instance();
+            result = ReplyServiceUnavailable.instance();
             return;
         }
-        XSPReply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
+        Reply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
         if (!reply.isSuccess()) {
             result = reply;
             return;
         }
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null) {
-            result = XSPReplyServiceUnavailable.instance();
+            result = ReplyServiceUnavailable.instance();
             return;
         }
         TripleStore live = storageService.getLiveStore();
         List<XOWLImpactAnalysisResultPart> finalParts = new ArrayList<>();
-        result = new XSPReplyResult<>(new XOWLImpactAnalysisResult(finalParts));
+        result = new ReplyResult<>(new XOWLImpactAnalysisResult(finalParts));
         browseGraph(live, finalParts);
     }
 
@@ -194,12 +194,12 @@ class XOWLImpactAnalysisJob extends JobBase {
             builder.append(TextUtils.escapeAbsoluteURIW3C(parts.get(i).getNode().getIRIValue()));
             builder.append(">");
         }
-        XSPReply reply = live.sparql(builder.toString(), null, null);
+        Reply reply = live.sparql(builder.toString(), null, null);
         if (!reply.isSuccess()) {
             Logging.get().error(reply.getMessage());
             return 0;
         }
-        Result result = ((XSPReplyResult<Result>) reply).getData();
+        Result result = ((ReplyResult<Result>) reply).getData();
         if (!result.isSuccess()) {
             Logging.get().error(((ResultFailure) result).getMessage());
             return 0;

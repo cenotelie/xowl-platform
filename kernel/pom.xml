@@ -23,12 +23,6 @@
             <version>${xowlInfraVersion}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.xowl.infra</groupId>
-            <artifactId>xowl-server-api</artifactId>
-            <version>${xowlInfraVersion}</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

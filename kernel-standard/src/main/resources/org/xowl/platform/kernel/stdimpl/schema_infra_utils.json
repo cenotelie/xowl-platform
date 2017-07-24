@@ -7,7 +7,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.ApiError"
+            "org.xowl.infra.utils.api.ApiError"
           ]
         },
         "code": {

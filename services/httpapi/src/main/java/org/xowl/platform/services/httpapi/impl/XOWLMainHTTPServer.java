@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyException;
-import org.xowl.infra.server.xsp.XSPReplyExpiredSession;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplyExpiredSession;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -124,7 +124,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             doResponse(servletResponse, service.handle(securityService, apiRequest));
         } catch (Throwable exception) {
             Logging.get().error(exception);
-            doResponse(servletResponse, XSPReplyUtils.toHttpResponse(new XSPReplyException(exception), null));
+            doResponse(servletResponse, ReplyUtils.toHttpResponse(new ReplyException(exception), null));
         } finally {
             securityService.logout();
         }
@@ -148,10 +148,10 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
                     cookie = cookie.trim();
                     if (cookie.startsWith(securityService.getTokens().getTokenName() + "=")) {
                         String token = cookie.substring(securityService.getTokens().getTokenName().length() + 1);
-                        XSPReply reply = securityService.authenticate(request.getRemoteAddr(), token);
+                        Reply reply = securityService.authenticate(request.getRemoteAddr(), token);
                         if (reply.isSuccess())
                             return true;
-                        if (reply == XSPReplyExpiredSession.instance())
+                        if (reply == ReplyExpiredSession.instance())
                             response.setStatus(HttpConstants.HTTP_SESSION_EXPIRED);
                         else
                             response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);

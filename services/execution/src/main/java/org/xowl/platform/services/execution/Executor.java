@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.execution;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 
@@ -32,7 +32,7 @@ public interface Executor extends Identifiable, Serializable {
      *
      * @return The protocol reply
      */
-    XSPReply getExecutables();
+    Reply getExecutables();
 
     /**
      * Launches the execution of an executable with this executor
@@ -40,5 +40,5 @@ public interface Executor extends Identifiable, Serializable {
      * @param executable The executable to execute
      * @return The protocol reply
      */
-    XSPReply execute(Executable executable);
+    Reply execute(Executable executable);
 }

@@ -19,19 +19,19 @@ package org.xowl.platform.services.connection;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.remote.Deserializer;
-import org.xowl.platform.kernel.remote.DeserializerFactory;
-import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
+import org.xowl.platform.kernel.remote.PlatformApiDeserializer;
+import org.xowl.platform.kernel.remote.PlatformApiFactory;
+import org.xowl.platform.kernel.remote.PlatformApiFactoryForKernel;
 
 /**
  * Implements a factory for the connection objects
  *
  * @author Laurent Wouters
  */
-public class DeserializerFactoryForConnection implements DeserializerFactory {
+public class PlatformApiFactoryForConnection implements PlatformApiFactory {
     @Override
     public String getIdentifier() {
-        return DeserializerFactoryForKernel.class.getCanonicalName();
+        return PlatformApiFactoryForKernel.class.getCanonicalName();
     }
 
     @Override
@@ -40,12 +40,7 @@ public class DeserializerFactoryForConnection implements DeserializerFactory {
     }
 
     @Override
-    public Object newObject(String type, ASTNode definition) {
-        return newObject(null, type, definition);
-    }
-
-    @Override
-    public Object newObject(Deserializer deserializer, String type, ASTNode definition) {
+    public Object newObject(PlatformApiDeserializer parent, String type, ASTNode definition) {
         if (ConnectorDescriptor.class.getCanonicalName().equals(type))
             return new ConnectorDescriptorRemote(definition);
         if (ConnectorDescriptorParam.class.getCanonicalName().equals(type))

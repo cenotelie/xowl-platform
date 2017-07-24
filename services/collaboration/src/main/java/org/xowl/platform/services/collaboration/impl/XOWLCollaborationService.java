@@ -18,9 +18,9 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
@@ -152,19 +152,19 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
-    public XSPReply getNeighbourManifest(String collaborationId) {
+    public Reply getNeighbourManifest(String collaborationId) {
         // authorization is delegated to the network service
         return getNetworkService().getNeighbourManifest(collaborationId);
     }
 
     @Override
-    public XSPReply getNeighbourInputsFor(String collaborationId, String specificationId) {
+    public Reply getNeighbourInputsFor(String collaborationId, String specificationId) {
         // authorization is delegated to the network service
         return getNetworkService().getNeighbourInputsFor(collaborationId, specificationId);
     }
 
     @Override
-    public XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId) {
+    public Reply getNeighbourOutputsFor(String collaborationId, String specificationId) {
         // authorization is delegated to the network service
         return getNetworkService().getNeighbourOutputsFor(collaborationId, specificationId);
     }
@@ -185,37 +185,37 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     }
 
     @Override
-    public XSPReply spawn(CollaborationSpecification specification) {
+    public Reply spawn(CollaborationSpecification specification) {
         // authorization is delegated to the network service
         return getNetworkService().spawn(specification);
     }
 
     @Override
-    public XSPReply archive(String collaborationId) {
+    public Reply archive(String collaborationId) {
         // authorization is delegated to the network service
         return getNetworkService().archive(collaborationId);
     }
 
     @Override
-    public XSPReply restart(String collaborationId) {
+    public Reply restart(String collaborationId) {
         // authorization is delegated to the network service
         return getNetworkService().restart(collaborationId);
     }
 
     @Override
-    public XSPReply delete(String collaborationId) {
+    public Reply delete(String collaborationId) {
         // authorization is delegated to the network service
         return getNetworkService().delete(collaborationId);
     }
 
     @Override
-    public XSPReply archive() {
+    public Reply archive() {
         // authorization is delegated to the network service
         return getNetworkService().archive(getCollaborationIdentifier());
     }
 
     @Override
-    public XSPReply delete() {
+    public Reply delete() {
         // authorization is delegated to the network service
         return getNetworkService().delete(getCollaborationIdentifier());
     }
@@ -246,11 +246,11 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (request.getUri().equals(apiUri + "/archive")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return XSPReplyUtils.toHttpResponse(archive(), null);
+            return ReplyUtils.toHttpResponse(archive(), null);
         } else if (request.getUri().equals(apiUri + "/delete")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return XSPReplyUtils.toHttpResponse(delete(), null);
+            return ReplyUtils.toHttpResponse(delete(), null);
         } else if (request.getUri().startsWith(apiUri + "/manifest")) {
             return handleManifest(request);
         } else if (request.getUri().startsWith(apiUri + "/neighbours")) {
@@ -336,13 +336,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = JsonLoader.parseJson(logger, content);
                     if (root == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     ArtifactSpecification specification = new ArtifactSpecification(root);
-                    return XSPReplyUtils.toHttpResponse(addInputSpecification(specification), null);
+                    return ReplyUtils.toHttpResponse(addInputSpecification(specification), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -355,7 +355,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (index < 0) {
             if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
-            return XSPReplyUtils.toHttpResponse(removeInputSpecification(specId), null);
+            return ReplyUtils.toHttpResponse(removeInputSpecification(specId), null);
         }
         rest = rest.substring(index + 1);
         if (!rest.startsWith("artifacts"))
@@ -395,9 +395,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
         switch (request.getMethod()) {
             case HttpConstants.METHOD_PUT:
-                return XSPReplyUtils.toHttpResponse(registerInput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(registerInput(specId, artifactId), null);
             case HttpConstants.METHOD_DELETE:
-                return XSPReplyUtils.toHttpResponse(unregisterInput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(unregisterInput(specId, artifactId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -426,13 +426,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = JsonLoader.parseJson(logger, content);
                     if (root == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     ArtifactSpecification specification = new ArtifactSpecification(root);
-                    return XSPReplyUtils.toHttpResponse(addOutputSpecification(specification), null);
+                    return ReplyUtils.toHttpResponse(addOutputSpecification(specification), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -445,7 +445,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         if (index < 0) {
             if (!HttpConstants.METHOD_DELETE.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected DELETE method");
-            return XSPReplyUtils.toHttpResponse(removeOutputSpecification(specId), null);
+            return ReplyUtils.toHttpResponse(removeOutputSpecification(specId), null);
         }
         rest = rest.substring(index + 1);
         if (!rest.startsWith("artifacts"))
@@ -485,9 +485,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
 
         switch (request.getMethod()) {
             case HttpConstants.METHOD_PUT:
-                return XSPReplyUtils.toHttpResponse(registerOutput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(registerOutput(specId, artifactId), null);
             case HttpConstants.METHOD_DELETE:
-                return XSPReplyUtils.toHttpResponse(unregisterOutput(specId, artifactId), null);
+                return ReplyUtils.toHttpResponse(unregisterOutput(specId, artifactId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -517,13 +517,13 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = JsonLoader.parseJson(logger, content);
                     if (root == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     PlatformRoleBase role = new PlatformRoleBase(root);
-                    return XSPReplyUtils.toHttpResponse(createRole(role.getIdentifier(), role.getName()), null);
+                    return ReplyUtils.toHttpResponse(createRole(role.getIdentifier(), role.getName()), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -533,9 +533,9 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
         String roleId = URIUtils.decodeComponent(rest.substring(1));
         switch (request.getMethod()) {
             case HttpConstants.METHOD_DELETE:
-                return XSPReplyUtils.toHttpResponse(removeRole(roleId), null);
+                return ReplyUtils.toHttpResponse(removeRole(roleId), null);
             case HttpConstants.METHOD_PUT:
-                return XSPReplyUtils.toHttpResponse(addRole(roleId), null);
+                return ReplyUtils.toHttpResponse(addRole(roleId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
     }
@@ -565,16 +565,16 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                 case HttpConstants.METHOD_PUT: {
                     String content = new String(request.getContent(), IOUtils.CHARSET);
                     if (content.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                     BufferedLogger logger = new BufferedLogger();
                     ASTNode root = JsonLoader.parseJson(logger, content);
                     if (root == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                     CollaborationSpecification specification = new CollaborationSpecification(root);
                     JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
                     if (executionService == null)
-                        return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-                    return XSPReplyUtils.toHttpResponse(executionService.schedule(new CollaborationSpawnJob(specification)), null);
+                        return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+                    return ReplyUtils.toHttpResponse(executionService.schedule(new CollaborationSpawnJob(specification)), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -603,7 +603,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, remoteCollaboration.serializedJSON());
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return XSPReplyUtils.toHttpResponse(delete(neighbourId), null);
+                    return ReplyUtils.toHttpResponse(delete(neighbourId), null);
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, DELETE");
@@ -612,7 +612,7 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             case "manifest": {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return XSPReplyUtils.toHttpResponse(getNeighbourManifest(neighbourId), null);
+                return ReplyUtils.toHttpResponse(getNeighbourManifest(neighbourId), null);
             }
             case "status": {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
@@ -622,23 +622,23 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
             case "archive": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return XSPReplyUtils.toHttpResponse(archive(neighbourId), null);
+                return ReplyUtils.toHttpResponse(archive(neighbourId), null);
             }
             case "restart": {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return XSPReplyUtils.toHttpResponse(restart(neighbourId), null);
+                return ReplyUtils.toHttpResponse(restart(neighbourId), null);
             }
         }
         if (rest.startsWith("manifest/inputs/") && rest.endsWith("/artifacts")) {
             rest = rest.substring("manifest/inputs/".length(), rest.length() - "/artifacts".length());
             String specId = URIUtils.decodeComponent(rest);
-            return XSPReplyUtils.toHttpResponse(getNeighbourInputsFor(neighbourId, specId), null);
+            return ReplyUtils.toHttpResponse(getNeighbourInputsFor(neighbourId, specId), null);
         }
         if (rest.startsWith("manifest/outputs/") && rest.endsWith("/artifacts")) {
             rest = rest.substring("manifest/outputs/".length(), rest.length() - "/artifacts".length());
             String specId = URIUtils.decodeComponent(rest);
-            return XSPReplyUtils.toHttpResponse(getNeighbourOutputsFor(neighbourId, specId), null);
+            return ReplyUtils.toHttpResponse(getNeighbourOutputsFor(neighbourId, specId), null);
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
     }

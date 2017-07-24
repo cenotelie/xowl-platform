@@ -205,7 +205,7 @@ public class ConnectorServiceData implements Identifiable, Serializable {
             builder.append(", \"");
             builder.append(TextUtils.escapeStringJSON(entry.getKey().getIdentifier()));
             builder.append("\": ");
-            TextUtils.serializeJSON(builder, entry.getValue());
+            Json.serialize(builder, entry.getValue());
         }
         builder.append("}");
         return builder.toString();

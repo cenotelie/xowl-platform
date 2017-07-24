@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ApiError;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -99,7 +99,7 @@ public interface EvaluationService extends SecuredService {
      *
      * @return The ongoing evaluations
      */
-    XSPReply getEvaluations();
+    Reply getEvaluations();
 
     /**
      * Gets the evaluation for the specified identifier
@@ -107,7 +107,7 @@ public interface EvaluationService extends SecuredService {
      * @param evalId The identifier of an evaluation
      * @return The corresponding evaluation
      */
-    XSPReply getEvaluation(String evalId);
+    Reply getEvaluation(String evalId);
 
     /**
      * Launches a new evaluation
@@ -118,5 +118,5 @@ public interface EvaluationService extends SecuredService {
      * @param criteria      The evaluation criteria
      * @return The operation's result
      */
-    XSPReply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria);
+    Reply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria);
 }

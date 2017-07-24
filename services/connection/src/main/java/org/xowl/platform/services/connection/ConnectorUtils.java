@@ -17,11 +17,11 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyNotFound;
+import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.events.EventService;
@@ -40,10 +40,10 @@ public class ConnectorUtils {
      * @param connectorId The identifier of a connector
      * @return The result of the operation
      */
-    public static XSPReply pullArtifactFrom(String connectorId) {
+    public static Reply pullArtifactFrom(String connectorId) {
         ConnectorService connector = Register.getComponent(ConnectorService.class, "id", connectorId);
         if (connector == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return pullArtifactFrom(connector);
     }
 
@@ -53,22 +53,22 @@ public class ConnectorUtils {
      * @param connector The connector to pull from
      * @return The result of the operation
      */
-    public static XSPReply pullArtifactFrom(ConnectorService connector) {
+    public static Reply pullArtifactFrom(ConnectorService connector) {
         ArtifactStorageService storageService = Register.getComponent(ArtifactStorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply replyArtifact = connector.pullArtifact();
+            return ReplyServiceUnavailable.instance();
+        Reply replyArtifact = connector.pullArtifact();
         if (!replyArtifact.isSuccess())
             return replyArtifact;
-        Artifact artifact = ((XSPReplyResult<Artifact>) replyArtifact).getData();
-        XSPReply reply = storageService.store(artifact);
+        Artifact artifact = ((ReplyResult<Artifact>) replyArtifact).getData();
+        Reply reply = storageService.store(artifact);
         if (!reply.isSuccess())
             return reply;
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ArtifactPulledFromConnectorEvent(connector, artifact));
         // reply with the artifact
-        return new XSPReplyResult<>(artifact.getIdentifier());
+        return new ReplyResult<>(artifact.getIdentifier());
     }
 
     /**
@@ -78,17 +78,17 @@ public class ConnectorUtils {
      * @param artifactId  The identifier of the artifact to push
      * @return The result of the operation
      */
-    public static XSPReply pushArtifactTo(String connectorId, String artifactId) {
+    public static Reply pushArtifactTo(String connectorId, String artifactId) {
         ConnectorService connector = Register.getComponent(ConnectorService.class, "id", connectorId);
         if (connector == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         ArtifactStorageService storage = Register.getComponent(ArtifactStorageService.class);
         if (storage == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = storage.retrieve(artifactId);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = storage.retrieve(artifactId);
         if (!reply.isSuccess())
             return reply;
-        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         reply = connector.pushArtifact(artifact);
         if (!reply.isSuccess())
             return reply;

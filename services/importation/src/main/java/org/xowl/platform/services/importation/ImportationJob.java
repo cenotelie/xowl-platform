@@ -18,7 +18,7 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactFuture;
@@ -46,7 +46,7 @@ public abstract class ImportationJob<T extends ImporterConfiguration> extends Jo
     /**
      * The job's result
      */
-    protected XSPReply result;
+    protected Reply result;
 
     /**
      * Initializes this job
@@ -106,7 +106,7 @@ public abstract class ImportationJob<T extends ImporterConfiguration> extends Jo
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 }

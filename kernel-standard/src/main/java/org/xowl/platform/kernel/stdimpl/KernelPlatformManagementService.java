@@ -204,16 +204,16 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
             Product product = getPlatformProduct();
             if (product == null)
-                return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
+                return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, product.serializedJSON());
         } else if (request.getUri().equals(apiUri + "/shutdown")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return XSPReplyUtils.toHttpResponse(shutdown(), null);
+            return ReplyUtils.toHttpResponse(shutdown(), null);
         } else if (request.getUri().equals(apiUri + "/restart")) {
             if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-            return XSPReplyUtils.toHttpResponse(restart(), null);
+            return ReplyUtils.toHttpResponse(restart(), null);
         } else if (request.getUri().equals(apiUri + "/bundles")) {
             if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
@@ -257,13 +257,13 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
                 }
                 case HttpConstants.METHOD_DELETE: {
-                    return XSPReplyUtils.toHttpResponse(uninstallAddon(addonId), null);
+                    return ReplyUtils.toHttpResponse(uninstallAddon(addonId), null);
                 }
                 case HttpConstants.METHOD_PUT: {
                     byte[] content = request.getContent();
                     if (content == null || content.length == 0)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    return XSPReplyUtils.toHttpResponse(installAddon(addonId, new ByteArrayInputStream(content)), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return ReplyUtils.toHttpResponse(installAddon(addonId, new ByteArrayInputStream(content)), null);
                 }
                 default:
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -312,7 +312,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
-        XSPReply reply = securityService.checkAction(ACTION_GET_PRODUCT);
+        Reply reply = securityService.checkAction(ACTION_GET_PRODUCT);
         if (!reply.isSuccess())
             return null;
         return product;
@@ -323,7 +323,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return Collections.emptyList();
-        XSPReply reply = securityService.checkAction(ACTION_GET_BUNDLES);
+        Reply reply = securityService.checkAction(ACTION_GET_BUNDLES);
         if (!reply.isSuccess())
             return Collections.emptyList();
         if (bundles.isEmpty()) {
@@ -340,43 +340,43 @@ public class KernelPlatformManagementService implements PlatformManagementServic
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return Collections.emptyList();
-        XSPReply reply = securityService.checkAction(ACTION_GET_ADDONS);
+        Reply reply = securityService.checkAction(ACTION_GET_ADDONS);
         if (!reply.isSuccess())
             return Collections.emptyList();
         return Collections.unmodifiableCollection(addons);
     }
 
     @Override
-    public XSPReply installAddon(String identifier, InputStream packageStream) {
+    public Reply installAddon(String identifier, InputStream packageStream) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_INSTALL_ADDON);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_INSTALL_ADDON);
         if (!reply.isSuccess())
             return reply;
 
         synchronized (addons) {
             for (Addon addon : addons) {
                 if (Objects.equals(addon.getIdentifier(), identifier))
-                    return new XSPReplyApiError(ERROR_ADDON_ALREADY_INSTALLED);
+                    return new ReplyApiError(ERROR_ADDON_ALREADY_INSTALLED);
             }
 
             File directory = new File(addonsCache, UUID.randomUUID().toString());
             if (!directory.mkdirs()) {
                 Logging.get().error("Failed to create directory " + directory.getAbsolutePath());
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+                return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
             }
             try {
                 unpackAddon(packageStream, directory);
             } catch (IOException exception) {
                 Logging.get().error(exception);
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
+                return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to unpack the addon.");
             }
             File fileDescriptor = new File(directory, "descriptor.json");
             if (!fileDescriptor.exists()) {
                 // delete the directory
                 IOUtils.deleteFolder(directory);
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
+                return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "No descriptor found.");
             }
 
             Addon descriptor;
@@ -384,19 +384,19 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 ASTNode definition = JsonLoader.parseJson(Logging.get(), reader);
                 if (definition == null) {
                     IOUtils.deleteFolder(directory);
-                    return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
+                    return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
                 }
                 descriptor = new Addon(definition);
             } catch (IOException exception) {
                 Logging.get().error(exception);
                 IOUtils.deleteFolder(directory);
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
+                return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Failed to read the descriptor.");
             }
 
             // check the identifier
             if (!Objects.equals(descriptor.getIdentifier(), identifier)) {
                 IOUtils.deleteFolder(directory);
-                return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
+                return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Descriptor does not match the provided identifier.");
             }
             // check the presence of the bundles
             Collection<File> fileBundles = new ArrayList<>();
@@ -404,7 +404,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 File fileBundle = new File(directory, bundle.serializedString() + ".jar");
                 if (!fileBundle.exists()) {
                     IOUtils.deleteFolder(directory);
-                    return new XSPReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
+                    return new ReplyApiError(ERROR_INVALID_ADDON_PACKAGE, "Addon package does not contain bundle " + fileBundle.getName());
                 }
                 fileBundles.add(fileBundle);
             }
@@ -420,7 +420,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             } catch (IOException exception) {
                 Logging.get().error(exception);
                 IOUtils.deleteFolder(directory);
-                return new XSPReplyException(exception);
+                return new ReplyException(exception);
             }
             // delete the folder
             IOUtils.deleteFolder(directory);
@@ -428,7 +428,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new AddonInstalledEvent(this, descriptor));
-            return new XSPReplyResult<>(descriptor);
+            return new ReplyResult<>(descriptor);
         }
     }
 
@@ -460,11 +460,11 @@ public class KernelPlatformManagementService implements PlatformManagementServic
     }
 
     @Override
-    public XSPReply uninstallAddon(String identifier) {
+    public Reply uninstallAddon(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UNINSTALL_ADDON);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_UNINSTALL_ADDON);
         if (!reply.isSuccess())
             return reply;
 
@@ -477,7 +477,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 }
             }
             if (descriptor == null)
-                return new XSPReplyApiError(ERROR_ADDON_NOT_INSTALLED);
+                return new ReplyApiError(ERROR_ADDON_NOT_INSTALLED);
 
             File felixBundles = PlatformUtils.resolve("felix/bundle");
             for (AddonBundle bundle : descriptor.getBundles()) {
@@ -494,15 +494,15 @@ public class KernelPlatformManagementService implements PlatformManagementServic
                 eventService.onEvent(new AddonUninstalledEvent(this, descriptor));
             addons.remove(descriptor);
         }
-        return new XSPReplyResult<>(descriptor);
+        return new ReplyResult<>(descriptor);
     }
 
     @Override
-    public XSPReply shutdown() {
+    public Reply shutdown() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_SHUTDOWN);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_SHUTDOWN);
         if (!reply.isSuccess())
             return reply;
 
@@ -513,15 +513,15 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             }
         }, KernelPlatformManagementService.class.getCanonicalName() + ".ThreadShutdown");
         thread.start();
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply restart() {
+    public Reply restart() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_RESTART);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_RESTART);
         if (!reply.isSuccess())
             return reply;
 
@@ -532,7 +532,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
             }
         }, KernelPlatformManagementService.class.getCanonicalName() + ".ThreadRestart");
         thread.start();
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**

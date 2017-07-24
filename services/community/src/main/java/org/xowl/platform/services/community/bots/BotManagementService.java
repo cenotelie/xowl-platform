@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.community.bots;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ApiError;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -80,7 +80,7 @@ public interface BotManagementService extends SecuredService {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    XSPReply getBotMessages(String botId);
+    Reply getBotMessages(String botId);
 
     /**
      * Wakes a bot up
@@ -88,7 +88,7 @@ public interface BotManagementService extends SecuredService {
      * @param botId The identifier of the bot to wake up
      * @return The protocol reply
      */
-    XSPReply wakeup(String botId);
+    Reply wakeup(String botId);
 
     /**
      * Puts a bot to sleep
@@ -96,5 +96,5 @@ public interface BotManagementService extends SecuredService {
      * @param botId The identifier of the bot to put to sleep
      * @return The protocol reply
      */
-    XSPReply putToSleep(String botId);
+    Reply putToSleep(String botId);
 }

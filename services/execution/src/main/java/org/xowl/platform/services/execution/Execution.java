@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.execution;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.platform.PlatformLogMessage;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
@@ -62,7 +62,7 @@ public interface Execution {
      *
      * @return The protocol reply
      */
-    XSPReply abort();
+    Reply abort();
 
     /**
      * Gets the log for this execution

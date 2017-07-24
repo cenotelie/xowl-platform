@@ -17,23 +17,18 @@
 
 package org.xowl.platform.kernel.remote;
 
-import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.api.XOWLFactory;
-import org.xowl.platform.kernel.Registrable;
+import org.xowl.platform.kernel.Register;
+
+import java.util.Collection;
 
 /**
- * Represents a factory for serialized platform objects
+ * Implements a factory that relies on the OSGi service register to discover the factories
  *
  * @author Laurent Wouters
  */
-public interface DeserializerFactory extends Registrable, XOWLFactory {
-    /**
-     * Creates a new object
-     *
-     * @param deserializer The parent deserializer
-     * @param type         The object's type
-     * @param definition   The definition
-     * @return The new object
-     */
-    Object newObject(Deserializer deserializer, String type, ASTNode definition);
+public class PlatformApiDeserializerForOSGi extends PlatformApiDeserializer {
+    @Override
+    protected Collection<PlatformApiFactory> getParts() {
+        return Register.getComponents(PlatformApiFactory.class);
+    }
 }

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
@@ -76,7 +76,7 @@ public class EvaluableEntity implements Evaluable {
             this.name = identifier;
         } else {
             String name = null;
-            XSPReply reply = storageService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
+            Reply reply = storageService.getLongTermStore().sparql("SELECT DISTINCT ?p ?o WHERE { GRAPH <" +
                     TextUtils.escapeAbsoluteURIW3C(artifactId) +
                     "> { <" +
                     TextUtils.escapeAbsoluteURIW3C(elementURI) +
@@ -84,7 +84,7 @@ public class EvaluableEntity implements Evaluable {
             if (!reply.isSuccess()) {
                 name = elementURI;
             } else {
-                Result result = ((XSPReplyResult<Result>) reply).getData();
+                Result result = ((ReplyResult<Result>) reply).getData();
                 if (result.isFailure()) {
                     name = elementURI;
                 } else {
@@ -101,7 +101,7 @@ public class EvaluableEntity implements Evaluable {
             }
             reply = artifactStorageService.retrieve(artifactId);
             if (reply.isSuccess()) {
-                Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+                Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
                 name += " in " + artifact.getName() + " (" + artifact.getVersion() + ")";
             } else {
                 name += " in " + artifactId;

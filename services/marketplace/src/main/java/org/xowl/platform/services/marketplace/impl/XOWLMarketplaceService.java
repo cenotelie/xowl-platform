@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -174,7 +174,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
             if (rest.equals("/install")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return XSPReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
+                return ReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -245,18 +245,18 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
     }
 
     @Override
-    public XSPReply beginInstallOf(String identifier) {
+    public Reply beginInstallOf(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(PlatformManagementService.ACTION_INSTALL_ADDON);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(PlatformManagementService.ACTION_INSTALL_ADDON);
         if (!reply.isSuccess())
             return reply;
         JobExecutionService service = Register.getComponent(JobExecutionService.class);
         if (service == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         Job job = new AddonInstallationJob(identifier);
         service.schedule(job);
-        return new XSPReplyResult<>(job);
+        return new ReplyResult<>(job);
     }
 }

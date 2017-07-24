@@ -26,7 +26,7 @@ import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -99,14 +99,14 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
      *
      * @return The protocol reply
      */
-    private XSPReply serializeManifest() {
+    private Reply serializeManifest() {
         try (Writer writer = IOUtils.getWriter(fileManifest)) {
             writer.write(manifest.serializedJSON());
             writer.flush();
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
     }
 
@@ -146,11 +146,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply addInputSpecification(ArtifactSpecification specification) {
+    public Reply addInputSpecification(ArtifactSpecification specification) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ADD_INPUT_SPEC);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ADD_INPUT_SPEC);
         if (!reply.isSuccess())
             return reply;
 
@@ -158,15 +158,15 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         reply = serializeManifest();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(specification);
+        return new ReplyResult<>(specification);
     }
 
     @Override
-    public XSPReply addOutputSpecification(ArtifactSpecification specification) {
+    public Reply addOutputSpecification(ArtifactSpecification specification) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ADD_OUTPUT_SPEC);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ADD_OUTPUT_SPEC);
         if (!reply.isSuccess())
             return reply;
 
@@ -174,34 +174,34 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
         reply = serializeManifest();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(specification);
+        return new ReplyResult<>(specification);
     }
 
     @Override
-    public XSPReply removeInputSpecification(String specificationId) {
+    public Reply removeInputSpecification(String specificationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_REMOVE_INPUT_SPEC);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_REMOVE_INPUT_SPEC);
         if (!reply.isSuccess())
             return reply;
 
         if (!manifest.removeInputSpecification(specificationId))
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return serializeManifest();
     }
 
     @Override
-    public XSPReply removeOutputSpecification(String specificationId) {
+    public Reply removeOutputSpecification(String specificationId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_REMOVE_OUTPUT_SPEC);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_REMOVE_OUTPUT_SPEC);
         if (!reply.isSuccess())
             return reply;
 
         if (!manifest.removeOutputSpecification(specificationId))
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return serializeManifest();
     }
 
@@ -212,9 +212,9 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
             return Collections.emptyList();
         Collection<Artifact> artifacts = new ArrayList<>();
         for (String artifactId : manifest.getArtifactsForInput(specificationId)) {
-            XSPReply reply = storageService.retrieve(artifactId);
+            Reply reply = storageService.retrieve(artifactId);
             if (reply.isSuccess())
-                artifacts.add(((XSPReplyResult<Artifact>) reply).getData());
+                artifacts.add(((ReplyResult<Artifact>) reply).getData());
         }
         return artifacts;
     }
@@ -226,19 +226,19 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
             return Collections.emptyList();
         Collection<Artifact> artifacts = new ArrayList<>();
         for (String artifactId : manifest.getArtifactsForOutput(specificationId)) {
-            XSPReply reply = storageService.retrieve(artifactId);
+            Reply reply = storageService.retrieve(artifactId);
             if (reply.isSuccess())
-                artifacts.add(((XSPReplyResult<Artifact>) reply).getData());
+                artifacts.add(((ReplyResult<Artifact>) reply).getData());
         }
         return artifacts;
     }
 
     @Override
-    public XSPReply registerInput(String specificationId, String artifactId) {
+    public Reply registerInput(String specificationId, String artifactId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_REGISTER_INPUT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_REGISTER_INPUT);
         if (!reply.isSuccess())
             return reply;
 
@@ -247,11 +247,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply unregisterInput(String specificationId, String artifactId) {
+    public Reply unregisterInput(String specificationId, String artifactId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UNREGISTER_INPUT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_UNREGISTER_INPUT);
         if (!reply.isSuccess())
             return reply;
 
@@ -260,11 +260,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply registerOutput(String specificationId, String artifactId) {
+    public Reply registerOutput(String specificationId, String artifactId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_REGISTER_OUTPUT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_REGISTER_OUTPUT);
         if (!reply.isSuccess())
             return reply;
 
@@ -273,11 +273,11 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply unregisterOutput(String specificationId, String artifactId) {
+    public Reply unregisterOutput(String specificationId, String artifactId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UNREGISTER_OUTPUT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_UNREGISTER_OUTPUT);
         if (!reply.isSuccess())
             return reply;
 
@@ -291,55 +291,55 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
     }
 
     @Override
-    public XSPReply createRole(String identifier, String name) {
+    public Reply createRole(String identifier, String name) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ADD_ROLE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ADD_ROLE);
         if (!reply.isSuccess())
             return reply;
 
         reply = securityService.getRealm().createRole(identifier, name);
         if (!reply.isSuccess())
             return reply;
-        PlatformRole role = ((XSPReplyResult<PlatformRole>) reply).getData();
+        PlatformRole role = ((ReplyResult<PlatformRole>) reply).getData();
         manifest.addRole(role);
         reply = serializeManifest();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(role);
+        return new ReplyResult<>(role);
     }
 
     @Override
-    public XSPReply addRole(String roleId) {
+    public Reply addRole(String roleId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ADD_ROLE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ADD_ROLE);
         if (!reply.isSuccess())
             return reply;
 
         PlatformRole role = securityService.getRealm().getRole(roleId);
         if (role == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         manifest.addRole(role);
         reply = serializeManifest();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(role);
+        return new ReplyResult<>(role);
     }
 
     @Override
-    public XSPReply removeRole(String roleId) {
+    public Reply removeRole(String roleId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_REMOVE_ROLE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_REMOVE_ROLE);
         if (!reply.isSuccess())
             return reply;
 
         if (!manifest.removeRole(roleId))
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return serializeManifest();
     }
 

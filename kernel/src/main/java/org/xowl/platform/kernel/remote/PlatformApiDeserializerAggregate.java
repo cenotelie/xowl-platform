@@ -17,18 +17,32 @@
 
 package org.xowl.platform.kernel.remote;
 
-import org.xowl.platform.kernel.Register;
-
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Implements a deserializer that relies on the OSGi service register to discover the factories
+ * Implements a factory that requires the manual registering of parts
  *
  * @author Laurent Wouters
  */
-public class DeserializerForOSGi extends Deserializer {
+public class PlatformApiDeserializerAggregate extends PlatformApiDeserializer {
+    /**
+     * The registered parts
+     */
+    private final Collection<PlatformApiFactory> parts = new ArrayList<>();
+
+    /**
+     * Registers a factory
+     *
+     * @param factory The factory to register
+     */
+    public void register(PlatformApiFactory factory) {
+        this.parts.add(factory);
+    }
+
     @Override
-    protected Collection<DeserializerFactory> getFactories() {
-        return Register.getComponents(DeserializerFactory.class);
+    protected Collection<PlatformApiFactory> getParts() {
+        return Collections.unmodifiableCollection(parts);
     }
 }

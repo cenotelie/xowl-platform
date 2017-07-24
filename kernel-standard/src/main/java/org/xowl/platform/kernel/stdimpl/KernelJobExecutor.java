@@ -337,7 +337,7 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
     }
 
     @Override
-    public XSPReply schedule(Job job) {
+    public Reply schedule(Job job) {
         boolean exists = storage.exists();
         if (!exists) {
             exists = storage.mkdirs();
@@ -360,15 +360,15 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
             }
         }
         Logging.get().info(new RichString("Scheduled job ", job));
-        return new XSPReplyResult<>(job);
+        return new ReplyResult<>(job);
     }
 
     @Override
-    public XSPReply cancel(Job job) {
+    public Reply cancel(Job job) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_CANCEL, job);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_CANCEL, job);
         if (!reply.isSuccess())
             return reply;
 
@@ -376,21 +376,21 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
         if (success) {
             // the job was queued and prevented from running
             job.onTerminated(true);
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
         switch (job.getStatus()) {
             case Unscheduled:
             case Scheduled:
                 job.onTerminated(true);
-                return XSPReplySuccess.instance();
+                return ReplySuccess.instance();
             case Running:
                 return job.cancel();
             case Completed:
-                return new XSPReplyApiError(ERROR_ALREADY_COMPLETED);
+                return new ReplyApiError(ERROR_ALREADY_COMPLETED);
             case Cancelled:
-                return new XSPReplyApiError(ERROR_ALREADY_CANCELLED);
+                return new ReplyApiError(ERROR_ALREADY_CANCELLED);
             default:
-                return new XSPReplyApiError(ERROR_INVALID_JOB_STATE, job.getStatus().toString());
+                return new ReplyApiError(ERROR_INVALID_JOB_STATE, job.getStatus().toString());
         }
     }
 
@@ -511,7 +511,7 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
                 Job job = getJob(jobId, JobStatus.Completed);
                 if (job == null)
                     return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-                return XSPReplyUtils.toHttpResponse(cancel(job), null);
+                return ReplyUtils.toHttpResponse(cancel(job), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

@@ -18,6 +18,7 @@
 package org.xowl.platform.kernel.remote;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.api.ApiDeserializer;
 import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.*;
@@ -31,10 +32,10 @@ import org.xowl.platform.kernel.security.*;
  *
  * @author Laurent Wouters
  */
-public class DeserializerFactoryForKernel implements DeserializerFactory {
+public class PlatformApiFactoryForKernel implements PlatformApiFactory {
     @Override
     public String getIdentifier() {
-        return DeserializerFactoryForKernel.class.getCanonicalName();
+        return PlatformApiFactoryForKernel.class.getCanonicalName();
     }
 
     @Override
@@ -43,12 +44,7 @@ public class DeserializerFactoryForKernel implements DeserializerFactory {
     }
 
     @Override
-    public Object newObject(String type, ASTNode definition) {
-        return newObject(null, type, definition);
-    }
-
-    @Override
-    public Object newObject(Deserializer deserializer, String type, ASTNode definition) {
+    public Object newObject(ApiDeserializer deserializer, String type, ASTNode definition) {
         if (Product.class.getCanonicalName().equals(type))
             return new ProductBase(definition);
         if (Addon.class.getCanonicalName().equals(type))

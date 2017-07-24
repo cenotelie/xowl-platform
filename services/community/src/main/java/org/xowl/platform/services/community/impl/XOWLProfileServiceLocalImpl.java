@@ -108,7 +108,7 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
     }
 
     @Override
-    public XSPReply updatePublicProfile(PublicProfile profile) {
+    public Reply updatePublicProfile(PublicProfile profile) {
         PublicProfile target = resolveProfile(profile.getIdentifier());
         target.update(profile);
         EventService eventService = Register.getComponent(EventService.class);
@@ -137,10 +137,10 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
     }
 
     @Override
-    public XSPReply awardBadge(String userId, String badgeId) {
+    public Reply awardBadge(String userId, String badgeId) {
         Badge badge = getBadge(badgeId);
         if (badge == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         PublicProfile target = resolveProfile(userId);
         target.awardBadge(badge);
         EventService eventService = Register.getComponent(EventService.class);
@@ -150,10 +150,10 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
     }
 
     @Override
-    public XSPReply rescindBadge(String userId, String badgeId) {
+    public Reply rescindBadge(String userId, String badgeId) {
         Badge badge = getBadge(badgeId);
         if (badge == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         PublicProfile target = resolveProfile(userId);
         target.rescindBadge(badge);
         EventService eventService = Register.getComponent(EventService.class);
@@ -185,10 +185,10 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
      * @param profile The profile to write
      * @return The protocol reply
      */
-    private XSPReply writeBack(PublicProfile profile) {
+    private Reply writeBack(PublicProfile profile) {
         if (!storage.exists()) {
             if (!storage.mkdirs())
-                return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED);
+                return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED);
         }
         File file = new File(storage, getFileNameFor(profile.getIdentifier()));
         try (Writer writer = IOUtils.getWriter(file)) {
@@ -196,9 +196,9 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**

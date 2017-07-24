@@ -19,9 +19,9 @@ package org.xowl.platform.services.community;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.PlatformUtils;
-import org.xowl.platform.kernel.remote.Deserializer;
-import org.xowl.platform.kernel.remote.DeserializerFactory;
-import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
+import org.xowl.platform.kernel.remote.PlatformApiDeserializer;
+import org.xowl.platform.kernel.remote.PlatformApiFactory;
+import org.xowl.platform.kernel.remote.PlatformApiFactoryForKernel;
 import org.xowl.platform.services.community.bots.Bot;
 import org.xowl.platform.services.community.bots.BotRemote;
 import org.xowl.platform.services.community.bots.BotSpecification;
@@ -33,10 +33,10 @@ import org.xowl.platform.services.community.profiles.PublicProfile;
  *
  * @author Laurent Wouters
  */
-public class DeserializerFactoryForCommunity implements DeserializerFactory {
+public class PlatformApiFactoryForCommunity implements PlatformApiFactory {
     @Override
     public String getIdentifier() {
-        return DeserializerFactoryForKernel.class.getCanonicalName();
+        return PlatformApiFactoryForKernel.class.getCanonicalName();
     }
 
     @Override
@@ -45,12 +45,7 @@ public class DeserializerFactoryForCommunity implements DeserializerFactory {
     }
 
     @Override
-    public Object newObject(String type, ASTNode definition) {
-        return newObject(null, type, definition);
-    }
-
-    @Override
-    public Object newObject(Deserializer deserializer, String type, ASTNode definition) {
+    public Object newObject(PlatformApiDeserializer parent, String type, ASTNode definition) {
         if (Bot.class.getCanonicalName().equals(type))
             return new BotRemote(definition);
         if (BotSpecification.class.getCanonicalName().equals(type))

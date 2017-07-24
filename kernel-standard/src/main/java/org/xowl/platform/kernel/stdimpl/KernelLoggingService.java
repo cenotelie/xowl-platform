@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -138,9 +138,9 @@ public class KernelLoggingService extends DispatchLogger implements LoggingServi
 
     @Override
     public HttpResponse handle(SecurityService securityService, HttpApiRequest request) {
-        XSPReply reply = securityService.checkAction(ACTION_GET_LOG);
+        Reply reply = securityService.checkAction(ACTION_GET_LOG);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
 
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.denotation;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.security.SecuredService;
 
 import java.util.Collection;
@@ -33,7 +33,7 @@ public interface DenotationService extends SecuredService {
      *
      * @return The uploaded documents pending importation
      */
-    XSPReply getDocuments();
+    Reply getDocuments();
 
     /**
      * Gets an uploaded document
@@ -41,7 +41,7 @@ public interface DenotationService extends SecuredService {
      * @param documentId The identifier of a document
      * @return The document, or null if it cannot be found
      */
-    XSPReply getDocument(String documentId);
+    Reply getDocument(String documentId);
 
     /**
      * Gets the representation of the specified document
@@ -49,7 +49,7 @@ public interface DenotationService extends SecuredService {
      * @param documentId The identifier of a document
      * @return The representation
      */
-    XSPReply getDocumentRepresentation(String documentId);
+    Reply getDocumentRepresentation(String documentId);
 
     /**
      * Gets the linguistic phrase within the specified document
@@ -57,7 +57,7 @@ public interface DenotationService extends SecuredService {
      * @param documentId The identifier of a document
      * @return The linguistic phrase within the specified document
      */
-    XSPReply getDocumentPhrase(String documentId);
+    Reply getDocumentPhrase(String documentId);
 
     /**
      * Uploads a new document
@@ -67,14 +67,14 @@ public interface DenotationService extends SecuredService {
      * @param content          The document's content
      * @return The document
      */
-    XSPReply upload(String name, String originalFileName, byte[] content);
+    Reply upload(String name, String originalFileName, byte[] content);
 
     /**
      * Drops the specified document
      *
      * @param documentId The identifier of a document
      */
-    XSPReply drop(String documentId);
+    Reply drop(String documentId);
 
     /**
      * Gets the known document parsers

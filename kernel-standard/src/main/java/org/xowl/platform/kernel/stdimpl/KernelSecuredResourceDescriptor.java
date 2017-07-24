@@ -18,10 +18,10 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyNotFound;
+import org.xowl.infra.utils.api.ReplySuccess;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.logging.Logging;
@@ -74,12 +74,12 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      * @param user The new owner for this resource
      * @return The protocol reply
      */
-    public XSPReply addOwner(String user) {
+    public Reply addOwner(String user) {
         synchronized (owners) {
             if (owners.contains(user))
-                return new XSPReplyApiError(SecuredResourceManager.ERROR_ALREADY_OWNER);
+                return new ReplyApiError(SecuredResourceManager.ERROR_ALREADY_OWNER);
             owners.add(user);
-            XSPReply reply = writeDescriptor();
+            Reply reply = writeDescriptor();
             if (!reply.isSuccess())
                 owners.remove(user);
             return reply;
@@ -92,14 +92,14 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      * @param user The previous owner for this resource
      * @return The protocol reply
      */
-    public XSPReply removeOwner(String user) {
+    public Reply removeOwner(String user) {
         synchronized (owners) {
             if (owners.size() == 1)
-                return new XSPReplyApiError(SecuredResourceManager.ERROR_LAST_OWNER);
+                return new ReplyApiError(SecuredResourceManager.ERROR_LAST_OWNER);
             boolean removed = owners.remove(user);
             if (!removed)
-                return XSPReplyNotFound.instance();
-            XSPReply reply = writeDescriptor();
+                return ReplyNotFound.instance();
+            Reply reply = writeDescriptor();
             if (!reply.isSuccess())
                 owners.add(user);
             return reply;
@@ -112,10 +112,10 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      * @param sharing The sharing to add
      * @return The protocol reply
      */
-    public XSPReply addSharing(SecuredResourceSharing sharing) {
+    public Reply addSharing(SecuredResourceSharing sharing) {
         synchronized (this.sharing) {
             this.sharing.add(sharing);
-            XSPReply reply = writeDescriptor();
+            Reply reply = writeDescriptor();
             if (!reply.isSuccess())
                 this.sharing.remove(sharing);
             return reply;
@@ -128,19 +128,19 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      * @param sharing The sharing to remove
      * @return The protocol reply
      */
-    public XSPReply removeSharing(SecuredResourceSharing sharing) {
+    public Reply removeSharing(SecuredResourceSharing sharing) {
         synchronized (this.sharing) {
             for (SecuredResourceSharing candidate : this.sharing) {
                 if (candidate.equals(sharing)) {
                     this.sharing.remove(candidate);
-                    XSPReply reply = writeDescriptor();
+                    Reply reply = writeDescriptor();
                     if (!reply.isSuccess())
                         this.sharing.add(candidate);
                     return reply;
                 }
             }
         }
-        return XSPReplyNotFound.instance();
+        return ReplyNotFound.instance();
     }
 
     /**
@@ -148,18 +148,18 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      *
      * @return The protocol reply
      */
-    public XSPReply writeDescriptor() {
+    public Reply writeDescriptor() {
         if (!storage.exists() && !storage.mkdirs())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
         File fileDescriptor = new File(storage, getFileName());
         try (Writer writer = IOUtils.getWriter(fileDescriptor)) {
             writer.write(serializedJSON());
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**
@@ -167,13 +167,13 @@ public class KernelSecuredResourceDescriptor extends SecuredResourceDescriptorBa
      *
      * @return The protocol reply
      */
-    public XSPReply deleteDescriptor() {
+    public Reply deleteDescriptor() {
         File fileDescriptor = new File(storage, getFileName());
         if (fileDescriptor.exists() && !fileDescriptor.delete()) {
             Logging.get().error("Failed to delete descriptor file " + fileDescriptor.getAbsolutePath());
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to delete descriptor in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to delete descriptor in storage");
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**

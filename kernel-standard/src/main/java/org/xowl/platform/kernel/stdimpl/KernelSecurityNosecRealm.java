@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -111,107 +111,107 @@ public class KernelSecurityNosecRealm implements SecurityRealm {
     }
 
     @Override
-    public XSPReply createUser(String identifier, String name, String key) {
-        return XSPReplyUnsupported.instance();
+    public Reply createUser(String identifier, String name, String key) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply createGroup(String identifier, String name, String adminId) {
-        return XSPReplyUnsupported.instance();
+    public Reply createGroup(String identifier, String name, String adminId) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply createRole(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+    public Reply createRole(String identifier, String name) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply renameUser(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+    public Reply renameUser(String identifier, String name) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply renameGroup(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+    public Reply renameGroup(String identifier, String name) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply renameRole(String identifier, String name) {
-        return XSPReplyUnsupported.instance();
+    public Reply renameRole(String identifier, String name) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply deleteUser(String identifier) {
-        return XSPReplyUnsupported.instance();
+    public Reply deleteUser(String identifier) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply deleteGroup(String identifier) {
-        return XSPReplyUnsupported.instance();
+    public Reply deleteGroup(String identifier) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply deleteRole(String identifier) {
-        return XSPReplyUnsupported.instance();
+    public Reply deleteRole(String identifier) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
-        return XSPReplyUnsupported.instance();
+    public Reply changeUserKey(String identifier, String oldKey, String newKey) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply resetUserKey(String identifier, String newKey) {
-        return XSPReplyUnsupported.instance();
+    public Reply resetUserKey(String identifier, String newKey) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply addUserToGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+    public Reply addUserToGroup(String user, String group) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply addAdminToGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+    public Reply addAdminToGroup(String user, String group) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply removeUserFromGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+    public Reply removeUserFromGroup(String user, String group) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply removeAdminFromGroup(String user, String group) {
-        return XSPReplyUnsupported.instance();
+    public Reply removeAdminFromGroup(String user, String group) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply assignRoleToUser(String user, String role) {
-        return XSPReplyUnsupported.instance();
+    public Reply assignRoleToUser(String user, String role) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply assignRoleToGroup(String group, String role) {
-        return XSPReplyUnsupported.instance();
+    public Reply assignRoleToGroup(String group, String role) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply unassignRoleToUser(String user, String role) {
-        return XSPReplyUnsupported.instance();
+    public Reply unassignRoleToUser(String user, String role) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply unassignRoleToGroup(String group, String role) {
-        return XSPReplyUnsupported.instance();
+    public Reply unassignRoleToGroup(String group, String role) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply addRoleImplication(String sourceRole, String targetRole) {
-        return XSPReplyUnsupported.instance();
+    public Reply addRoleImplication(String sourceRole, String targetRole) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply removeRoleImplication(String sourceRole, String targetRole) {
-        return XSPReplyUnsupported.instance();
+    public Reply removeRoleImplication(String sourceRole, String targetRole) {
+        return ReplyUnsupported.instance();
     }
 }

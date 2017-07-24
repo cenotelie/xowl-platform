@@ -135,10 +135,10 @@ public class KernelSecurityTokenService implements SecurityTokenService {
     }
 
     @Override
-    public XSPReply checkToken(String token) {
+    public Reply checkToken(String token) {
         byte[] tokenBytes = org.xowl.infra.utils.Base64.decodeBase64(token);
         if (tokenBytes.length <= HASH_LENGTH + TIMESTAMP_LENGTH)
-            return XSPReplyUnauthenticated.instance();
+            return ReplyUnauthenticated.instance();
         byte[] tokenData = Arrays.copyOf(tokenBytes, tokenBytes.length - HASH_LENGTH);
         byte[] hashProvided = new byte[HASH_LENGTH];
         System.arraycopy(tokenBytes, tokenBytes.length - HASH_LENGTH, hashProvided, 0, HASH_LENGTH);
@@ -150,10 +150,10 @@ public class KernelSecurityTokenService implements SecurityTokenService {
                 byte[] computedHash = securityMAC.doFinal(tokenData);
                 if (!Arrays.equals(hashProvided, computedHash))
                     // the token does not checks out ...
-                    return XSPReplyUnauthenticated.instance();
+                    return ReplyUnauthenticated.instance();
             } catch (InvalidKeyException exception) {
                 Logging.get().error(exception);
-                return new XSPReplyException(exception);
+                return new ReplyException(exception);
             }
         }
 
@@ -175,7 +175,7 @@ public class KernelSecurityTokenService implements SecurityTokenService {
                 | ((long) b7 & 0xFFL);
         if (System.currentTimeMillis() > validUntil)
             // the token expired
-            return XSPReplyExpiredSession.instance();
-        return new XSPReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - HASH_LENGTH - TIMESTAMP_LENGTH, IOUtils.CHARSET));
+            return ReplyExpiredSession.instance();
+        return new ReplyResult<>(new String(tokenBytes, 0, tokenBytes.length - HASH_LENGTH - TIMESTAMP_LENGTH, IOUtils.CHARSET));
     }
 }

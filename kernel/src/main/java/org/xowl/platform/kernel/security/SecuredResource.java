@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.api.Reply;
 
 /**
  * Represents a resource that is owned by a platform user and can be shared with others in the collaboration
@@ -31,5 +31,5 @@ public interface SecuredResource extends Identifiable {
      *
      * @return Whether the current user has access to this resource
      */
-    XSPReply checkAccess();
+    Reply checkAccess();
 }

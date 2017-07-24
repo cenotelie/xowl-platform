@@ -20,7 +20,7 @@ package org.xowl.platform.services.community;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.*;
-import org.xowl.platform.kernel.remote.DeserializerFactory;
+import org.xowl.platform.kernel.remote.PlatformApiFactory;
 import org.xowl.platform.kernel.security.SecuredActionPolicyProvider;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
@@ -39,7 +39,7 @@ import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
 public class Activator implements BundleActivator {
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
-        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCommunity(), null);
+        bundleContext.registerService(PlatformApiFactory.class, new PlatformApiFactoryForCommunity(), null);
         bundleContext.registerService(SecuredActionPolicyProvider.class, new XOWLCommunitySecurityProvider(), null);
         bundleContext.registerService(ProfileServiceProvider.class, new XOWLProfileServiceProvider(), null);
         bundleContext.registerService(BadgeProvider.class, new XOWLDefaultBadges(), null);

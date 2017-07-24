@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ApiError;
 import org.xowl.platform.kernel.ManagedService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
@@ -116,7 +116,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param collaborationId The identifier of the collaboration
      * @return The protocol reply
      */
-    XSPReply getNeighbourManifest(String collaborationId);
+    Reply getNeighbourManifest(String collaborationId);
 
     /**
      * Gets the available artifacts for a specific input, for a neighbour collaboration
@@ -125,7 +125,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param specificationId The identifier of the input specification
      * @return The associated artifacts
      */
-    XSPReply getNeighbourInputsFor(String collaborationId, String specificationId);
+    Reply getNeighbourInputsFor(String collaborationId, String specificationId);
 
     /**
      * Gets the available artifacts for a specific output, for a neighbour collaboration
@@ -134,7 +134,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param specificationId The identifier of the output specification
      * @return The associated artifacts
      */
-    XSPReply getNeighbourOutputsFor(String collaborationId, String specificationId);
+    Reply getNeighbourOutputsFor(String collaborationId, String specificationId);
 
     /**
      * Gets the known specifications for collaboration inputs and outputs across the network of collaborations
@@ -149,7 +149,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    XSPReply spawn(CollaborationSpecification specification);
+    Reply spawn(CollaborationSpecification specification);
 
     /**
      * Archives a running collaboration
@@ -157,7 +157,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param collaborationId The identifier of a collaboration
      * @return the protocol reply
      */
-    XSPReply archive(String collaborationId);
+    Reply archive(String collaborationId);
 
     /**
      * Restarts an archived collaboration
@@ -165,7 +165,7 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param collaborationId The identifier of a collaboration
      * @return the protocol reply
      */
-    XSPReply restart(String collaborationId);
+    Reply restart(String collaborationId);
 
     /**
      * Deletes a collaboration and its data
@@ -173,5 +173,5 @@ public interface CollaborationNetworkService extends SecuredService, ManagedServ
      * @param collaborationId The identifier of a collaboration
      * @return the protocol reply
      */
-    XSPReply delete(String collaborationId);
+    Reply delete(String collaborationId);
 }

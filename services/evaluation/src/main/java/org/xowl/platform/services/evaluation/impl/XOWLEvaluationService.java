@@ -29,7 +29,7 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -219,33 +219,33 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     }
 
     @Override
-    public XSPReply getEvaluations() {
+    public Reply getEvaluations() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
         if (!reply.isSuccess())
             return reply;
         return XOWLEvaluation.retrieveAll();
     }
 
     @Override
-    public XSPReply getEvaluation(String evalId) {
+    public Reply getEvaluation(String evalId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_GET_EVALUATIONS);
         if (!reply.isSuccess())
             return reply;
         return XOWLEvaluation.retrieve(this, evalId);
     }
 
     @Override
-    public XSPReply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria) {
+    public Reply newEvaluation(String name, EvaluableType evaluableType, Collection<Evaluable> evaluables, Collection<Criterion> criteria) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
         if (!reply.isSuccess())
             return reply;
         XOWLEvaluation evaluation = new XOWLEvaluation(null, name, evaluableType, evaluables, criteria);
@@ -255,7 +255,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));
-        return new XSPReplyResult<>(evaluation);
+        return new ReplyResult<>(evaluation);
     }
 
     /**
@@ -285,16 +285,16 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetEvaluables(HttpApiRequest request) {
         String type = request.getParameter("type");
         if (type == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
         EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
-        XSPReply reply = evaluableType.getElements();
+        Reply reply = evaluableType.getElements();
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (Evaluable evaluable : ((XSPReplyResultCollection<Evaluable>) reply).getData()) {
+        for (Evaluable evaluable : ((ReplyResultCollection<Evaluable>) reply).getData()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -313,7 +313,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetCriterionTypes(HttpApiRequest request) {
         String type = request.getParameter("for");
         if (type == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
         EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -335,12 +335,12 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
      * @return The response
      */
     private HttpResponse onGetEvaluations() {
-        XSPReply reply = getEvaluations();
+        Reply reply = getEvaluations();
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (EvaluationReference evaluation : ((XSPReplyResultCollection<EvaluationReference>) reply).getData()) {
+        for (EvaluationReference evaluation : ((ReplyResultCollection<EvaluationReference>) reply).getData()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -357,10 +357,10 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
      * @return The response
      */
     private HttpResponse onGetEvaluation(String evaluationIdentifier) {
-        XSPReply reply = getEvaluation(evaluationIdentifier);
+        Reply reply = getEvaluation(evaluationIdentifier);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Evaluation>) reply).getData().serializedJSON());
+            return ReplyUtils.toHttpResponse(reply, null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<Evaluation>) reply).getData().serializedJSON());
     }
 
     /**
@@ -372,22 +372,22 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onPutEvaluation(HttpApiRequest request) {
         byte[] content = request.getContent();
         if (content == null || content.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
-        XSPReply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+        Reply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
         reply = evaluation.store();
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));

@@ -18,7 +18,7 @@
 package org.xowl.platform.services.importation;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Service;
@@ -52,7 +52,7 @@ public abstract class Importer implements Service, Serializable {
      * @param configuration The configuration for this preview
      * @return The preview, or null if it cannot be produced
      */
-    public abstract XSPReply getPreview(String documentId, ImporterConfiguration configuration);
+    public abstract Reply getPreview(String documentId, ImporterConfiguration configuration);
 
     /**
      * Gets the job for importing a document
@@ -62,7 +62,7 @@ public abstract class Importer implements Service, Serializable {
      * @param metadata      The metadata for the artifact to produce
      * @return The job for importing the document
      */
-    public abstract XSPReply getImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata);
+    public abstract Reply getImportJob(String documentId, ImporterConfiguration configuration, Artifact metadata);
 
     @Override
     public String serializedString() {

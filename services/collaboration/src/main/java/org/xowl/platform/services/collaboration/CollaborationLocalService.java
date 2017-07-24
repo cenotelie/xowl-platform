@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -123,7 +123,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param specification The specification
      * @return The protocol reply
      */
-    XSPReply addInputSpecification(ArtifactSpecification specification);
+    Reply addInputSpecification(ArtifactSpecification specification);
 
     /**
      * Adds a new specification for an output
@@ -131,7 +131,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param specification The specification
      * @return The protocol reply
      */
-    XSPReply addOutputSpecification(ArtifactSpecification specification);
+    Reply addOutputSpecification(ArtifactSpecification specification);
 
     /**
      * Removes the specification of an input
@@ -139,7 +139,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param specificationId The identifier of the specification to remove
      * @return The protocol reply
      */
-    XSPReply removeInputSpecification(String specificationId);
+    Reply removeInputSpecification(String specificationId);
 
     /**
      * Removes the specification of an output
@@ -147,7 +147,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param specificationId The identifier of the specification to remove
      * @return The protocol reply
      */
-    XSPReply removeOutputSpecification(String specificationId);
+    Reply removeOutputSpecification(String specificationId);
 
     /**
      * Gets the available artifacts (in this collaboration) for a specific input
@@ -172,7 +172,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param artifactId      The identifier of the input artifact
      * @return The protocol reply
      */
-    XSPReply registerInput(String specificationId, String artifactId);
+    Reply registerInput(String specificationId, String artifactId);
 
     /**
      * Un-registers an artifact as an input for this collaboration
@@ -181,7 +181,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param artifactId      The identifier of the input artifact
      * @return The protocol reply
      */
-    XSPReply unregisterInput(String specificationId, String artifactId);
+    Reply unregisterInput(String specificationId, String artifactId);
 
     /**
      * Registers an artifact as an output for this collaboration
@@ -190,7 +190,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param artifactId      The identifier of the output artifact
      * @return The protocol reply
      */
-    XSPReply registerOutput(String specificationId, String artifactId);
+    Reply registerOutput(String specificationId, String artifactId);
 
     /**
      * Un-registers an artifact as an output for this collaboration
@@ -199,7 +199,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param artifactId      The identifier of the output artifact
      * @return The protocol reply
      */
-    XSPReply unregisterOutput(String specificationId, String artifactId);
+    Reply unregisterOutput(String specificationId, String artifactId);
 
     /**
      * Gets the roles for this collaboration
@@ -215,7 +215,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param name       The name for this role
      * @return The protocol reply
      */
-    XSPReply createRole(String identifier, String name);
+    Reply createRole(String identifier, String name);
 
     /**
      * Registers a role for this collaboration
@@ -223,7 +223,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    XSPReply addRole(String roleId);
+    Reply addRole(String roleId);
 
     /**
      * Unregisters a role from this collaboration
@@ -231,7 +231,7 @@ public interface CollaborationLocalService extends SecuredService {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    XSPReply removeRole(String roleId);
+    Reply removeRole(String roleId);
 
     /**
      * Gets the descriptor of the collaboration pattern for the orchestration of this collaboration

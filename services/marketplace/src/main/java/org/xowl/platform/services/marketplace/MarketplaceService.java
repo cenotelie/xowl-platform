@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.marketplace;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -69,5 +69,5 @@ public interface MarketplaceService extends SecuredService {
      * @param identifier The identifier of the addon to install
      * @return The protocol reply
      */
-    XSPReply beginInstallOf(String identifier);
+    Reply beginInstallOf(String identifier);
 }

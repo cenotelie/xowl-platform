@@ -25,7 +25,7 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredResource;
 import org.xowl.platform.kernel.security.SecuredResourceManager;
@@ -118,126 +118,126 @@ public class KernelSecuredResourceManager implements SecuredResourceManager {
     }
 
     @Override
-    public XSPReply createDescriptorFor(SecuredResource resource) {
+    public Reply createDescriptorFor(SecuredResource resource) {
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource.getIdentifier());
         if (descriptor != null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
 
         descriptor = new KernelSecuredResourceDescriptor(resource, storage);
-        XSPReply reply = descriptor.writeDescriptor();
+        Reply reply = descriptor.writeDescriptor();
         if (!reply.isSuccess())
             return reply;
         getDescriptors().put(resource.getIdentifier(), descriptor);
-        return new XSPReplyResult<>(reply);
+        return new ReplyResult<>(reply);
     }
 
     @Override
-    public XSPReply getDescriptorFor(String resource) {
+    public Reply getDescriptorFor(String resource) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_GET_DESCRIPTOR, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_GET_DESCRIPTOR, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
-        return new XSPReplyResult<>(descriptor);
+            return ReplyNotFound.instance();
+        return new ReplyResult<>(descriptor);
     }
 
     @Override
-    public XSPReply addOwner(String resource, String user) {
+    public Reply addOwner(String resource, String user) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return descriptor.addOwner(user);
     }
 
     @Override
-    public XSPReply removeOwner(String resource, String user) {
+    public Reply removeOwner(String resource, String user) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return descriptor.removeOwner(user);
     }
 
     @Override
-    public XSPReply addSharing(String resource, SecuredResourceSharing sharing) {
+    public Reply addSharing(String resource, SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return descriptor.addSharing(sharing);
     }
 
     @Override
-    public XSPReply removeSharing(String resource, SecuredResourceSharing sharing) {
+    public Reply removeSharing(String resource, SecuredResourceSharing sharing) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return descriptor.removeSharing(sharing);
     }
 
     @Override
-    public XSPReply deleteDescriptorFor(String resource) {
+    public Reply deleteDescriptorFor(String resource) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_RESOURCE_MANAGE, resource);
         if (!reply.isSuccess())
             return reply;
         KernelSecuredResourceDescriptor descriptor = getDescriptors().remove(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return descriptor.deleteDescriptor();
     }
 
     @Override
-    public XSPReply checkIsResourceOwner(SecurityService securityService, PlatformUser user, String resource) {
+    public Reply checkIsResourceOwner(SecurityService securityService, PlatformUser user, String resource) {
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         if (descriptor.getOwners().contains(user.getIdentifier()))
-            return new XSPReplyResult<>(descriptor);
-        return XSPReplyUnauthorized.instance();
+            return new ReplyResult<>(descriptor);
+        return ReplyUnauthorized.instance();
     }
 
     @Override
-    public XSPReply checkIsInSharing(SecurityService securityService, PlatformUser user, String resource) {
+    public Reply checkIsInSharing(SecurityService securityService, PlatformUser user, String resource) {
         KernelSecuredResourceDescriptor descriptor = getDescriptors().get(resource);
         if (descriptor == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         if (descriptor.getOwners().contains(user.getIdentifier()))
             // resource owner can access the resource
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         // look for a sharing of the resource matching the requesting user
         for (SecuredResourceSharing sharing : descriptor.getSharing()) {
             if (sharing.isAllowedAccess(securityService, user))
-                return XSPReplySuccess.instance();
+                return ReplySuccess.instance();
         }
-        return XSPReplyUnauthorized.instance();
+        return ReplyUnauthorized.instance();
     }
 }

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.webapi;
 
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.ApiError;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Service;

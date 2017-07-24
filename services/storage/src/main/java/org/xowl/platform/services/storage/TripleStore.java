@@ -18,7 +18,7 @@
 package org.xowl.platform.services.storage;
 
 import org.xowl.infra.server.api.XOWLDatabase;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 
 /**
@@ -30,9 +30,9 @@ public interface TripleStore extends XOWLDatabase {
     /**
      * Gets the artifacts in this store
      *
-     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
+     * @return The operation's result which can be casted to ReplyResultCollection in case of success
      */
-    XSPReply getArtifacts();
+    Reply getArtifacts();
 
     /**
      * Stores an artifact in this store
@@ -40,15 +40,15 @@ public interface TripleStore extends XOWLDatabase {
      * @param artifact The artifact to store
      * @return The operation's result
      */
-    XSPReply store(Artifact artifact);
+    Reply store(Artifact artifact);
 
     /**
      * Retrieves the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return The operation's result which can be casted to XSPReplyResult in case of success
+     * @return The operation's result which can be casted to ReplyResult in case of success
      */
-    XSPReply retrieve(String identifier);
+    Reply retrieve(String identifier);
 
     /**
      * Deletes the artifact identified by the specified identifier
@@ -56,5 +56,5 @@ public interface TripleStore extends XOWLDatabase {
      * @param identifier The identifier of a artifact
      * @return The operation's result
      */
-    XSPReply delete(String identifier);
+    Reply delete(String identifier);
 }

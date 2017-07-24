@@ -18,8 +18,8 @@
 package org.xowl.platform.services.collaboration.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 import org.xowl.platform.services.collaboration.RemoteCollaboration;
@@ -124,38 +124,38 @@ public class RemoteCollaborationBase implements RemoteCollaboration {
     }
 
     @Override
-    public XSPReply getManifest() {
-        return XSPReplyUnsupported.instance();
+    public Reply getManifest() {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply getArtifactsForInput(String specificationId) {
-        return XSPReplyUnsupported.instance();
+    public Reply getArtifactsForInput(String specificationId) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply getArtifactsForOutput(String specificationId) {
-        return XSPReplyUnsupported.instance();
+    public Reply getArtifactsForOutput(String specificationId) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply archive() {
-        return XSPReplyUnsupported.instance();
+    public Reply archive() {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply restart() {
-        return XSPReplyUnsupported.instance();
+    public Reply restart() {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply delete() {
-        return XSPReplyUnsupported.instance();
+    public Reply delete() {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply retrieveOutput(String specificationId, String artifactId) {
-        return XSPReplyUnsupported.instance();
+    public Reply retrieveOutput(String specificationId, String artifactId) {
+        return ReplyUnsupported.instance();
     }
 
     @Override

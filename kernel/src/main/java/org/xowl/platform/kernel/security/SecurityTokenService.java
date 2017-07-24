@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.Service;
 
 /**
@@ -47,5 +47,5 @@ public interface SecurityTokenService extends Service {
      * @param token The authentication token to check
      * @return The protocol reply, or null if the token is invalid
      */
-    XSPReply checkToken(String token);
+    Reply checkToken(String token);
 }

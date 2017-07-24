@@ -18,16 +18,16 @@
 package org.xowl.platform.services.community.bots;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResultCollection;
+import org.xowl.infra.utils.api.ReplySuccess;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.infra.utils.logging.DispatchLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;
 import org.xowl.platform.kernel.events.EventConsumer;
 import org.xowl.platform.kernel.events.EventService;
@@ -203,29 +203,29 @@ public class BotBase implements Bot, EventConsumer {
     }
 
     @Override
-    public XSPReply getMessages() {
+    public Reply getMessages() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_GET_MESSAGES, this);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(BotManagementService.ACTION_GET_MESSAGES, this);
         if (!reply.isSuccess())
             return reply;
 
-        return new XSPReplyResultCollection<>(logBuffer.getMessages());
+        return new ReplyResultCollection<>(logBuffer.getMessages());
     }
 
     @Override
-    public XSPReply wakeup() {
+    public Reply wakeup() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_WAKE_UP, this);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(BotManagementService.ACTION_WAKE_UP, this);
         if (!reply.isSuccess())
             return reply;
 
         synchronized (this) {
             if (status != BotStatus.Asleep)
-                return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
+                return new ReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not asleep: " + status);
             status = BotStatus.WakingUp;
         }
         mustStop.set(false);
@@ -235,21 +235,21 @@ public class BotBase implements Bot, EventConsumer {
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new BotWokeUpEvent(this));
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply sleep() {
+    public Reply sleep() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(BotManagementService.ACTION_SLEEP, this);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(BotManagementService.ACTION_SLEEP, this);
         if (!reply.isSuccess())
             return reply;
 
         synchronized (this) {
             if (status != BotStatus.Awaken && status != BotStatus.Working)
-                return new XSPReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not awake: " + status);
+                return new ReplyApiError(BotManagementService.ERROR_INVALID_STATUS, "Bot is not awake: " + status);
             status = BotStatus.GoingToSleep;
         }
         mustStop.set(true);
@@ -266,7 +266,7 @@ public class BotBase implements Bot, EventConsumer {
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new BotHasGoneToSleepEvent(this));
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override

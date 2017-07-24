@@ -18,9 +18,9 @@
 package org.xowl.platform.services.collaboration.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationSpecification;
@@ -38,7 +38,7 @@ public class CollaborationSpawnJob extends JobBase {
     /**
      * The job's result
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -66,7 +66,7 @@ public class CollaborationSpawnJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 
@@ -74,7 +74,7 @@ public class CollaborationSpawnJob extends JobBase {
     public void doRun() {
         CollaborationNetworkService networkService = Register.getComponent(CollaborationNetworkService.class);
         if (networkService == null) {
-            result = XSPReplyServiceUnavailable.instance();
+            result = ReplyServiceUnavailable.instance();
             return;
         }
         result = networkService.spawn(specification);

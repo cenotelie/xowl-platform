@@ -30,7 +30,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSimple;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
@@ -268,9 +268,9 @@ class XOWLEvaluation implements Evaluation {
      *
      * @return The operation's result
      */
-    public XSPReply store() {
+    public Reply store() {
         if (evaluableType == null)
-            return new XSPReplyApiError(EvaluationService.ERROR_INVALID_EVALUABLE_TYPE);
+            return new ReplyApiError(EvaluationService.ERROR_INVALID_EVALUABLE_TYPE);
         NodeManager nodes = new CachedNodes();
         IRINode graphEval = nodes.getIRINode(identifier);
         IRINode registry = nodes.getIRINode(KernelSchema.GRAPH_ARTIFACTS);
@@ -305,7 +305,7 @@ class XOWLEvaluation implements Evaluation {
         Artifact artifact = new ArtifactSimple(metadata, content);
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         return storageService.getServiceStore().store(artifact);
     }
 
@@ -314,11 +314,11 @@ class XOWLEvaluation implements Evaluation {
      *
      * @return The response
      */
-    public static XSPReply retrieveAll() {
+    public static Reply retrieveAll() {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
+            return ReplyServiceUnavailable.instance();
+        Reply reply = storageService.getServiceStore().sparql("SELECT DISTINCT ?a ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
                 TextUtils.escapeAbsoluteURIW3C(EVALUATION) +
@@ -327,9 +327,9 @@ class XOWLEvaluation implements Evaluation {
                 "> ?n } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (!sparqlResult.isSuccess())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<EvaluationReference> result = new ArrayList<>();
         for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             result.add(new XOWLEvaluationReference(
@@ -337,7 +337,7 @@ class XOWLEvaluation implements Evaluation {
                     ((LiteralNode) solution.get("n")).getLexicalValue()
             ));
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     /**
@@ -347,17 +347,17 @@ class XOWLEvaluation implements Evaluation {
      * @param identifier        The identifier of the evaluation to retrieve
      * @return The result
      */
-    public static XSPReply retrieve(XOWLEvaluationService evaluationService, String identifier) {
+    public static Reply retrieve(XOWLEvaluationService evaluationService, String identifier) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = storageService.getServiceStore().retrieve(identifier);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = storageService.getServiceStore().retrieve(identifier);
         if (!reply.isSuccess())
             return reply;
-        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+        Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         Collection<Quad> content = artifact.getContent();
         if (content.isEmpty())
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         IRINode graphEval = (IRINode) content.iterator().next().getGraph();
         Map<SubjectNode, Collection<Quad>> data = PlatformUtils.mapBySubject(content);
 
@@ -374,7 +374,7 @@ class XOWLEvaluation implements Evaluation {
             }
         }
         if (evaluableType == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         for (Quad quad : quads) {
             if (((IRINode) quad.getProperty()).getIRIValue().equals(EVAL_URI + "/hasEvaluable")) {
                 IRINode evaluableNode = (IRINode) quad.getObject();
@@ -401,7 +401,7 @@ class XOWLEvaluation implements Evaluation {
         }
 
         XOWLEvaluation evaluation = new XOWLEvaluation(graphEval.getIRIValue(), artifact.getName(), evaluableType, evaluables, criteria);
-        return new XSPReplyResult<>(evaluation);
+        return new ReplyResult<>(evaluation);
     }
 
     /**

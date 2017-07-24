@@ -18,7 +18,7 @@
 package org.xowl.platform.services.connection.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.connection.ConnectorUtils;
@@ -36,7 +36,7 @@ public class PullArtifactJob extends JobBase {
     /**
      * The job's result
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -75,7 +75,7 @@ public class PullArtifactJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 

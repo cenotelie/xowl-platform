@@ -18,13 +18,13 @@
 package org.xowl.platform.services.marketplace.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyException;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplyNotFound;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.services.marketplace.MarketplaceService;
@@ -45,7 +45,7 @@ public class AddonInstallationJob extends JobBase {
     /**
      * The job's result
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -84,7 +84,7 @@ public class AddonInstallationJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 
@@ -99,21 +99,21 @@ public class AddonInstallationJob extends JobBase {
      * @param addonId The identifier of the addon to install
      * @return The protocol reply
      */
-    public static XSPReply installAddon(String addonId) {
+    public static Reply installAddon(String addonId) {
         MarketplaceService marketplaceService = Register.getComponent(MarketplaceService.class);
         if (marketplaceService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformManagementService platformManagementService = Register.getComponent(PlatformManagementService.class);
         if (platformManagementService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
 
         try (InputStream stream = marketplaceService.getAddonPackage(addonId)) {
             if (stream == null)
-                return XSPReplyNotFound.instance();
+                return ReplyNotFound.instance();
             return platformManagementService.installAddon(addonId, stream);
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
     }
 }

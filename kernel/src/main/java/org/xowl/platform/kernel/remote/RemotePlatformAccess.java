@@ -17,15 +17,15 @@
 
 package org.xowl.platform.kernel.remote;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyException;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.sparql.Command;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -45,9 +45,9 @@ import org.xowl.platform.kernel.security.SecuredResourceSharing;
  */
 public class RemotePlatformAccess extends HttpConnection {
     /**
-     * The deserializer to use
+     * The factory to use
      */
-    protected final Deserializer deserializer;
+    protected final PlatformApiDeserializer deserializer;
 
     /**
      * Initializes this platform connection
@@ -55,7 +55,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param endpoint     The API endpoint (https://something:port/api)
      * @param deserializer The deserializer to use
      */
-    public RemotePlatformAccess(String endpoint, Deserializer deserializer) {
+    public RemotePlatformAccess(String endpoint, PlatformApiDeserializer deserializer) {
         super(endpoint);
         this.deserializer = deserializer;
     }
@@ -67,7 +67,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param password The user password
      * @return The protocol reply, or null if the client is banned
      */
-    public XSPReply login(String login, String password) {
+    public Reply login(String login, String password) {
         return doRequest(
                 "/kernel/security/login?login=" + URIUtils.encodeComponent(login),
                 HttpConstants.METHOD_POST,
@@ -79,7 +79,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply logout() {
+    public Reply logout() {
         return doRequest("/kernel/security/logout",
                 HttpConstants.METHOD_POST);
     }
@@ -89,7 +89,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getSecurityPolicy() {
+    public Reply getSecurityPolicy() {
         return doRequest(
                 "/kernel/security/policy",
                 HttpConstants.METHOD_GET);
@@ -102,7 +102,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param policy   The policy to set for the action
      * @return The protocol reply
      */
-    public XSPReply setSecuredActionPolicy(String actionId, SecuredActionPolicy policy) {
+    public Reply setSecuredActionPolicy(String actionId, SecuredActionPolicy policy) {
         return doRequest(
                 "/kernel/security/policy/actions/" + URIUtils.encodeComponent(actionId),
                 HttpConstants.METHOD_POST,
@@ -114,7 +114,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getPlatformUsers() {
+    public Reply getPlatformUsers() {
         return doRequest(
                 "/kernel/security/users",
                 HttpConstants.METHOD_GET);
@@ -126,7 +126,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId The identifier of the user to retrieve
      * @return The protocol reply
      */
-    public XSPReply getPlatformUser(String userId) {
+    public Reply getPlatformUser(String userId) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_GET);
@@ -140,7 +140,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param password The password for the user
      * @return The protocol reply
      */
-    public XSPReply createPlatformUser(String userId, String name, String password) {
+    public Reply createPlatformUser(String userId, String name, String password) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_PUT,
@@ -153,7 +153,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId The identifier of the user to delete
      * @return The protocol reply
      */
-    public XSPReply deletePlatformUser(String userId) {
+    public Reply deletePlatformUser(String userId) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_DELETE);
@@ -166,7 +166,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param name   The new name for the user
      * @return The protocol reply
      */
-    public XSPReply renamePlatformUser(String userId, String name) {
+    public Reply renamePlatformUser(String userId, String name) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "/rename" + "?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_POST);
@@ -180,7 +180,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param newPassword The new password
      * @return The protocol reply
      */
-    public XSPReply changePlatformUserPassword(String userId, String oldPassword, String newPassword) {
+    public Reply changePlatformUserPassword(String userId, String oldPassword, String newPassword) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "/updateKey" + "?oldKey=" + URIUtils.encodeComponent(oldPassword),
                 HttpConstants.METHOD_POST,
@@ -194,7 +194,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param newPassword The new password
      * @return The protocol reply
      */
-    public XSPReply resetPlatformUserPassword(String userId, String newPassword) {
+    public Reply resetPlatformUserPassword(String userId, String newPassword) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "/resetKey",
                 HttpConstants.METHOD_POST,
@@ -206,7 +206,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getPlatformGroups() {
+    public Reply getPlatformGroups() {
         return doRequest(
                 "/kernel/security/groups",
                 HttpConstants.METHOD_GET);
@@ -218,7 +218,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param groupId The identifier of the group
      * @return The protocol reply
      */
-    public XSPReply getPlatformGroup(String groupId) {
+    public Reply getPlatformGroup(String groupId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId),
                 HttpConstants.METHOD_GET);
@@ -232,7 +232,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param adminId The identifier of the first administrator for the group
      * @return The protocol reply
      */
-    public XSPReply createPlatformGroup(String groupId, String name, String adminId) {
+    public Reply createPlatformGroup(String groupId, String name, String adminId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "?name=" + URIUtils.encodeComponent(name) + "&admin=" + URIUtils.encodeComponent(adminId),
                 HttpConstants.METHOD_PUT);
@@ -244,7 +244,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param groupId The identifier of the group to delete
      * @return The protocol reply
      */
-    public XSPReply deletePlatformGroup(String groupId) {
+    public Reply deletePlatformGroup(String groupId) {
         return doRequest("/kernel/security/groups/" + URIUtils.encodeComponent(groupId),
                 HttpConstants.METHOD_DELETE);
     }
@@ -256,7 +256,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param name    The new name for the group
      * @return The protocol reply
      */
-    public XSPReply renamePlatformGroup(String groupId, String name) {
+    public Reply renamePlatformGroup(String groupId, String name) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/rename?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_POST);
@@ -269,7 +269,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId  The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply addMemberToPlatformGroup(String groupId, String userId) {
+    public Reply addMemberToPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addMember?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -282,7 +282,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId  The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply removeMemberFromPlatformGroup(String groupId, String userId) {
+    public Reply removeMemberFromPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeMember?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -295,7 +295,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId  The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply addAdminToPlatformGroup(String groupId, String userId) {
+    public Reply addAdminToPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/addAdmin?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -308,7 +308,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId  The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply removeAdminFromPlatformGroup(String groupId, String userId) {
+    public Reply removeAdminFromPlatformGroup(String groupId, String userId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/removeAdmin?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -319,7 +319,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return the protocol reply
      */
-    public XSPReply getPlatformRoles() {
+    public Reply getPlatformRoles() {
         return doRequest(
                 "/kernel/security/roles",
                 HttpConstants.METHOD_GET);
@@ -331,7 +331,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    public XSPReply getPlatformRole(String roleId) {
+    public Reply getPlatformRole(String roleId) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_GET);
@@ -344,7 +344,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param name   The name for the new role
      * @return The protocol reply
      */
-    public XSPReply createPlatformRole(String roleId, String name) {
+    public Reply createPlatformRole(String roleId, String name) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_PUT);
@@ -356,7 +356,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    public XSPReply deletePlatformRole(String roleId) {
+    public Reply deletePlatformRole(String roleId) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_DELETE);
@@ -369,7 +369,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param name   The new name for the role
      * @return The protocol reply
      */
-    public XSPReply renamePlatformRole(String roleId, String name) {
+    public Reply renamePlatformRole(String roleId, String name) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/rename?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_POST);
@@ -382,7 +382,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId The identifier of the target user
      * @return The protocol reply
      */
-    public XSPReply assignRoleToPlatformUser(String roleId, String userId) {
+    public Reply assignRoleToPlatformUser(String roleId, String userId) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_POST);
@@ -395,7 +395,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId The identifier of the target user
      * @return The protocol reply
      */
-    public XSPReply unassignRoleFromPlatformUser(String roleId, String userId) {
+    public Reply unassignRoleFromPlatformUser(String roleId, String userId) {
         return doRequest(
                 "/kernel/security/users/" + URIUtils.encodeComponent(userId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_POST);
@@ -408,7 +408,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param groupId The identifier of the target group
      * @return The protocol reply
      */
-    public XSPReply assignRoleToPlatformGroup(String roleId, String groupId) {
+    public Reply assignRoleToPlatformGroup(String roleId, String groupId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/assign?role=" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_POST);
@@ -421,7 +421,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param groupId The identifier of the target group
      * @return The protocol reply
      */
-    public XSPReply unassignRoleFromPlatformGroup(String roleId, String groupId) {
+    public Reply unassignRoleFromPlatformGroup(String roleId, String groupId) {
         return doRequest(
                 "/kernel/security/groups/" + URIUtils.encodeComponent(groupId) + "/unassign?role=" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_POST);
@@ -434,7 +434,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param impliedRoleId The identifier of the role implied by the first one
      * @return The protocol reply
      */
-    public XSPReply addPlatformRoleImplication(String roleId, String impliedRoleId) {
+    public Reply addPlatformRoleImplication(String roleId, String impliedRoleId) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/imply?target=" + URIUtils.encodeComponent(impliedRoleId),
                 HttpConstants.METHOD_POST);
@@ -447,7 +447,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param impliedRoleId The identifier of the role implied by the first one
      * @return The protocol reply
      */
-    public XSPReply removePlatformRoleImplication(String roleId, String impliedRoleId) {
+    public Reply removePlatformRoleImplication(String roleId, String impliedRoleId) {
         return doRequest(
                 "/kernel/security/roles/" + URIUtils.encodeComponent(roleId) + "/unimply?target=" + URIUtils.encodeComponent(impliedRoleId),
                 HttpConstants.METHOD_POST);
@@ -459,7 +459,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param resourceId The identifier of a secured resource
      * @return The protocol reply
      */
-    public XSPReply getSecuredResourceDescriptor(String resourceId) {
+    public Reply getSecuredResourceDescriptor(String resourceId) {
         return doRequest(
                 "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId),
                 HttpConstants.METHOD_GET);
@@ -472,7 +472,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId     The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply addSecuredResourceOwner(String resourceId, String userId) {
+    public Reply addSecuredResourceOwner(String resourceId, String userId) {
         return doRequest(
                 "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/addOwner?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -485,7 +485,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param userId     The identifier of the user
      * @return The protocol reply
      */
-    public XSPReply removeSecuredResourceOwner(String resourceId, String userId) {
+    public Reply removeSecuredResourceOwner(String resourceId, String userId) {
         return doRequest(
                 "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/removeOwner?user=" + URIUtils.encodeComponent(userId),
                 HttpConstants.METHOD_POST);
@@ -498,7 +498,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param sharing    The sharing to add
      * @return The protocol reply
      */
-    public XSPReply addSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
+    public Reply addSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
         return doRequest(
                 "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/addSharing",
                 HttpConstants.METHOD_POST,
@@ -512,7 +512,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param sharing    The sharing to remove
      * @return The protocol reply
      */
-    public XSPReply removeSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
+    public Reply removeSecuredResourceSharing(String resourceId, SecuredResourceSharing sharing) {
         return doRequest(
                 "/kernel/security/resources/" + URIUtils.encodeComponent(resourceId) + "/removeSharing",
                 HttpConstants.METHOD_POST,
@@ -524,7 +524,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getApiResources() {
+    public Reply getApiResources() {
         return doRequest("/kernel/discovery/resources", HttpConstants.METHOD_GET);
     }
 
@@ -533,7 +533,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getApiServices() {
+    public Reply getApiServices() {
         return doRequest("/kernel/discovery/services", HttpConstants.METHOD_GET);
     }
 
@@ -542,7 +542,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getPlatformProduct() {
+    public Reply getPlatformProduct() {
         return doRequest("/kernel/platform/product", HttpConstants.METHOD_GET);
     }
 
@@ -551,7 +551,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getPlatformBundles() {
+    public Reply getPlatformBundles() {
         return doRequest("/kernel/platform/bundles", HttpConstants.METHOD_GET);
     }
 
@@ -560,7 +560,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getPlatformAddons() {
+    public Reply getPlatformAddons() {
         return doRequest("/kernel/platform/addons", HttpConstants.METHOD_GET);
     }
 
@@ -570,7 +570,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param addonId The identifier of an addon
      * @return The protocol reply
      */
-    public XSPReply getPlatformAddon(String addonId) {
+    public Reply getPlatformAddon(String addonId) {
         return doRequest(
                 "/kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
                 HttpConstants.METHOD_GET);
@@ -583,7 +583,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param stream  The data stream containing the addon
      * @return The protocol reply
      */
-    public XSPReply installPlatformAddon(String addonId, byte[] stream) {
+    public Reply installPlatformAddon(String addonId, byte[] stream) {
         return doRequest("/kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
                 HttpConstants.METHOD_PUT,
                 stream,
@@ -598,7 +598,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param addonId The identifier of the addon
      * @return The protocol reply
      */
-    public XSPReply uninstallPlatformAddon(String addonId) {
+    public Reply uninstallPlatformAddon(String addonId) {
         return doRequest(
                 "/kernel/platform/addons/" + URIUtils.encodeComponent(addonId),
                 HttpConstants.METHOD_DELETE);
@@ -609,7 +609,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply platformShutdown() {
+    public Reply platformShutdown() {
         return doRequest("/kernel/platform/shutdown", HttpConstants.METHOD_POST);
     }
 
@@ -618,7 +618,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply platformRestart() {
+    public Reply platformRestart() {
         return doRequest("/kernel/platform/restart", HttpConstants.METHOD_POST);
     }
 
@@ -627,7 +627,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The log messages
      */
-    public XSPReply getLogMessages() {
+    public Reply getLogMessages() {
         return doRequest("/kernel/log", HttpConstants.METHOD_GET);
     }
 
@@ -636,7 +636,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getJobs() {
+    public Reply getJobs() {
         return doRequest("/kernel/jobs", HttpConstants.METHOD_GET);
     }
 
@@ -646,7 +646,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param jobId The identifier of the job
      * @return The protocol reply
      */
-    public XSPReply getJob(String jobId) {
+    public Reply getJob(String jobId) {
         return doRequest(
                 "/kernel/jobs/" + URIUtils.encodeComponent(jobId),
                 HttpConstants.METHOD_GET);
@@ -658,7 +658,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param jobId The identifier of the job
      * @return The protocol reply
      */
-    public XSPReply cancelJob(String jobId) {
+    public Reply cancelJob(String jobId) {
         return doRequest(
                 "/kernel/jobs/" + URIUtils.encodeComponent(jobId) + "/cancel",
                 HttpConstants.METHOD_POST);
@@ -669,7 +669,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getAllMetrics() {
+    public Reply getAllMetrics() {
         return doRequest(
                 "/kernel/statistics/metrics",
                 HttpConstants.METHOD_GET);
@@ -681,7 +681,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param metricId The identifier of the metric
      * @return The protocol reply
      */
-    public XSPReply getMetric(String metricId) {
+    public Reply getMetric(String metricId) {
         return doRequest(
                 "/kernel/statistics/metrics/" + URIUtils.encodeComponent(metricId),
                 HttpConstants.METHOD_GET);
@@ -693,7 +693,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param metricId The identifier of the metric
      * @return The protocol reply
      */
-    public XSPReply getMetricSnapshot(String metricId) {
+    public Reply getMetricSnapshot(String metricId) {
         return doRequest(
                 "/kernel/statistics/metrics/" + URIUtils.encodeComponent(metricId) + "/snapshot",
                 HttpConstants.METHOD_GET);
@@ -704,7 +704,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getArtifactArchetypes() {
+    public Reply getArtifactArchetypes() {
         return doRequest(
                 "/kernel/business/archetypes",
                 HttpConstants.METHOD_GET);
@@ -716,7 +716,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param archetypeId The identifier of the archetype
      * @return The protocol reply
      */
-    public XSPReply getArtifactArchetype(String archetypeId) {
+    public Reply getArtifactArchetype(String archetypeId) {
         return doRequest(
                 "/kernel/business/archetypes/" + URIUtils.encodeComponent(archetypeId),
                 HttpConstants.METHOD_GET);
@@ -727,7 +727,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getArtifactSchemas() {
+    public Reply getArtifactSchemas() {
         return doRequest(
                 "/kernel/business/schemas",
                 HttpConstants.METHOD_GET);
@@ -739,7 +739,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param schemaId The identifier of the schema
      * @return The protocol reply
      */
-    public XSPReply getArtifactSchema(String schemaId) {
+    public Reply getArtifactSchema(String schemaId) {
         return doRequest(
                 "/kernel/business/schemas/" + URIUtils.encodeComponent(schemaId),
                 HttpConstants.METHOD_GET);
@@ -750,7 +750,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getWebModules() {
+    public Reply getWebModules() {
         return doRequest("/services/webapp/modules", HttpConstants.METHOD_GET);
     }
 
@@ -759,7 +759,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply archiveCollaboration() {
+    public Reply archiveCollaboration() {
         return doRequest("/services/collaboration/archive", HttpConstants.METHOD_POST);
     }
 
@@ -768,7 +768,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply deleteCollaboration() {
+    public Reply deleteCollaboration() {
         return doRequest("/services/collaboration/delete", HttpConstants.METHOD_POST);
     }
 
@@ -777,7 +777,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationManifest() {
+    public Reply getCollaborationManifest() {
         return doRequest("/services/collaboration/manifest", HttpConstants.METHOD_GET);
     }
 
@@ -786,7 +786,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationInputSpecifications() {
+    public Reply getCollaborationInputSpecifications() {
         return doRequest("/services/collaboration/manifest/inputs", HttpConstants.METHOD_GET);
     }
 
@@ -796,7 +796,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specification The input specification
      * @return The protocol reply
      */
-    public XSPReply addCollaborationInputSpecification(Serializable specification) {
+    public Reply addCollaborationInputSpecification(Serializable specification) {
         return doRequest(
                 "/services/collaboration/manifest/inputs",
                 HttpConstants.METHOD_PUT,
@@ -809,7 +809,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the specification
      * @return The protocol reply
      */
-    public XSPReply removeCollaborationInputSpecification(String specificationId) {
+    public Reply removeCollaborationInputSpecification(String specificationId) {
         return doRequest(
                 "/services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId),
                 HttpConstants.METHOD_DELETE);
@@ -821,7 +821,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the specification
      * @return The protocol reply
      */
-    public XSPReply getArtifactsForCollaborationInput(String specificationId) {
+    public Reply getArtifactsForCollaborationInput(String specificationId) {
         return doRequest("/services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts", HttpConstants.METHOD_GET);
     }
 
@@ -832,7 +832,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId      The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply registerArtifactForCollaborationInput(String specificationId, String artifactId) {
+    public Reply registerArtifactForCollaborationInput(String specificationId, String artifactId) {
         return doRequest(
                 "/services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_PUT);
@@ -845,7 +845,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId      The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply unregisterArtifactForCollaborationInput(String specificationId, String artifactId) {
+    public Reply unregisterArtifactForCollaborationInput(String specificationId, String artifactId) {
         return doRequest(
                 "/services/collaboration/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_DELETE);
@@ -856,7 +856,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationOutputSpecifications() {
+    public Reply getCollaborationOutputSpecifications() {
         return doRequest("/services/collaboration/manifest/outputs", HttpConstants.METHOD_GET);
     }
 
@@ -866,7 +866,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specification The output specification
      * @return The protocol reply
      */
-    public XSPReply addCollaborationOutputSpecification(Serializable specification) {
+    public Reply addCollaborationOutputSpecification(Serializable specification) {
         return doRequest(
                 "/services/collaboration/manifest/outputs",
                 HttpConstants.METHOD_PUT,
@@ -879,7 +879,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the specification
      * @return The protocol reply
      */
-    public XSPReply removeCollaborationOutputSpecification(String specificationId) {
+    public Reply removeCollaborationOutputSpecification(String specificationId) {
         return doRequest(
                 "/services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId),
                 HttpConstants.METHOD_DELETE);
@@ -891,7 +891,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the specification
      * @return The protocol reply
      */
-    public XSPReply getArtifactsForCollaborationOutput(String specificationId) {
+    public Reply getArtifactsForCollaborationOutput(String specificationId) {
         return doRequest(
                 "/services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
                 HttpConstants.METHOD_GET);
@@ -904,7 +904,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId      The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply registerArtifactForCollaborationOutput(String specificationId, String artifactId) {
+    public Reply registerArtifactForCollaborationOutput(String specificationId, String artifactId) {
         return doRequest(
                 "/services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_PUT);
@@ -917,7 +917,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId      The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply unregisterArtifactForCollaborationOutput(String specificationId, String artifactId) {
+    public Reply unregisterArtifactForCollaborationOutput(String specificationId, String artifactId) {
         return doRequest(
                 "/services/collaboration/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_DELETE);
@@ -928,7 +928,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationRoles() {
+    public Reply getCollaborationRoles() {
         return doRequest("/services/collaboration/manifest/roles", HttpConstants.METHOD_GET);
     }
 
@@ -938,7 +938,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param role The role to create
      * @return The protocol reply
      */
-    public XSPReply createCollaborationRole(PlatformRole role) {
+    public Reply createCollaborationRole(PlatformRole role) {
         return doRequest(
                 "/services/collaboration/manifest/roles",
                 HttpConstants.METHOD_PUT,
@@ -951,7 +951,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    public XSPReply addCollaborationRole(String roleId) {
+    public Reply addCollaborationRole(String roleId) {
         return doRequest(
                 "/services/collaboration/manifest/roles/" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_PUT);
@@ -963,7 +963,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param roleId The identifier of the role
      * @return The protocol reply
      */
-    public XSPReply removeCollaborationRole(String roleId) {
+    public Reply removeCollaborationRole(String roleId) {
         return doRequest(
                 "/services/collaboration/manifest/roles/" + URIUtils.encodeComponent(roleId),
                 HttpConstants.METHOD_DELETE);
@@ -974,7 +974,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationPattern() {
+    public Reply getCollaborationPattern() {
         return doRequest("/services/collaboration/manifest/pattern", HttpConstants.METHOD_GET);
     }
 
@@ -983,7 +983,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getKnownIOSpecifications() {
+    public Reply getKnownIOSpecifications() {
         return doRequest("/services/collaboration/specifications", HttpConstants.METHOD_GET);
     }
 
@@ -992,7 +992,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getKnownPatterns() {
+    public Reply getKnownPatterns() {
         return doRequest("/services/collaboration/patterns", HttpConstants.METHOD_GET);
     }
 
@@ -1001,7 +1001,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbours() {
+    public Reply getCollaborationNeighbours() {
         return doRequest("/services/collaboration/neighbours", HttpConstants.METHOD_GET);
     }
 
@@ -1011,7 +1011,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specification The specification for the collaboration
      * @return The protocol reply
      */
-    public XSPReply spawnCollaboration(Serializable specification) {
+    public Reply spawnCollaboration(Serializable specification) {
         return doRequest(
                 "/services/collaboration/neighbours",
                 HttpConstants.METHOD_PUT,
@@ -1024,7 +1024,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbour(String neighbourId) {
+    public Reply getCollaborationNeighbour(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId),
                 HttpConstants.METHOD_GET);
@@ -1036,7 +1036,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbourManifest(String neighbourId) {
+    public Reply getCollaborationNeighbourManifest(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest",
                 HttpConstants.METHOD_GET);
@@ -1048,7 +1048,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbourStatus(String neighbourId) {
+    public Reply getCollaborationNeighbourStatus(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/status",
                 HttpConstants.METHOD_GET);
@@ -1060,7 +1060,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply deleteCollaborationNeighbour(String neighbourId) {
+    public Reply deleteCollaborationNeighbour(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId),
                 HttpConstants.METHOD_DELETE);
@@ -1072,7 +1072,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply archiveCollaborationNeighbour(String neighbourId) {
+    public Reply archiveCollaborationNeighbour(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/archive",
                 HttpConstants.METHOD_POST);
@@ -1084,7 +1084,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param neighbourId The identifier of the collaboration
      * @return The protocol reply
      */
-    public XSPReply restartCollaborationNeighbour(String neighbourId) {
+    public Reply restartCollaborationNeighbour(String neighbourId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/restart",
                 HttpConstants.METHOD_POST);
@@ -1097,7 +1097,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the requested input specification
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbourInputs(String neighbourId, String specificationId) {
+    public Reply getCollaborationNeighbourInputs(String neighbourId, String specificationId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/inputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
                 HttpConstants.METHOD_GET);
@@ -1110,7 +1110,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specificationId The identifier of the requested output specification
      * @return The protocol reply
      */
-    public XSPReply getCollaborationNeighbourOutputs(String neighbourId, String specificationId) {
+    public Reply getCollaborationNeighbourOutputs(String neighbourId, String specificationId) {
         return doRequest(
                 "/services/collaboration/neighbours/" + URIUtils.encodeComponent(neighbourId) + "/manifest/outputs/" + URIUtils.encodeComponent(specificationId) + "/artifacts",
                 HttpConstants.METHOD_GET);
@@ -1121,7 +1121,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getBots() {
+    public Reply getBots() {
         return doRequest("/services/community/bots", HttpConstants.METHOD_GET);
     }
 
@@ -1131,7 +1131,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    public XSPReply getBot(String botId) {
+    public Reply getBot(String botId) {
         return doRequest(
                 "/services/community/bots/" + URIUtils.encodeComponent(botId),
                 HttpConstants.METHOD_GET);
@@ -1143,7 +1143,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    public XSPReply getBotMessages(String botId) {
+    public Reply getBotMessages(String botId) {
         return doRequest(
                 "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/messages",
                 HttpConstants.METHOD_GET);
@@ -1155,7 +1155,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    public XSPReply wakeupBot(String botId) {
+    public Reply wakeupBot(String botId) {
         return doRequest(
                 "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/wakeup",
                 HttpConstants.METHOD_POST);
@@ -1167,7 +1167,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param botId The identifier of the bot
      * @return The protocol reply
      */
-    public XSPReply putBotToSleep(String botId) {
+    public Reply putBotToSleep(String botId) {
         return doRequest(
                 "/services/community/bots/" + URIUtils.encodeComponent(botId) + "/putToSleep",
                 HttpConstants.METHOD_POST);
@@ -1179,7 +1179,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param profileId The identifier of the the profile
      * @return The protocol reply
      */
-    public XSPReply getPublicProfile(String profileId) {
+    public Reply getPublicProfile(String profileId) {
         return doRequest(
                 "/services/community/profiles/" + URIUtils.encodeComponent(profileId) + "/public",
                 HttpConstants.METHOD_GET);
@@ -1191,7 +1191,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param profile The profile to update
      * @return The protocol reply
      */
-    public XSPReply updatePublicProfile(Identifiable profile) {
+    public Reply updatePublicProfile(Identifiable profile) {
         return doRequest(
                 "/services/community/profiles/" + URIUtils.encodeComponent(profile.getIdentifier()) + "/public",
                 HttpConstants.METHOD_PUT,
@@ -1203,7 +1203,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getBadges() {
+    public Reply getBadges() {
         return doRequest("/services/community/badges", HttpConstants.METHOD_GET);
     }
 
@@ -1213,7 +1213,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param badgeId The identifier of a badge
      * @return The protocol reply
      */
-    public XSPReply getBadge(String badgeId) {
+    public Reply getBadge(String badgeId) {
         return doRequest("/services/community/badges/" + URIUtils.encodeComponent(badgeId), HttpConstants.METHOD_GET);
     }
 
@@ -1224,7 +1224,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param badgeId The identifier of the badge
      * @return The protocol reply
      */
-    public XSPReply awardBadge(String userId, String badgeId) {
+    public Reply awardBadge(String userId, String badgeId) {
         return doRequest(
                 "/services/community/profiles/" + URIUtils.encodeComponent(userId) + "/public/badges/" + URIUtils.encodeComponent(badgeId),
                 HttpConstants.METHOD_PUT);
@@ -1237,7 +1237,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param badgeId The identifier of the badge
      * @return The protocol reply
      */
-    public XSPReply rescindBadge(String userId, String badgeId) {
+    public Reply rescindBadge(String userId, String badgeId) {
         return doRequest(
                 "/services/community/profiles/" + URIUtils.encodeComponent(userId) + "/public/badges/" + URIUtils.encodeComponent(badgeId),
                 HttpConstants.METHOD_DELETE);
@@ -1248,7 +1248,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getDescriptors() {
+    public Reply getDescriptors() {
         return doRequest("/services/connection/descriptors", HttpConstants.METHOD_GET);
     }
 
@@ -1257,7 +1257,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getConnectors() {
+    public Reply getConnectors() {
         return doRequest("/services/connection/connectors", HttpConstants.METHOD_GET);
     }
 
@@ -1267,7 +1267,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param connectorId The identifier of a connector
      * @return The protocol reply
      */
-    public XSPReply getConnector(String connectorId) {
+    public Reply getConnector(String connectorId) {
         return doRequest(
                 "/services/connection/connectors/" + URIUtils.encodeComponent(connectorId),
                 HttpConstants.METHOD_GET);
@@ -1280,7 +1280,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param specification The specification data for the connector
      * @return The protocol reply
      */
-    public XSPReply createConnector(String descriptorId, Identifiable specification) {
+    public Reply createConnector(String descriptorId, Identifiable specification) {
         return doRequest(
                 "/services/connection/connectors/" + URIUtils.encodeComponent(specification.getIdentifier()) + "?descriptor=" + URIUtils.encodeComponent(descriptorId),
                 HttpConstants.METHOD_PUT,
@@ -1293,7 +1293,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param connectorId The identifier of the connector
      * @return The protocol reply
      */
-    public XSPReply deleteConnector(String connectorId) {
+    public Reply deleteConnector(String connectorId) {
         return doRequest(
                 "/services/connection/connectors/" + URIUtils.encodeComponent(connectorId),
                 HttpConstants.METHOD_DELETE);
@@ -1305,7 +1305,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param connectorId The identifier of the connector
      * @return The protocol reply
      */
-    public XSPReply pullFromConnector(String connectorId) {
+    public Reply pullFromConnector(String connectorId) {
         return doRequest(
                 "/services/connection/connectors/" + URIUtils.encodeComponent(connectorId) + "/pull",
                 HttpConstants.METHOD_POST);
@@ -1318,7 +1318,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId  The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply pushToConnector(String connectorId, String artifactId) {
+    public Reply pushToConnector(String connectorId, String artifactId) {
         return doRequest(
                 "/services/connection/connectors/" + URIUtils.encodeComponent(connectorId) + "/push?artifact=" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_POST);
@@ -1330,7 +1330,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param query The SPARQL query
      * @return The protocol reply
      */
-    public XSPReply sparql(String query) {
+    public Reply sparql(String query) {
         return doRequest("/services/storage/sparql",
                 HttpConstants.METHOD_POST,
                 query.getBytes(IOUtils.CHARSET),
@@ -1346,7 +1346,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param store The identifier of the RDF store
      * @return The protocol reply
      */
-    public XSPReply sparql(String query, String store) {
+    public Reply sparql(String query, String store) {
         return doRequest("/services/storage/sparql?store=" + URIUtils.encodeComponent(store),
                 HttpConstants.METHOD_POST,
                 query.getBytes(IOUtils.CHARSET),
@@ -1360,7 +1360,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getAllArtifacts() {
+    public Reply getAllArtifacts() {
         return doRequest("/services/storage/artifacts", HttpConstants.METHOD_GET);
     }
 
@@ -1369,7 +1369,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getLiveArtifacts() {
+    public Reply getLiveArtifacts() {
         return doRequest("/services/storage/artifacts/live", HttpConstants.METHOD_GET);
     }
 
@@ -1379,7 +1379,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param base The base URI to look for
      * @return The protocol reply
      */
-    public XSPReply getArtifactsForBase(String base) {
+    public Reply getArtifactsForBase(String base) {
         return doRequest(
                 "/services/storage/artifacts?=base" + URIUtils.encodeComponent(base),
                 HttpConstants.METHOD_GET);
@@ -1391,7 +1391,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param archetype The identifier of an archetype
      * @return The protocol reply
      */
-    public XSPReply getArtifactsForArchetype(String archetype) {
+    public Reply getArtifactsForArchetype(String archetype) {
         return doRequest(
                 "/services/storage/artifacts?=archetype" + URIUtils.encodeComponent(archetype),
                 HttpConstants.METHOD_GET);
@@ -1403,7 +1403,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply getArtifact(String artifactId) {
+    public Reply getArtifact(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_GET);
@@ -1415,7 +1415,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply getArtifactMetadata(String artifactId) {
+    public Reply getArtifactMetadata(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/metadata",
                 HttpConstants.METHOD_GET,
@@ -1431,7 +1431,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply getArtifactContent(String artifactId) {
+    public Reply getArtifactContent(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/content",
                 HttpConstants.METHOD_GET,
@@ -1447,7 +1447,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply deleteArtifact(String artifactId) {
+    public Reply deleteArtifact(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId),
                 HttpConstants.METHOD_DELETE);
@@ -1461,7 +1461,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @return The protocol reply
      */
 
-    public XSPReply diffArtifacts(String artifactLeft, String artifactRight) {
+    public Reply diffArtifacts(String artifactLeft, String artifactRight) {
         return doRequest(
                 "/services/storage/artifacts/diff?left=" + URIUtils.encodeComponent(artifactLeft) + "&right=" + URIUtils.encodeComponent(artifactRight),
                 HttpConstants.METHOD_POST);
@@ -1473,7 +1473,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply pullArtifactFromLive(String artifactId) {
+    public Reply pullArtifactFromLive(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/deactivate",
                 HttpConstants.METHOD_POST);
@@ -1485,7 +1485,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param artifactId The identifier of the artifact
      * @return The protocol reply
      */
-    public XSPReply pushArtifactToLive(String artifactId) {
+    public Reply pushArtifactToLive(String artifactId) {
         return doRequest(
                 "/services/storage/artifacts/" + URIUtils.encodeComponent(artifactId) + "/activate",
                 HttpConstants.METHOD_POST);
@@ -1496,7 +1496,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getDocumentImporters() {
+    public Reply getDocumentImporters() {
         return doRequest("/services/importation/importers", HttpConstants.METHOD_GET);
     }
 
@@ -1506,7 +1506,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param importerId The identifier of an importer
      * @return The protocol reply
      */
-    public XSPReply getDocumentImporter(String importerId) {
+    public Reply getDocumentImporter(String importerId) {
         return doRequest(
                 "/services/importation/importers/" + URIUtils.encodeComponent(importerId),
                 HttpConstants.METHOD_GET);
@@ -1518,7 +1518,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param importerId The identifier of an importer
      * @return The protocol reply
      */
-    public XSPReply getImporterConfigurationsFor(String importerId) {
+    public Reply getImporterConfigurationsFor(String importerId) {
         return doRequest(
                 "/services/importation/importers/" + URIUtils.encodeComponent(importerId) + "/configurations",
                 HttpConstants.METHOD_GET);
@@ -1529,7 +1529,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getImporterConfigurations() {
+    public Reply getImporterConfigurations() {
         return doRequest(
                 "/services/importation/configurations",
                 HttpConstants.METHOD_GET);
@@ -1541,7 +1541,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param configurationId The identifier of a configuration
      * @return The protocol reply
      */
-    public XSPReply getImporterConfiguration(String configurationId) {
+    public Reply getImporterConfiguration(String configurationId) {
         return doRequest(
                 "/services/importation/configurations/" + URIUtils.encodeComponent(configurationId),
                 HttpConstants.METHOD_GET);
@@ -1553,7 +1553,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param configurationId The identifier of a configuration
      * @return The protocol reply
      */
-    public XSPReply deleteImporterConfiguration(String configurationId) {
+    public Reply deleteImporterConfiguration(String configurationId) {
         return doRequest(
                 "/services/importation/configurations/" + URIUtils.encodeComponent(configurationId),
                 HttpConstants.METHOD_DELETE);
@@ -1565,7 +1565,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param configuration The configuration to store
      * @return The protocol reply
      */
-    public XSPReply storeImporterConfiguration(Serializable configuration) {
+    public Reply storeImporterConfiguration(Serializable configuration) {
         return doRequest(
                 "/services/importation/configurations",
                 HttpConstants.METHOD_PUT,
@@ -1577,7 +1577,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getUploadedDocuments() {
+    public Reply getUploadedDocuments() {
         return doRequest("/services/importation/documents", HttpConstants.METHOD_GET);
     }
 
@@ -1587,7 +1587,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param documentId The identifier of the document
      * @return The protocol reply
      */
-    public XSPReply getUploadedDocument(String documentId) {
+    public Reply getUploadedDocument(String documentId) {
         return doRequest
                 ("/services/importation/documents/" + URIUtils.encodeComponent(documentId),
                         HttpConstants.METHOD_GET);
@@ -1599,7 +1599,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param documentId The identifier of the document
      * @return The protocol reply
      */
-    public XSPReply dropUploadedDocument(String documentId) {
+    public Reply dropUploadedDocument(String documentId) {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId),
                 HttpConstants.METHOD_DELETE);
@@ -1613,7 +1613,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param content  The file's content
      * @return The protocol reply
      */
-    public XSPReply uploadDocument(String name, String fileName, byte[] content) {
+    public Reply uploadDocument(String name, String fileName, byte[] content) {
         return doRequest(
                 "/services/importation/documents?name=" + URIUtils.encodeComponent(name) + "&fileName=" + URIUtils.encodeComponent(fileName),
                 HttpConstants.METHOD_PUT,
@@ -1630,7 +1630,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param configurationId The identifier of the stored configuration to use
      * @return The protocol reply
      */
-    public XSPReply getUploadedDocumentPreview(String documentId, String configurationId) {
+    public Reply getUploadedDocumentPreview(String documentId, String configurationId) {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview?configuration=" + URIUtils.encodeComponent(configurationId),
                 HttpConstants.METHOD_POST);
@@ -1643,7 +1643,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param configuration The configuration for the importer
      * @return The protocol reply
      */
-    public XSPReply getUploadedDocumentPreview(String documentId, Serializable configuration) {
+    public Reply getUploadedDocumentPreview(String documentId, Serializable configuration) {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/preview",
                 HttpConstants.METHOD_POST,
@@ -1658,7 +1658,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param metadata        The metadata for the artifact to produce
      * @return The protocol reply
      */
-    public XSPReply importUploadedDocument(String documentId, String configurationId, Artifact metadata) {
+    public Reply importUploadedDocument(String documentId, String configurationId, Artifact metadata) {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
                         "?configuration=" + URIUtils.encodeComponent(configurationId) +
@@ -1679,7 +1679,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param metadata      The metadata for the artifact to produce
      * @return The protocol reply
      */
-    public XSPReply importUploadedDocument(String documentId, Serializable configuration, Artifact metadata) {
+    public Reply importUploadedDocument(String documentId, Serializable configuration, Artifact metadata) {
         return doRequest(
                 "/services/importation/documents/" + URIUtils.encodeComponent(documentId) + "/import" +
                         "?name=" + URIUtils.encodeComponent(metadata.getName()) +
@@ -1696,7 +1696,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getInconsistencies() {
+    public Reply getInconsistencies() {
         return doRequest("/services/consistency/inconsistencies", HttpConstants.METHOD_GET);
     }
 
@@ -1705,7 +1705,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getReasoningRules() {
+    public Reply getReasoningRules() {
         return doRequest("/services/consistency/rules", HttpConstants.METHOD_GET);
     }
 
@@ -1715,7 +1715,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply getReasoningRule(String ruleId) {
+    public Reply getReasoningRule(String ruleId) {
         return doRequest(
                 "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_GET);
@@ -1728,7 +1728,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param definition The rule's xRDF definition
      * @return The protocol reply
      */
-    public XSPReply newReasoningRule(String name, String definition) {
+    public Reply newReasoningRule(String name, String definition) {
         return doRequest("/services/consistency/rules" +
                         "?name=" + URIUtils.encodeComponent(name),
                 HttpConstants.METHOD_PUT,
@@ -1744,7 +1744,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply activateReasoningRule(String ruleId) {
+    public Reply activateReasoningRule(String ruleId) {
         return doRequest(
                 "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/activate",
                 HttpConstants.METHOD_POST);
@@ -1756,7 +1756,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deactivateReasoningRule(String ruleId) {
+    public Reply deactivateReasoningRule(String ruleId) {
         return doRequest(
                 "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
                 HttpConstants.METHOD_POST);
@@ -1768,7 +1768,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deleteReasoningRule(String ruleId) {
+    public Reply deleteReasoningRule(String ruleId) {
         return doRequest(
                 "/services/consistency/rules/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_DELETE);
@@ -1779,7 +1779,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getConsistencyConstraints() {
+    public Reply getConsistencyConstraints() {
         return doRequest("/services/consistency/constraints", HttpConstants.METHOD_GET);
     }
 
@@ -1789,7 +1789,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply getConsistencyConstraint(String ruleId) {
+    public Reply getConsistencyConstraint(String ruleId) {
         return doRequest(
                 "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_GET);
@@ -1805,7 +1805,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param guard       The constraint's guard (if any)
      * @return The protocol reply
      */
-    public XSPReply newConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
+    public Reply newConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
         return doRequest("/services/consistency/constraints" +
                         "?name=" + URIUtils.encodeComponent(name) +
                         "&message=" + URIUtils.encodeComponent(message) +
@@ -1821,7 +1821,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply activateConsistencyConstraint(String ruleId) {
+    public Reply activateConsistencyConstraint(String ruleId) {
         return doRequest(
                 "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId) + "/activate",
                 HttpConstants.METHOD_POST);
@@ -1833,7 +1833,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deactivateConsistencyConstraint(String ruleId) {
+    public Reply deactivateConsistencyConstraint(String ruleId) {
         return doRequest(
                 "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId) + "/deactivate",
                 HttpConstants.METHOD_POST);
@@ -1845,7 +1845,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param ruleId The identifier of the rule
      * @return The protocol reply
      */
-    public XSPReply deleteConsistencyConstraint(String ruleId) {
+    public Reply deleteConsistencyConstraint(String ruleId) {
         return doRequest(
                 "/services/consistency/constraints/" + URIUtils.encodeComponent(ruleId),
                 HttpConstants.METHOD_DELETE);
@@ -1857,7 +1857,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param definition The specification for the analysis
      * @return The protocol reply
      */
-    public XSPReply newImpactAnalysis(Serializable definition) {
+    public Reply newImpactAnalysis(Serializable definition) {
         return doRequest(
                 "/services/impact",
                 HttpConstants.METHOD_POST,
@@ -1869,7 +1869,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getEvaluations() {
+    public Reply getEvaluations() {
         return doRequest("/services/evaluation/evaluations", HttpConstants.METHOD_GET);
     }
 
@@ -1879,7 +1879,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param evaluationId The identifier of an evaluation
      * @return The protocol reply
      */
-    public XSPReply getEvaluation(String evaluationId) {
+    public Reply getEvaluation(String evaluationId) {
         return doRequest(
                 "/services/evaluation/evaluations/" + URIUtils.encodeComponent(evaluationId),
                 HttpConstants.METHOD_GET);
@@ -1890,7 +1890,7 @@ public class RemotePlatformAccess extends HttpConnection {
      *
      * @return The protocol reply
      */
-    public XSPReply getEvaluableTypes() {
+    public Reply getEvaluableTypes() {
         return doRequest("/services/evaluation/evaluableTypes", HttpConstants.METHOD_GET);
     }
 
@@ -1900,7 +1900,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param typeId The identifier of the evaluable type
      * @return The protocol reply
      */
-    public XSPReply getEvaluables(String typeId) {
+    public Reply getEvaluables(String typeId) {
         return doRequest(
                 "/services/evaluation/evaluables?type=" + URIUtils.encodeComponent(typeId),
                 HttpConstants.METHOD_GET);
@@ -1912,7 +1912,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param typeId The identifier of the evaluable type
      * @return The protocol reply
      */
-    public XSPReply getEvaluationCriteria(String typeId) {
+    public Reply getEvaluationCriteria(String typeId) {
         return doRequest(
                 "/services/evaluation/criterionTypes?for=typeId" + URIUtils.encodeComponent(typeId),
                 HttpConstants.METHOD_GET);
@@ -1924,7 +1924,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param definition the definition of an evaluation
      * @return The protocol reply
      */
-    public XSPReply newEvaluation(Serializable definition) {
+    public Reply newEvaluation(Serializable definition) {
         return doRequest(
                 "/services/evaluation/evaluations",
                 HttpConstants.METHOD_PUT,
@@ -1937,7 +1937,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param input The input string to look for
      * @return The protocol reply
      */
-    public XSPReply marketplaceLookupAddons(String input) {
+    public Reply marketplaceLookupAddons(String input) {
         return doRequest(
                 "/services/marketplace/addons?input=" + URIUtils.encodeComponent(input),
                 HttpConstants.METHOD_GET);
@@ -1949,7 +1949,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param addonId The identifier of the addon in the marketplace
      * @return The protocol reply
      */
-    public XSPReply marketplaceGetAddon(String addonId) {
+    public Reply marketplaceGetAddon(String addonId) {
         return doRequest(
                 "/services/marketplace/addons/" + URIUtils.encodeComponent(addonId),
                 HttpConstants.METHOD_GET);
@@ -1961,7 +1961,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param addonId The identifier of the addon in the marketplace
      * @return The protocol reply
      */
-    public XSPReply marketplaceInstallAddon(String addonId) {
+    public Reply marketplaceInstallAddon(String addonId) {
         return doRequest(
                 "/services/marketplace/addons/" + URIUtils.encodeComponent(addonId) + "/install",
                 HttpConstants.METHOD_POST);
@@ -1974,7 +1974,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param method        The HTTP method to use, if any
      * @return The response, or null if the request failed before reaching the server
      */
-    public XSPReply doRequest(String uriComplement, String method) {
+    public Reply doRequest(String uriComplement, String method) {
         return doRequest(uriComplement, method, null, HttpConstants.MIME_TEXT_PLAIN, false, HttpConstants.MIME_JSON);
     }
 
@@ -1986,7 +1986,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param body          The request body object, if any
      * @return The response, or null if the request failed before reaching the server
      */
-    public XSPReply doRequest(String uriComplement, String method, Object body) {
+    public Reply doRequest(String uriComplement, String method, Object body) {
         byte[] byteBody = null;
         String contentType = HttpConstants.MIME_TEXT_PLAIN;
         if (body != null) {
@@ -2011,7 +2011,7 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param accept        The MIME type to accept for the response, if any
      * @return The response, or null if the request failed before reaching the server
      */
-    public XSPReply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
+    public Reply doRequest(String uriComplement, String method, byte[] body, String contentType, boolean compressed, String accept) {
         HttpResponse response = request(uriComplement,
                 method,
                 body,
@@ -2019,7 +2019,7 @@ public class RemotePlatformAccess extends HttpConnection {
                 compressed,
                 accept
         );
-        return XSPReplyUtils.fromHttpResponse(response, deserializer);
+        return ReplyUtils.fromHttpResponse(response, deserializer);
     }
 
     /**
@@ -2028,12 +2028,12 @@ public class RemotePlatformAccess extends HttpConnection {
      * @param jobId The identifier of the job
      * @return The job's result, or the error
      */
-    public XSPReply waitForJob(String jobId) {
+    public Reply waitForJob(String jobId) {
         while (true) {
-            XSPReply reply = getJob(jobId);
+            Reply reply = getJob(jobId);
             if (!reply.isSuccess())
                 return reply;
-            Job job = ((XSPReplyResult<Job>) reply).getData();
+            Job job = ((ReplyResult<Job>) reply).getData();
             if (job.getStatus() == JobStatus.Completed)
                 return job.getResult();
             if (job.getStatus() == JobStatus.Cancelled)
@@ -2042,7 +2042,7 @@ public class RemotePlatformAccess extends HttpConnection {
                 Thread.sleep(1500);
             } catch (InterruptedException exception) {
                 Logging.get().error(exception);
-                return new XSPReplyException(exception);
+                return new ReplyException(exception);
             }
         }
     }

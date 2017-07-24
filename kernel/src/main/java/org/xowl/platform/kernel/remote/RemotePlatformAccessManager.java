@@ -33,9 +33,9 @@ public class RemotePlatformAccessManager implements RemotePlatformAccessProvider
      */
     private final String endpoint;
     /**
-     * The common deserializer to use
+     * The common factory to use
      */
-    private final Deserializer deserializer;
+    private final PlatformApiDeserializer deserializer;
     /**
      * The managed connections
      */
@@ -45,9 +45,9 @@ public class RemotePlatformAccessManager implements RemotePlatformAccessProvider
      * Initializes this manager
      *
      * @param endpoint     The API endpoint for the remote platform
-     * @param deserializer The common deserializer to use
+     * @param deserializer The common factory to use
      */
-    public RemotePlatformAccessManager(String endpoint, Deserializer deserializer) {
+    public RemotePlatformAccessManager(String endpoint, PlatformApiDeserializer deserializer) {
         this.endpoint = endpoint;
         this.deserializer = deserializer;
         this.connections = new HashMap<>();

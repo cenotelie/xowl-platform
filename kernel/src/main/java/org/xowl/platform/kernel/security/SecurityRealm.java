@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.api.ApiError;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;
@@ -135,7 +135,7 @@ public interface SecurityRealm extends Identifiable {
      * @param key        The initial key associated to the user
      * @return The protocol reply
      */
-    XSPReply createUser(String identifier, String name, String key);
+    Reply createUser(String identifier, String name, String key);
 
     /**
      * Creates a new group
@@ -145,7 +145,7 @@ public interface SecurityRealm extends Identifiable {
      * @param adminId    The identifier of the initial administrator for the group
      * @return The protocol reply
      */
-    XSPReply createGroup(String identifier, String name, String adminId);
+    Reply createGroup(String identifier, String name, String adminId);
 
     /**
      * Creates a new role
@@ -154,7 +154,7 @@ public interface SecurityRealm extends Identifiable {
      * @param name       The human-readable name for the role
      * @return The protocol reply
      */
-    XSPReply createRole(String identifier, String name);
+    Reply createRole(String identifier, String name);
 
     /**
      * Renames a user
@@ -163,7 +163,7 @@ public interface SecurityRealm extends Identifiable {
      * @param name       The new name for the user
      * @return The protocol reply
      */
-    XSPReply renameUser(String identifier, String name);
+    Reply renameUser(String identifier, String name);
 
     /**
      * Renames a group
@@ -172,7 +172,7 @@ public interface SecurityRealm extends Identifiable {
      * @param name       The new name for the group
      * @return The protocol reply
      */
-    XSPReply renameGroup(String identifier, String name);
+    Reply renameGroup(String identifier, String name);
 
     /**
      * Renames a role
@@ -181,7 +181,7 @@ public interface SecurityRealm extends Identifiable {
      * @param name       The new name for the role
      * @return The protocol reply
      */
-    XSPReply renameRole(String identifier, String name);
+    Reply renameRole(String identifier, String name);
 
     /**
      * Deletes a user
@@ -189,7 +189,7 @@ public interface SecurityRealm extends Identifiable {
      * @param identifier The identifier of the user to delete
      * @return The protocol reply
      */
-    XSPReply deleteUser(String identifier);
+    Reply deleteUser(String identifier);
 
     /**
      * Deletes a group
@@ -197,7 +197,7 @@ public interface SecurityRealm extends Identifiable {
      * @param identifier The identifier of the group to delete
      * @return The protocol reply
      */
-    XSPReply deleteGroup(String identifier);
+    Reply deleteGroup(String identifier);
 
     /**
      * Deletes a role
@@ -205,7 +205,7 @@ public interface SecurityRealm extends Identifiable {
      * @param identifier The identifier of the role to delete
      * @return The protocol reply
      */
-    XSPReply deleteRole(String identifier);
+    Reply deleteRole(String identifier);
 
     /**
      * Changes the key for a user
@@ -215,7 +215,7 @@ public interface SecurityRealm extends Identifiable {
      * @param newKey     The new key
      * @return The protocol reply
      */
-    XSPReply changeUserKey(String identifier, String oldKey, String newKey);
+    Reply changeUserKey(String identifier, String oldKey, String newKey);
 
     /**
      * Resets the key for a user
@@ -224,7 +224,7 @@ public interface SecurityRealm extends Identifiable {
      * @param newKey     The new key
      * @return The protocol reply
      */
-    XSPReply resetUserKey(String identifier, String newKey);
+    Reply resetUserKey(String identifier, String newKey);
 
     /**
      * Adds a user as a member of a group
@@ -233,7 +233,7 @@ public interface SecurityRealm extends Identifiable {
      * @param group The group
      * @return The protocol reply
      */
-    XSPReply addUserToGroup(String user, String group);
+    Reply addUserToGroup(String user, String group);
 
     /**
      * Adds a user as an admin for a group
@@ -242,7 +242,7 @@ public interface SecurityRealm extends Identifiable {
      * @param group The group
      * @return The protocol reply
      */
-    XSPReply addAdminToGroup(String user, String group);
+    Reply addAdminToGroup(String user, String group);
 
     /**
      * Removes a user from a group
@@ -251,7 +251,7 @@ public interface SecurityRealm extends Identifiable {
      * @param group The group
      * @return The protocol reply
      */
-    XSPReply removeUserFromGroup(String user, String group);
+    Reply removeUserFromGroup(String user, String group);
 
     /**
      * Removes a user as an admin from a group
@@ -260,7 +260,7 @@ public interface SecurityRealm extends Identifiable {
      * @param group The group
      * @return The protocol reply
      */
-    XSPReply removeAdminFromGroup(String user, String group);
+    Reply removeAdminFromGroup(String user, String group);
 
     /**
      * Assigns a role to a user
@@ -269,7 +269,7 @@ public interface SecurityRealm extends Identifiable {
      * @param role The role to assign
      * @return The protocol reply
      */
-    XSPReply assignRoleToUser(String user, String role);
+    Reply assignRoleToUser(String user, String role);
 
     /**
      * Assigns a role to a group
@@ -278,7 +278,7 @@ public interface SecurityRealm extends Identifiable {
      * @param role  The role to assign
      * @return The protocol reply
      */
-    XSPReply assignRoleToGroup(String group, String role);
+    Reply assignRoleToGroup(String group, String role);
 
     /**
      * Un-assigns a role to a user
@@ -287,7 +287,7 @@ public interface SecurityRealm extends Identifiable {
      * @param role The role to un-assign
      * @return The protocol reply
      */
-    XSPReply unassignRoleToUser(String user, String role);
+    Reply unassignRoleToUser(String user, String role);
 
     /**
      * Un-assigns a role to a group
@@ -296,7 +296,7 @@ public interface SecurityRealm extends Identifiable {
      * @param role  The role to un-assign
      * @return The protocol reply
      */
-    XSPReply unassignRoleToGroup(String group, String role);
+    Reply unassignRoleToGroup(String group, String role);
 
     /**
      * Adds the implication of a role from another
@@ -305,7 +305,7 @@ public interface SecurityRealm extends Identifiable {
      * @param targetRole The target (implied) role
      * @return The protocol reply
      */
-    XSPReply addRoleImplication(String sourceRole, String targetRole);
+    Reply addRoleImplication(String sourceRole, String targetRole);
 
     /**
      * Removes the implication of a role from another
@@ -314,5 +314,5 @@ public interface SecurityRealm extends Identifiable {
      * @param targetRole The target (implied) role
      * @return The protocol reply
      */
-    XSPReply removeRoleImplication(String sourceRole, String targetRole);
+    Reply removeRoleImplication(String sourceRole, String targetRole);
 }

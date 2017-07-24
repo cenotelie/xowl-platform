@@ -18,10 +18,11 @@
 package org.xowl.platform.kernel.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.remote.Deserializer;
+import org.xowl.infra.utils.api.ApiDeserializer;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUtils;
+import org.xowl.infra.utils.json.Json;
 
 /**
  * Represents a job running on a remote platform
@@ -36,25 +37,25 @@ public class JobRemote extends JobBase {
     /**
      * The job's result
      */
-    private final XSPReply result;
+    private final Reply result;
 
     /**
      * Initializes this job
      *
-     * @param definition   The serialized definition
-     * @param deserializer The current deserializer
+     * @param definition The serialized definition
+     * @param parent     The parent deserializer
      */
-    public JobRemote(ASTNode definition, Deserializer deserializer) {
+    public JobRemote(ASTNode definition, ApiDeserializer parent) {
         super(definition);
         Object payload = null;
-        XSPReply result = null;
+        Reply result = null;
         for (ASTNode member : definition.getChildren()) {
             String head = TextUtils.unescape(member.getChildren().get(0).getValue());
             head = head.substring(1, head.length() - 1);
             if ("payload".equals(head)) {
-                payload = XSPReplyUtils.getJSONObject(member.getChildren().get(1), deserializer);
+                payload = parent.deserialize(member.getChildren().get(1), null);
             } else if ("result".equals(head)) {
-                result = XSPReplyUtils.parseJSONResult(member.getChildren().get(1), deserializer);
+                result = ReplyUtils.parse(member.getChildren().get(1), parent);
             }
         }
         this.payload = payload;
@@ -63,7 +64,7 @@ public class JobRemote extends JobBase {
 
     @Override
     protected String getJSONSerializedPayload() {
-        return TextUtils.serializeJSON(payload);
+        return Json.serialize(payload);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class JobRemote extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 }

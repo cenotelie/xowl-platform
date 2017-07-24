@@ -115,10 +115,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             protected XOWLDatabase resolveBackend() {
                 XOWLDatabase database = XOWLStorageService.this.resolveRemote(this.getName());
                 if (database != null) {
-                    XSPReply reply = database.getEntailmentRegime();
+                    Reply reply = database.getEntailmentRegime();
                     if (!reply.isSuccess())
                         return database;
-                    if (((XSPReplyResult<EntailmentRegime>) reply).getData() == EntailmentRegime.none)
+                    if (((ReplyResult<EntailmentRegime>) reply).getData() == EntailmentRegime.none)
                         database.setEntailmentRegime(EntailmentRegime.OWL2_RDF);
                     for (ArtifactSchema schema : Register.getComponents(ArtifactSchema.class)) {
                         if (schema.isDeployable()) {
@@ -157,7 +157,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             if (endpoint == null)
                 return null;
             XOWLServer server = new RemoteServer(endpoint);
-            XSPReply reply = server.login(configuration.get("remote", "login"), configuration.get("remote", "password"));
+            Reply reply = server.login(configuration.get("remote", "login"), configuration.get("remote", "password"));
             if (!reply.isSuccess())
                 return null;
             return server;
@@ -165,7 +165,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             try {
                 String location = (PlatformUtils.resolve(configuration.get("embedded", "location"))).getAbsolutePath();
                 XOWLServer server = new EmbeddedServer(Logging.get(), new ServerConfiguration(location));
-                XSPReply reply = server.getDatabase(configuration.get("databases", STORE_ID_LIVE));
+                Reply reply = server.getDatabase(configuration.get("databases", STORE_ID_LIVE));
                 if (!reply.isSuccess()) {
                     // initialize
                     if (!server.createDatabase(configuration.get("databases", STORE_ID_LIVE)).isSuccess())
@@ -192,10 +192,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private XOWLDatabase resolveRemote(String name) {
         if (server == null)
             return null;
-        XSPReply reply = server.getDatabase(name);
+        Reply reply = server.getDatabase(name);
         if (!reply.isSuccess())
             return null;
-        return ((XSPReplyResult<XOWLDatabase>) reply).getData();
+        return ((ReplyResult<XOWLDatabase>) reply).getData();
     }
 
     @Override
@@ -248,21 +248,21 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     }
 
     @Override
-    public XSPReply store(Artifact artifact) {
+    public Reply store(Artifact artifact) {
         return storeLongTerm.store(artifact);
     }
 
     @Override
-    public XSPReply retrieve(String identifier) {
+    public Reply retrieve(String identifier) {
         return storeLongTerm.retrieve(identifier);
     }
 
     @Override
-    public XSPReply retrieve(String base, String version) {
+    public Reply retrieve(String base, String version) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
         if (!reply.isSuccess())
             return reply;
         StringWriter writer = new StringWriter();
@@ -282,36 +282,36 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         reply = storeLongTerm.doSparql(writer.toString());
         if (!reply.isSuccess())
             return reply;
-        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
+        Collection<Quad> metadata = ((ReplyResult<ResultQuads>) reply).getData().getQuads();
         if (metadata.isEmpty())
-            return XSPReplyNotFound.instance();
-        return new XSPReplyResult<>(storeLongTerm.buildArtifact(metadata));
+            return ReplyNotFound.instance();
+        return new ReplyResult<>(storeLongTerm.buildArtifact(metadata));
     }
 
     @Override
-    public XSPReply delete(String identifier) {
-        XSPReply result = storeLive.delete(identifier);
+    public Reply delete(String identifier) {
+        Reply result = storeLive.delete(identifier);
         if (!result.isSuccess())
             return result;
         return storeLongTerm.delete(identifier);
     }
 
     @Override
-    public XSPReply delete(Artifact artifact) {
+    public Reply delete(Artifact artifact) {
         return delete(artifact.getIdentifier());
     }
 
     @Override
-    public XSPReply getAllArtifacts() {
+    public Reply getAllArtifacts() {
         return storeLongTerm.getArtifacts();
     }
 
     @Override
-    public XSPReply getArtifactsForBase(String base) {
+    public Reply getArtifactsForBase(String base) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
         if (!reply.isSuccess())
             return reply;
         StringWriter writer = new StringWriter();
@@ -327,16 +327,16 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         reply = storeLongTerm.doSparql(writer.toString());
         if (!reply.isSuccess())
             return reply;
-        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
-        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
+        Collection<Quad> metadata = ((ReplyResult<ResultQuads>) reply).getData().getQuads();
+        return new ReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
     }
 
     @Override
-    public XSPReply getArtifactsForArchetype(String archetype) {
+    public Reply getArtifactsForArchetype(String archetype) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_RETRIEVE_METADATA);
         if (!reply.isSuccess())
             return reply;
         StringWriter writer = new StringWriter();
@@ -352,22 +352,22 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         reply = storeLongTerm.doSparql(writer.toString());
         if (!reply.isSuccess())
             return reply;
-        Collection<Quad> metadata = ((XSPReplyResult<ResultQuads>) reply).getData().getQuads();
-        return new XSPReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
+        Collection<Quad> metadata = ((ReplyResult<ResultQuads>) reply).getData().getQuads();
+        return new ReplyResultCollection<>(storeLongTerm.buildArtifacts(metadata));
     }
 
     @Override
-    public XSPReply getLiveArtifacts() {
+    public Reply getLiveArtifacts() {
         return storeLive.getArtifacts();
     }
 
     @Override
-    public XSPReply pushToLive(Artifact artifact) {
+    public Reply pushToLive(Artifact artifact) {
         return storeLive.store(artifact);
     }
 
     @Override
-    public XSPReply pullFromLive(Artifact artifact) {
+    public Reply pullFromLive(Artifact artifact) {
         return storeLive.delete(artifact.getIdentifier());
     }
 
@@ -376,9 +376,9 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         List<Metric> metrics = new ArrayList<>();
         metrics.add(METRIC_TOTAL_ARTIFACTS_COUNT);
         metrics.add(METRIC_LIVE_ARTIFACTS_COUNT);
-        metrics.add(((XSPReplyResult<Metric>) storeService.getMetric()).getData());
-        metrics.add(((XSPReplyResult<Metric>) storeLongTerm.getMetric()).getData());
-        metrics.add(((XSPReplyResult<Metric>) storeLive.getMetric()).getData());
+        metrics.add(((ReplyResult<Metric>) storeService.getMetric()).getData());
+        metrics.add(((ReplyResult<Metric>) storeLongTerm.getMetric()).getData());
+        metrics.add(((ReplyResult<Metric>) storeLive.getMetric()).getData());
         return metrics;
     }
 
@@ -389,20 +389,20 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         } else if (metric == METRIC_TOTAL_ARTIFACTS_COUNT) {
             return new MetricSnapshotInt(storeLongTerm.getArtifactsCount());
         } else if (metric == storeService.metricStatistics) {
-            XSPReply reply = storeService.getMetricSnapshot();
+            Reply reply = storeService.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
+            return ((ReplyResult<MetricSnapshot>) reply).getData();
         } else if (metric == storeLongTerm.metricStatistics) {
-            XSPReply reply = storeLongTerm.getMetricSnapshot();
+            Reply reply = storeLongTerm.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
+            return ((ReplyResult<MetricSnapshot>) reply).getData();
         } else if (metric == storeLive.metricStatistics) {
-            XSPReply reply = storeLive.getMetricSnapshot();
+            Reply reply = storeLive.getMetricSnapshot();
             if (!reply.isSuccess())
                 return null;
-            return ((XSPReplyResult<MetricSnapshot>) reply).getData();
+            return ((ReplyResult<MetricSnapshot>) reply).getData();
         }
         return null;
     }
@@ -448,12 +448,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         String archetype = request.getParameter("archetype");
         if (archetype != null) {
             // get all artifacts for an archetype
-            XSPReply reply = getArtifactsForArchetype(archetype);
+            Reply reply = getArtifactsForArchetype(archetype);
             if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply, null);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+            for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -465,12 +465,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         String base = request.getParameter("base");
         if (base != null) {
             // get all artifacts for an base
-            XSPReply reply = getArtifactsForBase(base);
+            Reply reply = getArtifactsForBase(base);
             if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply, null);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+            for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -479,12 +479,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             builder.append("]");
             return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, builder.toString());
         } else {
-            XSPReply reply = getAllArtifacts();
+            Reply reply = getAllArtifacts();
             if (!reply.isSuccess())
-                return XSPReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply, null);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
-            for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+            for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
                 if (!first)
                     builder.append(", ");
                 first = false;
@@ -501,12 +501,12 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      * @return The response
      */
     private HttpResponse handleArtifactsLive() {
-        XSPReply reply = getLiveArtifacts();
+        Reply reply = getLiveArtifacts();
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
-        for (Artifact artifact : ((XSPReplyResultCollection<Artifact>) reply).getData()) {
+        for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -529,9 +529,9 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         String left = request.getParameter("left");
         String right = request.getParameter("right");
         if (left == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
         if (right == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
         return onMessageDiffArtifacts(left, right, request.getHeader(HttpConstants.HEADER_ACCEPT));
     }
 
@@ -550,10 +550,10 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         if (index < 0) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    XSPReply reply = retrieve(artifactId);
+                    Reply reply = retrieve(artifactId);
                     if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<Artifact>) reply).getData().serializedJSON());
+                        return ReplyUtils.toHttpResponse(reply, null);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<Artifact>) reply).getData().serializedJSON());
                 }
                 case HttpConstants.METHOD_DELETE:
                     return onMessageDeleteArtifact(artifactId);
@@ -631,7 +631,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         if (request.getContent() == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);
         String sparql = new String(request.getContent(), IOUtils.CHARSET);
 
@@ -647,8 +647,8 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             }
         }
 
-        XSPReply reply = store.sparql(sparql, null, null);
-        return XSPReplyUtils.toHttpResponse(reply, Arrays.asList(accept));
+        Reply reply = store.sparql(sparql, null, null);
+        return ReplyUtils.toHttpResponse(reply, Arrays.asList(accept));
     }
 
     /**
@@ -659,18 +659,18 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      * @return The response
      */
     private HttpResponse onMessageGetArtifactMetadata(String artifactId, String[] accept) {
-        XSPReply reply = retrieve(artifactId);
+        Reply reply = retrieve(artifactId);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+            return ReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
 
         BufferedLogger logger = new BufferedLogger();
         String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
         String content = RDFUtils.serialize(logger, artifact.getMetadata().iterator(), contentType);
         if (!logger.getErrorMessages().isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
@@ -682,21 +682,21 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      * @return The artifact
      */
     private HttpResponse onMessageGetArtifactContent(String artifactId, String[] accept) {
-        XSPReply reply = retrieve(artifactId);
+        Reply reply = retrieve(artifactId);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+            return ReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> quads = artifact.getContent();
         if (quads == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"), null);
 
         BufferedLogger logger = new BufferedLogger();
         String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
         String content = RDFUtils.serialize(logger, quads.iterator(), contentType);
         if (!logger.getErrorMessages().isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
         return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
@@ -709,7 +709,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessageDeleteArtifact(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
         Job job = new DeleteArtifactJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -724,25 +724,25 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      * @return The artifact
      */
     private HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight, String[] accept) {
-        XSPReply reply = retrieve(artifactLeft);
+        Reply reply = retrieve(artifactLeft);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        Artifact artifact = ((XSPReplyResult<Artifact>) reply).getData();
+            return ReplyUtils.toHttpResponse(reply, null);
+        Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentLeft = artifact.getContent();
         if (contentLeft == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         reply = retrieve(artifactRight);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        artifact = ((XSPReplyResult<Artifact>) reply).getData();
+            return ReplyUtils.toHttpResponse(reply, null);
+        artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
         Collection<Quad> contentRight = artifact.getContent();
         if (contentRight == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
 
@@ -758,7 +758,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         RDFUtils.serialize(writer, logger, changeset.getRemoved().iterator(), contentType);
 
         if (!logger.getErrorMessages().isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
         return new HttpResponse(
                 HttpURLConnection.HTTP_OK,
                 HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY,
@@ -775,7 +775,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessagePullFromLive(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
         Job job = new PullArtifactFromLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -791,7 +791,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessagePushToLive(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
         Job job = new PushArtifactToLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());

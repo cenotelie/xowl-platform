@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.consistency;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
@@ -94,14 +94,14 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      *
      * @return The current inconsistencies
      */
-    XSPReply getInconsistencies();
+    Reply getInconsistencies();
 
     /**
      * Gets all the reasoning rules
      *
      * @return The reasoning rules
      */
-    XSPReply getReasoningRules();
+    Reply getReasoningRules();
 
     /**
      * Gets the reasoning rule for the specified identifier
@@ -109,7 +109,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a rule
      * @return The operation's result
      */
-    XSPReply getReasoningRule(String identifier);
+    Reply getReasoningRule(String identifier);
 
     /**
      * Creates a new reasoning rule
@@ -118,7 +118,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param definition The rule's definition
      * @return The operation's result
      */
-    XSPReply createReasoningRule(String name, String definition);
+    Reply createReasoningRule(String name, String definition);
 
     /**
      * Adds the specified reasoning rule
@@ -126,7 +126,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The reasoning rule to add
      * @return The operation's result
      */
-    XSPReply addReasoningRule(ReasoningRule rule);
+    Reply addReasoningRule(ReasoningRule rule);
 
     /**
      * Activates a reasoning rule
@@ -134,7 +134,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a reasoning rule
      * @return The operation's result
      */
-    XSPReply activateReasoningRule(String identifier);
+    Reply activateReasoningRule(String identifier);
 
     /**
      * Activates a reasoning rule
@@ -142,7 +142,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The reasoning rule to activate
      * @return The operation's result
      */
-    XSPReply activateReasoningRule(ReasoningRule rule);
+    Reply activateReasoningRule(ReasoningRule rule);
 
     /**
      * Deactivates a reasoning rule
@@ -150,7 +150,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a reasoning rule
      * @return The operation's result
      */
-    XSPReply deactivateReasoningRule(String identifier);
+    Reply deactivateReasoningRule(String identifier);
 
     /**
      * Deactivates a reasoning rule
@@ -158,7 +158,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The reasoning rule to deactivate
      * @return The operation's result
      */
-    XSPReply deactivateReasoningRule(ReasoningRule rule);
+    Reply deactivateReasoningRule(ReasoningRule rule);
 
     /**
      * Deletes a reasoning rule
@@ -166,7 +166,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a reasoning rule
      * @return The operation's result
      */
-    XSPReply deleteReasoningRule(String identifier);
+    Reply deleteReasoningRule(String identifier);
 
     /**
      * Deletes a reasoning rule
@@ -174,14 +174,14 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param rule The reasoning rule to delete
      * @return The operation's result
      */
-    XSPReply deleteReasoningRule(ReasoningRule rule);
+    Reply deleteReasoningRule(ReasoningRule rule);
 
     /**
      * Gets all the consistency constraints
      *
      * @return The consistency constraints
      */
-    XSPReply getConsistencyConstraints();
+    Reply getConsistencyConstraints();
 
     /**
      * Gets the consistency constraint for the specified identifier
@@ -189,7 +189,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a constraint
      * @return The operation's result
      */
-    XSPReply getConsistencyConstraint(String identifier);
+    Reply getConsistencyConstraint(String identifier);
 
     /**
      * Creates a new consistency constraint
@@ -201,7 +201,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param guard       The constraint's guard (if any)
      * @return The operation's result
      */
-    XSPReply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard);
+    Reply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard);
 
     /**
      * Adds the specified consistency constraint
@@ -209,7 +209,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param constraint The consistency constraint to add
      * @return The operation's result
      */
-    XSPReply addConsistencyConstraint(ConsistencyConstraint constraint);
+    Reply addConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
      * Activates a consistency constraint
@@ -217,7 +217,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply activateConsistencyConstraint(String identifier);
+    Reply activateConsistencyConstraint(String identifier);
 
     /**
      * Activates a consistency constraint
@@ -225,7 +225,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param constraint The consistency constraint to activate
      * @return The operation's result
      */
-    XSPReply activateConsistencyConstraint(ConsistencyConstraint constraint);
+    Reply activateConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
      * Deactivates a consistency constraint
@@ -233,7 +233,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply deactivateConsistencyConstraint(String identifier);
+    Reply deactivateConsistencyConstraint(String identifier);
 
     /**
      * Deactivates a consistency constraint
@@ -241,7 +241,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param constraint The consistency constraint to deactivate
      * @return The operation's result
      */
-    XSPReply deactivateConsistencyConstraint(ConsistencyConstraint constraint);
+    Reply deactivateConsistencyConstraint(ConsistencyConstraint constraint);
 
     /**
      * Deletes a consistency constraint
@@ -249,7 +249,7 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param identifier The identifier of a consistency constraint
      * @return The operation's result
      */
-    XSPReply deleteConsistencyConstraint(String identifier);
+    Reply deleteConsistencyConstraint(String identifier);
 
     /**
      * Deletes a consistency constraint
@@ -257,5 +257,5 @@ public interface ConsistencyService extends SecuredService, MeasurableService {
      * @param constraint The consistency constraint to delete
      * @return The operation's result
      */
-    XSPReply deleteConsistencyConstraint(ConsistencyConstraint constraint);
+    Reply deleteConsistencyConstraint(ConsistencyConstraint constraint);
 }

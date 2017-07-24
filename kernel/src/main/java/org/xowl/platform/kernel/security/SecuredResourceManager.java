@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
 import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.api.ApiError;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
@@ -48,7 +48,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply createDescriptorFor(SecuredResource resource);
+    Reply createDescriptorFor(SecuredResource resource);
 
     /**
      * Gets the security descriptor for the specified resource
@@ -56,7 +56,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply getDescriptorFor(String resource);
+    Reply getDescriptorFor(String resource);
 
     /**
      * Adds an owner of a resource
@@ -65,7 +65,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param user     The new owner for this resource
      * @return The protocol reply
      */
-    XSPReply addOwner(String resource, String user);
+    Reply addOwner(String resource, String user);
 
     /**
      * Removes an owner of a resource
@@ -74,7 +74,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param user     The previous owner for this resource
      * @return The protocol reply
      */
-    XSPReply removeOwner(String resource, String user);
+    Reply removeOwner(String resource, String user);
 
     /**
      * Adds a sharing for a resource
@@ -83,7 +83,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param sharing  The sharing to add
      * @return The protocol reply
      */
-    XSPReply addSharing(String resource, SecuredResourceSharing sharing);
+    Reply addSharing(String resource, SecuredResourceSharing sharing);
 
     /**
      * Remove a sharing for a resource
@@ -92,7 +92,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param sharing  The sharing to remove
      * @return The protocol reply
      */
-    XSPReply removeSharing(String resource, SecuredResourceSharing sharing);
+    Reply removeSharing(String resource, SecuredResourceSharing sharing);
 
     /**
      * Deletes the security descriptor for the specified resource
@@ -100,7 +100,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource A secured resource
      * @return The protocol reply
      */
-    XSPReply deleteDescriptorFor(String resource);
+    Reply deleteDescriptorFor(String resource);
 
     /**
      * Checks whether the current user is an owner of the specified resource
@@ -110,7 +110,7 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource        The identifier of the resource
      * @return The protocol reply
      */
-    XSPReply checkIsResourceOwner(SecurityService securityService, PlatformUser user, String resource);
+    Reply checkIsResourceOwner(SecurityService securityService, PlatformUser user, String resource);
 
     /**
      * Checks whether the current user is either an owner of is part of the sharing of the specified resource
@@ -120,5 +120,5 @@ public interface SecuredResourceManager extends Identifiable {
      * @param resource        The identifier of the resource
      * @return The protocol reply
      */
-    XSPReply checkIsInSharing(SecurityService securityService, PlatformUser user, String resource);
+    Reply checkIsInSharing(SecurityService securityService, PlatformUser user, String resource);
 }

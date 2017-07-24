@@ -21,7 +21,7 @@ import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
-import org.xowl.platform.kernel.remote.DeserializerForOSGi;
+import org.xowl.platform.kernel.remote.PlatformApiDeserializerForOSGi;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
 
@@ -168,7 +168,7 @@ class RemoteCollaborationManagedDescriptor implements Identifiable, Serializable
      * @return An access to the managed collaboration
      */
     public RemotePlatformAccess newAccess() {
-        RemotePlatformAccess platform = new RemotePlatformAccess(endpoint, new DeserializerForOSGi());
+        RemotePlatformAccess platform = new RemotePlatformAccess(endpoint, new PlatformApiDeserializerForOSGi());
         platform.login(masterLogin, masterPassword);
         return platform;
     }

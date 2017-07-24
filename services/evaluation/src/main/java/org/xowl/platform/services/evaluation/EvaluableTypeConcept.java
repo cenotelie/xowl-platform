@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
@@ -29,7 +29,7 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactArchetype;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.services.storage.StorageService;
@@ -68,10 +68,10 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
     }
 
     @Override
-    public XSPReply getElements() {
+    public Reply getElements() {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         String query = "SELECT DISTINCT ?a ?e WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(KernelSchema.GRAPH_ARTIFACTS) +
                 "> { ?a a <" +
@@ -83,19 +83,19 @@ public class EvaluableTypeConcept extends EvaluableTypeBase {
                 "\" } . GRAPH ?a { ?e a <" +
                 TextUtils.escapeAbsoluteURIW3C(conceptyURI) +
                 "> } }";
-        XSPReply reply = storageService.getLongTermStore().sparql(query, null, null);
+        Reply reply = storageService.getLongTermStore().sparql(query, null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<Evaluable> result = new ArrayList<>();
         for (RDFPatternSolution solution : ((ResultSolutions) sparqlResult).getSolutions()) {
             String artifactId = ((IRINode) solution.get("a")).getIRIValue();
             String elementId = ((IRINode) solution.get("e")).getIRIValue();
             result.add(new EvaluableEntity(this, artifactId, elementId));
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override

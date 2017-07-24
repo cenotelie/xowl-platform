@@ -17,14 +17,14 @@
 
 package org.xowl.platform.services.security.internal;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
-import org.xowl.platform.kernel.remote.DeserializerForOSGi;
+import org.xowl.platform.kernel.remote.PlatformApiDeserializerForOSGi;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.kernel.remote.RemotePlatformAccessManager;
 import org.xowl.platform.kernel.remote.RemotePlatformAccessProvider;
@@ -52,7 +52,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
      */
     public XOWLSubordinateRealm(Section configuration) {
         super(configuration);
-        this.accessManager = new RemotePlatformAccessManager(configuration.get("master"), new DeserializerForOSGi());
+        this.accessManager = new RemotePlatformAccessManager(configuration.get("master"), new PlatformApiDeserializerForOSGi());
     }
 
     @Override
@@ -77,10 +77,10 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
 
     @Override
     public PlatformUser authenticate(String login, String password) {
-        XSPReply reply = getAccess(login).login(login, password);
+        Reply reply = getAccess(login).login(login, password);
         if (!reply.isSuccess())
             return null;
-        PlatformUser result = ((XSPReplyResult<PlatformUser>) reply).getData();
+        PlatformUser result = ((ReplyResult<PlatformUser>) reply).getData();
         return getUser(result.getIdentifier(), result.getName());
     }
 
@@ -91,11 +91,11 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
             return Collections.emptyList();
         PlatformUser currentUser = securityService.getCurrentUser();
 
-        XSPReply reply = getAccess(currentUser.getIdentifier()).getPlatformUsers();
+        Reply reply = getAccess(currentUser.getIdentifier()).getPlatformUsers();
         if (!reply.isSuccess())
             return Collections.emptyList();
         Collection<PlatformUser> result = new ArrayList<>();
-        for (PlatformUser remoterUser : ((XSPReplyResultCollection<PlatformUser>) reply).getData()) {
+        for (PlatformUser remoterUser : ((ReplyResultCollection<PlatformUser>) reply).getData()) {
             result.add(getUser(remoterUser.getIdentifier(), remoterUser.getName()));
         }
         return result;
@@ -111,15 +111,15 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
             return null;
         PlatformUser currentUser = securityService.getCurrentUser();
 
-        XSPReply reply = getAccess(currentUser == null ? identifier : currentUser.getIdentifier()).getPlatformUser(identifier);
+        Reply reply = getAccess(currentUser == null ? identifier : currentUser.getIdentifier()).getPlatformUser(identifier);
         if (!reply.isSuccess())
             return null;
-        result = ((XSPReplyResult<PlatformUser>) reply).getData();
+        result = ((ReplyResult<PlatformUser>) reply).getData();
         return getUser(result.getIdentifier(), result.getName());
     }
 
     @Override
-    public XSPReply createUser(String identifier, String name, String key) {
+    public Reply createUser(String identifier, String name, String key) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
@@ -128,7 +128,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
     }
 
     @Override
-    public XSPReply renameUser(String identifier, String name) {
+    public Reply renameUser(String identifier, String name) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
@@ -137,7 +137,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
     }
 
     @Override
-    public XSPReply deleteUser(String identifier) {
+    public Reply deleteUser(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
@@ -146,7 +146,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
     }
 
     @Override
-    public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
+    public Reply changeUserKey(String identifier, String oldKey, String newKey) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;
@@ -155,7 +155,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
     }
 
     @Override
-    public XSPReply resetUserKey(String identifier, String newKey) {
+    public Reply resetUserKey(String identifier, String newKey) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
             return null;

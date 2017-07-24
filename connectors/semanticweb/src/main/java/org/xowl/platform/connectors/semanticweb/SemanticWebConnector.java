@@ -17,10 +17,10 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResultCollection;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -82,15 +82,15 @@ public class SemanticWebConnector extends ConnectorServiceBase {
         String superseded = request.getParameter("superseded");
         String contentType = request.getContentType();
         if (name == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
         if (base == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
         if (version == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
         if (archetype == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
         if (contentType == null || contentType.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_HEADER_CONTENT_TYPE), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_HEADER_CONTENT_TYPE), null);
         int index = contentType.indexOf(";");
         if (index != -1)
             contentType = contentType.substring(0, index);
@@ -98,11 +98,11 @@ public class SemanticWebConnector extends ConnectorServiceBase {
 
         String resource = ArtifactBase.newArtifactID();
         SemanticWebLoader loader = new SemanticWebLoader();
-        XSPReply reply = loader.load(new InputStreamReader(new ByteArrayInputStream(request.getContent())), resource, contentType);
+        Reply reply = loader.load(new InputStreamReader(new ByteArrayInputStream(request.getContent())), resource, contentType);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
 
-        Collection<Quad> quads = ((XSPReplyResultCollection<Quad>) reply).getData();
+        Collection<Quad> quads = ((ReplyResultCollection<Quad>) reply).getData();
         Artifact artifact = new ArtifactSimple(
                 resource, name, base, version, archetype, identifier, DateFormat.getDateTimeInstance().format(new Date()), superseded,
                 quads);

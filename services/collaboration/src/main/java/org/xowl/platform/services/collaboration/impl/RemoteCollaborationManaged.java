@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;
@@ -81,37 +81,37 @@ public class RemoteCollaborationManaged extends RemoteCollaborationBase {
     }
 
     @Override
-    public XSPReply getManifest() {
+    public Reply getManifest() {
         return getAccess().getCollaborationManifest();
     }
 
     @Override
-    public XSPReply getArtifactsForInput(String specificationId) {
+    public Reply getArtifactsForInput(String specificationId) {
         return getAccess().getArtifactsForCollaborationInput(specificationId);
     }
 
     @Override
-    public XSPReply getArtifactsForOutput(String specificationId) {
+    public Reply getArtifactsForOutput(String specificationId) {
         return getAccess().getArtifactsForCollaborationOutput(specificationId);
     }
 
     @Override
-    public XSPReply archive() {
+    public Reply archive() {
         return networkService.archive(identifier);
     }
 
     @Override
-    public XSPReply restart() {
+    public Reply restart() {
         return networkService.restart(identifier);
     }
 
     @Override
-    public XSPReply delete() {
+    public Reply delete() {
         return networkService.delete(identifier);
     }
 
     @Override
-    public XSPReply retrieveOutput(String specificationId, String artifactId) {
-        return XSPReplyUnsupported.instance();
+    public Reply retrieveOutput(String specificationId, String artifactId) {
+        return ReplyUnsupported.instance();
     }
 }

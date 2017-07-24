@@ -17,9 +17,9 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyResultCollection;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResultCollection;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.RepositoryRDF;
 import org.xowl.infra.store.loaders.*;
@@ -59,13 +59,13 @@ class SemanticWebLoader {
      * @param syntax      The expected syntax
      * @return The reply
      */
-    public XSPReply load(Reader reader, String resourceIRI, String syntax) {
+    public Reply load(Reader reader, String resourceIRI, String syntax) {
         IRINode graph = repository.getStore().getIRINode(resourceIRI);
         BufferedLogger bufferedLogger = new BufferedLogger();
         try {
             Collection<Quad> quads = load(bufferedLogger, reader, resourceIRI, syntax);
             if (quads == null || !bufferedLogger.getErrorMessages().isEmpty())
-                return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
+                return new ReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
             Collection<Quad> result = new ArrayList<>(quads.size());
             for (Quad quad : quads) {
                 if (quad.getGraph() != graph)
@@ -73,10 +73,10 @@ class SemanticWebLoader {
                 else
                     result.add(quad);
             }
-            return new XSPReplyResultCollection<>(result);
+            return new ReplyResultCollection<>(result);
         } catch (TranslationException exception) {
             bufferedLogger.error(exception);
-            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
+            return new ReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, bufferedLogger.getErrorsAsString());
         }
     }
 

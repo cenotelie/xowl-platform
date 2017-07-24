@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.jobs;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.ApiError;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
@@ -105,7 +105,7 @@ public interface JobExecutionService extends SecuredService, MeasurableService {
      * @param job The job to execute
      * @return The operation's result
      */
-    XSPReply schedule(Job job);
+    Reply schedule(Job job);
 
     /**
      * Cancels a job
@@ -113,7 +113,7 @@ public interface JobExecutionService extends SecuredService, MeasurableService {
      * @param job The job to cancel
      * @return The operation's result
      */
-    XSPReply cancel(Job job);
+    Reply cancel(Job job);
 
     /**
      * Gets the current queue

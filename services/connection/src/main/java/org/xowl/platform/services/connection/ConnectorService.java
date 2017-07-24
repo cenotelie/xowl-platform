@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -68,9 +68,9 @@ public interface ConnectorService extends SecuredService, Serializable {
     /**
      * Gets the next queued artifact
      *
-     * @return The operation's result which can be casted to XSPReplyResult in case of success
+     * @return The operation's result which can be casted to ReplyResult in case of success
      */
-    XSPReply pullArtifact();
+    Reply pullArtifact();
 
     /**
      * Pushes an artifact to the associated client
@@ -78,5 +78,5 @@ public interface ConnectorService extends SecuredService, Serializable {
      * @param artifact The artifact to push
      * @return The operation's result
      */
-    XSPReply pushArtifact(Artifact artifact);
+    Reply pushArtifact(Artifact artifact);
 }

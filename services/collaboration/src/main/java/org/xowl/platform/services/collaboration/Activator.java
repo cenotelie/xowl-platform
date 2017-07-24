@@ -21,7 +21,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.jobs.JobFactory;
-import org.xowl.platform.kernel.remote.DeserializerFactory;
+import org.xowl.platform.kernel.remote.PlatformApiFactory;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 import org.xowl.platform.services.collaboration.impl.XOWLCollaborationService;
@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
         Register.waitFor(PlatformHttp.class, new RegisterWaiter<PlatformHttp>() {
             @Override
             public void onAvailable(BundleContext bundleContext, PlatformHttp component) {
-                bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForCollaboration(), null);
+                bundleContext.registerService(PlatformApiFactory.class, new PlatformApiFactoryForCollaboration(), null);
 
                 bundleContext.registerService(JobFactory.class, new CollaborationJobFactory(), null);
 

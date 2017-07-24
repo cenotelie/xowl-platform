@@ -18,9 +18,9 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyException;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyException;
+import org.xowl.infra.utils.api.ReplySuccess;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.logging.Logging;
@@ -72,15 +72,15 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
      *
      * @return The protocol reply
      */
-    private XSPReply writeBack() {
+    private Reply writeBack() {
         try (Writer writer = IOUtils.getWriter(storage)) {
             writer.write(serializedJSON());
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyException(exception);
+            return new ReplyException(exception);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**
@@ -120,8 +120,8 @@ public class KernelSecurityPolicyConfiguration extends SecurityPolicyConfigurati
     }
 
     @Override
-    public XSPReply put(SecuredAction action, SecuredActionPolicy policy) {
-        XSPReply reply = super.put(action, policy);
+    public Reply put(SecuredAction action, SecuredActionPolicy policy) {
+        Reply reply = super.put(action, policy);
         if (!reply.isSuccess())
             return reply;
         return writeBack();

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
@@ -69,14 +69,14 @@ public interface CollaborationService extends SecuredService, CollaborationLocal
      *
      * @return The protocol reply
      */
-    XSPReply archive();
+    Reply archive();
 
     /**
      * Stops this collaboration and delete all its data
      *
      * @return The protocol reply
      */
-    XSPReply delete();
+    Reply delete();
 
     /**
      * Gets the known collaboration patterns

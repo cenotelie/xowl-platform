@@ -47,7 +47,6 @@ import org.xowl.platform.kernel.platform.*;
 import org.xowl.platform.kernel.security.SecurityRealm;
 import org.xowl.platform.kernel.security.SecurityService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -116,7 +115,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             String location = (PlatformUtils.resolve(configuration.get("location"))).getAbsolutePath();
             ServerConfiguration serverConfiguration = new ServerConfiguration(location);
             server = new EmbeddedServer(Logging.get(), serverConfiguration);
-            database = ((XSPReplyResult<XOWLDatabase>) server.getDatabase(serverConfiguration.getAdminDBName())).getData();
+            database = ((ReplyResult<XOWLDatabase>) server.getDatabase(serverConfiguration.getAdminDBName())).getData();
         } catch (Exception exception) {
             Logging.get().error(exception);
         }
@@ -138,7 +137,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
      */
     private void initializeDatabase() {
         // (re-)upload the rules
-        XSPReply reply = database.upload(Repository.SYNTAX_XRDF, readResource("rules.xrdf"));
+        Reply reply = database.upload(Repository.SYNTAX_XRDF, readResource("rules.xrdf"));
         if (!reply.isSuccess()) {
             Logging.get().error("Failed to initialize the security database");
             return;
@@ -151,7 +150,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             return;
         }
 
-        if (!((XSPReplyResultCollection<?>) reply).getData().isEmpty()) {
+        if (!((ReplyResultCollection<?>) reply).getData().isEmpty()) {
             // we already have the stored procedures, retrieve them
             getProcedure("procedure-add-admin");
             getProcedure("procedure-add-member");
@@ -253,7 +252,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
      * @param name The name of the procedure
      */
     private void getProcedure(String name) {
-        XOWLStoredProcedure procedure = ((XSPReplyResult<XOWLStoredProcedure>) database.getStoreProcedure(name)).getData();
+        XOWLStoredProcedure procedure = ((ReplyResult<XOWLStoredProcedure>) database.getStoreProcedure(name)).getData();
         procedures.put(name, procedure);
     }
 
@@ -265,12 +264,12 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
      */
     private void deployProcedure(String name, String... parameters) {
         String content = readResource(name + ".sparql");
-        XSPReply reply = database.addStoredProcedure(name, content, Arrays.asList(parameters));
+        Reply reply = database.addStoredProcedure(name, content, Arrays.asList(parameters));
         if (!reply.isSuccess()) {
             Logging.get().error("Failed to deploy the procedure " + name);
             return;
         }
-        XOWLStoredProcedure procedure = ((XSPReplyResult<XOWLStoredProcedure>) reply).getData();
+        XOWLStoredProcedure procedure = ((ReplyResult<XOWLStoredProcedure>) reply).getData();
         procedures.put(name, procedure);
     }
 
@@ -321,7 +320,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
 
     @Override
     public PlatformUser authenticate(String login, String password) {
-        XSPReply reply = server.login(login, password);
+        Reply reply = server.login(login, password);
         if (!reply.isSuccess())
             return null;
         return getUser(login);
@@ -332,22 +331,22 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("user", nodes.getIRINode(USERS + userId));
         parameters.put("role", nodes.getIRINode(ROLES + roleId));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-check-role"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-check-role"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return false;
-        Result result = ((XSPReplyResult<Result>) reply).getData();
+        Result result = ((ReplyResult<Result>) reply).getData();
         return reply.isSuccess() && ((ResultYesNo) result).getValue();
     }
 
     @Override
     public Collection<PlatformUser> getUsers() {
         Map<String, Node> parameters = new HashMap<>();
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-users"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-users"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return Collections.emptyList();
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String id = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());
@@ -360,11 +359,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     @Override
     public Collection<PlatformGroup> getGroups() {
         Map<String, Node> parameters = new HashMap<>();
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-groups"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-groups"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return Collections.emptyList();
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformGroup> groups = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String id = ((IRINode) solution.get("group")).getIRIValue().substring(GROUPS.length());
@@ -377,11 +376,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     @Override
     public Collection<PlatformRole> getRoles() {
         Map<String, Node> parameters = new HashMap<>();
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-roles"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-roles"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return Collections.emptyList();
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformRole> roles = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String id = ((IRINode) solution.get("role")).getIRIValue().substring(ROLES.length());
@@ -425,17 +424,17 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     }
 
     @Override
-    public XSPReply createUser(String identifier, String name, String key) {
+    public Reply createUser(String identifier, String name, String key) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_USER);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_USER);
         if (!reply.isSuccess())
             return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
-            return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
+            return new ReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
         // create the user as an embedded server user
         reply = server.createUser(identifier, key);
         if (!reply.isSuccess())
@@ -452,23 +451,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new PlatformUserCreatedEvent(user, securityService));
-        return new XSPReplyResult<>(user);
+        return new ReplyResult<>(user);
     }
 
     @Override
-    public XSPReply createGroup(String identifier, String name, String adminId) {
+    public Reply createGroup(String identifier, String name, String adminId) {
         /// check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_GROUP);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_GROUP);
         if (!reply.isSuccess())
             return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
-            return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
+            return new ReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
         if (getUser(adminId) == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, adminId);
+            return new ReplyApiError(ERROR_INVALID_USER, adminId);
         // create the group data
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(GROUPS + identifier));
@@ -482,21 +481,21 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new PlatformGroupCreatedEvent(group, securityService));
-        return new XSPReplyResult<>(group);
+        return new ReplyResult<>(group);
     }
 
     @Override
-    public XSPReply createRole(String identifier, String name) {
+    public Reply createRole(String identifier, String name) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_ROLE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_CREATE_ROLE);
         if (!reply.isSuccess())
             return reply;
         // check identifier format
         if (!identifier.matches("[_a-zA-Z0-9]+"))
-            return new XSPReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
+            return new ReplyApiError(ERROR_INVALID_IDENTIFIER, "[_a-zA-Z0-9]+");
         // create the group data
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("role", nodes.getIRINode(ROLES + identifier));
@@ -509,19 +508,19 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new PlatformRoleCreatedEvent(role, securityService));
-        return new XSPReplyResult<>(role);
+        return new ReplyResult<>(role);
     }
 
     @Override
-    public XSPReply renameUser(String identifier, String name) {
+    public Reply renameUser(String identifier, String name) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformUser userObject = getUser(identifier);
         if (userObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_USER, userObject);
+            return new ReplyApiError(ERROR_INVALID_USER, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_USER, userObject);
         if (!reply.isSuccess())
             return reply;
         synchronized (cacheUsers) {
@@ -533,20 +532,20 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             if (!reply.isSuccess())
                 return reply;
             cacheUsers.remove(identifier);
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply renameGroup(String identifier, String name) {
+    public Reply renameGroup(String identifier, String name) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformGroup groupObject = getGroup(identifier);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_GROUP, groupObject);
+            return new ReplyApiError(ERROR_INVALID_GROUP, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         synchronized (cacheGroups) {
@@ -559,20 +558,20 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             if (!reply.isSuccess())
                 return reply;
             cacheGroups.remove(identifier);
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply renameRole(String identifier, String name) {
+    public Reply renameRole(String identifier, String name) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformRole roleObject = getRole(identifier);
         if (roleObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_ROLE, roleObject);
+            return new ReplyApiError(ERROR_INVALID_ROLE, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RENAME_ROLE, roleObject);
         if (!reply.isSuccess())
             return reply;
         synchronized (cacheRoles) {
@@ -585,31 +584,31 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             if (!reply.isSuccess())
                 return reply;
             cacheRoles.remove(identifier);
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply deleteUser(String identifier) {
+    public Reply deleteUser(String identifier) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformUser userObject = getUser(identifier);
         if (userObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_USER, userObject);
+            return new ReplyApiError(ERROR_INVALID_USER, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_USER, userObject);
         if (!reply.isSuccess())
             return reply;
         // check for entity that cannot be deleted
         if (PlatformUserRoot.INSTANCE.getIdentifier().equals(identifier))
-            return new XSPReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
+            return new ReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
         // delete the server user
         synchronized (cacheUsers) {
             reply = server.getUser(identifier);
             if (!reply.isSuccess())
                 return reply;
-            reply = server.deleteUser(((XSPReplyResult<XOWLUser>) reply).getData());
+            reply = server.deleteUser(((ReplyResult<XOWLUser>) reply).getData());
             if (!reply.isSuccess())
                 return reply;
             // delete the entity
@@ -623,20 +622,20 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new PlatformUserDeletedEvent(deleted, securityService));
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply deleteGroup(String identifier) {
+    public Reply deleteGroup(String identifier) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformGroup groupObject = getGroup(identifier);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_GROUP, groupObject);
+            return new ReplyApiError(ERROR_INVALID_GROUP, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         // delete the entity
@@ -651,25 +650,25 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new PlatformGroupDeletedEvent(deleted, securityService));
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply deleteRole(String identifier) {
+    public Reply deleteRole(String identifier) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformRole roleObject = getRole(identifier);
         if (roleObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_ROLE, roleObject);
+            return new ReplyApiError(ERROR_INVALID_ROLE, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_DELETE_ROLE, roleObject);
         if (!reply.isSuccess())
             return reply;
         // check for entity that cannot be deleted
         if (PlatformRoleAdmin.INSTANCE.getIdentifier().equals(identifier))
-            return new XSPReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
+            return new ReplyApiError(ERROR_CANNOT_DELETE_ENTITY, identifier);
         // delete the entity
         synchronized (cacheRoles) {
             Map<String, Node> parameters = new HashMap<>();
@@ -682,64 +681,64 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new PlatformRoleDeletedEvent(deleted, securityService));
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
     @Override
-    public XSPReply changeUserKey(String identifier, String oldKey, String newKey) {
+    public Reply changeUserKey(String identifier, String oldKey, String newKey) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformUser platformUser = authenticate(identifier, oldKey);
         if (platformUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UPDATE_USER_KEY, platformUser);
+            return new ReplyApiError(ERROR_INVALID_USER, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UPDATE_USER_KEY, platformUser);
         if (!reply.isSuccess())
             return reply;
         // execute
         reply = server.getUser(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLUser xowlUser = ((XSPReplyResult<XOWLUser>) reply).getData();
+        XOWLUser xowlUser = ((ReplyResult<XOWLUser>) reply).getData();
         return xowlUser.updatePassword(newKey);
     }
 
     @Override
-    public XSPReply resetUserKey(String identifier, String newKey) {
+    public Reply resetUserKey(String identifier, String newKey) {
         // check authorization
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         PlatformUser platformUser = getUser(identifier);
         if (platformUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, identifier);
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RESET_USER_KEY, platformUser);
+            return new ReplyApiError(ERROR_INVALID_USER, identifier);
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_RESET_USER_KEY, platformUser);
         if (!reply.isSuccess())
             return reply;
         // execute
         reply = server.getUser(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLUser xowlUser = ((XSPReplyResult<XOWLUser>) reply).getData();
+        XOWLUser xowlUser = ((ReplyResult<XOWLUser>) reply).getData();
         return xowlUser.updatePassword(newKey);
     }
 
     @Override
-    public XSPReply addUserToGroup(String user, String group) {
+    public Reply addUserToGroup(String user, String group) {
         // check input data
         PlatformGroup groupObject = getGroup(group);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformUser newUser = getUser(user);
         if (newUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_USER_TO_GROUP, groupObject);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_USER_TO_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -750,23 +749,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply addAdminToGroup(String user, String group) {
+    public Reply addAdminToGroup(String user, String group) {
         // check input data
         PlatformGroup groupObject = getGroup(group);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformUser newUser = getUser(user);
         if (newUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_ADMIN_TO_GROUP, groupObject);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ADD_ADMIN_TO_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -777,23 +776,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply removeUserFromGroup(String user, String group) {
+    public Reply removeUserFromGroup(String user, String group) {
         // check input data
         PlatformGroup groupObject = getGroup(group);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformUser newUser = getUser(user);
         if (newUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_USER_FROM_GROUP, groupObject);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_USER_FROM_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -804,23 +803,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply removeAdminFromGroup(String user, String group) {
+    public Reply removeAdminFromGroup(String user, String group) {
         // check input data
         PlatformGroup groupObject = getGroup(group);
         if (groupObject == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformUser newUser = getUser(user);
         if (newUser == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         // check the current user is either the platform admin or the group admin
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_ADMIN_FROM_GROUP, groupObject);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_REMOVE_ADMIN_FROM_GROUP, groupObject);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -831,23 +830,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply assignRoleToUser(String user, String role) {
+    public Reply assignRoleToUser(String user, String role) {
         // check input data
         PlatformUser userObj = getUser(user);
         if (userObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         PlatformRole roleObj = getRole(role);
         if (roleObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+            return new ReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_USER);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_USER);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -858,23 +857,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply assignRoleToGroup(String group, String role) {
+    public Reply assignRoleToGroup(String group, String role) {
         // check input data
         PlatformGroup groupObj = getGroup(group);
         if (groupObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformRole roleObj = getRole(role);
         if (roleObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+            return new ReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_GROUP);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_ASSIGN_ROLE_TO_GROUP);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -885,23 +884,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply unassignRoleToUser(String user, String role) {
+    public Reply unassignRoleToUser(String user, String role) {
         // check input data
         PlatformUser userObj = getUser(user);
         if (userObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_USER, user);
+            return new ReplyApiError(ERROR_INVALID_USER, user);
         PlatformRole roleObj = getRole(role);
         if (roleObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+            return new ReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_USER);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_USER);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -912,23 +911,23 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply unassignRoleToGroup(String group, String role) {
+    public Reply unassignRoleToGroup(String group, String role) {
         // check input data
         PlatformGroup groupObj = getGroup(group);
         if (groupObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_GROUP, group);
+            return new ReplyApiError(ERROR_INVALID_GROUP, group);
         PlatformRole roleObj = getRole(role);
         if (roleObj == null)
-            return new XSPReplyApiError(ERROR_INVALID_ROLE, role);
+            return new ReplyApiError(ERROR_INVALID_ROLE, role);
         // check for current user with admin role
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_GROUP);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.getPolicy().checkAction(securityService, SecurityService.ACTION_UNASSIGN_ROLE_TO_GROUP);
         if (!reply.isSuccess())
             return reply;
         // execute
@@ -939,17 +938,17 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return reply;
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply addRoleImplication(String sourceRole, String targetRole) {
-        return XSPReplyUnsupported.instance();
+    public Reply addRoleImplication(String sourceRole, String targetRole) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply removeRoleImplication(String sourceRole, String targetRole) {
-        return XSPReplyUnsupported.instance();
+    public Reply removeRoleImplication(String sourceRole, String targetRole) {
+        return ReplyUnsupported.instance();
     }
 
     /**
@@ -961,11 +960,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     private String getEntityName(String entity) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(entity));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-name"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-name"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return null;
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         if (result.getSolutions().size() == 0)
             return null;
         RDFPatternSolution solution = result.getSolutions().iterator().next();
@@ -981,11 +980,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     protected Collection<PlatformRole> getEntityRoles(String entity) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("entity", nodes.getIRINode(entity));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-roles"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-entity-roles"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return null;
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformRole> roles = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String roleId = ((IRINode) solution.get("role")).getIRIValue().substring(ROLES.length());
@@ -1004,11 +1003,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     protected Collection<PlatformUser> getGroupAdmins(String groupIRI) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(groupIRI));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-admins"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-admins"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return null;
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String userId = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());
@@ -1027,11 +1026,11 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
     protected Collection<PlatformUser> getGroupMembers(String groupIRI) {
         Map<String, Node> parameters = new HashMap<>();
         parameters.put("group", nodes.getIRINode(groupIRI));
-        XSPReply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-members"),
+        Reply reply = database.executeStoredProcedure(procedures.get("procedure-get-group-members"),
                 new BaseStoredProcedureContext(Collections.<String>emptyList(), Collections.<String>emptyList(), parameters));
         if (!reply.isSuccess())
             return null;
-        ResultSolutions result = ((XSPReplyResult<ResultSolutions>) reply).getData();
+        ResultSolutions result = ((ReplyResult<ResultSolutions>) reply).getData();
         Collection<PlatformUser> users = new ArrayList<>(result.getSolutions().size());
         for (RDFPatternSolution solution : result.getSolutions()) {
             String userId = ((IRINode) solution.get("user")).getIRIValue().substring(USERS.length());

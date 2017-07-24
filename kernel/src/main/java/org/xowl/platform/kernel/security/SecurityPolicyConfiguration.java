@@ -18,11 +18,11 @@
 package org.xowl.platform.kernel.security;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplySuccess;
 import org.xowl.platform.kernel.webapi.HttpApiService;
 
 import java.util.Collection;
@@ -196,7 +196,7 @@ public class SecurityPolicyConfiguration implements Serializable {
      * @param policy The associated policy
      * @return The protocol reply
      */
-    public XSPReply put(SecuredAction action, SecuredActionPolicy policy) {
+    public Reply put(SecuredAction action, SecuredActionPolicy policy) {
         SecuredActionPolicyDescriptor[] allowedPolicies = action.getPolicies();
         boolean found = false;
         for (int i = 0; i != allowedPolicies.length; i++) {
@@ -206,12 +206,12 @@ public class SecurityPolicyConfiguration implements Serializable {
             }
         }
         if (!found)
-            return new XSPReplyApiError(HttpApiService.ERROR_PARAMETER_RANGE, "The specified policy is not allowed for this action");
+            return new ReplyApiError(HttpApiService.ERROR_PARAMETER_RANGE, "The specified policy is not allowed for this action");
         synchronized (policies) {
             policies.put(action, policy);
             unknownActions.remove(action.getIdentifier());
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     /**

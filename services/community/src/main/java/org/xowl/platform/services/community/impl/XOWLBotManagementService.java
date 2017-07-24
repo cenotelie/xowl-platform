@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.community.impl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyNotFound;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyNotFound;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
@@ -134,26 +134,26 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     }
 
     @Override
-    public XSPReply getBotMessages(String botId) {
+    public Reply getBotMessages(String botId) {
         Bot bot = bots.get(botId);
         if (bot == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return bot.getMessages();
     }
 
     @Override
-    public XSPReply wakeup(String botId) {
+    public Reply wakeup(String botId) {
         Bot bot = bots.get(botId);
         if (bot == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return bot.wakeup();
     }
 
     @Override
-    public XSPReply putToSleep(String botId) {
+    public Reply putToSleep(String botId) {
         Bot bot = bots.get(botId);
         if (bot == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return bot.sleep();
     }
 
@@ -230,15 +230,15 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
             } else if (rest.substring(index).equals("/messages")) {
                 if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-                return XSPReplyUtils.toHttpResponse(getBotMessages(botId), null);
+                return ReplyUtils.toHttpResponse(getBotMessages(botId), null);
             } else if (rest.substring(index).equals("/wakeup")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return XSPReplyUtils.toHttpResponse(wakeup(botId), null);
+                return ReplyUtils.toHttpResponse(wakeup(botId), null);
             } else if (rest.substring(index).equals("/putToSleep")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return XSPReplyUtils.toHttpResponse(putToSleep(botId), null);
+                return ReplyUtils.toHttpResponse(putToSleep(botId), null);
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

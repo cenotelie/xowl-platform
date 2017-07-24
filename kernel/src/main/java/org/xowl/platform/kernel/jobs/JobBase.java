@@ -18,9 +18,9 @@
 package org.xowl.platform.kernel.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyUnsupported;
 import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -228,8 +228,8 @@ public abstract class JobBase extends SafeRunnable implements Job {
     }
 
     @Override
-    public XSPReply cancel() {
-        return XSPReplyUnsupported.instance();
+    public Reply cancel() {
+        return ReplyUnsupported.instance();
     }
 
     @Override

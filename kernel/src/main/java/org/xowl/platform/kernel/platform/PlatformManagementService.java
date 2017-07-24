@@ -18,8 +18,8 @@
 package org.xowl.platform.kernel.platform;
 
 import org.osgi.framework.Bundle;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.ApiError;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.collections.Couple;
 import org.xowl.infra.utils.metrics.Metric;
 import org.xowl.infra.utils.metrics.MetricBase;
@@ -188,7 +188,7 @@ public interface PlatformManagementService extends SecuredService, MeasurableSer
      * @param packageStream A stream to the addon package
      * @return The protocol reply
      */
-    XSPReply installAddon(String identifier, InputStream packageStream);
+    Reply installAddon(String identifier, InputStream packageStream);
 
     /**
      * Un-installs an addon from the platform
@@ -196,19 +196,19 @@ public interface PlatformManagementService extends SecuredService, MeasurableSer
      * @param identifier The identifier of the addon
      * @return The protocol reply
      */
-    XSPReply uninstallAddon(String identifier);
+    Reply uninstallAddon(String identifier);
 
     /**
      * Shutdowns the platform
      *
      * @return The protocol reply
      */
-    XSPReply shutdown();
+    Reply shutdown();
 
     /**
      * Restarts the platform
      *
      * @return The protocol reply
      */
-    XSPReply restart();
+    Reply restart();
 }

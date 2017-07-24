@@ -22,7 +22,7 @@ import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -150,11 +150,11 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
     }
 
     @Override
-    public XSPReply pullArtifact() {
+    public Reply pullArtifact() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(actionPull);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(actionPull);
         if (!reply.isSuccess())
             return reply;
         return doPullArtifact();
@@ -165,19 +165,19 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
      *
      * @return The operation's result
      */
-    protected XSPReply doPullArtifact() {
+    protected Reply doPullArtifact() {
         Artifact artifact = input.poll();
         if (artifact == null)
-            return new XSPReplyApiError(ConnectionService.ERROR_EMPTY_QUEUE);
-        return new XSPReplyResult<>(artifact);
+            return new ReplyApiError(ConnectionService.ERROR_EMPTY_QUEUE);
+        return new ReplyResult<>(artifact);
     }
 
     @Override
-    public XSPReply pushArtifact(Artifact artifact) {
+    public Reply pushArtifact(Artifact artifact) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(actionPush);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(actionPush);
         if (!reply.isSuccess())
             return reply;
         return doPushArtifact(artifact);
@@ -189,8 +189,8 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
      * @param artifact The artifact to push
      * @return The operation's result
      */
-    protected XSPReply doPushArtifact(Artifact artifact) {
-        return XSPReplyUnsupported.instance();
+    protected Reply doPushArtifact(Artifact artifact) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
@@ -209,7 +209,7 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
 
     @Override
     public HttpResponse handle(SecurityService securedService, HttpApiRequest request) {
-        return XSPReplyUtils.toHttpResponse(XSPReplyUnsupported.instance(), null);
+        return ReplyUtils.toHttpResponse(ReplyUnsupported.instance(), null);
     }
 
     @Override

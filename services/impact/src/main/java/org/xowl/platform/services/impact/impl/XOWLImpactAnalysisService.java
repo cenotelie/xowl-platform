@@ -18,10 +18,10 @@
 package org.xowl.platform.services.impact.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyResult;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyResult;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
@@ -31,7 +31,7 @@ import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -108,13 +108,13 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         byte[] content = request.getContent();
         if (content == null || content.length == 0)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = JsonLoader.parseJson(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-        return XSPReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+        return ReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);
     }
 
     @Override
@@ -153,18 +153,18 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
     }
 
     @Override
-    public XSPReply perform(ImpactAnalysisSetup setup) {
+    public Reply perform(ImpactAnalysisSetup setup) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ImpactAnalysisService.ACTION_PERFORM);
         if (!reply.isSuccess())
             return reply;
         JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         XOWLImpactAnalysisJob job = new XOWLImpactAnalysisJob(setup);
         executionService.schedule(job);
-        return new XSPReplyResult<>(job);
+        return new ReplyResult<>(job);
     }
 }

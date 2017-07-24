@@ -17,10 +17,10 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplySuccess;
-import org.xowl.infra.server.xsp.XSPReplyUnauthenticated;
-import org.xowl.infra.server.xsp.XSPReplyUnsupported;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplySuccess;
+import org.xowl.infra.utils.api.ReplyUnauthenticated;
+import org.xowl.infra.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredAction;
@@ -45,33 +45,33 @@ public class KernelSecurityPolicyAuthenticated implements SecurityPolicy {
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, SecuredAction action) {
+    public Reply checkAction(SecurityService securityService, SecuredAction action) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
-            return XSPReplyUnauthenticated.instance();
-        return XSPReplySuccess.instance();
+            return ReplyUnauthenticated.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data) {
+    public Reply checkAction(SecurityService securityService, SecuredAction action, Object data) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
-            return XSPReplyUnauthenticated.instance();
-        return XSPReplySuccess.instance();
+            return ReplyUnauthenticated.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply getConfiguration() {
-        return XSPReplyUnsupported.instance();
+    public Reply getConfiguration() {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply setPolicy(String actionId, SecuredActionPolicy policy) {
-        return XSPReplyUnsupported.instance();
+    public Reply setPolicy(String actionId, SecuredActionPolicy policy) {
+        return ReplyUnsupported.instance();
     }
 
     @Override
-    public XSPReply setPolicy(String actionId, String policyDefinition) {
-        return XSPReplyUnsupported.instance();
+    public Reply setPolicy(String actionId, String policyDefinition) {
+        return ReplyUnsupported.instance();
     }
 }

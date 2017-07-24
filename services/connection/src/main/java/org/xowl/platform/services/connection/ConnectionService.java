@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ApiError;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -96,7 +96,7 @@ public interface ConnectionService extends SecuredService {
      * @param specification The specification for the new connector
      * @return The operation's result
      */
-    XSPReply spawn(ConnectorDescriptor description, ConnectorServiceData specification);
+    Reply spawn(ConnectorDescriptor description, ConnectorServiceData specification);
 
     /**
      * Deletes a spawned connector
@@ -105,5 +105,5 @@ public interface ConnectionService extends SecuredService {
      * @param identifier The identifier of a connector
      * @return The operation's result
      */
-    XSPReply delete(String identifier);
+    Reply delete(String identifier);
 }

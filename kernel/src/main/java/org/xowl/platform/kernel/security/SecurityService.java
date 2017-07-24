@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -204,14 +204,14 @@ public interface SecurityService extends SecuredService {
      * @param password The key used to identified the user (e.g. a password)
      * @return If the operation succeed, the authentication token
      */
-    XSPReply login(String client, String userId, String password);
+    Reply login(String client, String userId, String password);
 
     /**
      * Performs the logout of a client
      *
      * @return Whether the operation succeed
      */
-    XSPReply logout();
+    Reply logout();
 
     /**
      * Performs the authentication of a user on the current thread
@@ -220,14 +220,14 @@ public interface SecurityService extends SecuredService {
      * @param token  The authentication token
      * @return Whether the operation succeed
      */
-    XSPReply authenticate(String client, String token);
+    Reply authenticate(String client, String token);
 
     /**
      * Forces the authentication of the specified user on the current thread
      *
      * @param user The user to authenticate
      */
-    XSPReply authenticate(PlatformUser user);
+    Reply authenticate(PlatformUser user);
 
     /**
      * Gets the currently authenticated user on the current thread, if any
@@ -242,7 +242,7 @@ public interface SecurityService extends SecuredService {
      * @param action The requested action
      * @return The protocol reply
      */
-    XSPReply checkAction(SecuredAction action);
+    Reply checkAction(SecuredAction action);
 
     /**
      * Checks the authorization policy for the specified action
@@ -251,5 +251,5 @@ public interface SecurityService extends SecuredService {
      * @param data   Custom data that may be required to make a decision
      * @return The protocol reply
      */
-    XSPReply checkAction(SecuredAction action, Object data);
+    Reply checkAction(SecuredAction action, Object data);
 }

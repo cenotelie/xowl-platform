@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
+import org.xowl.infra.utils.api.Reply;
 
 /**
  * Represents an authorization policy for the platform
@@ -33,7 +33,7 @@ public interface SecurityPolicy extends Identifiable {
      * @param action          The requested action
      * @return The protocol reply
      */
-    XSPReply checkAction(SecurityService securityService, SecuredAction action);
+    Reply checkAction(SecurityService securityService, SecuredAction action);
 
     /**
      * Checks the authorization policy for the specified action
@@ -43,14 +43,14 @@ public interface SecurityPolicy extends Identifiable {
      * @param data            Custom data that may be required to make a decision
      * @return The protocol reply
      */
-    XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data);
+    Reply checkAction(SecurityService securityService, SecuredAction action, Object data);
 
     /**
      * Gets the description of the configuration for this policy
      *
      * @return The protocol reply
      */
-    XSPReply getConfiguration();
+    Reply getConfiguration();
 
     /**
      * Sets the policy for a secured action
@@ -59,7 +59,7 @@ public interface SecurityPolicy extends Identifiable {
      * @param policy   The policy to set
      * @return The protocol reply
      */
-    XSPReply setPolicy(String actionId, SecuredActionPolicy policy);
+    Reply setPolicy(String actionId, SecuredActionPolicy policy);
 
     /**
      * Sets the policy for a secured action
@@ -68,5 +68,5 @@ public interface SecurityPolicy extends Identifiable {
      * @param policyDefinition The definition of the policy to set
      * @return The protocol reply
      */
-    XSPReply setPolicy(String actionId, String policyDefinition);
+    Reply setPolicy(String actionId, String policyDefinition);
 }

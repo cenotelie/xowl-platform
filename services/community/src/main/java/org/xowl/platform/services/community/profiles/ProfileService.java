@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.profiles;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
@@ -64,7 +64,7 @@ public interface ProfileService extends SecuredService {
      * @param profile The profile to update
      * @return The protocol reply
      */
-    XSPReply updatePublicProfile(PublicProfile profile);
+    Reply updatePublicProfile(PublicProfile profile);
 
     /**
      * Gets the description of all the badges
@@ -88,7 +88,7 @@ public interface ProfileService extends SecuredService {
      * @param badgeId The identifier of the badge
      * @return The protocol reply
      */
-    XSPReply awardBadge(String userId, String badgeId);
+    Reply awardBadge(String userId, String badgeId);
 
     /**
      * Rescinds a badge from a user
@@ -97,5 +97,5 @@ public interface ProfileService extends SecuredService {
      * @param badgeId The identifier of the badge
      * @return The protocol reply
      */
-    XSPReply rescindBadge(String userId, String badgeId);
+    Reply rescindBadge(String userId, String badgeId);
 }

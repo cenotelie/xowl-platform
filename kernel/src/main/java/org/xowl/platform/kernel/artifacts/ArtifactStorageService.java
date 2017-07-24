@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.artifacts;
 
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.utils.ApiError;
+import org.xowl.infra.utils.api.ApiError;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
@@ -89,24 +89,24 @@ public interface ArtifactStorageService extends SecuredService {
      * @param artifact The artifact to store
      * @return The operation's result
      */
-    XSPReply store(Artifact artifact);
+    Reply store(Artifact artifact);
 
     /**
      * Retrieves the artifact identified by the specified identifier
      *
      * @param identifier The identifier of a artifact
-     * @return The operation's result which can be casted to XSPReplyResult in case of success
+     * @return The operation's result which can be casted to ReplyResult in case of success
      */
-    XSPReply retrieve(String identifier);
+    Reply retrieve(String identifier);
 
     /**
      * Retrieves the specific version of an artifact
      *
      * @param base    The identifier of the base artifact
      * @param version The version to retrieve
-     * @return The operation's result which can be casted to XSPReplyResult in case of success
+     * @return The operation's result which can be casted to ReplyResult in case of success
      */
-    XSPReply retrieve(String base, String version);
+    Reply retrieve(String base, String version);
 
     /**
      * Completely delete an artifact from the long term and live stores
@@ -114,7 +114,7 @@ public interface ArtifactStorageService extends SecuredService {
      * @param identifier The identifier of the artifact to delete
      * @return The operation's result
      */
-    XSPReply delete(String identifier);
+    Reply delete(String identifier);
 
     /**
      * Completely delete an artifact from the long term and live stores
@@ -122,37 +122,37 @@ public interface ArtifactStorageService extends SecuredService {
      * @param artifact The artifact to delete
      * @return The operation's result
      */
-    XSPReply delete(Artifact artifact);
+    Reply delete(Artifact artifact);
 
     /**
      * Lists all the stored artifacts
      *
-     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
+     * @return The operation's result which can be casted to ReplyResultCollection in case of success
      */
-    XSPReply getAllArtifacts();
+    Reply getAllArtifacts();
 
     /**
      * Lists all the stored versions of a base artifact
      *
      * @param base The identifier of the base artifact
-     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
+     * @return The operation's result which can be casted to ReplyResultCollection in case of success
      */
-    XSPReply getArtifactsForBase(String base);
+    Reply getArtifactsForBase(String base);
 
     /**
      * Lists all the store artifacts of the specified archetype
      *
      * @param archetype The archetype to look for
-     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
+     * @return The operation's result which can be casted to ReplyResultCollection in case of success
      */
-    XSPReply getArtifactsForArchetype(String archetype);
+    Reply getArtifactsForArchetype(String archetype);
 
     /**
      * Lists all the live artifacts
      *
-     * @return The operation's result which can be casted to XSPReplyResultCollection in case of success
+     * @return The operation's result which can be casted to ReplyResultCollection in case of success
      */
-    XSPReply getLiveArtifacts();
+    Reply getLiveArtifacts();
 
     /**
      * Pushes an artifact to a live reasoning store
@@ -160,7 +160,7 @@ public interface ArtifactStorageService extends SecuredService {
      * @param artifact The artifact to push
      * @return Whether the operation succeeded
      */
-    XSPReply pushToLive(Artifact artifact);
+    Reply pushToLive(Artifact artifact);
 
     /**
      * Pulls an artifact from a live reasoning store
@@ -169,5 +169,5 @@ public interface ArtifactStorageService extends SecuredService {
      * @param artifact The artifact to pull
      * @return The operation's result
      */
-    XSPReply pullFromLive(Artifact artifact);
+    Reply pullFromLive(Artifact artifact);
 }

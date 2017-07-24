@@ -24,7 +24,7 @@ import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.platform.PlatformRoleAdmin;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.*;
@@ -84,55 +84,55 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, SecuredAction action) {
+    public Reply checkAction(SecurityService securityService, SecuredAction action) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
             // no user => un-authenticated
-            return XSPReplyUnauthenticated.instance();
+            return ReplyUnauthenticated.instance();
         if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
             // user is platform admin => authorized
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         // check the custom action policies
         SecuredActionPolicy policy = resolveConfig().getPolicyFor(action);
         if (policy != null && policy.isAuthorized(securityService, user, action))
-            return XSPReplySuccess.instance();
-        return XSPReplyUnauthorized.instance();
+            return ReplySuccess.instance();
+        return ReplyUnauthorized.instance();
     }
 
     @Override
-    public XSPReply checkAction(SecurityService securityService, SecuredAction action, Object data) {
+    public Reply checkAction(SecurityService securityService, SecuredAction action, Object data) {
         PlatformUser user = securityService.getCurrentUser();
         if (user == null)
             // no user => un-authenticated
-            return XSPReplyUnauthenticated.instance();
+            return ReplyUnauthenticated.instance();
         if (securityService.getRealm().checkHasRole(user.getIdentifier(), PlatformRoleAdmin.INSTANCE.getIdentifier()))
             // user is platform admin => authorized
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         // check the custom action policies
         SecuredActionPolicy policy = resolveConfig().getPolicyFor(action);
         if (policy != null && policy.isAuthorized(securityService, user, action, data))
-            return XSPReplySuccess.instance();
-        return XSPReplyUnauthorized.instance();
+            return ReplySuccess.instance();
+        return ReplyUnauthorized.instance();
     }
 
     @Override
-    public XSPReply getConfiguration() {
+    public Reply getConfiguration() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_GET_POLICY);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_GET_POLICY);
         if (!reply.isSuccess())
             return reply;
         KernelSecurityPolicyConfiguration configuration = resolveConfig();
-        return new XSPReplyResult<>(configuration.synchronize());
+        return new ReplyResult<>(configuration.synchronize());
     }
 
     @Override
-    public XSPReply setPolicy(String actionId, SecuredActionPolicy policy) {
+    public Reply setPolicy(String actionId, SecuredActionPolicy policy) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(SecurityService.ACTION_SET_POLICY);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(SecurityService.ACTION_SET_POLICY);
         if (!reply.isSuccess())
             return reply;
         for (SecuredService securedService : Register.getComponents(SecuredService.class)) {
@@ -142,17 +142,17 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
                 }
             }
         }
-        return XSPReplyNotFound.instance();
+        return ReplyNotFound.instance();
     }
 
     @Override
-    public XSPReply setPolicy(String actionId, String policyDefinition) {
+    public Reply setPolicy(String actionId, String policyDefinition) {
         ASTNode definition = JsonLoader.parseJson(Logging.get(), policyDefinition);
         if (definition == null)
-            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
+            return new ReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED);
         SecuredActionPolicy policy = SecuredActionPolicyBase.load(definition);
         if (policy == null)
-            return new XSPReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, "Invalid policy definition");
+            return new ReplyApiError(HttpApiService.ERROR_CONTENT_PARSING_FAILED, "Invalid policy definition");
         return setPolicy(actionId, policy);
     }
 }

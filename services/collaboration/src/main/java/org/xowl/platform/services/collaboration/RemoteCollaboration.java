@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 
@@ -46,7 +46,7 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      *
      * @return The manifest
      */
-    XSPReply getManifest();
+    Reply getManifest();
 
     /**
      * Gets the available artifacts for a specific input
@@ -54,7 +54,7 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      * @param specificationId The identifier for the specification of the input
      * @return The associated artifacts
      */
-    XSPReply getArtifactsForInput(String specificationId);
+    Reply getArtifactsForInput(String specificationId);
 
     /**
      * Gets the available artifacts for a specific output
@@ -62,28 +62,28 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      * @param specificationId The identifier for the specification of the output
      * @return The associated artifacts
      */
-    XSPReply getArtifactsForOutput(String specificationId);
+    Reply getArtifactsForOutput(String specificationId);
 
     /**
      * Stops and archive this collaboration
      *
      * @return The protocol reply
      */
-    XSPReply archive();
+    Reply archive();
 
     /**
      * Un-archives and re-starts this collaboration
      *
      * @return The protocol reply
      */
-    XSPReply restart();
+    Reply restart();
 
     /**
      * Stops this collaboration and delete all its data
      *
      * @return The protocol reply
      */
-    XSPReply delete();
+    Reply delete();
 
     /**
      * Copies locally an output of the remote collaboration
@@ -92,5 +92,5 @@ public interface RemoteCollaboration extends Identifiable, Serializable {
      * @param artifactId      The identifier of the artifact to retrieve
      * @return The protocol reply
      */
-    XSPReply retrieveOutput(String specificationId, String artifactId);
+    Reply retrieveOutput(String specificationId, String artifactId);
 }

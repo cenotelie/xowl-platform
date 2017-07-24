@@ -18,10 +18,10 @@
 package org.xowl.platform.services.storage.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
-import org.xowl.platform.kernel.XSPReplyServiceUnavailable;
+import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;
 import org.xowl.platform.kernel.jobs.JobBase;
 
@@ -38,7 +38,7 @@ public class DeleteArtifactJob extends JobBase {
     /**
      * The job's result
      */
-    private XSPReply result;
+    private Reply result;
 
     /**
      * Initializes this job
@@ -77,7 +77,7 @@ public class DeleteArtifactJob extends JobBase {
     }
 
     @Override
-    public XSPReply getResult() {
+    public Reply getResult() {
         return result;
     }
 
@@ -85,7 +85,7 @@ public class DeleteArtifactJob extends JobBase {
     public void doRun() {
         ArtifactStorageService storage = Register.getComponent(ArtifactStorageService.class);
         if (storage == null) {
-            result = XSPReplyServiceUnavailable.instance();
+            result = ReplyServiceUnavailable.instance();
             return;
         }
         result = storage.delete(artifactId);

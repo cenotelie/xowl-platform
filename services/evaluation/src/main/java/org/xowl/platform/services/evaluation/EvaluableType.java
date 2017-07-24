@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.Registrable;
 
@@ -35,7 +35,7 @@ public interface EvaluableType extends Registrable, Serializable {
      *
      * @return The evaluable elements
      */
-    XSPReply getElements();
+    Reply getElements();
 
     /**
      * Gets the evaluable elements given the specified parameters

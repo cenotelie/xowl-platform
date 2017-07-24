@@ -18,9 +18,9 @@
 package org.xowl.platform.services.community.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.XSPReply;
-import org.xowl.infra.server.xsp.XSPReplyApiError;
-import org.xowl.infra.server.xsp.XSPReplyUtils;
+import org.xowl.infra.utils.api.Reply;
+import org.xowl.infra.utils.api.ReplyApiError;
+import org.xowl.infra.utils.api.ReplyUtils;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
@@ -123,11 +123,11 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
     }
 
     @Override
-    public XSPReply updatePublicProfile(PublicProfile profile) {
+    public Reply updatePublicProfile(PublicProfile profile) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UPDATE_PROFILE, profile);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_UPDATE_PROFILE, profile);
         if (!reply.isSuccess())
             return reply;
         return getImplementation().updatePublicProfile(profile);
@@ -144,22 +144,22 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
     }
 
     @Override
-    public XSPReply awardBadge(String userId, String badgeId) {
+    public Reply awardBadge(String userId, String badgeId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_AWARD_BADGE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_AWARD_BADGE);
         if (!reply.isSuccess())
             return reply;
         return getImplementation().awardBadge(userId, badgeId);
     }
 
     @Override
-    public XSPReply rescindBadge(String userId, String badgeId) {
+    public Reply rescindBadge(String userId, String badgeId) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_RESCIND_BADGE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_RESCIND_BADGE);
         if (!reply.isSuccess())
             return reply;
         return getImplementation().rescindBadge(userId, badgeId);
@@ -249,15 +249,15 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
             } else if (HttpConstants.METHOD_PUT.equals(request.getMethod())) {
                 String content = new String(request.getContent(), IOUtils.CHARSET);
                 if (content.isEmpty())
-                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                 BufferedLogger logger = new BufferedLogger();
                 ASTNode root = JsonLoader.parseJson(logger, content);
                 if (root == null)
-                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
                 PublicProfile profile = new PublicProfile(root, null);
                 if (!Objects.equals(profile.getIdentifier(), profileId))
-                    return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"), null);
-                return XSPReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
+                    return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, "Profile identifier in content does not match URI"), null);
+                return ReplyUtils.toHttpResponse(updatePublicProfile(profile), null);
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
         }
@@ -267,9 +267,9 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
                 return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
             String badgeId = URIUtils.decodeComponent(rest);
             if (HttpConstants.METHOD_PUT.equals(request.getMethod()))
-                return XSPReplyUtils.toHttpResponse(awardBadge(profileId, badgeId), null);
+                return ReplyUtils.toHttpResponse(awardBadge(profileId, badgeId), null);
             if (HttpConstants.METHOD_DELETE.equals(request.getMethod()))
-                return XSPReplyUtils.toHttpResponse(rescindBadge(profileId, badgeId), null);
+                return ReplyUtils.toHttpResponse(rescindBadge(profileId, badgeId), null);
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: PUT, DELETE");
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

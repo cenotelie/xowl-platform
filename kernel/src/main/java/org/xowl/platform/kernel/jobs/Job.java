@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.jobs;
 
-import org.xowl.infra.server.xsp.XSPReply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**
@@ -47,7 +47,7 @@ public interface Job extends Identifiable, Serializable, Runnable {
      *
      * @return The result for this job
      */
-    XSPReply getResult();
+    Reply getResult();
 
     /**
      * Gets an estimation of the current completion rate
@@ -68,7 +68,7 @@ public interface Job extends Identifiable, Serializable, Runnable {
      *
      * @return The result of the attemps to cancel the job
      */
-    XSPReply cancel();
+    Reply cancel();
 
     /**
      * Event when the job is being scheduled

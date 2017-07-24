@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.bots;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Identifiable;
 import org.xowl.infra.utils.Serializable;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -55,19 +55,19 @@ public interface Bot extends Identifiable, Serializable {
      *
      * @return The last messages from this bot
      */
-    XSPReply getMessages();
+    Reply getMessages();
 
     /**
      * Wakes this bot up (when asleep)
      *
      * @return The protocol reply
      */
-    XSPReply wakeup();
+    Reply wakeup();
 
     /**
      * Puts this bot to sleep (when awaken)
      *
      * @return The protocol reply
      */
-    XSPReply sleep();
+    Reply sleep();
 }

@@ -20,8 +20,8 @@ package org.xowl.platform.kernel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.xowl.platform.kernel.artifacts.*;
-import org.xowl.platform.kernel.remote.DeserializerFactory;
-import org.xowl.platform.kernel.remote.DeserializerFactoryForKernel;
+import org.xowl.platform.kernel.remote.PlatformApiFactory;
+import org.xowl.platform.kernel.remote.PlatformApiFactoryForKernel;
 
 /**
  * Activator for this bundle
@@ -44,7 +44,7 @@ public class Activator implements BundleActivator {
         bundleContext.registerService(Service.class, locator, null);
         bundleContext.registerService(PlatformLocator.class, locator, null);
 
-        bundleContext.registerService(DeserializerFactory.class, new DeserializerFactoryForKernel(), null);
+        bundleContext.registerService(PlatformApiFactory.class, new PlatformApiFactoryForKernel(), null);
 
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaKernel.INSTANCE, null);
         bundleContext.registerService(ArtifactSchema.class, ArtifactSchemaRDFS.INSTANCE, null);

@@ -17,34 +17,59 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.server.xsp.XSPReplyFailure;
+import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
 
 /**
  * An XSP reply when a required service is not available
  *
  * @author Laurent Wouters
  */
-public class XSPReplyServiceUnavailable extends XSPReplyFailure {
+public class ReplyServiceUnavailable implements Reply {
     /**
      * The singleton instance
      */
-    private static XSPReplyFailure INSTANCE = null;
+    private static ReplyServiceUnavailable INSTANCE = null;
 
     /**
-     * Gets the default instance
+     * Gets the singleton instance
      *
-     * @return The default instance
+     * @return The singleton instance
      */
-    public synchronized static XSPReplyFailure instance() {
+    public synchronized static ReplyServiceUnavailable instance() {
         if (INSTANCE == null)
-            return new XSPReplyServiceUnavailable();
+            INSTANCE = new ReplyServiceUnavailable();
         return INSTANCE;
     }
 
     /**
-     * Initializes this reply
+     * Initializes this instance
      */
-    public XSPReplyServiceUnavailable() {
-        super("FAILED: A required service is not available");
+    private ReplyServiceUnavailable() {
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
+
+    @Override
+    public String getMessage() {
+        return "SERVICE UNAVAILABLE";
+    }
+
+    @Override
+    public String serializedString() {
+        return "SERVICE UNAVAILABLE";
+    }
+
+    @Override
+    public String serializedJSON() {
+        return "{\"type\": \"" +
+                TextUtils.escapeStringJSON(Reply.class.getCanonicalName()) +
+                "\", \"kind\": \"" +
+                TextUtils.escapeStringJSON(ReplyServiceUnavailable.class.getSimpleName()) +
+                "\", \"isSuccess\": false," +
+                "\"message\": \"SERVICE UNAVAILABLE\"}";
     }
 }

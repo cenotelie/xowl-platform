@@ -22,20 +22,20 @@ import java.util.Collection;
 import java.util.ServiceLoader;
 
 /**
- * Implements a deserializer that relies on the java service discovery to discover the factories
+ * Implements a factory that relies on the java service discovery to discover the factories
  *
  * @author Laurent Wouters
  */
-public class DeserializerForJava extends Deserializer {
+public class PlatformApiDeserializerForJava extends PlatformApiDeserializer {
     /**
      * The loader for the factories
      */
-    private final ServiceLoader<DeserializerFactory> serviceLoader = ServiceLoader.load(DeserializerFactory.class);
+    private final ServiceLoader<PlatformApiFactory> serviceLoader = ServiceLoader.load(PlatformApiFactory.class);
 
     @Override
-    protected Collection<DeserializerFactory> getFactories() {
-        Collection<DeserializerFactory> result = new ArrayList<>();
-        for (DeserializerFactory factory : serviceLoader)
+    protected Collection<PlatformApiFactory> getParts() {
+        Collection<PlatformApiFactory> result = new ArrayList<>();
+        for (PlatformApiFactory factory : serviceLoader)
             result.add(factory);
         return result;
     }

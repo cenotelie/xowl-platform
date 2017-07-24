@@ -321,7 +321,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocuments() {
-        return XSPReplyUtils.toHttpResponse(getDocuments(), null);
+        return ReplyUtils.toHttpResponse(getDocuments(), null);
     }
 
     /**
@@ -331,7 +331,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocument(String documentId) {
-        return XSPReplyUtils.toHttpResponse(getDocument(documentId), null);
+        return ReplyUtils.toHttpResponse(getDocument(documentId), null);
     }
 
     /**
@@ -344,11 +344,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String name = request.getParameter("name");
         String fileName = request.getParameter("fileName");
         if (name == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
         if (fileName == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
-        XSPReply reply = upload(name, fileName, request.getContent());
-        return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
+        Reply reply = upload(name, fileName, request.getContent());
+        return ReplyUtils.toHttpResponse(reply, null);
     }
 
     /**
@@ -358,7 +358,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onPostDropDocument(String documentId) {
-        return XSPReplyUtils.toHttpResponse(drop(documentId), null);
+        return ReplyUtils.toHttpResponse(drop(documentId), null);
     }
 
     /**
@@ -372,16 +372,16 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         // should use a stored configuration?
         String configurationId = request.getParameter("configuration");
         if (configurationId != null)
-            return XSPReplyUtils.toHttpResponse(getPreview(documentId, configurationId), null);
+            return ReplyUtils.toHttpResponse(getPreview(documentId, configurationId), null);
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return XSPReplyUtils.toHttpResponse(getPreview(documentId, configuration), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+        return ReplyUtils.toHttpResponse(getPreview(documentId, configuration), null);
     }
 
     /**
@@ -430,28 +430,28 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String archetype = request.getParameter("archetype"); // the archetype for the artifact
         String superseded = request.getParameter("superseded"); // the superseded artifact
         if (name == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
         if (base == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
         if (version == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
         if (archetype == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
         Artifact metadata = new ArtifactFuture(name, base, version, archetype, superseded);
 
         // should use a stored configuration?
         String configurationId = request.getParameter("configuration");
         if (configurationId != null)
-            return XSPReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata), null);
+            return ReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata), null);
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return XSPReplyUtils.toHttpResponse(beginImport(documentId, configuration, metadata), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+        return ReplyUtils.toHttpResponse(beginImport(documentId, configuration, metadata), null);
     }
 
     /**
@@ -460,7 +460,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfigurations() {
-        return XSPReplyUtils.toHttpResponse(retrieveConfigurations(), null);
+        return ReplyUtils.toHttpResponse(retrieveConfigurations(), null);
     }
 
     /**
@@ -470,7 +470,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfiguration(String configurationId) {
-        return XSPReplyUtils.toHttpResponse(retrieveConfiguration(configurationId), null);
+        return ReplyUtils.toHttpResponse(retrieveConfiguration(configurationId), null);
     }
 
     /**
@@ -480,7 +480,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfigurationsFor(String importerId) {
-        return XSPReplyUtils.toHttpResponse(retrieveConfigurations(importerId), null);
+        return ReplyUtils.toHttpResponse(retrieveConfigurations(importerId), null);
     }
 
     /**
@@ -492,11 +492,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     private HttpResponse onPutConfiguration(HttpApiRequest request) {
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return XSPReplyUtils.toHttpResponse(storeConfiguration(configuration), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+        return ReplyUtils.toHttpResponse(storeConfiguration(configuration), null);
     }
 
     /**
@@ -506,11 +506,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onPostDeleteConfiguration(String configurationId) {
-        return XSPReplyUtils.toHttpResponse(deleteConfiguration(configurationId), null);
+        return ReplyUtils.toHttpResponse(deleteConfiguration(configurationId), null);
     }
 
     @Override
-    public XSPReply getDocuments() {
+    public Reply getDocuments() {
         onActivated();
         Collection<Document> result = new ArrayList<>();
         synchronized (documents) {
@@ -519,35 +519,35 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                     result.add(document);
             }
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override
-    public XSPReply getDocument(String documentId) {
+    public Reply getDocument(String documentId) {
         onActivated();
         Document document;
         synchronized (documents) {
             document = documents.get(documentId);
         }
         if (document == null)
-            return XSPReplyNotFound.instance();
-        XSPReply reply = document.checkAccess();
+            return ReplyNotFound.instance();
+        Reply reply = document.checkAccess();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(document);
+        return new ReplyResult<>(document);
     }
 
     @Override
-    public XSPReply upload(String name, String fileName, byte[] content) {
+    public Reply upload(String name, String fileName, byte[] content) {
         onActivated();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_UPLOAD_DOCUMENT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_UPLOAD_DOCUMENT);
         if (!reply.isSuccess())
             return reply;
         if (!storage.exists() && !storage.mkdirs())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         Document document = new Document(name, fileName);
         reply = securityService.getSecuredResources().createDescriptorFor(document);
         if (!reply.isSuccess())
@@ -559,14 +559,14 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write descriptor in storage");
         }
         try (FileOutputStream stream = new FileOutputStream(fileContent)) {
             stream.write(content);
             stream.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write document in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write document in storage");
         }
         synchronized (documents) {
             documents.put(document.getIdentifier(), document);
@@ -574,22 +574,22 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentUploadedEvent(document, this));
-        return new XSPReplyResult<>(document);
+        return new ReplyResult<>(document);
     }
 
     @Override
-    public XSPReply drop(String documentId) {
+    public Reply drop(String documentId) {
         onActivated();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         Document document;
         synchronized (documents) {
             document = documents.remove(documentId);
             if (document == null)
-                return XSPReplyNotFound.instance();
+                return ReplyNotFound.instance();
         }
-        XSPReply reply = securityService.checkAction(ACTION_DROP_DOCUMENT, document);
+        Reply reply = securityService.checkAction(ACTION_DROP_DOCUMENT, document);
         if (!reply.isSuccess())
             return reply;
         reply = securityService.getSecuredResources().deleteDescriptorFor(document.getIdentifier());
@@ -604,30 +604,30 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new DocumentDroppedEvent(document, this));
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply getStreamFor(String documentId) {
+    public Reply getStreamFor(String documentId) {
         onActivated();
         Document document;
         synchronized (documents) {
             document = documents.remove(documentId);
             if (document == null)
-                return XSPReplyNotFound.instance();
+                return ReplyNotFound.instance();
         }
-        XSPReply reply = document.checkAccess();
+        Reply reply = document.checkAccess();
         if (!reply.isSuccess())
             return reply;
         File fileContent = new File(storage, getDocContentFile(document));
         if (!fileContent.exists())
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         try {
             FileInputStream result = new FileInputStream(fileContent);
-            return new XSPReplyResult<>(result);
+            return new ReplyResult<>(result);
         } catch (FileNotFoundException exception) {
             Logging.get().error(exception);
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         }
     }
 
@@ -647,54 +647,54 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     }
 
     @Override
-    public XSPReply getPreview(String documentId, ImporterConfiguration configuration) {
+    public Reply getPreview(String documentId, ImporterConfiguration configuration) {
         Importer importer = getImporter(configuration.getImporter());
         if (importer == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         return importer.getPreview(documentId, configuration);
     }
 
     @Override
-    public XSPReply getPreview(String documentId, String configurationId) {
-        XSPReply reply = retrieveConfiguration(configurationId);
+    public Reply getPreview(String documentId, String configurationId) {
+        Reply reply = retrieveConfiguration(configurationId);
         if (!reply.isSuccess())
             return reply;
-        return getPreview(documentId, ((XSPReplyResult<ImporterConfiguration>) reply).getData());
+        return getPreview(documentId, ((ReplyResult<ImporterConfiguration>) reply).getData());
     }
 
     @Override
-    public XSPReply beginImport(String documentId, ImporterConfiguration configuration, Artifact metadata) {
+    public Reply beginImport(String documentId, ImporterConfiguration configuration, Artifact metadata) {
         Importer importer = getImporter(configuration.getImporter());
         if (importer == null)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
         JobExecutionService executionService = Register.getComponent(JobExecutionService.class);
         if (executionService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = importer.getImportJob(documentId, configuration, metadata);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = importer.getImportJob(documentId, configuration, metadata);
         if (!reply.isSuccess())
             return reply;
-        return executionService.schedule(((XSPReplyResult<Job>) reply).getData());
+        return executionService.schedule(((ReplyResult<Job>) reply).getData());
     }
 
     @Override
-    public XSPReply beginImport(String documentId, String configurationId, Artifact metadata) {
-        XSPReply reply = retrieveConfiguration(configurationId);
+    public Reply beginImport(String documentId, String configurationId, Artifact metadata) {
+        Reply reply = retrieveConfiguration(configurationId);
         if (!reply.isSuccess())
             return reply;
-        return beginImport(documentId, ((XSPReplyResult<ImporterConfiguration>) reply).getData(), metadata);
+        return beginImport(documentId, ((ReplyResult<ImporterConfiguration>) reply).getData(), metadata);
     }
 
     @Override
-    public XSPReply storeConfiguration(ImporterConfiguration configuration) {
+    public Reply storeConfiguration(ImporterConfiguration configuration) {
         onActivated();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_STORE_CONFIG);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_STORE_CONFIG);
         if (!reply.isSuccess())
             return reply;
         if (!storage.exists() && !storage.mkdirs())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to access document storage");
         reply = securityService.getSecuredResources().createDescriptorFor(configuration);
         if (!reply.isSuccess())
             return reply;
@@ -704,16 +704,16 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             writer.flush();
         } catch (IOException exception) {
             Logging.get().error(exception);
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write configuration in storage");
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to write configuration in storage");
         }
         synchronized (configurations) {
             configurations.put(configuration.getIdentifier(), configuration);
         }
-        return XSPReplySuccess.instance();
+        return ReplySuccess.instance();
     }
 
     @Override
-    public XSPReply retrieveConfigurations() {
+    public Reply retrieveConfigurations() {
         onActivated();
         Collection<ImporterConfiguration> result = new ArrayList<>();
         synchronized (configurations) {
@@ -722,26 +722,26 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                     result.add(configuration);
             }
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override
-    public XSPReply retrieveConfiguration(String configurationId) {
+    public Reply retrieveConfiguration(String configurationId) {
         onActivated();
         ImporterConfiguration configuration;
         synchronized (configurations) {
             configuration = configurations.get(configurationId);
         }
         if (configuration == null)
-            return XSPReplyNotFound.instance();
-        XSPReply reply = configuration.checkAccess();
+            return ReplyNotFound.instance();
+        Reply reply = configuration.checkAccess();
         if (!reply.isSuccess())
             return reply;
-        return new XSPReplyResult<>(configuration);
+        return new ReplyResult<>(configuration);
     }
 
     @Override
-    public XSPReply retrieveConfigurations(String importerId) {
+    public Reply retrieveConfigurations(String importerId) {
         onActivated();
         Collection<ImporterConfiguration> result = new ArrayList<>();
         synchronized (configurations) {
@@ -750,21 +750,21 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
                     result.add(configuration);
             }
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override
-    public XSPReply deleteConfiguration(String configurationId) {
+    public Reply deleteConfiguration(String configurationId) {
         onActivated();
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         ImporterConfiguration configuration;
         synchronized (configurations) {
             configuration = configurations.get(configurationId);
             if (configuration == null)
-                return XSPReplyNotFound.instance();
-            XSPReply reply = securityService.checkAction(ACTION_DELETE_CONFIG, configuration);
+                return ReplyNotFound.instance();
+            Reply reply = securityService.checkAction(ACTION_DELETE_CONFIG, configuration);
             if (!reply.isSuccess())
                 return reply;
             reply = securityService.getSecuredResources().deleteDescriptorFor(configuration.getIdentifier());
@@ -774,7 +774,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
             File file = new File(storage, getConfigurationFile(configuration));
             if (!file.delete())
                 Logging.get().error("Failed to delete " + file.getAbsolutePath());
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 

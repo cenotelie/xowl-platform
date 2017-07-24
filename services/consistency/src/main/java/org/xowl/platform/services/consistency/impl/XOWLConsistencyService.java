@@ -179,12 +179,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     private HttpResponse handleInconsistencies(HttpApiRequest request) {
         if (!HttpConstants.METHOD_GET.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
-        XSPReply reply = getInconsistencies();
+        Reply reply = getInconsistencies();
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply, null);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
-        for (Inconsistency inconsistency : ((XSPReplyResultCollection<Inconsistency>) reply).getData()) {
+        for (Inconsistency inconsistency : ((ReplyResultCollection<Inconsistency>) reply).getData()) {
             if (!first)
                 builder.append(", ");
             first = false;
@@ -204,12 +204,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (request.getUri().equals(apiUri + "/rules")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    XSPReply reply = getReasoningRules();
+                    Reply reply = getReasoningRules();
                     if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     StringBuilder builder = new StringBuilder("[");
                     boolean first = true;
-                    for (ReasoningRule rule : ((XSPReplyResultCollection<ReasoningRule>) reply).getData()) {
+                    for (ReasoningRule rule : ((ReplyResultCollection<ReasoningRule>) reply).getData()) {
                         if (!first)
                             builder.append(", ");
                         first = false;
@@ -221,14 +221,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_PUT: {
                     String name = request.getParameter("name");
                     if (name == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
                     String definition = new String(request.getContent(), IOUtils.CHARSET);
                     if (definition.isEmpty())
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
-                    XSPReply reply = createReasoningRule(name, definition);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                    Reply reply = createReasoningRule(name, definition);
                     if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ReasoningRule>) reply).getData().serializedJSON());
+                        return ReplyUtils.toHttpResponse(reply, null);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ReasoningRule>) reply).getData().serializedJSON());
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -242,26 +242,26 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             if (index < 0) {
                 switch (request.getMethod()) {
                     case HttpConstants.METHOD_GET: {
-                        XSPReply reply = getReasoningRule(ruleId);
+                        Reply reply = getReasoningRule(ruleId);
                         if (!reply.isSuccess())
-                            return XSPReplyUtils.toHttpResponse(reply, null);
-                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ReasoningRule>) reply).getData().serializedJSON());
+                            return ReplyUtils.toHttpResponse(reply, null);
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ReasoningRule>) reply).getData().serializedJSON());
                     }
                     case HttpConstants.METHOD_PUT: {
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
-                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                         ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
                         if (definition == null)
-                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ReasoningRule rule = new XOWLReasoningRule(definition);
                         if (!ruleId.equals(rule.getIdentifier()))
-                            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
-                        return XSPReplyUtils.toHttpResponse(addReasoningRule(rule), null);
+                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
+                        return ReplyUtils.toHttpResponse(addReasoningRule(rule), null);
                     }
                     case HttpConstants.METHOD_DELETE: {
-                        XSPReply reply = deleteReasoningRule(ruleId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = deleteReasoningRule(ruleId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                 }
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -270,14 +270,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     case "/activate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        XSPReply reply = activateReasoningRule(ruleId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = activateReasoningRule(ruleId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                     case "/deactivate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        XSPReply reply = deactivateReasoningRule(ruleId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = deactivateReasoningRule(ruleId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                 }
             }
@@ -296,12 +296,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (request.getUri().equals(apiUri + "/constraints")) {
             switch (request.getMethod()) {
                 case HttpConstants.METHOD_GET: {
-                    XSPReply reply = getConsistencyConstraints();
+                    Reply reply = getConsistencyConstraints();
                     if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     StringBuilder builder = new StringBuilder("[");
                     boolean first = true;
-                    for (ConsistencyConstraint constraint : ((XSPReplyResultCollection<ConsistencyConstraint>) reply).getData()) {
+                    for (ConsistencyConstraint constraint : ((ReplyResultCollection<ConsistencyConstraint>) reply).getData()) {
                         if (!first)
                             builder.append(", ");
                         first = false;
@@ -313,21 +313,21 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_PUT: {
                     String name = request.getParameter("name");
                     if (name == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
                     String message = request.getParameter("message");
                     if (message == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"), null);
                     String prefixes = request.getParameter("prefixes");
                     if (prefixes == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
                     String antecedents = request.getParameter("antecedents");
                     if (antecedents == null)
-                        return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'antecedents'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'antecedents'"), null);
                     String guard = request.getParameter("guard");
-                    XSPReply reply = createConsistencyConstraint(name, message, prefixes, antecedents, guard);
+                    Reply reply = createConsistencyConstraint(name, message, prefixes, antecedents, guard);
                     if (!reply.isSuccess())
-                        return XSPReplyUtils.toHttpResponse(reply, null);
-                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
+                        return ReplyUtils.toHttpResponse(reply, null);
+                    return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                 }
             }
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT");
@@ -341,26 +341,26 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             if (index < 0) {
                 switch (request.getMethod()) {
                     case HttpConstants.METHOD_GET: {
-                        XSPReply reply = getConsistencyConstraint(constraintId);
+                        Reply reply = getConsistencyConstraint(constraintId);
                         if (!reply.isSuccess())
-                            return XSPReplyUtils.toHttpResponse(reply, null);
-                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
+                            return ReplyUtils.toHttpResponse(reply, null);
+                        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                     }
                     case HttpConstants.METHOD_PUT: {
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
-                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
                         ASTNode definition = JsonLoader.parseJson(Logging.get(), content);
                         if (definition == null)
-                            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
                         ConsistencyConstraint constraint = new XOWLConsistencyConstraint(definition);
                         if (!constraintId.equals(constraint.getIdentifier()))
-                            return XSPReplyUtils.toHttpResponse(XSPReplyNotFound.instance(), null);
-                        return XSPReplyUtils.toHttpResponse(addConsistencyConstraint(constraint), null);
+                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
+                        return ReplyUtils.toHttpResponse(addConsistencyConstraint(constraint), null);
                     }
                     case HttpConstants.METHOD_DELETE: {
-                        XSPReply reply = deleteConsistencyConstraint(constraintId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = deleteConsistencyConstraint(constraintId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                 }
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -369,14 +369,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     case "/activate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        XSPReply reply = activateConsistencyConstraint(constraintId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = activateConsistencyConstraint(constraintId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                     case "/deactivate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                        XSPReply reply = deactivateConsistencyConstraint(constraintId);
-                        return XSPReplyUtils.toHttpResponse(reply, null);
+                        Reply reply = deactivateConsistencyConstraint(constraintId);
+                        return ReplyUtils.toHttpResponse(reply, null);
                     }
                 }
             }
@@ -421,17 +421,17 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
-    public XSPReply getInconsistencies() {
+    public Reply getInconsistencies() {
         // get all the consistency constraints
-        XSPReply reply = getConsistencyConstraints();
+        Reply reply = getConsistencyConstraints();
         if (!reply.isSuccess())
             return reply;
-        Collection<XOWLConsistencyConstraint> constraints = ((XSPReplyResultCollection<XOWLConsistencyConstraint>) reply).getData();
+        Collection<XOWLConsistencyConstraint> constraints = ((ReplyResultCollection<XOWLConsistencyConstraint>) reply).getData();
 
         // query for inconsistencies
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         reply = live.sparql("DESCRIBE ?i WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
@@ -440,9 +440,9 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         Collection<Quad> quads = ((ResultQuads) sparqlResult).getQuads();
         Map<SubjectNode, Collection<Quad>> map = PlatformUtils.mapBySubject(quads);
 
@@ -472,18 +472,18 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             if (constraint != null)
                 inconsistencies.add(new XOWLInconsistency(IRI_PREFIX_INCONSISTENCY + UUID.randomUUID().toString(), message, constraint, antecedents));
         }
-        return new XSPReplyResultCollection<>(inconsistencies);
+        return new ReplyResultCollection<>(inconsistencies);
     }
 
     @Override
-    public XSPReply getReasoningRules() {
+    public Reply getReasoningRules() {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // query the database for reasoning rules metadata
-        XSPReply reply = live.sparql("SELECT DISTINCT ?r ?n WHERE { GRAPH <" +
+        Reply reply = live.sparql("SELECT DISTINCT ?r ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) +
                 "> { ?r a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_CONCEPT_REASONING_RULE) +
@@ -492,9 +492,9 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?n } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
 
         // tries to map to rules in the database
@@ -505,20 +505,20 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             reply = live.getRule(ruleId);
             if (!reply.isSuccess())
                 return reply;
-            result.add(new XOWLReasoningRule(((XSPReplyResult<XOWLRule>) reply).getData(), ruleName));
+            result.add(new XOWLReasoningRule(((ReplyResult<XOWLRule>) reply).getData(), ruleName));
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override
-    public XSPReply getReasoningRule(String identifier) {
+    public Reply getReasoningRule(String identifier) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // query the database for reasoning rules metadata
-        XSPReply reply = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
+        Reply reply = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) +
                 "> { <" +
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
@@ -531,12 +531,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?n } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
 
         // tries to map to a rule in the database
         RDFPatternSolution solution = solutions.getSolutions().iterator().next();
@@ -544,29 +544,29 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         reply = live.getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLReasoningRule rule = new XOWLReasoningRule(((XSPReplyResult<XOWLRule>) reply).getData(), ruleName);
-        return new XSPReplyResult<>(rule);
+        XOWLReasoningRule rule = new XOWLReasoningRule(((ReplyResult<XOWLRule>) reply).getData(), ruleName);
+        return new ReplyResult<>(rule);
     }
 
     @Override
-    public XSPReply createReasoningRule(String name, String definition) {
+    public Reply createReasoningRule(String name, String definition) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_CREATE_REASONING_RULE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_CREATE_REASONING_RULE);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // create the new rule in the database
         reply = live.addRule(definition, false);
         if (!reply.isSuccess())
             return reply;
-        XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
+        XOWLRule original = ((ReplyResult<XOWLRule>) reply).getData();
 
         // insert the metadata
         reply = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) + "> {" +
@@ -579,68 +579,68 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ReasoningRuleCreatedEvent(rule, this));
-        return new XSPReplyResult<>(rule);
+        return new ReplyResult<>(rule);
     }
 
     @Override
-    public XSPReply addReasoningRule(ReasoningRule rule) {
+    public Reply addReasoningRule(ReasoningRule rule) {
         return createReasoningRule(rule.getName(), rule.getDefinition());
     }
 
     @Override
-    public XSPReply activateReasoningRule(String identifier) {
+    public Reply activateReasoningRule(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ACTIVATE_REASONING_RULE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ACTIVATE_REASONING_RULE);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         return live.activateRule(identifier);
     }
 
     @Override
-    public XSPReply activateReasoningRule(ReasoningRule rule) {
+    public Reply activateReasoningRule(ReasoningRule rule) {
         return activateReasoningRule(rule.getIdentifier());
     }
 
     @Override
-    public XSPReply deactivateReasoningRule(String identifier) {
+    public Reply deactivateReasoningRule(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_DEACTIVATE_REASONING_RULE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_DEACTIVATE_REASONING_RULE);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         return live.deactivateRule(identifier);
     }
 
     @Override
-    public XSPReply deactivateReasoningRule(ReasoningRule rule) {
+    public Reply deactivateReasoningRule(ReasoningRule rule) {
         return deactivateReasoningRule(rule.getIdentifier());
     }
 
     @Override
-    public XSPReply deleteReasoningRule(String identifier) {
+    public Reply deleteReasoningRule(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_DELETE_REASONING_RULE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_DELETE_REASONING_RULE);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         reply = live.sparql("DELETE WHERE { GRAPH <" +
@@ -655,19 +655,19 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
-    public XSPReply deleteReasoningRule(ReasoningRule rule) {
+    public Reply deleteReasoningRule(ReasoningRule rule) {
         return deleteReasoningRule(rule.getIdentifier());
     }
 
     @Override
-    public XSPReply getConsistencyConstraints() {
+    public Reply getConsistencyConstraints() {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // query the database for consistency constraint metadata
-        XSPReply reply = live.sparql("SELECT DISTINCT ?r ?n WHERE { GRAPH <" +
+        Reply reply = live.sparql("SELECT DISTINCT ?r ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) +
                 "> { ?r a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_CONCEPT_CONSISTENCY_CONSTRAINT) +
@@ -676,9 +676,9 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?n } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
 
         // tries to map to rules in the database
@@ -689,20 +689,20 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             reply = live.getRule(constraintId);
             if (!reply.isSuccess())
                 return reply;
-            result.add(new XOWLConsistencyConstraint(((XSPReplyResult<XOWLRule>) reply).getData(), constraintName));
+            result.add(new XOWLConsistencyConstraint(((ReplyResult<XOWLRule>) reply).getData(), constraintName));
         }
-        return new XSPReplyResultCollection<>(result);
+        return new ReplyResultCollection<>(result);
     }
 
     @Override
-    public XSPReply getConsistencyConstraint(String identifier) {
+    public Reply getConsistencyConstraint(String identifier) {
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // query the database for consistency constraints metadata
-        XSPReply reply = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
+        Reply reply = live.sparql("SELECT DISTINCT ?n WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) +
                 "> { <" +
                 TextUtils.escapeAbsoluteURIW3C(identifier) +
@@ -715,12 +715,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 "> ?n } }", null, null);
         if (!reply.isSuccess())
             return reply;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
-            return new XSPReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
+            return new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, ((ResultFailure) sparqlResult).getMessage());
         ResultSolutions solutions = (ResultSolutions) sparqlResult;
         if (solutions.getSolutions().size() == 0)
-            return XSPReplyNotFound.instance();
+            return ReplyNotFound.instance();
 
         // tries to map to a rule in the database
         RDFPatternSolution solution = solutions.getSolutions().iterator().next();
@@ -728,12 +728,12 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         reply = live.getRule(identifier);
         if (!reply.isSuccess())
             return reply;
-        XOWLConsistencyConstraint rule = new XOWLConsistencyConstraint(((XSPReplyResult<XOWLRule>) reply).getData(), ruleName);
-        return new XSPReplyResult<>(rule);
+        XOWLConsistencyConstraint rule = new XOWLConsistencyConstraint(((ReplyResult<XOWLRule>) reply).getData(), ruleName);
+        return new ReplyResult<>(rule);
     }
 
     @Override
-    public XSPReply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
+    public Reply createConsistencyConstraint(String name, String message, String prefixes, String antecedents, String guard) {
         // find the antecedents in the specified conditions
         String constraintIRI = IRI_PREFIX_CONSISTENCY_CONSTRAINT + "#" + SHA1.hashSHA1(name);
         String definition = prefixes + "\nRULE <" + TextUtils.escapeAbsoluteURIW3C(constraintIRI) + "> {\n" + antecedents + "\n} => {}";
@@ -741,9 +741,9 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         xRDFLoader loader = new xRDFLoader();
         RDFLoaderResult rdfResult = loader.loadRDF(logger, new StringReader(definition), IRI_GRAPH_METADATA, IRI_GRAPH_METADATA);
         if (!logger.getErrorMessages().isEmpty())
-            return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
+            return new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
         if (rdfResult == null || rdfResult.getRules().isEmpty())
-            return new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
+            return new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString());
         Collection<VariableNode> variables = rdfResult.getRules().get(0).getAntecedentVariables();
 
         if (guard != null)
@@ -805,24 +805,24 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
      * @param definition The constraint's definition
      * @return The operation result
      */
-    private XSPReply createConsistencyConstraint(String name, String definition) {
+    private Reply createConsistencyConstraint(String name, String definition) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_CREATE_CONSISTENCY_CONSTRAINT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_CREATE_CONSISTENCY_CONSTRAINT);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         // create the new rule in the database
         reply = live.addRule(definition, false);
         if (!reply.isSuccess())
             return reply;
-        XOWLRule original = ((XSPReplyResult<XOWLRule>) reply).getData();
+        XOWLRule original = ((ReplyResult<XOWLRule>) reply).getData();
 
         // insert the metadata
         reply = live.sparql("INSERT DATA { GRAPH <" + TextUtils.escapeAbsoluteURIW3C(IRI_GRAPH_METADATA) + "> {" +
@@ -835,68 +835,68 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new ConsistencyConstraintCreatedEvent(constraint, this));
-        return new XSPReplyResult<>(constraint);
+        return new ReplyResult<>(constraint);
     }
 
     @Override
-    public XSPReply addConsistencyConstraint(ConsistencyConstraint constraint) {
+    public Reply addConsistencyConstraint(ConsistencyConstraint constraint) {
         return createConsistencyConstraint(constraint.getName(), constraint.getDefinition());
     }
 
     @Override
-    public XSPReply activateConsistencyConstraint(String identifier) {
+    public Reply activateConsistencyConstraint(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_ACTIVATE_CONSISTENCY_CONSTRAINT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_ACTIVATE_CONSISTENCY_CONSTRAINT);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         return live.activateRule(identifier);
     }
 
     @Override
-    public XSPReply activateConsistencyConstraint(ConsistencyConstraint constraint) {
+    public Reply activateConsistencyConstraint(ConsistencyConstraint constraint) {
         return activateConsistencyConstraint(constraint.getIdentifier());
     }
 
     @Override
-    public XSPReply deactivateConsistencyConstraint(String identifier) {
+    public Reply deactivateConsistencyConstraint(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_DEACTIVATE_CONSISTENCY_CONSTRAINT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_DEACTIVATE_CONSISTENCY_CONSTRAINT);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
         return live.deactivateRule(identifier);
     }
 
     @Override
-    public XSPReply deactivateConsistencyConstraint(ConsistencyConstraint constraint) {
+    public Reply deactivateConsistencyConstraint(ConsistencyConstraint constraint) {
         return deactivateConsistencyConstraint(constraint.getIdentifier());
     }
 
     @Override
-    public XSPReply deleteConsistencyConstraint(String identifier) {
+    public Reply deleteConsistencyConstraint(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_DELETE_CONSISTENCY_CONSTRAINT);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_DELETE_CONSISTENCY_CONSTRAINT);
         if (!reply.isSuccess())
             return reply;
 
         StorageService storageService = Register.getComponent(StorageService.class);
         if (storageService == null)
-            return XSPReplyServiceUnavailable.instance();
+            return ReplyServiceUnavailable.instance();
         TripleStore live = storageService.getLiveStore();
 
         reply = live.sparql("DELETE WHERE { GRAPH <" +
@@ -911,7 +911,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
     }
 
     @Override
-    public XSPReply deleteConsistencyConstraint(ConsistencyConstraint constraint) {
+    public Reply deleteConsistencyConstraint(ConsistencyConstraint constraint) {
         return deleteConsistencyConstraint(constraint.getIdentifier());
     }
 
@@ -925,14 +925,14 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
         if (storageService == null)
             return -1;
         TripleStore live = storageService.getLiveStore();
-        XSPReply reply = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
+        Reply reply = live.sparql("SELECT (COUNT(?i) AS ?c) WHERE { GRAPH <" +
                 TextUtils.escapeAbsoluteURIW3C(IRIs.GRAPH_INFERENCE) +
                 "> { ?i a <" +
                 TextUtils.escapeAbsoluteURIW3C(IRI_CONCEPT_INCONSISTENCY) +
                 "> } }", null, null);
         if (!reply.isSuccess())
             return -1;
-        Result sparqlResult = ((XSPReplyResult<Result>) reply).getData();
+        Result sparqlResult = ((ReplyResult<Result>) reply).getData();
         if (sparqlResult.isFailure())
             return -1;
         RDFPatternSolution solution = ((ResultSolutions) sparqlResult).getSolutions().iterator().next();

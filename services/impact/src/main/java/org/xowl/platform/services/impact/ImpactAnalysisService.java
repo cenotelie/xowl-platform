@@ -17,13 +17,13 @@
 
 package org.xowl.platform.services.impact;
 
-import org.xowl.infra.server.xsp.XSPReply;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 
 /**
  * Represents a service for impact analyses
- * The perform method launches an impact analysis. On an successful launch, the XSPReply contains the job that was launched.
+ * The perform method launches an impact analysis. On an successful launch, the Reply contains the job that was launched.
  * The result of the analysis will be provided as the job's result upon completion.
  *
  * @author Laurent Wouters
@@ -47,5 +47,5 @@ public interface ImpactAnalysisService extends SecuredService {
      * @param setup The setup for the analysis
      * @return The response, that encapsulate the spawned job in case of success
      */
-    XSPReply perform(ImpactAnalysisSetup setup);
+    Reply perform(ImpactAnalysisSetup setup);
 }

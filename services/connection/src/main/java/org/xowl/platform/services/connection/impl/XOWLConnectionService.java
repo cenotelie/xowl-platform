@@ -260,11 +260,11 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     }
 
     @Override
-    public XSPReply spawn(ConnectorDescriptor description, ConnectorServiceData specification) {
+    public Reply spawn(ConnectorDescriptor description, ConnectorServiceData specification) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_SPAWN);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_SPAWN);
         if (!reply.isSuccess())
             return reply;
 
@@ -272,7 +272,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             ConnectorService service = getConnector(specification.getIdentifier());
             if (service != null)
                 // already exists
-                return new XSPReplyApiError(ERROR_CONNECTOR_SAME_ID);
+                return new ReplyApiError(ERROR_CONNECTOR_SAME_ID);
 
             for (ConnectorServiceFactory factory : Register.getComponents(ConnectorServiceFactory.class)) {
                 service = factory.newConnector(description, specification);
@@ -281,7 +281,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             }
             if (service == null)
                 // failed to create the service (factory not fond?)
-                return new XSPReplyApiError(ERROR_NO_FACTORY);
+                return new ReplyApiError(ERROR_NO_FACTORY);
 
             Registration registration = new Registration();
             registration.service = service;
@@ -306,29 +306,29 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorSpawnedEvent(this, registration.service));
-            return new XSPReplyResult<>(registration.service);
+            return new ReplyResult<>(registration.service);
         }
     }
 
     @Override
-    public XSPReply delete(String identifier) {
+    public Reply delete(String identifier) {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return XSPReplyServiceUnavailable.instance();
-        XSPReply reply = securityService.checkAction(ACTION_DELETE);
+            return ReplyServiceUnavailable.instance();
+        Reply reply = securityService.checkAction(ACTION_DELETE);
         if (!reply.isSuccess())
             return reply;
 
         synchronized (connectorsById) {
             Registration registration = connectorsById.remove(identifier);
             if (registration == null)
-                return XSPReplyNotFound.instance();
+                return ReplyNotFound.instance();
             for (int i = 0; i != registration.references.length; i++)
                 registration.references[i].unregister();
             EventService eventService = Register.getComponent(EventService.class);
             if (eventService != null)
                 eventService.onEvent(new ConnectorDeletedEvent(this, registration.service));
-            return XSPReplySuccess.instance();
+            return ReplySuccess.instance();
         }
     }
 
@@ -437,15 +437,15 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessageCreateConnector(String connectorId, HttpApiRequest request) {
         String descriptorId = request.getParameter("descriptor");
         if (descriptorId == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = JsonLoader.parseJson(logger, content);
         if (root == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
 
         ConnectorDescriptor descriptor = null;
         for (ConnectorDescriptor description : getDescriptors()) {
@@ -455,14 +455,14 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             }
         }
         if (descriptor == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
         ConnectorServiceData specification = new ConnectorServiceData(descriptor, root);
         if (!specification.getIdentifier().equals(connectorId))
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_PARAMETER_RANGE, "'identifier' is not the same as URI parameter"), null);
-        XSPReply reply = spawn(descriptor, specification);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'identifier' is not the same as URI parameter"), null);
+        Reply reply = spawn(descriptor, specification);
         if (!reply.isSuccess())
-            return XSPReplyUtils.toHttpResponse(reply, null);
-        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((XSPReplyResult<ConnectorService>) reply).getData().serializedJSON());
+            return ReplyUtils.toHttpResponse(reply, null);
+        return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConnectorService>) reply).getData().serializedJSON());
     }
 
     /**
@@ -472,8 +472,8 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
      * @return The response
      */
     private HttpResponse onMessageDeleteConnector(String connectorId) {
-        XSPReply reply = delete(connectorId);
-        return XSPReplyUtils.toHttpResponse(reply, null);
+        Reply reply = delete(connectorId);
+        return ReplyUtils.toHttpResponse(reply, null);
     }
 
     /**
@@ -486,7 +486,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessagePullFromConnector(String connectorId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
         Job job = new PullArtifactJob(connectorId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -503,11 +503,11 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessagePushToConnector(String connectorId, HttpApiRequest request) {
         String artifact = request.getParameter("artifact");
         if (artifact == null)
-            return XSPReplyUtils.toHttpResponse(new XSPReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
 
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return XSPReplyUtils.toHttpResponse(XSPReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
         Job job = new PushArtifactJob(connectorId, artifact);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());

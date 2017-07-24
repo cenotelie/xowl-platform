@@ -80,6 +80,18 @@
         </dependency>
         <dependency>
             <groupId>org.xowl.infra</groupId>
+            <artifactId>xowl-jsonrpc</artifactId>
+            <version>${xowlInfraVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.infra</groupId>
+            <artifactId>xowl-lsp</artifactId>
+            <version>${xowlInfraVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xowl.infra</groupId>
             <artifactId>xowl-lang</artifactId>
             <version>${xowlInfraVersion}</version>
             <scope>compile</scope>

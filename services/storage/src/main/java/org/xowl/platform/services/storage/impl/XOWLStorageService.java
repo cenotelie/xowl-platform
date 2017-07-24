@@ -19,10 +19,10 @@ package org.xowl.platform.services.storage.impl;
 
 import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
+import org.xowl.infra.server.api.XOWLReplyUtils;
 import org.xowl.infra.server.api.XOWLServer;
 import org.xowl.infra.server.embedded.EmbeddedServer;
 import org.xowl.infra.server.remote.RemoteServer;
-import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.EntailmentRegime;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Changeset;
@@ -30,6 +30,7 @@ import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.ResultQuads;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
@@ -450,7 +451,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             // get all artifacts for an archetype
             Reply reply = getArtifactsForArchetype(archetype);
             if (!reply.isSuccess())
-                return ReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
@@ -467,7 +468,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
             // get all artifacts for an base
             Reply reply = getArtifactsForBase(base);
             if (!reply.isSuccess())
-                return ReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
@@ -481,7 +482,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         } else {
             Reply reply = getAllArtifacts();
             if (!reply.isSuccess())
-                return ReplyUtils.toHttpResponse(reply, null);
+                return ReplyUtils.toHttpResponse(reply);
             boolean first = true;
             StringBuilder builder = new StringBuilder("[");
             for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
@@ -503,7 +504,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse handleArtifactsLive() {
         Reply reply = getLiveArtifacts();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         boolean first = true;
         StringBuilder builder = new StringBuilder("[");
         for (Artifact artifact : ((ReplyResultCollection<Artifact>) reply).getData()) {
@@ -529,9 +530,9 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         String left = request.getParameter("left");
         String right = request.getParameter("right");
         if (left == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'left'"));
         if (right == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'right'"));
         return onMessageDiffArtifacts(left, right, request.getHeader(HttpConstants.HEADER_ACCEPT));
     }
 
@@ -552,7 +553,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
                 case HttpConstants.METHOD_GET: {
                     Reply reply = retrieve(artifactId);
                     if (!reply.isSuccess())
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<Artifact>) reply).getData().serializedJSON());
                 }
                 case HttpConstants.METHOD_DELETE:
@@ -631,7 +632,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         if (request.getContent() == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
         String[] accept = request.getHeader(HttpConstants.HEADER_ACCEPT);
         String sparql = new String(request.getContent(), IOUtils.CHARSET);
 
@@ -648,7 +649,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         }
 
         Reply reply = store.sparql(sparql, null, null);
-        return ReplyUtils.toHttpResponse(reply, Arrays.asList(accept));
+        return XOWLReplyUtils.toHttpResponse(reply, Arrays.asList(accept));
     }
 
     /**
@@ -661,16 +662,16 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessageGetArtifactMetadata(String artifactId, String[] accept) {
         Reply reply = retrieve(artifactId);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"));
 
         BufferedLogger logger = new BufferedLogger();
         String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
         String content = RDFUtils.serialize(logger, artifact.getMetadata().iterator(), contentType);
         if (!logger.getErrorMessages().isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()));
         return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
@@ -684,19 +685,19 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessageGetArtifactContent(String artifactId, String[] accept) {
         Reply reply = retrieve(artifactId);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"));
         Collection<Quad> quads = artifact.getContent();
         if (quads == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact's content"));
 
         BufferedLogger logger = new BufferedLogger();
         String contentType = RDFUtils.coerceContentTypeQuads(Arrays.asList(accept));
         String content = RDFUtils.serialize(logger, quads.iterator(), contentType);
         if (!logger.getErrorMessages().isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()));
         return new HttpResponse(HttpURLConnection.HTTP_OK, contentType, content);
     }
 
@@ -709,7 +710,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessageDeleteArtifact(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Job job = new DeleteArtifactJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -726,23 +727,23 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessageDiffArtifacts(String artifactLeft, String artifactRight, String[] accept) {
         Reply reply = retrieve(artifactLeft);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         Artifact artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"));
         Collection<Quad> contentLeft = artifact.getContent();
         if (contentLeft == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"));
 
         reply = retrieve(artifactRight);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         artifact = ((ReplyResult<Artifact>) reply).getData();
         if (artifact == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the artifact"));
         Collection<Quad> contentRight = artifact.getContent();
         if (contentRight == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, "Failed to retrieve the content of the artifact"));
 
         Changeset changeset = RDFUtils.diff(contentLeft, contentRight, true);
 
@@ -758,7 +759,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
         RDFUtils.serialize(writer, logger, changeset.getRemoved().iterator(), contentType);
 
         if (!logger.getErrorMessages().isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ArtifactStorageService.ERROR_STORAGE_FAILED, logger.getErrorsAsString()));
         return new HttpResponse(
                 HttpURLConnection.HTTP_OK,
                 HttpConstants.MIME_MULTIPART_MIXED + "; boundary=" + HttpConstants.MULTIPART_BOUNDARY,
@@ -775,7 +776,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessagePullFromLive(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Job job = new PullArtifactFromLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -791,7 +792,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
     private HttpResponse onMessagePushToLive(String artifactId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Job job = new PushArtifactToLiveJob(artifactId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());

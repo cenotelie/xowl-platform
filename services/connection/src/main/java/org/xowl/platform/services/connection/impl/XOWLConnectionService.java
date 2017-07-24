@@ -21,15 +21,15 @@ import fr.cenotelie.hime.redist.ASTNode;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
@@ -437,15 +437,15 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessageCreateConnector(String connectorId, HttpApiRequest request) {
         String descriptorId = request.getParameter("descriptor");
         if (descriptorId == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'descriptor'"));
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = Json.parse(logger, content);
         if (root == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
 
         ConnectorDescriptor descriptor = null;
         for (ConnectorDescriptor description : getDescriptors()) {
@@ -455,13 +455,13 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
             }
         }
         if (descriptor == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'descriptor' is not the identifier of a recognized connector descriptor"));
         ConnectorServiceData specification = new ConnectorServiceData(descriptor, root);
         if (!specification.getIdentifier().equals(connectorId))
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'identifier' is not the same as URI parameter"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_PARAMETER_RANGE, "'identifier' is not the same as URI parameter"));
         Reply reply = spawn(descriptor, specification);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConnectorService>) reply).getData().serializedJSON());
     }
 
@@ -473,7 +473,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
      */
     private HttpResponse onMessageDeleteConnector(String connectorId) {
         Reply reply = delete(connectorId);
-        return ReplyUtils.toHttpResponse(reply, null);
+        return ReplyUtils.toHttpResponse(reply);
     }
 
     /**
@@ -486,7 +486,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessagePullFromConnector(String connectorId) {
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Job job = new PullArtifactJob(connectorId);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());
@@ -503,11 +503,11 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
     private HttpResponse onMessagePushToConnector(String connectorId, HttpApiRequest request) {
         String artifact = request.getParameter("artifact");
         if (artifact == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'artifact'"));
 
         JobExecutionService executor = Register.getComponent(JobExecutionService.class);
         if (executor == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Job job = new PushArtifactJob(connectorId, artifact);
         executor.schedule(job);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, job.serializedJSON());

@@ -19,10 +19,8 @@ package org.xowl.platform.services.consistency.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
-import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.store.IRIs;
 import org.xowl.infra.store.Vocabulary;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.store.loaders.RDFLoaderResult;
 import org.xowl.infra.store.loaders.xRDFLoader;
 import org.xowl.infra.store.rdf.*;
@@ -33,9 +31,11 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.SHA1;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.infra.utils.metrics.Metric;
@@ -181,7 +181,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected GET method");
         Reply reply = getInconsistencies();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (Inconsistency inconsistency : ((ReplyResultCollection<Inconsistency>) reply).getData()) {
@@ -206,7 +206,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_GET: {
                     Reply reply = getReasoningRules();
                     if (!reply.isSuccess())
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     StringBuilder builder = new StringBuilder("[");
                     boolean first = true;
                     for (ReasoningRule rule : ((ReplyResultCollection<ReasoningRule>) reply).getData()) {
@@ -221,13 +221,13 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_PUT: {
                     String name = request.getParameter("name");
                     if (name == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
                     String definition = new String(request.getContent(), IOUtils.CHARSET);
                     if (definition.isEmpty())
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                     Reply reply = createReasoningRule(name, definition);
                     if (!reply.isSuccess())
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ReasoningRule>) reply).getData().serializedJSON());
                 }
             }
@@ -244,24 +244,24 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     case HttpConstants.METHOD_GET: {
                         Reply reply = getReasoningRule(ruleId);
                         if (!reply.isSuccess())
-                            return ReplyUtils.toHttpResponse(reply, null);
+                            return ReplyUtils.toHttpResponse(reply);
                         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ReasoningRule>) reply).getData().serializedJSON());
                     }
                     case HttpConstants.METHOD_PUT: {
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
-                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                         ASTNode definition = Json.parse(Logging.get(), content);
                         if (definition == null)
-                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED));
                         ReasoningRule rule = new XOWLReasoningRule(definition);
                         if (!ruleId.equals(rule.getIdentifier()))
-                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
-                        return ReplyUtils.toHttpResponse(addReasoningRule(rule), null);
+                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance());
+                        return ReplyUtils.toHttpResponse(addReasoningRule(rule));
                     }
                     case HttpConstants.METHOD_DELETE: {
                         Reply reply = deleteReasoningRule(ruleId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                 }
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -271,13 +271,13 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                         Reply reply = activateReasoningRule(ruleId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                     case "/deactivate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                         Reply reply = deactivateReasoningRule(ruleId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                 }
             }
@@ -298,7 +298,7 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_GET: {
                     Reply reply = getConsistencyConstraints();
                     if (!reply.isSuccess())
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     StringBuilder builder = new StringBuilder("[");
                     boolean first = true;
                     for (ConsistencyConstraint constraint : ((ReplyResultCollection<ConsistencyConstraint>) reply).getData()) {
@@ -313,20 +313,20 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                 case HttpConstants.METHOD_PUT: {
                     String name = request.getParameter("name");
                     if (name == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
                     String message = request.getParameter("message");
                     if (message == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'message'"));
                     String prefixes = request.getParameter("prefixes");
                     if (prefixes == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'prefixes'"));
                     String antecedents = request.getParameter("antecedents");
                     if (antecedents == null)
-                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'antecedents'"), null);
+                        return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'antecedents'"));
                     String guard = request.getParameter("guard");
                     Reply reply = createConsistencyConstraint(name, message, prefixes, antecedents, guard);
                     if (!reply.isSuccess())
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                 }
             }
@@ -343,24 +343,24 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                     case HttpConstants.METHOD_GET: {
                         Reply reply = getConsistencyConstraint(constraintId);
                         if (!reply.isSuccess())
-                            return ReplyUtils.toHttpResponse(reply, null);
+                            return ReplyUtils.toHttpResponse(reply);
                         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<ConsistencyConstraint>) reply).getData().serializedJSON());
                     }
                     case HttpConstants.METHOD_PUT: {
                         String content = new String(request.getContent(), IOUtils.CHARSET);
                         if (content.isEmpty())
-                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
                         ASTNode definition = Json.parse(Logging.get(), content);
                         if (definition == null)
-                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
+                            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED));
                         ConsistencyConstraint constraint = new XOWLConsistencyConstraint(definition);
                         if (!constraintId.equals(constraint.getIdentifier()))
-                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance(), null);
-                        return ReplyUtils.toHttpResponse(addConsistencyConstraint(constraint), null);
+                            return ReplyUtils.toHttpResponse(ReplyNotFound.instance());
+                        return ReplyUtils.toHttpResponse(addConsistencyConstraint(constraint));
                     }
                     case HttpConstants.METHOD_DELETE: {
                         Reply reply = deleteConsistencyConstraint(constraintId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                 }
                 return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected methods: GET, PUT, DELETE");
@@ -370,13 +370,13 @@ public class XOWLConsistencyService implements ConsistencyService, HttpApiServic
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                         Reply reply = activateConsistencyConstraint(constraintId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                     case "/deactivate": {
                         if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
                         Reply reply = deactivateConsistencyConstraint(constraintId);
-                        return ReplyUtils.toHttpResponse(reply, null);
+                        return ReplyUtils.toHttpResponse(reply);
                     }
                 }
             }

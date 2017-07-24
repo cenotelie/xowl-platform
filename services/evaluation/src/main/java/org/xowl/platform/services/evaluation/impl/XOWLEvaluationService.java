@@ -18,13 +18,13 @@
 package org.xowl.platform.services.evaluation.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -285,13 +285,13 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetEvaluables(HttpApiRequest request) {
         String type = request.getParameter("type");
         if (type == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'type'"));
         EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
         Reply reply = evaluableType.getElements();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (Evaluable evaluable : ((ReplyResultCollection<Evaluable>) reply).getData()) {
@@ -313,7 +313,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetCriterionTypes(HttpApiRequest request) {
         String type = request.getParameter("for");
         if (type == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'for'"));
         EvaluableType evaluableType = getEvaluableType(type);
         if (evaluableType == null)
             return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);
@@ -337,7 +337,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetEvaluations() {
         Reply reply = getEvaluations();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         StringBuilder builder = new StringBuilder("[");
         boolean first = true;
         for (EvaluationReference evaluation : ((ReplyResultCollection<EvaluationReference>) reply).getData()) {
@@ -359,7 +359,7 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onGetEvaluation(String evaluationIdentifier) {
         Reply reply = getEvaluation(evaluationIdentifier);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         return new HttpResponse(HttpURLConnection.HTTP_OK, HttpConstants.MIME_JSON, ((ReplyResult<Evaluation>) reply).getData().serializedJSON());
     }
 
@@ -372,22 +372,22 @@ public class XOWLEvaluationService implements EvaluationService, HttpApiService 
     private HttpResponse onPutEvaluation(HttpApiRequest request) {
         byte[] content = request.getContent();
         if (content == null || content.length == 0)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = Json.parse(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null)
-            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance(), null);
+            return ReplyUtils.toHttpResponse(ReplyServiceUnavailable.instance());
         Reply reply = securityService.checkAction(ACTION_NEW_EVALUATION);
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         XOWLEvaluation evaluation = new XOWLEvaluation(root, this);
         reply = evaluation.store();
         if (!reply.isSuccess())
-            return ReplyUtils.toHttpResponse(reply, null);
+            return ReplyUtils.toHttpResponse(reply);
         EventService eventService = Register.getComponent(EventService.class);
         if (eventService != null)
             eventService.onEvent(new EvaluationCreatedEvent(evaluation, this));

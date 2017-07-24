@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.Serializable;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.security.SecuredService;
 

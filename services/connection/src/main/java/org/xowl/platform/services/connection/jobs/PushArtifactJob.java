@@ -18,8 +18,8 @@
 package org.xowl.platform.services.connection.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.jobs.JobBase;
 import org.xowl.platform.services.connection.ConnectorUtils;
 

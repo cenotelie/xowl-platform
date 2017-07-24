@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.server.xsp.*;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
@@ -209,7 +209,7 @@ public abstract class ConnectorServiceBase implements ConnectorService, HttpApiS
 
     @Override
     public HttpResponse handle(SecurityService securedService, HttpApiRequest request) {
-        return ReplyUtils.toHttpResponse(ReplyUnsupported.instance(), null);
+        return ReplyUtils.toHttpResponse(ReplyUnsupported.instance());
     }
 
     @Override

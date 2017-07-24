@@ -18,8 +18,8 @@
 package org.xowl.platform.services.storage.jobs;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.ArtifactStorageService;

@@ -124,7 +124,7 @@ public class XOWLMainHTTPServer extends HttpServlet implements HTTPServerService
             doResponse(servletResponse, service.handle(securityService, apiRequest));
         } catch (Throwable exception) {
             Logging.get().error(exception);
-            doResponse(servletResponse, ReplyUtils.toHttpResponse(new ReplyException(exception), null));
+            doResponse(servletResponse, ReplyUtils.toHttpResponse(new ReplyException(exception)));
         } finally {
             securityService.logout();
         }

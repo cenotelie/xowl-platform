@@ -18,14 +18,14 @@
 package org.xowl.platform.services.importation.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.server.xsp.*;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.IOUtils;
 import org.xowl.infra.utils.TextUtils;
+import org.xowl.infra.utils.api.*;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.infra.utils.http.URIUtils;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
@@ -321,7 +321,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocuments() {
-        return ReplyUtils.toHttpResponse(getDocuments(), null);
+        return ReplyUtils.toHttpResponse(getDocuments());
     }
 
     /**
@@ -331,7 +331,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetDocument(String documentId) {
-        return ReplyUtils.toHttpResponse(getDocument(documentId), null);
+        return ReplyUtils.toHttpResponse(getDocument(documentId));
     }
 
     /**
@@ -344,11 +344,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String name = request.getParameter("name");
         String fileName = request.getParameter("fileName");
         if (name == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
         if (fileName == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'fileName'"));
         Reply reply = upload(name, fileName, request.getContent());
-        return ReplyUtils.toHttpResponse(reply, null);
+        return ReplyUtils.toHttpResponse(reply);
     }
 
     /**
@@ -358,7 +358,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onPostDropDocument(String documentId) {
-        return ReplyUtils.toHttpResponse(drop(documentId), null);
+        return ReplyUtils.toHttpResponse(drop(documentId));
     }
 
     /**
@@ -372,16 +372,16 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         // should use a stored configuration?
         String configurationId = request.getParameter("configuration");
         if (configurationId != null)
-            return ReplyUtils.toHttpResponse(getPreview(documentId, configurationId), null);
+            return ReplyUtils.toHttpResponse(getPreview(documentId, configurationId));
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return ReplyUtils.toHttpResponse(getPreview(documentId, configuration), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED));
+        return ReplyUtils.toHttpResponse(getPreview(documentId, configuration));
     }
 
     /**
@@ -430,28 +430,28 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         String archetype = request.getParameter("archetype"); // the archetype for the artifact
         String superseded = request.getParameter("superseded"); // the superseded artifact
         if (name == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'name'"));
         if (base == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'base'"));
         if (version == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'version'"));
         if (archetype == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_EXPECTED_QUERY_PARAMETERS, "'archetype'"));
         Artifact metadata = new ArtifactFuture(name, base, version, archetype, superseded);
 
         // should use a stored configuration?
         String configurationId = request.getParameter("configuration");
         if (configurationId != null)
-            return ReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata), null);
+            return ReplyUtils.toHttpResponse(beginImport(documentId, configurationId, metadata));
 
         // the configuration is expected to be inline in the body
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return ReplyUtils.toHttpResponse(beginImport(documentId, configuration, metadata), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED));
+        return ReplyUtils.toHttpResponse(beginImport(documentId, configuration, metadata));
     }
 
     /**
@@ -460,7 +460,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfigurations() {
-        return ReplyUtils.toHttpResponse(retrieveConfigurations(), null);
+        return ReplyUtils.toHttpResponse(retrieveConfigurations());
     }
 
     /**
@@ -470,7 +470,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfiguration(String configurationId) {
-        return ReplyUtils.toHttpResponse(retrieveConfiguration(configurationId), null);
+        return ReplyUtils.toHttpResponse(retrieveConfiguration(configurationId));
     }
 
     /**
@@ -480,7 +480,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onGetConfigurationsFor(String importerId) {
-        return ReplyUtils.toHttpResponse(retrieveConfigurations(importerId), null);
+        return ReplyUtils.toHttpResponse(retrieveConfigurations(importerId));
     }
 
     /**
@@ -492,11 +492,11 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     private HttpResponse onPutConfiguration(HttpApiRequest request) {
         String content = new String(request.getContent(), IOUtils.CHARSET);
         if (content.isEmpty())
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
         ImporterConfiguration configuration = loadConfiguration(content);
         if (configuration == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED), null);
-        return ReplyUtils.toHttpResponse(storeConfiguration(configuration), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED));
+        return ReplyUtils.toHttpResponse(storeConfiguration(configuration));
     }
 
     /**
@@ -506,7 +506,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
      * @return The HTTP response
      */
     private HttpResponse onPostDeleteConfiguration(String configurationId) {
-        return ReplyUtils.toHttpResponse(deleteConfiguration(configurationId), null);
+        return ReplyUtils.toHttpResponse(deleteConfiguration(configurationId));
     }
 
     @Override

@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.config.Configuration;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConstants;
@@ -174,7 +174,7 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
             if (rest.equals("/install")) {
                 if (!HttpConstants.METHOD_POST.equals(request.getMethod()))
                     return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
-                return ReplyUtils.toHttpResponse(beginInstallOf(addonId), null);
+                return ReplyUtils.toHttpResponse(beginInstallOf(addonId));
             }
         }
         return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND);

@@ -18,15 +18,15 @@
 package org.xowl.platform.services.impact.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
+import org.xowl.infra.utils.IOUtils;
+import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.api.Reply;
 import org.xowl.infra.utils.api.ReplyApiError;
 import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.store.loaders.JsonLoader;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -108,13 +108,13 @@ public class XOWLImpactAnalysisService implements ImpactAnalysisService, HttpApi
             return new HttpResponse(HttpURLConnection.HTTP_BAD_METHOD, HttpConstants.MIME_TEXT_PLAIN, "Expected POST method");
         byte[] content = request.getContent();
         if (content == null || content.length == 0)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_FAILED_TO_READ_CONTENT));
 
         BufferedLogger logger = new BufferedLogger();
         ASTNode root = Json.parse(logger, new String(content, IOUtils.CHARSET));
         if (root == null)
-            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()), null);
-        return ReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)), null);
+            return ReplyUtils.toHttpResponse(new ReplyApiError(ERROR_CONTENT_PARSING_FAILED, logger.getErrorsAsString()));
+        return ReplyUtils.toHttpResponse(perform(new XOWLImpactAnalysisSetup(root)));
     }
 
     @Override

@@ -18,11 +18,11 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.utils.config.Section;
 import org.xowl.infra.utils.http.HttpConnection;
 import org.xowl.infra.utils.http.HttpConstants;
 import org.xowl.infra.utils.http.HttpResponse;
+import org.xowl.infra.utils.json.Json;
 import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.impact;
 
+import fr.cenotelie.commons.utils.Serializable;
 import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.utils.Serializable;
 
 /**
  * Represents a filter in the impact analysis on a link between nodes

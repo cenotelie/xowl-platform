@@ -17,19 +17,19 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
+import fr.cenotelie.commons.utils.AutoReader;
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyException;
+import fr.cenotelie.commons.utils.api.ReplyResult;
+import fr.cenotelie.commons.utils.api.ReplyResultCollection;
+import fr.cenotelie.commons.utils.logging.BufferedLogger;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.writers.NQuadsSerializer;
 import org.xowl.infra.store.writers.RDFSerializer;
-import org.xowl.infra.utils.AutoReader;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyResult;
-import org.xowl.infra.utils.api.ReplyResultCollection;
-import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;

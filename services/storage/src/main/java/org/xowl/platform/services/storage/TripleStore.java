@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.storage;
 
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.infra.server.api.XOWLDatabase;
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 
 /**

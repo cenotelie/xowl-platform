@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.profiles;
 
-import org.xowl.infra.utils.RichString;
+import fr.cenotelie.commons.utils.RichString;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.events.EventBase;
 

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.api.ApiError;
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.api.ApiError;
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.platform.PlatformUser;
 

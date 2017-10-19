@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.webapp;
 
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.RegisterWaiter;

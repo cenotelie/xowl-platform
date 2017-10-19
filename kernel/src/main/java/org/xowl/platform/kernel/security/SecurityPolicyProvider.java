@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.config.Section;
+import fr.cenotelie.commons.utils.config.Section;
 import org.xowl.platform.kernel.Registrable;
 
 /**

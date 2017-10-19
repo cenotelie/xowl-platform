@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Serializable;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**

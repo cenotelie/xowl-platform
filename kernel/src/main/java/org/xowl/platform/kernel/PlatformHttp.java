@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.utils.config.Configuration;
+import fr.cenotelie.commons.utils.config.Configuration;
 
 /**
  * Manages the HTTP configuration for the platform

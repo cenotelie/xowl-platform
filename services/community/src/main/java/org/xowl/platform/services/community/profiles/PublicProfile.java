@@ -17,11 +17,11 @@
 
 package org.xowl.platform.services.community.profiles;
 
+import fr.cenotelie.commons.utils.Base64;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Base64;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 
 import java.text.DateFormat;
 import java.util.Date;

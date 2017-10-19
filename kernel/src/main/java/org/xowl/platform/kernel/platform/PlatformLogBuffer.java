@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.platform;
 
-import org.xowl.infra.utils.logging.Logger;
+import fr.cenotelie.commons.utils.logging.Logger;
 import org.xowl.platform.kernel.events.Event;
 
 import java.util.ArrayList;

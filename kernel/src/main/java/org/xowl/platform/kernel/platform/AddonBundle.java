@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.platform;
 
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 
 /**
  * Describes a bundle that is part of an addon

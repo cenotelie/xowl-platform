@@ -17,11 +17,11 @@
 
 package org.xowl.platform.services.impact.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterLink;
 import org.xowl.platform.services.impact.ImpactAnalysisFilterType;
 import org.xowl.platform.services.impact.ImpactAnalysisSetup;

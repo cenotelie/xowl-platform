@@ -38,7 +38,7 @@ function onClickNewRule() {
 	}
 	xowl.newReasoningRule(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created reasoning rule ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Created reasoning rule ", content, "."]});
 			waitAndGo("rules.html");
 		}
 	}, name, definition);

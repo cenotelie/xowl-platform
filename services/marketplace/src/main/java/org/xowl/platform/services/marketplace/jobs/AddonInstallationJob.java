@@ -17,12 +17,12 @@
 
 package org.xowl.platform.services.marketplace.jobs;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyException;
+import fr.cenotelie.commons.utils.api.ReplyNotFound;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyNotFound;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;

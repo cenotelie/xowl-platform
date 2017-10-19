@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.impact;
 
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.webapp.impl;
 
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;

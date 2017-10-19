@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.utils.collections.Couple;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricBase;
+import fr.cenotelie.commons.utils.collections.Couple;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.statistics.MeasurableService;
 

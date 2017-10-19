@@ -17,6 +17,8 @@
 
 package org.xowl.platform.services.evaluation.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.*;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
@@ -25,8 +27,6 @@ import org.xowl.infra.store.sparql.ResultFailure;
 import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.*;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;

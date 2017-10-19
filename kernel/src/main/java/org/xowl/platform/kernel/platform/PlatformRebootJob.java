@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
+import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.jobs.JobBase;

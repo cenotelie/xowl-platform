@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.security;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;

@@ -17,11 +17,11 @@
 
 package org.xowl.platform.kernel.platform;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.product.LicensePlain;
+import fr.cenotelie.commons.utils.product.Product;
+import fr.cenotelie.commons.utils.product.VersionInfo;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.product.LicensePlain;
-import org.xowl.infra.utils.product.Product;
-import org.xowl.infra.utils.product.VersionInfo;
 
 /**
  * Extends the base description of a product

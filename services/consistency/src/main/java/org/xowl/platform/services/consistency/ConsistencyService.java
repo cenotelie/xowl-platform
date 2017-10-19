@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.consistency;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.collections.Couple;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricBase;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.collections.Couple;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricBase;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecuredService;
 import org.xowl.platform.kernel.statistics.MeasurableService;

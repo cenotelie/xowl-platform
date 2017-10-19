@@ -17,11 +17,11 @@
 
 package org.xowl.platform.kernel.jobs;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUnsupported;
+import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUnsupported;
-import org.xowl.infra.utils.concurrent.SafeRunnable;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.platform.PlatformUserRoot;

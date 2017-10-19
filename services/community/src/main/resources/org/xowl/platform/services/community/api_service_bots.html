@@ -1,4 +1,16 @@
-<!DOCTYPE HTML><html><head><title>Bots Management Service API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 4.0.0-beta12"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script><script type="text/javascript">
+<!DOCTYPE HTML>
+<html>
+<head><title>Bots Management Service API documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="generator" content="https://github.com/raml2html/raml2html 4.0.0-beta12">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script type="text/javascript">
       $(document).ready(function() {
         $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
           hljs.highlightBlock(block);
@@ -34,7 +46,9 @@
           } catch(e) {}
         });
       });
-    </script><style>
+
+    </script>
+    <style>
       .hljs {
         background: transparent;
       }
@@ -160,9 +174,86 @@
         font-size: 13px;
         line-height: 1.42857143;
       }
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>Bots Management Service API documentation <small>version v1</small></h1><p>https://localhost:8443/api</p></div><div class="panel panel-default"><div class="panel-heading"><h3 id="services_community_bots" class="panel-title">/services/community/bots</h3></div><div class="panel-body"><div class="top-resource-description"><p>Collection of the bots on the platform</p></div><div class="panel-group"><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots"><span class="parent"></span>/services/community/bots</a> <span class="methods"><a href="#services_community_bots_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_services_community_bots" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#services_community_bots_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets the list of the bots running on the platform</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots_get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/services/community/bots</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets the list of the bots running on the platform</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots_get_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots_get_request"><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The list of the bots running on the platform</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+
+    </style>
+</head>
+<body data-spy="scroll" data-target="#sidebar">
+<div class="container">
+    <div class="row">
+        <div class="col-md-9" role="main">
+            <div class="page-header">
+                <h1>Bots Management Service API documentation
+                    <small>version v1</small>
+                </h1>
+                <p>https://localhost:8443/api</p></div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3 id="services_community_bots" class="panel-title">
+                    /services/community/bots</h3></div>
+                <div class="panel-body">
+                    <div class="top-resource-description"><p>Collection of the bots on the platform</p></div>
+                    <div class="panel-group">
+                        <div class="panel panel-white">
+                            <div class="panel-heading"><h4 class="panel-title"><a class="collapsed"
+                                                                                  data-toggle="collapse"
+                                                                                  href="#panel_services_community_bots"><span
+                                    class="parent"></span>/services/community/bots</a> <span class="methods"><a
+                                    href="#services_community_bots_get"><span
+                                    class="badge badge_get">get</span></a></span></h4></div>
+                            <div id="panel_services_community_bots" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="list-group">
+                                        <div onclick="window.location.href = '#services_community_bots_get'"
+                                             class="list-group-item"><span class="badge badge_get">get</span>
+                                            <div class="method_description"><p>Gets the list of the bots running on the
+                                                platform</p></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" tabindex="0" id="services_community_bots_get">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel"><span
+                                                    class="badge badge_get">get</span> <span class="parent"></span>/services/community/bots
+                                            </h4></div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info"><p>Gets the list of the bots running on the
+                                                platform</p></div>
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a href="#services_community_bots_get_request"
+                                                                      data-toggle="tab">Request</a></li>
+                                                <li><a href="#services_community_bots_get_response" data-toggle="tab">Response</a>
+                                                </li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" id="services_community_bots_get_request">
+                                                    <h3>Headers</h3>
+                                                    <ul>
+                                                        <li><strong>Cookie</strong>: <em>required (string)</em>
+                                                            <p>Authentication token provided by the platform</p>
+                                                            <p><strong>Examples</strong>:</p>
+                                                            <pre>__Secure-xOWL-Platform=AAAAA</pre>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="tab-pane" id="services_community_bots_get_response"><h2>HTTP
+                                                    status code <a href="http://httpstatus.es/200"
+                                                                   target="_blank">200</a></h2>
+                                                    <p>The list of the bots running on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_platform_community.json#/definitions/Bots"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>[
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>[
   {
     "type": "org.xowl.platform.services.community.bots.Bot",
     "identifier": "bender",
@@ -172,18 +263,125 @@
     "status": "Awake"
   }
 ]
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/400"
+                                                                            target="_blank">400</a></h2>
+                                                    <p>The request is malformed in some way</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
   "content": "Supplementary information about the error"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots__botid_"><span class="parent">/services/community/bots</span>/{botId}</a> <span class="methods"><a href="#services_community_bots__botid__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_services_community_bots__botid_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Represents a bot running by the platform</p></div><div class="list-group"><div onclick="window.location.href = '#services_community_bots__botid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets the description of the bot</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots__botid__get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/services/community/bots</span>/{botId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets the description of the bot</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots__botid__get_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots__botid__get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots__botid__get_request"><h3>URI Parameters</h3><ul><li><strong>botId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots__botid__get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The description of the bot</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/401"
+                                                                            target="_blank">401</a></h2>
+                                                    <p>No user is logged-in, or the authentication token is invalid.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/403"
+                                                                            target="_blank">403</a></h2>
+                                                    <p>The logged-in user is not authorized to perform this
+                                                        operation.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/440"
+                                                                            target="_blank">440</a></h2>
+                                                    <p>The user session has expired.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/500"
+                                                                            target="_blank">500</a></h2>
+                                                    <p>An unexpected error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/501"
+                                                                            target="_blank">501</a></h2>
+                                                    <p>The requested operation is not supported</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/560"
+                                                                            target="_blank">560</a></h2>
+                                                    <p>An unknown error error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading"><h4 class="panel-title"><a class="collapsed"
+                                                                                  data-toggle="collapse"
+                                                                                  href="#panel_services_community_bots__botid_"><span
+                                    class="parent">/services/community/bots</span>/{botId}</a> <span class="methods"><a
+                                    href="#services_community_bots__botid__get"><span class="badge badge_get">get</span></a></span>
+                            </h4></div>
+                            <div id="panel_services_community_bots__botid_" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="resource-description"><p>Represents a bot running by the platform</p>
+                                    </div>
+                                    <div class="list-group">
+                                        <div onclick="window.location.href = '#services_community_bots__botid__get'"
+                                             class="list-group-item"><span class="badge badge_get">get</span>
+                                            <div class="method_description"><p>Gets the description of the bot</p></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" tabindex="0" id="services_community_bots__botid__get">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel"><span
+                                                    class="badge badge_get">get</span> <span class="parent">/services/community/bots</span>/{botId}
+                                            </h4></div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info"><p>Gets the description of the bot</p></div>
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a
+                                                        href="#services_community_bots__botid__get_request"
+                                                        data-toggle="tab">Request</a></li>
+                                                <li><a href="#services_community_bots__botid__get_response"
+                                                       data-toggle="tab">Response</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active"
+                                                     id="services_community_bots__botid__get_request"><h3>URI
+                                                    Parameters</h3>
+                                                    <ul>
+                                                        <li><strong>botId</strong>: <em>required (string)</em></li>
+                                                    </ul>
+                                                    <h3>Headers</h3>
+                                                    <ul>
+                                                        <li><strong>Cookie</strong>: <em>required (string)</em>
+                                                            <p>Authentication token provided by the platform</p>
+                                                            <p><strong>Examples</strong>:</p>
+                                                            <pre>__Secure-xOWL-Platform=AAAAA</pre>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="tab-pane" id="services_community_bots__botid__get_response">
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/200"
+                                                                            target="_blank">200</a></h2>
+                                                    <p>The description of the bot</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_platform_community.json#/definitions/Bot"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
   "type": "org.xowl.platform.services.community.bots.Bot",
   "identifier": "bender",
   "name": "Bender",
@@ -191,18 +389,128 @@
   "wakeupOnStartup": true,
   "status": "Awake"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/400"
+                                                                            target="_blank">400</a></h2>
+                                                    <p>The request is malformed in some way</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
   "content": "Supplementary information about the error"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots__botid__messages"><span class="parent">/services/community/bots/{botId}</span>/messages</a> <span class="methods"><a href="#services_community_bots__botid__messages_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_services_community_bots__botid__messages" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>The messages from the bot</p></div><div class="list-group"><div onclick="window.location.href = '#services_community_bots__botid__messages_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets the messages from the bot</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots__botid__messages_get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/services/community/bots/{botId}</span>/messages</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets the messages from the bot</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots__botid__messages_get_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots__botid__messages_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots__botid__messages_get_request"><h3>URI Parameters</h3><ul><li><strong>botId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots__botid__messages_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The messages from the bot</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/401"
+                                                                            target="_blank">401</a></h2>
+                                                    <p>No user is logged-in, or the authentication token is invalid.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/403"
+                                                                            target="_blank">403</a></h2>
+                                                    <p>The logged-in user is not authorized to perform this
+                                                        operation.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/404"
+                                                                            target="_blank">404</a></h2>
+                                                    <p>The requested resource cannot be found.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/440"
+                                                                            target="_blank">440</a></h2>
+                                                    <p>The user session has expired.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/500"
+                                                                            target="_blank">500</a></h2>
+                                                    <p>An unexpected error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/501"
+                                                                            target="_blank">501</a></h2>
+                                                    <p>The requested operation is not supported</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/560"
+                                                                            target="_blank">560</a></h2>
+                                                    <p>An unknown error error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading"><h4 class="panel-title"><a class="collapsed"
+                                                                                  data-toggle="collapse"
+                                                                                  href="#panel_services_community_bots__botid__messages"><span
+                                    class="parent">/services/community/bots/{botId}</span>/messages</a> <span
+                                    class="methods"><a href="#services_community_bots__botid__messages_get"><span
+                                    class="badge badge_get">get</span></a></span></h4></div>
+                            <div id="panel_services_community_bots__botid__messages" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="resource-description"><p>The messages from the bot</p></div>
+                                    <div class="list-group">
+                                        <div onclick="window.location.href = '#services_community_bots__botid__messages_get'"
+                                             class="list-group-item"><span class="badge badge_get">get</span>
+                                            <div class="method_description"><p>Gets the messages from the bot</p></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" tabindex="0" id="services_community_bots__botid__messages_get">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel"><span
+                                                    class="badge badge_get">get</span> <span class="parent">/services/community/bots/{botId}</span>/messages
+                                            </h4></div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info"><p>Gets the messages from the bot</p></div>
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a
+                                                        href="#services_community_bots__botid__messages_get_request"
+                                                        data-toggle="tab">Request</a></li>
+                                                <li><a href="#services_community_bots__botid__messages_get_response"
+                                                       data-toggle="tab">Response</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active"
+                                                     id="services_community_bots__botid__messages_get_request"><h3>URI
+                                                    Parameters</h3>
+                                                    <ul>
+                                                        <li><strong>botId</strong>: <em>required (string)</em></li>
+                                                    </ul>
+                                                    <h3>Headers</h3>
+                                                    <ul>
+                                                        <li><strong>Cookie</strong>: <em>required (string)</em>
+                                                            <p>Authentication token provided by the platform</p>
+                                                            <p><strong>Examples</strong>:</p>
+                                                            <pre>__Secure-xOWL-Platform=AAAAA</pre>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="tab-pane"
+                                                     id="services_community_bots__botid__messages_get_response"><h2>HTTP
+                                                    status code <a href="http://httpstatus.es/200"
+                                                                   target="_blank">200</a></h2>
+                                                    <p>The messages from the bot</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_platform_kernel.json#/definitions/LogMessages"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>[
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>[
   {
     "type": "org.xowl.platform.kernel.platform.PlatformLogMessage",
     "level": "INFO",
@@ -210,31 +518,296 @@
     "content": "This is a message"
   }
 ]
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/400"
+                                                                            target="_blank">400</a></h2>
+                                                    <p>The request is malformed in some way</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
   "content": "Supplementary information about the error"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots__botid__wakeup"><span class="parent">/services/community/bots/{botId}</span>/wakeup</a> <span class="methods"><a href="#services_community_bots__botid__wakeup_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_services_community_bots__botid__wakeup" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Action to wake the bot up</p></div><div class="list-group"><div onclick="window.location.href = '#services_community_bots__botid__wakeup_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Attemps to wake up the bot</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots__botid__wakeup_post"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/services/community/bots/{botId}</span>/wakeup</h4></div><div class="modal-body"><div class="alert alert-info"><p>Attemps to wake up the bot</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots__botid__wakeup_post_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots__botid__wakeup_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots__botid__wakeup_post_request"><h3>URI Parameters</h3><ul><li><strong>botId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots__botid__wakeup_post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The operation succeeded</p><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/401"
+                                                                            target="_blank">401</a></h2>
+                                                    <p>No user is logged-in, or the authentication token is invalid.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/403"
+                                                                            target="_blank">403</a></h2>
+                                                    <p>The logged-in user is not authorized to perform this
+                                                        operation.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/404"
+                                                                            target="_blank">404</a></h2>
+                                                    <p>The requested resource cannot be found.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/440"
+                                                                            target="_blank">440</a></h2>
+                                                    <p>The user session has expired.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/500"
+                                                                            target="_blank">500</a></h2>
+                                                    <p>An unexpected error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/501"
+                                                                            target="_blank">501</a></h2>
+                                                    <p>The requested operation is not supported</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/560"
+                                                                            target="_blank">560</a></h2>
+                                                    <p>An unknown error error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading"><h4 class="panel-title"><a class="collapsed"
+                                                                                  data-toggle="collapse"
+                                                                                  href="#panel_services_community_bots__botid__wakeup"><span
+                                    class="parent">/services/community/bots/{botId}</span>/wakeup</a> <span
+                                    class="methods"><a href="#services_community_bots__botid__wakeup_post"><span
+                                    class="badge badge_post">post</span></a></span></h4></div>
+                            <div id="panel_services_community_bots__botid__wakeup" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="resource-description"><p>Action to wake the bot up</p></div>
+                                    <div class="list-group">
+                                        <div onclick="window.location.href = '#services_community_bots__botid__wakeup_post'"
+                                             class="list-group-item"><span class="badge badge_post">post</span>
+                                            <div class="method_description"><p>Attemps to wake up the bot</p></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" tabindex="0" id="services_community_bots__botid__wakeup_post">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span>
+                                                <span class="parent">/services/community/bots/{botId}</span>/wakeup</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info"><p>Attemps to wake up the bot</p></div>
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a
+                                                        href="#services_community_bots__botid__wakeup_post_request"
+                                                        data-toggle="tab">Request</a></li>
+                                                <li><a href="#services_community_bots__botid__wakeup_post_response"
+                                                       data-toggle="tab">Response</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active"
+                                                     id="services_community_bots__botid__wakeup_post_request"><h3>URI
+                                                    Parameters</h3>
+                                                    <ul>
+                                                        <li><strong>botId</strong>: <em>required (string)</em></li>
+                                                    </ul>
+                                                    <h3>Headers</h3>
+                                                    <ul>
+                                                        <li><strong>Cookie</strong>: <em>required (string)</em>
+                                                            <p>Authentication token provided by the platform</p>
+                                                            <p><strong>Examples</strong>:</p>
+                                                            <pre>__Secure-xOWL-Platform=AAAAA</pre>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="tab-pane"
+                                                     id="services_community_bots__botid__wakeup_post_response"><h2>HTTP
+                                                    status code <a href="http://httpstatus.es/200"
+                                                                   target="_blank">200</a></h2>
+                                                    <p>The operation succeeded</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/400"
+                                                                            target="_blank">400</a></h2>
+                                                    <p>The request is malformed in some way</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
   "content": "Supplementary information about the error"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_services_community_bots__botid__puttosleep"><span class="parent">/services/community/bots/{botId}</span>/putToSleep</a> <span class="methods"><a href="#services_community_bots__botid__puttosleep_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_services_community_bots__botid__puttosleep" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Action to put the bot to sleep</p></div><div class="list-group"><div onclick="window.location.href = '#services_community_bots__botid__puttosleep_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Attemps to put the bot to sleep</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_community_bots__botid__puttosleep_post"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/services/community/bots/{botId}</span>/putToSleep</h4></div><div class="modal-body"><div class="alert alert-info"><p>Attemps to put the bot to sleep</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_community_bots__botid__puttosleep_post_request" data-toggle="tab">Request</a></li><li><a href="#services_community_bots__botid__puttosleep_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_community_bots__botid__puttosleep_post_request"><h3>URI Parameters</h3><ul><li><strong>botId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="services_community_bots__botid__puttosleep_post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The operation succeeded</p><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/401"
+                                                                            target="_blank">401</a></h2>
+                                                    <p>No user is logged-in, or the authentication token is invalid.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/403"
+                                                                            target="_blank">403</a></h2>
+                                                    <p>The logged-in user is not authorized to perform this
+                                                        operation.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/404"
+                                                                            target="_blank">404</a></h2>
+                                                    <p>The requested resource cannot be found.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/440"
+                                                                            target="_blank">440</a></h2>
+                                                    <p>The user session has expired.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/500"
+                                                                            target="_blank">500</a></h2>
+                                                    <p>An unexpected error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/501"
+                                                                            target="_blank">501</a></h2>
+                                                    <p>The requested operation is not supported</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/560"
+                                                                            target="_blank">560</a></h2>
+                                                    <p>An unknown error error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading"><h4 class="panel-title"><a class="collapsed"
+                                                                                  data-toggle="collapse"
+                                                                                  href="#panel_services_community_bots__botid__puttosleep"><span
+                                    class="parent">/services/community/bots/{botId}</span>/putToSleep</a> <span
+                                    class="methods"><a href="#services_community_bots__botid__puttosleep_post"><span
+                                    class="badge badge_post">post</span></a></span></h4></div>
+                            <div id="panel_services_community_bots__botid__puttosleep" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="resource-description"><p>Action to put the bot to sleep</p></div>
+                                    <div class="list-group">
+                                        <div onclick="window.location.href = '#services_community_bots__botid__puttosleep_post'"
+                                             class="list-group-item"><span class="badge badge_post">post</span>
+                                            <div class="method_description"><p>Attemps to put the bot to sleep</p></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" tabindex="0" id="services_community_bots__botid__puttosleep_post">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span>
+                                                <span class="parent">/services/community/bots/{botId}</span>/putToSleep
+                                            </h4></div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info"><p>Attemps to put the bot to sleep</p></div>
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a
+                                                        href="#services_community_bots__botid__puttosleep_post_request"
+                                                        data-toggle="tab">Request</a></li>
+                                                <li><a href="#services_community_bots__botid__puttosleep_post_response"
+                                                       data-toggle="tab">Response</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active"
+                                                     id="services_community_bots__botid__puttosleep_post_request"><h3>
+                                                    URI Parameters</h3>
+                                                    <ul>
+                                                        <li><strong>botId</strong>: <em>required (string)</em></li>
+                                                    </ul>
+                                                    <h3>Headers</h3>
+                                                    <ul>
+                                                        <li><strong>Cookie</strong>: <em>required (string)</em>
+                                                            <p>Authentication token provided by the platform</p>
+                                                            <p><strong>Examples</strong>:</p>
+                                                            <pre>__Secure-xOWL-Platform=AAAAA</pre>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="tab-pane"
+                                                     id="services_community_bots__botid__puttosleep_post_response"><h2>
+                                                    HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a>
+                                                </h2>
+                                                    <p>The operation succeeded</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/400"
+                                                                            target="_blank">400</a></h2>
+                                                    <p>The request is malformed in some way</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: application/json</p>
+                                                    <p><strong>Type</strong>: json</p>
+                                                    <p><strong>Content</strong>:</p>
+                                                    <pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
-}</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+}</code></pre>
+                                                    <p><strong>Examples</strong>:</p>
+                                                    <pre><code>{
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
   "content": "Supplementary information about the error"
 }
-</code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a href="#services_community_bots">/services/community/bots</a></li></ul></div></div></div></div></body></html>
+</code></pre>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/401"
+                                                                            target="_blank">401</a></h2>
+                                                    <p>No user is logged-in, or the authentication token is invalid.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/403"
+                                                                            target="_blank">403</a></h2>
+                                                    <p>The logged-in user is not authorized to perform this
+                                                        operation.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/404"
+                                                                            target="_blank">404</a></h2>
+                                                    <p>The requested resource cannot be found.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/440"
+                                                                            target="_blank">440</a></h2>
+                                                    <p>The user session has expired.</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/500"
+                                                                            target="_blank">500</a></h2>
+                                                    <p>An unexpected error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/501"
+                                                                            target="_blank">501</a></h2>
+                                                    <p>The requested operation is not supported</p>
+                                                    <h2>HTTP status code <a href="http://httpstatus.es/560"
+                                                                            target="_blank">560</a></h2>
+                                                    <p>An unknown error error occurred on the platform</p>
+                                                    <h3>Body</h3>
+                                                    <p><strong>Media type</strong>: text/plain</p>
+                                                    <p><strong>Type</strong>: string</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div id="sidebar" class="hidden-print affix" role="complementary">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="#services_community_bots">/services/community/bots</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

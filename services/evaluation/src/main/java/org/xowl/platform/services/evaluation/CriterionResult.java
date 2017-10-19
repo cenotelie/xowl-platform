@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Serializable;
 
 /**
  * Represents the result of an evaluation criterion on an evaluable element

@@ -17,10 +17,10 @@
 
 package org.xowl.platform.connectors.csv;
 
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

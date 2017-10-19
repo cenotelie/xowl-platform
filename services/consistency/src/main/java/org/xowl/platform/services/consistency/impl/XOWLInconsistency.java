@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Node;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.consistency.ConsistencyConstraint;
 import org.xowl.platform.services.consistency.Inconsistency;
 

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.collaboration;
 
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;
 import org.xowl.platform.kernel.platform.PlatformRoleBase;

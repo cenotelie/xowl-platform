@@ -17,8 +17,8 @@
 
 package org.xowl.platform.connectors.csv;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.importation.ImporterConfiguration;
 
 /**

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.events;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.RichString;
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.RichString;
+import fr.cenotelie.commons.utils.Serializable;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.platform.PlatformUser;
 

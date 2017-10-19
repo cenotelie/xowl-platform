@@ -17,15 +17,15 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricProvider;
-import org.xowl.infra.utils.metrics.MetricSnapshot;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricProvider;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshot;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;

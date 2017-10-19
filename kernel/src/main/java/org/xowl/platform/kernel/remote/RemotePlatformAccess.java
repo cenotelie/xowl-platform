@@ -17,20 +17,20 @@
 
 package org.xowl.platform.kernel.remote;
 
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyException;
+import fr.cenotelie.commons.utils.api.ReplyResult;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.http.HttpConnection;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.infra.store.Repository;
 import org.xowl.infra.store.sparql.Command;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyResult;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.http.HttpConnection;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobStatus;

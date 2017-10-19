@@ -17,6 +17,10 @@
 
 package org.xowl.platform.services.security.internal;
 
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.xowl.infra.server.ServerConfiguration;
@@ -37,10 +41,6 @@ import org.xowl.infra.store.sparql.ResultSolutions;
 import org.xowl.infra.store.sparql.ResultYesNo;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.config.Section;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.events.EventService;
 import org.xowl.platform.kernel.platform.*;

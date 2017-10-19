@@ -177,7 +177,7 @@ function onClickNewConnector() {
 
 	xowl.createConnector(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Spawned connector ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Spawned connector ", content, "."]});
 			waitAndGo("connector.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, selectedDescriptor, data);

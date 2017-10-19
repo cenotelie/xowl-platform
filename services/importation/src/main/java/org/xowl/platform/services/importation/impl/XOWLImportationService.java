@@ -17,16 +17,16 @@
 
 package org.xowl.platform.services.importation.impl;
 
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.json.Json;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.json.Json;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactFuture;

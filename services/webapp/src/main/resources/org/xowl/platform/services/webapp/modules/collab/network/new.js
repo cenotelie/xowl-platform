@@ -358,7 +358,7 @@ function onClickSpawn() {
 	specification.name = name;
 	xowl.spawnCollaboration(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched job ", content]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Launched job ", content]});
 			waitForJob(content.identifier, content.name, function (job) {
 				onSpawnJobComplete(job.result);
 			});
@@ -374,7 +374,7 @@ function onSpawnJobComplete(xsp) {
 		displayMessage("error", "FAILURE: " + xsp.message);
 	} else {
 		displayMessage("success", {
-			type: "org.xowl.infra.utils.RichString",
+			type: "fr.cenotelie.commons.utils.RichString",
 			parts: ["Spawned collaboration ", xsp.payload]
 		});
 		waitAndGo("neighbour.html?id=" + encodeURIComponent(xsp.payload.identifier));

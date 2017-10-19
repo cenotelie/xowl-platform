@@ -17,10 +17,10 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.loaders.JsonLoader;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

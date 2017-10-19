@@ -17,11 +17,11 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyNetworkError;
-import org.xowl.infra.utils.api.ReplyResult;
-import org.xowl.infra.utils.api.ReplyResultCollection;
-import org.xowl.infra.utils.config.Section;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyNetworkError;
+import fr.cenotelie.commons.utils.api.ReplyResult;
+import fr.cenotelie.commons.utils.api.ReplyResultCollection;
+import fr.cenotelie.commons.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;

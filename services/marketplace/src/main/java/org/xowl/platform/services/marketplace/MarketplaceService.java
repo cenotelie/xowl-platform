@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.marketplace;
 
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.kernel.platform.PlatformManagementService;
 import org.xowl.platform.kernel.security.SecuredAction;

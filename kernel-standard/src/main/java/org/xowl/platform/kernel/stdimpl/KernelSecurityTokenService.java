@@ -17,10 +17,10 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.config.Section;
-import org.xowl.infra.utils.logging.Logging;
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecurityTokenService;
 
@@ -126,7 +126,7 @@ public class KernelSecurityTokenService implements SecurityTokenService {
                 byte[] tokenHash = securityMAC.doFinal(tokenData);
                 byte[] token = Arrays.copyOf(tokenData, tokenData.length + tokenHash.length);
                 System.arraycopy(tokenHash, 0, token, tokenData.length, tokenHash.length);
-                return org.xowl.infra.utils.Base64.encodeBase64(token);
+                return fr.cenotelie.commons.utils.Base64.encodeBase64(token);
             } catch (InvalidKeyException exception) {
                 Logging.get().error(exception);
                 return null;
@@ -136,7 +136,7 @@ public class KernelSecurityTokenService implements SecurityTokenService {
 
     @Override
     public Reply checkToken(String token) {
-        byte[] tokenBytes = org.xowl.infra.utils.Base64.decodeBase64(token);
+        byte[] tokenBytes = fr.cenotelie.commons.utils.Base64.decodeBase64(token);
         if (tokenBytes.length <= HASH_LENGTH + TIMESTAMP_LENGTH)
             return ReplyUnauthenticated.instance();
         byte[] tokenData = Arrays.copyOf(tokenBytes, tokenBytes.length - HASH_LENGTH);

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.importation;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactFuture;
 import org.xowl.platform.kernel.jobs.JobBase;

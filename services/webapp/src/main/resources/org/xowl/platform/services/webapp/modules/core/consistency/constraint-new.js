@@ -34,7 +34,7 @@ function onClickNewRule() {
 	}
 	xowl.newConsistencyConstraint(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created constraint ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Created constraint ", content, "."]});
 			waitAndGo("constraints.html");
 		}
 	}, name, message, prefixes, antecedents, guard);

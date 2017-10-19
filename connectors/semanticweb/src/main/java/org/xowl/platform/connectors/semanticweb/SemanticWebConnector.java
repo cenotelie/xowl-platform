@@ -17,13 +17,13 @@
 
 package org.xowl.platform.connectors.semanticweb;
 
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyApiError;
+import fr.cenotelie.commons.utils.api.ReplyResultCollection;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyApiError;
-import org.xowl.infra.utils.api.ReplyResultCollection;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactBase;

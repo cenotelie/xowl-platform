@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.activator;
 
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.BusinessDirectoryService;
 import org.xowl.platform.kernel.events.EventService;

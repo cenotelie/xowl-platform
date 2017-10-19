@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.evaluation;
 
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Serializable;
 import org.xowl.platform.kernel.Registrable;
 
 import java.util.Collection;

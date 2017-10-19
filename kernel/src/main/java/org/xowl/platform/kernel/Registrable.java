@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.utils.Identifiable;
+import fr.cenotelie.commons.utils.Identifiable;
 
 /**
  * Represents a component that can be registered so that it can be discovered later

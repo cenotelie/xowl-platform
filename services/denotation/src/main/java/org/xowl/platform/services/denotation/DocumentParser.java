@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.denotation;
 
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import org.xowl.infra.denotation.phrases.Parser;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.Service;
 
 import java.io.InputStream;

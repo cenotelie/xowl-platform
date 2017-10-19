@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel;
 
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.rdf.SubjectNode;
-import org.xowl.infra.utils.logging.Logging;
 
 import java.io.File;
 import java.util.ArrayList;

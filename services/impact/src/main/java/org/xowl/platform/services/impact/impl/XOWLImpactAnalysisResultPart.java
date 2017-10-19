@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.impact.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.collections.Couple;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.collections.Couple;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 
 import java.util.ArrayList;

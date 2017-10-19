@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.statistics;
 
-import org.xowl.infra.utils.metrics.MetricProvider;
+import fr.cenotelie.commons.utils.metrics.MetricProvider;
 import org.xowl.platform.kernel.Service;
 
 /**

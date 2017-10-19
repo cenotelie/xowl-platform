@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUnsupported;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformGroup;
 import org.xowl.platform.kernel.platform.PlatformRole;

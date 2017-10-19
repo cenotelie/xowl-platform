@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
 import org.xowl.infra.store.rdf.Quad;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
 
 import java.util.Collection;
 

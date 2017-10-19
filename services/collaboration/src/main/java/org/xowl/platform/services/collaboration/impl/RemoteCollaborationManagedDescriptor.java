@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.remote.PlatformApiDeserializerForOSGi;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationStatus;

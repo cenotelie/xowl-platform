@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.remote;
 
+import fr.cenotelie.commons.utils.api.ApiDeserializer;
+import fr.cenotelie.commons.utils.product.Product;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.ApiDeserializer;
-import org.xowl.infra.utils.product.Product;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.artifacts.*;
 import org.xowl.platform.kernel.jobs.Job;

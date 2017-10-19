@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.community.impl;
 
-import org.xowl.infra.utils.RichString;
-import org.xowl.infra.utils.http.HttpConnection;
-import org.xowl.infra.utils.logging.Logging;
+import fr.cenotelie.commons.utils.RichString;
+import fr.cenotelie.commons.utils.http.HttpConnection;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.services.community.bots.BotBase;
 import org.xowl.platform.services.community.bots.BotSpecification;
 

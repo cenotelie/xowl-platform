@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.webapi;
 
-import org.xowl.infra.utils.TextUtils;
+import fr.cenotelie.commons.utils.TextUtils;
 
 import java.net.URL;
 

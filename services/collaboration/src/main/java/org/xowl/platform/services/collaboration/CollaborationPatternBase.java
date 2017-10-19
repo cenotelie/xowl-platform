@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.collaboration;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation for collaboration patterns

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.config.Configuration;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.config.Configuration;
 
 /**
  * The configuration service that provides configuration elements to other entities

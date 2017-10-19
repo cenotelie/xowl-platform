@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.utils.RichString;
+import fr.cenotelie.commons.utils.RichString;
 import org.xowl.platform.kernel.Service;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.events.EventBase;

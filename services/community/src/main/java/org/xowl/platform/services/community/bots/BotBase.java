@@ -17,15 +17,15 @@
 
 package org.xowl.platform.services.community.bots;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyApiError;
+import fr.cenotelie.commons.utils.api.ReplyResultCollection;
+import fr.cenotelie.commons.utils.api.ReplySuccess;
+import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
+import fr.cenotelie.commons.utils.logging.DispatchLogger;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyApiError;
-import org.xowl.infra.utils.api.ReplyResultCollection;
-import org.xowl.infra.utils.api.ReplySuccess;
-import org.xowl.infra.utils.concurrent.SafeRunnable;
-import org.xowl.infra.utils.logging.DispatchLogger;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.events.Event;

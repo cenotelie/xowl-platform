@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.remote;
 
+import fr.cenotelie.commons.utils.api.ApiDeserializer;
+import fr.cenotelie.commons.utils.api.ApiFactory;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.api.ApiDeserializer;
-import org.xowl.infra.utils.api.ApiFactory;
 
 import java.util.Collection;
 

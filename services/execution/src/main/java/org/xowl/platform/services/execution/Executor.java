@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.execution;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.api.Reply;
 
 /**
  * Represents an executor for executable pieces of content

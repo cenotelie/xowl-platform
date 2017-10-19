@@ -17,19 +17,19 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyApiError;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.json.Json;
+import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyApiError;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.config.Section;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.json.Json;
-import org.xowl.infra.utils.logging.BufferedLogger;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;

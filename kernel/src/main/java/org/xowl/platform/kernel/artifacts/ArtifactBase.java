@@ -17,12 +17,12 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.*;
 import org.xowl.infra.store.storage.NodeManager;
 import org.xowl.infra.store.storage.cache.CachedNodes;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.kernel.KernelSchema;
 
 import java.text.DateFormat;

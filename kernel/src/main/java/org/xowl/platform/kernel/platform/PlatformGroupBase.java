@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.platform;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
 
 /**
  * Base implementation of a group of users on the platform

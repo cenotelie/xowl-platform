@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.api.Reply;
 
 /**
  * Represents a resource that is owned by a platform user and can be shared with others in the collaboration

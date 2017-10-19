@@ -17,14 +17,14 @@
 
 package org.xowl.platform.kernel.artifacts;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.IRIs;
 import org.xowl.infra.store.rdf.GraphNode;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.storage.cache.CachedNodes;
 import org.xowl.infra.store.writers.JsonSerializer;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.logging.Logging;
 
 import java.io.StringWriter;
 import java.util.ArrayList;

@@ -24,7 +24,7 @@ function create() {
 	}
 	xowl.createCollaborationRole(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created role ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Created role ", content, "."]});
 			waitAndGo("people.html");
 		}
 	}, {identifier: identifier, name: name});

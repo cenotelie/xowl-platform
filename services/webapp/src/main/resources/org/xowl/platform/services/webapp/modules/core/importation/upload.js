@@ -52,7 +52,7 @@ function onUpload() {
 		xowl.uploadDocument(function (status, type, content) {
 			if (onOperationEnded(status, content)) {
 				progressBar.classList.add("progress-bar-success");
-				displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Uploaded document ", content, "."]});
+				displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Uploaded document ", content, "."]});
 				waitAndGo("document.html?id=" + encodeURIComponent(content.identifier));
 			} else {
 				progressBar.classList.add("progress-bar-error");

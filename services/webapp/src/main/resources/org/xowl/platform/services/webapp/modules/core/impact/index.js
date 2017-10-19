@@ -233,7 +233,7 @@ function onClickRun() {
 		return;
 	xowl.newImpactAnalysis(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched analysis as job ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Launched analysis as job ", content, "."]});
 			waitAndGo("result.html?id=" + encodeURIComponent(content.identifier) + "&name=" + encodeURIComponent(content.name));
 		}
 	}, definition);

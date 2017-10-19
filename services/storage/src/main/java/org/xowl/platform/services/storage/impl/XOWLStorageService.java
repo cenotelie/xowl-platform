@@ -17,6 +17,18 @@
 
 package org.xowl.platform.services.storage.impl;
 
+import fr.cenotelie.commons.utils.IOUtils;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.logging.BufferedLogger;
+import fr.cenotelie.commons.utils.logging.Logging;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshot;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshotInt;
 import org.xowl.infra.server.ServerConfiguration;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLReplyUtils;
@@ -28,18 +40,6 @@ import org.xowl.infra.store.RDFUtils;
 import org.xowl.infra.store.rdf.Changeset;
 import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.sparql.ResultQuads;
-import org.xowl.infra.utils.IOUtils;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.logging.BufferedLogger;
-import org.xowl.infra.utils.logging.Logging;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.infra.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSchema;

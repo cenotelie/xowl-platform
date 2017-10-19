@@ -268,13 +268,13 @@ function createNewSelectRegexp(index) {
 }
 
 function onClickOk() {
-	if (!onOperationRequest({ type: "org.xowl.infra.utils.RichString", parts: ["Importing document ", doc, " ..."]}))
+	if (!onOperationRequest({ type: "fr.cenotelie.commons.utils.RichString", parts: ["Importing document ", doc, " ..."]}))
 		return;
 	var configIndex = document.getElementById("input-configuration").selectedIndex;
 	if (configIndex == 0) {
 		xowl.importUploadedDocument(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
+				displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
 				waitForJob(content.identifier, content.name, function (job) {
 					onJobCompleted(job);
 				});
@@ -294,7 +294,7 @@ function onClickOk() {
 	} else {
 		xowl.importUploadedDocumentWith(function (status, ct, content) {
 			if (onOperationEnded(status, content)) {
-				displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
+				displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Launched importation job for ", doc, "."]});
 				waitForJob(content.identifier, content.name, function (job) {
 					onJobCompleted(job);
 				});
@@ -310,7 +310,7 @@ function onJobCompleted(job) {
 		displayMessage("error", "FAILURE: " + job.result.message);
 	} else {
 		var artifactId = job.result.payload;
-		displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported ", doc, " as artifact " + artifactId]});
+		displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Imported ", doc, " as artifact " + artifactId]});
 		waitAndGo(ROOT + "/modules/core/artifacts/artifact.html?id=" + encodeURIComponent(artifactId));
 	}
 }

@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel;
 
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
 
 /**
  * An XSP reply when a required service is not available

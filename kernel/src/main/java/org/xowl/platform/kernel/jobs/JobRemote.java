@@ -17,12 +17,12 @@
 
 package org.xowl.platform.kernel.jobs;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.ApiDeserializer;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.ApiDeserializer;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.json.Json;
 
 /**
  * Represents a job running on a remote platform

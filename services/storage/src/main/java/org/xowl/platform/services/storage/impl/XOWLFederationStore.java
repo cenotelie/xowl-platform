@@ -17,6 +17,10 @@
 
 package org.xowl.platform.services.storage.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricComposite;
 import org.xowl.infra.server.api.XOWLDatabase;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.api.XOWLStoredProcedure;
@@ -28,10 +32,6 @@ import org.xowl.infra.store.rdf.Quad;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.rdf.SubjectNode;
 import org.xowl.infra.store.sparql.*;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricComposite;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;

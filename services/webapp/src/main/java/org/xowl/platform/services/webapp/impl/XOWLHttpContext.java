@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.webapp.impl;
 
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.URIUtils;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.URIUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ui.WebUIContribution;
 import org.xowl.platform.kernel.webapi.HttpApiResource;

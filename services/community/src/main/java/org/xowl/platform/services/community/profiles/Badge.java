@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.community.profiles;
 
+import fr.cenotelie.commons.utils.*;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.*;
-import org.xowl.infra.utils.logging.Logging;
 
 import java.io.IOException;
 import java.io.InputStream;

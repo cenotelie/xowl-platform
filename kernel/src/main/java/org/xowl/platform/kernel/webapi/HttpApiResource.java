@@ -17,8 +17,8 @@
 
 package org.xowl.platform.kernel.webapi;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.Serializable;
 
 import java.net.URL;
 

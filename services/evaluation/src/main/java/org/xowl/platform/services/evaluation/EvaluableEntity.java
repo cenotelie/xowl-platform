@@ -17,15 +17,15 @@
 
 package org.xowl.platform.services.evaluation;
 
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyResult;
 import org.xowl.infra.store.Vocabulary;
 import org.xowl.infra.store.rdf.IRINode;
 import org.xowl.infra.store.rdf.LiteralNode;
 import org.xowl.infra.store.rdf.RDFPatternSolution;
 import org.xowl.infra.store.sparql.Result;
 import org.xowl.infra.store.sparql.ResultSolutions;
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyResult;
 import org.xowl.platform.kernel.KernelSchema;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.artifacts.Artifact;

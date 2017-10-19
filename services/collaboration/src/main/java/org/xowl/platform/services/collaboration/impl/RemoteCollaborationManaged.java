@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUnsupported;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.remote.RemotePlatformAccess;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationStatus;

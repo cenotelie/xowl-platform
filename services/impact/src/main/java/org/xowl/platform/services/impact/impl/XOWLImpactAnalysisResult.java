@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.impact.impl;
 
-import org.xowl.infra.utils.TextUtils;
+import fr.cenotelie.commons.utils.TextUtils;
 import org.xowl.platform.services.impact.ImpactAnalysisResult;
 import org.xowl.platform.services.impact.ImpactAnalysisResultPart;
 

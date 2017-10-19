@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyNotFound;
-import org.xowl.infra.utils.api.ReplyResult;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyNotFound;
+import fr.cenotelie.commons.utils.api.ReplyResult;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
 import org.xowl.platform.kernel.artifacts.Artifact;

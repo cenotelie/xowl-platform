@@ -207,7 +207,7 @@ function onEvaluationGo() {
 	}
 	xowl.newEvaluation(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Created evaluation ", content, "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Created evaluation ", content, "."]});
 			waitAndGo("eval.html?id=" + encodeURIComponent(content.identifier));
 		}
 	}, definition);

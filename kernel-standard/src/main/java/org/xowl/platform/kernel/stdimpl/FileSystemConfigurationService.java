@@ -17,9 +17,9 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.Identifiable;
-import org.xowl.infra.utils.config.Configuration;
-import org.xowl.infra.utils.logging.Logging;
+import fr.cenotelie.commons.utils.Identifiable;
+import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
 

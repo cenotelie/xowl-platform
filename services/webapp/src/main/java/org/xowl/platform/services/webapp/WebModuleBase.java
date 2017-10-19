@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.webapp;
 
-import org.xowl.infra.utils.TextUtils;
+import fr.cenotelie.commons.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.impact;
 
+import fr.cenotelie.commons.utils.Serializable;
+import fr.cenotelie.commons.utils.collections.Couple;
 import org.xowl.infra.store.rdf.IRINode;
-import org.xowl.infra.utils.Serializable;
-import org.xowl.infra.utils.collections.Couple;
 
 import java.util.Collection;
 import java.util.List;

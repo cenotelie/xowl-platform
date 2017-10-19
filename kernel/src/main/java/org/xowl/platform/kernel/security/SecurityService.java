@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.platform.kernel.platform.PlatformUser;
 
 /**

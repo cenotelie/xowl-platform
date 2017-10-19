@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.consistency.impl;
 
+import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.server.api.XOWLRule;
 import org.xowl.infra.server.base.BaseRule;
-import org.xowl.infra.utils.TextUtils;
 import org.xowl.platform.services.consistency.ConsistencyConstraint;
 
 /**

@@ -164,7 +164,7 @@
   "$ref": "schema_infra_utils.json#/definitions/Metrics"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>[
   {
-    "type": "org.xowl.infra.utils.metrics.Metric",
+    "type": "fr.cenotelie.commons.utils.metrics.Metric",
     "identifier": "metric1",
     "name": "My Metric",
     "unit": "second",
@@ -178,7 +178,7 @@
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
@@ -187,7 +187,7 @@
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_kernel_statistics_metrics__metricid_"><span class="parent">/kernel/statistics/metrics</span>/{metricId}</a> <span class="methods"><a href="#kernel_statistics_metrics__metricid__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_kernel_statistics_metrics__metricid_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>A metric on the platform</p></div><div class="list-group"><div onclick="window.location.href = '#kernel_statistics_metrics__metricid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets the description of a metric</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="kernel_statistics_metrics__metricid__get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/kernel/statistics/metrics</span>/{metricId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets the description of a metric</p></div><ul class="nav nav-tabs"><li class="active"><a href="#kernel_statistics_metrics__metricid__get_request" data-toggle="tab">Request</a></li><li><a href="#kernel_statistics_metrics__metricid__get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="kernel_statistics_metrics__metricid__get_request"><h3>URI Parameters</h3><ul><li><strong>metricId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="kernel_statistics_metrics__metricid__get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The description of the metric</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/Metric"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.metrics.Metric",
+  "type": "fr.cenotelie.commons.utils.metrics.Metric",
   "identifier": "metric1",
   "name": "My Metric",
   "unit": "second",
@@ -200,7 +200,7 @@
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",
@@ -209,14 +209,14 @@
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>No user is logged-in, or the authentication token is invalid.</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>The logged-in user is not authorized to perform this operation.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The requested resource cannot be found.</p><h2>HTTP status code <a href="http://httpstatus.es/440" target="_blank">440</a></h2><p>The user session has expired.</p><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>An unexpected error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p><h2>HTTP status code <a href="http://httpstatus.es/501" target="_blank">501</a></h2><p>The requested operation is not supported</p><h2>HTTP status code <a href="http://httpstatus.es/560" target="_blank">560</a></h2><p>An unknown error error occurred on the platform</p><h3>Body</h3><p><strong>Media type</strong>: text/plain</p><p><strong>Type</strong>: string</p></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_kernel_statistics_metrics__metricid__snapshot"><span class="parent">/kernel/statistics/metrics/{metricId}</span>/snapshot</a> <span class="methods"><a href="#kernel_statistics_metrics__metricid__snapshot_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_kernel_statistics_metrics__metricid__snapshot" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>A snapshot of the metric</p></div><div class="list-group"><div onclick="window.location.href = '#kernel_statistics_metrics__metricid__snapshot_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Gets a snapshot of the metric</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="kernel_statistics_metrics__metricid__snapshot_get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/kernel/statistics/metrics/{metricId}</span>/snapshot</h4></div><div class="modal-body"><div class="alert alert-info"><p>Gets a snapshot of the metric</p></div><ul class="nav nav-tabs"><li class="active"><a href="#kernel_statistics_metrics__metricid__snapshot_get_request" data-toggle="tab">Request</a></li><li><a href="#kernel_statistics_metrics__metricid__snapshot_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="kernel_statistics_metrics__metricid__snapshot_get_request"><h3>URI Parameters</h3><ul><li><strong>metricId</strong>: <em>required (string)</em></li></ul><h3>Headers</h3><ul><li><strong>Cookie</strong>: <em>required (string)</em><p>Authentication token provided by the platform</p><p><strong>Examples</strong>:</p><pre>__Secure-xOWL-Platform=AAAAA</pre></li></ul></div><div class="tab-pane" id="kernel_statistics_metrics__metricid__snapshot_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The description of the metric</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/MetricSnapshot"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.metrics.MetricSnapshot",
+  "type": "fr.cenotelie.commons.utils.metrics.MetricSnapshot",
   "value": "50",
   "parts": []
 }
 </code></pre><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The request is malformed in some way</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: json</p><p><strong>Content</strong>:</p><pre><code>{
   "$ref": "schema_infra_utils.json#/definitions/ApiError"
 }</code></pre><p><strong>Examples</strong>:</p><pre><code>{
-  "type": "org.xowl.infra.utils.api.ApiError",
+  "type": "fr.cenotelie.commons.utils.api.ApiError",
   "code": 1,
   "message": "The main description of this error",
   "helpLink": "http://xowl.org/supports/errors/001.html",

@@ -17,9 +17,9 @@
 
 package org.xowl.platform.services.connection;
 
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.*;
-import org.xowl.infra.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.*;
+import fr.cenotelie.commons.utils.http.HttpResponse;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;

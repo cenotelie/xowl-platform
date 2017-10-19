@@ -17,11 +17,11 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.concurrent.SafeRunnable;
-import org.xowl.infra.utils.logging.Logging;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.infra.utils.metrics.MetricSnapshotInt;
+import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
+import fr.cenotelie.commons.utils.logging.Logging;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshot;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.ManagedService;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.events.Event;

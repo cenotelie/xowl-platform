@@ -17,14 +17,14 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyException;
-import org.xowl.infra.utils.api.ReplyExpiredSession;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.collections.Couple;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.logging.Logging;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyException;
+import fr.cenotelie.commons.utils.api.ReplyExpiredSession;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.collections.Couple;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.security.SecurityService;

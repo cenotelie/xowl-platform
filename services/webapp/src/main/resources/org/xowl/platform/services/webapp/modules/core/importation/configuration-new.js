@@ -63,7 +63,7 @@ function doImport(definitions, index) {
 		return false;
 	xowl.storeImporterConfiguration(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			displayMessage("success", { type: "org.xowl.infra.utils.RichString", parts: ["Imported configuration " + definition.name + "."]});
+			displayMessage("success", { type: "fr.cenotelie.commons.utils.RichString", parts: ["Imported configuration " + definition.name + "."]});
 			if (index + 1 < definitions.length) {
 				doImport(definitions, index + 1);
 			} else {

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import org.xowl.infra.utils.config.Section;
+import fr.cenotelie.commons.utils.config.Section;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkServiceProvider;

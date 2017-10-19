@@ -17,10 +17,10 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplySuccess;
-import org.xowl.infra.utils.api.ReplyUnauthenticated;
-import org.xowl.infra.utils.api.ReplyUnsupported;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplySuccess;
+import fr.cenotelie.commons.utils.api.ReplyUnauthenticated;
+import fr.cenotelie.commons.utils.api.ReplyUnsupported;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.platform.PlatformUser;
 import org.xowl.platform.kernel.security.SecuredAction;

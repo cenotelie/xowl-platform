@@ -7,7 +7,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.api.ApiError"
+            "fr.cenotelie.commons.utils.api.ApiError"
           ]
         },
         "code": {
@@ -35,7 +35,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.metrics.Metric"
+            "fr.cenotelie.commons.utils.metrics.Metric"
           ]
         },
         "identifier": {
@@ -90,7 +90,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.metrics.MetricSnapshot"
+            "fr.cenotelie.commons.utils.metrics.MetricSnapshot"
           ]
         },
         "value": {
@@ -116,7 +116,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.product.License"
+            "fr.cenotelie.commons.utils.product.License"
           ]
         },
         "name": {
@@ -137,7 +137,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.product.VersionInfo"
+            "fr.cenotelie.commons.utils.product.VersionInfo"
           ]
         },
         "number": {
@@ -170,7 +170,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.product.EmbeddedDependency"
+            "fr.cenotelie.commons.utils.product.EmbeddedDependency"
           ]
         },
         "identifier": {
@@ -227,7 +227,7 @@
       "properties": {
         "type": {
           "enum": [
-            "org.xowl.infra.utils.product.Product"
+            "fr.cenotelie.commons.utils.product.Product"
           ]
         },
         "identifier": {

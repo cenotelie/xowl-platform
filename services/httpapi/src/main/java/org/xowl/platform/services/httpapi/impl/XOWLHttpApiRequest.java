@@ -17,8 +17,8 @@
 
 package org.xowl.platform.services.httpapi.impl;
 
-import org.xowl.infra.utils.http.URIUtils;
-import org.xowl.infra.utils.logging.Logging;
+import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.webapi.HttpApiRequest;
 
 import javax.servlet.http.HttpServletRequest;

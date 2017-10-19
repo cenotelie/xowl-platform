@@ -17,17 +17,17 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import org.xowl.infra.utils.TextUtils;
-import org.xowl.infra.utils.api.Reply;
-import org.xowl.infra.utils.api.ReplyUtils;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.logging.ConsoleLogger;
-import org.xowl.infra.utils.logging.DispatchLogger;
-import org.xowl.infra.utils.logging.FileLogger;
-import org.xowl.infra.utils.metrics.Metric;
-import org.xowl.infra.utils.metrics.MetricSnapshot;
-import org.xowl.infra.utils.metrics.MetricSnapshotInt;
+import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.ReplyUtils;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.logging.ConsoleLogger;
+import fr.cenotelie.commons.utils.logging.DispatchLogger;
+import fr.cenotelie.commons.utils.logging.FileLogger;
+import fr.cenotelie.commons.utils.metrics.Metric;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshot;
+import fr.cenotelie.commons.utils.metrics.MetricSnapshotInt;
 import org.xowl.platform.kernel.LoggingService;
 import org.xowl.platform.kernel.PlatformHttp;
 import org.xowl.platform.kernel.PlatformUtils;

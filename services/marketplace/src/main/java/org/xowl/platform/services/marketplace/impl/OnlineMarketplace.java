@@ -17,13 +17,13 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
+import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.http.HttpConnection;
+import fr.cenotelie.commons.utils.http.HttpConstants;
+import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.json.Json;
+import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
-import org.xowl.infra.utils.config.Section;
-import org.xowl.infra.utils.http.HttpConnection;
-import org.xowl.infra.utils.http.HttpConstants;
-import org.xowl.infra.utils.http.HttpResponse;
-import org.xowl.infra.utils.json.Json;
-import org.xowl.infra.utils.logging.Logging;
 import org.xowl.platform.kernel.platform.Addon;
 import org.xowl.platform.services.marketplace.MarketplaceDescriptor;
 

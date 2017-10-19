@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import org.xowl.infra.utils.api.Reply;
+import fr.cenotelie.commons.utils.api.Reply;
 import org.xowl.platform.kernel.artifacts.Artifact;
 import org.xowl.platform.kernel.artifacts.ArtifactSpecification;
 import org.xowl.platform.kernel.platform.PlatformRole;

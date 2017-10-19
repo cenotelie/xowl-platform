@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.importation;
 
-import org.xowl.infra.utils.Serializable;
+import fr.cenotelie.commons.utils.Serializable;
 
 /**
  * Represents the preview of a document to be imported

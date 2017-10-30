@@ -27,13 +27,13 @@
     </developers>
     <scm>
         <connection>scm:hg:https://bitbucket.org/cenotelie/xowl-platform</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org:xowl/xowl-platform</developerConnection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org:cenotelie/xowl-platform</developerConnection>
         <url>https://bitbucket.org/cenotelie/xowl-platform</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
-            <id>cenotelie-snapshots</id>
+            <id>cenotelie</id>
             <url>https://nexus.cenotelie.fr/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>

@@ -612,7 +612,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
         onActivated();
         Document document;
         synchronized (documents) {
-            document = documents.remove(documentId);
+            document = documents.get(documentId);
             if (document == null)
                 return ReplyNotFound.instance();
         }

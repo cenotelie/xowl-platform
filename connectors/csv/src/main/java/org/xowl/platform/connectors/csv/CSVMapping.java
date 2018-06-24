@@ -19,6 +19,8 @@ package org.xowl.platform.connectors.csv;
 
 import fr.cenotelie.commons.utils.Serializable;
 import fr.cenotelie.commons.utils.TextUtils;
+import fr.cenotelie.commons.utils.csv.CsvDocument;
+import fr.cenotelie.commons.utils.csv.CsvRow;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.IRINode;
 
@@ -79,9 +81,9 @@ public class CSVMapping implements Serializable {
      * @param context      The context
      * @param skipFirstRow Whether to skip the first row
      */
-    public void apply(Iterator<Iterator<String>> document, CSVImportationContext context, boolean skipFirstRow) {
+    public void apply(CsvDocument document, CSVImportationContext context, boolean skipFirstRow) {
         if (skipFirstRow && document.hasNext()) {
-            Iterator<String> row = document.next();
+            CsvRow row = document.next();
             while (row.hasNext())
                 row.next();
         }

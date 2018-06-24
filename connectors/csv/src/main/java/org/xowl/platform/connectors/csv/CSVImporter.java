@@ -23,6 +23,9 @@ import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyException;
 import fr.cenotelie.commons.utils.api.ReplyResult;
+import fr.cenotelie.commons.utils.csv.Csv;
+import fr.cenotelie.commons.utils.csv.CsvDocument;
+import fr.cenotelie.commons.utils.csv.CsvRow;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.infra.store.rdf.Quad;
@@ -94,12 +97,11 @@ public class CSVImporter extends Importer {
             return reply;
         try (InputStream stream = ((ReplyResult<InputStream>) reply).getData()) {
             InputStreamReader reader = new InputStreamReader(stream, IOUtils.CHARSET);
-            CSVParser parser = new CSVParser(reader, csvConfiguration.getSeparator(), csvConfiguration.getTextMarker());
-            Iterator<Iterator<String>> content = parser.parse();
+            CsvDocument document = Csv.parse(reader, csvConfiguration.getSeparator(), csvConfiguration.getTextMarker());
             final List<List<String>> data = new ArrayList<>();
             int count = 0;
-            while (content.hasNext() && count < csvConfiguration.getRowCount()) {
-                Iterator<String> row = content.next();
+            while (document.hasNext() && count < csvConfiguration.getRowCount()) {
+                CsvRow row = document.next();
                 List<String> rowData = new ArrayList<>();
                 while (row.hasNext())
                     rowData.add(row.next());
@@ -173,8 +175,7 @@ public class CSVImporter extends Importer {
             return reply;
         String artifactId = ArtifactBase.newArtifactID();
         try (InputStream stream = ((ReplyResult<InputStream>) reply).getData()) {
-            CSVParser parser = new CSVParser(new AutoReader(stream), configuration.getSeparator(), configuration.getTextMarker());
-            Iterator<Iterator<String>> content = parser.parse();
+            CsvDocument content = Csv.parse(new AutoReader(stream), configuration.getSeparator(), configuration.getTextMarker());
             BaseStore store = StoreFactory.create().inMemory().make();
             CSVImportationContext context = new CSVImportationContext(Character.toString(configuration.getTextMarker()), store, artifactId, artifactId);
             configuration.getMapping().apply(content, context, configuration.getSkipFirstRow());

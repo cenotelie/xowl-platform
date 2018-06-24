@@ -20,11 +20,11 @@ package org.xowl.platform.kernel.stdimpl;
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.commons.utils.logging.Logging;
@@ -98,19 +98,19 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
     /**
      * The configuration section for the security realm
      */
-    private final Section realmConfiguration;
+    private final IniSection realmConfiguration;
     /**
      * The configuration section for the security policy
      */
-    private final Section policyConfiguration;
+    private final IniSection policyConfiguration;
     /**
      * The configuration section for the token service
      */
-    private final Section tokenServiceConfiguration;
+    private final IniSection tokenServiceConfiguration;
     /**
      * The configuration section for the descriptors of secured resources
      */
-    private final Section descriptorsConfiguration;
+    private final IniSection descriptorsConfiguration;
     /**
      * The time to live in seconds of an authentication token
      */
@@ -142,7 +142,7 @@ public class KernelSecurityService implements SecurityService, HttpApiService {
      * @param configurationService The configuration service
      */
     public KernelSecurityService(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(SecurityService.class.getCanonicalName());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/security";
         this.maxLoginFailure = Integer.parseInt(configuration.get("maxLoginFailure"));
         this.banLength = Integer.parseInt(configuration.get("banLength"));

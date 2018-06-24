@@ -21,11 +21,11 @@ import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyNotFound;
 import fr.cenotelie.commons.utils.api.ReplyUtils;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.security.SecuredAction;
 import org.xowl.platform.kernel.security.SecurityService;
@@ -94,8 +94,8 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
     @Override
     public void onLifecycleStart() {
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(BotManagementService.class.getCanonicalName());
-        for (Section section : configuration.getSections()) {
+        IniDocument configuration = configurationService.getConfigFor(BotManagementService.class.getCanonicalName());
+        for (IniSection section : configuration.getSections()) {
             BotSpecification specification = loadBotSpecification(section);
             if (specification == null)
                 continue;
@@ -163,7 +163,7 @@ public class XOWLBotManagementService implements BotManagementService, HttpApiSe
      * @param section The configuration section
      * @return The specification, or null if the section is not a valid specification
      */
-    private BotSpecification loadBotSpecification(Section section) {
+    private BotSpecification loadBotSpecification(IniSection section) {
         String id = section.getName();
         String name = section.get("name");
         String botType = section.get("type");

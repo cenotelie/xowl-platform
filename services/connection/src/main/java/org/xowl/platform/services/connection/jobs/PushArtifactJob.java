@@ -104,7 +104,7 @@ public class PushArtifactJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         result = ConnectorUtils.pushArtifactTo(connectorId, artifactId);
     }
 }

@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.commons.utils.Identifiable;
-import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.ConfigurationService;
 import org.xowl.platform.kernel.PlatformUtils;
@@ -64,13 +64,13 @@ public class FileSystemConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public Configuration getConfigFor(Identifiable entity) {
+    public IniDocument getConfigFor(Identifiable entity) {
         return getConfigFor(entity.getIdentifier());
     }
 
     @Override
-    public Configuration getConfigFor(String entityId) {
-        Configuration configuration = new Configuration();
+    public IniDocument getConfigFor(String entityId) {
+        IniDocument configuration = new IniDocument();
         File file = new File(directory, entityId + CONFIG_EXT);
         if (file.exists() && file.canRead()) {
             try {

@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.marketplace.Marketplace;
 import org.xowl.platform.services.marketplace.MarketplaceProvider;
@@ -48,7 +48,7 @@ public class XOWLMarketplaceProvider implements MarketplaceProvider {
     }
 
     @Override
-    public Marketplace newMarketplace(String type, Section configuration) {
+    public Marketplace newMarketplace(String type, IniSection configuration) {
         if (FSMarketplace.class.getCanonicalName().equals(type))
             return new FSMarketplace(configuration);
         if (OnlineMarketplace.class.getCanonicalName().equals(type))

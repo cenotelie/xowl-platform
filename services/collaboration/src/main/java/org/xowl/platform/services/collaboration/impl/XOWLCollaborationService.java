@@ -22,11 +22,11 @@ import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyApiError;
 import fr.cenotelie.commons.utils.api.ReplyUtils;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -91,8 +91,8 @@ public class XOWLCollaborationService extends XOWLCollaborationLocalService impl
     private synchronized CollaborationNetworkService getNetworkService() {
         if (networkService == null) {
             ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
-            Section configNetwork = configuration.getSection("network");
+            IniDocument configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
+            IniSection configNetwork = configuration.getSection("network");
             String identifier = configNetwork.get("service");
             for (CollaborationNetworkServiceProvider provider : Register.getComponents(CollaborationNetworkServiceProvider.class)) {
                 networkService = provider.instantiate(identifier, configNetwork);

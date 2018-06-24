@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.security;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -33,5 +33,5 @@ public interface SecurityRealmProvider extends Registrable {
      * @param configuration The configuration for the realm
      * @return The security realm, or null if it cannot be instantiated
      */
-    SecurityRealm newRealm(String identifier, Section configuration);
+    SecurityRealm newRealm(String identifier, IniSection configuration);
 }

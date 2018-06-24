@@ -18,7 +18,7 @@
 package org.xowl.platform.services.marketplace.impl;
 
 import fr.cenotelie.commons.utils.IOUtils;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -44,7 +44,7 @@ class FSMarketplace extends StaticMarketplace {
      *
      * @param configuration The configuration for this marketplace
      */
-    public FSMarketplace(Section configuration) {
+    public FSMarketplace(IniSection configuration) {
         this.location = PlatformUtils.resolve(configuration.get("location"));
     }
 

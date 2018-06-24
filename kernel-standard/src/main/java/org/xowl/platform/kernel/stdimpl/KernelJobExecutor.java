@@ -22,10 +22,10 @@ import fr.cenotelie.commons.utils.RichString;
 import fr.cenotelie.commons.utils.SHA1;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.commons.utils.metrics.Metric;
@@ -125,7 +125,7 @@ public class KernelJobExecutor implements JobExecutionService, ManagedService, H
      * @param configurationService The configuration service to use
      */
     public KernelJobExecutor(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(JobExecutionService.class.getCanonicalName());
         int queueBound = EXECUTOR_QUEUE_BOUND;
         int poolMin = EXECUTOR_POOL_MIN;
         int poolMax = EXECUTOR_POOL_MAX;

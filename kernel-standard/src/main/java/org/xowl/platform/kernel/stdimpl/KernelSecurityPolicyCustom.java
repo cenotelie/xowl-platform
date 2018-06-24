@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -56,7 +56,7 @@ public class KernelSecurityPolicyCustom implements SecurityPolicy {
      *
      * @param configuration The configuration for the policy
      */
-    public KernelSecurityPolicyCustom(Section configuration) {
+    public KernelSecurityPolicyCustom(IniSection configuration) {
         this.storage = PlatformUtils.resolve(configuration.get("storage"));
     }
 

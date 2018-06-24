@@ -17,7 +17,6 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.commons.utils.metrics.Metric;
 import fr.cenotelie.commons.utils.metrics.MetricSnapshot;
@@ -74,9 +73,9 @@ public class KernelEventService implements EventService, ManagedService {
      * Initializes this service
      */
     public KernelEventService() {
-        this.dispatchThread = new Thread(new SafeRunnable() {
+        this.dispatchThread = new Thread(new Runnable() {
             @Override
-            public void doRun() {
+            public void run() {
                 KernelEventService.this.dispatchRun();
             }
         }, KernelEventService.class.getCanonicalName() + ".EventDispatcher");

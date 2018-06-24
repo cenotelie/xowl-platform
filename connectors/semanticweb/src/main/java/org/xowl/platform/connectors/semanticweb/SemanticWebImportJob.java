@@ -50,7 +50,7 @@ public class SemanticWebImportJob extends ImportationJob<SemanticWebImporterConf
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         result = SemanticWebImporter.doImport(documentId, configuration, metadata);
     }
 }

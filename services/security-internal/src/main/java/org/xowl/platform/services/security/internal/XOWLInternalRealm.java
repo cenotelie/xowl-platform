@@ -19,7 +19,7 @@ package org.xowl.platform.services.security.internal;
 
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.logging.Logging;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -108,7 +108,7 @@ class XOWLInternalRealm implements SecurityRealm, ManagedService {
      *
      * @param configuration The configuration for the realm
      */
-    public XOWLInternalRealm(Section configuration) {
+    public XOWLInternalRealm(IniSection configuration) {
         XOWLServer server = null;
         XOWLDatabase database = null;
         try {

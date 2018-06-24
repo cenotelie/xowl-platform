@@ -20,7 +20,7 @@ package org.xowl.platform.services.community.impl;
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.SHA1;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.commons.utils.logging.Logging;
@@ -61,7 +61,7 @@ public class XOWLProfileServiceLocalImpl implements ProfileService, BadgeProvide
      *
      * @param configuration The configuration for this service
      */
-    public XOWLProfileServiceLocalImpl(Section configuration) {
+    public XOWLProfileServiceLocalImpl(IniSection configuration) {
         this.storage = PlatformUtils.resolve(configuration.get("storage"));
         this.publicProfiles = new HashMap<>();
     }

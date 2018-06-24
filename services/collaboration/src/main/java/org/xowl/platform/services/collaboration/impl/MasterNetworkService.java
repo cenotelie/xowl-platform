@@ -19,8 +19,8 @@ package org.xowl.platform.services.collaboration.impl;
 
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.commons.utils.product.Product;
@@ -88,7 +88,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
      *
      * @param configuration The configuration for this service
      */
-    public MasterNetworkService(Section configuration) {
+    public MasterNetworkService(IniSection configuration) {
         File storage = PlatformUtils.resolve(configuration.get("storage"));
         this.storageDistributions = new File(storage, "platforms");
         this.storageInstances = new File(storage, "instances");
@@ -516,7 +516,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
         // write the platform HTTP configuration
         File instanceConfigDir = new File(instanceDirectory, "config");
         File platformHttpConfigFile = new File(instanceConfigDir, PlatformHttp.class.getCanonicalName() + ".ini");
-        Configuration configuration = new Configuration();
+        IniDocument configuration = new IniDocument();
         try {
             configuration.load(platformHttpConfigFile);
             configuration.set("httpsPort", Integer.toString(instance.getDescriptor().getPort()));
@@ -530,7 +530,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
         // write the collaboration service configuration
         File serviceCollabConfigFile = new File(instanceConfigDir, CollaborationService.class.getCanonicalName() + ".ini");
-        configuration = new Configuration();
+        configuration = new IniDocument();
         try {
             configuration.load(serviceCollabConfigFile);
             configuration.set("manifest", "collaboration.json");
@@ -544,7 +544,7 @@ public class MasterNetworkService implements CollaborationNetworkService {
 
         // write the security service configuration
         File serviceSecurityConfigFile = new File(instanceConfigDir, SecurityService.class.getCanonicalName() + ".ini");
-        configuration = new Configuration();
+        configuration = new IniDocument();
         try {
             configuration.load(serviceSecurityConfigFile);
             configuration.set("realm", "type", "org.xowl.platform.services.security.internal.XOWLSubordinateRealm");

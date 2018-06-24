@@ -19,7 +19,7 @@ package org.xowl.platform.kernel.stdimpl;
 
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.logging.Logging;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecurityTokenService;
@@ -72,7 +72,7 @@ public class KernelSecurityTokenService implements SecurityTokenService {
      *
      * @param configuration The configuration to use
      */
-    public KernelSecurityTokenService(Section configuration) {
+    public KernelSecurityTokenService(IniSection configuration) {
         Mac mac = null;
         Key key = null;
         try {

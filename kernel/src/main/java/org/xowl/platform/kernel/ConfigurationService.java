@@ -18,7 +18,7 @@
 package org.xowl.platform.kernel;
 
 import fr.cenotelie.commons.utils.Identifiable;
-import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 
 /**
  * The configuration service that provides configuration elements to other entities
@@ -32,7 +32,7 @@ public interface ConfigurationService extends Service {
      * @param entity An entity
      * @return The corresponding configuration element
      */
-    Configuration getConfigFor(Identifiable entity);
+    IniDocument getConfigFor(Identifiable entity);
 
     /**
      * Gets the configuration for the entity with the specified identifier
@@ -40,5 +40,5 @@ public interface ConfigurationService extends Service {
      * @param entityId The identifier of an entity
      * @return The corresponding configuration element
      */
-    Configuration getConfigFor(String entityId);
+    IniDocument getConfigFor(String entityId);
 }

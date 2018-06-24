@@ -91,7 +91,7 @@ class XOWLImpactAnalysisJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         SecurityService securityService = Register.getComponent(SecurityService.class);
         if (securityService == null) {
             result = ReplyServiceUnavailable.instance();

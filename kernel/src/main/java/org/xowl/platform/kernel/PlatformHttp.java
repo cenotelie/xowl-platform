@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel;
 
-import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 
 /**
  * Manages the HTTP configuration for the platform
@@ -243,7 +243,7 @@ public class PlatformHttp implements Registrable {
      * @param configurationService The configuration service
      */
     private PlatformHttp(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(PlatformHttp.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(PlatformHttp.class.getCanonicalName());
         this.httpEnabled = Boolean.parseBoolean(configuration.get("httpEnabled"));
         this.httpsEnabled = Boolean.parseBoolean(configuration.get("httpsEnabled"));
         this.httpHost = configuration.get("httpHost");

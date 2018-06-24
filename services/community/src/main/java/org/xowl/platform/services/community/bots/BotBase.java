@@ -22,7 +22,6 @@ import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyApiError;
 import fr.cenotelie.commons.utils.api.ReplyResultCollection;
 import fr.cenotelie.commons.utils.api.ReplySuccess;
-import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
 import fr.cenotelie.commons.utils.logging.DispatchLogger;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -304,15 +303,15 @@ public class BotBase implements Bot, EventConsumer {
      * @return The runnable
      */
     private Runnable getRunnable() {
-        return new SafeRunnable() {
+        return new Runnable() {
             @Override
-            public void doRun() {
-                doBotRun();
-            }
-
-            @Override
-            protected void onRunFailed(Throwable throwable) {
-                onBotStop();
+            public void run() {
+                try {
+                    doBotRun();
+                } catch (Exception exception) {
+                    Logging.get().error(exception);
+                    onBotStop();
+                }
             }
         };
     }

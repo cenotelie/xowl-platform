@@ -20,7 +20,7 @@ package org.xowl.platform.services.security.internal;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyResult;
 import fr.cenotelie.commons.utils.api.ReplyResultCollection;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -50,7 +50,7 @@ class XOWLSubordinateRealm extends XOWLInternalRealm implements RemotePlatformAc
      *
      * @param configuration The configuration for the realm
      */
-    public XOWLSubordinateRealm(Section configuration) {
+    public XOWLSubordinateRealm(IniSection configuration) {
         super(configuration);
         this.accessManager = new RemotePlatformAccessManager(configuration.get("master"), new PlatformApiDeserializerForOSGi());
     }

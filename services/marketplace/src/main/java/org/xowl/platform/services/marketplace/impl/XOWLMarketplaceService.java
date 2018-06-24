@@ -21,11 +21,11 @@ import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyResult;
 import fr.cenotelie.commons.utils.api.ReplyUtils;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.*;
 import org.xowl.platform.kernel.jobs.Job;
 import org.xowl.platform.kernel.jobs.JobExecutionService;
@@ -91,11 +91,11 @@ public class XOWLMarketplaceService implements MarketplaceService, HttpApiServic
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         if (configurationService == null)
             return Collections.unmodifiableCollection(marketplaces);
-        Configuration configuration = configurationService.getConfigFor(MarketplaceService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(MarketplaceService.class.getCanonicalName());
         if (configuration == null)
             return Collections.unmodifiableCollection(marketplaces);
         Collection<MarketplaceProvider> providers = Register.getComponents(MarketplaceProvider.class);
-        for (Section section : configuration.getSections()) {
+        for (IniSection section : configuration.getSections()) {
             String type = section.get("type");
             if (type == null || type.isEmpty())
                 continue;

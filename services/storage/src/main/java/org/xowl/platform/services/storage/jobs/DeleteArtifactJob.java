@@ -82,7 +82,7 @@ public class DeleteArtifactJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         ArtifactStorageService storage = Register.getComponent(ArtifactStorageService.class);
         if (storage == null) {
             result = ReplyServiceUnavailable.instance();

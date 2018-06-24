@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.marketplace;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -41,5 +41,5 @@ public interface MarketplaceProvider extends Registrable {
      * @param configuration The configuration section for the marketplace
      * @return The created marketplace
      */
-    Marketplace newMarketplace(String type, Section configuration);
+    Marketplace newMarketplace(String type, IniSection configuration);
 }

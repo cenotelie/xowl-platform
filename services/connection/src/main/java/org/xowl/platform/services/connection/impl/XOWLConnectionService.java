@@ -20,11 +20,11 @@ package org.xowl.platform.services.connection.impl;
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -121,8 +121,8 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
         if (configurationService == null)
             return;
-        Configuration configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
-        for (Section section : configuration.getSections()) {
+        IniDocument configuration = configurationService.getConfigFor(ConnectionService.class.getCanonicalName());
+        for (IniSection section : configuration.getSections()) {
             resolveConfigConnector(section);
         }
     }
@@ -337,7 +337,7 @@ public class XOWLConnectionService implements ConnectionService, HttpApiService,
      *
      * @param section The configuration to resolve
      */
-    private void resolveConfigConnector(Section section) {
+    private void resolveConfigConnector(IniSection section) {
         String id = section.getName();
         String name = section.get("name");
         String descriptorId = section.get("descriptor");

@@ -20,10 +20,10 @@ package org.xowl.platform.services.importation.impl;
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -97,7 +97,7 @@ public class XOWLImportationService implements ImportationService, HttpApiServic
     private void onActivated() {
         if (storage == null) {
             ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-            Configuration configuration = configurationService.getConfigFor(ImportationService.class.getCanonicalName());
+            IniDocument configuration = configurationService.getConfigFor(ImportationService.class.getCanonicalName());
             storage = PlatformUtils.resolve(configuration.get("storage"));
             reloadDocuments();
         }

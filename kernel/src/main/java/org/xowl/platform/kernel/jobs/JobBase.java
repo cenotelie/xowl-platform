@@ -20,7 +20,6 @@ package org.xowl.platform.kernel.jobs;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyUnsupported;
-import fr.cenotelie.commons.utils.concurrent.SafeRunnable;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.platform.PlatformUser;
@@ -36,7 +35,7 @@ import java.util.UUID;
  *
  * @author Laurent Wouters
  */
-public abstract class JobBase extends SafeRunnable implements Job {
+public abstract class JobBase implements Job {
     /**
      * The job's identifier
      */

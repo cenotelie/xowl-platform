@@ -68,7 +68,7 @@ public class JobRemote extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         // do nothing
     }
 

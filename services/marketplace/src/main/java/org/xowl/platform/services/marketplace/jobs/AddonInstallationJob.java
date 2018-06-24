@@ -89,7 +89,7 @@ public class AddonInstallationJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         result = installAddon(addonId);
     }
 

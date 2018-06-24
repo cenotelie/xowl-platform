@@ -21,10 +21,10 @@ import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.SSLGenerator;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.commons.utils.metrics.Metric;
@@ -100,7 +100,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      * @param configurationService The current configuration service
      */
     public KernelPlatformManagementService(ConfigurationService configurationService) {
-        Configuration configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(PlatformManagementService.class.getCanonicalName());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/kernel/platform";
         this.bundles = new ArrayList<>();
         this.product = loadProductDescriptor();
@@ -607,7 +607,7 @@ public class KernelPlatformManagementService implements PlatformManagementServic
      */
     public static boolean enforceHttpConfigFelix(PlatformHttp platformHttp) {
         File confFile = PlatformUtils.resolve("felix/conf/config.properties");
-        Configuration felixConfiguration = new Configuration();
+        IniDocument felixConfiguration = new IniDocument();
         try {
             felixConfiguration.load(confFile);
         } catch (IOException exception) {

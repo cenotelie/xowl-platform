@@ -22,11 +22,11 @@ import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyApiError;
 import fr.cenotelie.commons.utils.api.ReplyUtils;
-import fr.cenotelie.commons.utils.config.Configuration;
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -91,9 +91,9 @@ public class XOWLProfileService implements ProfileService, HttpApiService {
         if (implementation != null)
             return implementation;
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(ProfileService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(ProfileService.class.getCanonicalName());
         String identifier = configuration.get("implementation");
-        Section section = configuration.getSection(identifier);
+        IniSection section = configuration.getSection(identifier);
         for (ProfileServiceProvider provider : Register.getComponents(ProfileServiceProvider.class)) {
             implementation = provider.instantiate(identifier, section);
             if (implementation != null)

@@ -19,7 +19,7 @@ package org.xowl.platform.services.collaboration.impl;
 
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -64,7 +64,7 @@ public class XOWLCollaborationLocalService implements CollaborationLocalService 
      */
     public XOWLCollaborationLocalService() {
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(CollaborationService.class.getCanonicalName());
         this.fileManifest = PlatformUtils.resolve(configuration.get("manifest"));
         CollaborationManifest manifest = null;
         if (fileManifest.exists()) {

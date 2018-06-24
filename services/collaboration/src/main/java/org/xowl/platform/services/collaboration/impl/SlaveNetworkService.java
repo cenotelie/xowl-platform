@@ -21,7 +21,7 @@ import fr.cenotelie.commons.utils.api.Reply;
 import fr.cenotelie.commons.utils.api.ReplyNetworkError;
 import fr.cenotelie.commons.utils.api.ReplyResult;
 import fr.cenotelie.commons.utils.api.ReplyResultCollection;
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.Register;
 import org.xowl.platform.kernel.ReplyServiceUnavailable;
@@ -49,7 +49,7 @@ public class SlaveNetworkService implements CollaborationNetworkService {
      *
      * @param configuration The configuration for this service
      */
-    public SlaveNetworkService(Section configuration) {
+    public SlaveNetworkService(IniSection configuration) {
     }
 
     @Override

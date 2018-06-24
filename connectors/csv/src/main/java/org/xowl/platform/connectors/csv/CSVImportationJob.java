@@ -50,7 +50,7 @@ public class CSVImportationJob extends ImportationJob<CSVConfiguration> {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         result = CSVImporter.doImport(documentId, configuration, metadata);
     }
 }

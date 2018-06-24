@@ -17,7 +17,7 @@
 
 package org.xowl.platform.kernel.stdimpl;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.hime.redist.ASTNode;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.jobs.SecuredActionPolicyIsJobOwner;
@@ -63,14 +63,14 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
     }
 
     @Override
-    public SecurityRealm newRealm(String identifier, Section configuration) {
+    public SecurityRealm newRealm(String identifier, IniSection configuration) {
         if (KernelSecurityNosecRealm.class.getCanonicalName().equals(identifier))
             return new KernelSecurityNosecRealm();
         return null;
     }
 
     @Override
-    public SecurityPolicy newPolicy(String identifier, Section configuration) {
+    public SecurityPolicy newPolicy(String identifier, IniSection configuration) {
         if (KernelSecurityPolicyAuthenticated.class.getCanonicalName().equals(identifier))
             return new KernelSecurityPolicyAuthenticated();
         if (KernelSecurityPolicyCustom.class.getCanonicalName().equals(identifier))
@@ -79,7 +79,7 @@ public class KernelSecurityProvider implements SecuredActionPolicyProvider, Secu
     }
 
     @Override
-    public SecurityTokenService newService(String identifier, Section configuration) {
+    public SecurityTokenService newService(String identifier, IniSection configuration) {
         if (KernelSecurityTokenService.class.getCanonicalName().equals(identifier))
             return new KernelSecurityTokenService(configuration);
         return null;

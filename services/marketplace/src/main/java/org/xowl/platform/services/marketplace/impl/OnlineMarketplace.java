@@ -17,10 +17,10 @@
 
 package org.xowl.platform.services.marketplace.impl;
 
-import fr.cenotelie.commons.utils.config.Section;
 import fr.cenotelie.commons.utils.http.HttpConnection;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import fr.cenotelie.commons.utils.json.Json;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.hime.redist.ASTNode;
@@ -51,7 +51,7 @@ class OnlineMarketplace extends StaticMarketplace {
      *
      * @param configuration The configuration for this marketplace
      */
-    public OnlineMarketplace(Section configuration) {
+    public OnlineMarketplace(IniSection configuration) {
         String url = configuration.get("url");
         this.location = url.endsWith("/") ? url : (url + "/");
         this.connection = new HttpConnection(

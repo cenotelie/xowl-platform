@@ -71,7 +71,7 @@ public class CollaborationSpawnJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         CollaborationNetworkService networkService = Register.getComponent(CollaborationNetworkService.class);
         if (networkService == null) {
             result = ReplyServiceUnavailable.instance();

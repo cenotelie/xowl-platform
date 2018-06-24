@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.community.impl;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.community.profiles.ProfileService;
 import org.xowl.platform.services.community.profiles.ProfileServiceProvider;
@@ -38,7 +38,7 @@ public class XOWLProfileServiceProvider implements ProfileServiceProvider {
     }
 
     @Override
-    public ProfileService instantiate(String identifier, Section configuration) {
+    public ProfileService instantiate(String identifier, IniSection configuration) {
         if (XOWLProfileServiceLocalImpl.class.getCanonicalName().equals(identifier))
             return new XOWLProfileServiceLocalImpl(configuration);
         return null;

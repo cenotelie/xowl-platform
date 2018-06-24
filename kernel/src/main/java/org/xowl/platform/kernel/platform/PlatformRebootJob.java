@@ -61,7 +61,7 @@ public class PlatformRebootJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         PlatformManagementService managementService = Register.getComponent(PlatformManagementService.class);
         if (managementService == null) {
             result = ReplyServiceUnavailable.instance();

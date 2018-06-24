@@ -20,10 +20,10 @@ package org.xowl.platform.services.storage.impl;
 import fr.cenotelie.commons.utils.IOUtils;
 import fr.cenotelie.commons.utils.TextUtils;
 import fr.cenotelie.commons.utils.api.*;
-import fr.cenotelie.commons.utils.config.Configuration;
 import fr.cenotelie.commons.utils.http.HttpConstants;
 import fr.cenotelie.commons.utils.http.HttpResponse;
 import fr.cenotelie.commons.utils.http.URIUtils;
+import fr.cenotelie.commons.utils.ini.IniDocument;
 import fr.cenotelie.commons.utils.logging.BufferedLogger;
 import fr.cenotelie.commons.utils.logging.Logging;
 import fr.cenotelie.commons.utils.metrics.Metric;
@@ -108,7 +108,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      */
     public XOWLStorageService() {
         ConfigurationService configurationService = Register.getComponent(ConfigurationService.class);
-        Configuration configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
+        IniDocument configuration = configurationService.getConfigFor(StorageService.class.getCanonicalName());
         this.apiUri = PlatformHttp.getUriPrefixApi() + "/services/storage";
         this.server = resolveServer(configuration);
         this.storeLive = new XOWLFederationStore(configuration.get("databases", STORE_ID_LIVE)) {
@@ -151,7 +151,7 @@ public class XOWLStorageService implements StorageService, HttpApiService, Manag
      *
      * @return The backing server
      */
-    private XOWLServer resolveServer(Configuration configuration) {
+    private XOWLServer resolveServer(IniDocument configuration) {
         String backendType = configuration.get("backend");
         if (backendType.equalsIgnoreCase("remote")) {
             String endpoint = configuration.get("remote", "endpoint");

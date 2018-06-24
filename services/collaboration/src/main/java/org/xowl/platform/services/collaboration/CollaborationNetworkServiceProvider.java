@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.Registrable;
 
 /**
@@ -33,5 +33,5 @@ public interface CollaborationNetworkServiceProvider extends Registrable {
      * @param configuration The configuration for the service
      * @return The instance, or null if it cannot be created
      */
-    CollaborationNetworkService instantiate(String identifier, Section configuration);
+    CollaborationNetworkService instantiate(String identifier, IniSection configuration);
 }

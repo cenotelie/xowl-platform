@@ -80,7 +80,7 @@ public class PullArtifactJob extends JobBase {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
         result = ConnectorUtils.pullArtifactFrom(connectorId);
     }
 }

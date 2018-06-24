@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.security.internal;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.kernel.security.SecurityRealm;
 import org.xowl.platform.kernel.security.SecurityRealmProvider;
@@ -39,7 +39,7 @@ class XOWLInternalSecurityProvider implements SecurityRealmProvider {
     }
 
     @Override
-    public SecurityRealm newRealm(String identifier, Section configuration) {
+    public SecurityRealm newRealm(String identifier, IniSection configuration) {
         if (XOWLInternalRealm.class.getCanonicalName().equals(identifier))
             return new XOWLInternalRealm(configuration);
         if (XOWLSubordinateRealm.class.getCanonicalName().equals(identifier))

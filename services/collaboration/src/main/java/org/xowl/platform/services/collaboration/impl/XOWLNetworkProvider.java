@@ -17,7 +17,7 @@
 
 package org.xowl.platform.services.collaboration.impl;
 
-import fr.cenotelie.commons.utils.config.Section;
+import fr.cenotelie.commons.utils.ini.IniSection;
 import org.xowl.platform.kernel.PlatformUtils;
 import org.xowl.platform.services.collaboration.CollaborationNetworkService;
 import org.xowl.platform.services.collaboration.CollaborationNetworkServiceProvider;
@@ -39,7 +39,7 @@ public class XOWLNetworkProvider implements CollaborationNetworkServiceProvider 
     }
 
     @Override
-    public CollaborationNetworkService instantiate(String identifier, Section configuration) {
+    public CollaborationNetworkService instantiate(String identifier, IniSection configuration) {
         if (StandaloneNetworkService.class.getCanonicalName().equals(identifier))
             return new StandaloneNetworkService();
         if (MasterNetworkService.class.getCanonicalName().equals(identifier))

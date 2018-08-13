@@ -8,6 +8,9 @@ VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -f "$ROO
 
 rm -rf "$1/xowl-distribution"
 tar -C "$1" -xf "$ROOT/distribution/target/xowl-distribution-$VERSION.tar.gz"
+if [ "$#" -eq 2 ]; then
+    find $2 -iname "*SNAPSHOT.jar" -exec cp "{}" "$1/xowl-distribution/felix/bundle" \;
+fi
 # first run to enforce the HTTP configuration
 cd "$1/xowl-distribution"
 java "-Dgosh.args=--noi" -jar "$1/xowl-distribution/felix/bin/felix.jar" -b "$1/xowl-distribution/felix/bundle" || true

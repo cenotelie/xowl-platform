@@ -160,32 +160,32 @@ var setActions = function(conversation, cell){
 	    var cb = configureButton();
 	    cell.append(cb);
 	    cb.click(function(){
-    		$(".modal-title").text("Configure Conversation");
+    	$(".modal-title").text("Configure Conversation");
 		$("#e_topic").val(conversation.topic);
 		$("#e_keywords").val(conversation.keywords.toString());
 		$("#e_abstract").val(conversation.summary);
 		$("#e_visibility").val(conversation.status);
-    		var $participants = $('#e_participants');
-    		var $non_participants = $('#e_non_participants');
-    		$participants.empty();
-    		$non_participants.empty();
-    		$.each(users.filter(isNotCurrentUser), function(i, item){
-    		    if (isParticipant(item.iri, conversation)) {
-    			$participants.append($('<option>', {
-    			    value: item.iri,
-    			    text: item.firstName + " " + item.lastName
-    			}));
-    		    } else {
-    			$non_participants.append($('<option>', {
-    			    value: item.iri,
-    			    text: item.firstName + " " + item.lastName
-    			}));
-    		    }
-    		});
+    	var $participants = $('#e_participants');
+    	var $non_participants = $('#e_non_participants');
+    	$participants.empty();
+    	$non_participants.empty();
+    	$.each(users.filter(isNotCurrentUser), function(i, item){
+    	    if (isParticipant(item.iri, conversation)) {
+    		$participants.append($('<option>', {
+    		    value: item.iri,
+    		    text: item.firstName + " " + item.lastName
+    		}));
+    	    } else {
+    		$non_participants.append($('<option>', {
+    		    value: item.iri,
+    		    text: item.firstName + " " + item.lastName
+    		}));
+    	    }
+    	});
 		$("#conversation-save").click(function(){
 		    modifyConversation();
 		});
-    		$("#conversation-edition").modal('show');
+    	$("#conversation-edition").modal('show');
 	    });
 	} else {
 	    cell.append(archiveButton()).append(removeButton());
@@ -269,7 +269,7 @@ var conversation2row = function(conv)
 	$row.css("font-weight", "200");
     }
     $conv_table.append($row);
-}
+};
 
 var addConversation = function() {
     var topic = $("#e_topic").val();
@@ -324,6 +324,6 @@ var openCreationDialog = function() {
     	});
 
      $.each(currentUserConversations(), function(i, item){
- 	conversation2row(item);
+ 	    conversation2row(item);
      });
  });

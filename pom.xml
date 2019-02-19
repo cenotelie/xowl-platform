@@ -38,7 +38,7 @@
         </snapshotRepository>
     </distributionManagement>
     <properties>
-        <xowlInfraVersion>2.1.0-SNAPSHOT</xowlInfraVersion>
+        <xowlInfraVersion>2.1.0</xowlInfraVersion>
     </properties>
     <modules>
         <module>kernel</module>

@@ -284,9 +284,9 @@ function onClickOk() {
 			identifier: "anonymous",
 			name: "Anonymous Configuration",
 			importer: importerId,
-			separator: document.getElementById("document-separator").value,
-			textMarker: document.getElementById("document-text-marker").value,
-			skipFirstRow: "\"" + document.getElementById("document-has-title-row").checked + "\"",
+			separator: document.getElementById("input-separator").value,
+			textMarker: document.getElementById("input-text-marker").value,
+			skipFirstRow: "\"" + document.getElementById("input-has-title-row").checked + "\"",
 			mapping: {
 				columns: MAPPING
 			}

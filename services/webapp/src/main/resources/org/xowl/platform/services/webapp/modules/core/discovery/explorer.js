@@ -44,7 +44,7 @@ function ensureData(identifier, continuation) {
 	REQUESTED.push(identifier);
 	xowl.sparql(function (status, ct, content) {
 		if (onOperationEnded(status, content)) {
-			var data = parseNQuads(content);
+			var data = JSON.parse(content);
 			var names = Object.getOwnPropertyNames(data);
 			var target = null;
 			for (var p = 0; p != names.length; p++) {

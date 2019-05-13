@@ -115,7 +115,7 @@ function onTypeChange() {
 }
 
 function renderElements(data) {
-	var entities = parseNQuads(data);
+	var entities = JSON.parse(data);
 	var names = Object.getOwnPropertyNames(entities);
 	var select = document.getElementById("root-element");
 	while (select.hasChildNodes()) {

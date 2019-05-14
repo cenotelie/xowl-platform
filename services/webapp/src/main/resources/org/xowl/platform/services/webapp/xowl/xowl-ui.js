@@ -977,7 +977,7 @@ function renderRdfNode(value) {
 		var dom = document.createElement("span");
 		dom.classList.add("rdfLiteral");
 		dom.appendChild(span1);
-		if (value.datatype !== null) {
+		if (value.hasOwnProperty("datatype")) {
 			dom.appendChild(document.createTextNode("^^<"));
 			var link = document.createElement("a");
 			link.appendChild(document.createTextNode(getShortURI(value.datatype)));

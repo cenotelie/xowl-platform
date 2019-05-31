@@ -55,8 +55,8 @@ function renderMetadataRight(metadata) {
 }
 
 function renderDiff(added, removed) {
-	ARTIFACT_LEFT = added[0].entities !== undefined ? added[0].entities : [];
-	ARTIFACT_RIGHT = removed[0].entities !== undefined ? removed[0].entities : [];
+	ARTIFACT_LEFT = added.length > 0 && added[0].entities !== undefined ? added[0].entities : [];
+	ARTIFACT_RIGHT = removed.length > 0 && removed[0].entities !== undefined ? removed[0].entities : [];
 	var table = document.getElementById("content");
 	for (var i = 0; i != ARTIFACT_LEFT.length; i++) {
 		var entity = ARTIFACT_LEFT[i]; // the current entity on the left

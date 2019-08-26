@@ -1,5 +1,7 @@
 # xOWL Collaboration Platform #
 
+[![Build Status](https://dev.azure.com/lwouters/cenotelie/_apis/build/status/cenotelie.xowl-platform?branchName=master)](https://dev.azure.com/lwouters/cenotelie/_build/latest?definitionId=4&branchName=master)
+
 This is the xOWL Collaboration Platform, a set of components for the construction of collaboration platform based on a semantic principles.
 The xOWL Collaboration Platform enables the federation of heterogeneous datasets into a semantically coherent common representation so that business analyses can be performed.
 Typical applications to system engineering include the federation of Requirements, Functional Architectures, System Architectures, Safety Analyses and more.

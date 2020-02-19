@@ -42,7 +42,8 @@
         </repository>
     </distributionManagement>
     <properties>
-        <xowlInfraVersion>2.1.0</xowlInfraVersion>
+        <xowlInfraVersion>2.3.0</xowlInfraVersion>
+        <cenotelieCommons>2.2.0</cenotelieCommons>
     </properties>
     <modules>
         <module>kernel</module>
@@ -117,6 +118,10 @@
                 </executions>
                 <configuration>
                     <keyname>contact@cenotelie.fr</keyname>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
                 </configuration>
             </plugin>
             <plugin>

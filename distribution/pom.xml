@@ -69,25 +69,25 @@
         <dependency>
             <groupId>fr.cenotelie.hime</groupId>
             <artifactId>hime-redist</artifactId>
-            <version>3.3.1</version>
+            <version>3.4.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>fr.cenotelie.commons</groupId>
             <artifactId>commons-utils</artifactId>
-            <version>2.1.0</version>
+            <version>${cenotelieCommons}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>fr.cenotelie.commons</groupId>
             <artifactId>commons-jsonrpc</artifactId>
-            <version>2.1.0</version>
+            <version>${cenotelieCommons}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>fr.cenotelie.commons</groupId>
             <artifactId>commons-lsp</artifactId>
-            <version>2.1.0</version>
+            <version>${cenotelieCommons}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

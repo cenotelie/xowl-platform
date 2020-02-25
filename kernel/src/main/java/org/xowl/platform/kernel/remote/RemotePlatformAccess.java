@@ -1381,7 +1381,7 @@ public class RemotePlatformAccess extends HttpConnection {
      */
     public Reply getArtifactsForBase(String base) {
         return doRequest(
-                "/services/storage/artifacts?=base" + URIUtils.encodeComponent(base),
+                "/services/storage/artifacts?base=" + URIUtils.encodeComponent(base),
                 HttpConstants.METHOD_GET);
     }
 
@@ -1393,7 +1393,7 @@ public class RemotePlatformAccess extends HttpConnection {
      */
     public Reply getArtifactsForArchetype(String archetype) {
         return doRequest(
-                "/services/storage/artifacts?=archetype" + URIUtils.encodeComponent(archetype),
+                "/services/storage/artifacts?archetype=" + URIUtils.encodeComponent(archetype),
                 HttpConstants.METHOD_GET);
     }
 
